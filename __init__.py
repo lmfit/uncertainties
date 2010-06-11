@@ -131,10 +131,10 @@ highest probability of their underlying distribution.  The nominal
 value of an expression is the expression evaluated at the nominal
 values of its variables.
 
-Good choices of nominal values for random variables (ufloat objects)
-are thus their median, the location of highest probability, or their
-average value: the nominal value of expressions should then be well
-inside their region of highest probability.
+Good choices of nominal values for random variables (objects created
+by ufloat) are thus their median, the location of highest probability,
+or their average value: the nominal value of expressions should then
+be well inside their region of highest probability.
 
 - When manipulating ensembles of numbers, some of which contain
 uncertainties, it can be useful to access the nominal value and
