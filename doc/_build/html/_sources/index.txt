@@ -93,11 +93,16 @@ You can also simply *copy the* :file:`uncertainties/` *directory* to a
 location that Python can import from (directory in which scripts using
 uncertainties are run, etc.).
 
-User Guide
-==========
+Available documentation
+=======================
 
-A more detailed presentation of the features of the uncertainties
-package can be found in the :doc:`user_guide`.
+In addition to this introduction, details on the features of the
+uncertainties package can be found in the :doc:`user_guide`.
+
+NumPy support is described in :doc:`numpy_guide`.
+
+Technical details about the mathematics behind this package are given
+in the :doc:`tech_guide`.
 
 .. index:: license, support
 

@@ -1,7 +1,9 @@
-.. index:: unumpy
+.. index: NumPy support
 
 Uncertainties in NumPy arrays
 *****************************
+
+.. index:: unumpy
 
 The unumpy package
 ==================

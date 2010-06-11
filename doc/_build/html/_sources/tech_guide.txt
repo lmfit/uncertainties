@@ -1,3 +1,5 @@
+.. index:: technical details
+
 Technical Guide
 ===============
 
@@ -7,33 +9,38 @@ Technical Guide
 Mathematical definition of numbers with uncertainties
 -----------------------------------------------------
 
-.. index:: nominal value; definition, correlations; definition
+.. index:: number with uncertainty; definition
 
-Mathematically, numbers with uncertainties are defined in this package
-as probability distributions that are described here by two numbers: a
-*nominal value* and an *uncertainty*.  Thus, both variables (Variable
-objects) and the result of mathematical operations (AffineScalarFunc
-objects) contain these two values (respectively in their nominal_value
-attribute and through their std_dev() method).
+Mathematically, **numbers with uncertainties** are, in this package,
+probability distributions.  These probabilities are reduced to two
+numbers: a nominal value and an uncertainty.
 
-Uncertainties are simply defined here as the standard deviation of the
+Thus, both variables (:class:`Variable` objects) and the result of
+mathematical operations (:class:`AffineScalarFunc` objects) contain
+these two values (respectively in their :attr:`nominal_value`
+attribute and through their :meth:`std_dev` method).
+
+.. index:: uncertainty; definition
+
+**Uncertainties** are simply defined here as the standard deviation of the
 underlying probability distribution.
 
-Nominal values are normally contained well inside the region of
+.. index:: nominal value; definition
+
+**Nominal values** are normally contained well inside the region of
 highest probability of their underlying distribution.  The nominal
 value of an expression is the expression evaluated at the nominal
 values of its variables.
 
-Good choices of nominal values for random variables (ufloat objects)
-are thus their median, the location of highest probability, or their
-average value: the nominal value of expressions should then be well
-inside their region of highest probability.
+Good choices of nominal values for random variables (objects created
+by :func:`ufloat`) are thus their median, the location of highest
+probability, or their average value: the nominal value of expressions
+should then be well inside their region of highest probability, in the
+:ref:`linear approximation method <linear_method>` used by the
+uncertainties package.
 
-
-
-
-- Probability distributions (random variables and calculation results)
-are printed as:
+Probability distributions (random variables and calculation results)
+are printed as::
 
   nominal value +/- standard deviation
 
@@ -42,12 +49,12 @@ fact that the nominal value is normally inside the region of high
 probability density), or that the probability distribution of the
 result is symmetrical (this is rarely strictly the case).
 
+.. _linear_method:
 
 Linear error propagation theory
 -------------------------------
 
-
-- Linear approximations of functions (around the nominal values) are
+Linear approximations of functions (around the nominal values) are
 used for the calculation of the standard deviation of mathematical
 expressions with this package.
 
@@ -55,16 +62,16 @@ The calculated standard deviations and nominal values are thus
 meaningful approximations as long as the functions involved have
 precise linear expansions in the region where the probability
 distribution of their variables is the largest.  It is therefore
-important that uncertainties be small.  Mathematically, this means
+important that uncertainties be "small".  Mathematically, this means
 that the linear term of functions around the nominal values of their
 variables should be much larger than the remaining higher-order terms
-(over the region of significant probability).
+over the region of significant probability.
 
-For instance, sin(0+/-0.01) yields a meaningful standard deviation
-since it is quite linear over 0+/-0.01.  However, cos(0+/-0.01), which
-is parabolic around 0, yields an approximate standard deviation of 0,
-which might not be precise enough for all applications.
-
+For instance, ``sin(0+/-0.01)`` yields a meaningful standard deviation
+since it is quite linear over 0±0.01.  However, ``cos(0+/-0.01)``,
+yields an approximate standard deviation of 0 (because the cosine is
+not well approximated by a line around 0), which might not be precise
+enough for all applications.
 
 
 Comparison operators

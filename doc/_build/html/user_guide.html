@@ -62,7 +62,7 @@
 <li><a class="reference internal" href="#simple-math">Simple math</a></li>
 <li><a class="reference internal" href="#access-to-the-uncertainty-and-the-nominal-value">Access to the uncertainty and the nominal value</a></li>
 <li><a class="reference internal" href="#mathematical-operations">Mathematical operations</a></li>
-<li><a class="reference internal" href="#comparison-operations">Comparison operations</a></li>
+<li><a class="reference internal" href="#comparison-operators">Comparison operators</a></li>
 <li><a class="reference internal" href="#arrays-of-numbers-with-uncertainties">Arrays of numbers with uncertainties</a></li>
 <li><a class="reference internal" href="#covariance-matrix">Covariance matrix</a></li>
 <li><a class="reference internal" href="#generalization-of-functions-to-numbers-with-uncertainties">Generalization of functions to numbers with uncertainties</a></li>
@@ -100,14 +100,14 @@
           <div class="body">
             
   <div class="section" id="user-guide">
-<h1>User guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
+<span id="index-0"></span><h1>User guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
 <p>Simple mathematical operations involving numbers with uncertainties
 only require a simple import:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">uncertainties</span> <span class="kn">import</span> <span class="n">ufloat</span>
 </pre></div>
 </div>
 <div class="section" id="creating-and-handling-numbers-with-uncertainties">
-<span id="index-0"></span><h2>Creating and handling numbers with uncertainties<a class="headerlink" href="#creating-and-handling-numbers-with-uncertainties" title="Permalink to this headline">¶</a></h2>
+<span id="index-1"></span><h2>Creating and handling numbers with uncertainties<a class="headerlink" href="#creating-and-handling-numbers-with-uncertainties" title="Permalink to this headline">¶</a></h2>
 <p>Numbers with uncertainties can be input either numerically, or through
 one of many string representations:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">((</span><span class="mf">0.20</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">))</span>  <span class="c"># x = 0.20+/-0.01</span>
@@ -127,7 +127,7 @@ one of many string representations:</p>
 </div>
 </div>
 <div class="section" id="access-to-the-uncertainty-and-the-nominal-value">
-<span id="index-1"></span><h2>Access to the uncertainty and the nominal value<a class="headerlink" href="#access-to-the-uncertainty-and-the-nominal-value" title="Permalink to this headline">¶</a></h2>
+<span id="index-2"></span><h2>Access to the uncertainty and the nominal value<a class="headerlink" href="#access-to-the-uncertainty-and-the-nominal-value" title="Permalink to this headline">¶</a></h2>
 <p>The nominal value and the uncertainty (standard deviation) on the
 calculated square can also be accessed independently:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">square</span>
@@ -156,7 +156,7 @@ directly obtained.  This is made easier when the variables are tagged:</p>
 sum of these independent uncertainties.</p>
 </div>
 <div class="section" id="mathematical-operations">
-<span id="index-2"></span><h2>Mathematical operations<a class="headerlink" href="#mathematical-operations" title="Permalink to this headline">¶</a></h2>
+<span id="index-3"></span><h2>Mathematical operations<a class="headerlink" href="#mathematical-operations" title="Permalink to this headline">¶</a></h2>
 <p>Besides being able to apply basic mathematical operations to numbers
 with uncertainty, this package provides generalizations of the
 functions from the standard <tt class="xref py py-mod docutils literal"><span class="pre">math</span></tt> module.  These operations are
@@ -167,9 +167,9 @@ found in the <tt class="xref py py-mod docutils literal"><span class="pre">uncer
 </pre></div>
 </div>
 </div>
-<div class="section" id="comparison-operations">
-<span id="index-3"></span><h2>Comparison operations<a class="headerlink" href="#comparison-operations" title="Permalink to this headline">¶</a></h2>
-<p>Boolean operators behave in a natural way:</p>
+<div class="section" id="comparison-operators">
+<span id="index-4"></span><h2>Comparison operators<a class="headerlink" href="#comparison-operators" title="Permalink to this headline">¶</a></h2>
+<p>Comparison operators behave in a natural way:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">x</span>
 <span class="go">0.2+/-0.01</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="mf">0.0001</span>
@@ -202,7 +202,7 @@ from <tt class="docutils literal"><span class="pre">z</span></tt>.</p>
 numbers with uncertainties can be found in the <a class="reference internal" href="tech_guide.html"><em>Technical Guide</em></a>.</p>
 </div>
 <div class="section" id="arrays-of-numbers-with-uncertainties">
-<span id="simple-array-use"></span><span id="index-4"></span><h2>Arrays of numbers with uncertainties<a class="headerlink" href="#arrays-of-numbers-with-uncertainties" title="Permalink to this headline">¶</a></h2>
+<span id="simple-array-use"></span><span id="index-5"></span><h2>Arrays of numbers with uncertainties<a class="headerlink" href="#arrays-of-numbers-with-uncertainties" title="Permalink to this headline">¶</a></h2>
 <p>It is possible to put numbers with uncertainties in <a class="reference external" href="http://numpy.scipy.org/">NumPy</a> arrays and
 matrices:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="mi">2</span><span class="o">*</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ufloat</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)),</span> <span class="n">ufloat</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">))])</span>
@@ -213,7 +213,7 @@ matrices:</p>
 performed through the dedicated <tt class="xref py py-mod docutils literal"><span class="pre">uncertainties.unumpy</span></tt> module.</p>
 </div>
 <div class="section" id="covariance-matrix">
-<span id="index-5"></span><h2>Covariance matrix<a class="headerlink" href="#covariance-matrix" title="Permalink to this headline">¶</a></h2>
+<span id="index-6"></span><h2>Covariance matrix<a class="headerlink" href="#covariance-matrix" title="Permalink to this headline">¶</a></h2>
 <p>The covariance matrix between various variables or calculated
 quantities can be simply obtained:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cov_matrix</span> <span class="o">=</span> <span class="n">uncertainties</span><span class="o">.</span><span class="n">covariance_matrix</span><span class="p">([</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">sum_value</span><span class="p">])</span>
@@ -244,7 +244,7 @@ correlations:</p>
 rounding errors).</p>
 </div>
 <div class="section" id="generalization-of-functions-to-numbers-with-uncertainties">
-<span id="index-6"></span><h2>Generalization of functions to numbers with uncertainties<a class="headerlink" href="#generalization-of-functions-to-numbers-with-uncertainties" title="Permalink to this headline">¶</a></h2>
+<span id="index-7"></span><h2>Generalization of functions to numbers with uncertainties<a class="headerlink" href="#generalization-of-functions-to-numbers-with-uncertainties" title="Permalink to this headline">¶</a></h2>
 <p>This package allows calculations that are performed through non-Python
 code (Fortran, C, etc.) to handle numbers with uncertainties instead
 of floats.  Similarly, functions that do not have a simple analytical
@@ -262,7 +262,7 @@ uncertainties.</p>
 </div>
 <div class="section" id="miscellaneous-utilities">
 <h2>Miscellaneous utilities<a class="headerlink" href="#miscellaneous-utilities" title="Permalink to this headline">¶</a></h2>
-<p id="index-7">It is sometimes useful to modify the error on certain parameters so as
+<p id="index-8">It is sometimes useful to modify the error on certain parameters so as
 to study its impact on a final result.  With this package, the
 <strong>uncertainty of a variable can be changed</strong> on the fly:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sum_value</span>
@@ -277,7 +277,7 @@ to study its impact on a final result.  With this package, the
 <p>The relevant concept is that <tt class="docutils literal"><span class="pre">sum_value</span></tt> does depend on the
 variables <tt class="docutils literal"><span class="pre">u</span></tt> and <tt class="docutils literal"><span class="pre">v</span></tt>: the uncertainties package keeps track of
 this fact.</p>
-<p id="index-8">When manipulating ensembles of numbers, <em>some</em> of which contain
+<p id="index-9">When manipulating ensembles of numbers, <em>some</em> of which contain
 uncertainties while others are pure real numbers, it can be useful to
 access the <strong>nominal value and uncertainty of all numbers in a uniform
 manner</strong>.  This is what the <tt class="xref py py-func docutils literal"><span class="pre">nominal_value()</span></tt> and
@@ -292,7 +292,7 @@ manner</strong>.  This is what the <tt class="xref py py-func docutils literal">
 <span class="go">0.0</span>
 </pre></div>
 </div>
-<p id="index-9">Since the application of error propagation theory involves the
+<p id="index-10">Since the application of error propagation theory involves the
 calculation of <strong>derivatives</strong>, this package gives access to the value of
 the derivative of an expression, with respect to any of its variables:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sum_value</span><span class="o">.</span><span class="n">derivatives</span><span class="p">[</span><span class="n">u</span><span class="p">]</span>
