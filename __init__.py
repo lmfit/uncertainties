@@ -170,9 +170,10 @@ variables should be much larger than the remaining higher-order terms
 over the region of significant probability.
 
 For instance, sin(0+/-0.01) yields a meaningful standard deviation
-since it is quite linear over 0+/-0.01.  However, cos(0+/-0.01), which
-is parabolic around 0, yields an approximate standard deviation of 0,
-which might not be precise enough for all applications.
+since it is quite linear over 0+/-0.01.  However, cos(0+/-0.01) yields
+an approximate standard deviation of 0 (because the cosine is not well
+approximated by a line around 0), which might not be precise enough
+for all applications.
 
 - Logical operations (>, ==, etc.) on numbers with uncertainties have
 a pragmatic semantics, in this module: numbers with uncertainties can
