@@ -1,0 +1,216 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Technical Guide &mdash; uncertainties Python package v1.5.4.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.5.4.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="uncertainties Python package v1.5.4.1 documentation" href="index.html" />
+    <link rel="prev" title="Uncertainties in NumPy arrays" href="numpy_guide.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><img src="_static/logo.jpg" border="0" alt="uncertainties"/></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="numpy_guide.html" title="Uncertainties in NumPy arrays"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+       <li><a href="user_guide.html">documentation </a> &raquo;</li>
+ 
+      </ul>
+    </div>
+
+
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference internal" href="#">Technical Guide</a><ul>
+<li><a class="reference internal" href="#mathematical-definition-of-numbers-with-uncertainties">Mathematical definition of numbers with uncertainties</a></li>
+<li><a class="reference internal" href="#linear-error-propagation-theory">Linear error propagation theory</a></li>
+<li><a class="reference internal" href="#comparison-operators">Comparison operators</a></li>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="numpy_guide.html"
+                                  title="previous chapter">Uncertainties in NumPy arrays</a></p>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Search the documentation.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="technical-guide">
+<h1>Technical Guide<a class="headerlink" href="#technical-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="mathematical-definition-of-numbers-with-uncertainties">
+<h2>Mathematical definition of numbers with uncertainties<a class="headerlink" href="#mathematical-definition-of-numbers-with-uncertainties" title="Permalink to this headline">¶</a></h2>
+<p id="index-0">Mathematically, numbers with uncertainties are defined in this package
+as probability distributions that are described here by two numbers: a
+<em>nominal value</em> and an <em>uncertainty</em>.  Thus, both variables (Variable
+objects) and the result of mathematical operations (AffineScalarFunc
+objects) contain these two values (respectively in their nominal_value
+attribute and through their std_dev() method).</p>
+<p>Uncertainties are simply defined here as the standard deviation of the
+underlying probability distribution.</p>
+<p>Nominal values are normally contained well inside the region of
+highest probability of their underlying distribution.  The nominal
+value of an expression is the expression evaluated at the nominal
+values of its variables.</p>
+<p>Good choices of nominal values for random variables (ufloat objects)
+are thus their median, the location of highest probability, or their
+average value: the nominal value of expressions should then be well
+inside their region of highest probability.</p>
+<ul class="simple">
+<li>Probability distributions (random variables and calculation results)</li>
+</ul>
+<p>are printed as:</p>
+<blockquote>
+nominal value +/- standard deviation</blockquote>
+<p>but this does not imply any property on the nominal value (beyond the
+fact that the nominal value is normally inside the region of high
+probability density), or that the probability distribution of the
+result is symmetrical (this is rarely strictly the case).</p>
+</div>
+<div class="section" id="linear-error-propagation-theory">
+<h2>Linear error propagation theory<a class="headerlink" href="#linear-error-propagation-theory" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Linear approximations of functions (around the nominal values) are</li>
+</ul>
+<p>used for the calculation of the standard deviation of mathematical
+expressions with this package.</p>
+<p>The calculated standard deviations and nominal values are thus
+meaningful approximations as long as the functions involved have
+precise linear expansions in the region where the probability
+distribution of their variables is the largest.  It is therefore
+important that uncertainties be small.  Mathematically, this means
+that the linear term of functions around the nominal values of their
+variables should be much larger than the remaining higher-order terms
+(over the region of significant probability).</p>
+<p>For instance, sin(0+/-0.01) yields a meaningful standard deviation
+since it is quite linear over 0+/-0.01.  However, cos(0+/-0.01), which
+is parabolic around 0, yields an approximate standard deviation of 0,
+which might not be precise enough for all applications.</p>
+</div>
+<div class="section" id="comparison-operators">
+<h2>Comparison operators<a class="headerlink" href="#comparison-operators" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Logical operations (&gt;, ==, etc.) on numbers with uncertainties have</li>
+</ul>
+<p>a pragmatic semantics, in this module: numbers with uncertainties can
+be used wherever Python numbers are used, most of the time with a
+result identical to the one that would be obtained with their nominal
+value only.  However, since the objects defined in this module
+represent probability distributions and not pure numbers, logical
+operations are defined in a specific way.</p>
+<p>The result of a logical operation (&#8220;==&#8221;, &#8220;&gt;&#8221;, etc.) is defined so as
+to be essentially consistent with the requirement that uncertainties
+be small: the value of a logical operation is True only if the
+operation yields True for all infinitesimal variations of its random
+variables, except, possibly, for an infinitely small number of cases.</p>
+<p>Example:</p>
+<blockquote>
+&#8220;x = 3.14; y = 3.14&#8221; is such that x == y</blockquote>
+<p>but</p>
+<blockquote>
+x = ufloat((3.14, 0.01))
+y = ufloat((3.14, 0.01))</blockquote>
+<p>is not such that x == y, since x and y are independent random
+variables that almost never give the same value.  However, x == x
+still holds.</p>
+<p>The boolean value (bool(x), &#8220;if x...&#8221;) of a number with uncertainty x
+is the result of x != 0.</p>
+</div>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>The main function provided by this module is ufloat, which creates</li>
+</ul>
+<p>numbers with uncertainties (Variable objects).  Variable objects can
+be used as if they were regular Python numbers.  The main attributes
+and methods of Variable objects are defined in the documentation of
+the Variable class.</p>
+<ul class="simple">
+<li>Mathematical expressions involving numbers with uncertainties</li>
+</ul>
+<p>(Variable objects) generally return AffineScalarFunc objects, which
+also print as a value with uncertainty.  Their most useful attributes
+and methods are described in the documentation for AffineScalarFunc.
+Note that Variable objects are also AffineScalarFunc objects: testing
+whether a value carries an uncertainty handled by this module should
+be done with insinstance(my_value, AffineScalarFunc).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="numpy_guide.html" title="Uncertainties in NumPy arrays"
+             >previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+       <li><a href="user_guide.html">documentation </a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, Eric O. LEBIGOT (EOL).
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0b2.
+    </div>
+  </body>
+</html>

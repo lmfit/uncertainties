@@ -1,0 +1,237 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Uncertainties in NumPy arrays &mdash; uncertainties Python package v1.5.4.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.5.4.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="uncertainties Python package v1.5.4.1 documentation" href="index.html" />
+    <link rel="next" title="Technical Guide" href="tech_guide.html" />
+    <link rel="prev" title="User guide" href="user_guide.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><img src="_static/logo.jpg" border="0" alt="uncertainties"/></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tech_guide.html" title="Technical Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="user_guide.html" title="User guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+       <li><a href="user_guide.html">documentation </a> &raquo;</li>
+ 
+      </ul>
+    </div>
+
+
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference internal" href="#">Uncertainties in NumPy arrays</a><ul>
+<li><a class="reference internal" href="#the-unumpy-package">The unumpy package</a><ul>
+<li><a class="reference internal" href="#creation-and-manipulation-of-arrays-and-matrices">Creation and manipulation of arrays and matrices</a><ul>
+<li><a class="reference internal" href="#arrays">Arrays</a></li>
+<li><a class="reference internal" href="#matrices">Matrices</a></li>
+<li><a class="reference internal" href="#uncertainties-and-nominal-values">Uncertainties and nominal values</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mathematical-functions">Mathematical functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-unumpy-ulinalg-module">The unumpy.ulinalg module</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="user_guide.html"
+                                  title="previous chapter">User guide</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="tech_guide.html"
+                                  title="next chapter">Technical Guide</a></p>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Search the documentation.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="uncertainties-in-numpy-arrays">
+<span id="index-0"></span><h1>Uncertainties in NumPy arrays<a class="headerlink" href="#uncertainties-in-numpy-arrays" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="the-unumpy-package">
+<h2>The unumpy package<a class="headerlink" href="#the-unumpy-package" title="Permalink to this headline">¶</a></h2>
+<p>This package contains:</p>
+<p>1. utilities that help with the <strong>creation and manipulation</strong> of
+<a class="reference external" href="http://numpy.scipy.org/">NumPy</a> arrays and matrices of numbers with uncertainties;</p>
+<p>2. <strong>generalizations</strong> of multiple NumPy functions so that they also
+work with arrays that contain numbers with uncertainties.</p>
+<p>While <a class="reference internal" href="user_guide.html#simple-array-use"><em>simple operations on arrays</em></a> that
+contain numbers with uncertainties can be performed without it, the
+<tt class="xref py py-mod docutils literal"><span class="pre">unumpy</span></tt> package is useful for more advanced uses.</p>
+<p>These features can be made available with</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">uncertainties</span> <span class="kn">import</span> <span class="n">unumpy</span>
+</pre></div>
+</div>
+<div class="section" id="creation-and-manipulation-of-arrays-and-matrices">
+<h3>Creation and manipulation of arrays and matrices<a class="headerlink" href="#creation-and-manipulation-of-arrays-and-matrices" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="arrays">
+<span id="index-1"></span><h4>Arrays<a class="headerlink" href="#arrays" title="Permalink to this headline">¶</a></h4>
+<p>Arrays of numbers with uncertainties can be built from values and
+uncertainties:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">unumpy</span><span class="o">.</span><span class="n">uarray</span><span class="p">(([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.002</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">arr</span>
+<span class="go">[1.0+/-0.01 2.0+/-0.002]</span>
+</pre></div>
+</div>
+<p>NumPy arrays of numbers with uncertainties can also be built directly
+through NumPy, thanks to NumPy&#8217;s support of arrays of arbitrary objects:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ufloat</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)),</span> <span class="n">ufloat</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.002</span><span class="p">))])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="matrices">
+<span id="index-2"></span><h4>Matrices<a class="headerlink" href="#matrices" title="Permalink to this headline">¶</a></h4>
+<p>Matrices of numbers with uncertainties are best created in one of
+two ways.  The first way is similar to using <tt class="xref py py-func docutils literal"><span class="pre">uarray()</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">mat</span> <span class="o">=</span> <span class="n">unumpy</span><span class="o">.</span><span class="n">umatrix</span><span class="p">(([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.002</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>Matrices can also be built by converting arrays of numbers with
+uncertainties into matrices through the <tt class="xref py py-class docutils literal"><span class="pre">unumpy.matrix</span></tt> class:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">mat</span> <span class="o">=</span> <span class="n">unumpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><tt class="xref py py-class docutils literal"><span class="pre">unumpy.matrix</span></tt> objects behave like <tt class="xref py py-class docutils literal"><span class="pre">numpy.matrix</span></tt>
+objects of numbers with uncertainties, but with better support for
+some operations (such as matrix inversion).  For instance, regular
+NumPy matrices cannot be inverted, if they contain numbers with
+uncertainties (i.e., <tt class="docutils literal"><span class="pre">numpy.matrix([[ufloat(…),…]]).I</span></tt> does not
+work).  This is why the <tt class="xref py py-class docutils literal"><span class="pre">unumpy.matrix</span></tt> class was created: both
+the inverse and the pseudo-inverse of a matrix can be calculated in
+the usual way: if <tt class="docutils literal"><span class="pre">mat</span></tt> is a <tt class="xref py py-class docutils literal"><span class="pre">unumpy.matrix</span></tt>,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">mat</span><span class="o">.</span><span class="n">I</span>
+</pre></div>
+</div>
+<p>does calculate the inverse or pseudo-inverse of <tt class="docutils literal"><span class="pre">mat</span></tt> with
+uncertainties.</p>
+</div>
+<div class="section" id="uncertainties-and-nominal-values">
+<span id="index-3"></span><h4>Uncertainties and nominal values<a class="headerlink" href="#uncertainties-and-nominal-values" title="Permalink to this headline">¶</a></h4>
+<p>Nominal values and uncertainties in arrays (and matrices) can be
+directly accessed (through functions that work on pure float arrays
+too):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unumpy</span><span class="o">.</span><span class="n">nominal_values</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="go">array([ 1.,  2.])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unumpy</span><span class="o">.</span><span class="n">std_devs</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+<span class="go">matrix([[ 0.1  ,  0.002]])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="mathematical-functions">
+<span id="index-4"></span><h3>Mathematical functions<a class="headerlink" href="#mathematical-functions" title="Permalink to this headline">¶</a></h3>
+<p>This module defines uncertainty-aware mathematical functions that
+generalize those from <tt class="xref py py-mod docutils literal"><span class="pre">uncertainties.umath</span></tt> so that they work on
+NumPy arrays of numbers with uncertainties instead of just scalars:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">unumpy</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>  <span class="c"># Cosine of each array element</span>
+</pre></div>
+</div>
+<p>NumPy&#8217;s function names are used, and not those from the <tt class="xref py py-mod docutils literal"><span class="pre">math</span></tt>
+module (for instance, <tt class="xref py py-func docutils literal"><span class="pre">unumpy.arccos()</span></tt> is defined, like in NumPy,
+and is not named <tt class="xref py py-func docutils literal"><span class="pre">acos()</span></tt> like in <tt class="xref py py-func docutils literal"><span class="pre">math()</span></tt> module).</p>
+<p>The definitions of the mathematical quantities calculated by these
+functions are available in the documentation of
+<tt class="xref py py-mod docutils literal"><span class="pre">uncertainties.umath</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="the-unumpy-ulinalg-module">
+<span id="index-5"></span><h2>The unumpy.ulinalg module<a class="headerlink" href="#the-unumpy-ulinalg-module" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref py py-mod docutils literal"><span class="pre">unumpy.ulinalg</span></tt> module contains more uncertainty-aware
+functions for arrays that contain numbers with uncertainties.</p>
+<p>It currently offers generalizations of two functions from
+<tt class="xref py py-mod docutils literal"><span class="pre">numpy.linalg</span></tt> that work on arrays (or matrices) that contain
+numbers with uncertainties, the <strong>matrix inverse and pseudo-inverse</strong>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">unumpy</span><span class="o">.</span><span class="n">ulinalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">ufloat</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)))</span>
+<span class="go">matrix([[0.5+/-0.025]], dtype=object)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unumpy</span><span class="o">.</span><span class="n">ulinalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+<span class="go">matrix([[0.2+/-0.0120042571202],</span>
+<span class="go">        [0.4+/-0.0160018014941]], dtype=object)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tech_guide.html" title="Technical Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="user_guide.html" title="User guide"
+             >previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+       <li><a href="user_guide.html">documentation </a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, Eric O. LEBIGOT (EOL).
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0b2.
+    </div>
+  </body>
+</html>
