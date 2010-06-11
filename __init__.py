@@ -116,9 +116,9 @@ Note that Variable objects are also AffineScalarFunc objects: testing
 whether a value carries an uncertainty handled by this module should
 be done with insinstance(my_value, AffineScalarFunc).
 
-- Mathematically, numbers with uncertainties are defined as
-probability distributions that are described here by two numbers: a
-nominal value and an uncertainty.  Thus, both variables
+- Mathematically, numbers with uncertainties are, in this package,
+probability distributions.  These probabilities are reduced to two
+numbers: a nominal value and an uncertainty.  Thus, both variables
 (Variable objects) and the result of mathematical operations
 (AffineScalarFunc objects) contain these two values (respectively in
 their nominal_value attribute and through their std_dev() method).
