@@ -85,10 +85,10 @@ found in the :mod:`uncertainties.umath` module::
 
 .. index:: comparison operators
 
-Comparison operations
+Comparison operators
 ---------------------
 
-Boolean operators behave in a natural way::
+Comparison operators behave in a natural way::
 
   >>> print x
   0.2+/-0.01
