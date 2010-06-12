@@ -112,6 +112,12 @@ Contact
 Please send feature requests, bug reports, or feedback to `Eric
 O. LEBIGOT (EOL)`_.
 
+.. figure:: _static/eol.*
+   :height: 64
+   :width:  64
+
+   `Visit EOL's page`_
+
 Please `support the development`_ of this program by donating $5 or
 more through PayPal!
 
@@ -139,3 +145,4 @@ This software is released under a dual license:
 .. _support the development: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _GNU General Public License version 2: http://creativecommons.org/licenses/GPL/2.0/
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
+.. _Visit EOL's page: http://lebigot.pip.verisignlabs.com/
