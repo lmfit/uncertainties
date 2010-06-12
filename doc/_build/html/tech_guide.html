@@ -198,9 +198,11 @@ uncertainty <tt class="docutils literal"><span class="pre">x</span></tt> is the 
 <div class="section" id="classes">
 <span id="index-7"></span><h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <p>Numbers with uncertainties are represented through two different
-classes:
-1. A class for independent variables (<tt class="xref py py-class docutils literal"><span class="pre">Variable</span></tt>),
-2. A class for functions that depend on independent variables
+classes:</p>
+<ol class="arabic simple">
+<li>A class for independent variables (<tt class="xref py py-class docutils literal"><span class="pre">Variable</span></tt>),</li>
+</ol>
+<p>2. A class for functions that depend on independent variables
 (<tt class="xref py py-class docutils literal"><span class="pre">AffineScalarFunc</span></tt>).</p>
 <p>Thus, the factory function <tt class="xref py py-func docutils literal"><span class="pre">ufloat()</span></tt> creates variables and
 returns a <tt class="xref py py-class docutils literal"><span class="pre">Variable</span></tt> object:</p>
@@ -219,8 +221,9 @@ store all the variables they depend from:</p>
 </pre></div>
 </div>
 <p>Note that <tt class="xref py py-class docutils literal"><span class="pre">Variable</span></tt> objects are also <tt class="xref py py-class docutils literal"><span class="pre">AffineScalarFunc</span></tt>
-objects: testing whether <tt class="docutils literal"><span class="pre">my_value</span></tt> carries an uncertainty handled
-by this module should be done with <tt class="docutils literal"><span class="pre">insinstance(my_value,</span>
+objects (a variable x is simply considered to be the identity function
+x → x): testing whether <tt class="docutils literal"><span class="pre">my_value</span></tt> carries an uncertainty handled by
+this module should be done with <tt class="docutils literal"><span class="pre">insinstance(my_value,</span>
 <span class="pre">AffineScalarFunc)</span></tt>.</p>
 </div>
 </div>

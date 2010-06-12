@@ -151,7 +151,9 @@ Classes
 
 Numbers with uncertainties are represented through two different
 classes:
+
 1. A class for independent variables (:class:`Variable`),
+
 2. A class for functions that depend on independent variables
 (:class:`AffineScalarFunc`).
 
@@ -173,8 +175,9 @@ store all the variables they depend from:
   <class 'uncertainties.AffineScalarFunc'>
 
 Note that :class:`Variable` objects are also :class:`AffineScalarFunc`
-objects: testing whether ``my_value`` carries an uncertainty handled
-by this module should be done with ``insinstance(my_value,
+objects (a variable x is simply considered to be the identity function
+x → x): testing whether ``my_value`` carries an uncertainty handled by
+this module should be done with ``insinstance(my_value,
 AffineScalarFunc)``.
 
 
