@@ -154,8 +154,7 @@ classes:
 
 1. A class for independent variables (:class:`Variable`),
 
-2. A class for functions that depend on independent variables
-(:class:`AffineScalarFunc`).
+2. A class for functions that depend on independent variables (:class:`AffineScalarFunc`).
 
 Thus, the factory function :func:`ufloat` creates variables and
 returns a :class:`Variable` object:
