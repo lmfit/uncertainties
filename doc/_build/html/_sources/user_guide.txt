@@ -1,7 +1,3 @@
-.. !!!!!!!!! Add an intro paragraph: point to other important pages:
-   operations on arrays (can point to the bottom of this document),
-   and reference guide
-
 .. index:: user guide
 
 User guide

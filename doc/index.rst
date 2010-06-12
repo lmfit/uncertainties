@@ -106,7 +106,7 @@ in the :doc:`tech_guide`.
 
 .. index:: license, support
 
-License
+Contact
 =======
 
 Please send feature requests, bug reports, or feedback to `Eric
