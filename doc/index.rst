@@ -89,7 +89,7 @@ or, if additional access rights are needed (Unix):
 
    sudo python setup.py install
 
-You can also simply *copy the* :file:`uncertainties/` *directory* to a
+You can also simply **copy** the :file:`uncertainties/` directory to a
 location that Python can import from (directory in which scripts using
 uncertainties are run, etc.).
 
