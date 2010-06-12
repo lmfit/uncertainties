@@ -175,9 +175,9 @@ an approximate standard deviation of 0 (because the cosine is not well
 approximated by a line around 0), which might not be precise enough
 for all applications.
 
-- Logical operations (>, ==, etc.) on numbers with uncertainties have
-a pragmatic semantics, in this module: numbers with uncertainties can
-be used wherever Python numbers are used, most of the time with a
+- Comparison operations (>, ==, etc.) on numbers with uncertainties
+have a pragmatic semantics, in this module: numbers with uncertainties
+can be used wherever Python numbers are used, most of the time with a
 result identical to the one that would be obtained with their nominal
 value only.  However, since the objects defined in this module
 represent probability distributions and not pure numbers, logical
