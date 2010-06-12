@@ -99,7 +99,7 @@ Comparison operators behave in a natural way::
   True
 
 One important concept to keep in mind is that :func:`ufloat` creates
-a random variables:
+a random variable:
 
   >>> y = ufloat((1, 0.1))
   >>> z = ufloat((1, 0.1))
