@@ -97,18 +97,16 @@ numbers: a nominal value and an uncertainty.</p>
 mathematical operations (<tt class="xref py py-class docutils literal"><span class="pre">AffineScalarFunc</span></tt> objects) contain
 these two values (respectively in their <tt class="xref py py-attr docutils literal"><span class="pre">nominal_value</span></tt>
 attribute and through their <tt class="xref py py-meth docutils literal"><span class="pre">std_dev()</span></tt> method).</p>
-<p id="index-2"><strong>Uncertainties</strong> are simply defined here as the standard deviation of the
-underlying probability distribution.</p>
-<p id="index-3"><strong>Nominal values</strong> are normally contained well inside the region of
-highest probability of their underlying distribution.  The nominal
-value of an expression is the expression evaluated at the nominal
-values of its variables.</p>
-<p>Good choices of nominal values for random variables (objects created
-by <tt class="xref py py-func docutils literal"><span class="pre">ufloat()</span></tt>) are thus their median, the location of highest
-probability, or their average value: the nominal value of expressions
-should then be well inside their region of highest probability, in the
-<a class="reference internal" href="#linear-method"><em>linear approximation method</em></a> used by the
-uncertainties package.</p>
+<p id="index-2">The <strong>uncertainty</strong> of a number with uncertainty is simply defined in
+this package as the standard deviation of the underlying probability
+distribution.</p>
+<p id="index-3">The numbers with uncertainties manipulated by this package are assumed
+to have a <strong>probability distribution</strong> mostly contained around their
+nominal value, in an interval of about the size of their standard
+deviation.  This should cover most practical cases.</p>
+<p id="index-4">A good choice of <strong>nominal value</strong> for a number with uncertainty is thus
+the median of its probability distribution, the location of highest
+probability, or the average value.</p>
 <p>Probability distributions (random variables and calculation results)
 are printed as:</p>
 <div class="highlight-python"><pre>nominal value +/- standard deviation</pre>
@@ -138,47 +136,74 @@ not well approximated by a line around 0), which might not be precise
 enough for all applications.</p>
 </div>
 <div class="section" id="comparison-operators">
-<h2>Comparison operators<a class="headerlink" href="#comparison-operators" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>Logical operations (&gt;, ==, etc.) on numbers with uncertainties have</li>
-</ul>
-<p>a pragmatic semantics, in this module: numbers with uncertainties can
-be used wherever Python numbers are used, most of the time with a
+<span id="index-5"></span><h2>Comparison operators<a class="headerlink" href="#comparison-operators" title="Permalink to this headline">¶</a></h2>
+<p>Comparison operations (&gt;, ==, etc.) on numbers with uncertainties have
+a <strong>pragmatic semantics</strong>, in this package: numbers with uncertainties
+can be used wherever Python numbers are used, most of the time with a
 result identical to the one that would be obtained with their nominal
-value only.  However, since the objects defined in this module
-represent probability distributions and not pure numbers, logical
-operations are defined in a specific way.</p>
-<p>The result of a logical operation (&#8220;==&#8221;, &#8220;&gt;&#8221;, etc.) is defined so as
+value only.  This allows code that runs with pure numbers to also work
+with numbers with uncertainties.</p>
+<p>However, since the objects defined in this module represent
+probability distributions and not pure numbers, comparison operators
+are interpreted in a specific way.</p>
+<p>The result of a comparison operation (&#8220;==&#8221;, &#8220;&gt;&#8221;, etc.) is defined so as
 to be essentially consistent with the requirement that uncertainties
-be small: the value of a logical operation is True only if the
+be small: the value of a comparison operation is True only if the
 operation yields True for all infinitesimal variations of its random
 variables, except, possibly, for an infinitely small number of cases.</p>
 <p>Example:</p>
-<blockquote>
-&#8220;x = 3.14; y = 3.14&#8221; is such that x == y</blockquote>
-<p>but</p>
-<blockquote>
-x = ufloat((3.14, 0.01))
-y = ufloat((3.14, 0.01))</blockquote>
-<p>is not such that x == y, since x and y are independent random
-variables that almost never give the same value.  However, x == x
-still holds.</p>
-<p>The boolean value (bool(x), &#8220;if x...&#8221;) of a number with uncertainty x
-is the result of x != 0.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">((</span><span class="mf">3.14</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">==</span> <span class="n">x</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>because a sample from the probability distribution of <tt class="docutils literal"><span class="pre">x</span></tt> is always
+equal to itself.  However:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">((</span><span class="mf">3.14</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>since <tt class="docutils literal"><span class="pre">x</span></tt> and <tt class="docutils literal"><span class="pre">y</span></tt> are independent random variables that <em>almost</em>
+never give the same value.</p>
+<p>Similarly,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">((</span><span class="mf">3.14</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">((</span><span class="mf">3.00</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>because <tt class="docutils literal"><span class="pre">x</span></tt> is supposed to have a probability distribution largely
+contained in the 3.14±~0.01 interval, while <tt class="docutils literal"><span class="pre">y</span></tt> is supposed to be
+well in the 3.00±~0.01 one: random samples of <tt class="docutils literal"><span class="pre">x</span></tt> and <tt class="docutils literal"><span class="pre">y</span></tt> will
+most of the time be such that the sample from <tt class="docutils literal"><span class="pre">x</span></tt> is larger than the
+sample from <tt class="docutils literal"><span class="pre">y</span></tt>.  Therefore, it is natural to consider that for all
+practical purposes, <tt class="docutils literal"><span class="pre">x</span> <span class="pre">&gt;</span> <span class="pre">y</span></tt>.</p>
+<p>Comparison operations are subject to the same constraints as other
+operations, as required by the <a class="reference internal" href="#linear-method"><em>linear approximation</em></a> method: their result should be linear (i.e. constant,
+for boolean values) over the regions of highest probability of their
+variables.  Thus, it is not meaningful to compare the following two
+values, whose probability distributions overlap:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">((</span><span class="mf">3.0001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>In fact the function (x, y) → (x &gt; y) is not even continuous (and
+linear) over the region where x and y are concentrated.  Comparing
+such numbers therefore returns a boolean result whose meaning is
+undefined.</p>
+<p>The boolean value (<tt class="docutils literal"><span class="pre">bool(x)</span></tt>, <tt class="docutils literal"><span class="pre">if</span> <span class="pre">x…</span></tt>) of a number with
+uncertainty <tt class="docutils literal"><span class="pre">x</span></tt> is the result of <tt class="docutils literal"><span class="pre">x</span> <span class="pre">!=</span> <span class="pre">0</span></tt>, as usual.</p>
 </div>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>The main function provided by this module is ufloat, which creates</li>
-</ul>
-<p>numbers with uncertainties (Variable objects).  Variable objects can
+<p>The main function provided by this module is ufloat, which creates
+numbers with uncertainties (Variable objects).  Variable objects can
 be used as if they were regular Python numbers.  The main attributes
 and methods of Variable objects are defined in the documentation of
 the Variable class.</p>
-<ul class="simple">
-<li>Mathematical expressions involving numbers with uncertainties</li>
-</ul>
-<p>(Variable objects) generally return AffineScalarFunc objects, which
+<p>Mathematical expressions involving numbers with uncertainties
+(Variable objects) generally return AffineScalarFunc objects, which
 also print as a value with uncertainty.  Their most useful attributes
 and methods are described in the documentation for AffineScalarFunc.
 Note that Variable objects are also AffineScalarFunc objects: testing

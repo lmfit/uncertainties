@@ -22,22 +22,22 @@ attribute and through their :meth:`std_dev` method).
 
 .. index:: uncertainty; definition
 
-**Uncertainties** are simply defined here as the standard deviation of the
-underlying probability distribution.
+The **uncertainty** of a number with uncertainty is simply defined in
+this package as the standard deviation of the underlying probability
+distribution.
+
+.. index:: probability distribution
+
+The numbers with uncertainties manipulated by this package are assumed
+to have a **probability distribution** mostly contained around their
+nominal value, in an interval of about the size of their standard
+deviation.  This should cover most practical cases.
 
 .. index:: nominal value; definition
 
-**Nominal values** are normally contained well inside the region of
-highest probability of their underlying distribution.  The nominal
-value of an expression is the expression evaluated at the nominal
-values of its variables.
-
-Good choices of nominal values for random variables (objects created
-by :func:`ufloat`) are thus their median, the location of highest
-probability, or their average value: the nominal value of expressions
-should then be well inside their region of highest probability, in the
-:ref:`linear approximation method <linear_method>` used by the
-uncertainties package.
+A good choice of **nominal value** for a number with uncertainty is thus
+the median of its probability distribution, the location of highest
+probability, or the average value.
 
 Probability distributions (random variables and calculation results)
 are printed as::
@@ -73,52 +73,87 @@ yields an approximate standard deviation of 0 (because the cosine is
 not well approximated by a line around 0), which might not be precise
 enough for all applications.
 
+.. index:: comparison operators; technical details
 
 Comparison operators
 --------------------
 
-
-- Logical operations (>, ==, etc.) on numbers with uncertainties have
-a pragmatic semantics, in this module: numbers with uncertainties can
-be used wherever Python numbers are used, most of the time with a
+Comparison operations (>, ==, etc.) on numbers with uncertainties have
+a **pragmatic semantics**, in this package: numbers with uncertainties
+can be used wherever Python numbers are used, most of the time with a
 result identical to the one that would be obtained with their nominal
-value only.  However, since the objects defined in this module
-represent probability distributions and not pure numbers, logical
-operations are defined in a specific way.
+value only.  This allows code that runs with pure numbers to also work
+with numbers with uncertainties.
 
-The result of a logical operation ("==", ">", etc.) is defined so as
+However, since the objects defined in this module represent
+probability distributions and not pure numbers, comparison operators
+are interpreted in a specific way.
+
+The result of a comparison operation ("==", ">", etc.) is defined so as
 to be essentially consistent with the requirement that uncertainties
-be small: the value of a logical operation is True only if the
+be small: the value of a comparison operation is True only if the
 operation yields True for all infinitesimal variations of its random
 variables, except, possibly, for an infinitely small number of cases.
 
 Example:
 
-  "x = 3.14; y = 3.14" is such that x == y
+  >>> x = ufloat((3.14, 0.01))
+  >>> x == x
+  True
 
-but
+because a sample from the probability distribution of ``x`` is always
+equal to itself.  However:
 
-  x = ufloat((3.14, 0.01))
-  y = ufloat((3.14, 0.01))
+  >>> y = ufloat((3.14, 0.01))
+  >>> x == y
+  False
 
-is not such that x == y, since x and y are independent random
-variables that almost never give the same value.  However, x == x
-still holds.
+since ``x`` and ``y`` are independent random variables that *almost*
+never give the same value.
 
-The boolean value (bool(x), "if x...") of a number with uncertainty x
-is the result of x != 0.
+Similarly,
+
+  >>> x = ufloat((3.14, 0.01))
+  >>> y = ufloat((3.00, 0.01))
+  >>> x > y
+  True
+
+because ``x`` is supposed to have a probability distribution largely
+contained in the 3.14±~0.01 interval, while ``y`` is supposed to be
+well in the 3.00±~0.01 one: random samples of ``x`` and ``y`` will
+most of the time be such that the sample from ``x`` is larger than the
+sample from ``y``.  Therefore, it is natural to consider that for all
+practical purposes, ``x > y``.
+
+Comparison operations are subject to the same constraints as other
+operations, as required by the :ref:`linear approximation
+<linear_method>` method: their result should be linear (i.e. constant,
+for boolean values) over the regions of highest probability of their
+variables.  Thus, it is not meaningful to compare the following two
+values, whose probability distributions overlap:
+
+  >>> x = ufloat((3, 0.01))
+  >>> y = ufloat((3.0001, 0.01))
+
+In fact the function (x, y) → (x > y) is not even continuous (and
+linear) over the region where x and y are concentrated.  Comparing
+such numbers therefore returns a boolean result whose meaning is
+undefined.
+
+The boolean value (``bool(x)``, ``if x…``) of a number with
+uncertainty ``x`` is the result of ``x != 0``, as usual.
 
 
 Classes
 -------
 
-- The main function provided by this module is ufloat, which creates
+The main function provided by this module is ufloat, which creates
 numbers with uncertainties (Variable objects).  Variable objects can
 be used as if they were regular Python numbers.  The main attributes
 and methods of Variable objects are defined in the documentation of
 the Variable class.
 
-- Mathematical expressions involving numbers with uncertainties
+Mathematical expressions involving numbers with uncertainties
 (Variable objects) generally return AffineScalarFunc objects, which
 also print as a value with uncertainty.  Their most useful attributes
 and methods are described in the documentation for AffineScalarFunc.
