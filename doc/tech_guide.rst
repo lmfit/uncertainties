@@ -73,6 +73,8 @@ enough for all applications.
 
 .. index:: comparison operators; technical details
 
+.. _comparison_operators:
+
 Comparison operators
 --------------------
 

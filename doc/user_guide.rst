@@ -117,7 +117,8 @@ on their length generally are of different sizes: ``y`` is different
 from ``z``.
 
 More detailed information on the semantics of comparison operators for
-numbers with uncertainties can be found in the :doc:`tech_guide`.
+numbers with uncertainties can be found in the :ref:`Technical Guide
+<comparison_operators>`.
 
 .. index:: arrays; simple use, matrices; simple use
 

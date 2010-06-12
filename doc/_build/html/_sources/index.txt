@@ -113,7 +113,6 @@ Please send feature requests, bug reports, or feedback to `Eric
 O. LEBIGOT (EOL)`_.
 
 .. figure:: _static/eol.*
-   :align:  center
    :height: 64
    :width:  64
 
