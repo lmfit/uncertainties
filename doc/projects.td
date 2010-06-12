@@ -48,7 +48,7 @@ Photo centered, at a minimum.
 * Put on the web
 X Handle all !!! marks in the .rst
 X Put the doc on the web, even if I don't yet have implemented all the features
-- Tell Alex Vallette + Stéphane Boucard
+X Tell Alex Vallette + Stéphane Boucard
 - Tell people on my uncertainties mailing list (on a week day)
 - Tell Sanofi about the web site (on a week day)
 
