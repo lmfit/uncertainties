@@ -189,26 +189,39 @@ values, whose probability distributions overlap:</p>
 </pre></div>
 </div>
 <p>In fact the function (x, y) → (x &gt; y) is not even continuous (and
-linear) over the region where x and y are concentrated.  Comparing
-such numbers therefore returns a boolean result whose meaning is
-undefined.</p>
+linear) over the region where x and y are concentrated, which violates
+the assumption made in this package about operations.  Comparing such
+numbers therefore returns a boolean result whose meaning is undefined.</p>
 <p>The boolean value (<tt class="docutils literal"><span class="pre">bool(x)</span></tt>, <tt class="docutils literal"><span class="pre">if</span> <span class="pre">x…</span></tt>) of a number with
 uncertainty <tt class="docutils literal"><span class="pre">x</span></tt> is the result of <tt class="docutils literal"><span class="pre">x</span> <span class="pre">!=</span> <span class="pre">0</span></tt>, as usual.</p>
-</div>
+<span class="target" id="index-6"></span></div>
 <div class="section" id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
-<p>The main function provided by this module is ufloat, which creates
-numbers with uncertainties (Variable objects).  Variable objects can
-be used as if they were regular Python numbers.  The main attributes
-and methods of Variable objects are defined in the documentation of
-the Variable class.</p>
+<span id="index-7"></span><h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<p>Numbers with uncertainties are represented through two different
+classes:
+1. A class for independent variables (<tt class="xref py py-class docutils literal"><span class="pre">Variable</span></tt>),
+2. A class for functions that depend on independent variables
+(<tt class="xref py py-class docutils literal"><span class="pre">AffineScalarFunc</span></tt>).</p>
+<p>Thus, the factory function <tt class="xref py py-func docutils literal"><span class="pre">ufloat()</span></tt> creates variables and
+returns a <tt class="xref py py-class docutils literal"><span class="pre">Variable</span></tt> object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">&lt;class &#39;uncertainties.Variable&#39;&gt;</span>
+</pre></div>
+</div>
+<p><tt class="xref py py-class docutils literal"><span class="pre">Variable</span></tt> objects can be used as if they were regular Python
+numbers (the summation, etc. of these objects is defined).</p>
 <p>Mathematical expressions involving numbers with uncertainties
-(Variable objects) generally return AffineScalarFunc objects, which
-also print as a value with uncertainty.  Their most useful attributes
-and methods are described in the documentation for AffineScalarFunc.
-Note that Variable objects are also AffineScalarFunc objects: testing
-whether a value carries an uncertainty handled by this module should
-be done with insinstance(my_value, AffineScalarFunc).</p>
+generally return <tt class="xref py py-class docutils literal"><span class="pre">AffineScalarFunc</span></tt> objects; these objects
+store all the variables they depend from:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">umath</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="go">&lt;class &#39;uncertainties.AffineScalarFunc&#39;&gt;</span>
+</pre></div>
+</div>
+<p>Note that <tt class="xref py py-class docutils literal"><span class="pre">Variable</span></tt> objects are also <tt class="xref py py-class docutils literal"><span class="pre">AffineScalarFunc</span></tt>
+objects: testing whether <tt class="docutils literal"><span class="pre">my_value</span></tt> carries an uncertainty handled
+by this module should be done with <tt class="docutils literal"><span class="pre">insinstance(my_value,</span>
+<span class="pre">AffineScalarFunc)</span></tt>.</p>
 </div>
 </div>
 

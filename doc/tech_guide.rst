@@ -143,22 +143,39 @@ numbers therefore returns a boolean result whose meaning is undefined.
 The boolean value (``bool(x)``, ``if x…``) of a number with
 uncertainty ``x`` is the result of ``x != 0``, as usual.
 
+.. index:: number with uncertainty; classes, Variable class
+.. index::  AffineScalarFunc class
 
 Classes
 -------
 
-The main function provided by this module is ufloat, which creates
-numbers with uncertainties (Variable objects).  Variable objects can
-be used as if they were regular Python numbers.  The main attributes
-and methods of Variable objects are defined in the documentation of
-the Variable class.
+Numbers with uncertainties are represented through two different
+classes:
+1. A class for independent variables (:class:`Variable`),
+2. A class for functions that depend on independent variables
+(:class:`AffineScalarFunc`).
+
+Thus, the factory function :func:`ufloat` creates variables and
+returns a :class:`Variable` object:
+
+  >>> x = ufloat((1, 0.1))
+  >>> type(x)
+  <class 'uncertainties.Variable'>
+
+:class:`Variable` objects can be used as if they were regular Python
+numbers (the summation, etc. of these objects is defined).
 
 Mathematical expressions involving numbers with uncertainties
-(Variable objects) generally return AffineScalarFunc objects, which
-also print as a value with uncertainty.  Their most useful attributes
-and methods are described in the documentation for AffineScalarFunc.
-Note that Variable objects are also AffineScalarFunc objects: testing
-whether a value carries an uncertainty handled by this module should
-be done with insinstance(my_value, AffineScalarFunc).
+generally return :class:`AffineScalarFunc` objects; these objects
+store all the variables they depend from:
+
+  >>> type(umath.sin(x))
+  <class 'uncertainties.AffineScalarFunc'>
+
+Note that :class:`Variable` objects are also :class:`AffineScalarFunc`
+objects (a variable x is simply considered to be the identity function
+x → x): testing whether ``my_value`` carries an uncertainty handled by
+this module should be done with ``insinstance(my_value,
+AffineScalarFunc)``.
 
 
