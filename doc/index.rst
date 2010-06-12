@@ -58,7 +58,7 @@ Many other error propagation codes return the incorrect value
 Installation and update
 =======================
 
-The uncertainties package may be automatically downloaded and
+The :mod:`uncertainties` package may be automatically downloaded and
 installed (or updated) with
 
 .. code-block:: sh
@@ -97,7 +97,7 @@ Available documentation
 =======================
 
 In addition to this introduction, details on the features of the
-uncertainties package can be found in the :doc:`user_guide`.
+:mod:`uncertainties` package can be found in the :doc:`user_guide`.
 
 Support for arrays of numbers with uncertainties is described in
 :doc:`numpy_guide`.

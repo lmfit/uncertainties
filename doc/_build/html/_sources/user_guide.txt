@@ -214,8 +214,8 @@ to study its impact on a final result.  With this package, the
   >>> u.set_std_dev(prev_uncert)
 
 The relevant concept is that ``sum_value`` does depend on the
-variables ``u`` and ``v``: the uncertainties package keeps track of
-this fact.
+variables ``u`` and ``v``: the :mod:`uncertainties` package keeps
+track of this fact.
 
 .. index::
    pair: nominal value; uniform access (scalar)
@@ -258,7 +258,7 @@ uncertainty:
 Additional information
 ----------------------
 
-The capabilities of the uncertainties package in terms of array
+The capabilities of the :mod:`uncertainties` package in terms of array
 handling are detailed in :doc:`numpy_guide`.
 
 Details about the theory behind this package are given in the
