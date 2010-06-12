@@ -123,18 +123,17 @@ numbers: a nominal value and an uncertainty.  Thus, both variables
 (AffineScalarFunc objects) contain these two values (respectively in
 their nominal_value attribute and through their std_dev() method).
 
-Uncertainties are simply defined here as the standard deviation of the
-underlying probability distribution.
+The uncertainty of a number with uncertainty is simply defined in
+this package as the standard deviation of the underlying probability
+distribution.
 
-Nominal values are normally contained well inside the region of
-highest probability of their underlying distribution.  The nominal
-value of an expression is the expression evaluated at the nominal
-values of its variables.
-
-Good choices of nominal values for random variables (objects created
-by ufloat) are thus their median, the location of highest probability,
-or their average value: the nominal value of expressions should then
-be well inside their region of highest probability.
+The numbers with uncertainties manipulated by this package are assumed
+to have a probability distribution mostly contained around their
+nominal value, in an interval of about the size of their standard
+deviation.  This should cover most practical cases.  A good choice of
+nominal value for a number with uncertainty is thus the median of its
+probability distribution, the location of highest probability, or the
+average value.
 
 - When manipulating ensembles of numbers, some of which contain
 uncertainties, it can be useful to access the nominal value and
@@ -183,9 +182,9 @@ with their nominal value only.  However, since the objects defined in
 this module represent probability distributions and not pure numbers,
 comparison operator are interpreted in a specific way.
 
-The result of a logical operation ("==", ">", etc.) is defined so as
+The result of a comparison operation ("==", ">", etc.) is defined so as
 to be essentially consistent with the requirement that uncertainties
-be small: the value of a logical operation is True only if the
+be small: the value of a comparison operation is True only if the
 operation yields True for all infinitesimal variations of its random
 variables, except, possibly, for an infinitely small number of cases.
 
