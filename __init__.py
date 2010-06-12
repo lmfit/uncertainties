@@ -109,12 +109,12 @@ as input for the definition of correlated quantities (correlated_values()
 function--defined only if the NumPy module is available).
 
 - Mathematical expressions involving numbers with uncertainties
-(Variable objects) generally return AffineScalarFunc objects, which
-also print as a value with uncertainty.  Their most useful attributes
-and methods are described in the documentation for AffineScalarFunc.
-Note that Variable objects are also AffineScalarFunc objects: testing
-whether a value carries an uncertainty handled by this module should
-be done with insinstance(my_value, AffineScalarFunc).
+generally return AffineScalarFunc objects, which also print as a value
+with uncertainty.  Their most useful attributes and methods are
+described in the documentation for AffineScalarFunc.  Note that
+Variable objects are also AffineScalarFunc objects: testing whether a
+value carries an uncertainty handled by this module should be done
+with insinstance(my_value, AffineScalarFunc).
 
 - Mathematically, numbers with uncertainties are, in this package,
 probability distributions.  These probabilities are reduced to two
