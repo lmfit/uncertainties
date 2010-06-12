@@ -116,8 +116,8 @@ functions are available in the documentation of
 
 .. index:: linear algebra; additional functions, ulinalg
 
-The unumpy.ulinalg module
-=========================
+Additional array functions: unumpy.ulinalg
+==========================================
 
 The :mod:`unumpy.ulinalg` module contains more uncertainty-aware
 functions for arrays that contain numbers with uncertainties.
