@@ -41,8 +41,8 @@ performed directly and transparently:
 .. index:: correlations; simple example
 
 Another strength of this package is its correct handling of
-correlations.  For instance, the following quantity is always zero
-even if ``x`` has an uncertainty:
+correlations.  For instance, the following quantity is zero even if
+``x`` has an uncertainty:
 
   >>> x-x
   0.0
