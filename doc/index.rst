@@ -99,7 +99,8 @@ Available documentation
 In addition to this introduction, details on the features of the
 uncertainties package can be found in the :doc:`user_guide`.
 
-NumPy support is described in :doc:`numpy_guide`.
+Support for arrays of numbers with uncertainties is described in
+:doc:`numpy_guide`.
 
 Technical details about the mathematics behind this package are given
 in the :doc:`tech_guide`.
