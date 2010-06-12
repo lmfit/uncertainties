@@ -3,8 +3,6 @@
 Technical Guide
 ===============
 
-.. !!!!! The paragraphs below are only notes: they should be adapted.
-
 
 Mathematical definition of numbers with uncertainties
 -----------------------------------------------------
