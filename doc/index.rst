@@ -13,7 +13,7 @@ simple** thanks to this package.  In fact, it automatically calculates
 the `numerous derivatives`_ required by linear error propagation
 theory.
 
-Calculations can be performed in an interactive session, or in
+Calculations can be performed in an **interactive session**, or in
 programs written in the Python_ programming language.  Existing
 calculation code can **run with no or little change**.
 
