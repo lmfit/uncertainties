@@ -55,8 +55,11 @@ Many other error propagation codes return the incorrect value
 
 .. _installing this package:
 
-Installation and update
-=======================
+Installation and download
+=========================
+
+Automatic install
+-----------------
 
 The :mod:`uncertainties` package may be automatically downloaded and
 installed (or updated) with
@@ -70,8 +73,12 @@ manual download, but does require setuptools_).  Under Unix, it may be
 necessary to prefix this command with ``sudo``, so that the
 installation program has enough access rights to the system.
 
-Alternatively, you can simply download the program `from the Python
-Package Index`_ (PyPI) and, after unpacking it, install it with:
+Manual download and install
+---------------------------
+
+Alternatively, you can simply **download** the program from the
+Python Package Index (PyPI_) and, after unpacking it, install it
+with:
 
 .. code-block:: sh
 
@@ -93,7 +100,7 @@ You can also simply **copy** the :file:`uncertainties/` directory to a
 location that Python can import from (directory in which scripts using
 uncertainties are run, etc.).
 
-The code and the documentation source are available on GitHub_.
+The **code** and the **documentation source** are available on GitHub_.
 
 Available documentation
 =======================
@@ -141,7 +148,7 @@ This software is released under a dual license:
 .. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
 .. _invoking the Python interpreter: http://docs.python.org/tutorial/interpreter.html
 .. _setuptools: http://pypi.python.org/pypi/setuptools
-.. _from the Python package index: http://pypi.python.org/pypi/uncertainties/
+.. _PyPI: _http://pypi.python.org/pypi/uncertainties/
 .. _numerous derivatives: http://en.wikipedia.org/wiki/Propagation_of_uncertainty#Non-linear_combinations
 
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
