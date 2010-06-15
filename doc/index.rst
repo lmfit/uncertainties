@@ -148,7 +148,7 @@ This software is released under a dual license:
 .. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
 .. _invoking the Python interpreter: http://docs.python.org/tutorial/interpreter.html
 .. _setuptools: http://pypi.python.org/pypi/setuptools
-.. _PyPI: _http://pypi.python.org/pypi/uncertainties/
+.. _PyPI: http://pypi.python.org/pypi/uncertainties/
 .. _numerous derivatives: http://en.wikipedia.org/wiki/Propagation_of_uncertainty#Non-linear_combinations
 
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
