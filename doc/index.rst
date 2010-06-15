@@ -93,7 +93,7 @@ You can also simply **copy** the :file:`uncertainties/` directory to a
 location that Python can import from (directory in which scripts using
 uncertainties are run, etc.).
 
-The code and the source documentation are available on GitHub_.
+The code and the documentation source are available on GitHub_.
 
 Available documentation
 =======================
