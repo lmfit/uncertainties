@@ -76,8 +76,8 @@ installation program has enough access rights to the system.
 Manual download and install
 ---------------------------
 
-Alternatively, you can simply **download** the program from the
-Python Package Index (PyPI_) and, after unpacking it, install it
+Alternatively, you can simply download_ the program from the
+Python Package Index (PyPI) and, after unpacking it, install it
 with:
 
 .. code-block:: sh
@@ -148,7 +148,7 @@ This software is released under a dual license:
 .. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
 .. _invoking the Python interpreter: http://docs.python.org/tutorial/interpreter.html
 .. _setuptools: http://pypi.python.org/pypi/setuptools
-.. _PyPI: http://pypi.python.org/pypi/uncertainties/
+.. _download: http://pypi.python.org/pypi/uncertainties/
 .. _numerous derivatives: http://en.wikipedia.org/wiki/Propagation_of_uncertainty#Non-linear_combinations
 
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
