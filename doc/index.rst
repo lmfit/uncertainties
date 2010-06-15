@@ -9,9 +9,9 @@ particular, it handles **correlations** between variables, which sets
 this it apart from most existing error propagation codes.
 
 Calculations involving numbers with uncertainties are made **very
-simple** thanks to this package.  This is due to the fact that it
-automatically calculates the `numerous derivatives`_ required by
-linear error propagation theory.
+simple** thanks to this package.  In fact, it automatically calculates
+the `numerous derivatives`_ required by linear error propagation
+theory.
 
 Calculations can be performed in an interactive session, or in
 programs written in the Python_ programming language.  Existing
