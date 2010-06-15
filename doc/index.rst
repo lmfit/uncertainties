@@ -93,6 +93,8 @@ You can also simply **copy** the :file:`uncertainties/` directory to a
 location that Python can import from (directory in which scripts using
 uncertainties are run, etc.).
 
+The code and the source documentation are available on GitHub_.
+
 Available documentation
 =======================
 
@@ -147,3 +149,4 @@ This software is released under a dual license:
 .. _GNU General Public License version 2: http://creativecommons.org/licenses/GPL/2.0/
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
 .. _Visit EOL's page: http://lebigot.pip.verisignlabs.com/
+.. _GitHub: http://github.com/lebigot/uncertainties
