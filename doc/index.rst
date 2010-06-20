@@ -114,8 +114,8 @@ Support for arrays of numbers with uncertainties is described in
 Technical details about the mathematics behind this package are given
 in the :doc:`tech_guide`.
 
-In addition, the documentation of any module defined in this package
-is available through the pydoc_ command.
+In addition, the documentation for any of the modules defined in this
+package is available through the pydoc_ command.
 
 .. index:: license, support
 

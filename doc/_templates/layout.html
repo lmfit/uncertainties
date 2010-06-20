@@ -3,7 +3,7 @@
 {% block rootrellink %}
         <li><a href="{{ pathto('index') }}">home</a>|&nbsp;</li>
         <li><a href="{{ pathto('search') }}">search</a>|&nbsp;</li>
-       <li><a href="{{ pathto('user_guide') }}">documentation </a> &raquo;</li>
+        <li><a href="{{ pathto('user_guide') }}">documentation </a> &raquo;</li>
 {% endblock %}
 
 
@@ -80,6 +80,10 @@ pathto("_static/logo.png", 1) }}" border="0" alt="uncertainties"/></a>
           </div>
           <script type="text/javascript">$('#searchbox').show(0);</script>
           {%- endif %}
+          {%- endblock %}
+          {%- block copyright %}
+          <h3>Documentation license</h3>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-nd/3.0/88x31.png" /></a>
           {%- endblock %}
         </div>
       </div>
