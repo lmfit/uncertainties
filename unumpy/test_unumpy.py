@@ -16,7 +16,7 @@ import uncertainties
 from uncertainties import ufloat
 from uncertainties import unumpy
 from .. import test_uncertainties
-from uncertainties.test_uncertainties import _numbers_close
+from uncertainties.test_uncertainties import _numbers_close, matrices_close
 
 from uncertainties import __author__
 
@@ -103,38 +103,8 @@ def test_matrix():
     assert _numbers_close(1/m_nominal_values[1, 1],
                           m_inv_uncert[1, 1].nominal_value), "Wrong value"
 
-
-def matrices_close(m1, m2, precision=1e-4):
-    """
-    Returns True iff m1 and m2 are almost equal, where elements
-    can be either floats or AffineScalarFunc objects.
-
-    precision -- precision passed through to
-    uncertainties.test_uncertainties._numbers_close().
-    """
-
-    # ! numpy.allclose() is similar to this function, but does not
-    # work on arrays that contain numbers with uncertainties, because
-    # of the isinf() function.
-
-    for (elmt1, elmt2) in zip(m1.flat, m2.flat):
-
-        # For a simpler comparison, both elements are
-        # converted to AffineScalarFunc objects:
-        elmt1 = uncertainties.to_affine_scalar(elmt1)
-        elmt2 = uncertainties.to_affine_scalar(elmt2)
-
-        if not _numbers_close(elmt1.nominal_value,
-                              elmt2.nominal_value, precision):
-            return False
-
-        if not _numbers_close(elmt1.std_dev(),
-                              elmt2.std_dev(), precision):
-            return False
-    return True
-
-def test_covariances():
-    "Test of covariances between variables"
+def test_inverse():
+    "Tests of the matrix inverse"
 
     # Checks of the covariances between elements:
     x = ufloat((10, 1))
@@ -187,60 +157,6 @@ def test_covariances():
     # Correlations between m and m_inverse should create a perfect
     # inversion:
     assert matrices_close(m * m_inverse,  numpy.eye(m.shape[0]))
-
-    ########################################
-
-    # Covariances between output and input variables:
-
-    x = ufloat((1, 0.1))
-    y = -2*x+10
-    z = -3*x
-    covs = uncertainties.covariance_matrix([x, y, z])
-    # Diagonal elements are simple:
-    assert _numbers_close(covs[0][0], 0.01)
-    assert _numbers_close(covs[1][1], 0.04)
-    assert _numbers_close(covs[2][2], 0.09)
-    # Non-diagonal elements:
-    assert _numbers_close(covs[0][1], -0.02)
-
-    # "Inversion" of the covariance matrix: creation of new
-    # variables:
-    (x_new, y_new, z_new) = uncertainties.correlated_values(
-        [x.nominal_value, y.nominal_value, z.nominal_value],
-        covs,
-        tags = ['x', 'y', 'z'])
-
-    # Even the uncertainties should be correctly reconstructed:
-    assert matrices_close(numpy.array((x, y, z)),
-                                  numpy.array((x_new, y_new, z_new)))
-
-    # ... and the covariances too:
-    assert matrices_close(
-        numpy.array(covs),
-        numpy.array(uncertainties.covariance_matrix([x_new, y_new, z_new])))
-
-    assert matrices_close(
-        numpy.array([y_new]), numpy.array([-2*x_new+10]))
-
-    ####################
-
-    # ... as well as functional relations:
-
-    u = ufloat((1, 0.05))
-    v = ufloat((10,  0.1))
-    sum_value = u+v
-
-    # Covariance matrices:
-    cov_matrix = uncertainties.covariance_matrix([u, v, u+v])
-
-    # Correlated variables can be constructed from a covariance matrix, if
-    # NumPy is available:
-    (u2, v2, sum2) = uncertainties.correlated_values(
-        [x.nominal_value for x in [u, v, sum_value]],
-        cov_matrix)
-    assert matrices_close(numpy.array([0]),
-                                  numpy.array([sum2-u2-v2]))
-
 
 def test_broadcast_funcs():
     """

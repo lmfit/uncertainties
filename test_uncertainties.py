@@ -550,15 +550,92 @@ def test_wrapped_func():
     
 
 ###############################################################################
+        
+def test_access_to_std_dev():
+    "Uniform access to the standard deviation"
 
-# The tests below require NumPy:
+    x = ufloat((1, 0.1))
+    y = 2*x
+
+    # std_dev for Variable and AffineScalarFunc objects:
+    assert uncertainties.std_dev(x) == x.std_dev()
+    assert uncertainties.std_dev(y) == y.std_dev()
+
+    # std_dev for other objects:
+    assert uncertainties.std_dev([]) == 0
+    assert uncertainties.std_dev(None) == 0
+    
+def test_legacy():
+    "Test of legacy code"
+    x = (1, 0.1)
+
+    old1 = uncertainties.NumberWithUncert(x)  # Warnings are normal
+    old2 = uncertainties.num_with_uncert(x)  # Warnings are normal
+    new = uncertainties.ufloat(x)
+    
+    assert old1.nominal_value == new.nominal_value
+    assert old2.nominal_value == new.nominal_value
+    assert old1.std_dev() == new.std_dev()
+    assert old2.std_dev() == new.std_dev()
+
+###############################################################################
+
+def test_covariances():
+    "Covariance matrix"
+
+    x = ufloat((1, 0.1))
+    y = -2*x+10
+    z = -3*x
+    covs = uncertainties.covariance_matrix([x, y, z])
+    # Diagonal elements are simple:
+    assert _numbers_close(covs[0][0], 0.01)
+    assert _numbers_close(covs[1][1], 0.04)
+    assert _numbers_close(covs[2][2], 0.09)
+    # Non-diagonal elements:
+    assert _numbers_close(covs[0][1], -0.02)
+
+###############################################################################
+
+# The tests below require NumPy, which is an optional package:
 try:
     import numpy
 except ImportError:
     pass
 else:
+
+    def matrices_close(m1, m2, precision=1e-4):
+        """
+        Returns True iff m1 and m2 are almost equal, where elements
+        can be either floats or AffineScalarFunc objects.
+
+        m1, m2 -- NumPy matrices.
+        precision -- precision passed through to
+        uncertainties.test_uncertainties._numbers_close().
+        """
+
+        # ! numpy.allclose() is similar to this function, but does not
+        # work on arrays that contain numbers with uncertainties, because
+        # of the isinf() function.
+
+        for (elmt1, elmt2) in zip(m1.flat, m2.flat):
+
+            # For a simpler comparison, both elements are
+            # converted to AffineScalarFunc objects:
+            elmt1 = uncertainties.to_affine_scalar(elmt1)
+            elmt2 = uncertainties.to_affine_scalar(elmt2)
+
+            if not _numbers_close(elmt1.nominal_value,
+                                  elmt2.nominal_value, precision):
+                return False
+
+            if not _numbers_close(elmt1.std_dev(),
+                                  elmt2.std_dev(), precision):
+                return False
+        return True
+
+    
     def test_numpy_comparison():
-        "Comparison with a Numpy array"
+        "Comparison with a Numpy array."
 
         x = ufloat((1, 0.1))
         
@@ -596,31 +673,66 @@ else:
         # meaningful (x >= 0, but not x <= 1):
         assert numpy.all((x >= numpy.arange(3)) == [True, False, False])
 
-###############################################################################
-        
-def test_access_to_std_dev():
-    "Uniform access to the standard deviation"
+    def test_correlated_values():
+        "Correlated variables."
 
-    x = ufloat((1, 0.1))
-    y = 2*x
+        u = uncertainties.ufloat((1, 0.1))
+        cov = uncertainties.covariance_matrix([u])
+        # "1" is used instead of u.nominal_value because
+        # u.nominal_value might return a float.  The idea is to force
+        # the new variable u2 to be defined through an integer nominal
+        # value:
+        u2, = uncertainties.correlated_values([1], cov)
+        expr = 2*u2  # Calculations with u2 should be possible, like with u
 
-    # std_dev for Variable and AffineScalarFunc objects:
-    assert uncertainties.std_dev(x) == x.std_dev()
-    assert uncertainties.std_dev(y) == y.std_dev()
+        ####################    
 
-    # std_dev for other objects:
-    assert uncertainties.std_dev([]) == 0
-    assert uncertainties.std_dev(None) == 0
-    
-def test_legacy():
-    "Test of legacy code"
-    x = (1, 0.1)
+        # Covariances between output and input variables:
 
-    old1 = uncertainties.NumberWithUncert(x)  # Warnings are normal
-    old2 = uncertainties.num_with_uncert(x)  # Warnings are normal
-    new = uncertainties.ufloat(x)
-    
-    assert old1.nominal_value == new.nominal_value
-    assert old2.nominal_value == new.nominal_value
-    assert old1.std_dev() == new.std_dev()
-    assert old2.std_dev() == new.std_dev()
+        x = ufloat((1, 0.1))
+        y = ufloat((2, 0.3))
+        z = -3*x+y
+
+        covs = uncertainties.covariance_matrix([x, y, z])
+
+        # "Inversion" of the covariance matrix: creation of new
+        # variables:
+        (x_new, y_new, z_new) = uncertainties.correlated_values(
+            [x.nominal_value, y.nominal_value, z.nominal_value],
+            covs,
+            tags = ['x', 'y', 'z'])
+
+        # Even the uncertainties should be correctly reconstructed:
+        assert matrices_close(numpy.array((x, y, z)),
+                              numpy.array((x_new, y_new, z_new)))
+
+        # ... and the covariances too:
+        assert matrices_close(
+            numpy.array(covs),
+            numpy.array(uncertainties.covariance_matrix([x_new, y_new, z_new])))
+
+        assert matrices_close(
+            numpy.array([z_new]), numpy.array([-3*x_new+y_new]))
+
+        ####################
+
+        # ... as well as functional relations:
+
+        u = ufloat((1, 0.05))
+        v = ufloat((10, 0.1))
+        sum_value = u+2*v
+
+        # Covariance matrices:
+        cov_matrix = uncertainties.covariance_matrix([u, v, sum_value])
+
+        # Correlated variables can be constructed from a covariance matrix, if
+        # NumPy is available:
+        (u2, v2, sum2) = uncertainties.correlated_values(
+            [x.nominal_value for x in [u, v, sum_value]],
+            cov_matrix)
+
+        # matrices_close() is used instead of _numbers_close() because
+        # it compares uncertainties too:
+        assert matrices_close(numpy.array([0]),
+                              numpy.array([sum2-(u2+2*v2)]))
+

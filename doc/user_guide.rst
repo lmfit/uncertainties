@@ -136,7 +136,7 @@ matrices:
 :doc:`More complex operations on NumPy arrays <numpy_guide>` can be
 performed through the dedicated :mod:`uncertainties.unumpy` module.
 
-.. index:: covariance matrix, correlations
+.. index:: covariance matrix
 
 Covariance matrix
 -----------------
@@ -144,6 +144,7 @@ Covariance matrix
 The covariance matrix between various variables or calculated
 quantities can be simply obtained::
 
+  >>> sum_value = u+2*v
   >>> cov_matrix = uncertainties.covariance_matrix([u, v, sum_value])
 
 has value
@@ -153,6 +154,20 @@ has value
   [[0.01, 0.0,  0.01],
    [0.0,  0.01, 0.02],
    [0.01, 0.02, 0.05]]
+
+In this matrix, the zero covariances indicate that ``u`` and ``v`` are
+independent from each other; the last column shows that ``sum_value``
+does depend on these variables.  The uncertainties package keeps track
+at all times of all correlations between quantities (variables and
+functions):
+
+  >>> sum_value - (u+2*v)
+  >>> 0.0
+
+.. index:: correlations; correlated variables
+
+Correlated variables
+--------------------
 
 Reciprocally, correlated variables can be handled transparently,
 provided that the NumPy_ package is available::
@@ -164,6 +179,8 @@ correlations::
 
   >>> print u2
   1+/-0.1
+
+.. !!!!!!!!! It would be better to print sum2 - (u2+2*v2), and point to the exact 0 result
 
 The correlation matrix is the desired one::
 

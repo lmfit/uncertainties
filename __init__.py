@@ -717,8 +717,9 @@ class AffineScalarFunc(object):
         #! There is no coercion to a float, here, because
         # AffineScalarFunc objects are also used for representing
         # constants of any type (in which case derivatives is empty:
-        # there are no variables):
-        self._nominal_value = nominal_value
+        # there are no variables), and some functions do need integer
+        # arguments (like math.ldexp):
+        self._nominal_value = float(nominal_value)
         self.derivatives = derivatives
 
     @property
