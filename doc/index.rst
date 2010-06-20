@@ -114,6 +114,9 @@ Support for arrays of numbers with uncertainties is described in
 Technical details about the mathematics behind this package are given
 in the :doc:`tech_guide`.
 
+In addition, the documentation of any module defined in this package
+is available through the pydoc_ command.
+
 .. index:: license, support
 
 Contact
@@ -157,3 +160,4 @@ This software is released under a dual license:
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
 .. _Visit EOL's page: http://lebigot.pip.verisignlabs.com/
 .. _GitHub: http://github.com/lebigot/uncertainties
+.. _pydoc: http://docs.python.org/library/pydoc.html
