@@ -80,11 +80,11 @@ from uncertainties import __author__, to_affine_scalar, AffineScalarFunc
 
 # Some functions require a specific treatment and must therefore be
 # Excluded from standard wrapping
-no_std_wrapping = ['modf', 'fsum', 'factorial']  #!!!!!! 'frexp', 
+no_std_wrapping = ['modf', 'ldexp', 'fsum', 'factorial']
 
-std_wrapped_math_funcs = []  # Math functions wrapped in the standard way
-
-non_std_wrapped_math_funcs = []  # Math functions wrapped in a non-standard way
+# Math functions that have a standard interface: they take
+# one or more float arguments, and return a scalar:
+many_scalar_to_scalar_funcs = []
 
 # Function that copies the relevant attributes from generalized
 # functions from the math module:
@@ -156,11 +156,6 @@ fixed_derivatives = {
     'floor': [lambda x: 0],
     'hypot': [lambda x, y: x/math.hypot(x, y),
               lambda x, y: y/math.hypot(x, y)],
-    'ldexp': [lambda x, y: 2**y,
-              # math.ldexp only accepts an integer as its second
-              # argument: the derivative on the second argument should
-              # never be needed:
-              None],    
     'log': [log_der0,
             lambda x, y: -math.log(x, y)/y/math.log(y)],
     'log10': [lambda x: 1/x/math.log(10)],
@@ -194,8 +189,10 @@ for (name, func) in inspect.getmembers(math, inspect.isbuiltin):
         derivatives = None  # Means: numerical calculation required
     setattr(this_module, name,
             wraps(uncertainties.wrap(func, derivatives), func))
-    std_wrapped_math_funcs.append(name)
+    many_scalar_to_scalar_funcs.append(name)
 
+###############################################################################
+    
 ########################################
 # Special cases: some of the functions from no_std_wrapping:
 
@@ -236,9 +233,6 @@ if sys.version_info[:2] >= (2, 6):
 
     fsum = wrapped_fsum()
 
-    # Wrapping already done:
-    non_std_wrapped_math_funcs.append('fsum')
-
 ##########
 def modf(x):
     """
@@ -263,19 +257,45 @@ def modf(x):
         # argument: there is no need to return numbers with uncertainties:
         return (frac_part, int_part)
     
-non_std_wrapped_math_funcs.append('modf')
+many_scalar_to_scalar_funcs.append('modf')
 
-#!!!!!!!!!! ldexp is better handled separately *if* floats are
-#assigned to AffineScalarFunc?
+def ldexp(x, y):
+    """
+    Version of ldexp that works for numbers with uncertainty, and also
+    for regular numbers.
+    """
 
-## #!!!!!!!!!!!  ADD factorial (no version) and ldexp (new version)
-##     'ldexp': [lambda x, y: 2**y,
-##               # math.ldexp only accepts an integer as its second
-##               # argument:
-##               None],
+    # The code below is inspired by uncertainties.wrap().  It is
+    # simpler because only 1 argument is given, and there is no
+    # delegation to other functions involved (as for __mul__, etc.).
+
+    # Another approach would be to add an additional argument to
+    # uncertainties.wrap() so that some arguments are automatically
+    # considered as constants.
+
+    aff_func = to_affine_scalar(x)  # y must be an integer, for math.ldexp
+
+    if aff_func.derivatives:
+        factor = 2**y
+        return AffineScalarFunc(
+            math.ldexp(aff_func.nominal_value, y),
+            # Chain rule:
+            dict((var, factor*deriv)
+                 for (var, deriv) in aff_func.derivatives.iteritems()))
+    else:
+        # This function was not called with an AffineScalarFunc
+        # argument: there is no need to return numbers with uncertainties:
+
+        # aff_func.nominal_value is not passed instead of x, because
+        # we do not have to care about the type of the return value of
+        # math.ldexp, this way (aff_func.nominal_value might be the
+        # value of x coerced to a difference type [int->float, for
+        # instance]):
+        return math.ldexp(x, y)
+many_scalar_to_scalar_funcs.append('ldexp')
 
 ###############################################################################
 # Exported functions:
 
-__all__ = std_wrapped_math_funcs + non_std_wrapped_math_funcs
+__all__ = many_scalar_to_scalar_funcs + ['fsum']
 

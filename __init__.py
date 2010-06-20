@@ -713,17 +713,13 @@ class AffineScalarFunc(object):
 
         # Defines the value at the origin:
 
-        #!!!!!!!!!!!!! put same doc as for Variable?
-
-        #!!!!! add that it would not make sense to have a complex
-        #number here, for instance!
-        
-        #! There is no coercion to a float, here, because
-        # AffineScalarFunc objects are also used for representing
-        # constants of any type (in which case derivatives is empty:
-        # there are no variables), and some functions do need integer
-        # arguments (like math.ldexp):
-        self._nominal_value = nominal_value
+        # Only float-like values are handled.  One reason is that it
+        # does not make sense for a scalar function to be affine to
+        # not yield float values.  Another reason is that it would not
+        # make sense to have a complex nominal value, here (it would
+        # not be handled correctly at all): converting to float should
+        # be possible.
+        self._nominal_value = float(nominal_value)
         self.derivatives = derivatives
 
     @property

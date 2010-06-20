@@ -419,10 +419,10 @@ def define_vectorized_funcs():
         func_name_translations[function_name]
         if function_name in func_name_translations
         else function_name
-        for function_name in umath.std_wrapped_math_funcs]
+        for function_name in umath.many_scalar_to_scalar_funcs]
         
     for (function_name, unumpy_name) in \
-        zip(umath.std_wrapped_math_funcs, new_func_names):
+        zip(umath.many_scalar_to_scalar_funcs, new_func_names):
 
         # ! The newly defined functions (uncertainties.unumpy.cos, etc.)
         # do not behave exactly like their NumPy equivalent (numpy.cos,

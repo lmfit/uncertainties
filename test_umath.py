@@ -24,10 +24,12 @@ from uncertainties import __author__
     
 def test_fixed_derivatives_math_funcs():
     """
-    Check of wrapped functions from the math module.
+    Comparison between function derivatives and numerical derivatives.
+
+    This comparison is useful for derivatives that are analytical.
     """
 
-    for name in umath.std_wrapped_math_funcs:
+    for name in umath.many_scalar_to_scalar_funcs:
         # print "Checking %s..." % name
         func = getattr(umath, name)
         # Numerical derivatives of func: the nominal value of func() results
@@ -35,6 +37,24 @@ def test_fixed_derivatives_math_funcs():
         numerical_derivatives = uncertainties.NumericalDerivatives(
             lambda *args: func(*args).nominal_value)
         test_uncertainties._compare_derivatives(func, numerical_derivatives)
+
+    # Functions that are not in umath.many_scalar_to_scalar_funcs:
+
+    # modf(): returns a tuple:
+    def frac_part_func(x):
+        return umath.modf(x)[0]
+    def int_part_func(x):
+        return umath.modf(x)[1]
+    
+    test_uncertainties._compare_derivatives(
+        frac_part_func,
+        uncertainties.NumericalDerivatives(
+            lambda x: frac_part_func(x).nominal_value))
+    test_uncertainties._compare_derivatives(
+        int_part_func,
+        uncertainties.NumericalDerivatives(
+            lambda x: int_part_func(x).nominal_value))
+    
 
 def test_compound_expression():
     """
