@@ -123,7 +123,7 @@ def _compare_derivatives(func, numerical_derivatives,
 
                 func_approx = func(*args)
 
-                # Some functions are simple Python constants, after
+                # Some functions yield simple Python constants, after
                 # wrapping in wrap(): no test has to be performed:
                 if isinstance(func_approx, AffineScalarFunc):
                     
