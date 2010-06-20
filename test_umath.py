@@ -34,27 +34,45 @@ def test_fixed_derivatives_math_funcs():
         func = getattr(umath, name)
         # Numerical derivatives of func: the nominal value of func() results
         # is used as the underlying function:
+        #!!!!!!!!!! I could use the original function: this would be
+        # more robust!
         numerical_derivatives = uncertainties.NumericalDerivatives(
             lambda *args: func(*args).nominal_value)
         test_uncertainties._compare_derivatives(func, numerical_derivatives)
 
     # Functions that are not in umath.many_scalar_to_scalar_funcs:
 
+    ##
     # modf(): returns a tuple:
-    def frac_part_func(x):
+    def frac_part_modf(x):
         return umath.modf(x)[0]
-    def int_part_func(x):
+    def int_part_modf(x):
         return umath.modf(x)[1]
     
     test_uncertainties._compare_derivatives(
-        frac_part_func,
+        frac_part_modf,
         uncertainties.NumericalDerivatives(
-            lambda x: frac_part_func(x).nominal_value))
+            lambda x: frac_part_modf(x).nominal_value))
     test_uncertainties._compare_derivatives(
-        int_part_func,
+        int_part_modf,
         uncertainties.NumericalDerivatives(
-            lambda x: int_part_func(x).nominal_value))
+            lambda x: int_part_modf(x).nominal_value))
     
+    ##
+    # frexp(): returns a tuple:
+    def mantissa_frexp(x):
+        return umath.frexp(x)[0]
+    def exponent_frexp(x):
+        return umath.frexp(x)[1]
+    
+    test_uncertainties._compare_derivatives(
+        mantissa_frexp,
+        uncertainties.NumericalDerivatives(
+            lambda x: mantissa_frexp(x).nominal_value))
+    test_uncertainties._compare_derivatives(
+        exponent_frexp,
+        uncertainties.NumericalDerivatives(
+            lambda x: exponent_frexp(x).nominal_value))
 
 def test_compound_expression():
     """
