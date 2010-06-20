@@ -170,10 +170,13 @@ def test_math_module():
 
     if sys.version_info[:2] >= (2, 6):
     
-        # factorial must not be "damaged" by this module; in particular,
-        # as of Python 2.6, it does not accept non integral values, and
-        # must therefore not be differentiated:
-        assert umath.factorial(4) == 24
+        # factorial must not be "damaged" by this module; in
+        # particular, as of Python 2.6, it does not accept non
+        # integral values, and the user should not want to give
+        # uncertain (continuous) arguments to an equivalent of the
+        # math.factorial() function:
+        #
+        # assert umath.factorial(4) == 24
 
         # Boolean functions:
         assert not umath.isinf(x)

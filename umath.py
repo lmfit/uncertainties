@@ -47,7 +47,7 @@ import inspect
 # Local modules
 import uncertainties
 
-from uncertainties import __author__
+from uncertainties import __author__, to_affine_scalar, AffineScalarFunc
 
 ###############################################################################
 
@@ -78,7 +78,9 @@ from uncertainties import __author__
 # code.  The function should function normally, except possibly when
 # given AffineScalarFunc arguments.
 
-no_std_wrapping = ['frexp', 'modf', 'fsum']  # Exclude from standard wrapping
+# Some functions require a specific treatment and must therefore be
+# Excluded from standard wrapping
+no_std_wrapping = ['modf', 'fsum', 'factorial']  #!!!!!! 'frexp', 
 
 std_wrapped_math_funcs = []  # Math functions wrapped in the standard way
 
@@ -88,41 +90,6 @@ non_std_wrapped_math_funcs = []  # Math functions wrapped in a non-standard way
 # functions from the math module:
 wraps = functools.partial(functools.update_wrapper,
                           assigned=('__doc__', '__name__'))
-
-########################################
-# Special cases:
-
-# fsum takes a single argument, which cannot be differentiated.
-# However, each of the arguments inside this single list can
-# be a variable.  We handle this in a specific way:
-
-if sys.version_info[:2] >= (2, 6):    
-
-    original_func = math.fsum  # Shortcut
-
-    # We wrap math.fsum
-
-    def wrapped_fsum():
-        """
-        Return an uncertainty aware version of math.fsum, which must
-        be contained in _original_func.
-        """
-
-        # The fsum function is flattened, in order to use the
-        # wrap() wrapper:
-
-        flat_fsum = lambda *args: original_func(args)
-
-        flat_fsum_wrap = uncertainties.wrap(
-            flat_fsum, itertools.repeat(lambda *args: 1))
-
-        return wraps(lambda arg_list: flat_fsum_wrap(*arg_list),
-                     original_func)
-
-    fsum = wrapped_fsum()
-
-    # Wrapping already done:
-    non_std_wrapped_math_funcs.append('fsum')
 
 ########################################
 # Wrapping of built-in math functions not in no_std_wrapping:
@@ -191,8 +158,9 @@ fixed_derivatives = {
               lambda x, y: y/math.hypot(x, y)],
     'ldexp': [lambda x, y: 2**y,
               # math.ldexp only accepts an integer as its second
-              # argument:
-              None],
+              # argument: the derivative on the second argument should
+              # never be needed:
+              None],    
     'log': [log_der0,
             lambda x, y: -math.log(x, y)/y/math.log(y)],
     'log10': [lambda x: 1/x/math.log(10)],
@@ -221,10 +189,90 @@ for (name, func) in inspect.getmembers(math, inspect.isbuiltin):
     if name in fixed_derivatives:
         derivatives = fixed_derivatives[name]
     else:
+        # Functions whose derivatives are calculated numerically by
+        # this module fall here (isinf, fmod,...):
         derivatives = None  # Means: numerical calculation required
     setattr(this_module, name,
             wraps(uncertainties.wrap(func, derivatives), func))
     std_wrapped_math_funcs.append(name)
+
+########################################
+# Special cases: some of the functions from no_std_wrapping:
+
+##########
+# The math.factorial function is not converted to an uncertainty-aware
+# function, because it does not handle non-integer arguments: it does
+# not make sense to give it an argument with a numerical error
+# (whereas this would be relevant for the gamma function).
+
+##########
+
+# fsum takes a single argument, which cannot be differentiated.
+# However, each of the arguments inside this single list can
+# be a variable.  We handle this in a specific way:
+
+if sys.version_info[:2] >= (2, 6):    
+
+    original_func = math.fsum  # For optimization purposes
+
+    # We wrap math.fsum
+
+    def wrapped_fsum():
+        """
+        Returns an uncertainty-aware version of math.fsum, which must
+        be contained in _original_func.
+        """
+
+        # The fsum function is flattened, in order to use the
+        # wrap() wrapper:
+
+        flat_fsum = lambda *args: original_func(args)
+
+        flat_fsum_wrap = uncertainties.wrap(
+            flat_fsum, itertools.repeat(lambda *args: 1))
+
+        return wraps(lambda arg_list: flat_fsum_wrap(*arg_list),
+                     original_func)
+
+    fsum = wrapped_fsum()
+
+    # Wrapping already done:
+    non_std_wrapped_math_funcs.append('fsum')
+
+##########
+def modf(x):
+    """
+    Version of modf that works for numbers with uncertainty, and also
+    for regular numbers.
+    """
+    
+    # The code below is inspired by uncertainties.wrap().  It is
+    # simpler because only 1 argument is given, and there is no
+    # delegation to other functions involved (as for __mul__, etc.).
+    
+    aff_func = to_affine_scalar(x)
+
+    (frac_part, int_part) = math.modf(aff_func.nominal_value)
+
+    if aff_func.derivatives:
+        # The derivative of the fractional part is simply 1: the
+        # derivatives of modf(x)[0] are the derivatives of x:
+        return (AffineScalarFunc(frac_part, aff_func.derivatives), int_part)
+    else:
+        # This function was not called with an AffineScalarFunc
+        # argument: there is no need to return numbers with uncertainties:
+        return (frac_part, int_part)
+    
+non_std_wrapped_math_funcs.append('modf')
+
+#!!!!!!!!!! ldexp is better handled separately *if* floats are
+#assigned to AffineScalarFunc?
+
+## #!!!!!!!!!!!  ADD factorial (no version) and ldexp (new version)
+##     'ldexp': [lambda x, y: 2**y,
+##               # math.ldexp only accepts an integer as its second
+##               # argument:
+##               None],
 
 ###############################################################################
 # Exported functions:

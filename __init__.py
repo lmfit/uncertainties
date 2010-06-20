@@ -528,12 +528,12 @@ def wrap(f, derivatives_funcs=None):
             derivatives_wrt_args.append(derivative(*args_values)
                                         if arg.derivatives
                                         else 0)
-                                
 
         ########################################
         # Calculation of the derivative of f with respect to all the
         # variables (Variable) involved.
 
+        # Initial value (is updated below):
         derivatives_wrt_vars = dict((var, 0.) for var in variables)
 
         # The chain rule is used (we already have
@@ -541,8 +541,7 @@ def wrap(f, derivatives_funcs=None):
 
         for (func, f_derivative) in zip(aff_funcs, derivatives_wrt_args):
             for (var, func_derivative) in func.derivatives.iteritems():
-                derivatives_wrt_vars[var] += (f_derivative
-                                              * func_derivative)
+                derivatives_wrt_vars[var] += f_derivative * func_derivative
 
         # The function now returns an AffineScalarFunc object:
         return AffineScalarFunc(f_nominal_value, derivatives_wrt_vars)
@@ -714,12 +713,17 @@ class AffineScalarFunc(object):
 
         # Defines the value at the origin:
 
+        #!!!!!!!!!!!!! put same doc as for Variable?
+
+        #!!!!! add that it would not make sense to have a complex
+        #number here, for instance!
+        
         #! There is no coercion to a float, here, because
         # AffineScalarFunc objects are also used for representing
         # constants of any type (in which case derivatives is empty:
         # there are no variables), and some functions do need integer
         # arguments (like math.ldexp):
-        self._nominal_value = float(nominal_value)
+        self._nominal_value = nominal_value
         self.derivatives = derivatives
 
     @property
