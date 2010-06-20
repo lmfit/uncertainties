@@ -54,9 +54,9 @@ from uncertainties import __author__, to_affine_scalar, AffineScalarFunc
 # We wrap the functions from the math module so that they keep track of
 # uncertainties by returning a AffineScalarFunc object.
 
-# Some functions from the math module cannot be simply adapted to work
-# with AffineScalarFunc objects (either as their result or as their
-# arguments):
+# Some functions from the math module cannot be adapted in a standard
+# way so to work with AffineScalarFunc objects (either as their result
+# or as their arguments):
 
 # (1) Some functions return a result of a type whose value and
 # variations (uncertainties) cannot be represented by AffineScalarFunc
@@ -66,25 +66,22 @@ from uncertainties import __author__, to_affine_scalar, AffineScalarFunc
 # attempts operations that are not supported, such as calculation a
 # subtraction on a result of type tuple).
 
-# (2) Some functions don't take scalar arguments (which can be varied
-# during differentiation): math.fsum...  Such functions can either be:
+# (2) Some functions don't take continuous scalar arguments (which can
+# be varied during differentiation): math.fsum, math.factorial...
+# Such functions can either be:
 
-# - wrapped in a special way in wrap_math_functions()
+# - wrapped in a special way.
 
-# - excluded from wrapping by adding their name to no_std_wrapping
-
-# - wrapped in a general way in wrap_math_functions(); in this case,
-# the function does not have to be mentioned in any location in this
-# code.  The function should function normally, except possibly when
-# given AffineScalarFunc arguments.
-
-# Some functions require a specific treatment and must therefore be
-# Excluded from standard wrapping
-no_std_wrapping = ['modf', 'ldexp', 'fsum', 'factorial']
+# - excluded from standard wrapping by adding their name to
+# no_std_wrapping
 
 # Math functions that have a standard interface: they take
 # one or more float arguments, and return a scalar:
 many_scalar_to_scalar_funcs = []
+
+# Some functions require a specific treatment and must therefore be
+# excluded from standard wrapping.  Functions
+no_std_wrapping = ['modf', 'frexp', 'ldexp', 'fsum', 'factorial']
 
 # Function that copies the relevant attributes from generalized
 # functions from the math module:

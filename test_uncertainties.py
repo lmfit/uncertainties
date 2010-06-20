@@ -124,11 +124,9 @@ def _compare_derivatives(func, numerical_derivatives,
                 func_approx = func(*args)
 
                 # Some functions yield simple Python constants, after
-                # wrapping in wrap(): no test has to be performed:
+                # wrapping in wrap(): no test has to be performed.
+                # Some functions also yield tuples...
                 if isinstance(func_approx, AffineScalarFunc):
-                    
-                    #!!!!!! func_approx: it could be that the numerical
-                    # derivatives are actually not zero!
                     
                     # We compare all derivatives:
                     for (arg_num, (arg, numerical_deriv)) in \
