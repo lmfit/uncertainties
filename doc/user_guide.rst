@@ -174,13 +174,20 @@ provided that the NumPy_ package is available::
 
   >>> (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 21], cov_matrix)
 
-creates three new variables with the indicated values and the correct
+creates three new variables with the indicated values, and correct
 correlations::
 
-  >>> print u2
-  1+/-0.1
+  >>> sum_value
+  21.0+/-0.22360679774997899
+  >>> sum2
+  21.0+/-0.22360679774997899
+  >>> sum2 - (u2+2*v2)
+  0.0+/-3.8337185686225597e-09
 
-.. !!!!!!!!! It would be better to print sum2 - (u2+2*v2), and point to the exact 0 result
+The theoretical result is exactly zero, like for ``sum - (u+2*v)``,
+but numerical errors yield a small uncertainty (3e-9 is very small
+compared to the uncertainty on ``sum2``: correlations should in fact
+cancel the uncertainty on ``sum2``).
 
 The correlation matrix is the desired one::
 

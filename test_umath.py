@@ -34,8 +34,6 @@ def test_fixed_derivatives_math_funcs():
         func = getattr(umath, name)
         # Numerical derivatives of func: the nominal value of func() results
         # is used as the underlying function:
-        #!!!!!!!!!! I could use the original function: this would be
-        # more robust!
         numerical_derivatives = uncertainties.NumericalDerivatives(
             lambda *args: func(*args).nominal_value)
         test_uncertainties._compare_derivatives(func, numerical_derivatives)
