@@ -95,7 +95,7 @@ Comparison operators behave in a natural way::
   0.2001+/-0.01
   >>> y > x
   True
-  >>> ufloat((1, 0.001)) > 0
+  >>> y > 0
   True
 
 One important concept to keep in mind is that :func:`ufloat` creates
