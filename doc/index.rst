@@ -142,6 +142,7 @@ This software is released under a dual license:
 
 .. toctree::
    :hidden:
+   :maxdepth: 1
 
    Overview <self>
    user_guide
