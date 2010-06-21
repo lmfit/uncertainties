@@ -211,10 +211,17 @@ for (name, func) in inspect.getmembers(math, inspect.isbuiltin):
 
 if sys.version_info[:2] >= (2, 6):    
 
-    original_func = math.fsum  # For optimization purposes
+    # For drop-in compatibility with the math module:
+    factorial = math.factorial
+    non_std_wrapped_funcs.append('factorial')
+
 
     # We wrap math.fsum
 
+    original_func = math.fsum  # For optimization purposes
+
+    # The function below exists so that temporary variables do not
+    # pollute the module namespace:
     def wrapped_fsum():
         """
         Returns an uncertainty-aware version of math.fsum, which must
@@ -236,6 +243,7 @@ if sys.version_info[:2] >= (2, 6):
     non_std_wrapped_funcs.append('fsum')
 
 ##########
+@uncertainties.set_doc(math.modf.__doc__)
 def modf(x):
     """
     Version of modf that works for numbers with uncertainty, and also
@@ -261,12 +269,8 @@ def modf(x):
     
 many_scalar_to_scalar_funcs.append('modf')
 
+@uncertainties.set_doc(math.ldexp.__doc__)
 def ldexp(x, y):
-    """
-    Version of ldexp that works for numbers with uncertainty, and also
-    for regular numbers.
-    """
-
     # The code below is inspired by uncertainties.wrap().  It is
     # simpler because only 1 argument is given, and there is no
     # delegation to other functions involved (as for __mul__, etc.).
@@ -296,6 +300,7 @@ def ldexp(x, y):
         return math.ldexp(x, y)
 many_scalar_to_scalar_funcs.append('ldexp')
 
+@uncertainties.set_doc(math.frexp.__doc__)
 def frexp(x):
     """
     Version of frexp that works for numbers with uncertainty, and also
