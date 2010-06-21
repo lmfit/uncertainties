@@ -175,7 +175,7 @@ provided that the NumPy_ package is available::
   >>> (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 21], cov_matrix)
 
 creates three new variables with the indicated values, and correct
-correlations::
+uncertainties and correlations::
 
   >>> sum_value
   21.0+/-0.22360679774997899
