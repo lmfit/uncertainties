@@ -108,7 +108,7 @@ NumPy arrays of numbers with uncertainties instead of just scalars:
 
 NumPy's function names are used, and not those from the :mod:`math`
 module (for instance, :func:`unumpy.arccos` is defined, like in NumPy,
-and is not named :func:`acos` like in :func:`math` module).
+and is not named :func:`acos` like in the :func:`math` module).
 
 The definitions of the mathematical quantities calculated by these
 functions are available in the documentation of
