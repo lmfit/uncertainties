@@ -25,7 +25,7 @@ pathto("_static/logo.png", 1) }}" border="0" alt="uncertainties"/></a>
 
 {%- macro sidebar() %}
       {%- if not embedded %}{% if not theme_nosidebar|tobool %}
-      <div class="sphinxsidebar">
+<div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
           {%- block sidebarlogo %}
           {%- if logo %}
@@ -80,6 +80,10 @@ pathto("_static/logo.png", 1) }}" border="0" alt="uncertainties"/></a>
           </div>
           <script type="text/javascript">$('#searchbox').show(0);</script>
           {%- endif %}
+          {%- endblock %}
+          {%- block sidebarglobaltoc %}
+            <h3>{{ _('Global Table Of Contents') }}</h3>
+            {{ toctree() }}
           {%- endblock %}
           {%- block copyright %}
           <h3>Documentation license</h3>

@@ -143,6 +143,7 @@ This software is released under a dual license:
 .. toctree::
    :hidden:
 
+   Overview <self>
    user_guide
    numpy_guide
    tech_guide
