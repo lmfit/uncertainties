@@ -178,8 +178,8 @@ objects store all the variables they depend from:
 
 Note that :class:`Variable` objects are also :class:`AffineScalarFunc`
 objects (a variable x is simply considered to be the identity function
-x → x): testing whether ``my_value`` carries an uncertainty handled by
-this module can therefore be done with ``insinstance(my_value,
+x → x): testing whether ``value`` carries an uncertainty handled by
+this module can therefore be done with ``insinstance(value,
 AffineScalarFunc)``.
 
 
