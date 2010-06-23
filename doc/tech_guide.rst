@@ -143,7 +143,7 @@ uncertainties.  Comparing such numbers therefore returns a boolean
 result whose meaning is undefined.
 
 The boolean value (``bool(x)``, ``if x…``) of a number with
-uncertainty ``x`` is the result of ``x != 0``, as usual.
+uncertainty ``x`` is defined as the result of ``x != 0``, as usual.
 
 .. index:: number with uncertainty; classes, Variable class
 .. index::  AffineScalarFunc class
