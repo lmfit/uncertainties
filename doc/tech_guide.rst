@@ -89,12 +89,12 @@ However, since the objects defined in this module represent
 probability distributions and not pure numbers, comparison operators
 are interpreted in a specific way.
 
-The result of a comparison operation ("==", ">", etc.) is defined so
-as to be essentially consistent with the requirement that
-uncertainties be small: the value of a comparison operation is True
-only if the operation yields True for all infinitesimal variations of
-its random variables around their nominal values, except, possibly,
-for an infinitely small number of cases.
+The result of a comparison operation is defined so as to be
+essentially consistent with the requirement that uncertainties be
+small: the value of a comparison operation is True only if the
+operation yields True for all infinitesimal variations of its random
+variables around their nominal values, except, possibly, for an
+infinitely small number of cases.
 
 Example:
 
