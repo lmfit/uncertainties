@@ -169,8 +169,9 @@ returns a :class:`Variable` object:
 numbers (the summation, etc. of these objects is defined).
 
 Mathematical expressions involving numbers with uncertainties
-generally return :class:`AffineScalarFunc` objects; these objects
-store all the variables they depend from:
+generally return :class:`AffineScalarFunc` objects, because they
+represent mathematical functions and not simple variables; these
+objects store all the variables they depend from:
 
   >>> type(umath.sin(x))
   <class 'uncertainties.AffineScalarFunc'>
