@@ -33,8 +33,8 @@ Calculations can be performed directly, as with simple floats:
   0.04+/-0.004
 
 .. index::
-   pair: nominal value; scalar
-   pair: uncertainty; scalar
+   pair: nominal value; of scalar
+   pair: uncertainty; of scalar
 
 Access to the uncertainty and the nominal value
 -----------------------------------------------
