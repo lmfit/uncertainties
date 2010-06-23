@@ -4,9 +4,9 @@ Welcome to the uncertainties package
 The `uncertainties package`_ handles calculations that involve
 **numbers with uncertainties** (like 3.14±0.01).  Whatever the
 complexity of the calculation, this package returns the result with
-its uncertainty as predicted by `error propagation theory`_.  In
-particular, it handles **correlations** between variables, which sets
-this it apart from most existing error propagation codes.
+its uncertainty as predicted by linear `error propagation theory`_.
+In particular, it handles **correlations** between variables, which
+sets this it apart from most existing error propagation codes.
 
 Calculations involving numbers with uncertainties are made **very
 simple** thanks to this package.  In fact, it automatically calculates
