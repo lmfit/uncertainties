@@ -63,6 +63,10 @@ pathto("_static/logo.png", 1) }}" border="0" alt="uncertainties"/></a>
           {%- if customsidebar %}
           {% include customsidebar %}
           {%- endif %}
+          {%- block sidebarglobaltoc %}
+            <h3>{{ _('Global Table Of Contents') }}</h3>
+            {{ toctree() }}
+          {%- endblock %}
           {%- block sidebarsearch %}
           {%- if pagename != "search" %}
           <div id="searchbox" style="display: none">
@@ -79,10 +83,6 @@ pathto("_static/logo.png", 1) }}" border="0" alt="uncertainties"/></a>
           </div>
           <script type="text/javascript">$('#searchbox').show(0);</script>
           {%- endif %}
-          {%- endblock %}
-          {%- block sidebarglobaltoc %}
-            <h3>{{ _('Global Table Of Contents') }}</h3>
-            {{ toctree() }}
           {%- endblock %}
           {%- block copyright %}
           <h3>Documentation license</h3>
