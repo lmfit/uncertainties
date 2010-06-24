@@ -274,7 +274,7 @@ the derivative of an expression, with respect to any of its variables:
 
 Finally, a utility method is provided that directly yields the
 **number of standard deviations** between a number and a result with
-uncertainty:
+uncertainty: with ``x`` equal to 0.20±0.01,
 
   >>> x.position_in_sigmas(0.17)
   -3.0
