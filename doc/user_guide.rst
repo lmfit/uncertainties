@@ -169,7 +169,7 @@ functions):
 Correlated variables
 --------------------
 
-Reciprocally, correlated variables can be handled transparently,
+Reciprocally, correlated variables can be created transparently,
 provided that the NumPy_ package is available::
 
   >>> (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 21], cov_matrix)
@@ -184,10 +184,10 @@ uncertainties and correlations::
   >>> sum2 - (u2+2*v2)
   0.0+/-3.8337185686225597e-09
 
-The theoretical result is exactly zero, like for ``sum - (u+2*v)``,
-but numerical errors yield a small uncertainty (3e-9 is very small
-compared to the uncertainty on ``sum2``: correlations should in fact
-cancel the uncertainty on ``sum2``).
+The theoretical value of the last expression is exactly zero, like for
+``sum - (u+2*v)``, but numerical errors yield a small uncertainty
+(3e-9 is indeed very small compared to the uncertainty on ``sum2``:
+correlations should in fact cancel the uncertainty on ``sum2``).
 
 The correlation matrix is the desired one::
 
