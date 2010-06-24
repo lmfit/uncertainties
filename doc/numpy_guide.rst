@@ -111,7 +111,7 @@ module (for instance, :func:`unumpy.arccos` is defined, like in NumPy,
 and is not named :func:`acos` like in the :func:`math` module).
 
 The definition of the mathematical quantities calculated by these
-functions is available in the documentation of
+functions is available in the documentation for
 :mod:`uncertainties.umath`.
 
 .. index:: linear algebra; additional functions, ulinalg
