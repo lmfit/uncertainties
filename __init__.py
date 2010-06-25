@@ -696,17 +696,16 @@ class AffineScalarFunc(object):
 
     def __init__(self, nominal_value, derivatives):
         """
-        'nominal_value' is the value of the function at the origin.
-        
-        'derivatives' maps each Variable object on which the function
+        nominal_value -- value of the function at the origin.
+        nominal_value must not depend in any way of the Variable
+        objects in 'derivatives' (the value at the origin of the
+        function being defined is a constant).
+
+        derivatives -- maps each Variable object on which the function
         being defined depends to the value of the derivative with
         respect to that variable, taken at the nominal value of all
         variables.
  
-        'nominal_value' must not depend in any way of the Variable
-        objects in 'derivatives' (the value at the origin of the
-        function being defined is a constant).
-
         Warning: the above constraint is not checked, and the user is
         responsible for complying with it.
         """
