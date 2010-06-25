@@ -111,11 +111,11 @@ because a sample from the probability distribution of ``x`` is always
 equal to itself.  However:
 
   >>> y = ufloat((3.14, 0.01))
-  >>> x == y
-  False
+  >>> x != y
+  True
 
 since ``x`` and ``y`` are independent random variables that *almost*
-never give the same value.
+always give a different value.
 
 Similarly,
 
