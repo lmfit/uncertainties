@@ -238,6 +238,10 @@ def wrap_array_func(func):
 # Arrays
 
 # Vectorized creation of an array of variables:
+
+# ! Looking up uncertainties.Variable beforehand through '_Variable =
+# uncertainties.Variable' does not result in a significant speed up:
+
 _uarray = numpy.vectorize(lambda v, s: uncertainties.Variable(v, s),
                           otypes=[object])
 
