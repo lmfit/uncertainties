@@ -1137,21 +1137,21 @@ class Variable(AffineScalarFunc):
 
         # Reference: http://www.doughellmann.com/PyMOTW/copy/index.html
         
-        # For robustness reasons, parameters are deep-copied (in case
-        # Variable objects contain, in some version, attributes that
-        # are not simple floats):
-        return Variable(copy.deepcopy(self.nominal_value, memo),
-                        copy.deepcopy(self.std_dev(), memo),
-                        copy.deepcopy(self.tag, memo))
+        return Variable(self.nominal_value, self.std_dev(), self.tag)
 
-    # Hooks for the pickle module:
-    def __getstate__(self):        
+    def __getstate__(self):
+        """
+        Hook for the standard pickle module.
+        """
         obj_slot_values = dict((k, getattr(self, k)) for k in self.__slots__)
         obj_slot_values.update(AffineScalarFunc.__getstate__(self))
         # Conversion to a usual dictionary:
         return obj_slot_values
 
     def __setstate__(self, data_dict):
+        """
+        Hook for the standard pickle module.
+        """        
         for (name, value) in data_dict.iteritems():
             setattr(self, name, value)
         
