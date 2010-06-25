@@ -142,6 +142,21 @@ made in this package about operations involving numbers with
 uncertainties.  Comparing such numbers therefore returns a boolean
 result whose meaning is undefined.
 
+However, values with largely overlapping probability distributions can
+sometimes be compared unambiguously:
+
+  >>> x = ufloat((3, 1))
+  >>> x
+  3.0+/-1.0
+  >>> y = x + 0.0002
+  >>> y
+  3.0002+/-1.0
+  >>> y > x
+  True
+
+In fact, correlations guarantee that ``y`` is always larger than
+``x`` (by 0.0002).
+
 The boolean value (``bool(x)``, ``if x…``) of a number with
 uncertainty ``x`` is defined as the result of ``x != 0``, as usual.
 
