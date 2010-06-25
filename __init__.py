@@ -900,7 +900,7 @@ class AffineScalarFunc(object):
         """
         return AffineScalarFunc(
             self._nominal_value,
-            dict((copy.copy(var), deriv)
+            dict((copy.deepcopy(var), deriv)
                  for (var, deriv) in self.derivatives.iteritems()))
 
     # Hooks for the pickle module:
