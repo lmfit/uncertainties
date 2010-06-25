@@ -158,6 +158,9 @@ def test_inverse():
     # inversion:
     assert matrices_close(m * m_inverse,  numpy.eye(m.shape[0]))
 
+    ####################
+    
+
 def test_broadcast_funcs():
     """
     Test of mathematical functions that work with NumPy arrays of
