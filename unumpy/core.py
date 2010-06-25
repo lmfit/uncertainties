@@ -297,7 +297,8 @@ def apply_func_with_matrix_derivatives(func_with_derivatives):
     #returns an array of numbers with uncertainty.
     """
 
-    #!!!!! Adapt to lists as array_like:
+    #!!!!! Adapt to lists as array_like?  how can the types work as
+    #with the original function??
     def wrapped_func(array_like):
         """
         array_like -- array-like object that contains numbers with
