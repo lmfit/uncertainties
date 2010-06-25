@@ -85,6 +85,11 @@ result identical to the one that would be obtained with their nominal
 value only.  This allows code that runs with pure numbers to also work
 with numbers with uncertainties.
 
+.. index:: boolean value
+
+The **boolean value** (``bool(x)``, ``if x…``) of a number with
+uncertainty ``x`` is defined as the result of ``x != 0``, as usual.
+
 However, since the objects defined in this module represent
 probability distributions and not pure numbers, comparison operators
 are interpreted in a specific way.
@@ -157,11 +162,6 @@ sometimes be compared unambiguously:
 
 In fact, correlations guarantee that ``y`` is always larger than
 ``x`` (by 0.0002).
-
-.. index:: boolean value
-
-The **boolean value** (``bool(x)``, ``if x…``) of a number with
-uncertainty ``x`` is defined as the result of ``x != 0``, as usual.
 
 .. index:: number with uncertainty; classes, Variable class
 .. index::  AffineScalarFunc class
