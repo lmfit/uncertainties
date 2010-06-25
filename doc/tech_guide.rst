@@ -137,7 +137,7 @@ other operations, as required by the :ref:`linear approximation
 over the regions of highest probability of their variables (this is
 the equivalent of the linearity of a real function, for boolean
 values).  Thus, it is not meaningful to compare the following two
-independent variables whose probability distributions overlap:
+independent variables, whose probability distributions overlap:
 
   >>> x = ufloat((3, 0.01))
   >>> y = ufloat((3.0001, 0.01))
