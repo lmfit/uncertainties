@@ -275,9 +275,7 @@ def array_derivative(array_like, var):
                            # array:
                            otypes=[float])(array_like)
 
-
-#!!!! name OK???
-def apply_func_with_matrix_derivatives(func_with_derivatives):
+def func_with_deriv_to_uncert_func(func_with_derivatives):
     """
     Returns a function that can be applied to array-like objects that
     contain numbers with uncertainties (lists, lists of lists, Numpy
@@ -382,7 +380,7 @@ def inv_with_derivatives(arr, input_type, derivatives):
     """
     Defines the matrix inverse and its derivatives.
 
-    See the definition of apply_func_with_matrix_derivatives() for its
+    See the definition of func_with_deriv_to_uncert_func() for its
     detailed semantics.
     """
 
@@ -418,7 +416,7 @@ uncertainties.set_doc("""\
     %s
     """ % numpy.linalg.inv.__doc__)
 
-_inv = apply_func_with_matrix_derivatives(inv_with_derivatives)
+_inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
 
 # Default rcond argument for the generalization of numpy.linalg.pinv:
 try:
