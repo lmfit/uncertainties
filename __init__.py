@@ -893,10 +893,10 @@ class AffineScalarFunc(object):
         """
         Hook for the standard copy module.
 
-        New copies of the variables that the object depend on are
-        created.  Thus, the returned AffineScalarFunc is completely
-        fresh copy, which is fully independent of any variable defined
-        so far.
+        The returned AffineScalarFunc is a completely fresh copy,
+        which is fully independent of any variable defined so far.
+        New variables are specially created for the returned
+        AffineScalarFunc object.
         """
         return AffineScalarFunc(
             self._nominal_value,
