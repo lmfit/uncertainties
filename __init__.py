@@ -1139,7 +1139,7 @@ class Variable(AffineScalarFunc):
 
         # Reference: http://www.doughellmann.com/PyMOTW/copy/index.html
         
-        return Variable(self.nominal_value, self.std_dev(), self.tag)
+        return self.__copy__()
 
     def __getstate__(self):
         """
