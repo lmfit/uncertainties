@@ -1058,6 +1058,9 @@ class Variable(AffineScalarFunc):
         # takes much more memory.  Thus, this implementation chooses
         # more cycles and a smaller memory footprint instead of no
         # cycles and a larger memory footprint.
+
+        # ! Using AffineScalarFunc instead of super() results only in
+        # a 3 % speed loss (Python 2.6, Mac OS X):
         super(Variable, self).__init__(value, {self: 1.})
 
         # We force the error to be float-like.  Since it is considered
