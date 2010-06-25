@@ -206,13 +206,12 @@ def test_math_module():
 
     if sys.version_info[:2] >= (2, 6):
     
-        # factorial must not be "damaged" by this module; in
-        # particular, as of Python 2.6, it does not accept non
-        # integral values, and the user should not want to give
-        # uncertain (continuous) arguments to an equivalent of the
-        # math.factorial() function:
-        #
-        # assert umath.factorial(4) == 24
+        # factorial() must not be "damaged" by the umath module, so as 
+        # to help make it a drop-in replacement for math (even though 
+        # factorial() does not work on numbers with uncertainties 
+        # because it is restricted to integers, as for 
+        # math.factorial()):
+        assert umath.factorial(4) == 24
 
         # Boolean functions:
         assert not umath.isinf(x)
