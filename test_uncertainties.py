@@ -228,7 +228,29 @@ def test_copy():
     z = copy.deepcopy(x)
     assert x != z
 
+    # Copy tests on expressions:
+    t = x + 2*z
+    # t depends on x:
+    assert x in t.derivatives
     
+    # The relationship between the copy of an expression and the
+    # original variables should be preserved:
+    t_copy = copy.copy(t)
+    # Shallow copy: the variables on which t depends are not copied:
+    assert x in t_copy.derivatives
+    assert (uncertainties.covariance_matrix([t, z]) ==
+            uncertainties.covariance_matrix([t_copy, z]))
+
+    # However, the relationship between a deep copy and the original
+    # variables should be broken, since the deep copy created new,
+    # independent variables:
+    t_deepcopy = copy.deepcopy(t)
+    assert x not in t_deepcopy.derivatives    
+    assert (uncertainties.covariance_matrix([t, z]) !=
+            uncertainties.covariance_matrix([t_deepcopy, z]))
+
+    # Test of implementations with weak references:
+
     # Weak references: destroying a variable should never destroy the
     # integrity of its copies (which would happen if the copy keeps a
     # weak reference to the original, in its derivatives member: the

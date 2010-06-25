@@ -889,6 +889,20 @@ class AffineScalarFunc(object):
             raise ValueError("The standard deviation is zero:"
                              " undefined result.")
 
+    def __deepcopy__(self, memo):
+        """
+        Hook for the standard copy module.
+
+        New copies of the variables that the object depend on are
+        created.  Thus, the returned AffineScalarFunc is completely
+        fresh copy, which is fully independent of any variable defined
+        so far.
+        """
+        return AffineScalarFunc(
+            self._nominal_value,
+            dict((copy.copy(var), deriv)
+                 for (var, deriv) in self.derivatives.iteritems()))
+
     # Hooks for the pickle module:
     def __getstate__(self):        
         obj_slot_values = dict((k, getattr(self, k)) for k in
