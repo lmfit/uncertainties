@@ -15,6 +15,8 @@ import numpy
 import uncertainties
 from uncertainties import ufloat
 from uncertainties import unumpy
+from . import core
+
 from .. import test_uncertainties
 from uncertainties.test_uncertainties import _numbers_close, matrices_close
 
@@ -160,13 +162,14 @@ def test_inverse():
 def test_pseudo_inverse():
     "Tests of the pseudo-inverse"
 
-    #!!!!!!!!
-    from . import core  #!!!!!!! put on top, if use confirmed
-    
+    #!!!! add tests, comparing an analytical version to the numerical
+    # version, including for non full-rank matrices, and square matrices.
+
     # Numerical version:
     pinv_wrapped = core.wrap_array_func(numpy.linalg.pinv)
 
-    #!!!!!!!!!!!!!!!
+    #!!!! Add numerical checks, including of array-like objects with
+    #no uncertainties (like in test_inverse()).
     
 def test_broadcast_funcs():
     """
