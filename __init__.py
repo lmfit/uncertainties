@@ -1141,7 +1141,7 @@ class Variable(AffineScalarFunc):
         
         return Variable(self.nominal_value, self.std_dev(), self.tag)
 
-q    def __getstate__(self):
+    def __getstate__(self):
         """
         Hook for the standard pickle module.
         """
