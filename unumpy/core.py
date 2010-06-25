@@ -239,7 +239,7 @@ def wrap_array_func(func):
 
 # Vectorized creation of an array of variables:
 _uarray = numpy.vectorize(lambda v, s: uncertainties.Variable(v, s),
-                           otypes=[object])
+                          otypes=[object])
 
 def uarray((values, std_devs)):
     """
