@@ -98,8 +98,8 @@ The result of a comparison operation is defined so as to be
 essentially consistent with the requirement that uncertainties be
 small: the **value of a comparison operation** is True only if the
 operation yields True for all *infinitesimal* variations of its random
-variables around their nominal values, except, possibly, for an
-infinitely small number of cases.
+variables around their nominal values, *except*, possibly, for an
+*infinitely small number* of cases.
 
 Example:
 
@@ -137,7 +137,7 @@ other operations, as required by the :ref:`linear approximation
 over the regions of highest probability of their variables (this is
 the equivalent of the linearity of a real function, for boolean
 values).  Thus, it is not meaningful to compare the following two
-values, whose probability distributions overlap:
+independent variables whose probability distributions overlap:
 
   >>> x = ufloat((3, 0.01))
   >>> y = ufloat((3.0001, 0.01))
