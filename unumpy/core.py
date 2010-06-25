@@ -279,25 +279,37 @@ def array_derivative(array_like, var):
 #!!!! name OK???
 def apply_func_with_matrix_derivatives(func_with_derivatives):
     """
-    func_with_derivatives -- iterator that returns a function
-    evaluated at a point, and all the derivatives of this function.
-    Example: inv_with_derivatives().
+    Returns a function that can be applied to array-like objects that
+    contain numbers with uncertainties (lists, lists of lists, Numpy
+    arrays, etc.).
+    
+    func_with_derivatives -- defines a function that takes array-like
+    objects containing scalars and returns an array.  Both the value
+    and the derivatives of this function with respect to multiple
+    scalar parameters are calculated by func_with_derivatives().
+    
+    func_with_derivatives(arr, input_type, derivatives) returns an
+    iterator.  The first element is the value of the function at point
+    'arr' (with the correct type).  The following elements are arrays
+    that represent the derivative of the function for each derivative
+    array from the iterator 'derivatives'.
 
-    #!!!!!!!!! Give details on func_with_derivatives by copying
-    #inv_with_derivatives
+      func_with_derivatives takes the following arguments:
 
-    #!!!!!!! func_with_derivatives describes a function that
-    #essentially takes an array of numbers with uncertainty and
-    #returns an array of numbers with uncertainty.
+      arr -- Numpy ndarray of scalars where the function must be
+      evaluated.
 
-    #!!!!!!! func_with_derivatives[0] is a nominal value of the
-    #function with the type of the final result.
+      input_type -- type of the input array-like object.  This type is
+      used for determining the type that the function should return.
+
+      derivatives -- iterator that returns the derivatives of the
+      argument of the function with respect to multiple scalar
+      variables.  func_with_derivatives() returns the derivatives of
+      the defined function with respect to these variables.
+
+    Examples of func_with_derivatives: inv_with_derivatives().
     """
-
-    #!!!!!!!!! Handle the type problem.  For instance, for inv: list>arr,
-    # arr>arr, mat>mat.  A difficulty is that Numpy arrays are convenient
-    # for deep access to everything.
-
+    
     def wrapped_func(array_like):
         """
         array_like -- array-like object that contains numbers with
@@ -368,22 +380,10 @@ def apply_func_with_matrix_derivatives(func_with_derivatives):
 
 def inv_with_derivatives(arr, input_type, derivatives):
     """
-    Iterator that returns:
+    Defines the matrix inverse and its derivatives.
 
-    1 - The matrix inverse of array_like, which is a Numpy array of
-    floats.
-
-    2 - The matrix derivatives of the inverse, where the array
-    derivatives are given in the derivatives argument.
-
-    arr -- Numpy array that contains some nominal value.
-
-    input_type -- Type of the original array-like object that
-    contained the numbers with uncertainties.
-
-    derivatives -- iterator that returns matrix derivatives.  This
-    function returns the derivative of the inverse, given the
-    derivatives from this iterator.
+    See the definition of apply_func_with_matrix_derivatives() for its
+    detailed semantics.
     """
 
     # It is convenient to use matrices, in this function (which
