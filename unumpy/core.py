@@ -203,15 +203,9 @@ def wrap_array_func(func):
             if not shift_var:
                 shift_var = 1e-8
 
-            #!!!!!!!!! could use array_derivative
             # Shift of all the elements of arr when var changes by shift_var:
-            shift_arr = numpy.vectorize(lambda u: derivative(u, var),
-                                        # The type is set because an
-                                        # integer derivative should not
-                                        # set the output type of the
-                                        # array:
-                                        otypes=[float]
-                                        )(arr)*shift_var
+            shift_arr = array_derivative(arr, var)*shift_var
+
             # Origin value of array arr when var is shifted by shift_var:
             shifted_arr_values = arr_nominal_value + shift_arr
             func_shifted = func(shifted_arr_values, *args)
