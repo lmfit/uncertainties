@@ -158,7 +158,9 @@ sometimes be compared unambiguously:
 In fact, correlations guarantee that ``y`` is always larger than
 ``x`` (by 0.0002).
 
-The boolean value (``bool(x)``, ``if x…``) of a number with
+.. index:: boolean value
+
+The **boolean value** (``bool(x)``, ``if x…``) of a number with
 uncertainty ``x`` is defined as the result of ``x != 0``, as usual.
 
 .. index:: number with uncertainty; classes, Variable class
