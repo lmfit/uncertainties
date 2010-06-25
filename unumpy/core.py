@@ -403,8 +403,8 @@ def inv_with_derivatives(arr, input_type, derivatives):
         derivative_mat = numpy.asmatrix(derivative)
         yield -inverse_mat * derivative_mat * inverse_mat
 
-#!!!!!! add doc to _inv
-uncertainties.set_doc("""\
+_inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
+_inv.__doc__ = """\
     Version of numpy.linalg.inv that works with array-like objects
     that contain numbers with uncertainties.
 
@@ -414,9 +414,7 @@ uncertainties.set_doc("""\
 
     Original documentation:
     %s
-    """ % numpy.linalg.inv.__doc__)
-
-_inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
+    """ % numpy.linalg.inv.__doc__
 
 # Default rcond argument for the generalization of numpy.linalg.pinv:
 try:
@@ -425,7 +423,7 @@ try:
 except AttributeError:
     _pinv_default = 1e-15
 
-#!!!!!!!!!!! Useless, when analytical formula added
+#!!!! Useless, when analytical formula is added
 _pinv_wrapped = wrap_array_func(numpy.linalg.pinv)
 
 @uncertainties.set_doc("""
@@ -441,10 +439,8 @@ _pinv_wrapped = wrap_array_func(numpy.linalg.pinv)
     """ % numpy.linalg.pinv.__doc__)
 def _pinv(arr, rcond=_pinv_default):
 
-    #!!!!!!!!!!!!!!! I should generalize _inv().  Essentially, I
-    #should write a function that progressively updates all the
-    #variables of the result for successive "full" matrix derivatives.
-    
+    #!!!! An analytical formula could be implemented through
+    #func_with_deriv_to_uncert_func().
     
     # The resulting inverse generally contains numbers with
     # uncertainties: it is view()ed as a core.matrix:
