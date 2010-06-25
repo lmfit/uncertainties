@@ -203,6 +203,7 @@ def wrap_array_func(func):
             if not shift_var:
                 shift_var = 1e-8
 
+            #!!!!!!!!! could use array_derivative
             # Shift of all the elements of arr when var changes by shift_var:
             shift_arr = numpy.vectorize(lambda u: derivative(u, var),
                                         # The type is set because an
@@ -260,7 +261,135 @@ def uarray((values, std_devs)):
 
 ###############################################################################
 
-@uncertainties.set_doc("""\
+def array_derivative(array_like, var):
+    """
+    Returns the derivative of the given array with respect to the
+    given variable.
+
+    The returned derivative is an array of the same shape, that
+    contains floats.
+
+    array_like -- Numpy array that contains scalars or numbers with
+    uncertainties.
+
+    var -- Variable object.
+    """    
+    return numpy.vectorize(lambda u: derivative(u, var),
+                           # The type is set because an
+                           # integer derivative should not
+                           # set the output type of the
+                           # array:
+                           otypes=[float])(array_like)
+
+
+#!!!! name OK???
+def apply_func_with_matrix_derivatives(func_with_derivatives):
+    """
+    func_with_derivatives -- iterator that returns a function
+    evaluated at a point, and all the derivatives of this function.
+    Example: inv_with_derivatives().
+
+    #!!!!!!!!! Give details on func_with_derivatives by copying
+    #inv_with_derivatives
+
+    #!!!!!!! func_with_derivatives describes a function that
+    #essentially takes an array of numbers with uncertainty and
+    #returns an array of numbers with uncertainty.
+    """
+
+    #!!!!! Adapt to lists as array_like:
+    def wrapped_func(array_like):
+        """
+        array_like -- array-like object that contains numbers with
+        uncertainties (list, Numpy ndarray or matrix, etc.).
+        """
+
+        # Variables on which the array depends are collected:
+        variables = set()
+        for element in array_like.flat:
+            # floats, etc. might be present
+            if isinstance(element, uncertainties.AffineScalarFunc):
+                variables |= set(element.derivatives.iterkeys())
+
+        array_nominal = nominal_values(array_like)
+        # Function value, and derivatives at array_like (the
+        # derivatives are with respect to the variables contained in
+        # array_like):
+        func_and_derivs = func_with_derivatives(
+            array_nominal,
+            (array_derivative(array_like, var) for var in variables))
+
+        func_nominal_value = func_and_derivs.next()
+        
+        # The result is built progressively, with the contribution of
+        # each variable added in turn:
+
+        # Calculation of the derivatives of the result with respect to the
+        # variables.
+        derivatives = numpy.vectorize(lambda _: {}, otypes=[object])(
+            array_like)
+        # Memory-efficient approach.  A memory-hungry approach would be to
+        # calculate the matrix derivatives will respect to all variables
+        # and then combine them into a matrix of AffineScalarFunc objects.
+        # The approach followed here is to progressively build the matrix
+        # of derivatives, by progressively adding the derivatives with
+        # respect to successive variables.
+        for (var, deriv_wrt_var) in zip(variables, func_and_derivs):
+
+            # Update of the list of variables and associated
+            # derivatives, for each element:
+            for (derivative_dict, derivative_value) in zip(
+                derivatives.flat, deriv_wrt_var.flat):
+                if derivative_value:
+                    derivative_dict[var] = derivative_value
+
+        # An array of numbers with uncertainties are built from the
+        # result:
+        result = numpy.vectorize(uncertainties.AffineScalarFunc)(
+            func_nominal_value, derivatives)
+
+        # Numpy matrices that contain numbers with uncertainties are
+        # better as unumpy matrices:
+        if isinstance(result, numpy.matrix):
+            result = result.view(matrix)
+
+        return result
+    
+    return wrapped_func
+
+def inv_with_derivatives(array_like, derivatives):
+    """
+    Iterator that returns:
+
+    1 - The matrix inverse of array_like, which is a Numpy array of
+    floats.
+
+    2 - The matrix derivatives of the inverse, where the array
+    derivatives are given in the derivatives argument.
+
+    array_like -- Numpy array that contains some nominal value.
+
+    derivatives -- iterator that returns matrix derivatives.  This
+    function returns the derivative of the inverse, given the
+    derivatives from this iterator.
+    """
+
+    # It is convenient to use matrices, in this function (which
+    # returns a matrix):
+    
+    inverse = numpy.linalg.inv(array_like)    
+    yield inverse
+
+    # It is mathematically convenient to work with matrices:
+    inverse_mat = numpy.asmatrix(inverse)
+
+    # Successive derivatives of the inverse:
+    for derivative in derivatives:
+        derivative_mat = numpy.asmatrix(derivative)
+        yield -inverse_mat * derivative_mat * inverse_mat
+
+#!!!!!! add doc to _inv
+uncertainties.set_doc("""\
     Version of numpy.linalg.inv that works with array-like objects
     that contain numbers with uncertainties.
 
@@ -271,62 +400,8 @@ def uarray((values, std_devs)):
     Original documentation:
     %s
     """ % numpy.linalg.inv.__doc__)
-def _inv(array_like):
 
-    # numpy.linalg.inv works on array-like elements like lists.  It is
-    # convenient to use matrices, in this function:
-    mat = numpy.asmatrix(array_like)
-    
-    # Nominal value:
-    mat_nominal_value = nominal_values(mat)
-    func_nominal_value = numpy.linalg.inv(mat_nominal_value)
-
-    # Variables on which the array depends are collected:
-    variables = set()
-    for element in mat.flat:
-        # floats, etc. might be present
-        if isinstance(element, uncertainties.AffineScalarFunc):
-            variables |= set(element.derivatives.iterkeys())
-
-    # If the matrix has no variables, then the function value can be
-    # directly returned:
-    if not variables:
-        return func_nominal_value
-
-    # Calculation of the derivatives of the result with respect to the
-    # variables.
-    derivatives = numpy.vectorize(lambda _: {}, otypes=[object])(mat)
-    # Memory-efficient approach.  A memory-hungry approach would be to
-    # calculate the matrix derivatives will respect to all variables
-    # and then combine them into a matrix of AffineScalarFunc objects.
-    # The approach followed here is to progressively build the matrix
-    # of derivatives, by progressively adding the derivatives with
-    # respect to successive variables.
-    for var in variables:
-        # The * operator is assumed to be the matrix multiplication:
-        deriv_wrt_var = -numpy.dot(
-            func_nominal_value,
-            numpy.dot(numpy.vectorize(lambda u: derivative(u, var),
-                                      # The type is set because an
-                                      # integer derivative should not
-                                      # set the output type of the
-                                      # array:
-                                      otypes=[float])(mat),
-                      func_nominal_value))
-      
-        # Update of the list of variables and associated derivatives,
-        # for each element:
-        for (derivative_dict, derivative_value) in zip(derivatives.flat,
-                                                       deriv_wrt_var.flat):
-            if derivative_value:
-                derivative_dict[var] = derivative_value
-
-    # Numbers with uncertainties are built from the result:      
-    return (numpy.vectorize(uncertainties.AffineScalarFunc)(func_nominal_value,
-                                                            derivatives)
-            .view(matrix))
-
-_pinv_wrapped = wrap_array_func(numpy.linalg.pinv)
+_inv = apply_func_with_matrix_derivatives(inv_with_derivatives)
 
 # Default rcond argument for the generalization of numpy.linalg.pinv:
 try:
@@ -334,6 +409,9 @@ try:
     _pinv_default = numpy.linalg.pinv.__defaults__[0]
 except AttributeError:
     _pinv_default = 1e-15
+
+#!!!!!!!!!!! Useless, when analytical formula added
+_pinv_wrapped = wrap_array_func(numpy.linalg.pinv)
 
 @uncertainties.set_doc("""
     Version of numpy.linalg.pinv that works with array-like objects
@@ -347,6 +425,12 @@ except AttributeError:
     %s
     """ % numpy.linalg.pinv.__doc__)
 def _pinv(arr, rcond=_pinv_default):
+
+    #!!!!!!!!!!!!!!! I should generalize _inv().  Essentially, I
+    #should write a function that progressively updates all the
+    #variables of the result for successive "full" matrix derivatives.
+    
+    
     # The resulting inverse generally contains numbers with
     # uncertainties: it is view()ed as a core.matrix:
     return _pinv_wrapped(numpy.asarray(arr), rcond).view(matrix)

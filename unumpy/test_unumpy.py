@@ -103,6 +103,22 @@ def test_matrix():
     assert _numbers_close(1/m_nominal_values[1, 1],
                           m_inv_uncert[1, 1].nominal_value), "Wrong value"
 
+def _derivatives_close(x, y):
+    """
+    Returns True iff the AffineScalarFunc objects x and y have
+    derivatives that are close to each other (they must depend
+    on the same variables).
+    """
+
+    # x and y must depend on the same variables:
+    if len(set(x.derivatives)\
+           .symmetric_difference(y.derivatives)):
+        return False  # Not the same variables
+
+    return all( _numbers_close(x.derivatives[var],
+                               y.derivatives[var])
+                for var in x.derivatives)
+
 def test_inverse():
     "Tests of the matrix inverse"
 
@@ -121,23 +137,6 @@ def test_inverse():
                           m[0, 0].nominal_value)
     assert _numbers_close(m_double_inverse[0, 0].std_dev(),
                           m[0, 0].std_dev())
-
-
-    def _derivatives_close(x, y):
-        """
-        Returns True iff the AffineScalarFunc objects x and y have
-        derivatives that are close to each other (they must depend
-        on the same variables).
-        """
-
-        # x and y must depend on the same variables:
-        if len(set(x.derivatives)\
-               .symmetric_difference(y.derivatives)):
-            return False  # Not the same variables
-
-        return all( _numbers_close(x.derivatives[var],
-                                   y.derivatives[var])
-                    for var in x.derivatives)
 
     assert matrices_close(m_double_inverse, m)
 
@@ -158,6 +157,17 @@ def test_inverse():
     # inversion:
     assert matrices_close(m * m_inverse,  numpy.eye(m.shape[0]))
 
+def test_pseudo_inverse():
+    "Tests of the pseudo-inverse"
+
+    #!!!!!!!!
+    from . import core  #!!!!!!! put on top, if use confirmed
+    
+    # Numerical version:
+    pinv_wrapped = core.wrap_array_func(numpy.linalg.pinv)
+
+    #!!!!!!!!!!!!!!!
+    
 def test_broadcast_funcs():
     """
     Test of mathematical functions that work with NumPy arrays of
