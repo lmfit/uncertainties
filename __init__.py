@@ -722,6 +722,8 @@ class AffineScalarFunc(object):
         self._nominal_value = float(nominal_value)
         self.derivatives = derivatives
 
+    # The following prevents the 'nominal_value' attribute from being
+    # modified by the user:
     @property
     def nominal_value(self):
         "Nominal value of the random number."
