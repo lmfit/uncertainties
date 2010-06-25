@@ -27,11 +27,17 @@ def test_list_inverse():
     # though mat_list is a list of lists (and not a matrix).  Can
     # ulinalg do the same?  Here is a test:
     mat_list_inv = unumpy.ulinalg.inv(mat_list)
+
     # The resulting matrix does not have to be a matrix that can
     # handle uncertainties, because the input matrix does not have
     # uncertainties:
     assert not isinstance(mat_list_inv, unumpy.matrix)
     assert mat_list_inv[1,1] == -1
+
+    # unumpy.ulinalg should behave in the same way as numpy.linalg,
+    # with respect to types:
+    mat_list_inv_numpy = numpy.linalg.inv(mat_list)
+    assert type(mat_list_inv) == type(mat_list_inv_numpy)
     
     x = ufloat((1, 0.1))
     y = ufloat((2, 0.1))
