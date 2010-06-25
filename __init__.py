@@ -1129,6 +1129,8 @@ class Variable(AffineScalarFunc):
     def __deepcopy__(self, memo):
         """
         Hook for the standard copy module.
+
+        A new variable is created.
         """
         
         # This deep copy implicitly takes care of the reference of the
@@ -1139,7 +1141,7 @@ class Variable(AffineScalarFunc):
         
         return Variable(self.nominal_value, self.std_dev(), self.tag)
 
-    def __getstate__(self):
+q    def __getstate__(self):
         """
         Hook for the standard pickle module.
         """
