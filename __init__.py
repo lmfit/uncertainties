@@ -903,8 +903,10 @@ class AffineScalarFunc(object):
             dict((copy.deepcopy(var), deriv)
                  for (var, deriv) in self.derivatives.iteritems()))
 
-    # Hooks for the pickle module:
-    def __getstate__(self):        
+    def __getstate__(self):
+        """
+        Hook for the pickle module.
+        """
         obj_slot_values = dict((k, getattr(self, k)) for k in
                                # self.__slots__ would not work when
                                # self is an instance of a subclass:
@@ -912,6 +914,9 @@ class AffineScalarFunc(object):
         return obj_slot_values
 
     def __setstate__(self, data_dict):
+        """
+        Hook for the pickle module.
+        """        
         for (name, value) in data_dict.iteritems():
             setattr(self, name, value)
 
