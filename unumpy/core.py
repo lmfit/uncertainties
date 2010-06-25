@@ -362,7 +362,12 @@ def apply_func_with_matrix_derivatives(func_with_derivatives):
         # result:
         result = numpy.vectorize(uncertainties.AffineScalarFunc)(
             func_nominal_value, derivatives)
-            
+
+        # Numpy matrices that contain numbers with uncertainties are
+        # better as unumpy matrices:
+        if isinstance(result, numpy.matrix):
+            result = result.view(matrix)
+                    
         return result
     
     return wrapped_func
