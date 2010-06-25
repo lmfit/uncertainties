@@ -266,11 +266,11 @@ def array_derivative(array_like, var):
     Returns the derivative of the given array with respect to the
     given variable.
 
-    The returned derivative is an array of the same shape, that
-    contains floats.
+    The returned derivative is a Numpy ndarray of the same shape as
+    array_like, that contains floats.
 
-    array_like -- Numpy array that contains scalars or numbers with
-    uncertainties.
+    array_like -- array-like object (list, etc.)  that contains
+    scalars or numbers with uncertainties.
 
     var -- Variable object.
     """    
@@ -295,46 +295,60 @@ def apply_func_with_matrix_derivatives(func_with_derivatives):
     #!!!!!!! func_with_derivatives describes a function that
     #essentially takes an array of numbers with uncertainty and
     #returns an array of numbers with uncertainty.
+
+    #!!!!!!! func_with_derivatives[0] is a nominal value of the
+    #function with the type of the final result.
     """
 
-    #!!!!! Adapt to lists as array_like?  how can the types work as
-    #with the original function??
+    #!!!!!!!!! Handle the type problem.  For instance, for inv: list>arr,
+    # arr>arr, mat>mat.  A difficulty is that Numpy arrays are convenient
+    # for deep access to everything.
+
     def wrapped_func(array_like):
         """
         array_like -- array-like object that contains numbers with
         uncertainties (list, Numpy ndarray or matrix, etc.).
         """
 
+        # So that .flat works even if array_like is a list.  Later
+        # useful for faster code:
+        array_version = numpy.asarray(array_like)
+
         # Variables on which the array depends are collected:
         variables = set()
-        for element in array_like.flat:
+        for element in array_version.flat:
             # floats, etc. might be present
             if isinstance(element, uncertainties.AffineScalarFunc):
                 variables |= set(element.derivatives.iterkeys())
 
-        array_nominal = nominal_values(array_like)
-        # Function value, and derivatives at array_like (the
+        array_nominal = nominal_values(array_version)
+        # Function value, and derivatives at array_nominal (the
         # derivatives are with respect to the variables contained in
         # array_like):
         func_and_derivs = func_with_derivatives(
             array_nominal,
-            (array_derivative(array_like, var) for var in variables))
+            type(array_like),
+            (array_derivative(array_version, var) for var in variables))
 
         func_nominal_value = func_and_derivs.next()
+
+        if not variables:
+            return func_nominal_value
         
         # The result is built progressively, with the contribution of
         # each variable added in turn:
 
-        # Calculation of the derivatives of the result with respect to the
-        # variables.
+        # Calculation of the derivatives of the result with respect to
+        # the variables.
         derivatives = numpy.vectorize(lambda _: {}, otypes=[object])(
-            array_like)
-        # Memory-efficient approach.  A memory-hungry approach would be to
-        # calculate the matrix derivatives will respect to all variables
-        # and then combine them into a matrix of AffineScalarFunc objects.
-        # The approach followed here is to progressively build the matrix
-        # of derivatives, by progressively adding the derivatives with
-        # respect to successive variables.
+            array_version)
+        # Memory-efficient approach.  A memory-hungry approach would
+        # be to calculate the matrix derivatives will respect to all
+        # variables and then combine them into a matrix of
+        # AffineScalarFunc objects.  The approach followed here is to
+        # progressively build the matrix of derivatives, by
+        # progressively adding the derivatives with respect to
+        # successive variables.
         for (var, deriv_wrt_var) in zip(variables, func_and_derivs):
 
             # Update of the list of variables and associated
@@ -348,17 +362,12 @@ def apply_func_with_matrix_derivatives(func_with_derivatives):
         # result:
         result = numpy.vectorize(uncertainties.AffineScalarFunc)(
             func_nominal_value, derivatives)
-
-        # Numpy matrices that contain numbers with uncertainties are
-        # better as unumpy matrices:
-        if isinstance(result, numpy.matrix):
-            result = result.view(matrix)
-
+            
         return result
     
     return wrapped_func
 
-def inv_with_derivatives(array_like, derivatives):
+def inv_with_derivatives(arr, input_type, derivatives):
     """
     Iterator that returns:
 
@@ -368,7 +377,10 @@ def inv_with_derivatives(array_like, derivatives):
     2 - The matrix derivatives of the inverse, where the array
     derivatives are given in the derivatives argument.
 
-    array_like -- Numpy array that contains some nominal value.
+    arr -- Numpy array that contains some nominal value.
+
+    input_type -- Type of the original array-like object that
+    contained the numbers with uncertainties.
 
     derivatives -- iterator that returns matrix derivatives.  This
     function returns the derivative of the inverse, given the
@@ -378,7 +390,12 @@ def inv_with_derivatives(array_like, derivatives):
     # It is convenient to use matrices, in this function (which
     # returns a matrix):
     
-    inverse = numpy.linalg.inv(array_like)    
+    inverse = numpy.linalg.inv(arr)
+    # The inverse of a numpy.matrix is a numpy.matrix.  It is assumed
+    # that numpy.linalg.inv is such that other types yield
+    # numpy.ndarrays:
+    if issubclass(input_type, numpy.matrix):
+        inverse = inverse.view(numpy.matrix)
     yield inverse
 
     # It is mathematically convenient to work with matrices:

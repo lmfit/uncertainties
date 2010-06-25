@@ -28,17 +28,25 @@ def test_list_inverse():
     # ulinalg do the same?  Here is a test:
     mat_list_inv = unumpy.ulinalg.inv(mat_list)
 
-    # The resulting matrix does not have to be a matrix that can
-    # handle uncertainties, because the input matrix does not have
-    # uncertainties:
-    assert not isinstance(mat_list_inv, unumpy.matrix)
-    assert mat_list_inv[1,1] == -1
+    # More type testing:
+    mat_matrix = numpy.asmatrix(mat_list)
+    assert isinstance(unumpy.ulinalg.inv(mat_matrix),
+                      type(numpy.linalg.inv(mat_matrix)))
 
     # unumpy.ulinalg should behave in the same way as numpy.linalg,
     # with respect to types:
     mat_list_inv_numpy = numpy.linalg.inv(mat_list)
     assert type(mat_list_inv) == type(mat_list_inv_numpy)
-    
+
+    # The resulting matrix does not have to be a matrix that can
+    # handle uncertainties, because the input matrix does not have
+    # uncertainties:
+    assert not isinstance(mat_list_inv, unumpy.matrix)
+
+    # Individual element check:
+    assert isinstance(mat_list_inv[1,1], float)    
+    assert mat_list_inv[1,1] == -1
+
     x = ufloat((1, 0.1))
     y = ufloat((2, 0.1))
     mat = unumpy.matrix([[x, x], [y, 0]])
@@ -47,6 +55,7 @@ def test_list_inverse():
     # unumpy.matrix inverse, for square matrices (.I is the
     # pseudo-inverse, for non-square matrices, but inv() is not).
     assert matrices_close(unumpy.ulinalg.inv(mat), mat.I)
+
 
 def test_list_pseudo_inverse():
     "Test of the pseudo-inverse"
