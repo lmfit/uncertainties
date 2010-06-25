@@ -67,9 +67,9 @@ over the region of significant probability.
 
 For instance, ``sin(0+/-0.01)`` yields a meaningful standard deviation
 since it is quite linear over 0±0.01.  However, ``cos(0+/-0.01)``,
-yields an approximate standard deviation of 0 (because the cosine is
-not well approximated by a line around 0), which might not be precise
-enough for all applications.
+yields an approximate standard deviation of 0 (because around 0, the
+cosine is parabolic, not linear), which might not be precise enough
+for all applications.
 
 .. index:: comparison operators; technical details
 
