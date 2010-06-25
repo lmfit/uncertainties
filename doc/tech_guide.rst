@@ -60,10 +60,10 @@ The calculated standard deviations and nominal values are thus
 meaningful approximations as long as the functions involved have
 precise linear expansions in the region where the probability
 distribution of their variables is the largest.  It is therefore
-important that uncertainties be "small".  Mathematically, this means
-that the linear term of functions around the nominal values of their
-variables should be much larger than the remaining higher-order terms
-over the region of significant probability.
+important that **uncertainties be "small"**.  Mathematically, this
+means that the linear term of functions around the nominal values of
+their variables should be much larger than the remaining higher-order
+terms over the region of significant probability.
 
 For instance, ``sin(0+/-0.01)`` yields a meaningful standard deviation
 since it is quite linear over 0±0.01.  However, ``cos(0+/-0.01)``,
@@ -91,8 +91,8 @@ are interpreted in a specific way.
 
 The result of a comparison operation is defined so as to be
 essentially consistent with the requirement that uncertainties be
-small: the value of a comparison operation is True only if the
-operation yields True for all infinitesimal variations of its random
+small: the **value of a comparison operation** is True only if the
+operation yields True for all *infinitesimal* variations of its random
 variables around their nominal values, except, possibly, for an
 infinitely small number of cases.
 
@@ -126,11 +126,12 @@ most of the time be such that the sample from ``x`` is larger than the
 sample from ``y``.  Therefore, it is natural to consider that for all
 practical purposes, ``x > y``.
 
-Comparison operations are subject to the same constraints as other
-operations, as required by the :ref:`linear approximation
-<linear_method>` method: their result should be linear (i.e. constant,
-for boolean values) over the regions of highest probability of their
-variables.  Thus, it is not meaningful to compare the following two
+Since comparison operations are subject to the same constraints as
+other operations, as required by the :ref:`linear approximation
+<linear_method>` method, their result should be essentially *constant*
+over the regions of highest probability of their variables (this is
+the equivalent of the linearity of a real function, for boolean
+values).  Thus, it is not meaningful to compare the following two
 values, whose probability distributions overlap:
 
   >>> x = ufloat((3, 0.01))
