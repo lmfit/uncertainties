@@ -344,8 +344,9 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
 
         # Calculation of the derivatives of the result with respect to
         # the variables.
-        derivatives = numpy.vectorize(lambda _: {}, otypes=[object])(
-            array_version)
+        derivatives = array([{} for _ in xrange(func_nominal_value.zize)],
+                            dtype=object).reshape(func_nominal_value.shape)
+
         # Memory-efficient approach.  A memory-hungry approach would
         # be to calculate the matrix derivatives will respect to all
         # variables and then combine them into a matrix of
