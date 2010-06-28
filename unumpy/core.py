@@ -286,11 +286,11 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
     and the derivatives of this function with respect to multiple
     scalar parameters are calculated by func_with_derivatives().
     
-    func_with_derivatives(arr, input_type, derivatives) returns an
-    iterator.  The first element is the value of the function at point
-    'arr' (with the correct type).  The following elements are arrays
-    that represent the derivative of the function for each derivative
-    array from the iterator 'derivatives'.
+    func_with_derivatives(arr, input_type, derivatives, *args) returns
+    an iterator.  The first element is the value of the function at
+    point 'arr' (with the correct type).  The following elements are
+    arrays that represent the derivative of the function for each
+    derivative array from the iterator 'derivatives'.
 
       func_with_derivatives takes the following arguments:
 
@@ -305,13 +305,19 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
       variables.  func_with_derivatives() returns the derivatives of
       the defined function with respect to these variables.
 
+      args -- additional arguments that define the result (example:
+      for the pseudo-inverse numpy.linalg.pinv: numerical cutoff).
+
     Examples of func_with_derivatives: inv_with_derivatives().
     """
     
-    def wrapped_func(array_like):
+    def wrapped_func(array_like, *args):
         """
         array_like -- array-like object that contains numbers with
         uncertainties (list, Numpy ndarray or matrix, etc.).
+
+        args -- additional arguments that are passed directly to
+        func_with_derivatives.
         """
 
         # So that .flat works even if array_like is a list.  Later
@@ -332,7 +338,8 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         func_and_derivs = func_with_derivatives(
             array_nominal,
             type(array_like),
-            (array_derivative(array_version, var) for var in variables))
+            (array_derivative(array_version, var) for var in variables),
+            *args)
 
         func_nominal_value = func_and_derivs.next()
 
@@ -344,8 +351,9 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
 
         # Calculation of the derivatives of the result with respect to
         # the variables.
-        derivatives = array([{} for _ in xrange(func_nominal_value.zize)],
-                            dtype=object).reshape(func_nominal_value.shape)
+        derivatives = numpy.array(
+            [{} for _ in xrange(func_nominal_value.size)], dtype=object)
+        derivatives.resize(func_nominal_value.shape)
 
         # Memory-efficient approach.  A memory-hungry approach would
         # be to calculate the matrix derivatives will respect to all
@@ -377,6 +385,8 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
     
     return wrapped_func
 
+########## Matrix inverse
+
 def inv_with_derivatives(arr, input_type, derivatives):
     """
     Defines the matrix inverse and its derivatives.
@@ -385,9 +395,6 @@ def inv_with_derivatives(arr, input_type, derivatives):
     detailed semantics.
     """
 
-    # It is convenient to use matrices, in this function (which
-    # returns a matrix):
-    
     inverse = numpy.linalg.inv(arr)
     # The inverse of a numpy.matrix is a numpy.matrix.  It is assumed
     # that numpy.linalg.inv is such that other types yield
@@ -417,6 +424,55 @@ _inv.__doc__ = """\
     %s
     """ % numpy.linalg.inv.__doc__
 
+########## Matrix pseudo-inverse
+
+def pinv_with_derivatives(arr, input_type, derivatives, rcond):
+    """
+    Defines the matrix pseudo-inverse and its derivatives.
+
+    Works with real or complex matrices.
+
+    See the definition of func_with_deriv_to_uncert_func() for its
+    detailed semantics.
+    """
+
+    inverse = numpy.linalg.pinv(arr, rcond)
+    # The pseudo-inverse of a numpy.matrix is a numpy.matrix.  It is
+    # assumed that numpy.linalg.pinv is such that other types yield
+    # numpy.ndarrays:
+    if issubclass(input_type, numpy.matrix):
+        inverse = inverse.view(numpy.matrix)
+    yield inverse
+
+    # It is mathematically convenient to work with matrices:
+    inverse_mat = numpy.asmatrix(inverse)
+
+    # Formula (4.12) from The Differentiation of Pseudo-Inverses and
+    # Nonlinear Least Squares Problems Whose Variables
+    # Separate. Author(s): G. H. Golub and V. Pereyra. Source: SIAM
+    # Journal on Numerical Analysis, Vol. 10, No. 2 (Apr., 1973),
+    # pp. 413-432
+
+    # See also
+    # http://mathoverflow.net/questions/25778/analytical-formula-for-numerical-derivative-of-the-matrix-pseudo-inverse
+
+    # Shortcuts.  All the following factors should be numpy.matrix objects:
+    PA = arr*inverse_mat
+    AP = inverse_mat*arr
+    factor21 = inverse_mat*inverse_mat.H
+    factor22 = numpy.eye(arr.shape[0])-PA
+    factor31 = numpy.eye(arr.shape[1])-AP
+    factor32 = inverse_mat.H*inverse_mat
+
+    # Successive derivatives of the inverse:
+    for derivative in derivatives:
+        derivative_mat = numpy.asmatrix(derivative)
+        term1 = -inverse_mat*derivative_mat*inverse_mat
+        derivative_mat_H = derivative_mat.H
+        term2 = factor21*derivative_mat_H*factor22
+        term3 = factor31*derivative_mat_H*factor32
+        yield term1+term2+term3
+
 # Default rcond argument for the generalization of numpy.linalg.pinv:
 try:
     # Python 2.6+:
@@ -424,8 +480,7 @@ try:
 except AttributeError:
     _pinv_default = 1e-15
 
-#!!!! Useless, when analytical formula is added
-_pinv_wrapped = wrap_array_func(numpy.linalg.pinv)
+_pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
 @uncertainties.set_doc("""
     Version of numpy.linalg.pinv that works with array-like objects
@@ -438,14 +493,10 @@ _pinv_wrapped = wrap_array_func(numpy.linalg.pinv)
     Original documentation:
     %s
     """ % numpy.linalg.pinv.__doc__)
-def _pinv(arr, rcond=_pinv_default):
+def _pinv(array_like, rcond=_pinv_default):
+    return _pinv_with_uncert(array_like, rcond)
 
-    #!!!! An analytical formula could be implemented through
-    #func_with_deriv_to_uncert_func().
-    
-    # The resulting inverse generally contains numbers with
-    # uncertainties: it is view()ed as a core.matrix:
-    return _pinv_wrapped(numpy.asarray(arr), rcond).view(matrix)
+########## Matrix class
 
 class matrix(numpy.matrix):
     # The name of this class is the same as NumPy's, which is why it

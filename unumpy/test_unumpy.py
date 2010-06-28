@@ -80,20 +80,7 @@ def test_matrix():
     # Test of the nominal_value attribute:
     assert numpy.all(m_nominal_values == m.nominal_values)
 
-    # "Regular" inverse matrix, when uncertainties are not taken
-    # into account:
-    m_no_uncert_inv = m_nominal_values.I
     assert type(m[0, 0]) == uncertainties.Variable
-
-    # The matrix inversion should not yield numbers with uncertainties:
-    assert m_no_uncert_inv.dtype == numpy.dtype(float)
-
-    # Inverse with uncertainties:
-    m_inv_uncert = m.I  # AffineScalarFunc elements
-    # The inverse contains uncertainties: it must support custom
-    # operations on matrices with uncertainties:
-    assert isinstance(m_inv_uncert, unumpy.matrix)
-    assert type(m_inv_uncert[0, 0]) == uncertainties.AffineScalarFunc
 
     # Checks of the numerical values: the diagonal elements of the
     # inverse should be the inverses of the diagonal elements of
@@ -123,6 +110,26 @@ def _derivatives_close(x, y):
 
 def test_inverse():
     "Tests of the matrix inverse"
+
+    m = unumpy.matrix([[ufloat((10, 1)), -3.1],
+                       [0, ufloat((3, 0))]])
+    m_nominal_values = unumpy.nominal_values(m)
+
+    # "Regular" inverse matrix, when uncertainties are not taken
+    # into account:
+    m_no_uncert_inv = m_nominal_values.I
+
+    # The matrix inversion should not yield numbers with uncertainties:
+    assert m_no_uncert_inv.dtype == numpy.dtype(float)
+
+    # Inverse with uncertainties:
+    m_inv_uncert = m.I  # AffineScalarFunc elements
+    # The inverse contains uncertainties: it must support custom
+    # operations on matrices with uncertainties:
+    assert isinstance(m_inv_uncert, unumpy.matrix)
+    assert type(m_inv_uncert[0, 0]) == uncertainties.AffineScalarFunc
+
+    ####################
 
     # Checks of the covariances between elements:
     x = ufloat((10, 1))
@@ -162,14 +169,36 @@ def test_inverse():
 def test_pseudo_inverse():
     "Tests of the pseudo-inverse"
 
-    #!!!! add tests, comparing an analytical version to the numerical
-    # version, including for non full-rank matrices, and square matrices.
+    # Numerical version of the pseudo-inverse:
+    pinv_num = core.wrap_array_func(numpy.linalg.pinv)
 
-    # Numerical version:
-    pinv_wrapped = core.wrap_array_func(numpy.linalg.pinv)
+    ##########
+    # Full rank rectangular matrix:
+    m = unumpy.matrix([[ufloat((10, 1)), -3.1],
+                       [0, ufloat((3, 0))],
+                       [1, -3.1]])
 
-    #!!!! Add numerical checks, including of array-like objects with
-    #no uncertainties (like in test_inverse()).
+    # Numerical and package (analytical) pseudo-inverses: they must be
+    # the same:
+    rcond = 1e-8  # Test of the second argument to pinv()
+    m_pinv_num = pinv_num(m, rcond)
+    m_pinv_package = core._pinv(m, rcond)
+    assert matrices_close(m_pinv_num, m_pinv_package)
+
+    ##########
+    # Example with a non-full rank rectangular matrix:
+    vector = [ufloat((10, 1)), -3.1, 11]
+    m = unumpy.matrix([vector, vector])
+    m_pinv_num = pinv_num(m, rcond)
+    m_pinv_package = core._pinv(m, rcond)
+    assert matrices_close(m_pinv_num, m_pinv_package)
+    
+    ##########
+    # Example with a non-full-rank square matrix:
+    m = unumpy.matrix([[ufloat((10, 1)), 0], [3, 0]])
+    m_pinv_num = pinv_num(m, rcond)
+    m_pinv_package = core._pinv(m, rcond)
+    assert matrices_close(m_pinv_num, m_pinv_package)
     
 def test_broadcast_funcs():
     """
