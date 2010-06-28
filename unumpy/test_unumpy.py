@@ -82,16 +82,6 @@ def test_matrix():
 
     assert type(m[0, 0]) == uncertainties.Variable
 
-    # Checks of the numerical values: the diagonal elements of the
-    # inverse should be the inverses of the diagonal elements of
-    # m (because we started with a triangular matrix):
-
-    assert _numbers_close(1/m_nominal_values[0, 0],
-                          m_inv_uncert[0, 0].nominal_value), "Wrong value"
-    
-    assert _numbers_close(1/m_nominal_values[1, 1],
-                          m_inv_uncert[1, 1].nominal_value), "Wrong value"
-
 def _derivatives_close(x, y):
     """
     Returns True iff the AffineScalarFunc objects x and y have
@@ -128,6 +118,16 @@ def test_inverse():
     # operations on matrices with uncertainties:
     assert isinstance(m_inv_uncert, unumpy.matrix)
     assert type(m_inv_uncert[0, 0]) == uncertainties.AffineScalarFunc
+
+    # Checks of the numerical values: the diagonal elements of the
+    # inverse should be the inverses of the diagonal elements of
+    # m (because we started with a triangular matrix):
+    assert _numbers_close(1/m_nominal_values[0, 0],
+                          m_inv_uncert[0, 0].nominal_value), "Wrong value"
+    
+    assert _numbers_close(1/m_nominal_values[1, 1],
+                          m_inv_uncert[1, 1].nominal_value), "Wrong value"
+
 
     ####################
 
