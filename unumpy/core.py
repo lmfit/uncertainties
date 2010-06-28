@@ -488,8 +488,6 @@ _pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
     The result is a unumpy.ulinalg.matrix.
 
-    The calculation is a numerical approximation.
-
     Original documentation:
     %s
     """ % numpy.linalg.pinv.__doc__)
