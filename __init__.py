@@ -238,7 +238,7 @@ import math
 from math import sqrt, log  # Optimization: no attribute look-up
 import copy
 
-__version__ = '1.5.4.5'
+__version__ = '1.5.4.6'
 # Numerical version:
 __version_info__ = tuple(int(num) for num in __version__.split('.'))
 
