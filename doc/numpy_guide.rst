@@ -126,10 +126,10 @@ It currently offers generalizations of two functions from
 :mod:`numpy.linalg` that work on arrays (or matrices) that contain
 numbers with uncertainties, the **matrix inverse and pseudo-inverse**:
 
-  >>> unumpy.ulinalg.inv(ufloat((2, 0.1)))
-  matrix([[0.5+/-0.025]], dtype=object)
+  >>> unumpy.ulinalg.inv([[ufloat((2, 0.1))]])
+  array([[0.5+/-0.025]], dtype=object)
   >>> unumpy.ulinalg.pinv(mat)
-  matrix([[0.2+/-0.0120042571202],
-          [0.4+/-0.0160018014941]], dtype=object)
+  matrix([[0.2+/-0.0012419339757],
+          [0.4+/-0.00161789987329]], dtype=object)
 
 .. _NumPy: http://numpy.scipy.org/
