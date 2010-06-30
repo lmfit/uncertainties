@@ -416,8 +416,8 @@ _inv.__doc__ = """\
     Version of numpy.linalg.inv that works with array-like objects
     that contain numbers with uncertainties.
 
-    The result is a unumpy.ulinalg.matrix if numpy.linalg.pinv would
-    return a matrix for the array of nominal values.
+    The result is a unumpy.matrix if numpy.linalg.pinv would return a
+    matrix for the array of nominal values.
     
     Analytical formulas are used.
 
@@ -487,8 +487,8 @@ _pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
     Version of numpy.linalg.pinv that works with array-like objects
     that contain numbers with uncertainties.
 
-    The result is a unumpy.ulinalg.matrix if numpy.linalg.pinv would
-    return a matrix for the array of nominal values.
+    The result is a unumpy.matrix if numpy.linalg.pinv would return a
+    matrix for the array of nominal values.
 
     Analytical formulas are used.
 
