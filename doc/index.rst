@@ -71,7 +71,7 @@ installed (or updated) with
 Whether this works depends on your system (this does not require any
 manual download, but does require setuptools_).  Under Unix, it may be
 necessary to prefix this command with ``sudo``, so that the
-installation program has enough access rights to the system.
+installation program has sufficient access rights to the system.
 
 Manual download and install
 ---------------------------
