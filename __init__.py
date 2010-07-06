@@ -8,7 +8,7 @@
 Calculations with full error propagation for quantities with uncertainties.
 Derivatives can also be calculated.
 
-Web documentation: http://packages.python.org/uncertainties/.
+Web user guide: http://packages.python.org/uncertainties/.
 
 Example of possible calculation: (0.2 +/- 0.01)**2 = 0.04 +/- 0.004.
 
