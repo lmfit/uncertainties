@@ -8,6 +8,8 @@
 Calculations with full error propagation for quantities with uncertainties.
 Derivatives can also be calculated.
 
+Web documentation: http://packages.python.org/uncertainties/.
+
 Example of possible calculation: (0.2 +/- 0.01)**2 = 0.04 +/- 0.004.
 
 Correlations between expressions are correctly taken into account (for
