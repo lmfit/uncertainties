@@ -36,6 +36,20 @@ Calculations can be performed directly, as with simple floats:
    pair: nominal value; of scalar
    pair: uncertainty; of scalar
 
+Correlations
+------------
+
+Correlations between variables are automatically handled.  Thus, each
+calculation result keeps track of how it is correlated to variables:
+
+  >>> square - x*x
+  0.0
+
+In fact, whatever the value of the random variable `x` , the above
+quantity is exactly zero, since ``square = x**2``.  Correlations are
+correctly handled whatever the number of variables involved, and
+whatever the complexity of the calculation.
+
 Access to the uncertainty and the nominal value
 -----------------------------------------------
 
