@@ -36,15 +36,19 @@ Calculations can be performed directly, as with simple floats:
    pair: nominal value; of scalar
    pair: uncertainty; of scalar
 
+.. index:: correlations; detailed example
+
 Correlations
 ------------
 
 Correlations between variables are automatically handled whatever the
 number of variables involved, and whatever the complexity of the
 calculation.  Thus, each calculation result keeps track of how it is
-correlated to random variables:
+correlated to random variables.  For example, when ``x`` is the number
+with uncertainty defined above,
 
-  >>> y = x**2 + 1
+  >>> square = x**2
+  >>> y = x*x + 1
   >>> square - x*x
   0.0
   >>> y - square
@@ -54,9 +58,11 @@ The results above have a zero uncertainty: the calculated functions
 give the same value for all samples of the random variable ``x``.
 
 Thanks to the tracking of dependencies on random variables,
-calculations can be performed in as many steps as necessary, exactly
-as with simple floats: correlations will be transparently handled by
-this package.
+calculations can therefore be performed in as many steps as necessary,
+exactly as with simple floats.  When various quantities are combined
+through mathematical operations, the result is calculated by taking
+into account all the correlations between the quantities involved.
+All of this is done completely transparently.
 
 Access to the uncertainty and the nominal value
 -----------------------------------------------
