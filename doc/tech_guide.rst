@@ -66,8 +66,8 @@ yield correct uncertainties.  For example:
 
 However, only the dependence of quantities on random variables created
 by this module is tracked.  Thus, if the variable ``a`` above is
-modified, the value of ``square`` is not modified, as with regular
-floats:
+modified, the value of ``square`` is not modified, as is usual in
+Python:
 
   >>> a = 123
   >>> print square
