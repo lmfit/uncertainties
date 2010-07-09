@@ -55,7 +55,7 @@ give the same value for all samples of the random variable ``x``.
 
 Thanks to the tracking of dependencies on random variables,
 calculations can performed in as many steps as necessary, exactly as
-with simple floats; correlations are transparently handled by this
+with simple floats: correlations will be transparently handled by this
 package.
 
 Access to the uncertainty and the nominal value
