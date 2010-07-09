@@ -39,16 +39,24 @@ Calculations can be performed directly, as with simple floats:
 Correlations
 ------------
 
-Correlations between variables are automatically handled.  Thus, each
-calculation result keeps track of how it is correlated to variables:
+Correlations between variables are automatically handled whatever the
+number of variables involved, and whatever the complexity of the
+calculation.  Thus, each calculation result keeps track of how it is
+correlated to random variables:
 
+  >>> y = x**2 + 1
   >>> square - x*x
   0.0
+  >>> y - square
+  1.0
 
-In fact, for any sample of the random variable ``x``, the above
-quantity is exactly zero, since ``square = x**2``.  Correlations are
-correctly handled whatever the number of variables involved, and
-whatever the complexity of the calculation.
+The results above have a zero uncertainty: the calculated functions
+give the same value for all samples of the random variable ``x``.
+
+Thanks to the tracking of dependencies on random variables,
+calculations can performed in as many steps as necessary, exactly as
+with simple floats; correlations are transparently handled by this
+package.
 
 Access to the uncertainty and the nominal value
 -----------------------------------------------
