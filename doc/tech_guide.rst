@@ -83,7 +83,8 @@ updated on the fly, because quantities with uncertainties (like
 
 As usual, Python keeps track of objects as long as they are used.
 Thus, redefining the value of ``x`` does not change the fact that
-``square`` depends on the object previously stored in ``x``:
+``square`` depends on the quantity with uncertainty previously stored
+in ``x``:
 
   >>> x = 10000
   >>> print square
