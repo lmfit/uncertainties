@@ -62,7 +62,10 @@ yield correct uncertainties.  For example:
   >>> square
   46.0+/-0.4
   >>> square - x*x
-  42.0  # Equal to 'a': zero uncertainty
+  42.0
+
+Even though ``x*x`` has a non-zero uncertainty, the result has a zero
+uncertainty, because it is equal ``a``.
 
 However, only the dependence of quantities on random variables created
 by this module is tracked.  Thus, if the variable ``a`` above is
