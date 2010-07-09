@@ -48,6 +48,8 @@ correlated to random variables.  For example, when ``x`` is the number
 with uncertainty defined above,
 
   >>> square = x**2
+  >>> print square
+  0.04+/-0.004
   >>> y = x*x + 1
   >>> square - x*x
   0.0
