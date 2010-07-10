@@ -120,7 +120,18 @@ in the :doc:`tech_guide`.
 In addition, the documentation for any of the modules defined in this
 package is available through the pydoc_ command.
 
-.. index:: license, support
+.. index:: license
+
+License
+=======
+
+This software is released under a **dual license**; one of the
+following options can be chosen:
+
+1. The `GNU General Public License version 2`_.
+2. Any other license, as long as it is obtained from the original author.
+
+.. index:: support
 
 Contact
 =======
@@ -137,10 +148,6 @@ O. LEBIGOT (EOL)`_.
 Please `support the development`_ of this program by donating $5 or
 more through PayPal!
 
-This software is released under a dual license:
-
-1. The `GNU General Public License version 2`_.
-2. Any other license, as long as it is obtained from the original author.
 
 
 .. toctree::
