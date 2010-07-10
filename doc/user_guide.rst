@@ -297,23 +297,32 @@ manner**.  This is what the :func:`nominal_value` and
   >>> uncertainties.std_dev(3)
   0.0
 
-.. index:: derivatives
-
-Since the application of error propagation theory involves the
-calculation of **derivatives**, this package gives access to the value of
-the derivative of an expression, with respect to any of its variables:
-
-  >>> sum_value.derivatives[u]
-  1.0
-  >>> sum_value.derivatives[v]
-  2.0
-
 Finally, a utility method is provided that directly yields the
 **number of standard deviations** between a number and a result with
 uncertainty: with ``x`` equal to 0.20±0.01,
 
   >>> x.position_in_sigmas(0.17)
   -3.0
+
+.. index:: derivatives
+
+Derivatives
+-----------
+
+Since the application of :ref:`linear error propagation theory
+<linear_method>` involves the calculation of **derivatives**, this
+package automatically performs such calculations; users can thus
+easily get the derivative of an expression with respect to any of its
+variables:
+
+  >>> u = ufloat((1, 0.1))
+  >>> v = ufloat((10, 0.1))
+  >>> sum_value = u+2*v
+  >>> sum_value.derivatives[u]
+  1.0
+  >>> sum_value.derivatives[v]
+  2.0
+
 
 Additional information
 ----------------------
