@@ -38,6 +38,9 @@ performed directly and transparently:
   >>> sin(2*x)  # In a Python shell, "print" is optional
   0.90929742682568171+/-0.083229367309428481
 
+Thus, existing calculation code designed for real numbers can be run
+with numbers with uncertainties with no or little modification.
+
 .. index:: correlations; simple example
 
 Another strength of this package is its correct handling of

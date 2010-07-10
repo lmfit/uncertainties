@@ -8,6 +8,11 @@ only require a simple import:
 
   >>> from uncertainties import ufloat
 
+The :func:`ufloat` function creates numbers with uncertainties.
+Existing calculation code can use such numbers as input, usually run
+with no or little modification, and automatically produce results with
+uncertainties.
+
 .. index::
    pair: number with uncertainty; creation
 
