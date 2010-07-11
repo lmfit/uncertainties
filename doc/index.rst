@@ -10,8 +10,8 @@ calculating uncertainties).
 Whatever the complexity of the calculation, this package returns the
 result with its uncertainty as predicted by linear `error propagation
 theory`_.  In particular, it handles **correlations** between
-variables, which sets this it apart from most existing error
-propagation codes.
+variables, which sets it apart from many existing error propagation
+codes.
 
 Calculations involving numbers with uncertainties are made **very
 simple** thanks to this package.  In fact, it automatically calculates
