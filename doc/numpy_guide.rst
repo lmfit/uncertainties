@@ -16,7 +16,7 @@ NumPy_ arrays and matrices of numbers with uncertainties;
 2. **generalizations** of multiple NumPy functions so that they also
 work with arrays that contain numbers with uncertainties.
 
-While :ref:`simple operations on arrays <simple_array_use>` that
+While :ref:`basic operations on arrays <simple_array_use>` that
 contain numbers with uncertainties can be performed without it, the
 :mod:`unumpy` package is useful for more advanced uses.
 
