@@ -85,6 +85,9 @@ calculated square can also be accessed independently:
   >>> print square.std_dev()
   0.004
 
+Details on the classes made available by this package can be found in
+the :ref:`Technical Guide <classes>`.
+
 The various independent contributions to an uncertainty can be
 directly obtained.  This is made easier when the variables are tagged:
 
