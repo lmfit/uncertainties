@@ -29,7 +29,7 @@ Let's now see how to use these unique features!
 An easy-to-use calculator
 =========================
 
-Calculations involving numbers with uncertainties can be performed
+Calculations involving **numbers with uncertainties** can be performed
 even without knowing anything about the Python_ programming language.
 After `installing this package`_ and `invoking the Python
 interpreter`_, calculations with automatic error propagation can be
@@ -49,7 +49,7 @@ numbers with uncertainties with no or little modification.
 .. index:: correlations; simple example
 
 Another strength of this package is its correct handling of
-correlations.  For instance, the following quantity is zero even if
+**correlations**.  For instance, the following quantity is zero even if
 ``x`` has an uncertainty:
 
   >>> x-x
@@ -58,6 +58,11 @@ correlations.  For instance, the following quantity is zero even if
 Many other error propagation codes return the incorrect value
 0±0.1414… because they assume that the two subtracted quantities are
 *independent* random variables.
+
+**Derivatives** are similarly very easy to obtain:
+
+  >>> (2*x+42).derivatives[x]
+  2.0
 
 .. index:: installation
 
