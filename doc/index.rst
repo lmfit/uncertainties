@@ -44,7 +44,7 @@ performed directly and transparently:
   0.90929742682568171+/-0.083229367309428481
 
 Thus, existing calculation code designed for floats can be run with
-numbers with uncertainties with no or little modification.
+numbers with uncertainties with :ref:`no or little modification <user guide>`.
 
 .. index:: correlations; simple example
 
@@ -59,7 +59,11 @@ Many other error propagation codes return the incorrect value
 0±0.1414… because they assume that the two subtracted quantities are
 *independent* random variables.
 
-**Derivatives** are similarly very easy to obtain:
+Operations on **arrays** of numbers with uncertainties are
+:ref:`transparently handled <simple_array_use>` too.
+
+
+**Derivatives** are similarly very :ref:`easy to obtain <derivatives>`:
 
   >>> (2*x+1000).derivatives[x]
   2.0
