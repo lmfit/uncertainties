@@ -18,7 +18,7 @@ simple** thanks to this package.  In fact, it transparently calculates
 the `numerous derivatives`_ required by linear error propagation
 theory.
 
-Calculations of results with uncertainties or of derivatives can
+Calculations of results with uncertainties, or of derivatives, can
 either be performed in an **interactive session**, or in programs
 written in the Python_ programming language.  Existing calculation
 code can **run with no or little change**.
