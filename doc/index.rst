@@ -2,20 +2,25 @@ Welcome to the uncertainties package
 ====================================
 
 The `uncertainties package`_ handles calculations that involve
-**numbers with uncertainties** (like 3.14±0.01).  Whatever the
-complexity of the calculation, this package returns the result with
-its uncertainty as predicted by linear `error propagation theory`_.
-In particular, it handles **correlations** between variables, which
-sets this it apart from most existing error propagation codes.
+**numbers with uncertainties** (like 3.14±0.01).  It also
+transparently yields the :ref:`derivatives <derivatives>` of any
+expression.
+
+Whatever the complexity of the calculation, this package returns the
+result with its uncertainty as predicted by linear `error propagation
+theory`_.  In particular, it handles **correlations** between
+variables, which sets this it apart from most existing error
+propagation codes.
 
 Calculations involving numbers with uncertainties are made **very
 simple** thanks to this package.  In fact, it automatically calculates
 the `numerous derivatives`_ required by linear error propagation
 theory.
 
-Calculations can either be performed in an **interactive session**, or
-in programs written in the Python_ programming language.  Existing
-calculation code can **run with no or little change**.
+Calculations of results with uncertainties or of derivatives can
+either be performed in an **interactive session**, or in programs
+written in the Python_ programming language.  Existing calculation
+code can **run with no or little change**.
 
 Let's now see how to use these unique features!
 
