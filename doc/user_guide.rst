@@ -250,9 +250,9 @@ of floats.  Similarly, functions that do not have a simple analytical
 form can be automatically wrapped so as to also work on float
 parameters that contain uncertainties.
 
-It is thus possible to have a *scalar* function :func:`f` that takes
-any number of floats, and to automatically generalize it so that it
-also works with numbers with uncertainty:
+It is thus possible to have a function :func:`f` that takes any number
+of floats and returns a single float, and to automatically generalize
+it so that it also works with numbers with uncertainty:
 
   >>> wrapped_f = uncertainties.wrap(f)
 
