@@ -3,7 +3,7 @@
 User guide
 ==========
 
-Simple mathematical operations involving numbers with uncertainties
+Basic mathematical operations involving numbers with uncertainties
 only require a simple import:
 
   >>> from uncertainties import ufloat
@@ -28,10 +28,10 @@ one of many string representations:
   >>> x = ufloat("0.20")
 
 
-Simple math
+Basic math
 -----------
 
-Calculations can be performed directly, as with simple floats:
+Calculations can be performed directly, as with regular real numbers:
 
   >>> square = x**2
   >>> print square
