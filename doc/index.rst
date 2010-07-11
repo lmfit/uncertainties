@@ -3,9 +3,8 @@ Welcome to the uncertainties package
 
 The `uncertainties package`_ handles calculations that involve
 **numbers with uncertainties** (like 3.14±0.01).  It also
-transparently yields the :ref:`derivatives <derivatives>` of any
-expression (these derivatives are :ref:`used <linear_method>` for
-calculating uncertainties).
+transparently yields the **derivatives** of any expression (these
+derivatives are used for calculating uncertainties).
 
 Whatever the complexity of the calculation, this package returns the
 result with its uncertainty as predicted by linear `error propagation
@@ -14,9 +13,9 @@ variables, which sets it apart from many existing error propagation
 codes.
 
 Calculations involving numbers with uncertainties are made **very
-simple** thanks to this package.  In fact, it transparently calculates
-the `numerous derivatives`_ required by linear error propagation
-theory.
+simple** thanks to this package.  In fact, it :ref:`transparently
+<derivatives>` calculates the `numerous derivatives`_ required by
+linear error propagation theory.
 
 Calculations of results with uncertainties, or of derivatives, can
 either be performed in an **interactive session**, or in programs
