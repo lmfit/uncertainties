@@ -63,9 +63,9 @@ This module requires the NumPy package.
 (c) 2009-2010 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 Please send feature requests, bug reports, or feedback to this address.
 
-This software is released under a dual license.  (1) The GNU General
-Public License version 2.  (2) Any other license, as long as it is
-obtained from the original author."""
+This software is released under a dual license.  (1) The BSD license.
+(2) Any other license, as long as it is obtained from the original
+author."""
 
 # Local modules:
 from core import *

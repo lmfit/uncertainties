@@ -149,7 +149,7 @@ License
 This software is released under a **dual license**; one of the
 following options can be chosen:
 
-1. The `GNU General Public License version 2`_.
+1. The `BSD license`_.
 2. Any other license, as long as it is obtained from the original author.
 
 .. index:: support
@@ -189,7 +189,7 @@ more through PayPal!
 
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
 .. _support the development: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
-.. _GNU General Public License version 2: http://creativecommons.org/licenses/GPL/2.0/
+.. _BSD license: http://creativecommons.org/licenses/BSD/
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
 .. _Visit EOL's page: http://lebigot.pip.verisignlabs.com/
 .. _GitHub: http://github.com/lebigot/uncertainties

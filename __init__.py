@@ -221,9 +221,9 @@ Please send feature requests, bug reports, or feedback to this address.
 
 Please support future development by donating $5 or more through PayPal!
 
-This software is released under a dual license.  (1) The GNU General
-Public License version 2.  (2) Any other license, as long as it is
-obtained from the original author.'''
+This software is released under a dual license.  (1) The BSD license.
+(2) Any other license, as long as it is obtained from the original
+author.'''
 
 # The idea behind this module is to replace the result of mathematical
 # operations by a local approximation of the defining function.  For
@@ -240,9 +240,9 @@ import math
 from math import sqrt, log  # Optimization: no attribute look-up
 import copy
 
-__version__ = '1.5.4.9'
 # Numerical version:
-__version_info__ = tuple(int(num) for num in __version__.split('.'))
+__version_info__ = (1, 5, 5)
+__version__ = '.'.join(str(num) for num in __version_info__)
 
 __author__ = 'Eric O. LEBIGOT (EOL)'
 
