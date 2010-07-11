@@ -89,7 +89,8 @@ Details on the classes made available by this package can be found in
 the :ref:`Technical Guide <classes>`.
 
 The various independent contributions to an uncertainty can be
-directly obtained.  This is made easier when the variables are tagged:
+directly obtained.  This information is more easily usable when the
+variables are tagged:
 
   >>> u = ufloat((1, 0.1), "u variable")  # Tag
   >>> v = ufloat((10, 0.1), "v variable")
