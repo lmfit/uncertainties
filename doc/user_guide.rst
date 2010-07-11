@@ -73,7 +73,7 @@ into account all the correlations between the quantities involved.
 All of this is done completely transparently.
 
 Access to the uncertainty and to the nominal value
------------------------------------------------
+--------------------------------------------------
 
 The nominal value and the uncertainty (standard deviation) on the
 calculated square can also be accessed independently:
@@ -250,8 +250,8 @@ of floats.  Similarly, functions that do not have a simple analytical
 form can be automatically wrapped so as to also work on float
 parameters that contain uncertainties.
 
-It is thus possible to define a function :func:`f` that takes any
-number of real numbers, and to automatically generalize it so that it
+It is thus possible to have a *scalar* function :func:`f` that takes
+any number of floats, and to automatically generalize it so that it
 also works with numbers with uncertainty:
 
   >>> wrapped_f = uncertainties.wrap(f)
