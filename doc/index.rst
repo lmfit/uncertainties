@@ -64,6 +64,8 @@ Many other error propagation codes return the incorrect value
   >>> (2*x+1000).derivatives[x]
   2.0
 
+They are calculated with a :ref:`fast method <differentiation method>`.
+
 .. index:: installation
 
 .. _installing this package:
