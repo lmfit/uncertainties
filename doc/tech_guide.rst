@@ -47,7 +47,7 @@ fact that the nominal value is normally inside the region of high
 probability density), or that the probability distribution of the
 result is symmetrical (this is rarely strictly the case).
 
-.. index:: correlations; technical details
+.. _variable_tracking:
 
 Tracking of random variables
 ----------------------------

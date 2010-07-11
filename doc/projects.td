@@ -23,6 +23,9 @@ X Write it
 * Technical Guide
 X Write it
 
+- Mention right at the beginning that the package calculates derivatives with a fast method (AD, reverse) (@ now)
+Link to user and tech guides.
+
 * Full docstrings
 - Should I include a full docstring doc?
 I would say yes, so that the user who wants details, additional, optional

@@ -269,6 +269,7 @@ It is sometimes useful to modify the error on certain parameters so as
 to study its impact on a final result.  With this package, the
 **uncertainty of a variable can be changed** on the fly:
 
+  >>> sum_value = u+2*v
   >>> sum_value
   21.0+/-0.22360679774997899
   >>> prev_uncert = u.std_dev()
@@ -279,7 +280,8 @@ to study its impact on a final result.  With this package, the
 
 The relevant concept is that ``sum_value`` does depend on the
 variables ``u`` and ``v``: the :mod:`uncertainties` package keeps
-track of this fact.
+track of this fact, as detailed in the :ref:`Technical Guide
+<variable_tracking>`, and uncertainties can thus be updated any time.
 
 .. index::
    pair: nominal value; uniform access (scalar)
