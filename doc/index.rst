@@ -61,7 +61,7 @@ Many other error propagation codes return the incorrect value
 
 **Derivatives** are similarly very easy to obtain:
 
-  >>> (2*x+42).derivatives[x]
+  >>> (2*x+1000).derivatives[x]
   2.0
 
 .. index:: installation
