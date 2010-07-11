@@ -216,6 +216,8 @@ In fact, correlations guarantee that ``y`` is always larger than
 .. index:: number with uncertainty; classes, Variable class
 .. index::  AffineScalarFunc class
 
+.. _classes:
+
 Classes
 -------
 
@@ -224,10 +226,14 @@ classes:
 
 1. a class for independent random variables (:class:`Variable`),
 
-2. a class for functions that depend on independent variables (:class:`AffineScalarFunc`).
+2. a class for functions that depend on independent variables
+   (:class:`AffineScalarFunc`).
 
-Thus, the factory function :func:`ufloat` creates variables and
-returns a :class:`Variable` object:
+Documentation for these classes is available in their Python
+docstring, which can for instance displayed through pydoc_.
+
+The factory function :func:`ufloat` creates variables and thus returns
+a :class:`Variable` object:
 
   >>> x = ufloat((1, 0.1))
   >>> type(x)
@@ -265,3 +271,5 @@ The derivatives of any expression can be obtained in a simple way, as
 demonstrated in the :ref:`User Guide <derivatives>`.
 
 .. _Automatic Differentiation: http://en.wikipedia.org/wiki/Automatic_differentiation
+
+.. _pydoc: http://docs.python.org/library/pydoc.html
