@@ -306,6 +306,8 @@ uncertainty: with ``x`` equal to 0.20±0.01,
 
 .. index:: derivatives
 
+.. _derivatives:
+
 Derivatives
 -----------
 
@@ -323,6 +325,8 @@ variables:
   >>> sum_value.derivatives[v]
   2.0
 
+This package uses a :ref:`fast differentiation algorithm
+<differentiation method>`.
 
 Additional information
 ----------------------
