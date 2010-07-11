@@ -104,7 +104,8 @@ Linear error propagation theory
 
 Linear approximations of functions (around the nominal values) are
 used for the calculation of the standard deviation of mathematical
-expressions with this package.
+expressions with this package.  This is why this package also
+calculates partial :ref:`derivatives <derivatives>`.
 
 The calculated standard deviations and nominal values are thus
 meaningful approximations as long as the functions involved have
