@@ -27,10 +27,12 @@ X Mention right at the beginning that the package calculates derivatives with a 
 Link to user and tech guides.
 
 * Full docstrings
-- Should I include a full docstring doc?
+X Should I include a full docstring doc?
+<conclusion> Probably not useful: the 'user' doc is better, and the 'programmer' doc is easily accessible through pydoc
 I would say yes, so that the user who wants details, additional, optional
 arguments, can quickly find them.
-- How do I handle the connection with the docstrings?
+X How do I handle the connection with the docstrings?
+<conclusion> Abandonned project: not very useful
 Should concepts link to function definitions?
 
 
@@ -52,7 +54,7 @@ Photo centered, at a minimum.
 X Handle all !!! marks in the .rst
 X Put the doc on the web, even if I don't yet have implemented all the features
 X Tell Alex Vallette + Stéphane Boucard
-- Tell people on my uncertainties mailing list (on a week day)
+X Tell people on my uncertainties mailing list (on a week day)
 - Tell Sanofi about the web site (on a week day)
 
 ##########################

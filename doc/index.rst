@@ -115,7 +115,12 @@ You can also simply **copy** the :file:`uncertainties/` directory to a
 location that Python can import from (directory in which scripts using
 uncertainties are run, etc.).
 
-The **code** and the **documentation source** are available on GitHub_.
+The **code** and the **documentation source** are available on
+GitHub_.  The code is 4000+ lines long.  75 % of those lines are
+documentation strings and comments.  The remaining 25 % are equally
+split between unit tests and the calculation code proper.
+:mod:`uncertainties` is thus a **lightweight package** with abundant
+documentation and tests.
 
 Available documentation
 =======================
