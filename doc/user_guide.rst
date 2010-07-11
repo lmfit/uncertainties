@@ -173,8 +173,9 @@ matrices:
   >>> print 2*numpy.array([ufloat((1, 0.01)), ufloat((2, 0.1))])
   [2.0+/-0.02 4.0+/-0.2]
 
-Thus, basic operations on arrays (multiplication, summation,…) can be
-performed transparently.
+Thus, the usual operations on Numpy arrays (multiplication, addition,
+:func:`sum` method, etc.) can be performed transparently even when the
+arrays contain numbers with uncertainties.
 
 :doc:`More complex operations on NumPy arrays <numpy_guide>` can be
 performed through the dedicated :mod:`uncertainties.unumpy` module.

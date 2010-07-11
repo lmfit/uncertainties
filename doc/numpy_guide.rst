@@ -20,7 +20,7 @@ While :ref:`basic operations on arrays <simple_array_use>` that
 contain numbers with uncertainties can be performed without it, the
 :mod:`unumpy` package is useful for more advanced uses.
 
-Operations on arrays (summation, matrix multiplication, cosine, etc.)
+Operations on arrays (addition, matrix multiplication, cosine, etc.)
 can thus be performed transparently.
 
 These features can be made available with
