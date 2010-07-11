@@ -170,8 +170,11 @@ Arrays of numbers with uncertainties
 It is possible to put numbers with uncertainties in NumPy_ arrays and
 matrices:
 
-  >>> print 2*numpy.array([ufloat((1, 0.01)), ufloat((2, 0.1))])
+  >>> arr = numpy.array([ufloat((1, 0.01)), ufloat((2, 0.1))])
+  >>> 2*arr
   [2.0+/-0.02 4.0+/-0.2]
+  >>> print arr.sum()
+  3.0+/-0.100498756211
 
 Thus, the usual operations on Numpy arrays (multiplication, addition,
 :func:`sum` method, etc.) can be performed transparently even when the
