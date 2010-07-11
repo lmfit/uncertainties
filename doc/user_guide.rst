@@ -176,7 +176,7 @@ matrices:
   >>> print arr.sum()
   3.0+/-0.100498756211
 
-Thus, the usual operations on Numpy arrays (multiplication, addition,
+Thus, the usual operations on NumPy arrays (multiplication, addition,
 :func:`sum` method, etc.) can be performed transparently even when the
 arrays contain numbers with uncertainties.
 
