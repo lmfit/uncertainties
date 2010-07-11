@@ -332,7 +332,7 @@ variables:
   2.0
 
 This package uses a :ref:`fast differentiation algorithm
-<differentiation method>`.
+<differentiation method>` for obtaining these values.
 
 Additional information
 ----------------------
