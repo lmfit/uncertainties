@@ -51,7 +51,7 @@ numbers with uncertainties with no or little modification.
 
 Another strength of this package is its correct handling of
 **correlations**.  For instance, the following quantity is exactly
-zero even if ``x`` has an uncertainty:
+zero even though ``x`` has an uncertainty:
 
   >>> x-x
   0.0
