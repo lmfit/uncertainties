@@ -331,8 +331,8 @@ variables:
   >>> sum_value.derivatives[v]
   2.0
 
-This package uses a :ref:`fast differentiation algorithm
-<differentiation method>` for obtaining these values.
+These values are obtained with a :ref:`fast differentiation algorithm
+<differentiation method>`.
 
 Additional information
 ----------------------
