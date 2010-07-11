@@ -283,7 +283,7 @@ track of this fact.
    pair: standard deviation; uniform access (scalar)
 
 When manipulating ensembles of numbers, *some* of which contain
-uncertainties while others are pure real numbers, it can be useful to
+uncertainties while others are simple floats, it can be useful to
 access the **nominal value and uncertainty of all numbers in a uniform
 manner**.  This is what the :func:`nominal_value` and
 :func:`std_dev` functions do:
