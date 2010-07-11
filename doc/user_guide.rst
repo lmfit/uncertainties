@@ -100,7 +100,7 @@ directly obtained.  This is made easier when the variables are tagged:
   v variable: 0.200000
 
 The total uncertainty on the result (``sum_value``) is the quadratic
-sum of these independent uncertainties.
+sum of these independent uncertainties, as it should.
 
 .. index:: mathematical operation; on a scalar, umath
 
