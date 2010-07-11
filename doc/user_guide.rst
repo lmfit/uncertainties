@@ -72,7 +72,7 @@ through mathematical operations, the result is calculated by taking
 into account all the correlations between the quantities involved.
 All of this is done completely transparently.
 
-Access to the uncertainty and the nominal value
+Access to the uncertainty and to the nominal value
 -----------------------------------------------
 
 The nominal value and the uncertainty (standard deviation) on the
