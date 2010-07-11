@@ -102,14 +102,14 @@ correlations between quantities.
 Linear error propagation theory
 -------------------------------
 
-Linear approximations of functions (around the nominal values) are
-used for the calculation of the standard deviation of mathematical
-expressions with this package.  This is why this package also
-calculates partial :ref:`derivatives <derivatives>`.
+This package calculates the standard deviation of mathematical
+expressions through the linear approximation of `error propagation
+theory`_.  This is why this package also calculates partial
+:ref:`derivatives <derivatives>`.
 
-The calculated standard deviations and nominal values are thus
-meaningful approximations as long as the functions involved have
-precise linear expansions in the region where the probability
+The standard deviations and nominal values calculated by this package
+are thus meaningful approximations as long as the functions involved
+have precise linear expansions in the region where the probability
 distribution of their variables is the largest.  It is therefore
 important that **uncertainties be "small"**.  Mathematically, this
 means that the linear term of functions around the nominal values of
@@ -274,3 +274,6 @@ demonstrated in the :ref:`User Guide <derivatives>`.
 .. _Automatic Differentiation: http://en.wikipedia.org/wiki/Automatic_differentiation
 
 .. _pydoc: http://docs.python.org/library/pydoc.html
+
+.. _error propagation theory: http://en.wikipedia.org/wiki/Error_propagation
+
