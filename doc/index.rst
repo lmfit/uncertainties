@@ -14,7 +14,7 @@ variables, which sets it apart from many existing error propagation
 codes.
 
 Calculations involving numbers with uncertainties are made **very
-simple** thanks to this package.  In fact, it automatically calculates
+simple** thanks to this package.  In fact, it transparently calculates
 the `numerous derivatives`_ required by linear error propagation
 theory.
 
