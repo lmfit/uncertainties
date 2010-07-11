@@ -13,8 +13,8 @@ simple** thanks to this package.  In fact, it automatically calculates
 the `numerous derivatives`_ required by linear error propagation
 theory.
 
-Calculations can be performed in an **interactive session**, or in
-programs written in the Python_ programming language.  Existing
+Calculations can either be performed in an **interactive session**, or
+in programs written in the Python_ programming language.  Existing
 calculation code can **run with no or little change**.
 
 Let's now see how to use these unique features!
@@ -38,8 +38,8 @@ performed directly and transparently:
   >>> sin(2*x)  # In a Python shell, "print" is optional
   0.90929742682568171+/-0.083229367309428481
 
-Thus, existing calculation code designed for real numbers can be run
-with numbers with uncertainties with no or little modification.
+Thus, existing calculation code designed for floats can be run with
+numbers with uncertainties with no or little modification.
 
 .. index:: correlations; simple example
 
