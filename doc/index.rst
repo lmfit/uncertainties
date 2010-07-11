@@ -4,7 +4,7 @@ Welcome to the uncertainties package
 The `uncertainties package`_ handles calculations that involve
 **numbers with uncertainties** (like 3.14±0.01).  It also
 transparently yields the :ref:`derivatives <derivatives>` of any
-expression.
+expression (these derivatives are used for calculating uncertainties).
 
 Whatever the complexity of the calculation, this package returns the
 result with its uncertainty as predicted by linear `error propagation
