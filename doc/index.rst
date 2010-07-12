@@ -164,8 +164,9 @@ of :mod:`uncertainties`, `Eric O. LEBIGOT (EOL)`_.
 .. figure:: _static/eol.*
    :height: 64
    :width:  64
-
-   `Visit EOL's page`_
+   :target: http://lebigot.pip.verisignlabs.com/
+   :align: center
+   :alt: Eric O. LEBIGOT (EOL)
 
 Please `support the development`_ of this program by donating $5 or
 more through PayPal!
@@ -199,6 +200,5 @@ users, which greatly helped improve this program.
 .. _support the development: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _BSD license: http://creativecommons.org/licenses/BSD/
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
-.. _Visit EOL's page: http://lebigot.pip.verisignlabs.com/
 .. _GitHub: http://github.com/lebigot/uncertainties
 .. _pydoc: http://docs.python.org/library/pydoc.html
