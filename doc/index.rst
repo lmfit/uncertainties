@@ -150,15 +150,16 @@ This software is released under a **dual license**; one of the
 following options can be chosen:
 
 1. The `BSD license`_.
-2. Any other license, as long as it is obtained from the original author.
+2. Any other license, as long as it is obtained from the creator of
+   this package.
 
 .. index:: support
 
 Contact
 =======
 
-Please send feature requests, bug reports, or feedback to `Eric
-O. LEBIGOT (EOL)`_.
+Please send feature requests, bug reports, or feedback to the creator
+of :mod:`uncertainties`, `Eric O. LEBIGOT (EOL)`_.
 
 .. figure:: _static/eol.*
    :height: 64
@@ -169,6 +170,13 @@ O. LEBIGOT (EOL)`_.
 Please `support the development`_ of this program by donating $5 or
 more through PayPal!
 
+Acknowledgments
+===============
+
+The author wishes to thank Arnaud Delobelle, Pierre Cladé, Joaquim
+Abian, Jason Moore, and Sebastian Walter for sharing important ideas
+with him.  Thank you also for all the feedback I received from other
+users, which greatly helped improve this program.
 
 
 .. toctree::

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 #!! When the documentation below is updated, setup.py should be
 # checked for consistency.
@@ -210,11 +209,6 @@ is the result of x != 0.
 
 - This package contains tests.  They can be run either manually or
 automatically with the nose unit testing framework (nosetests).
-
-- The author wishes to thank Arnaud Delobelle, Pierre Cladé, Joaquim
-Abian and contributors to the comp.lang.python newsgroup for valuable
-input.  Thank you also for all the feedback I received from other
-users, which helped improve this program.
 
 (c) 2009-2010 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 Please send feature requests, bug reports, or feedback to this address.
