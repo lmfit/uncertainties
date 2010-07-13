@@ -137,8 +137,7 @@ In addition to this introduction, details on the features of the
 Support for arrays of numbers with uncertainties is described in
 :doc:`numpy_guide`.
 
-Technical details about the mathematics behind this package are given
-in the :doc:`tech_guide`.
+Technical details on this package are given in the :doc:`tech_guide`.
 
 In addition, the documentation for any of the modules defined in this
 package is available through the pydoc_ command.
