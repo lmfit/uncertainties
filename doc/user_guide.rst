@@ -2,7 +2,7 @@
 .. _user guide:
 
 ==========
-User guide
+User Guide
 ==========
 
 Basic mathematical operations involving numbers with uncertainties
