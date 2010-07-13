@@ -143,6 +143,19 @@ package is available through the pydoc_ command.
 
 .. index:: license
 
+What others say about this package
+==================================
+
+- "*An awesome python package*" (`Jason Moore
+  <http://biosport.ucdavis.edu/blog/2010/05/07/uncertainty-analysis>`_)
+- "*Your package is brilliant and I love it.*" (e-mail)
+- "*A gift of the gods for the work I\'m doing*" (e-mail)
+- "*PyPI\'s uncertainties rocks!*" (`identi.ca
+  <http://identi.ca/notice/23330742>`_)
+- "*Holy f\*\*\* this would have saved me so much f\*\*\*ing time last
+  semester*." (`reddit
+  <http://www.reddit.com/r/Python/comments/am84v/now_you_can_do_calculations_with_uncertainties_5/>`_)
+
 License
 =======
 
