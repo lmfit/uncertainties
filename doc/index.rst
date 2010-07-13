@@ -144,8 +144,8 @@ package is available through the pydoc_ command.
 
 .. index:: license
 
-What others say about this package
-==================================
+What others say
+===============
 
 - "*An awesome python package*" (`Jason Moore
   <http://biosport.ucdavis.edu/blog/2010/05/07/uncertainty-analysis>`_)
