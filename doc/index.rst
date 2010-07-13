@@ -187,10 +187,11 @@ more through PayPal!
 Acknowledgments
 ===============
 
-The author wishes to thank Arnaud Delobelle, Pierre Cladé, Joaquim
-Abian, Jason Moore, and Sebastian Walter for sharing important ideas
-with him.  Thank you also for all the feedback I received from other
-users, which greatly helped improve this program.
+The author wishes to thank Arnaud Delobelle, Pierre Cladé, and
+Sebastian Walter for very useful technical input.  Thank you also for
+all the feedback and suggestions that I received from Joaquim Abian,
+Jason Moore, and other users, which greatly helped improve this
+program.
 
 
 .. toctree::
