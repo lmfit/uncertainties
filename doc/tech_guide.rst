@@ -1,5 +1,6 @@
 .. index:: technical details
 
+===============
 Technical Guide
 ===============
 

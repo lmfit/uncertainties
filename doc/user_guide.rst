@@ -1,6 +1,7 @@
 .. index:: user guide
 .. _user guide:
 
+==========
 User guide
 ==========
 
