@@ -189,9 +189,8 @@ Acknowledgments
 
 The author wishes to thank Arnaud Delobelle, Pierre Cladé, and
 Sebastian Walter for very useful technical input.  Thank you also for
-all the feedback and suggestions that I received from Joaquim Abian,
-Jason Moore, and other users, which greatly helped improve this
-program.
+the feedback and suggestions that I received from Joaquim Abian, Jason
+Moore, and other users, which greatly helped improve this program.
 
 
 .. toctree::
