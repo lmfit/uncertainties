@@ -81,30 +81,42 @@ Installation and download
 Automatic install
 -----------------
 
-The :mod:`uncertainties` package may be automatically downloaded and
-installed (or updated) with
+One of the automatic installation procedures below might work on your
+system, if you have a Python package installer.
+
+Under **Unix**, it may be necessary to prefix the installation command
+with ``sudo``, so that the installation program has sufficient access
+rights to the system.
+
+If you have setuptools_, you can try to automatically install or
+upgrade this package with
 
 .. code-block:: sh
 
-   easy_install -U uncertainties
+   easy_install --upgrade uncertainties
 
-Whether this works depends on your system (this does not require any
-manual download, but does require setuptools_).  Under Unix, it may be
-necessary to prefix this command with ``sudo``, so that the
-installation program has sufficient access rights to the system.
+If you have `pip <http://pip.openplans.org/>`_, you can try to
+do
+
+.. code-block:: sh
+
+   pip install --upgrade uncertainties
+
+
 
 Manual download and install
 ---------------------------
 
-Alternatively, you can simply download_ the program from the
-Python Package Index (PyPI) and, after unpacking it, install it
-with:
+Alternatively, you can simply download_ the package archive from the
+Python Package Index (PyPI) and unpack it.  The package can then be
+installed by going into the unpacked :file:`uncertainties` directory,
+and running the provided :file:`setup.py` program with
 
 .. code-block:: sh
 
    python setup.py install
 
-or, for an installation in a custom directory my_directory:
+or, for an installation in a custom directory :file:`my_directory`:
 
 .. code-block:: sh
 
@@ -116,9 +128,12 @@ or, if additional access rights are needed (Unix):
 
    sudo python setup.py install
 
-You can also simply **copy** the :file:`uncertainties/` directory to a
+You can also simply **copy** the :file:`uncertainties` directory to a
 location that Python can import from (directory in which scripts using
 uncertainties are run, etc.).
+
+Source code
+-----------
 
 The **code** and the **documentation source** are available on
 GitHub_.  The :mod:`uncertainties` package is written in pure Python,
@@ -188,9 +203,9 @@ Acknowledgments
 ===============
 
 The author wishes to thank Arnaud Delobelle, Pierre Cladé, and
-Sebastian Walter for very useful technical input.  Thank you also for
-the feedback and suggestions that I received from Joaquim Abian, Jason
-Moore, and other users, which greatly helped improve this program.
+Sebastian Walter for very useful technical input.  I would like to
+thank Joaquim Abian, Jason Moore, and the many other users for their
+feedback and suggestions, which greatly helped improve this program.
 
 
 .. toctree::
