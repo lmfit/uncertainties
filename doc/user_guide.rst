@@ -217,7 +217,7 @@ functions):
 Correlated variables
 --------------------
 
-Reciprocally, correlated variables can be created transparently,
+Reciprocally, **correlated variables can be created** transparently,
 provided that the NumPy_ package is available::
 
   >>> (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 21], cov_matrix)
@@ -254,13 +254,13 @@ Making functions accept numbers with uncertainties
 
 This package allows calculations that are performed through non-Python
 code (Fortran, C, etc.) to handle numbers with uncertainties instead
-of floats.  Similarly, functions that do not have a simple analytical
-form can be automatically wrapped so as to also work on float
-parameters that contain uncertainties.
+of floats.  Similarly, **functions that do not have a simple
+analytical form** can be automatically wrapped so as to also work on
+float parameters that contain uncertainties.
 
 It is thus possible to have a function :func:`f` that takes any number
 of floats and returns a single float, and to automatically generalize
-it so that it also works with numbers with uncertainty:
+it so that it also works with numbers with uncertainties:
 
   >>> wrapped_f = uncertainties.wrap(f)
 
