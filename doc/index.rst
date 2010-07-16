@@ -102,6 +102,12 @@ do
 
    pip install --upgrade uncertainties
 
+The :mod:`uncertainties` package is also available on the following
+**Linux distributions**: `Ubuntu
+<https://launchpad.net/ubuntu/maverick/+package/python-uncertainties>`_,
+`openSUSE
+<https://build.opensuse.org/package/show?package=python-uncertainties&project=home%3Aocefpaf>`_,
+and `Debian <http://packages.debian.org/source/sid/uncertainties>`_.
 
 
 Manual download and install
@@ -204,9 +210,10 @@ Acknowledgments
 
 The author wishes to thank Arnaud Delobelle, Pierre Cladé, and
 Sebastian Walter for very useful technical input.  I would like to
-thank Joaquim Abian, Jason Moore, and the many other users for their
+thank Joaquim Abian, Jason Moore, and many other users for their
 feedback and suggestions, which greatly helped improve this program.
-
+I am also grateful to the Linux distribution maintainers of this
+package.
 
 .. toctree::
    :hidden:
