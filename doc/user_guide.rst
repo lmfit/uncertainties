@@ -147,7 +147,7 @@ a random variable:
   >>> z = ufloat((1, 0.1))
   >>> print y
   1.0+/-0.1
-  >>> z
+  >>> print z
   1.0+/-0.1
   >>> y == y
   True
