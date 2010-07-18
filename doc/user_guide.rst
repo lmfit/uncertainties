@@ -115,8 +115,8 @@ Mathematical operations
 
 Besides being able to apply basic mathematical operations to numbers
 with uncertainty, this package provides generalizations of most of the
-functions from the standard :mod:`math` module.  These operations are
-found in the :mod:`uncertainties.umath` module::
+functions from the standard :mod:`math` module.  These mathematical
+functions are found in the :mod:`uncertainties.umath` module::
 
   >>> from uncertainties.umath import *  # Imports sin(), etc.
   >>> sin(x**2)
