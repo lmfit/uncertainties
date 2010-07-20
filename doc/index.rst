@@ -136,7 +136,7 @@ or, if additional access rights are needed (Unix):
 
 You can also simply **copy** the :file:`uncertainties` directory to a
 location that Python can import from (directory in which scripts using
-uncertainties are run, etc.).
+:mod:`uncertainties` are run, etc.).
 
 Source code
 -----------
