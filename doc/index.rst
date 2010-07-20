@@ -82,7 +82,8 @@ Automatic install
 -----------------
 
 One of the automatic installation procedures below might work on your
-system, if you have a Python package installer.
+system, if you have a Python package installer or use certain Linux
+distributions.
 
 Under **Unix**, it may be necessary to prefix the installation command
 with ``sudo``, so that the installation program has sufficient access
