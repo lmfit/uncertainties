@@ -141,11 +141,13 @@ uncertainties are run, etc.).
 Source code
 -----------
 
-The **code** and the **documentation source** are available on
-GitHub_.  The :mod:`uncertainties` package is written in pure Python,
-and contains about 4000 lines of code.  75 % of those lines are
-documentation strings and comments.  The remaining 25 % are equally
-split between unit tests and the calculation code proper.
+The `code <http://github.com/lebigot/uncertainties>`_ and the
+`documentation source
+<http://github.com/lebigot/uncertainties/tree/master/doc/>`_ are
+available on GitHub.  The :mod:`uncertainties` package is written in
+pure Python, and contains about 4000 lines of code.  75 % of those
+lines are documentation strings and comments.  The remaining 25 % are
+equally split between unit tests and the calculation code proper.
 :mod:`uncertainties` is thus a **lightweight package** with abundant
 documentation and tests.
 
@@ -235,5 +237,4 @@ package.
 .. _support the development: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _BSD license: http://creativecommons.org/licenses/BSD/
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
-.. _GitHub: http://github.com/lebigot/uncertainties
 .. _pydoc: http://docs.python.org/library/pydoc.html
