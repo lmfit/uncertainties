@@ -5,6 +5,9 @@
 User Guide
 ==========
 
+Setup
+=====
+
 Basic mathematical operations involving numbers with uncertainties
 only require a simple import:
 
@@ -14,6 +17,11 @@ The :func:`ufloat` function creates numbers with uncertainties.
 Existing calculation code can use such numbers as input, usually run
 with no or little modification, and automatically produce results with
 uncertainties.
+
+All the functions from the :mod:`uncertainties` package can be
+accessed through the usual package import:
+
+  >>> import uncertainties
 
 .. index::
    pair: number with uncertainty; creation
@@ -205,9 +213,9 @@ has value
 
 In this matrix, the zero covariances indicate that ``u`` and ``v`` are
 independent from each other; the last column shows that ``sum_value``
-does depend on these variables.  The uncertainties package keeps track
-at all times of all correlations between quantities (variables and
-functions):
+does depend on these variables.  The :mod:`uncertainties` package
+keeps track at all times of all correlations between quantities
+(variables and functions):
 
   >>> sum_value - (u+2*v)
   >>> 0.0
