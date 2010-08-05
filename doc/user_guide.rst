@@ -30,7 +30,8 @@ Creating and handling numbers with uncertainties
 ------------------------------------------------
 
 Numbers with uncertainties can be input either numerically, or through
-one of many string representations:
+one of many string representations, so that files containing numbers
+with uncertainties can easily be parsed:
 
   >>> x = ufloat((0.20, 0.01))  # x = 0.20+/-0.01
   >>> x = ufloat("0.20+/-0.01")
