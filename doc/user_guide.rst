@@ -66,9 +66,9 @@ with uncertainty defined above,
   >>> square = x**2
   >>> print square
   0.04+/-0.004
-  >>> y = x*x + 1
   >>> square - x*x
   0.0
+  >>> y = x*x + 1
   >>> y - square
   1.0
 
