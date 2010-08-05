@@ -150,8 +150,9 @@ Comparison operators behave in a natural way::
   >>> y > 0
   True
 
-One important concept to keep in mind is that :func:`ufloat` creates
-a random variable:
+One important concept to keep in mind is that :func:`ufloat` creates a
+random variable, so that two numbers with the same nominal value and
+standard deviation are generally different:
 
   >>> y = ufloat((1, 0.1))
   >>> z = ufloat((1, 0.1))
@@ -165,7 +166,7 @@ a random variable:
   False
 
 In physical terms, two rods of the same nominal length and uncertainty
-on their length generally are of different sizes: ``y`` is different
+on their length are generally of different sizes: ``y`` is different
 from ``z``.
 
 More detailed information on the semantics of comparison operators for
