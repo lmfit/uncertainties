@@ -72,10 +72,10 @@ with uncertainty defined above,
   >>> y - square
   1.0
 
-The results above have a zero uncertainty despite the fact that ``x``,
-``y`` and ``square`` have a non-zero uncertainty: the calculated
-functions give the same value for all samples of the random variable
-``x``.
+The last two results above have a zero uncertainty despite the fact
+that ``x``, ``y`` and ``square`` have a non-zero uncertainty: the
+calculated functions give the same value for all samples of the random
+variable ``x``.
 
 Thanks to the tracking of dependencies on random variables,
 calculations can therefore be performed in as many steps as necessary,
