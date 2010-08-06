@@ -149,8 +149,8 @@ available on GitHub.  The :mod:`uncertainties` package is written in
 pure Python, and contains about 4000 lines of code.  75 % of those
 lines are documentation strings and comments.  The remaining 25 % are
 equally split between unit tests and the calculation code proper.
-:mod:`uncertainties` is thus a **lightweight package** with abundant
-documentation and tests.
+:mod:`uncertainties` is thus a **lightweight, portable package** with
+abundant documentation and tests.
 
 Available documentation
 =======================
