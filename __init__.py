@@ -236,7 +236,7 @@ from math import sqrt, log  # Optimization: no attribute look-up
 import copy
 
 # Numerical version:
-__version_info__ = (1, 5, 5)
+__version_info__ = (1, 6, 0)
 __version__ = '.'.join(str(num) for num in __version_info__)
 
 __author__ = 'Eric O. LEBIGOT (EOL)'
@@ -257,11 +257,10 @@ __all__ = [
     # Utility functions (more are exported if NumPy is present):
     'covariance_matrix',
     
-    # Class returned by most operations: not typically created by
-    # users (except through the Variable subclass), but possibly
-    # manipulated by external code ['derivatives()' method, etc.];
-    # useful for testing whether a result is an expression with
-    # uncertainty:
+    # Class for testing whether an object is a number with
+    # uncertainty.  Not usually created by users (except through the
+    # Variable subclass), but possibly manipulated by external code
+    # ['derivatives()' method, etc.].
     'UFloat',
 
     # Wrapper for allowing non-pure-Python function to handle
@@ -654,6 +653,8 @@ class AffineScalarFunc(object):
     Affine functions that support basic mathematical operations
     (addition, etc.).  Such functions can for instance be used for
     representing the local (linear) behavior of any function.
+
+    This class is mostly meant to be used internally.
 
     This class can also be used to represent constants.
 
