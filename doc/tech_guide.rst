@@ -229,7 +229,7 @@ classes:
 1. a class for independent random variables (:class:`Variable`),
 
 2. a class for functions that depend on independent variables
-   (:class:`AffineScalarFunc`).
+   (:class:`AffineScalarFunc`, also aliased as :class:`UFloat`).
 
 Documentation for these classes is available in their Python
 docstring, which can for instance displayed through pydoc_.
@@ -252,11 +252,14 @@ objects store all the variables they depend from:
   >>> type(umath.sin(x))
   <class 'uncertainties.AffineScalarFunc'>
 
-Note that :class:`Variable` objects are also :class:`AffineScalarFunc`
-objects (a variable x is simply considered to be the identity function
-x → x): testing whether ``value`` carries an uncertainty handled by
-this module can therefore be done with ``insinstance(value,
-AffineScalarFunc)``.
+Testing whether an object is a number with uncertainty
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+:class:`Variable` objects are also
+:class:`AffineScalarFunc`/:class:`UFloat` objects (a variable x is
+simply considered to be the identity function x → x).  Testing whether
+``value`` carries an uncertainty handled by this module can therefore
+be done with ``insinstance(value, UFloat)``.
 
 .. _differentiation method:
 
