@@ -113,9 +113,10 @@ function--defined only if the NumPy module is available).
 generally return AffineScalarFunc objects, which also print as a value
 with uncertainty.  Their most useful attributes and methods are
 described in the documentation for AffineScalarFunc.  Note that
-Variable objects are also AffineScalarFunc objects: testing whether a
-value carries an uncertainty handled by this module should be done
-with insinstance(my_value, AffineScalarFunc).
+Variable objects are also AffineScalarFunc objects.  UFloat is an
+alias for AffineScalarFunc, provided as a convenience: testing whether
+a value carries an uncertainty handled by this module should be done
+with insinstance(my_value, UFloat).
 
 - Mathematically, numbers with uncertainties are, in this package,
 probability distributions.  These probabilities are reduced to two
@@ -261,7 +262,7 @@ __all__ = [
     # manipulated by external code ['derivatives()' method, etc.];
     # useful for testing whether a result is an expression with
     # uncertainty:
-    'AffineScalarFunc',
+    'UFloat',
 
     # Wrapper for allowing non-pure-Python function to handle
     # quantitites with uncertainties:
@@ -376,11 +377,12 @@ class NumericalDerivatives(object):
   
 def wrap(f, derivatives_funcs=None):
     """
-    Wraps function f so that, when applied to AffineScalarFunc
-    objects or float-like arguments, f returns a local approximation
-    of its values (in the form of an object of class AffineScalarFunc).
-    In this case, if none of the arguments of f involves variables
-    [i.e. Variable objects], f simply returns its usual result.
+    Wraps function f so that, when applied to numbers with
+    uncertainties (AffineScalarFunc objects) or float-like arguments,
+    f returns a local approximation of its values (in the form of an
+    object of class AffineScalarFunc).  In this case, if none of the
+    arguments of f involves variables [i.e. Variable objects], f
+    simply returns its usual result.
 
     When f is not called on AffineScalarFunc or float-like
     arguments, the original result of f is returned.
@@ -916,6 +918,8 @@ class AffineScalarFunc(object):
         for (name, value) in data_dict.iteritems():
             setattr(self, name, value)
 
+# Nicer name, for users: isinstance(ufloat(...), UFloat) is True:
+UFloat = AffineScalarFunc
 
 def get_ops_with_reflection():
 
@@ -1204,8 +1208,9 @@ def std_dev(x):
 def covariance_matrix(functions):
     """
     Returns a matrix that contains the covariances between the given
-    sequence of AffineScalarFunc objects.  The resulting matrix
-    implicitly depends on their ordering in 'functions'.
+    sequence of numbers with uncertainties (AffineScalarFunc objects).
+    The resulting matrix implicitly depends on their ordering in
+    'functions'.
 
     The covariances are floats (never int objects).
 
@@ -1253,9 +1258,9 @@ else:
     
     def correlated_values(values, covariance_mat, tags=None):
         """
-        Returns AffineScalarFunc objects that correctly reproduce the
-        given covariance matrix, and have the given values as their
-        nominal value.
+        Returns numbers with uncertainties (AffineScalarFunc objects)
+        that correctly reproduce the given covariance matrix, and have
+        the given values as their nominal value.
 
         The list of values and the covariance matrix must have the
         same length, and the matrix must be a square (symmetric) one.
