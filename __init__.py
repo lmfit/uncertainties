@@ -1338,8 +1338,8 @@ def parse_error_in_parentheses(representation):
         (sign, main_int, main_dec, uncert_int, uncert_dec,
          exponent) = match.groups()
     else:
-        raise Exception("Unparsable number representation: '%s'."
-                        % representation)
+        raise SyntaxError("Unparsable number representation: '%s'."
+                          % representation)
 
     # The value of the number is its nominal value:
     value = float("%s%s%s%s" % (sign or '',
