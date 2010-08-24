@@ -38,6 +38,7 @@ with uncertainties can easily be parsed:
   >>> x = ufloat("0.20(1)")
   >>> x = ufloat("0.20")
 
+Invalid string representations raise a :class:`ValueError` exception.
 
 Basic math
 -----------
