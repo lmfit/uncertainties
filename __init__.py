@@ -236,7 +236,7 @@ from math import sqrt, log  # Optimization: no attribute look-up
 import copy
 
 # Numerical version:
-__version_info__ = (1, 6, 0)
+__version_info__ = (1, 7, 0)
 __version__ = '.'.join(str(num) for num in __version_info__)
 
 __author__ = 'Eric O. LEBIGOT (EOL)'
@@ -1309,7 +1309,7 @@ else:
 ###############################################################################
 # Parsing of values with uncertainties:
 
-POSITIVE_FLOAT_UNSIGNED = r'(\d+)(\.\d*)?'
+POSITIVE_DECIMAL_UNSIGNED = r'(\d+)(\.\d*)?'
 
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where the
 # uncertainty is optional (in which case the uncertainty is implicit):
@@ -1318,7 +1318,7 @@ NUMBER_WITH_UNCERT_RE_STR = '''
     %s  # Main number
     (?:\(%s\))?  # Optional uncertainty
     ([eE][+-]?\d+)?  # Optional exponent
-    ''' % (POSITIVE_FLOAT_UNSIGNED, POSITIVE_FLOAT_UNSIGNED)
+    ''' % (POSITIVE_DECIMAL_UNSIGNED, POSITIVE_DECIMAL_UNSIGNED)
 
 NUMBER_WITH_UNCERT_RE = re.compile(
     "^%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE)
@@ -1326,7 +1326,10 @@ NUMBER_WITH_UNCERT_RE = re.compile(
 def parse_error_in_parentheses(representation):
     """
     Returns (value, error) from a string representing a number with
-    uncertainty like 12.34(5).
+    uncertainty like 12.34(5).  If no parenthesis is given, an
+    uncertainty of one on the last digit is assumed.
+
+    Raises ValueError if the string cannot be parsed.    
     """
 
     match = NUMBER_WITH_UNCERT_RE.search(representation)
@@ -1338,8 +1341,9 @@ def parse_error_in_parentheses(representation):
         (sign, main_int, main_dec, uncert_int, uncert_dec,
          exponent) = match.groups()
     else:
-        raise SyntaxError("Unparsable number representation: '%s'."
-                          % representation)
+        raise ValueError("Unparsable number representation: '%s'."
+                         " Was expecting a string of the form 1.23(4)"
+                         " or 1.234" % representation)
 
     # The value of the number is its nominal value:
     value = float("%s%s%s%s" % (sign or '',
@@ -1385,7 +1389,10 @@ def str_to_number_with_uncert(representation):
     - 124.50(15)
     - 124.5
 
-    When no error is given, an uncertainty of 1 on the last digit is implied.
+    When no numerical error is given, an uncertainty of 1 on the last
+    digit is implied.
+
+    Raises ValueError if the string cannot be parsed.
     """
 
     try:
@@ -1395,7 +1402,11 @@ def str_to_number_with_uncert(representation):
         # Form with parentheses or no uncertainty:
         parsed_value = parse_error_in_parentheses(representation)
     else:
-        parsed_value = (float(value), float(uncert))
+        try:
+            parsed_value = (float(value), float(uncert))
+        except ValueError:
+            raise ValueError('Cannot parse %s: was expecting a number'
+                             ' like 1.23+/-0.1' % representation)
 
     return parsed_value
 
