@@ -260,7 +260,7 @@ Testing whether an object is a number with uncertainty
 :class:`AffineScalarFunc`/:class:`UFloat` objects (a variable x is
 simply considered to be the identity function x → x).  Testing whether
 ``value`` carries an uncertainty handled by this module can therefore
-be done with ``insinstance(value, UFloat)``.
+be done with ``isinstance(value, UFloat)``.
 
 .. _differentiation method:
 
