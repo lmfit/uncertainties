@@ -29,7 +29,7 @@ this package as the standard deviation of the underlying probability
 distribution.
 
 The numbers with uncertainties manipulated by this package are assumed
-to have a **probability distribution** mostly contained around their
+to have a probability distribution mostly contained around their
 nominal value, in an interval of about the size of their standard
 deviation.  This should cover most practical cases.
 
