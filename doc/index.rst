@@ -208,7 +208,7 @@ of :mod:`uncertainties`, `Eric O. LEBIGOT (EOL)`_.
    :align: center
    :alt: Eric O. LEBIGOT (EOL)
 
-Please `support the development`_ of this program by donating $5 or
+Please support the development of this program by `donating $5`_ or
 more through PayPal!
 
 Acknowledgments
@@ -236,9 +236,8 @@ package.
 .. _setuptools: http://pypi.python.org/pypi/setuptools
 .. _download: http://pypi.python.org/pypi/uncertainties/
 .. _numerous derivatives: http://en.wikipedia.org/wiki/Propagation_of_uncertainty#Non-linear_combinations
-
+.. _donating $5: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
-.. _support the development: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _BSD license: http://creativecommons.org/licenses/BSD/
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
 .. _pydoc: http://docs.python.org/library/pydoc.html
