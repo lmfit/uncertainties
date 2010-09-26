@@ -5,6 +5,7 @@
 User Guide
 ==========
 
+
 Setup
 =====
 
@@ -27,7 +28,7 @@ accessed through the usual package import:
    pair: number with uncertainty; creation
 
 Creating and handling numbers with uncertainties
-------------------------------------------------
+================================================
 
 Numbers with uncertainties can be input either numerically, or through
 one of many string representations, so that files containing numbers
@@ -41,7 +42,7 @@ with uncertainties can easily be parsed:
 Invalid string representations raise a :class:`ValueError` exception.
 
 Basic math
------------
+==========
 
 Calculations can be performed directly, as with regular real numbers:
 
@@ -56,7 +57,7 @@ Calculations can be performed directly, as with regular real numbers:
 .. index:: correlations; detailed example
 
 Correlations
-------------
+============
 
 Correlations between variables are automatically handled whatever the
 number of variables involved, and whatever the complexity of the
@@ -86,7 +87,7 @@ into account all the correlations between the quantities involved.
 All of this is done completely transparently.
 
 Access to the uncertainty and to the nominal value
---------------------------------------------------
+==================================================
 
 The nominal value and the uncertainty (standard deviation) on the
 calculated square can also be accessed independently:
@@ -122,7 +123,7 @@ sum of these independent uncertainties, as it should.
 .. index:: mathematical operation; on a scalar, umath
 
 Mathematical operations
------------------------
+=======================
 
 Besides being able to apply basic mathematical operations to numbers
 with uncertainty, this package provides generalizations of most of the
@@ -137,7 +138,7 @@ functions are found in the :mod:`uncertainties.umath` module::
 .. index:: comparison operators
 
 Comparison operators
----------------------
+====================
 
 Comparison operators behave in a natural way::
 
@@ -179,7 +180,7 @@ numbers with uncertainties can be found in the :ref:`Technical Guide
 .. _simple_array_use:
 
 Arrays of numbers with uncertainties
-------------------------------------
+====================================
 
 It is possible to put numbers with uncertainties in NumPy_ arrays and
 matrices:
@@ -199,7 +200,7 @@ performed through the dedicated :mod:`uncertainties.unumpy` module.
 .. index:: covariance matrix
 
 Covariance matrix
------------------
+=================
 
 The covariance matrix between various variables or calculated
 quantities can be simply obtained::
@@ -227,7 +228,7 @@ keeps track at all times of all correlations between quantities
 .. index:: correlations; correlated variables
 
 Correlated variables
---------------------
+====================
 
 Reciprocally, **correlated variables can be created** transparently,
 provided that the NumPy_ package is available::
@@ -262,7 +263,7 @@ rounding errors).
    single: wrapping (C, Fortran,…) functions
 
 Making functions accept numbers with uncertainties
---------------------------------------------------
+==================================================
 
 This package allows calculations that are performed through non-Python
 code (Fortran, C, etc.) to handle numbers with uncertainties instead
@@ -281,7 +282,7 @@ uncertainties.  It returns the same values as :func:`f`, but with
 uncertainties.
 
 Miscellaneous utilities
------------------------
+=======================
 
 .. index:: standard deviation; on the fly modification
 
@@ -335,7 +336,7 @@ uncertainty: with ``x`` equal to 0.20±0.01,
 .. _derivatives:
 
 Derivatives
------------
+===========
 
 Since the application of :ref:`linear error propagation theory
 <linear_method>` involves the calculation of **derivatives**, this
@@ -355,7 +356,7 @@ These values are obtained with a :ref:`fast differentiation algorithm
 <differentiation method>`.
 
 Additional information
-----------------------
+======================
 
 The capabilities of the :mod:`uncertainties` package in terms of array
 handling are detailed in :doc:`numpy_guide`.
