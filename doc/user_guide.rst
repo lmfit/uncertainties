@@ -118,7 +118,7 @@ variables are tagged:
   v variable: 0.200000
 
 The total uncertainty on the result (``sum_value``) is the quadratic
-sum of these independent uncertainties, as it should.
+sum of these independent uncertainties, as it should be.
 
 .. index:: mathematical operation; on a scalar, umath
 
