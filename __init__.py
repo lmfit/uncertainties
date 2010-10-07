@@ -303,7 +303,7 @@ def to_affine_scalar(x):
     (AffineScalarFunc), unless it is already an AffineScalarFunc (in
     which case x is returned unchanged).
 
-    Raises an exception unless 'x' belong to some specific classes of
+    Raises an exception unless 'x' belongs to some specific classes of
     objects that are known not to depend on AffineScalarFunc objects
     (which then cannot be considered as constants).
     """
