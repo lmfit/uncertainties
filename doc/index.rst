@@ -60,8 +60,8 @@ Many other error propagation codes return the incorrect value
 0±0.1414… because they assume that the two subtracted quantities are
 *independent* random variables.
 
-Operations on **arrays** of numbers with uncertainties are
-:ref:`transparently handled <simple_array_use>` too.
+**Arrays** of numbers with uncertainties are :ref:`transparently
+handled <simple_array_use>` too.
 
 
 **Derivatives** are similarly very :ref:`easy to obtain <derivatives>`:
