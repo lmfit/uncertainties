@@ -170,10 +170,10 @@ of the documentation strings included in the code.
 What others say
 ===============
 
-- "*An awesome python package*" (`Jason Moore
-  <http://biosport.ucdavis.edu/blog/2010/05/07/uncertainty-analysis>`_)
 - "*Superb,*" "*wonderful,*" "*It's like magic.*" (`Joaquin Abian
   <http://blog.garlicsim.org/post/1266209646/cool-python-module-uncertainties#comment-85154147>`_)
+- "*An awesome python package*" (`Jason Moore
+  <http://biosport.ucdavis.edu/blog/2010/05/07/uncertainty-analysis>`_)
 - "*Your package is brilliant and I love it.*" (e-mail)
 - "*A very cool Python module*" (`Ram Rachum
   <http://blog.garlicsim.org/post/1266209646/cool-python-module-uncertainties>`_)
