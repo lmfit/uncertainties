@@ -211,8 +211,8 @@ of :mod:`uncertainties`, `Eric O. LEBIGOT (EOL)`_.
    :align: center
    :alt: Eric O. LEBIGOT (EOL)
 
-Please support the development of this program by `donating $5`_ or
-more through PayPal!
+Please support the continued development of this program by `donating 
+$5`_ or more through PayPal (no PayPal account necessary)!
 
 Acknowledgments
 ===============
