@@ -28,6 +28,8 @@ These features can be made available with
 
   >>> from uncertainties import unumpy
 
+.. Here, there is no need to mention unumpy.unlinalg, because it is indeed
+   made available through "import unumpy".
 
 Creation and manipulation of arrays and matrices
 ------------------------------------------------
