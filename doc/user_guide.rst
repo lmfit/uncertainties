@@ -27,7 +27,7 @@ made accessible through
 
   >>> import uncertainties
 
-The :mod:`uncertainties` package also contains modules for
+The :mod:`uncertainties` package also contains sub-modules for
 :ref:`advanced mathematical functions <advanced math operations>`, and
 :doc:`arrays and matrices <numpy_guide>`.
 
