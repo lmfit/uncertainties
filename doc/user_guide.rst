@@ -6,8 +6,8 @@ User Guide
 ==========
 
 
-Setup
-=====
+Basic setup
+===========
 
 Basic mathematical operations involving numbers with uncertainties
 only require a simple import:
@@ -19,10 +19,17 @@ Existing calculation code can use such numbers as input, usually run
 with no or little modification, and automatically produce results with
 uncertainties.
 
-All the functions from the :mod:`uncertainties` package can be
-accessed through the usual package import:
+.. The "import uncertainties" is put here because some examples requires
+   uncertainties to have been imported (and not only ufloat).
+
+The :mod:`uncertainties` module contains other features, which can be
+made accessible through
 
   >>> import uncertainties
+
+The :mod:`uncertainties` package also contains modules for
+:ref:`advanced mathematical functions <advanced math operations>`, and
+:doc:`arrays and matrices <numpy_guide>`.
 
 .. index::
    pair: number with uncertainty; creation
@@ -121,6 +128,8 @@ The total uncertainty on the result (``sum_value``) is the quadratic
 sum of these independent uncertainties, as it should be.
 
 .. index:: mathematical operation; on a scalar, umath
+
+.. _advanced math operations:
 
 Mathematical operations
 =======================
