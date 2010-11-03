@@ -174,6 +174,8 @@ What others say
   <http://blog.garlicsim.org/post/1266209646/cool-python-module-uncertainties#comment-85154147>`_)
 - "*An awesome python package*" (`Jason Moore
   <http://biosport.ucdavis.edu/blog/2010/05/07/uncertainty-analysis>`_)
+- "*Utterly brilliant.*" (`Jeffrey Simpson
+  <http://twitter.com/#!/GeekyJeffrey>`_ on Twitter)
 - "*Your package is brilliant and I love it.*" (e-mail)
 - "*A very cool Python module*" (`Ram Rachum
   <http://blog.garlicsim.org/post/1266209646/cool-python-module-uncertainties>`_)
