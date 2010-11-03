@@ -175,15 +175,15 @@ What others say
 - "*An awesome python package*" (`Jason Moore
   <http://biosport.ucdavis.edu/blog/2010/05/07/uncertainty-analysis>`_)
 - "*Utterly brilliant.*" (`Jeffrey Simpson
-  <http://twitter.com/#!/GeekyJeffrey>`_ on Twitter)
+  <http://twitter.com/#!/GeekyJeffrey>`_)
+- "*PyPI\'s uncertainties rocks!*" (`identi.ca
+  <http://identi.ca/notice/23330742>`_)
 - "*Your package is brilliant and I love it.*" (e-mail)
 - "*A very cool Python module*" (`Ram Rachum
   <http://blog.garlicsim.org/post/1266209646/cool-python-module-uncertainties>`_)
 - "*Those of us working with experimental data or simulation results
   will appreciate this.*" (`Konrad Hinsen
   <http://khinsen.wordpress.com/2010/07/12/euroscipy-2010/>`_)
-- "*PyPI\'s uncertainties rocks!*" (`identi.ca
-  <http://identi.ca/notice/23330742>`_)
 - "*Holy f\*\*\* this would have saved me so much f\*\*\*ing time last
   semester*." (`reddit
   <http://www.reddit.com/r/Python/comments/am84v/now_you_can_do_calculations_with_uncertainties_5/>`_)
