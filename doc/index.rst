@@ -176,9 +176,8 @@ What others say
   <http://biosport.ucdavis.edu/blog/2010/05/07/uncertainty-analysis>`_)
 - "*Utterly brilliant.*" (`Jeffrey Simpson
   <http://twitter.com/#!/GeekyJeffrey>`_)
-- "*PyPI\'s uncertainties rocks!*" (`identi.ca
+- "*PyPI\'s uncertainties rocks!*" (`Siegfried Gevatter
   <http://identi.ca/notice/23330742>`_)
-- "*Your package is brilliant and I love it.*" (e-mail)
 - "*A very cool Python module*" (`Ram Rachum
   <http://blog.garlicsim.org/post/1266209646/cool-python-module-uncertainties>`_)
 - "*Those of us working with experimental data or simulation results
