@@ -116,8 +116,9 @@ Manual download and install
 
 Alternatively, you can simply download_ the package archive from the
 Python Package Index (PyPI) and unpack it.  The package can then be
-installed by going into the unpacked :file:`uncertainties` directory,
-and running the provided :file:`setup.py` program with
+installed by **going into the unpacked directory**
+(:file:`uncertainties-…`), and running the provided :file:`setup.py`
+program with
 
 .. code-block:: sh
 
