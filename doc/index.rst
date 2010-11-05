@@ -136,9 +136,10 @@ or, if additional access rights are needed (Unix):
 
    sudo python setup.py install
 
-You can also simply **copy** the :file:`uncertainties` directory to a
-location that Python can import from (directory in which scripts using
-:mod:`uncertainties` are run, etc.).
+You can also simply **copy** the :file:`uncertainties-…` directory to
+a location that Python can import from (directory in which scripts
+using :mod:`uncertainties` are run, etc.), and then **rename** the copy
+:file:`uncertainties` (with no version number).
 
 Source code
 -----------
@@ -239,7 +240,7 @@ package.
 .. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
 .. _invoking the Python interpreter: http://docs.python.org/tutorial/interpreter.html
 .. _setuptools: http://pypi.python.org/pypi/setuptools
-.. _download: http://pypi.python.org/pypi/uncertainties/
+.. _download: http://pypi.python.org/pypi/uncertainties/#downloads
 .. _numerous derivatives: http://en.wikipedia.org/wiki/Propagation_of_uncertainty#Non-linear_combinations
 .. _donating $5: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
