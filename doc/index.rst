@@ -124,11 +124,18 @@ program with
 
    python setup.py install
 
+or, for an installation in the user Python library (no additional access
+rights needed):
+
+.. code-block:: sh
+
+   python setup.py install --user
+
 or, for an installation in a custom directory :file:`my_directory`:
 
 .. code-block:: sh
 
-   python setup.py install --prefix my_directory
+   python setup.py install --install-lib my_directory
 
 or, if additional access rights are needed (Unix):
 
