@@ -312,7 +312,7 @@ def to_affine_scalar(x):
         return x
 
     #! In Python 2.6+, numbers.Number could be used instead, here:
-    if isinstance(x, (float, int, complex)):
+    if isinstance(x, (float, int, complex, long)):
         # No variable => no derivative to define:
         return AffineScalarFunc(x, {})
 
