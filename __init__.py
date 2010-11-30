@@ -873,6 +873,90 @@ class AffineScalarFunc(object):
     def __str__(self):
         return self._general_representation(str)
 
+    def _format_fixed_point(self, relative_precision=2, postfix='', multiplicator=1):
+        """ String representation using a fixed point notation
+
+        relative_precision : number of digit on the uncertainty
+        postfix and multiplicator: to allow the exponent notation
+        """
+        def digit_position(a):
+            """ Return the position of the first digit 
+            """
+            if a==0:
+                return -1000
+            else:
+                return (int(math.floor(math.log(abs(a))/math.log(10))))
+        value = self.nominal_value*multiplicator
+        uncert = self.std_dev()*multiplicator
+        # number_of_digit should be lower than 24 (negligible uncertainty)
+        number_of_digit = min(max((relative_precision-1 - digit_position(uncert)),0),24)
+        spec = '.{0:d}f'.format(number_of_digit) # spec=.3f for example
+        return ('{0:'+spec+'}{2:}+/-{1:'+spec+'}{2:}').format(value, uncert, postfix)
+    
+    def __format__(self, s):
+        """ Format the uncertainty number
+
+
+        This method allows formating of numbers with uncertainty in a custom way. 
+        You can still use usual formatting for floating point numbers but
+        you can also specify the number of digit displayed in terms of 
+        the uncertainty of the number. 
+
+        By default, display the number with 2 significant digit and
+        choose automatically between the exponent and the fixed point notation
+
+        Format specifier
+           '.3e' or '.5f' -> usual formating for value and its uncertainty
+           '3u' -> give the number of digit in terms of the uncertainty
+           '3ue' -> force exponent notation and number of digit in terms of the uncertainty
+
+        Examples: 
+           >>> '{0:}'.format(ufloat((-4e-2,1.2e-3)))
+           '-0.0400+/-0.0012'
+           >>> '{0:}'.format(ufloat((-400,1.2)))
+           '-400.0+/-1.2'
+           >>> '{0:}'.format(ufloat((-4e15,1.2)))
+           '-4.0000000000000000e+15+/-0.0000000000000012e+15'
+           >>> '{0:2ue}'.format(ufloat((-40,1.2e-3)))
+           '-4.00000e+01+/-0.00012e+01'
+           >>> '{0:2uf}'.format(ufloat((-40,1.2e-3)))
+           '-40.0000+/-0.0012'
+           >>> '{0:.2f}'.format(ufloat((-40,1.2e-3)))
+           '-40.00+/-0.00'
+           >>> '{0:4u}'.format(ufloat((-400,1.2654)))
+           '-400.000+/-1.265'
+        """
+        def digit_position(a):
+            """ Return the position of the first digit 
+            """
+            if a==0:
+                return -1000
+            else:
+                return (int(math.floor(math.log(abs(a))/math.log(10))))
+        value = self.nominal_value
+        uncert = self.std_dev()
+        exponent = max(digit_position(value), digit_position(uncert))
+        exponent_notation = (exponent<-5 or exponent>5) # default choice for the exponent notation
+        relative_precision = 2 # number of digit on the uncertainty, default
+        if len(s)>0 and s.find('u')==-1: # usual notation
+            return value.__format__(s)+'+/-'+uncert.__format__(s)
+        if len(s)>0 and s[-1]=='u': # relative precision, default choice for e or f
+            relative_precision = int(s[0:-1])
+        elif len(s)>0 and s[-1] in ('e','E'): # exponent notation and relative precision
+            relative_precision = int(s[0:-2])
+            exponent_notation = True
+        elif len(s)>0 and s[-1] in ('f','F'):# fixed point notation and relative precision
+            relative_precision = int(s[0:-2])
+            exponent_notation = False            
+        # Choice between a represenation with an exponent notation or not
+        if exponent_notation:
+            return self._format_fixed_point(relative_precision=relative_precision,
+                                            postfix='e{0:+03d}'.format(exponent),
+                                            multiplicator=10**(-exponent))
+        else:
+            return self._format_fixed_point(relative_precision = relative_precision)
+
+
     def position_in_sigmas(self, value):
         """
         Returns 'value' - nominal value, in units of the standard
