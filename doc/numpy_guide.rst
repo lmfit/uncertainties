@@ -1,8 +1,8 @@
 .. index: NumPy support
 
-=============================
-Uncertainties in NumPy arrays
-=============================
+=======================
+Uncertainties in arrays
+=======================
 
 .. index:: unumpy
 
