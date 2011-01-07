@@ -227,12 +227,12 @@ $5`_ or more through PayPal (no PayPal account necessary)!
 Acknowledgments
 ===============
 
-The author wishes to thank Arnaud Delobelle, Pierre Cladé, and
-Sebastian Walter for very useful technical input.  I would like to
-thank Joaquin Abian, Jason Moore, and many other users for their
-feedback and suggestions, which greatly helped improve this program.
-I am also grateful to the Linux distribution maintainers of this
-package.
+The author wishes to thank Arnaud Delobelle, Pierre Cladé, and Sebastian 
+Walter for very useful technical input.  Patches by Pierre Cladé are 
+gratefully acknowledged. I would also like to thank Joaquin Abian, Jason 
+Moore, and many other users for their feedback and suggestions, which 
+greatly helped improve this program. I am also grateful to the Linux 
+distribution maintainers of this package.
 
 .. toctree::
    :hidden:

@@ -10,6 +10,7 @@ X Add my picture and my email
 * Intro
 X Add licence?
 X Add donations?  or in side bar?
+- Create PDF version automatically and link to PDF documentation in main documentation, and write Don back
 
 * User guide
 It contains the documentation from pydoc uncertainties, basically.
@@ -55,7 +56,8 @@ X Handle all !!! marks in the .rst
 X Put the doc on the web, even if I don't yet have implemented all the features
 X Tell Alex Vallette + Stéphane Boucard
 X Tell people on my uncertainties mailing list (on a week day)
-- Tell Sanofi about the web site (on a week day)
+X Tell Sanofi about the web site (on a week day)
+
 
 ##########################
 # SPECIAL td DATA BLOCK. #
