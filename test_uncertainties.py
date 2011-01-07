@@ -115,11 +115,17 @@ def _compare_derivatives(func, numerical_derivatives,
             try:
 
                 # We include negative numbers, for more thorough tests:
-                args = [
-                    random.choice(range(-10, 10))
-                    if arg_num in integer_arg_nums
-                    else uncertainties.Variable(random.random()*10-5, 0)
-                    for arg_num in range(num_args)]
+                #args = [
+                #    random.choice(range(-10, 10))
+                #    if arg_num in integer_arg_nums
+                #    else uncertainties.Variable(random.random()*10-5, 0)
+                #    for arg_num in range(num_args)]
+                args = []
+                for arg_num in range(num_args):
+                    if arg_num in integer_arg_nums:
+                        args.append(random.choice(range(-10, 10)))
+                    else:
+                        args.append(uncertainties.Variable(random.random()*10-5, 0))
 
                 func_approx = func(*args)
 

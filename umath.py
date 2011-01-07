@@ -41,7 +41,6 @@ from __future__ import division  # Many analytical derivatives depend on this
 import math
 import sys
 import itertools
-import functools
 import inspect
 
 # Local modules
@@ -89,8 +88,30 @@ non_std_wrapped_funcs = []
 
 # Function that copies the relevant attributes from generalized
 # functions from the math module:
-wraps = functools.partial(functools.update_wrapper,
-                          assigned=('__doc__', '__name__'))
+# This is a copy&paste job from the functools module, changing
+# the default arugment for assigned
+def wraps(wrapper,
+          wrapped,
+          assigned=('__doc__', '__name__'),
+          updated=('__dict__',)):
+    """Update a wrapper function to look like the wrapped function
+    
+    wrapper is the function to be updated
+    wrapped is the original function
+    assigned is a tuple naming the attributes assigned directly
+    from the wrapped function to the wrapper function (defaults to
+    functools.WRAPPER_ASSIGNMENTS)
+    updated is a tuple naming the attributes of the wrapper that
+    are updated with the corresponding attribute from the wrapped
+    function (defaults to functools.WRAPPER_UPDATES)
+    """
+    for attr in assigned:
+        setattr(wrapper, attr, getattr(wrapped, attr))
+    for attr in updated:
+        getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
+    # Return the wrapper so this can be used as a decorator via partial()
+    return wrapper
+                                    
 
 ########################################
 # Wrapping of built-in math functions not in no_std_wrapping:
@@ -135,7 +156,13 @@ def log_der0(*args):
     #    return log_1arg_der(*args)  # Argument number check
     #except TypeError:
     #    return 1/args[0]/math.log(args[1])  # 2-argument form
-    
+
+def _deriv_copysign(x,y):
+    if x>=0: return 1*math.copysign(1, y)
+    else: return -1*math.copysign(1, y)
+def _deriv_fabs(x):
+    if x >= 0: return 1
+    else: return -1
 fixed_derivatives = {
     # In alphabetical order, here:
     'acos': [lambda x: -1/math.sqrt(1-x**2)],
@@ -147,13 +174,14 @@ fixed_derivatives = {
               lambda y, x: -y/(x**2+y**2)],  # Correct for x == 0
     'atanh': [lambda x: 1/(1-x**2)],
     'ceil': [lambda x: 0],
-    'copysign': [lambda x, y: (1 if x >= 0 else -1) * math.copysign(1, y),
+    'copysign': [#lambda x, y: (1 if x >= 0 else -1) * math.copysign(1, y),
+                 _deriv_copysign,
                  lambda x, y: 0],
     'cos': [lambda x: -math.sin(x)],
     'cosh': [math.sinh],
     'degrees': [lambda x: math.degrees(1)],
     'exp': [math.exp],
-    'fabs': [lambda x: 1 if x >= 0 else -1],
+    'fabs': [_deriv_fabs],#[lambda x: 1 if x >= 0 else -1],
     'floor': [lambda x: 0],
     'hypot': [lambda x, y: x/math.hypot(x, y),
               lambda x, y: y/math.hypot(x, y)],
