@@ -37,7 +37,7 @@ source_suffix = '.rst'
 #source_encoding = 'utf-8'
 
 # The master toctree document.
-master_doc = 'overview'
+master_doc = 'index'
 
 # General information about the project.
 project = u'uncertainties Python package'
@@ -175,7 +175,7 @@ htmlhelp_basename = 'uncertaintiesPythonpackagedoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'uncertaintiesPythonpackage.tex', u'uncertainties Python package Documentation',
+  ('index_pdf', 'uncertaintiesPythonpackage.tex', u'uncertainties Python package Documentation',
    u'Eric O. LEBIGOT (EOL)', 'manual'),
 ]
 
