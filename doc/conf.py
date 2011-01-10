@@ -37,7 +37,7 @@ source_suffix = '.rst'
 #source_encoding = 'utf-8'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = 'overview'
 
 # General information about the project.
 project = u'uncertainties Python package'

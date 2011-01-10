@@ -234,6 +234,14 @@ Moore, and many other users for their feedback and suggestions, which
 greatly helped improve this program. I am also grateful to the Linux 
 distribution maintainers of this package.
 
+.. toctree::
+   :hidden:
+   :maxdepth: 1
+
+   Overview <self>
+   user_guide
+   numpy_guide
+   tech_guide
 
 .. _Python: http://python.org/
 .. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
