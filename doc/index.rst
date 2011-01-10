@@ -1,5 +1,5 @@
-Test
-====
+TOC
+===
 
 .. toctree::
    :hidden:
