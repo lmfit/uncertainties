@@ -3,6 +3,7 @@ TOC
 
 .. toctree::
    :hidden:
+   :maxdepth: 1
 
    main <self>
    overview
