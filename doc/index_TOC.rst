@@ -5,7 +5,7 @@ TOC
    :hidden:
    :maxdepth: 1
 
-   index
+   Overview <index>
    user_guide
    numpy_guide
    tech_guide

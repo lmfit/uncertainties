@@ -39,16 +39,6 @@ pathto("_static/logo.png", 1) }}" border="0" alt="uncertainties"/></a>
           {%- endif %}
           {%- endblock %}
           {%- block sidebarrel %}
-          {%- if prev %}
-            <h4>{{ _('Previous topic') }}</h4>
-            <p class="topless"><a href="{{ prev.link|e }}"
-                                  title="{{ _('previous chapter') }}">{{ prev.title }}</a></p>
-          {%- endif %}
-          {%- if next %}
-            <h4>{{ _('Next topic') }}</h4>
-            <p class="topless"><a href="{{ next.link|e }}"
-                                  title="{{ _('next chapter') }}">{{ next.title }}</a></p>
-          {%- endif %}
           {%- endblock %}
           {%- block sidebarsourcelink %}
           {%- if show_source and has_source and sourcename %}
