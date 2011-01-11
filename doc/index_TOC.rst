@@ -1,8 +1,7 @@
-TOC
-===
+Table of Contents
+=================
 
 .. toctree::
-   :hidden:
    :maxdepth: 1
 
    Overview <index>
