@@ -99,7 +99,7 @@ html_theme = 'default'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+# html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -161,7 +161,7 @@ html_show_sourcelink = False
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'uncertaintiesPythonpackagedoc'
+htmlhelp_basename = 'uncertaintiesPythonPackagedoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -175,7 +175,7 @@ htmlhelp_basename = 'uncertaintiesPythonpackagedoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index_TOC', 'uncertaintiesPythonpackage.tex', u'uncertainties Python package Documentation',
+  ('index_TOC', 'uncertaintiesPythonPackage.tex', u'uncertainties Python package Documentation',
    u'Eric O. LEBIGOT (EOL)', 'manual'),
 ]
 
