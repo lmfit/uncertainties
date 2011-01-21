@@ -176,8 +176,8 @@ The :doc:`tech_guide` gives advanced technical details.
    A :download:`PDF version <_build/latex/uncertaintiesPythonPackage.pdf>` 
    of the documentation is also available.
 
-In addition to this web documentation, the pydoc_ command gives access 
-to many of the documentation strings included in the code.
+Additional information is available through the pydoc_ command, which 
+gives access to many of the documentation strings included in the code.
 
 .. index:: license
 
