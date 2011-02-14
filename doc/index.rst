@@ -105,7 +105,7 @@ do
 
 The :mod:`uncertainties` package is also available on the following
 **Linux distributions**: `Ubuntu
-<https://launchpad.net/ubuntu/maverick/+package/python-uncertainties>`_,
+<https://launchpad.net/ubuntu/+source/uncertainties>`_,
 `openSUSE
 <https://build.opensuse.org/package/show?package=python-uncertainties&project=home%3Aocefpaf>`_,
 and `Debian <http://packages.debian.org/source/sid/uncertainties>`_.
