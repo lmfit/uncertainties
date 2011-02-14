@@ -71,6 +71,24 @@ handled <simple_array_use>` too.
 
 They are calculated with a :ref:`fast method <differentiation method>`.
 
+Available documentation
+=======================
+
+The :doc:`user_guide` details many of the features of this package.
+
+The part :doc:`numpy_guide` describes how arrays of numbers with
+uncertainties can be created and used.
+
+The :doc:`tech_guide` gives advanced technical details.
+
+.. only:: html
+
+   A :download:`PDF version <_build/latex/uncertaintiesPythonPackage.pdf>` 
+   of the documentation is also available.
+
+Additional information is available through the pydoc_ command, which 
+gives access to many of the documentation strings included in the code.
+
 .. index:: installation
 
 .. _installing this package:
@@ -161,25 +179,6 @@ equally split between unit tests and the calculation code proper.
 :mod:`uncertainties` is thus a **lightweight, portable package** with
 abundant documentation and tests.
 
-Available documentation
-=======================
-
-The :doc:`user_guide` details many of the features of this package.
-
-The part :doc:`numpy_guide` describes how arrays of numbers with
-uncertainties can be created and used.
-
-The :doc:`tech_guide` gives advanced technical details.
-
-.. only:: html
-
-   A :download:`PDF version <_build/latex/uncertaintiesPythonPackage.pdf>` 
-   of the documentation is also available.
-
-Additional information is available through the pydoc_ command, which 
-gives access to many of the documentation strings included in the code.
-
-.. index:: license
 
 What others say
 ===============
@@ -200,6 +199,8 @@ What others say
 - "*Holy f\*\*\* this would have saved me so much f\*\*\*ing time last
   semester*." (`reddit
   <http://www.reddit.com/r/Python/comments/am84v/now_you_can_do_calculations_with_uncertainties_5/>`_)
+
+.. index:: license
 
 License
 =======
