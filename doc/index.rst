@@ -239,7 +239,9 @@ Walter for very useful technical input.  Patches by Pierre Cladé are
 gratefully acknowledged. I would also like to thank Joaquin Abian, Jason 
 Moore, and many other users for their feedback and suggestions, which 
 greatly helped improve this program. I am also grateful to the Linux 
-distribution maintainers of this package.
+distribution maintainers of this package, and to Christoph Gohlke for 
+including it in his Base distribution of scientific Python packages for 
+Windows.
 
 .. _Python: http://python.org/
 .. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
