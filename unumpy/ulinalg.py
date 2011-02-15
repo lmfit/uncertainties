@@ -6,7 +6,7 @@ of the functions from numpy.linalg.
 """
 
 from uncertainties import __author__
-from . import core
+from uncertainties.unumpy import core
 
 # This module cannot import unumpy because unumpy imports this module.
 

@@ -19,7 +19,7 @@ import numpy
 
 # Local modules:
 import uncertainties
-from .. import umath
+from uncertainties import umath
 
 from uncertainties import __author__
 
@@ -70,7 +70,8 @@ def unumpy_to_numpy_matrix(arr):
     Otherwise, it is returned unchanged.
     """
 
-    return arr.view(numpy.matrix) if isinstance(arr, matrix) else arr        
+    #return arr.view(numpy.matrix) if isinstance(arr, matrix) else arr
+    return (lambda: arr, lambda: arr.view(numpy.matrix))[isinstance(arr, matrix)]()
 
 def nominal_values(arr):
     """
@@ -568,11 +569,17 @@ def define_vectorized_funcs():
         (f_name, 'arc'+f_name[1:])
         for f_name in ['acos', 'acosh', 'asin', 'atan', 'atan2', 'atanh'])
 
-    new_func_names = [
-        func_name_translations[function_name]
-        if function_name in func_name_translations
-        else function_name
-        for function_name in umath.many_scalar_to_scalar_funcs]
+    #new_func_names = [
+    #    func_name_translations[function_name]
+    #    if function_name in func_name_translations
+    #    else function_name
+    #    for function_name in umath.many_scalar_to_scalar_funcs]
+    new_func_names = []
+    for function_name in umath.many_scalar_to_scalar_funcs:
+        if function_name in func_name_translations:
+            new_func_names.append(func_name_translations[function_name])
+        else:
+            new_func_names.append(function_name)
         
     for (function_name, unumpy_name) in \
         zip(umath.many_scalar_to_scalar_funcs, new_func_names):

@@ -69,8 +69,8 @@ author."""
 
 # Local modules:
 from core import *
-from . import core
-from . import ulinalg  # Local sub-module
+from uncertainties.unumpy import core
+from uncertainties.unumpy import ulinalg  # Local sub-module
 
 from uncertainties import __author__
 
