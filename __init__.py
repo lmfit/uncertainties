@@ -275,6 +275,30 @@ __all__ = [
 
     ]
 
+# XXX Is this the correct way to provide builtins if they
+# XXX do not exist?
+# any() and all() only started existing in python2.5
+# so here we provide backup implementations for 2.4
+if not "any" in dir(__builtins__):
+    def any(iterable):
+        for element in iterable:
+            if element:
+                return True
+        return False
+
+else:
+    any = any
+
+if not "all" in dir(__builtins__):
+    def all(iterable):
+        for element in iterable:
+            if not element:
+                return False
+        return True
+
+else:
+    all = all
+
 ###############################################################################
 
 def set_doc(doc_string):
@@ -373,7 +397,7 @@ class NumericalDerivatives(object):
         Returns the n-th numerical derivative of the function.
         """
         return partial_derivative(self._function, n)
-  
+
 def wrap(f, derivatives_funcs=None):
     """
     Wraps function f so that, when applied to numbers with
@@ -414,10 +438,19 @@ def wrap(f, derivatives_funcs=None):
         except TypeError:
             pass
         else:
+            xxx="""
             derivatives_funcs = [
                 partial_derivative(f, k) if derivative is None
                 else derivative
-                for (k, derivative) in enumerate(derivatives_funcs)]
+                for (k, derivative) in enumerate(derivatives_funcs)]"""
+            derivatives_funcs_ = []
+            for (k, derivative) in enumerate(derivatives_funcs):
+                if derivative is None:
+                    derivatives_funcs_.append(partial_derivative(f, k))
+                else:
+                    derivatives_funcs_.append(derivative)
+                    
+            derivatives_funcs = derivatives_funcs_
 
     #! Setting the doc string after "def f_with...()" does not
     # seem to work.  We define it explicitly:
@@ -522,9 +555,14 @@ def wrap(f, derivatives_funcs=None):
 
         derivatives_wrt_args = []
         for (arg, derivative) in zip(aff_funcs, derivatives_funcs):
-            derivatives_wrt_args.append(derivative(*args_values)
-                                        if arg.derivatives
-                                        else 0)
+            #derivatives_wrt_args.append(derivative(*args_values)
+            #                            if arg.derivatives
+            #                            else 0)
+            if arg.derivatives:
+                derivatives_wrt_args.append(derivative(*args_values))
+            else:
+                derivatives_wrt_args.append(0)
+                
 
         ########################################
         # Calculation of the derivative of f with respect to all the
@@ -863,9 +901,13 @@ class AffineScalarFunc(object):
         # block of signs (otherwise, the standard deviation can be
         # mistaken for another element of the array).
 
-        return ("%s+/-%s" % (to_string(nominal_value), to_string(std_dev))
-                if std_dev
-                else to_string(nominal_value))
+        #return ("%s+/-%s" % (to_string(nominal_value), to_string(std_dev))
+        #        if std_dev
+        #        else to_string(nominal_value))
+        if std_dev:
+            return "%s+/-%s" % (to_string(nominal_value), to_string(std_dev))
+        else:
+            return to_string(nominal_value)
 
     def __repr__(self):
         return self._general_representation(repr)
@@ -997,8 +1039,13 @@ def add_operators_to_AffineScalarFunc():
 
     # Single-argument operators that should be adapted from floats to
     # AffineScalarFunc objects:
+    def _simple_add_deriv(x):
+        if x>=0:
+            return 1.
+        else:
+            return -1.
     simple_numerical_operators_derivatives = {
-        'abs': lambda x: 1. if x>=0 else -1.,
+        'abs': _simple_add_deriv,#lambda x: 1. if x>=0 else -1.,
         'neg': lambda x: -1.,
         'pos': lambda x: 1.,
         'trunc': lambda x: 0.
@@ -1128,8 +1175,12 @@ class Variable(AffineScalarFunc):
         # the variable.  Outputting the tag for regular string ("print
         # x") would be too heavy and produce an unusual representation
         # of a number with uncertainty.
-        return (num_repr if ((self.tag is None) or (to_string != repr))
-                else "< %s = %s >" % (self.tag, num_repr))
+        #return (num_repr if ((self.tag is None) or (to_string != repr))
+        #        else "< %s = %s >" % (self.tag, num_repr))
+        if ((self.tag is None) or (to_string != repr)):
+            return num_repr
+        else:
+            "< %s = %s >" % (self.tag, num_repr)
 
     def __copy__(self):
         """
@@ -1192,7 +1243,9 @@ def nominal_value(x):
     numbers, when only some of them generally carry an uncertainty.
     """
 
-    return x.nominal_value if isinstance(x, AffineScalarFunc) else x
+    #return x.nominal_value if isinstance(x, AffineScalarFunc) else x
+    if isinstance(x, AffineScalarFunc): return x.nominal_value
+    else: return x
 
 def std_dev(x):
     """
@@ -1204,7 +1257,9 @@ def std_dev(x):
     numbers, when only some of them generally carry an uncertainty.
     """
 
-    return x.std_dev() if isinstance(x, AffineScalarFunc) else 0.
+    #return x.std_dev() if isinstance(x, AffineScalarFunc) else 0.
+    if isinstance(x, AffineScalarFunc): return x.std_dev()
+    else: return 0.
 
 def covariance_matrix(functions):
     """
@@ -1361,9 +1416,13 @@ def parse_error_in_parentheses(representation):
         uncert = float("%s%s" % (uncert_int, uncert_dec or '.0'))
     else:
         # uncert_int represents an uncertainty on the last digits:
-        abs_value_string = "%s%s" % (main_int, main_dec) \
-                           if main_dec \
-                           else main_int
+        #abs_value_string = "%s%s" % (main_int, main_dec) \
+        #                   if main_dec \
+        #                   else main_int
+        if main_dec:
+            abs_value_string = "%s%s" % (main_int, main_dec)
+        else:
+            abs_value_string = main_int
         # We replace the digits that are known by zeroes:
         fixed_value = abs_value_string[:-len(uncert_int)]
         fixed_value = re.sub(r'\d', '0', fixed_value)

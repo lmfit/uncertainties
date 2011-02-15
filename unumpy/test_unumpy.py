@@ -15,12 +15,14 @@ import numpy
 import uncertainties
 from uncertainties import ufloat
 from uncertainties import unumpy
-from . import core
+from uncertainties.unumpy import core
 
-from .. import test_uncertainties
+from uncertainties import test_uncertainties
 from uncertainties.test_uncertainties import _numbers_close, matrices_close
 
 from uncertainties import __author__
+
+from uncertainties import all, any
 
 def test_numpy():
     
