@@ -121,13 +121,14 @@ do
 
    pip install --upgrade uncertainties
 
-The :mod:`uncertainties` package is also available on the following
-**Linux distributions**: `Ubuntu
-<https://launchpad.net/ubuntu/+source/uncertainties>`_,
-`openSUSE
-<https://build.opensuse.org/package/show?package=python-uncertainties&project=home%3Aocefpaf>`_,
-and `Debian <http://packages.debian.org/source/sid/uncertainties>`_.
-
+The :mod:`uncertainties` package is also available on the following 
+**Linux distributions**: `Ubuntu 
+<https://launchpad.net/ubuntu/+source/uncertainties>`_, `openSUSE 
+<https://build.opensuse.org/package/show?package=python-uncertainties&project=home%3Aocefpaf>`_, 
+and `Debian <http://packages.debian.org/source/sid/uncertainties>`_. It 
+may also be included in Christoph Gohlke's Base distribution of 
+`scientific Python packages 
+<http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_ for **Windows**.
 
 Manual download and install
 ---------------------------
