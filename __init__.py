@@ -1326,8 +1326,9 @@ NUMBER_WITH_UNCERT_RE = re.compile(
 def parse_error_in_parentheses(representation):
     """
     Returns (value, error) from a string representing a number with
-    uncertainty like 12.34(5).  If no parenthesis is given, an
-    uncertainty of one on the last digit is assumed.
+    uncertainty like 12.34(5), 12.34(142), 12.5(3.4) or 12.3(4.2)e3.
+    If no parenthesis is given, an uncertainty of one on the last
+    digit is assumed.
 
     Raises ValueError if the string cannot be parsed.    
     """
@@ -1345,12 +1346,15 @@ def parse_error_in_parentheses(representation):
                          " Was expecting a string of the form 1.23(4)"
                          " or 1.234" % representation)
 
-    # The value of the number is its nominal value:
-    value = float("%s%s%s%s" % (sign or '',
-                                main_int,
-                                main_dec or '.0',
-                                exponent or ''))
+    print (sign, main_int, main_dec, uncert_int, uncert_dec,
+         exponent)  #!!!!!!!!!
     
+    # The value of the number is its nominal value:
+    value = float(''.join((sign or '',
+                           main_int,
+                           main_dec or '.0',
+                           exponent or '')))
+                  
     if uncert_int is None:
         # No uncertainty was found: an uncertainty of 1 on the last
         # digit is assumed:
@@ -1387,6 +1391,7 @@ def str_to_number_with_uncert(representation):
     The string can be of the form:
     - 124.5+/-0.15
     - 124.50(15)
+    - 124.50(123)
     - 124.5
 
     When no numerical error is given, an uncertainty of 1 on the last
@@ -1446,6 +1451,7 @@ def ufloat(representation, tag=None):
         31
         -3.1e10
         169.0(7)
+        169.1(15)
     """
 
     # This function is somewhat optimized so as to help with the
