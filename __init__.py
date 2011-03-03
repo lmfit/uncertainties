@@ -1333,8 +1333,6 @@ def parse_error_in_parentheses(representation):
     Raises ValueError if the string cannot be parsed.    
     """
 
-    print representation #!!!!!!!!
-    
     match = NUMBER_WITH_UNCERT_RE.search(representation)
 
     if match:
@@ -1348,9 +1346,6 @@ def parse_error_in_parentheses(representation):
                          " Was expecting a string of the form 1.23(4)"
                          " or 1.234" % representation)
 
-    print (sign, main_int, main_dec, uncert_int, uncert_dec,
-         exponent)  #!!!!!!!!!
-    
     # The value of the number is its nominal value:
     value = float(''.join((sign or '',
                            main_int,
