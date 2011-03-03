@@ -1365,6 +1365,7 @@ def parse_error_in_parentheses(representation):
         uncert = float("%s%s" % (uncert_int, uncert_dec or '.0'))
     else:
         # uncert_int represents an uncertainty on the last digits:
+        # Absolute value of the main number:
         abs_value_string = "%s%s" % (main_int, main_dec) \
                            if main_dec \
                            else main_int
