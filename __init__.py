@@ -1359,7 +1359,7 @@ def parse_error_in_parentheses(representation):
 
     # Do we have a fully explicit uncertainty?
     if uncert_dec is not None:
-        uncert = float("%s%s" % (uncert_int, uncert_dec or '.0'))
+        uncert = float("%s%s" % (uncert_int, uncert_dec or ''))
     else:
         # uncert_int represents an uncertainty on the last digits:
 
