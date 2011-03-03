@@ -1333,6 +1333,8 @@ def parse_error_in_parentheses(representation):
     Raises ValueError if the string cannot be parsed.    
     """
 
+    print representation #!!!!!!!!
+    
     match = NUMBER_WITH_UNCERT_RE.search(representation)
 
     if match:
@@ -1365,20 +1367,12 @@ def parse_error_in_parentheses(representation):
         uncert = float("%s%s" % (uncert_int, uncert_dec or '.0'))
     else:
         # uncert_int represents an uncertainty on the last digits:
-        
-        # Absolute value of the main number:
-        abs_value_string = ("%s%s" % (main_int, main_dec)
-                            if main_dec
-                            else main_int)
-        # String where all the fixed digits in abs_value_string are
-        # set to 0, and where subsequent digits do not appear:
-        fixed_value = abs_value_string[:-len(uncert_int)]
-        fixed_value = re.sub(r'\d', '0', fixed_value)
-        #!!!!!!!
-        print (abs_value_string, fixed_value)
-        
-        # The last digits of the uncertainty are known:
-        uncert = float("%s%s" % (fixed_value, uncert_int))
+
+        # The number of digits after the period defines the power of
+        # 10 than must be applied to the provided uncertainty:
+        num_digits_after_period = (0 if main_dec is None
+                                   else len(main_dec)-1)
+        uncert = int(uncert_int)/10**num_digits_after_period
 
     # We apply the exponent to the uncertainty as well:
     uncert *= float("1%s" % (exponent or ''))
