@@ -1366,9 +1366,9 @@ def parse_error_in_parentheses(representation):
     else:
         # uncert_int represents an uncertainty on the last digits:
         # Absolute value of the main number:
-        abs_value_string = "%s%s" % (main_int, main_dec) \
-                           if main_dec \
-                           else main_int
+        abs_value_string = ("%s%s" % (main_int, main_dec)
+                            if main_dec
+                            else main_int)
         # We replace the digits that are known by zeroes:
         fixed_value = abs_value_string[:-len(uncert_int)]
         fixed_value = re.sub(r'\d', '0', fixed_value)
