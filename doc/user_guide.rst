@@ -143,6 +143,8 @@ functions are found in the :mod:`uncertainties.umath` module::
   >>> sin(x**2)
   0.039989334186634168+/-0.003996800426643912
 
+The list of available mathematical functions can be obtained with the
+``pydoc uncertainties.umath`` command.
 
 .. index:: comparison operators
 
