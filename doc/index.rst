@@ -170,7 +170,7 @@ using :mod:`uncertainties` are run, etc.), and then **rename** it
 Source code
 -----------
 
-The `code <http://github.com/lebigot/uncertainties>`_ and the
+The latest `code <http://github.com/lebigot/uncertainties>`_ and the
 `documentation source
 <http://github.com/lebigot/uncertainties/tree/master/doc/>`_ are
 available on GitHub.  The :mod:`uncertainties` package is written in
