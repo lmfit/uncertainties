@@ -13,10 +13,11 @@ theory`_.  In particular, it handles **correlations** between
 variables, which sets it apart from many existing error propagation
 codes.
 
-Calculations involving numbers with uncertainties are made **very
-simple** thanks to this package.  In fact, it :ref:`transparently
-<derivatives>` calculates the `numerous derivatives`_ required by
-linear error propagation theory.
+Calculations involving numbers with uncertainties are made **very 
+simple** thanks to this package.  In fact, it :ref:`transparently 
+<derivatives>` calculates the `numerous derivatives`_ required by linear 
+error propagation theory.  Performing the same calculations by hand and 
+implementing the resulting formulas is generally quite tedious.
 
 Calculations of results with uncertainties, or of derivatives, can
 either be performed in an **interactive session**, or in programs
