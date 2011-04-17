@@ -267,21 +267,24 @@ be done with ``isinstance(value, UFloat)``.
 Differentiation method
 ----------------------
 
-The :mod:`uncertainties` package calculates almost all the derivatives
-required by linear error propagation theory analytically (the
-mathematical functions that are differentiated through a numerical
-approximation are listed in ``umath.num_deriv_funcs``).
+The :mod:`uncertainties` package automatically calculates the
+derivatives required by linear error propagation theory.
 
-The derivatives of mathematical expressions are evaluated through a
+Almost all the derivatives of the fundamental functions provided by
+:mod:`uncertainties` are obtained through a analytical formulas (the
+few mathematical functions that are instead differentiated through
+numerical approximation are listed in ``umath.num_deriv_funcs``).
+
+The derivatives of mathematical *expressions* are evaluated through a
 fast and precise method: :mod:`uncertainties` transparently implements
-`Automatic Differentiation`_ with reverse accumulation. This method is
+`automatic differentiation`_ with reverse accumulation. This method is
 faster than symbolic differentiation and more precise than numerical
 differentiation.
 
 The derivatives of any expression can be obtained in a simple way, as
 demonstrated in the :ref:`User Guide <derivatives>`.
 
-.. _Automatic Differentiation: http://en.wikipedia.org/wiki/Automatic_differentiation
+.. _automatic differentiation: http://en.wikipedia.org/wiki/Automatic_differentiation
 
 .. _pydoc: http://docs.python.org/library/pydoc.html
 
