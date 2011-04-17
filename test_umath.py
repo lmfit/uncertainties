@@ -50,11 +50,11 @@ def test_fixed_derivatives_math_funcs():
     test_uncertainties._compare_derivatives(
         frac_part_modf,
         uncertainties.NumericalDerivatives(
-            lambda x: frac_part_modf(x).nominal_value))
+            lambda x: frac_part_modf(x)))
     test_uncertainties._compare_derivatives(
         int_part_modf,
         uncertainties.NumericalDerivatives(
-            lambda x: int_part_modf(x).nominal_value))
+            lambda x: int_part_modf(x)))
     
     ##
     # frexp(): returns a tuple:
@@ -66,11 +66,11 @@ def test_fixed_derivatives_math_funcs():
     test_uncertainties._compare_derivatives(
         mantissa_frexp,
         uncertainties.NumericalDerivatives(
-            lambda x: mantissa_frexp(x).nominal_value))
+            lambda x: mantissa_frexp(x)))
     test_uncertainties._compare_derivatives(
         exponent_frexp,
         uncertainties.NumericalDerivatives(
-            lambda x: exponent_frexp(x).nominal_value))
+            lambda x: exponent_frexp(x)))
 
 def test_compound_expression():
     """
