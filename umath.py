@@ -156,6 +156,7 @@ fixed_derivatives = {
     'cos': [lambda x: -math.sin(x)],
     'cosh': [math.sinh],
     'degrees': [lambda x: math.degrees(1)],
+    'erf': [lambda x: 1],
     'exp': [math.exp],
     'fabs': [lambda x: 1 if x >= 0 else -1],
     'floor': [lambda x: 0],

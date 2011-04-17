@@ -35,7 +35,7 @@ def test_fixed_derivatives_math_funcs():
         # Numerical derivatives of func: the nominal value of func() results
         # is used as the underlying function:
         numerical_derivatives = uncertainties.NumericalDerivatives(
-            lambda *args: func(*args).nominal_value)
+            lambda *args: func(*args))
         test_uncertainties._compare_derivatives(func, numerical_derivatives)
 
     # Functions that are not in umath.many_scalar_to_scalar_funcs:

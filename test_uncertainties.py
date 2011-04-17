@@ -136,7 +136,11 @@ def _compare_derivatives(func, numerical_derivatives,
                             continue
 
                         fixed_deriv_value = func_approx.derivatives[arg]
-                        num_deriv_value = numerical_deriv(*args)
+                        
+                        num_deriv_value = numerical_deriv(*[
+                            # All arguments, at this point, are
+                            # uncertainties.Variable objects:
+                            v.nominal_value for v in args])
 
                         # This message is useful: the user can see that
                         # tests are really performed (instead of not being
