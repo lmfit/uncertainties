@@ -12,9 +12,10 @@ from __future__ import division
 import copy
 import weakref
 import math
+import random
 
 # 3rd-party modules
-import nose.tools
+# import nose.tools
 
 # Local modules
 
@@ -63,8 +64,6 @@ def _compare_derivatives(func, numerical_derivatives,
 
     Tests are done on random arguments.
     """
-
-    import random
 
     # print "Testing", func.__name__
 
