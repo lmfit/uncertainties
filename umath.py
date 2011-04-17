@@ -84,7 +84,7 @@ many_scalar_to_scalar_funcs = []
 # no_std_wrapping = ['modf', 'frexp', 'ldexp', 'fsum', 'factorial']
 
 # Functions with numerical derivatives:
-num_deriv_funcs = ['erf', 'erfc', 'expm1', 'fmod', 'gamma', 'isinf', 'isnan',
+num_deriv_funcs = ['expm1', 'fmod', 'gamma', 'isinf', 'isnan',
                    'lgamma', 'trunc']
 
 # Functions that do not belong in many_scalar_to_scalar_funcs, but
