@@ -84,7 +84,7 @@ many_scalar_to_scalar_funcs = []
 # no_std_wrapping = ['modf', 'frexp', 'ldexp', 'fsum', 'factorial']
 
 # Functions with numerical derivatives:
-num_deriv_funcs = ['erf', 'erfc', 'expm1', 'fmod', 'gamma', 'isinf', 'isnan',
+num_deriv_funcs = ['fmod', 'gamma', 'isinf', 'isnan',
                    'lgamma', 'trunc']
 
 # Functions that do not belong in many_scalar_to_scalar_funcs, but
@@ -139,7 +139,9 @@ def log_der0(*args):
     #    return log_1arg_der(*args)  # Argument number check
     #except TypeError:
     #    return 1/args[0]/math.log(args[1])  # 2-argument form
-    
+
+_erf_coef = 2/math.sqrt(math.pi)  # Optimization for erf()
+
 fixed_derivatives = {
     # In alphabetical order, here:
     'acos': [lambda x: -1/math.sqrt(1-x**2)],
@@ -156,8 +158,10 @@ fixed_derivatives = {
     'cos': [lambda x: -math.sin(x)],
     'cosh': [math.sinh],
     'degrees': [lambda x: math.degrees(1)],
-    'erf': [lambda x: 1],  #!!!!!!!!!!!!
+    'erf': [lambda x: exp(-x**2)*_erf_coef],
+    'erfc': [lambda x: -exp(-x**2)*_erf_coef],
     'exp': [math.exp],
+    'expm1': [math.exp],
     'fabs': [lambda x: 1 if x >= 0 else -1],
     'floor': [lambda x: 0],
     'hypot': [lambda x, y: x/math.hypot(x, y),
