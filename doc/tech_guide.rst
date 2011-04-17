@@ -268,10 +268,15 @@ Differentiation method
 ----------------------
 
 The :mod:`uncertainties` package calculates almost all the derivatives
-required by linear error propagation theory with a fast and precise
-method: it transparently implements `Automatic Differentiation`_, with
-reverse accumulation. This method is faster than symbolic
-differentiation and more precise than numerical differentiation.
+required by linear error propagation theory analytically (the
+mathematical functions that are differentiated through a numerical
+approximation are listed in ``umath.num_deriv_funcs``).
+
+The derivatives of mathematical expressions are evaluated through a
+fast and precise method: :mod:`uncertainties` transparently implements
+`Automatic Differentiation`_ with reverse accumulation. This method is
+faster than symbolic differentiation and more precise than numerical
+differentiation.
 
 The derivatives of any expression can be obtained in a simple way, as
 demonstrated in the :ref:`User Guide <derivatives>`.
