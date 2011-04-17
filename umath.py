@@ -81,7 +81,11 @@ many_scalar_to_scalar_funcs = []
 
 # Some functions require a specific treatment and must therefore be
 # excluded from standard wrapping.  Functions
-no_std_wrapping = ['modf', 'frexp', 'ldexp', 'fsum', 'factorial']
+# no_std_wrapping = ['modf', 'frexp', 'ldexp', 'fsum', 'factorial']
+
+# Functions with numerical derivatives:
+num_deriv_funcs = ['erf', 'erfc', 'expm1', 'fmod', 'gamma', 'isinf', 'isnan',
+                   'lgamma', 'trunc']
 
 # Functions that do not belong in many_scalar_to_scalar_funcs, but
 # that have a version that handles uncertainties:
@@ -93,7 +97,7 @@ wraps = functools.partial(functools.update_wrapper,
                           assigned=('__doc__', '__name__'))
 
 ########################################
-# Wrapping of built-in math functions not in no_std_wrapping:
+# Wrapping of math functions:
 
 # Fixed formulas for the derivatives of some functions from the math
 # module (some functions might not be present in all version of
@@ -177,23 +181,20 @@ fixed_derivatives = {
 
 this_module = sys.modules[__name__]
 
-#!!!!!! make it work for Jython
+for (name, attr) in vars(math).items():
 
-# We do not want to wrap module attributes such as __doc__, etc.:
-for (name, func) in inspect.getmembers(math, inspect.isbuiltin):
-
-    if name in no_std_wrapping:
-        continue
-
-    if name in fixed_derivatives:
+    if name in fixed_derivatives:  # Priority to functions in fixed_derivatives
         derivatives = fixed_derivatives[name]
-    else:
+    elif name in num_deriv_funcs:
         # Functions whose derivatives are calculated numerically by
         # this module fall here (isinf, fmod,...):
         derivatives = None  # Means: numerical calculation required
-        print name #!!!!!!!!!!! as many analaytical as possible
+    else:
+        continue  # 'name' not wrapped by this module (__doc__, e, etc.)
+    
     setattr(this_module, name,
-            wraps(uncertainties.wrap(func, derivatives), func))
+            wraps(uncertainties.wrap(attr, derivatives), attr))
+    
     many_scalar_to_scalar_funcs.append(name)
 
 ###############################################################################
