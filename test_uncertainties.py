@@ -117,8 +117,15 @@ def _compare_derivatives(func, numerical_derivatives,
                 args = [
                     random.choice(range(-10, 10))
                     if arg_num in integer_arg_nums
-                    else uncertainties.Variable(random.random()*10-5, 0)
+                    else uncertainties.Variable(random.random()*4-2, 0)
                     for arg_num in range(num_args)]
+
+                # 'args', but as scalar values:
+                args_scalar = [
+                    v.nominal_value if isinstance(v, uncertainties.Variable)
+                    else v
+                    for v in args
+                ]
 
                 func_approx = func(*args)
 
@@ -137,10 +144,7 @@ def _compare_derivatives(func, numerical_derivatives,
 
                         fixed_deriv_value = func_approx.derivatives[arg]
                         
-                        num_deriv_value = numerical_deriv(*[
-                            # All arguments, at this point, are
-                            # uncertainties.Variable objects:
-                            v.nominal_value for v in args])
+                        num_deriv_value = numerical_deriv(*args_scalar)
 
                         # This message is useful: the user can see that
                         # tests are really performed (instead of not being
@@ -159,8 +163,8 @@ def _compare_derivatives(func, numerical_derivatives,
                                 raise DerivativesDiffer(
                                     "Derivative #%d of function '%s' may be"
                                     " wrong: at args = %s,"
-                                    " value obtained = %f,"
-                                    " while numerical approximation = %f."
+                                    " value obtained = %.16f,"
+                                    " while numerical approximation = %.16f."
                                     % (arg_num, func.__name__, args,
                                        fixed_deriv_value, num_deriv_value))
 
