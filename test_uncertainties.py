@@ -12,6 +12,7 @@ from __future__ import division
 import copy
 import weakref
 import math
+import random
 
 # 3rd-party modules
 import nose.tools
@@ -49,6 +50,8 @@ def _numbers_close(x, y, tolerance=1e-6):
 class DerivativesDiffer(Exception):
     pass
 
+#!!!!!!!! wrap this so that exceptions are reported as AssertionErrors?  THIS IS strange
+#!!!!!!! PLUS, check all tests and replace custom errors by AssertionErrors?
 def _compare_derivatives(func, numerical_derivatives,
                          num_args_list=None):
     """
@@ -63,8 +66,6 @@ def _compare_derivatives(func, numerical_derivatives,
 
     Tests are done on random arguments.
     """
-
-    import random
 
     # print "Testing", func.__name__
 
@@ -144,7 +145,7 @@ def _compare_derivatives(func, numerical_derivatives,
                         # performed, silently):
                         print "Testing %s at %s, arg #%d" % (
                             func.__name__, args, arg_num)
-
+                        
                         if not _numbers_close(fixed_deriv_value,
                                               num_deriv_value, 1e-4):
 

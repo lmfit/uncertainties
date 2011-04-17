@@ -152,6 +152,7 @@ fixed_derivatives = {
     'cos': [lambda x: -math.sin(x)],
     'cosh': [math.sinh],
     'degrees': [lambda x: math.degrees(1)],
+    'erf': [lambda x: 1],  #!!!!!!!!!!!!
     'exp': [math.exp],
     'fabs': [lambda x: 1 if x >= 0 else -1],
     'floor': [lambda x: 0],
@@ -176,6 +177,8 @@ fixed_derivatives = {
 
 this_module = sys.modules[__name__]
 
+#!!!!!! make it work for Jython
+
 # We do not want to wrap module attributes such as __doc__, etc.:
 for (name, func) in inspect.getmembers(math, inspect.isbuiltin):
 
@@ -188,6 +191,7 @@ for (name, func) in inspect.getmembers(math, inspect.isbuiltin):
         # Functions whose derivatives are calculated numerically by
         # this module fall here (isinf, fmod,...):
         derivatives = None  # Means: numerical calculation required
+        print name #!!!!!!!!!!! as many analaytical as possible
     setattr(this_module, name,
             wraps(uncertainties.wrap(func, derivatives), func))
     many_scalar_to_scalar_funcs.append(name)
