@@ -50,8 +50,6 @@ def _numbers_close(x, y, tolerance=1e-6):
 class DerivativesDiffer(Exception):
     pass
 
-#!!!!!!!! wrap this so that exceptions are reported as AssertionErrors?  THIS IS strange
-#!!!!!!! PLUS, check all tests and replace custom errors by AssertionErrors?
 def _compare_derivatives(func, numerical_derivatives,
                          num_args_list=None):
     """
