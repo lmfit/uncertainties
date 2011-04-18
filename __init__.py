@@ -246,7 +246,7 @@ __author__ = 'Eric O. LEBIGOT (EOL)'
 __all__ = [
 
     # All sub-modules and packages are not imported by default,
-    # because NumPy could not be installed:
+    # in particular because NumPy might be unavailable.
 
     'ufloat',  # Main function: returns a number with uncertainty
 
