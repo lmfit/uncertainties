@@ -203,10 +203,13 @@ def test_fixed_derivatives_basic_funcs():
         """
 
         op_string = "__%s__" % op
-        # print "Checking %s..." % op_string
         func = getattr(AffineScalarFunc, op_string)
         numerical_derivatives = uncertainties.NumericalDerivatives(
-            lambda *args: func(*args).nominal_value)
+            # The __neg__ etc. methods of AffineScalarFunc only apply,
+            # by definition, to AffineScalarFunc objects: we first map
+            # possible scalar arguments (used for calculating
+            # derivatives) to AffineScalarFunc objects:
+            lambda *args: func(*map(uncertainties.to_affine_scalar, args)))
         _compare_derivatives(func, numerical_derivatives, [num_args])
 
     # Operators that take 1 value:
