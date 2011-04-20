@@ -1,4 +1,4 @@
-Some installation methods:
+* Some installation methods:
 
 python setup.py install
 
@@ -19,3 +19,15 @@ You can also simply move the uncertainties/ directory to a location
 that Python can import from (directory in which scripts using 
 uncertainties are run, etc.), and then rename it uncertainties (with no 
 version number).
+
+* The tests programs (test_*.py) are meant to be run through the Nose 
+testing framework.  This can be achieved for instance with a command 
+like
+
+  nosetests -sv uncertainties/
+
+or simply
+
+  nosetests uncertainties/
+
+(for a less verbose output).
