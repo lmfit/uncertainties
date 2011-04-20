@@ -197,10 +197,10 @@ for name in dir(math):
     else:
         continue  # 'name' not wrapped by this module (__doc__, e, etc.)
 
-    attr = getattr(math, name)
+    func = getattr(math, name)
     
     setattr(this_module, name,
-            wraps(uncertainties.wrap(attr, derivatives), attr))
+            wraps(uncertainties.wrap(func, derivatives), func))
     
     many_scalar_to_scalar_funcs.append(name)
 
