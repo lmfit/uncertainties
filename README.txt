@@ -1,0 +1,21 @@
+Some installation methods:
+
+python setup.py install
+
+or, for an installation in the user Python library (no additional access 
+rights needed):
+
+python setup.py install --user
+
+or, for an installation in a custom directory my_directory:
+
+python setup.py install --install-lib my_directory
+
+or, if additional access rights are needed (Unix):
+
+sudo python setup.py install
+
+You can also simply move the uncertainties/ directory to a location 
+that Python can import from (directory in which scripts using 
+uncertainties are run, etc.), and then rename it uncertainties (with no 
+version number).
