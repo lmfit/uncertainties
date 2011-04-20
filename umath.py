@@ -185,7 +185,8 @@ fixed_derivatives = {
 
 this_module = sys.modules[__name__]
 
-for (name, attr) in vars(math).items():
+# for (name, attr) in vars(math).items():
+for name in dir(math):
 
     if name in fixed_derivatives:  # Priority to functions in fixed_derivatives
         derivatives = fixed_derivatives[name]
@@ -195,6 +196,8 @@ for (name, attr) in vars(math).items():
         derivatives = None  # Means: numerical calculation required
     else:
         continue  # 'name' not wrapped by this module (__doc__, e, etc.)
+
+    attr = getattr(math, name)
     
     setattr(this_module, name,
             wraps(uncertainties.wrap(attr, derivatives), attr))
