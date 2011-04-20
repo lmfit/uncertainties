@@ -163,10 +163,9 @@ or, if additional access rights are needed (Unix):
 
    sudo python setup.py install
 
-You can also simply **move** the :file:`uncertainties-…` directory to
+You can also simply **move** the :file:`uncertainties` directory to
 a location that Python can import from (directory in which scripts
-using :mod:`uncertainties` are run, etc.), and then **rename** it
-:file:`uncertainties` (with no version number).
+using :mod:`uncertainties` are run, etc.).
 
 Source code
 -----------

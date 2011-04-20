@@ -13,7 +13,7 @@
 
 import sys, os
 
-sys.path.insert(0, '../..')
+sys.path.insert(0, '..')
 import uncertainties
 
 # If extensions (or modules to document with autodoc) are in another directory,
