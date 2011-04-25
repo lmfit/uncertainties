@@ -290,11 +290,10 @@ objects store all the variables they depend from:
 Testing whether an object is a number with uncertainty
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-:class:`Variable` objects are also
-:class:`AffineScalarFunc`/:class:`UFloat` objects (a variable x is
-simply considered to be the identity function x → x).  Testing whether
-``value`` carries an uncertainty handled by this module can therefore
-be done with ``isinstance(value, UFloat)``.
+:class:`Variable` objects are also :class:`UFloat` objects (a variable
+x is simply considered to be the identity function x → x).  Testing
+whether ``value`` carries an uncertainty handled by this module can
+therefore be done with ``isinstance(value, UFloat)``.
 
 .. _differentiation method:
 
