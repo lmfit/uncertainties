@@ -285,7 +285,7 @@ if sys.version_info[:2] >= (2, 6):
     non_std_wrapped_funcs.append('fsum')
 
 ##########
-@uncertainties.set_doc(math.modf.__doc__)
+
 def modf(x):
     """
     Version of modf that works for numbers with uncertainty, and also
@@ -308,10 +308,10 @@ def modf(x):
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
         return (frac_part, int_part)
+modf = uncertainties.set_doc(math.modf.__doc__)(modf)
     
 many_scalar_to_scalar_funcs.append('modf')
 
-@uncertainties.set_doc(math.ldexp.__doc__)
 def ldexp(x, y):
     # The code below is inspired by uncertainties.wrap().  It is
     # simpler because only 1 argument is given, and there is no
@@ -340,9 +340,10 @@ def ldexp(x, y):
         # value of x coerced to a difference type [int->float, for
         # instance]):
         return math.ldexp(x, y)
+ldexp = uncertainties.set_doc(math.ldexp.__doc__)(ldexp)
+    
 many_scalar_to_scalar_funcs.append('ldexp')
 
-@uncertainties.set_doc(math.frexp.__doc__)
 def frexp(x):
     """
     Version of frexp that works for numbers with uncertainty, and also
@@ -372,6 +373,8 @@ def frexp(x):
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
         return math.frexp(x)
+frexp = uncertainties.set_doc(math.frexp.__doc__)(frexp)
+    
 non_std_wrapped_funcs.append('frexp')
 
 ###############################################################################
