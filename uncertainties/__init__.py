@@ -237,7 +237,7 @@ import copy
 
 # Numerical version:
 __version_info__ = (1, 7, 2)
-__version__ = '.'.join(str(num) for num in __version_info__)
+__version__ = '.'.join([str(num) for num in __version_info__])
 
 __author__ = 'Eric O. LEBIGOT (EOL)'
 
@@ -279,25 +279,12 @@ __all__ = [
 # XXX do not exist?
 # any() and all() only started existing in python2.5
 # so here we provide backup implementations for 2.4
-if not "any" in dir(__builtins__):
+if not 'any' in dir(__builtins__):
     def any(iterable):
         for element in iterable:
             if element:
                 return True
         return False
-
-else:
-    any = any
-
-if not "all" in dir(__builtins__):
-    def all(iterable):
-        for element in iterable:
-            if not element:
-                return False
-        return True
-
-else:
-    all = all
 
 ###############################################################################
 
@@ -469,7 +456,7 @@ def wrap(f, derivatives_funcs=None):
 
             # Is it clear that we can't delegate the calculation?
 
-            if any(isinstance(arg, AffineScalarFunc) for arg in args):
+            if any([isinstance(arg, AffineScalarFunc) for arg in args]):
                 # This situation arises for instance when calculating
                 # AffineScalarFunc(...)*numpy.array(...).  In this
                 # case, we must let NumPy handle the multiplication
@@ -556,7 +543,7 @@ def wrap(f, derivatives_funcs=None):
         # variables (Variable) involved.
 
         # Initial value (is updated below):
-        derivatives_wrt_vars = dict((var, 0.) for var in variables)
+        derivatives_wrt_vars = dict([(var, 0.) for var in variables])
 
         # The chain rule is used (we already have
         # derivatives_wrt_args):
@@ -881,8 +868,8 @@ class AffineScalarFunc(object):
         #std_dev value (in fact, many intermediate AffineScalarFunc do
         #not need to have their std_dev calculated: only the final
         #AffineScalarFunc returned to the user does).
-        return sqrt(sum(
-            delta**2 for delta in self.error_components().itervalues()))
+        return sqrt(sum([
+            delta**2 for delta in self.error_components().itervalues()]))
 
     def _general_representation(self, to_string):
         """
@@ -942,17 +929,17 @@ class AffineScalarFunc(object):
         """
         return AffineScalarFunc(
             self._nominal_value,
-            dict((copy.deepcopy(var), deriv)
-                 for (var, deriv) in self.derivatives.iteritems()))
+            dict([(copy.deepcopy(var), deriv)
+                  for (var, deriv) in self.derivatives.iteritems()]))
 
     def __getstate__(self):
         """
         Hook for the pickle module.
         """
-        obj_slot_values = dict((k, getattr(self, k)) for k in
-                               # self.__slots__ would not work when
-                               # self is an instance of a subclass:
-                               AffineScalarFunc.__slots__)
+        obj_slot_values = dict([(k, getattr(self, k)) for k in
+                                # self.__slots__ would not work when
+                                # self is an instance of a subclass:
+                                AffineScalarFunc.__slots__])
         return obj_slot_values
 
     def __setstate__(self, data_dict):
@@ -1218,7 +1205,7 @@ class Variable(AffineScalarFunc):
         """
         Hook for the standard pickle module.
         """
-        obj_slot_values = dict((k, getattr(self, k)) for k in self.__slots__)
+        obj_slot_values = dict([(k, getattr(self, k)) for k in self.__slots__])
         obj_slot_values.update(AffineScalarFunc.__getstate__(self))
         # Conversion to a usual dictionary:
         return obj_slot_values
@@ -1294,8 +1281,8 @@ def covariance_matrix(functions):
 
     # We symmetrize the matrix:
     for (i, covariance_coefs) in enumerate(covariance_matrix):
-        covariance_coefs.extend(covariance_matrix[j][i]
-                                 for j in range(i+1, len(covariance_matrix)))
+        covariance_coefs.extend([covariance_matrix[j][i]
+                                 for j in range(i+1, len(covariance_matrix))])
 
     return covariance_matrix
 
@@ -1348,15 +1335,15 @@ else:
         # We use the fact that the eigenvectors in 'transform' are
         # special: 'transform' is unitary: its inverse is its transpose:
 
-        variables = tuple(
+        variables = tuple([
             # The variables represent uncertainties only:
             Variable(0, sqrt(variance), tag)
-            for (variance, tag) in zip(variances, tags))
+            for (variance, tag) in zip(variances, tags)])
 
         # Representation of the initial correlated values:
-        values_funcs = tuple(
+        values_funcs = tuple([
             AffineScalarFunc(value, dict(zip(variables, coords)))
-            for (coords, value) in zip(transform, values))
+            for (coords, value) in zip(transform, values)])
 
         return values_funcs
 
