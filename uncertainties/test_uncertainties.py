@@ -24,6 +24,8 @@ from uncertainties import ufloat, AffineScalarFunc
 
 from uncertainties import __author__
 
+from backport import *
+
 ###############################################################################
 
 # Utilities for unit testing
@@ -387,8 +389,8 @@ def test_comparison_ops():
                     + var.nominal_value)
 
         # All operations are tested:
-        for op in ("__%s__" % name
-                   for name in('ne', 'eq', 'lt', 'le', 'gt', 'ge')):
+        for op in ["__%s__" % name
+                   for name in('ne', 'eq', 'lt', 'le', 'gt', 'ge')]:
 
             float_func = getattr(float, op)
             

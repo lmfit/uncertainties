@@ -236,6 +236,8 @@ from math import sqrt, log  # Optimization: no attribute look-up
 import copy
 import sys
 
+from backport import *
+
 # Numerical version:
 __version_info__ = (1, 7, 2)
 __version__ = '.'.join([str(num) for num in __version_info__])
@@ -276,21 +278,6 @@ __all__ = [
 
     ]
 
-# For Python < 2.5:
-if sys.version_info[:2] < (2, 5):
-    
-    def any(iterable):
-        for element in iterable:
-            if element:
-                return True
-            return False
-        
-    if sys.version_info[:2] < (2, 4):
-        
-        def reversed(sequence):
-            return sequence[::-1]
-
-        from sets import Set as set
         
 ###############################################################################
 
