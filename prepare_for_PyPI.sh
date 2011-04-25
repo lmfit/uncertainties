@@ -4,7 +4,7 @@
 git commit -a
 
 # Let's move the original files out of the way:
-mv uncertainties uncertainties-master
+mv uncertainties uncertainties-py25
 
 # Getting the Python <2.5 version:
 
@@ -19,7 +19,7 @@ echo "Python 2.3 version imported"
 #mv uncertainties uncertainties-py30
 
 # I get back the original directory:
-mv uncertainties-master uncertainties
+ln uncertainties-py25 uncertainties
 
-# Packaging (python2.7 does not handle MANIFEST in the same way):
-python2.6 setup.py sdist
+# Packaging:
+python setup.py sdist
