@@ -5,6 +5,7 @@
 
 import distutils.core
 import sys
+import os
 
 error_msg = "I'm sorry.  This package is for Python 2.3 and higher only."
 try:
@@ -230,11 +231,19 @@ _of_uncertainty
     packages=['uncertainties', 'uncertainties.unumpy']
     )  # End of setup definition
 
-if sys.version_info[:2] < (2, 5):
-    package_dir = 'uncertainties-py23'
+# Determination of the directory that contains the source code:
+if os.path.exists('uncertainties'):
+    # Case of a direct download of a Python-version-specific Git
+    # branch:
+    package_dir = 'uncertainties'
 else:
-    package_dir = 'uncertainties-py25'
+    # Case of a PyPI package download:
+    if sys.version_info[:2] < (2, 5):
+        package_dir = 'uncertainties-py23'
+    else:
+        package_dir = 'uncertainties-py25'
     
 setup_vars['package_dir'] = {'uncertainties': package_dir}
     
 distutils.core.setup(**setup_vars)
+
