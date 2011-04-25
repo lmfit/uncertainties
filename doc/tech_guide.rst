@@ -84,7 +84,7 @@ updated on the fly, because quantities with uncertainties (like
 
   >>> x.set_std_dev(0)
   >>> print square
-  0.04  # Zero uncertainty, now
+  46.0  # Zero uncertainty, now
 
 As usual, Python keeps track of objects as long as they are used.
 Thus, redefining the value of ``x`` does not change the fact that
@@ -93,7 +93,7 @@ in ``x``:
 
   >>> x = 10000
   >>> print square
-  0.04  # Unchanged
+  46.0  # Unchanged
 
 These mechanisms make quantities with uncertainties behave mostly like
 regular numbers, while providing a fully transparent way of handling
