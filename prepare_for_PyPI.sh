@@ -1,3 +1,6 @@
+# Only committed version are packaged, to help with debugging:
+git commit -a
+
 # Let's move the original files out of the way:
 mv uncertainties uncertainties-master
 
@@ -15,3 +18,6 @@ echo "Python 2.3 version imported"
 
 # I get back the original directory:
 mv uncertainties-master uncertainties
+
+# Packaging (python2.7 does not handle MANIFEST in the same way):
+python2.6 setup.py sdist
