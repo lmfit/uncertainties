@@ -163,11 +163,16 @@ def log_der0(*args):
 
 
 def _deriv_copysign(x,y):
-    if x>=0: return 1*math.copysign(1, y)
-    else: return -1*math.copysign(1, y)
+    if x >= 0:
+        return 1*math.copysign(1, y)
+    else:
+        return -1*math.copysign(1, y)
+    
 def _deriv_fabs(x):
-    if x >= 0: return 1
-    else: return -1
+    if x >= 0:
+        return 1
+    else:
+        return -1
 
 _erf_coef = 2/math.sqrt(math.pi)  # Optimization for erf()
 
