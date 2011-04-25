@@ -31,4 +31,4 @@ git reset
 
 # Packaging:
 python setup.py sdist
-echo "Package created.  The package can be uploaded with setup.py upload."
+echo "Package created.  The package can be uploaded with setup.py sdist upload."
