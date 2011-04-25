@@ -155,7 +155,7 @@ def _compare_derivatives(func, numerical_derivatives,
                         # tests are really performed (instead of not being
                         # performed, silently):
                         print "Testing %s at %s, arg #%d" % (
-                            func.__name__, args, arg_num)
+                            func.name, args, arg_num)
                         
                         if not _numbers_close(fixed_deriv_value,
                                               num_deriv_value, 1e-4):
