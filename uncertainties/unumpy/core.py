@@ -133,17 +133,6 @@ def wrap_array_func(func):
     func -- version that takes and returns a single NumPy array.
     """
 
-    @uncertainties.set_doc("""\
-    Version of %s(...) that works even when its first argument is a NumPy
-    array that contains numbers with uncertainties.
-    
-    Warning: elements of the first argument array that are not
-    AffineScalarFunc objects must not depend on uncertainties.Variable
-    objects in any way.  Otherwise, the dependence of the result in
-    uncertainties.Variable objects will be incorrect.
-    
-    Original documentation:
-    %s""" % (func.__name__, func.__doc__))
     def wrapped_func(arr, *args):
         # Nominal value:
         arr_nominal_value = nominal_values(arr)
@@ -222,6 +211,18 @@ def wrap_array_func(func):
         # numbers with uncertainties are build from the result:
         return numpy.vectorize(uncertainties.AffineScalarFunc)(
             func_nominal_value, derivatives)
+
+    wrapped_func = uncertainties.set_doc("""\
+    Version of %s(...) that works even when its first argument is a NumPy
+    array that contains numbers with uncertainties.
+    
+    Warning: elements of the first argument array that are not
+    AffineScalarFunc objects must not depend on uncertainties.Variable
+    objects in any way.  Otherwise, the dependence of the result in
+    uncertainties.Variable objects will be incorrect.
+    
+    Original documentation:
+    %s""" % (func.__name__, func.__doc__))(wrapped_func)
 
     # It is easier to work with wrapped_func, which represents a
     # wrapped version of 'func', when it bears the same name as
@@ -484,7 +485,10 @@ except AttributeError:
 
 _pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
-@uncertainties.set_doc("""
+def _pinv(array_like, rcond=_pinv_default):
+    return _pinv_with_uncert(array_like, rcond)
+
+_pinv = uncertainties.set_doc("""
     Version of numpy.linalg.pinv that works with array-like objects
     that contain numbers with uncertainties.
 
@@ -495,9 +499,7 @@ _pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
     Original documentation:
     %s
-    """ % numpy.linalg.pinv.__doc__)
-def _pinv(array_like, rcond=_pinv_default):
-    return _pinv_with_uncert(array_like, rcond)
+    """ % numpy.linalg.pinv.__doc__)(_pinv)
 
 ########## Matrix class
 
@@ -530,12 +532,12 @@ class matrix(numpy.matrix):
     I = property(getI, numpy.matrix.I.fset, numpy.matrix.I.fdel,
                  numpy.matrix.I.__doc__)
 
-    @property
     def nominal_values(self):
         """
         Nominal value of all the elements of the matrix.
         """
         return nominal_values(self)
+    nominal_values = property(nominal_values)
     
     std_devs = std_devs
     
