@@ -1,19 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# !! This program must run with all version of Python since 2.3 included.
+
 import distutils.core
 import sys
 
-error_msg = "I'm sorry.  This package is for Python 2.5 and higher only."
+error_msg = "I'm sorry.  This package is for Python 2.3 and higher only."
 try:
-    if sys.version_info[:2] < (2, 5):
+    if sys.version_info[:2] < (2, 3):
         print >> sys.stderr, error_msg
         sys.exit(1)
 except AttributeError:  # sys.version_info was introduced in Python 2.0
     print >> sys.stderr, error_msg
     sys.exit(1)
 
-distutils.core.setup(
+setup_vars = dict(
     name='uncertainties',
     version='1.7.2',  # Should generally correspond to uncertainties.__version__
     author='Eric O. LEBIGOT (EOL)',
@@ -221,7 +223,16 @@ _of_uncertainty
     'Topic :: Software Development :: Libraries :: Python Modules',
     'Topic :: Utilities'
     ],
-    
+
     # Files are defined in MANIFEST
     packages=['uncertainties', 'uncertainties.unumpy']
     )  # End of setup definition
+
+if sys.version_info[:2] < (2, 5):
+    package_dir = 'uncertainties-py23'
+else:
+    package_dir = 'uncertainties-py25'
+    
+setup_vars['package_dir'] = {'uncertainties': package_dir}
+    
+distutils.core.setup(**setup_vars)
