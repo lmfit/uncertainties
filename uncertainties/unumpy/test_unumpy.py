@@ -9,7 +9,11 @@ These tests can be run through the Nose testing framework.
 from __future__ import division
 
 # 3rd-party modules:
-import numpy
+try:
+    import numpy
+except ImportError:
+    import sys
+    sys.exit()  # There is no reason to test the interface to NumPy    
 
 # Local modules:
 import uncertainties

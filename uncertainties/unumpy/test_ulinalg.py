@@ -11,7 +11,11 @@ These tests can be run through the Nose testing framework.
 
 from __future__ import division
 
-import numpy
+try:
+    import numpy
+except ImportError:
+    import sys
+    sys.exit()  # There is no reason to test the interface to NumPy
 
 from uncertainties import unumpy, ufloat
 from uncertainties.unumpy.test_unumpy import matrices_close
