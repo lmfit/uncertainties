@@ -1,5 +1,10 @@
 # This script must be run before packaging (python setup.py sdist upload).
 
+# WARNING: this script erases any uncertainties-py23 and uncertainties-py25
+# found in the current directory.
+
+rm -rf uncertainties-py25
+
 # Only committed version are packaged, to help with debugging:
 git commit -a
 
