@@ -111,7 +111,9 @@ def test_monte_carlo_comparison():
         import numpy
         import numpy.random
     except ImportError:
-        raise Exception("Test not performed because NumPy is not available")
+        import warnings
+        warnings.warn("Test not performed because NumPy is not available")
+        return
 
     # Works on numpy.arrays of Variable objects (whereas umath.sin()
     # does not):
