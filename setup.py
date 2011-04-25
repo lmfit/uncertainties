@@ -34,8 +34,8 @@ author.''',
 Overview
 ========
 
-``uncertainties`` allows calculations such as (2 ± 0.1)*2 = 4
-± 0.2 to be performed transparently.  Much more complex mathematical
+``uncertainties`` allows calculations such as (2 +/- 0.1)*2 = 4
++/- 0.2 to be performed transparently.  Much more complex mathematical
 expressions involving numbers with uncertainties can also be evaluated
 directly.
 
@@ -136,7 +136,7 @@ Main changes:
        when given an incorrect \
        string representation, like ``float()`` does.
 - 1.6: Testing whether an object is a number with uncertainty should now \
-       be done with ``isinstance(…, UFloat)``. \
+       be done with ``isinstance(..., UFloat)``. \
        AffineScalarFunc is not imported by ``from uncertainties import *`` \
        anymore, but its new alias ``UFloat`` is.
 - 1.5.5: The first possible license is now BSD instead of GPLv2, which \
