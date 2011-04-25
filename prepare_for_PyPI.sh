@@ -19,7 +19,7 @@ echo "Python 2.3 version imported"
 #mv uncertainties uncertainties-py30
 
 # I get back the original directory:
-ln uncertainties-py25 uncertainties
+cp -r uncertainties-py25 uncertainties
 
 # Packaging:
 python setup.py sdist
