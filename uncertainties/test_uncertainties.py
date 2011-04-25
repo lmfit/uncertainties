@@ -67,6 +67,11 @@ def _compare_derivatives(func, numerical_derivatives,
     Tests are done on random arguments.
     """
 
+    try:
+        funcname = func.name
+    except AttributeError:
+        funcname = func.__name__
+        
     # print "Testing", func.__name__
 
     if not num_args_list: 
@@ -78,8 +83,8 @@ def _compare_derivatives(func, numerical_derivatives,
             'atanh': [1],
             'log': [1, 2]  # Both numbers of arguments are tested
             }
-        if func.__name__ in num_args_table:
-            num_args_list = num_args_table[func.__name__]
+        if funcname in num_args_table:
+            num_args_list = num_args_table[funcname]
         else:
 
             num_args_list = []
@@ -101,14 +106,14 @@ def _compare_derivatives(func, numerical_derivatives,
 
             if not num_args_list:
                 raise Exception("Can't find a reasonable number of arguments"
-                                " for function '%s'." % func.__name__)
+                                " for function '%s'." % funcname)
 
     for num_args in num_args_list:
 
         # Argument numbers that will have a random integer value:
         integer_arg_nums = set()
 
-        if func.__name__ == 'ldexp':
+        if funcname == 'ldexp':
             # The second argument must be an integer:
             integer_arg_nums.add(1)
 
@@ -155,7 +160,7 @@ def _compare_derivatives(func, numerical_derivatives,
                         # tests are really performed (instead of not being
                         # performed, silently):
                         print "Testing %s at %s, arg #%d" % (
-                            func.name, args, arg_num)
+                            funcname, args, arg_num)
                         
                         if not _numbers_close(fixed_deriv_value,
                                               num_deriv_value, 1e-4):
@@ -170,7 +175,7 @@ def _compare_derivatives(func, numerical_derivatives,
                                     " wrong: at args = %s,"
                                     " value obtained = %16f,"
                                     " while numerical approximation = %.16f."
-                                    % (arg_num, func.__name__, args,
+                                    % (arg_num, funcname, args,
                                        fixed_deriv_value, num_deriv_value))
 
             except ValueError, err:  # Arguments out of range, or of wrong type
@@ -183,7 +188,7 @@ def _compare_derivatives(func, numerical_derivatives,
                 if len(integer_arg_nums) == num_args:
                     raise Exception("Incorrect testing procedure: unable to "
                                     "find correct argument values for %s."
-                                    % func.__name__)
+                                    % funcname)
 
                 # Another argument might be forced to be an integer:
                 integer_arg_nums.add(random.choice(range(num_args)))
