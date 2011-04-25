@@ -1,6 +1,6 @@
 include README.txt
-prune README
 include LICENCE.txt
 include setup.py
 recursive-include uncertainties-py23 *.py
 recursive-include uncertainties-py25 *.py
+prune README
