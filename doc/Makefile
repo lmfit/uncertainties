@@ -29,7 +29,9 @@ help:
 clean:
 	-rm -rf _build/*
 
-html:
+# The HTML needs latex because the PDF version is linked to:
+html: latex
+	(cd _build/latex; make all-pdf)
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
 	@echo
 	@echo "Build finished. The HTML pages are in _build/html."

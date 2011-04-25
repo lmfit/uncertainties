@@ -12,9 +12,10 @@ from __future__ import division
 import copy
 import weakref
 import math
+import random
 
 # 3rd-party modules
-import nose.tools
+# import nose.tools
 
 # Local modules
 
@@ -63,8 +64,6 @@ def _compare_derivatives(func, numerical_derivatives,
 
     Tests are done on random arguments.
     """
-
-    import random
 
     # print "Testing", func.__name__
 
@@ -115,17 +114,20 @@ def _compare_derivatives(func, numerical_derivatives,
             try:
 
                 # We include negative numbers, for more thorough tests:
-                #args = [
-                #    random.choice(range(-10, 10))
-                #    if arg_num in integer_arg_nums
-                #    else uncertainties.Variable(random.random()*10-5, 0)
-                #    for arg_num in range(num_args)]
                 args = []
                 for arg_num in range(num_args):
-                    if arg_num in integer_arg_nums:
+                    if arg_num in integer_arg_nums:                    
                         args.append(random.choice(range(-10, 10)))
                     else:
-                        args.append(uncertainties.Variable(random.random()*10-5, 0))
+                        args.append(
+                            uncertainties.Variable(random.random()*4-2, 0))
+
+                # 'args', but as scalar values:
+                args_scalar = [
+                    v.nominal_value if isinstance(v, uncertainties.Variable)
+                    else v
+                    for v in args
+                ]
 
                 func_approx = func(*args)
 
@@ -143,14 +145,15 @@ def _compare_derivatives(func, numerical_derivatives,
                             continue
 
                         fixed_deriv_value = func_approx.derivatives[arg]
-                        num_deriv_value = numerical_deriv(*args)
+                        
+                        num_deriv_value = numerical_deriv(*args_scalar)
 
                         # This message is useful: the user can see that
                         # tests are really performed (instead of not being
                         # performed, silently):
                         print "Testing %s at %s, arg #%d" % (
                             func.__name__, args, arg_num)
-
+                        
                         if not _numbers_close(fixed_deriv_value,
                                               num_deriv_value, 1e-4):
 
@@ -162,8 +165,8 @@ def _compare_derivatives(func, numerical_derivatives,
                                 raise DerivativesDiffer(
                                     "Derivative #%d of function '%s' may be"
                                     " wrong: at args = %s,"
-                                    " value obtained = %f,"
-                                    " while numerical approximation = %f."
+                                    " value obtained = %16f,"
+                                    " while numerical approximation = %.16f."
                                     % (arg_num, func.__name__, args,
                                        fixed_deriv_value, num_deriv_value))
 
@@ -202,10 +205,13 @@ def test_fixed_derivatives_basic_funcs():
         """
 
         op_string = "__%s__" % op
-        # print "Checking %s..." % op_string
         func = getattr(AffineScalarFunc, op_string)
         numerical_derivatives = uncertainties.NumericalDerivatives(
-            lambda *args: func(*args).nominal_value)
+            # The __neg__ etc. methods of AffineScalarFunc only apply,
+            # by definition, to AffineScalarFunc objects: we first map
+            # possible scalar arguments (used for calculating
+            # derivatives) to AffineScalarFunc objects:
+            lambda *args: func(*map(uncertainties.to_affine_scalar, args)))
         _compare_derivatives(func, numerical_derivatives, [num_args])
 
     # Operators that take 1 value:
@@ -526,7 +532,10 @@ def test_str_input():
         "-3.1e10": (-3.1e10, 0.1e10),
         "169.0(7)": (169, 0.7),
         "-0.1+/-1": (-0.1, 1),
-        "-13e-2+/-1e2": (-13e-2, 1e2)
+        "-13e-2+/-1e2": (-13e-2, 1e2),
+        '-14.(15)': (-14, 15),
+        '-100.0(15)': (-100, 1.5),
+        '14.(15)': (14, 15)
         }
           
     for (representation, values) in tests.iteritems():

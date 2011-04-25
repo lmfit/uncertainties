@@ -9,10 +9,13 @@ Mathematical definition of numbers with uncertainties
 -----------------------------------------------------
 
 .. index:: number with uncertainty; definition
+.. index:: probability distribution
 
 Mathematically, **numbers with uncertainties** are, in this package,
-probability distributions.  These probabilities are reduced to two
-numbers: a nominal value and an uncertainty.
+**probability distributions**.  They are *not restricted* to normal
+(Gaussian) distributions and can be any kind of distribution.  These
+probability distributions are reduced to two numbers: a nominal value
+and a standard deviation.
 
 Thus, both variables (:class:`Variable` objects) and the result of
 mathematical operations (:class:`AffineScalarFunc` objects) contain
@@ -25,10 +28,8 @@ The **uncertainty** of a number with uncertainty is simply defined in
 this package as the standard deviation of the underlying probability
 distribution.
 
-.. index:: probability distribution
-
 The numbers with uncertainties manipulated by this package are assumed
-to have a **probability distribution** mostly contained around their
+to have a probability distribution mostly contained around their
 nominal value, in an interval of about the size of their standard
 deviation.  This should cover most practical cases.
 
@@ -100,8 +101,8 @@ correlations between quantities.
 
 .. _linear_method:
 
-Linear error propagation theory
--------------------------------
+Uncertainties must be small
+---------------------------
 
 This package calculates the standard deviation of mathematical
 expressions through the linear approximation of `error propagation
@@ -259,23 +260,31 @@ Testing whether an object is a number with uncertainty
 :class:`AffineScalarFunc`/:class:`UFloat` objects (a variable x is
 simply considered to be the identity function x → x).  Testing whether
 ``value`` carries an uncertainty handled by this module can therefore
-be done with ``insinstance(value, UFloat)``.
+be done with ``isinstance(value, UFloat)``.
 
 .. _differentiation method:
 
 Differentiation method
 ----------------------
 
-The :mod:`uncertainties` package calculates almost all the derivatives
-required by linear error propagation theory with a fast and precise
-method: it transparently implements `Automatic Differentiation`_, with
-reverse accumulation. This method is faster than symbolic
-differentiation and more precise than numerical differentiation.
+The :mod:`uncertainties` package automatically calculates the
+derivatives required by linear error propagation theory.
+
+Almost all the derivatives of the fundamental functions provided by
+:mod:`uncertainties` are obtained through a analytical formulas (the
+few mathematical functions that are instead differentiated through
+numerical approximation are listed in ``umath.num_deriv_funcs``).
+
+The derivatives of mathematical *expressions* are evaluated through a
+fast and precise method: :mod:`uncertainties` transparently implements
+`automatic differentiation`_ with reverse accumulation. This method is
+faster than symbolic differentiation and more precise than numerical
+differentiation.
 
 The derivatives of any expression can be obtained in a simple way, as
 demonstrated in the :ref:`User Guide <derivatives>`.
 
-.. _Automatic Differentiation: http://en.wikipedia.org/wiki/Automatic_differentiation
+.. _automatic differentiation: http://en.wikipedia.org/wiki/Automatic_differentiation
 
 .. _pydoc: http://docs.python.org/library/pydoc.html
 

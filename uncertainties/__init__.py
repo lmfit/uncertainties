@@ -236,7 +236,7 @@ from math import sqrt, log  # Optimization: no attribute look-up
 import copy
 
 # Numerical version:
-__version_info__ = (1, 7, 0)
+__version_info__ = (1, 7, 2)
 __version__ = '.'.join(str(num) for num in __version_info__)
 
 __author__ = 'Eric O. LEBIGOT (EOL)'
@@ -246,7 +246,7 @@ __author__ = 'Eric O. LEBIGOT (EOL)'
 __all__ = [
 
     # All sub-modules and packages are not imported by default,
-    # because NumPy could not be installed:
+    # in particular because NumPy might be unavailable.
 
     'ufloat',  # Main function: returns a number with uncertainty
 
@@ -327,7 +327,7 @@ def to_affine_scalar(x):
     (AffineScalarFunc), unless it is already an AffineScalarFunc (in
     which case x is returned unchanged).
 
-    Raises an exception unless 'x' belong to some specific classes of
+    Raises an exception unless 'x' belongs to some specific classes of
     objects that are known not to depend on AffineScalarFunc objects
     (which then cannot be considered as constants).
     """
@@ -336,7 +336,7 @@ def to_affine_scalar(x):
         return x
 
     #! In Python 2.6+, numbers.Number could be used instead, here:
-    if isinstance(x, (float, int, complex)):
+    if isinstance(x, (float, int, complex, long)):
         # No variable => no derivative to define:
         return AffineScalarFunc(x, {})
 
@@ -1381,8 +1381,9 @@ NUMBER_WITH_UNCERT_RE = re.compile(
 def parse_error_in_parentheses(representation):
     """
     Returns (value, error) from a string representing a number with
-    uncertainty like 12.34(5).  If no parenthesis is given, an
-    uncertainty of one on the last digit is assumed.
+    uncertainty like 12.34(5), 12.34(142), 12.5(3.4) or 12.3(4.2)e3.
+    If no parenthesis is given, an uncertainty of one on the last
+    digit is assumed.
 
     Raises ValueError if the string cannot be parsed.    
     """
@@ -1401,11 +1402,11 @@ def parse_error_in_parentheses(representation):
                          " or 1.234" % representation)
 
     # The value of the number is its nominal value:
-    value = float("%s%s%s%s" % (sign or '',
-                                main_int,
-                                main_dec or '.0',
-                                exponent or ''))
-    
+    value = float(''.join((sign or '',
+                           main_int,
+                           main_dec or '.0',
+                           exponent or '')))
+                  
     if uncert_int is None:
         # No uncertainty was found: an uncertainty of 1 on the last
         # digit is assumed:
@@ -1413,21 +1414,18 @@ def parse_error_in_parentheses(representation):
 
     # Do we have a fully explicit uncertainty?
     if uncert_dec is not None:
-        uncert = float("%s%s" % (uncert_int, uncert_dec or '.0'))
+        uncert = float("%s%s" % (uncert_int, uncert_dec or ''))
     else:
         # uncert_int represents an uncertainty on the last digits:
-        #abs_value_string = "%s%s" % (main_int, main_dec) \
-        #                   if main_dec \
-        #                   else main_int
-        if main_dec:
-            abs_value_string = "%s%s" % (main_int, main_dec)
+
+        # The number of digits after the period defines the power of
+        # 10 than must be applied to the provided uncertainty:
+        if main_dec is None:
+            num_digits_after_period = 0
         else:
-            abs_value_string = main_int
-        # We replace the digits that are known by zeroes:
-        fixed_value = abs_value_string[:-len(uncert_int)]
-        fixed_value = re.sub(r'\d', '0', fixed_value)
-        # The last digits of the uncertainty are known:
-        uncert = float("%s%s" % (fixed_value, uncert_int))
+            num_digits_after_period = len(main_dec)-1
+            
+        uncert = int(uncert_int)/10**num_digits_after_period
 
     # We apply the exponent to the uncertainty as well:
     uncert *= float("1%s" % (exponent or ''))
@@ -1446,6 +1444,7 @@ def str_to_number_with_uncert(representation):
     The string can be of the form:
     - 124.5+/-0.15
     - 124.50(15)
+    - 124.50(123)
     - 124.5
 
     When no numerical error is given, an uncertainty of 1 on the last
@@ -1505,6 +1504,7 @@ def ufloat(representation, tag=None):
         31
         -3.1e10
         169.0(7)
+        169.1(15)
     """
 
     # This function is somewhat optimized so as to help with the

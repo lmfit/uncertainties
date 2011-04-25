@@ -2,10 +2,10 @@
 Welcome to the uncertainties package
 ====================================
 
-The `uncertainties package`_ handles calculations that involve
-**numbers with uncertainties** (like 3.14±0.01).  It also
-transparently yields the **derivatives** of any expression (these
-derivatives are used for calculating uncertainties).
+The `uncertainties package`_ is a free, cross-platform program that 
+handles calculations with **numbers with uncertainties** (like 
+3.14±0.01).  It also transparently yields the **derivatives** of any 
+expression (these derivatives are used for calculating uncertainties).
 
 Whatever the complexity of the calculation, this package returns the
 result with its uncertainty as predicted by linear `error propagation
@@ -13,10 +13,11 @@ theory`_.  In particular, it handles **correlations** between
 variables, which sets it apart from many existing error propagation
 codes.
 
-Calculations involving numbers with uncertainties are made **very
-simple** thanks to this package.  In fact, it :ref:`transparently
-<derivatives>` calculates the `numerous derivatives`_ required by
-linear error propagation theory.
+Calculations involving numbers with uncertainties are made **very 
+simple** thanks to this package.  In fact, it :ref:`transparently 
+<derivatives>` calculates the `numerous derivatives`_ required by linear 
+error propagation theory.  Performing the same calculations by hand and 
+implementing the resulting formulas is generally quite tedious.
 
 Calculations of results with uncertainties, or of derivatives, can
 either be performed in an **interactive session**, or in programs
@@ -60,8 +61,8 @@ Many other error propagation codes return the incorrect value
 0±0.1414… because they assume that the two subtracted quantities are
 *independent* random variables.
 
-Operations on **arrays** of numbers with uncertainties are
-:ref:`transparently handled <simple_array_use>` too.
+**Arrays** of numbers with uncertainties are :ref:`transparently
+handled <simple_array_use>` too.
 
 
 **Derivatives** are similarly very :ref:`easy to obtain <derivatives>`:
@@ -70,6 +71,24 @@ Operations on **arrays** of numbers with uncertainties are
   2.0
 
 They are calculated with a :ref:`fast method <differentiation method>`.
+
+Available documentation
+=======================
+
+The :doc:`user_guide` details many of the features of this package.
+
+The part :doc:`numpy_guide` describes how arrays of numbers with
+uncertainties can be created and used.
+
+The :doc:`tech_guide` gives advanced technical details.
+
+.. only:: html
+
+   A :download:`PDF version <_build/latex/uncertaintiesPythonPackage.pdf>` 
+   of the documentation is also available.
+
+Additional information is available through the pydoc_ command, which 
+gives access to many of the documentation strings included in the code.
 
 .. index:: installation
 
@@ -103,31 +122,40 @@ do
 
    pip install --upgrade uncertainties
 
-The :mod:`uncertainties` package is also available on the following
-**Linux distributions**: `Ubuntu
-<https://launchpad.net/ubuntu/maverick/+package/python-uncertainties>`_,
-`openSUSE
-<https://build.opensuse.org/package/show?package=python-uncertainties&project=home%3Aocefpaf>`_,
-and `Debian <http://packages.debian.org/source/sid/uncertainties>`_.
-
+The :mod:`uncertainties` package is also available on the following 
+**Linux distributions**: `Ubuntu 
+<https://launchpad.net/ubuntu/+source/uncertainties>`_, `openSUSE 
+<https://build.opensuse.org/package/show?package=python-uncertainties&project=home%3Aocefpaf>`_, 
+and `Debian <http://packages.debian.org/source/sid/uncertainties>`_. It 
+may also be included in Christoph Gohlke's Base distribution of 
+`scientific Python packages 
+<http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_ for **Windows**.
 
 Manual download and install
 ---------------------------
 
 Alternatively, you can simply download_ the package archive from the
 Python Package Index (PyPI) and unpack it.  The package can then be
-installed by going into the unpacked :file:`uncertainties` directory,
-and running the provided :file:`setup.py` program with
+installed by **going into the unpacked directory**
+(:file:`uncertainties-…`), and running the provided :file:`setup.py`
+program with
 
 .. code-block:: sh
 
    python setup.py install
 
+or, for an installation in the user Python library (no additional access
+rights needed):
+
+.. code-block:: sh
+
+   python setup.py install --user
+
 or, for an installation in a custom directory :file:`my_directory`:
 
 .. code-block:: sh
 
-   python setup.py install --prefix my_directory
+   python setup.py install --install-lib my_directory
 
 or, if additional access rights are needed (Unix):
 
@@ -135,53 +163,47 @@ or, if additional access rights are needed (Unix):
 
    sudo python setup.py install
 
-You can also simply **copy** the :file:`uncertainties` directory to a
-location that Python can import from (directory in which scripts using
-:mod:`uncertainties` are run, etc.).
+You can also simply **move** the :file:`uncertainties` directory to
+a location that Python can import from (directory in which scripts
+using :mod:`uncertainties` are run, etc.).
 
 Source code
 -----------
 
-The `code <http://github.com/lebigot/uncertainties>`_ and the
-`documentation source
-<http://github.com/lebigot/uncertainties/tree/master/doc/>`_ are
-available on GitHub.  The :mod:`uncertainties` package is written in
-pure Python, and contains about 4000 lines of code.  75 % of those
-lines are documentation strings and comments.  The remaining 25 % are
-equally split between unit tests and the calculation code proper.
-:mod:`uncertainties` is thus a **lightweight, portable package** with
-abundant documentation and tests.
+The latest `code
+<https://github.com/lebigot/uncertainties/tree/master/uncertainties>`_
+is available `on GitHub <https://github.com/lebigot/uncertainties/>`_,
+as well as the `documentation source
+<https://github.com/lebigot/uncertainties/tree/master/doc/>`_. The
+:mod:`uncertainties` package is written in pure Python, and contains
+about 4000 lines of code.  75 % of those lines are documentation
+strings and comments.  The remaining 25 % are equally split between
+unit tests and the calculation code proper.  :mod:`uncertainties` is
+thus a **lightweight, portable package** with abundant documentation
+and tests.
 
-Available documentation
-=======================
-
-The :doc:`user_guide` details many of the features of this package.
-
-The part :doc:`numpy_guide` describes how arrays of numbers with
-uncertainties can be created and used.
-
-The :doc:`tech_guide` gives advanced technical details.
-
-In addition to this web documentation, the pydoc_ gives access to many
-of the documentation strings included in the code.
-
-.. index:: license
 
 What others say
 ===============
 
+- "*Superb,*" "*wonderful,*" "*It's like magic.*" (`Joaquin Abian
+  <http://blog.garlicsim.org/post/1266209646/cool-python-module-uncertainties#comment-85154147>`_)
 - "*An awesome python package*" (`Jason Moore
   <http://biosport.ucdavis.edu/blog/2010/05/07/uncertainty-analysis>`_)
-- "*Your package is brilliant and I love it.*" (e-mail)
+- "*Utterly brilliant.*" (`Jeffrey Simpson
+  <http://twitter.com/#!/GeekyJeffrey>`_)
+- "*PyPI\'s uncertainties rocks!*" (`Siegfried Gevatter
+  <http://identi.ca/notice/23330742>`_)
+- "*A very cool Python module*" (`Ram Rachum
+  <http://blog.garlicsim.org/post/1266209646/cool-python-module-uncertainties>`_)
 - "*Those of us working with experimental data or simulation results
   will appreciate this.*" (`Konrad Hinsen
   <http://khinsen.wordpress.com/2010/07/12/euroscipy-2010/>`_)
-- "*A gift of the gods for the work I\'m doing*" (e-mail)
-- "*PyPI\'s uncertainties rocks!*" (`identi.ca
-  <http://identi.ca/notice/23330742>`_)
 - "*Holy f\*\*\* this would have saved me so much f\*\*\*ing time last
   semester*." (`reddit
   <http://www.reddit.com/r/Python/comments/am84v/now_you_can_do_calculations_with_uncertainties_5/>`_)
+
+.. index:: license
 
 License
 =======
@@ -208,37 +230,29 @@ of :mod:`uncertainties`, `Eric O. LEBIGOT (EOL)`_.
    :align: center
    :alt: Eric O. LEBIGOT (EOL)
 
-Please `support the development`_ of this program by donating $5 or
-more through PayPal!
+Please support the continued development of this program by `donating 
+$5`_ or more through PayPal (no PayPal account necessary)!
 
 Acknowledgments
 ===============
 
-The author wishes to thank Arnaud Delobelle, Pierre Cladé, and
-Sebastian Walter for very useful technical input.  I would like to
-thank Joaquim Abian, Jason Moore, and many other users for their
-feedback and suggestions, which greatly helped improve this program.
-I am also grateful to the Linux distribution maintainers of this
-package.
-
-.. toctree::
-   :hidden:
-   :maxdepth: 1
-
-   Overview <self>
-   user_guide
-   numpy_guide
-   tech_guide
+The author wishes to thank Arnaud Delobelle, Pierre Cladé, and Sebastian 
+Walter for very useful technical input.  Patches by Pierre Cladé and 
+José Sabater Montes are gratefully acknowledged. I would also like to 
+thank Joaquin Abian, Jason Moore, Martin Lutz and many other users for 
+their feedback and suggestions, which greatly helped improve this 
+program. I am also grateful to the Linux distribution maintainers of 
+this package, and to Christoph Gohlke for including it in his Base 
+distribution of scientific Python packages for Windows.
 
 .. _Python: http://python.org/
 .. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
 .. _invoking the Python interpreter: http://docs.python.org/tutorial/interpreter.html
 .. _setuptools: http://pypi.python.org/pypi/setuptools
-.. _download: http://pypi.python.org/pypi/uncertainties/
+.. _download: http://pypi.python.org/pypi/uncertainties/#downloads
 .. _numerous derivatives: http://en.wikipedia.org/wiki/Propagation_of_uncertainty#Non-linear_combinations
-
+.. _donating $5: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
-.. _support the development: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _BSD license: http://creativecommons.org/licenses/BSD/
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
 .. _pydoc: http://docs.python.org/library/pydoc.html

@@ -80,7 +80,11 @@ many_scalar_to_scalar_funcs = []
 
 # Some functions require a specific treatment and must therefore be
 # excluded from standard wrapping.  Functions
-no_std_wrapping = ['modf', 'frexp', 'ldexp', 'fsum', 'factorial']
+# no_std_wrapping = ['modf', 'frexp', 'ldexp', 'fsum', 'factorial']
+
+# Functions with numerical derivatives:
+num_deriv_funcs = ['fmod', 'gamma', 'isinf', 'isnan',
+                   'lgamma', 'trunc']
 
 # Functions that do not belong in many_scalar_to_scalar_funcs, but
 # that have a version that handles uncertainties:
@@ -114,7 +118,7 @@ def wraps(wrapper,
                                     
 
 ########################################
-# Wrapping of built-in math functions not in no_std_wrapping:
+# Wrapping of math functions:
 
 # Fixed formulas for the derivatives of some functions from the math
 # module (some functions might not be present in all version of
@@ -157,12 +161,16 @@ def log_der0(*args):
     #except TypeError:
     #    return 1/args[0]/math.log(args[1])  # 2-argument form
 
+
 def _deriv_copysign(x,y):
     if x>=0: return 1*math.copysign(1, y)
     else: return -1*math.copysign(1, y)
 def _deriv_fabs(x):
     if x >= 0: return 1
     else: return -1
+
+_erf_coef = 2/math.sqrt(math.pi)  # Optimization for erf()
+
 fixed_derivatives = {
     # In alphabetical order, here:
     'acos': [lambda x: -1/math.sqrt(1-x**2)],
@@ -180,8 +188,11 @@ fixed_derivatives = {
     'cos': [lambda x: -math.sin(x)],
     'cosh': [math.sinh],
     'degrees': [lambda x: math.degrees(1)],
+    'erf': [lambda x: exp(-x**2)*_erf_coef],
+    'erfc': [lambda x: -exp(-x**2)*_erf_coef],
     'exp': [math.exp],
-    'fabs': [_deriv_fabs],#[lambda x: 1 if x >= 0 else -1],
+    'expm1': [math.exp],
+    'fabs': [_deriv_fabs],
     'floor': [lambda x: 0],
     'hypot': [lambda x, y: x/math.hypot(x, y),
               lambda x, y: y/math.hypot(x, y)],
@@ -204,20 +215,23 @@ fixed_derivatives = {
 
 this_module = sys.modules[__name__]
 
-# We do not want to wrap module attributes such as __doc__, etc.:
-for (name, func) in inspect.getmembers(math, inspect.isbuiltin):
+# for (name, attr) in vars(math).items():
+for name in dir(math):
 
-    if name in no_std_wrapping:
-        continue
-
-    if name in fixed_derivatives:
+    if name in fixed_derivatives:  # Priority to functions in fixed_derivatives
         derivatives = fixed_derivatives[name]
-    else:
+    elif name in num_deriv_funcs:
         # Functions whose derivatives are calculated numerically by
         # this module fall here (isinf, fmod,...):
         derivatives = None  # Means: numerical calculation required
+    else:
+        continue  # 'name' not wrapped by this module (__doc__, e, etc.)
+
+    func = getattr(math, name)
+    
     setattr(this_module, name,
             wraps(uncertainties.wrap(func, derivatives), func))
+    
     many_scalar_to_scalar_funcs.append(name)
 
 ###############################################################################

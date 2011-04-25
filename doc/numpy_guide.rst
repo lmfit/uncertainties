@@ -1,8 +1,8 @@
 .. index: NumPy support
 
-=============================
-Uncertainties in NumPy arrays
-=============================
+=======================
+Uncertainties in arrays
+=======================
 
 .. index:: unumpy
 
@@ -28,6 +28,8 @@ These features can be made available with
 
   >>> from uncertainties import unumpy
 
+.. Here, there is no need to mention unumpy.unlinalg, because it is indeed
+   made available through "import unumpy".
 
 Creation and manipulation of arrays and matrices
 ------------------------------------------------
@@ -116,7 +118,8 @@ and is not named :func:`acos` like in the :func:`math` module).
 
 The definition of the mathematical quantities calculated by these
 functions is available in the documentation for
-:mod:`uncertainties.umath`.
+:mod:`uncertainties.umath` (which is accessible through :func:`help`
+or ``pydoc``).
 
 .. index:: linear algebra; additional functions, ulinalg
 

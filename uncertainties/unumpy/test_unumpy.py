@@ -261,9 +261,9 @@ def test_legacy_code():
 
     # uarray, nominal_values, std_devs from the uncertainties module
     # (not the uncertainties.unumpy module):
-    arr = uncertainties.array_u(arr_def)
-    assert numpy.all(uncertainties.nominal_values(arr) == arr_def[0])
-    assert numpy.all(uncertainties.std_devs(arr) == arr_def[1])
+    arr = uncertainties.array_u(arr_def)  # Warning is normal
+    assert numpy.all(uncertainties.nominal_values(arr) == arr_def[0])  # Warning is normal
+    assert numpy.all(uncertainties.std_devs(arr) == arr_def[1])  # Warning is normal
     
 def test_array_comparisons():
     "Test of array and matrix comparisons"
