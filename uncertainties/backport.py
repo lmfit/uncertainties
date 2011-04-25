@@ -13,6 +13,12 @@ if sys.version_info[:2] < (2, 5):
                 return True
             return False
         
+    def all(iterable):
+        for element in iterable:
+            if not element:
+                return False
+            return True
+        
     if sys.version_info[:2] < (2, 4):
         
         def reversed(sequence):

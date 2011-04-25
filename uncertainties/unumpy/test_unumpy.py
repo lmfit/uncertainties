@@ -26,7 +26,7 @@ from uncertainties.test_uncertainties import _numbers_close, matrices_close
 
 from uncertainties import __author__
 
-from uncertainties import all, any
+from backport import all, any
 
 def test_numpy():
     
@@ -100,9 +100,9 @@ def _derivatives_close(x, y):
            .symmetric_difference(y.derivatives)):
         return False  # Not the same variables
 
-    return all( _numbers_close(x.derivatives[var],
+    return all([_numbers_close(x.derivatives[var],
                                y.derivatives[var])
-                for var in x.derivatives)
+                for var in x.derivatives])
 
 def test_inverse():
     "Tests of the matrix inverse"
