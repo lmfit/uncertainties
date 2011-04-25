@@ -31,3 +31,4 @@ cp -r uncertainties-py25 uncertainties
 
 # Packaging:
 python setup.py sdist
+echo "Package created.  The package can be uploaded with setup.py upload."
