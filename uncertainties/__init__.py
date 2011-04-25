@@ -279,12 +279,13 @@ __all__ = [
 # XXX do not exist?
 # any() and all() only started existing in python2.5
 # so here we provide backup implementations for 2.4
-if not 'any' in dir(__builtins__):
+if 'any' not in dir(__builtins__):
     def any(iterable):
         for element in iterable:
             if element:
                 return True
         return False
+
 
 ###############################################################################
 
