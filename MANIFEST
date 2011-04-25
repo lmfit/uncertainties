@@ -1,5 +1,6 @@
 README.txt
 setup.py
+uncertainties-py25
 uncertainties/__init__.py
 uncertainties/test_umath.py
 uncertainties/test_uncertainties.py
