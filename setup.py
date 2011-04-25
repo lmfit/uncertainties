@@ -4,9 +4,9 @@
 import distutils.core
 import sys
 
-error_msg = "I'm sorry.  This package is for Python 2.5 and higher only."
+error_msg = "I'm sorry.  This package is for Python 2.3 and higher only."
 try:
-    if sys.version_info[:2] < (2, 5):
+    if sys.version_info[:2] < (2, 3):
         print >> sys.stderr, error_msg
         sys.exit(1)
 except AttributeError:  # sys.version_info was introduced in Python 2.0
