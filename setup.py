@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# !! This program must run with all version of Python since 2.3 included.
+
 import distutils.core
 import sys
 
 error_msg = "I'm sorry.  This package is for Python 2.3 and higher only."
 try:
     if sys.version_info[:2] < (2, 3):
-        print >> sys.stderr, error_msg
-        sys.exit(1)
+        sys.exit(error_msg)
 except AttributeError:  # sys.version_info was introduced in Python 2.0
-    print >> sys.stderr, error_msg
-    sys.exit(1)
+    sys.exit(error_msg)
 
-distutils.core.setup(
+setup_vars = dict(
     name='uncertainties',
     version='1.7.2',  # Should generally correspond to uncertainties.__version__
     author='Eric O. LEBIGOT (EOL)',
@@ -34,8 +34,8 @@ author.''',
 Overview
 ========
 
-``uncertainties`` allows calculations such as (2 ± 0.1)*2 = 4
-± 0.2 to be performed transparently.  Much more complex mathematical
+``uncertainties`` allows calculations such as (2 +/- 0.1)*2 = 4
++/- 0.2 to be performed transparently.  Much more complex mathematical
 expressions involving numbers with uncertainties can also be evaluated
 directly.
 
@@ -128,13 +128,15 @@ Version history
 
 Main changes:
 
-- 1.7.1: New semantics: ``ufloat('12.3(78)')`` now represents 12.3±7.8 \
-         instead of 12.3±78.
+- 1.7.2: Compatibility with Python 2.3, Python 2.4, Jython 2.5.1 and \
+         Jython 2.5.2 added.
+- 1.7.1: New semantics: ``ufloat('12.3(78)')`` now represents 12.3+/-7.8 \
+         instead of 12.3+/-78.
 - 1.7: ``ufloat()`` now raises ValueError instead of a generic Exception, \
        when given an incorrect \
        string representation, like ``float()`` does.
 - 1.6: Testing whether an object is a number with uncertainty should now \
-       be done with ``isinstance(…, UFloat)``. \
+       be done with ``isinstance(..., UFloat)``. \
        AffineScalarFunc is not imported by ``from uncertainties import *`` \
        anymore, but its new alias ``UFloat`` is.
 - 1.5.5: The first possible license is now BSD instead of GPLv2, which \
@@ -209,6 +211,8 @@ _of_uncertainty
     'License :: OSI Approved :: BSD License',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
+    'Programming Language :: Python :: 2.3',
+    'Programming Language :: Python :: 2.4',
     'Programming Language :: Python :: 2.5',
     'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
@@ -221,7 +225,16 @@ _of_uncertainty
     'Topic :: Software Development :: Libraries :: Python Modules',
     'Topic :: Utilities'
     ],
-    
+
     # Files are defined in MANIFEST
     packages=['uncertainties', 'uncertainties.unumpy']
     )  # End of setup definition
+
+if sys.version_info[:2] < (2, 5):
+    package_dir = 'uncertainties-py23'
+else:
+    package_dir = 'uncertainties-py25'
+    
+setup_vars['package_dir'] = {'uncertainties': package_dir}
+    
+distutils.core.setup(**setup_vars)

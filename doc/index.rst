@@ -163,9 +163,10 @@ or, if additional access rights are needed (Unix):
 
    sudo python setup.py install
 
-You can also simply **move** the :file:`uncertainties` directory to
-a location that Python can import from (directory in which scripts
-using :mod:`uncertainties` are run, etc.).
+You can also simply **move** the appropriate :file:`uncertainties-py*`
+directory to a location that Python can import from (directory in
+which scripts using :mod:`uncertainties` are run, etc.), and then
+rename it :file:`uncertainties`.
 
 Source code
 -----------
@@ -190,7 +191,7 @@ What others say
   <http://blog.garlicsim.org/post/1266209646/cool-python-module-uncertainties#comment-85154147>`_)
 - "*An awesome python package*" (`Jason Moore
   <http://biosport.ucdavis.edu/blog/2010/05/07/uncertainty-analysis>`_)
-- "*Utterly brilliant.*" (`Jeffrey Simpson
+- "*Utterly brilliant*" (`Jeffrey Simpson
   <http://twitter.com/#!/GeekyJeffrey>`_)
 - "*PyPI\'s uncertainties rocks!*" (`Siegfried Gevatter
   <http://identi.ca/notice/23330742>`_)

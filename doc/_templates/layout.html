@@ -33,10 +33,10 @@ pathto("_static/logo.png", 1) }}" border="0" alt="uncertainties"/></a>
           {%- endif %}
           {%- endblock %}
           {%- block sidebartoc %}
-          {%- if display_toc %}
-            <h3>{{ _('Table of Contents') }}</h3>
-            {{ toc }}
-          {%- endif %}
+          {%- block sidebarglobaltoc %}
+            <h3>{{ _('Table of contents') }}</h3>
+            {{ toctree() }}
+          {%- endblock %}
           {%- endblock %}
           {%- block sidebarrel %}
           {%- endblock %}
@@ -52,10 +52,10 @@ pathto("_static/logo.png", 1) }}" border="0" alt="uncertainties"/></a>
           {%- if customsidebar %}
           {% include customsidebar %}
           {%- endif %}
-          {%- block sidebarglobaltoc %}
-            <h3>{{ _('Global Table of Contents') }}</h3>
-            {{ toctree() }}
-          {%- endblock %}
+          {%- if display_toc %}
+            <h3>{{ _('Section contents') }}</h3>
+            {{ toc }}
+          {%- endif %}
           {%- block sidebarsearch %}
           {%- if pagename != "search" %}
           <div id="searchbox" style="display: none">

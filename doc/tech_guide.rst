@@ -84,7 +84,7 @@ updated on the fly, because quantities with uncertainties (like
 
   >>> x.set_std_dev(0)
   >>> print square
-  0.04  # Zero uncertainty, now
+  46.0  # Zero uncertainty, now
 
 As usual, Python keeps track of objects as long as they are used.
 Thus, redefining the value of ``x`` does not change the fact that
@@ -93,11 +93,45 @@ in ``x``:
 
   >>> x = 10000
   >>> print square
-  0.04  # Unchanged
+  46.0  # Unchanged
 
 These mechanisms make quantities with uncertainties behave mostly like
 regular numbers, while providing a fully transparent way of handling
 correlations between quantities.
+
+.. index:: pickling
+ 
+Pickling
+--------
+
+The quantities with uncertainties created by the :mod:`uncertainties`
+package can be `pickled <http://docs.python.org/library/pickle.html>`_
+(they can be stored in a file, for instance).
+
+If multiple variables are pickled together, their correlations are
+preserved:
+
+  >>> import pickle
+  >>> x = ufloat((2, 0.1))
+  >>> y = 2*x
+  >>> p = pickle.dumps([x, y])  # Pickling to a string
+  >>> (x2, y2) = pickle.loads(p)  # Unpickling into new variables
+  >>> y2 - 2*x2
+  0.0
+
+The final result is exactly zero because the unpickled variables ``x2``
+and ``y2`` are completely correlated.
+
+However, unpickling necessarily creates *new* variables that bear no
+relationship with the original variables (in fact, the pickled
+representation can be stored in a file and read from another program
+after the program that did the pickling is finished).  Thus
+
+  >>> x - x2
+  0.0+/-0.14142135623730953
+
+which shows that the original variable ``x`` and the new variable ``x2``
+are completely uncorrelated.
 
 .. _linear_method:
 
@@ -256,11 +290,10 @@ objects store all the variables they depend from:
 Testing whether an object is a number with uncertainty
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-:class:`Variable` objects are also
-:class:`AffineScalarFunc`/:class:`UFloat` objects (a variable x is
-simply considered to be the identity function x → x).  Testing whether
-``value`` carries an uncertainty handled by this module can therefore
-be done with ``isinstance(value, UFloat)``.
+:class:`Variable` objects are also :class:`UFloat` objects (a variable
+x is simply considered to be the identity function x → x).  Testing
+whether ``value`` carries an uncertainty handled by this module can
+therefore be done with ``isinstance(value, UFloat)``.
 
 .. _differentiation method:
 
