@@ -18,7 +18,10 @@ echo "Python 2.3 version imported"
 #git co python-3 uncertainties/
 #mv uncertainties uncertainties-py30
 
-# I get back the original directory:
+# Removing files added to the index by the checkout:
+git reset
+
+# The original directory is put back:
 cp -r uncertainties-py25 uncertainties
 
 # Packaging:
