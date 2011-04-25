@@ -275,18 +275,22 @@ __all__ = [
 
     ]
 
-# XXX Is this the correct way to provide builtins if they
-# XXX do not exist?
-# any() and all() only started existing in python2.5
-# so here we provide backup implementations for 2.4
-if 'any' not in dir(__builtins__):
+# For Python < 2.5:
+if sys.version_info[:2] < (2, 5):
+    
     def any(iterable):
         for element in iterable:
             if element:
                 return True
-        return False
+            return False
+        
+    if sys.version_info[:2] < (2, 4):
+        
+        def reversed(sequence):
+            return sequence[::-1]
 
-
+        from sets import Set as set
+        
 ###############################################################################
 
 def set_doc(doc_string):
@@ -572,7 +576,8 @@ def wrap(f, derivatives_funcs=None):
 
     # It is easier to work with f_with_affine_output, which represents
     # a wrapped version of 'f', when it bears the same name as 'f':
-    f_with_affine_output.__name__ = f.__name__
+    # ! __name__ is read-only, in Python 2.3:
+    # f_with_affine_output.__name__ = f.__name__
 
     return f_with_affine_output
 
