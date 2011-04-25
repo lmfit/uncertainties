@@ -1,3 +1,5 @@
+# This script must be run before packaging (python setup.py sdist upload).
+
 # Only committed version are packaged, to help with debugging:
 git commit -a
 
