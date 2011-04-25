@@ -565,7 +565,7 @@ def wrap(f, derivatives_funcs=None):
     # It is easier to work with f_with_affine_output, which represents
     # a wrapped version of 'f', when it bears the same name as 'f':
     # ! __name__ is read-only, in Python 2.3:
-    # f_with_affine_output.__name__ = f.__name__
+    f_with_affine_output.name = f.__name__
 
     return f_with_affine_output
 

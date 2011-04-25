@@ -78,8 +78,8 @@ def _compare_derivatives(func, numerical_derivatives,
             'atanh': [1],
             'log': [1, 2]  # Both numbers of arguments are tested
             }
-        if func.__name__ in num_args_table:
-            num_args_list = num_args_table[func.__name__]
+        if hasattr(func, 'name') and func.name in num_args_table:
+            num_args_list = num_args_table[func.name]
         else:
 
             num_args_list = []
