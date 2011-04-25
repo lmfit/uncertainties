@@ -125,7 +125,7 @@ def test_inverse():
     # inverse should be the inverses of the diagonal elements of
     # m (because we started with a triangular matrix):
     assert _numbers_close(1/m_nominal_values[0, 0],
-                          m_inv_uncert[0, 0].nominal_value), "Wrong value"
+                          m_inv_uncert[0, 0].nominal_value)
     
     assert _numbers_close(1/m_nominal_values[1, 1],
                           m_inv_uncert[1, 1].nominal_value), "Wrong value"

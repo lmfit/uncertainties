@@ -340,7 +340,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         func_and_derivs = func_with_derivatives(
             array_nominal,
             type(array_like),
-            (array_derivative(array_version, var) for var in variables),
+            [array_derivative(array_version, var) for var in variables],
             *args)
 
         func_nominal_value = func_and_derivs.next()
@@ -567,9 +567,9 @@ def define_vectorized_funcs():
     this_module = sys.modules[__name__]
     # NumPy does not always use the same function names as the math
     # module:
-    func_name_translations = dict(
+    func_name_translations = dict([
         (f_name, 'arc'+f_name[1:])
-        for f_name in ['acos', 'acosh', 'asin', 'atan', 'atan2', 'atanh'])
+        for f_name in ['acos', 'acosh', 'asin', 'atan', 'atan2', 'atanh']])
 
     #new_func_names = [
     #    func_name_translations[function_name]

@@ -234,6 +234,7 @@ import re
 import math
 from math import sqrt, log  # Optimization: no attribute look-up
 import copy
+import sys
 
 # Numerical version:
 __version_info__ = (1, 7, 2)

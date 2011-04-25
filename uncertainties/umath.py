@@ -96,7 +96,7 @@ non_std_wrapped_funcs = []
 # the default arugment for assigned
 def wraps(wrapper,
           wrapped,
-          assigned=('__doc__', '__name__'),
+          assigned=('__doc__',),
           updated=('__dict__',)):
     """Update a wrapper function to look like the wrapped function
     
@@ -328,8 +328,8 @@ def ldexp(x, y):
         return AffineScalarFunc(
             math.ldexp(aff_func.nominal_value, y),
             # Chain rule:
-            dict((var, factor*deriv)
-                 for (var, deriv) in aff_func.derivatives.iteritems()))
+            dict([(var, factor*deriv)
+                  for (var, deriv) in aff_func.derivatives.iteritems()]))
     else:
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
@@ -364,8 +364,8 @@ def frexp(x):
             AffineScalarFunc(
                 result[0],
                 # Chain rule:
-                dict((var, factor*deriv)
-                     for (var, deriv) in aff_func.derivatives.iteritems())),
+                dict([(var, factor*deriv)
+                      for (var, deriv) in aff_func.derivatives.iteritems()])),
             # The exponent is an integer and is supposed to be
             # continuous (small errors):
             result[1])
