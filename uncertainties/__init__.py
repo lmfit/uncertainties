@@ -454,19 +454,6 @@ def wrap(f, derivatives_funcs=None):
 
     #! Setting the doc string after "def f_with...()" does not
     # seem to work.  We define it explicitly:
-    @set_doc("""\
-    Version of %s(...) that returns an affine approximation
-    (AffineScalarFunc object), if its result depends on variables
-    (Variable objects).  Otherwise, returns a simple constant (when
-    applied to constant arguments).
-    
-    Warning: arguments of the function that are not AffineScalarFunc
-    objects must not depend on uncertainties.Variable objects in any
-    way.  Otherwise, the dependence of the result in
-    uncertainties.Variable objects will be incorrect.
-    
-    Original documentation:
-    %s""" % (f.__name__, f.__doc__))
     def f_with_affine_output(*args):
         # Can this function perform the calculation of an
         # AffineScalarFunc (or maybe float) result?
@@ -580,6 +567,20 @@ def wrap(f, derivatives_funcs=None):
 
         # The function now returns an AffineScalarFunc object:
         return AffineScalarFunc(f_nominal_value, derivatives_wrt_vars)
+
+    f_with_affine_output = set_doc("""\
+    Version of %s(...) that returns an affine approximation
+    (AffineScalarFunc object), if its result depends on variables
+    (Variable objects).  Otherwise, returns a simple constant (when
+    applied to constant arguments).
+    
+    Warning: arguments of the function that are not AffineScalarFunc
+    objects must not depend on uncertainties.Variable objects in any
+    way.  Otherwise, the dependence of the result in
+    uncertainties.Variable objects will be incorrect.
+    
+    Original documentation:
+    %s""" % (f.__name__, f.__doc__))(f_with_affine_output)
 
     # It is easier to work with f_with_affine_output, which represents
     # a wrapped version of 'f', when it bears the same name as 'f':
@@ -760,10 +761,10 @@ class AffineScalarFunc(object):
 
     # The following prevents the 'nominal_value' attribute from being
     # modified by the user:
-    @property
     def nominal_value(self):
         "Nominal value of the random number."
         return self._nominal_value
+    nominal_value = property(nominal_value)
     
     ############################################################
 
