@@ -9,11 +9,9 @@ import sys
 error_msg = "I'm sorry.  This package is for Python 2.3 and higher only."
 try:
     if sys.version_info[:2] < (2, 3):
-        print >> sys.stderr, error_msg
-        sys.exit(1)
+        sys.exit(error_msg)
 except AttributeError:  # sys.version_info was introduced in Python 2.0
-    print >> sys.stderr, error_msg
-    sys.exit(1)
+    sys.exit(error_msg)
 
 setup_vars = dict(
     name='uncertainties',
@@ -130,8 +128,10 @@ Version history
 
 Main changes:
 
-- 1.7.1: New semantics: ``ufloat('12.3(78)')`` now represents 12.3±7.8 \
-         instead of 12.3±78.
+- 1.7.2: Compatibility with Python 2.3, Python 2.4, Jython 2.5.1 and \
+         Jython 2.5.2 added.
+- 1.7.1: New semantics: ``ufloat('12.3(78)')`` now represents 12.3+/-7.8 \
+         instead of 12.3+/-78.
 - 1.7: ``ufloat()`` now raises ValueError instead of a generic Exception, \
        when given an incorrect \
        string representation, like ``float()`` does.
@@ -211,6 +211,8 @@ _of_uncertainty
     'License :: OSI Approved :: BSD License',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
+    'Programming Language :: Python :: 2.3',
+    'Programming Language :: Python :: 2.4',
     'Programming Language :: Python :: 2.5',
     'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
