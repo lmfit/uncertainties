@@ -70,8 +70,10 @@ def unumpy_to_numpy_matrix(arr):
     Otherwise, it is returned unchanged.
     """
 
-    #return arr.view(numpy.matrix) if isinstance(arr, matrix) else arr
-    return (lambda: arr, lambda: arr.view(numpy.matrix))[isinstance(arr, matrix)]()
+    if isinstance(arr, matrix):
+        return arr.view(numpy.matrix)
+    else:
+        return arr
 
 def nominal_values(arr):
     """
