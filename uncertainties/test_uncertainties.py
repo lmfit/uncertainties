@@ -169,7 +169,7 @@ def _compare_derivatives(func, numerical_derivatives,
                                 raise DerivativesDiffer(
                                     "Derivative #%d of function '%s' may be"
                                     " wrong: at args = %s,"
-                                    " value obtained = %16f,"
+                                    " value obtained = %.16f,"
                                     " while numerical approximation = %.16f."
                                     % (arg_num, funcname, args,
                                        fixed_deriv_value, num_deriv_value))
