@@ -130,12 +130,8 @@ def _compare_derivatives(func, numerical_derivatives,
                             uncertainties.Variable(random.random()*4-2, 0))
 
                 # 'args', but as scalar values:
-                args_scalar = []
-                for v in args:
-                    if isinstance(v, uncertainties.Variable):
-                        args_scalar.append(v.nominal_value)
-                    else:
-                        args_scalar.append(v)
+                args_scalar = [uncertainties.nominal_value(v)
+                               for v in args]
 
                 func_approx = func(*args)
 
