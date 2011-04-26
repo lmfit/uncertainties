@@ -19,7 +19,7 @@ import numpy
 
 # Local modules:
 import uncertainties
-from .. import umath
+from uncertainties import umath
 
 from uncertainties import __author__
 
