@@ -60,10 +60,10 @@ yield correct uncertainties.  For example:
 
   >>> x = ufloat((2, 0.1))
   >>> a = 42
-  >>> square = x**2 + a
-  >>> square
+  >>> poly = x**2 + a
+  >>> poly
   46.0+/-0.4
-  >>> square - x*x
+  >>> poly - x*x
   42.0
 
 Even though ``x*x`` has a non-zero uncertainty, the result has a zero
@@ -71,28 +71,28 @@ uncertainty, because it is equal ``a``.
 
 However, only the dependence of quantities on random variables created
 by this module is tracked.  Thus, if the variable ``a`` above is
-modified, the value of ``square`` is not modified, as is usual in
+modified, the value of ``poly`` is not modified, as is usual in
 Python:
 
   >>> a = 123
-  >>> print square
+  >>> print poly
   46.0+/-0.4  # Still equal to x**2 + 42, not x**2 + 123
 
 Random variables can, on the other hand, have their uncertainty
 updated on the fly, because quantities with uncertainties (like
-``square``) keep track of them:
+``poly``) keep track of them:
 
   >>> x.set_std_dev(0)
-  >>> print square
+  >>> print poly
   46.0  # Zero uncertainty, now
 
 As usual, Python keeps track of objects as long as they are used.
 Thus, redefining the value of ``x`` does not change the fact that
-``square`` depends on the quantity with uncertainty previously stored
+``poly`` depends on the quantity with uncertainty previously stored
 in ``x``:
 
   >>> x = 10000
-  >>> print square
+  >>> print poly
   46.0  # Unchanged
 
 These mechanisms make quantities with uncertainties behave mostly like
