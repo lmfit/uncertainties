@@ -9,8 +9,7 @@ git commit -a
 ## Getting the Python 2.5 version:
 
 rm -rf uncertainties-py25
-mkdir uncertainties-py25
-git archive master uncertainties > /tmp/u.tar
+git archive master uncertainties >! /tmp/u.tar
 tar -C /tmp -xf /tmp/u.tar
 mv /tmp/uncertainties uncertainties-py25
 echo "Python 2.5 version imported"
@@ -18,15 +17,10 @@ echo "Python 2.5 version imported"
 ## Getting the Python 2.3 version:
 
 rm -rf uncertainties-py23
-git checkout python2.3 -- uncertainties
-mv uncertainties uncertainties-py23
+git archive python23 uncertainties >! /tmp/u.tar
+tar -C /tmp -xf /tmp/u.tar
+mv /tmp/uncertainties uncertainties-py23
 echo "Python 2.3 version imported"
-
-# The original directory is put back:
-mv uncertainties-orig uncertainties
-
-# Removing files added to the index by the checkouts:
-git reset
 
 # Packaging:
 python setup.py sdist
