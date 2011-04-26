@@ -568,7 +568,8 @@ def define_vectorized_funcs():
         (f_name, 'arc'+f_name[1:])
         for f_name in ['acos', 'acosh', 'asin', 'atan', 'atan2', 'atanh'])
 
-    new_func_names = [func_name_translations.get(function_name, function_name)]
+    new_func_names = [func_name_translations.get(function_name, function_name)
+                      for function_name in umath.many_scalar_to_scalar_funcs]
         
     for (function_name, unumpy_name) in \
         zip(umath.many_scalar_to_scalar_funcs, new_func_names):
