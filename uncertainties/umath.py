@@ -163,9 +163,9 @@ def log_der0(*args):
 
 def _deriv_copysign(x,y):
     if x >= 0:
-        return 1*math.copysign(1, y)
+        return math.copysign(1, y)
     else:
-        return -1*math.copysign(1, y)
+        return -math.copysign(1, y)
     
 def _deriv_fabs(x):
     if x >= 0:
@@ -186,8 +186,7 @@ fixed_derivatives = {
               lambda y, x: -y/(x**2+y**2)],  # Correct for x == 0
     'atanh': [lambda x: 1/(1-x**2)],
     'ceil': [lambda x: 0],
-    'copysign': [#lambda x, y: (1 if x >= 0 else -1) * math.copysign(1, y),
-                 _deriv_copysign,
+    'copysign': [_deriv_copysign,
                  lambda x, y: 0],
     'cos': [lambda x: -math.sin(x)],
     'cosh': [math.sinh],
