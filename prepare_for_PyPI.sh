@@ -6,14 +6,13 @@
 ## Only committed versions are packaged, to help with debugging published code:
 git commit -a
 
-## Let's move the original files out of the way:
-mv uncertainties uncertainties-orig
-
 ## Getting the Python 2.5 version:
 
 rm -rf uncertainties-py25
-git checkout master -- uncertainties
-mv uncertainties uncertainties-py25
+mkdir uncertainties-py25
+git archive master uncertainties > /tmp/u.tar
+tar -C /tmp -xf /tmp/u.tar
+mv /tmp/uncertainties uncertainties-py25
 echo "Python 2.5 version imported"
 
 ## Getting the Python 2.3 version:
