@@ -44,6 +44,7 @@ with uncertainties can easily be parsed:
   >>> x = ufloat((0.20, 0.01))  # x = 0.20+/-0.01
   >>> x = ufloat("0.20+/-0.01")
   >>> x = ufloat("0.20(1)")
+  >>> x = ufloat("20(1)e-2")  # Exponential notation supported
   >>> x = ufloat("0.20")  # Automatic uncertainty of +/-1 on last digit
 
 Invalid string representations raise a :class:`ValueError` exception.
