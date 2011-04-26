@@ -98,16 +98,15 @@ def wraps(wrapper,
           wrapped,
           assigned=('__doc__',),
           updated=('__dict__',)):
-    """Update a wrapper function to look like the wrapped function
+    """Update a wrapper function to look like the wrapped function.
     
-    wrapper is the function to be updated
-    wrapped is the original function
-    assigned is a tuple naming the attributes assigned directly
-    from the wrapped function to the wrapper function (defaults to
-    functools.WRAPPER_ASSIGNMENTS)
-    updated is a tuple naming the attributes of the wrapper that
+    wrapper -- function to be updated
+    wrapped -- original function
+    assigned -- tuple naming the attributes assigned directly
+    from the wrapped function to the wrapper function
+    updated -- tuple naming the attributes of the wrapper that
     are updated with the corresponding attribute from the wrapped
-    function (defaults to functools.WRAPPER_UPDATES)
+    function.
     """
     for attr in assigned:
         setattr(wrapper, attr, getattr(wrapped, attr))
