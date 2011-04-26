@@ -203,6 +203,9 @@ What others say
 - "*Holy f\*\*\* this would have saved me so much f\*\*\*ing time last
   semester*." (`reddit
   <http://www.reddit.com/r/Python/comments/am84v/now_you_can_do_calculations_with_uncertainties_5/>`_)
+- "*This package has a great interface and makes error propagation
+  something to stop fearing.*" (`Dr Dawes
+  <http://dawes.wordpress.com/2011/01/02/scientific-python/>`_)
 
 .. index:: license
 
