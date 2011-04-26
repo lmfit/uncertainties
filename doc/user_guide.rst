@@ -48,8 +48,8 @@ expressed in many convenient ways:
   >>> x = ufloat("20(1)e-2")  # Exponential notation supported
   >>> x = ufloat("0.20")  # Automatic uncertainty of +/-1 on last digit
 
-All the available representations can be listed with ``pydoc
-uncertainties.ufloat``.  Invalid string representations raise a
+The available representations can be listed with ``pydoc
+uncertainties.ufloat``.  Representations that are invalid raise a
 :class:`ValueError` exception.
 
 Basic math
