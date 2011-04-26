@@ -26,7 +26,7 @@ from uncertainties.test_uncertainties import _numbers_close, matrices_close
 
 from uncertainties import __author__
 
-from backport import all, any
+from uncertainties.backport import *
 
 def test_numpy():
     
@@ -129,7 +129,7 @@ def test_inverse():
     # inverse should be the inverses of the diagonal elements of
     # m (because we started with a triangular matrix):
     assert _numbers_close(1/m_nominal_values[0, 0],
-                          m_inv_uncert[0, 0].nominal_value)
+                          m_inv_uncert[0, 0].nominal_value), "Wrong value"
     
     assert _numbers_close(1/m_nominal_values[1, 1],
                           m_inv_uncert[1, 1].nominal_value), "Wrong value"
