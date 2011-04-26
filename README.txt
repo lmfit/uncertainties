@@ -15,10 +15,10 @@ or, if additional access rights are needed (Unix):
 
   sudo python setup.py install
 
-You can also simply move the appropriate uncertainties-py*/ directory to 
-a location that Python can import from (directory in which scripts using 
-uncertainties are run, etc.), and then rename it uncertainties/ (with no 
-Python version number).
+You can also simply move the uncertainties/ or uncertainties-py*/ 
+directory to a location that Python can import from (directory in which 
+scripts using uncertainties are run, etc.), and then rename it 
+uncertainties/ if necessary (with no Python version number).
 
 * The tests programs (test_*.py) are meant to be run through the Nose 
 testing framework.  This can be achieved for instance with a command 
