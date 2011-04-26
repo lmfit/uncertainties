@@ -1022,12 +1022,13 @@ def add_operators_to_AffineScalarFunc():
     # Single-argument operators that should be adapted from floats to
     # AffineScalarFunc objects:
     def _simple_add_deriv(x):
-        if x>=0:
+        if x >= 0:
             return 1.
         else:
             return -1.
+        
     simple_numerical_operators_derivatives = {
-        'abs': _simple_add_deriv,#lambda x: 1. if x>=0 else -1.,
+        'abs': _simple_add_deriv,
         'neg': lambda x: -1.,
         'pos': lambda x: 1.,
         'trunc': lambda x: 0.
@@ -1157,9 +1158,7 @@ class Variable(AffineScalarFunc):
         # the variable.  Outputting the tag for regular string ("print
         # x") would be too heavy and produce an unusual representation
         # of a number with uncertainty.
-        #return (num_repr if ((self.tag is None) or (to_string != repr))
-        #        else "< %s = %s >" % (self.tag, num_repr))
-        if ((self.tag is None) or (to_string != repr)):
+        if (self.tag is None) or (to_string != repr):
             return num_repr
         else:
             "< %s = %s >" % (self.tag, num_repr)
@@ -1225,9 +1224,10 @@ def nominal_value(x):
     numbers, when only some of them generally carry an uncertainty.
     """
 
-    #return x.nominal_value if isinstance(x, AffineScalarFunc) else x
-    if isinstance(x, AffineScalarFunc): return x.nominal_value
-    else: return x
+    if isinstance(x, AffineScalarFunc):
+        return x.nominal_value
+    else:
+        return x
 
 def std_dev(x):
     """
@@ -1239,9 +1239,10 @@ def std_dev(x):
     numbers, when only some of them generally carry an uncertainty.
     """
 
-    #return x.std_dev() if isinstance(x, AffineScalarFunc) else 0.
-    if isinstance(x, AffineScalarFunc): return x.std_dev()
-    else: return 0.
+    if isinstance(x, AffineScalarFunc):
+        return x.std_dev()
+    else:
+        return 0.
 
 def covariance_matrix(functions):
     """
