@@ -7,14 +7,29 @@ import distutils.core
 import sys
 import os
 
-error_msg = "I'm sorry.  This package is for Python 2.3 and higher only."
+min_version = (2, 3)
+error_msg = ("I'm sorry.  This package is for Python %d.%d and higher only."
+             % min_version)
 try:
-    if sys.version_info[:2] < (2, 3):
+    if sys.version_info < min_version:
         sys.exit(error_msg)
 except AttributeError:  # sys.version_info was introduced in Python 2.0
     sys.exit(error_msg)
 
-setup_vars = dict(
+
+# Determination of the directory that contains the source code:
+if os.path.exists('uncertainties'):
+    # Case of a direct download of a Python-version-specific Git
+    # branch:
+    package_dir = 'uncertainties'
+else:
+    # Case of a PyPI package download:
+    if sys.version_info >= (2, 5):
+        package_dir = 'uncertainties-py25'
+    else:
+        package_dir = 'uncertainties-py23'
+    
+distutils.core.setup(
     name='uncertainties',
     version='1.7.2',  # Should generally correspond to uncertainties.__version__
     author='Eric O. LEBIGOT (EOL)',
@@ -227,23 +242,9 @@ _of_uncertainty
     'Topic :: Utilities'
     ],
 
+    # Where to find the source code:
+    package_dir={'uncertainties': package_dir},
+
     # Files are defined in MANIFEST
     packages=['uncertainties', 'uncertainties.unumpy']
     )  # End of setup definition
-
-# Determination of the directory that contains the source code:
-if os.path.exists('uncertainties'):
-    # Case of a direct download of a Python-version-specific Git
-    # branch:
-    package_dir = 'uncertainties'
-else:
-    # Case of a PyPI package download:
-    if sys.version_info[:2] < (2, 5):
-        package_dir = 'uncertainties-py23'
-    else:
-        package_dir = 'uncertainties-py25'
-    
-setup_vars['package_dir'] = {'uncertainties': package_dir}
-    
-distutils.core.setup(**setup_vars)
-
