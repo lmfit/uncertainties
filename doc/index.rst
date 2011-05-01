@@ -108,19 +108,19 @@ Under **Unix**, it may be necessary to prefix the installation command
 with ``sudo``, so that the installation program has sufficient access
 rights to the system.
 
-If you have setuptools_, you can try to automatically install or
-upgrade this package with
-
-.. code-block:: sh
-
-   easy_install --upgrade uncertainties
-
 If you have `pip <http://pip.openplans.org/>`_, you can try to
 do
 
 .. code-block:: sh
 
    pip install --upgrade uncertainties
+
+If you have setuptools_, you can try to automatically install or
+upgrade this package with
+
+.. code-block:: sh
+
+   easy_install --upgrade uncertainties
 
 The :mod:`uncertainties` package is also available on the following 
 **Linux distributions**: `Ubuntu 
