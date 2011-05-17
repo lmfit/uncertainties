@@ -97,16 +97,16 @@ gives access to many of the documentation strings included in the code.
 Installation and download
 =========================
 
-Automatic install
------------------
+Automatic install or upgrade
+----------------------------
 
-One of the automatic installation procedures below might work on your
-system, if you have a Python package installer or use certain Linux
-distributions.
+One of the automatic installation or upgrade procedures below might work 
+on your system, if you have a Python package installer or use certain 
+Linux distributions.
 
-Under **Unix**, it may be necessary to prefix the installation command
-with ``sudo``, so that the installation program has sufficient access
-rights to the system.
+Under **Unix**, it may be necessary to prefix commands with ``sudo``, so 
+that the installation program has sufficient access rights to the 
+system.
 
 If you have `pip <http://pip.openplans.org/>`_, you can try to
 do
