@@ -61,9 +61,25 @@ Calculations can be performed directly, as with regular real numbers:
   >>> print square
   0.04+/-0.004
 
-.. index::
-   pair: nominal value; of scalar
-   pair: uncertainty; of scalar
+
+.. index:: mathematical operation; on a scalar, umath
+
+.. _advanced math operations:
+
+Mathematical operations
+=======================
+
+Besides being able to apply basic mathematical operations to numbers
+with uncertainty, this package provides generalizations of most of the
+functions from the standard :mod:`math` module.  These mathematical
+functions are found in the :mod:`uncertainties.umath` module::
+
+  >>> from uncertainties.umath import *  # Imports sin(), etc.
+  >>> sin(x**2)
+  0.039989334186634168+/-0.003996800426643912
+
+The list of available mathematical functions can be obtained with the
+``pydoc uncertainties.umath`` command.
 
 .. index:: correlations; detailed example
 
@@ -96,6 +112,10 @@ exactly as with simple floats.  When various quantities are combined
 through mathematical operations, the result is calculated by taking
 into account all the correlations between the quantities involved.
 All of this is done completely transparently.
+
+.. index::
+   pair: nominal value; of scalar
+   pair: uncertainty; of scalar
 
 Access to the uncertainty and to the nominal value
 ==================================================
@@ -130,25 +150,6 @@ variables are tagged:
 
 The total uncertainty on the result (``sum_value``) is the quadratic
 sum of these independent uncertainties, as it should be.
-
-.. index:: mathematical operation; on a scalar, umath
-
-.. _advanced math operations:
-
-Mathematical operations
-=======================
-
-Besides being able to apply basic mathematical operations to numbers
-with uncertainty, this package provides generalizations of most of the
-functions from the standard :mod:`math` module.  These mathematical
-functions are found in the :mod:`uncertainties.umath` module::
-
-  >>> from uncertainties.umath import *  # Imports sin(), etc.
-  >>> sin(x**2)
-  0.039989334186634168+/-0.003996800426643912
-
-The list of available mathematical functions can be obtained with the
-``pydoc uncertainties.umath`` command.
 
 .. index:: comparison operators
 
@@ -380,4 +381,3 @@ Details about the theory behind this package are given in the
 :doc:`tech_guide`.
 
 .. _NumPy: http://numpy.scipy.org/
-
