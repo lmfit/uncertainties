@@ -81,7 +81,30 @@ functions are found in the :mod:`uncertainties.umath` module::
 The list of available mathematical functions can be obtained with the
 ``pydoc uncertainties.umath`` command.
 
+.. index:: arrays; simple use, matrices; simple use
+
+.. _simple_array_use:
+
+Arrays of numbers with uncertainties
+====================================
+
+It is possible to put numbers with uncertainties in NumPy_ arrays and
+matrices:
+
+  >>> arr = numpy.array([ufloat((1, 0.01)), ufloat((2, 0.1))])
+  >>> 2*arr
+  [2.0+/-0.02 4.0+/-0.2]
+  >>> print arr.sum()
+  3.0+/-0.100498756211
+
+Thus, usual operations on NumPy arrays can be performed transparently
+even when these arrays contain numbers with uncertainties.
+
+:doc:`More complex operations on NumPy arrays <numpy_guide>` can be
+performed through the dedicated :mod:`uncertainties.unumpy` module.
+
 .. index:: correlations; detailed example
+
 
 Correlations
 ============
@@ -191,27 +214,6 @@ More detailed information on the semantics of comparison operators for
 numbers with uncertainties can be found in the :ref:`Technical Guide
 <comparison_operators>`.
 
-.. index:: arrays; simple use, matrices; simple use
-
-.. _simple_array_use:
-
-Arrays of numbers with uncertainties
-====================================
-
-It is possible to put numbers with uncertainties in NumPy_ arrays and
-matrices:
-
-  >>> arr = numpy.array([ufloat((1, 0.01)), ufloat((2, 0.1))])
-  >>> 2*arr
-  [2.0+/-0.02 4.0+/-0.2]
-  >>> print arr.sum()
-  3.0+/-0.100498756211
-
-Thus, usual operations on NumPy arrays can be performed transparently
-even when these arrays contain numbers with uncertainties.
-
-:doc:`More complex operations on NumPy arrays <numpy_guide>` can be
-performed through the dedicated :mod:`uncertainties.unumpy` module.
 
 .. index:: covariance matrix
 
