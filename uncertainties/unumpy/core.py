@@ -16,6 +16,7 @@ import sys
 
 # 3rd-party modules:
 import numpy
+import numpy.core.numeric as N
 
 # Local modules:
 import uncertainties
@@ -507,6 +508,17 @@ class matrix(numpy.matrix):
     Class equivalent to numpy.matrix, but that behaves better when the
     matrix contains numbers with uncertainties.
     """
+
+    def __rmul__(self, other):
+        # ! NumPy's matrix __rmul__ uses an apparently a restrictive
+        # dot() function that cannot handle the multiplication of a
+        # scalar and of a matrix containing objects (when the
+        # arguments are given in this order).  We go around this
+        # limitation:
+        if N.isscalar(other):
+            return N.dot(self, other)
+        else:
+            return N.dot(other, self)  # The order is important
 
     # The NumPy doc for getI is empty:
     # @uncertainties.set_doc(numpy.matrix.getI.__doc__)
