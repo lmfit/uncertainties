@@ -82,6 +82,10 @@ def test_matrix():
 
     assert type(m[0, 0]) == uncertainties.Variable
 
+    # Test of scalar multiplication, both sides:
+    3*m
+    m*3
+
 def _derivatives_close(x, y):
     """
     Returns True iff the AffineScalarFunc objects x and y have
