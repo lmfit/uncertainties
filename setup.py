@@ -31,7 +31,7 @@ else:
     
 distutils.core.setup(
     name='uncertainties',
-    version='1.7.2',  # Should generally correspond to uncertainties.__version__
+    version='1.7.3',  # Should generally correspond to uncertainties.__version__
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://packages.python.org/uncertainties/',

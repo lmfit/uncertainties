@@ -239,7 +239,7 @@ import sys
 from backport import *
 
 # Numerical version:
-__version_info__ = (1, 7, 2)
+__version_info__ = (1, 7, 3)
 __version__ = '.'.join([str(num) for num in __version_info__])
 
 __author__ = 'Eric O. LEBIGOT (EOL)'
