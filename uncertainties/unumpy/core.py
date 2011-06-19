@@ -16,7 +16,7 @@ import sys
 
 # 3rd-party modules:
 import numpy
-import numpy.core.numeric as N
+from numpy.core import numeric
 
 # Local modules:
 import uncertainties
@@ -520,10 +520,10 @@ class matrix(numpy.matrix):
         # scalar and of a matrix containing objects (when the
         # arguments are given in this order).  We go around this
         # limitation:
-        if N.isscalar(other):
-            return N.dot(self, other)
+        if numeric.isscalar(other):
+            return numeric.dot(self, other)
         else:
-            return N.dot(other, self)  # The order is important
+            return numeric.dot(other, self)  # The order is important
 
     # The NumPy doc for getI is empty:
     # @uncertainties.set_doc(numpy.matrix.getI.__doc__)
