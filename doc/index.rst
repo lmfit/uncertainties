@@ -104,12 +104,12 @@ One of the automatic installation or upgrade procedures below might work
 on your system, if you have a Python package installer or use certain 
 Linux distributions.
 
-Under **Unix**, it may be necessary to prefix commands with ``sudo``, so 
-that the installation program has sufficient access rights to the 
-system.
+Under **Unix**, it may be necessary to prefix the commands below with 
+``sudo``, so that the installation program has **sufficient access 
+rights to the system**.
 
-If you have `pip <http://pip.openplans.org/>`_, you can try to
-do
+If you have `pip <http://pip.openplans.org/>`_, you can try to install
+the latest version with
 
 .. code-block:: sh
 
@@ -126,7 +126,7 @@ The :mod:`uncertainties` package is also available on the following
 **Linux distributions**: `Ubuntu 
 <https://launchpad.net/ubuntu/+source/uncertainties>`_, `openSUSE 
 <https://build.opensuse.org/package/show?package=python-uncertainties&project=home%3Aocefpaf>`_, 
-and `Debian <http://packages.debian.org/source/sid/uncertainties>`_. It 
+and `Debian <http://packages.debian.org/search?keywords=python-uncertainties>`_. It 
 may also be included in Christoph Gohlke's Base distribution of 
 `scientific Python packages 
 <http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_ for **Windows**.
