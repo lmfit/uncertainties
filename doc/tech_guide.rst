@@ -250,6 +250,7 @@ sometimes be compared unambiguously:
 In fact, correlations guarantee that ``y`` is always larger than
 ``x`` (by 0.0002).
 
+
 .. index:: number with uncertainty; classes, Variable class
 .. index::  AffineScalarFunc class
 
@@ -258,13 +259,24 @@ In fact, correlations guarantee that ``y`` is always larger than
 Classes
 -------
 
-Numbers with uncertainties are represented through two different
-classes:
+Testing whether an object is a number with uncertainty
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. a class for independent random variables (:class:`Variable`),
+The recommended way of testing whether ``value`` carries an
+uncertainty handled by this module is by checking the value of
+``isinstance(value, UFloat)``.
+
+Variables and functions
+^^^^^^^^^^^^^^^^^^^^^^^
+
+In fact, numbers with uncertainties are represented through two
+different classes:
+
+1. a class for independent random variables (:class:`Variable`, which
+   inherits from :class:`UFloat`),
 
 2. a class for functions that depend on independent variables
-   (:class:`AffineScalarFunc`, also aliased as :class:`UFloat`).
+   (:class:`AffineScalarFunc`, aliased as :class:`UFloat`).
 
 Documentation for these classes is available in their Python
 docstring, which can for instance displayed through pydoc_.
@@ -287,13 +299,6 @@ objects store all the variables they depend from:
   >>> type(umath.sin(x))
   <class 'uncertainties.AffineScalarFunc'>
 
-Testing whether an object is a number with uncertainty
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-:class:`Variable` objects are also :class:`UFloat` objects (a variable
-x is simply considered to be the identity function x → x).  Testing
-whether ``value`` carries an uncertainty handled by this module can
-therefore be done with ``isinstance(value, UFloat)``.
 
 .. _differentiation method:
 
