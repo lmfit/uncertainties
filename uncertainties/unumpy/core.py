@@ -28,7 +28,7 @@ __all__ = [
     # Factory functions:
     'uarray', 'umatrix',
 
-    # Utilties:
+    # Utilities:
     'nominal_values', 'std_devs',
 
     # Classes:
