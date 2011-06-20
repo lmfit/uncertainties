@@ -104,12 +104,12 @@ One of the automatic installation or upgrade procedures below might work
 on your system, if you have a Python package installer or use certain 
 Linux distributions.
 
-Under **Unix**, it may be necessary to prefix commands with ``sudo``, so 
-that the installation program has sufficient access rights to the 
-system.
+Under **Unix**, it may be necessary to prefix the commands below with 
+``sudo``, so that the installation program has sufficient access rights 
+to the system.
 
-If you have `pip <http://pip.openplans.org/>`_, you can try to
-do
+If you have `pip <http://pip.openplans.org/>`_, you can try to install
+the latest version with
 
 .. code-block:: sh
 
