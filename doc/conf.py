@@ -11,6 +11,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+from datetime import date
+
 import sys, os
 
 sys.path.insert(0, '..')
@@ -41,7 +43,7 @@ master_doc = 'index_TOC'
 
 # General information about the project.
 project = u'uncertainties Python package'
-copyright = u'2010, Eric O. LEBIGOT (EOL)'
+copyright = u'2010–%d, Eric O. LEBIGOT (EOL)' % date.today().year
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

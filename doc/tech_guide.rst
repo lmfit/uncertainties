@@ -269,8 +269,8 @@ uncertainty handled by this module is by checking the value of
 Variables and functions
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-In fact, numbers with uncertainties are represented through two
-different classes:
+Numbers with uncertainties are represented through two different
+classes:
 
 1. a class for independent random variables (:class:`Variable`, which
    inherits from :class:`UFloat`),
