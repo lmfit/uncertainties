@@ -43,7 +43,7 @@ This software can be used under one of the following two licenses: \
 author.''',
       
     description=('Transparent calculations with uncertainties on the'
-                 ' quantities involved (aka "error propagation") ;'
+                 ' quantities involved (aka "error propagation");'
                  ' fast calculation of derivatives'),
     
     long_description='''\
