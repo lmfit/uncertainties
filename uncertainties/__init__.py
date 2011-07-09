@@ -376,15 +376,14 @@ class NumericalDerivatives(object):
   
 def wrap(f, derivatives_funcs=None):
     """
-    Wraps function f so that, when applied to numbers with
-    uncertainties (AffineScalarFunc objects) or float-like arguments,
-    f returns a local approximation of its values (in the form of an
-    object of class AffineScalarFunc).  In this case, if none of the
-    arguments of f involves variables [i.e. Variable objects], f
-    simply returns its usual result.
+    Wraps a function f into a function that also accepts numbers with
+    uncertainties (UFloat objects) and returns a number with
+    uncertainties.
 
-    When f is not called on AffineScalarFunc or float-like
-    arguments, the original result of f is returned.
+    If no argument to the wrapped function has an uncertainty, f
+    simply returns its usual, scalar result.
+
+    f must take only scalar arguments, and must return a scalar.
 
     If supplied, 'derivatives_funcs' is a sequence or iterator that
     generally contains functions; each successive function is the
