@@ -28,10 +28,14 @@ else:
         package_dir = 'uncertainties-py25'
     else:
         package_dir = 'uncertainties-py23'
-    
+
+# Access to the local uncertainties package (and not to an already
+# installed uncertainties package):
+sys.path.insert(0, package_dir)
+from uncertainties import __version__ as uncertainties_version
 distutils.core.setup(
     name='uncertainties',
-    version='1.7.3',  # Should generally correspond to uncertainties.__version__
+    version=uncertainties_version,
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://packages.python.org/uncertainties/',
