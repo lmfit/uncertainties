@@ -32,10 +32,11 @@ else:
 # Access to the local uncertainties package (and not to an already
 # installed uncertainties package):
 sys.path.insert(0, package_dir)
-from uncertainties import __version__ as uncertainties_version
+uncertainties = __import__(package_dir)
+
 distutils.core.setup(
     name='uncertainties',
-    version=uncertainties_version,
+    version=uncertainties.__version__,
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://packages.python.org/uncertainties/',
