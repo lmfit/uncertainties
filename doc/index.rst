@@ -20,7 +20,7 @@ error propagation theory.  Performing the same calculations by hand and
 implementing the resulting formulas is generally quite tedious.
 
 Calculations of results with uncertainties, or of derivatives, can
-either be performed in an **interactive session**, or in programs
+either be performed in an **interactive session**, or in **programs**
 written in the Python_ programming language.  Existing calculation
 code can **run with no or little change**.
 
@@ -237,6 +237,17 @@ of :mod:`uncertainties`, `Eric O. LEBIGOT (EOL)`_.
 
 Please support the continued development of this program by `donating 
 $5`_ or more through PayPal (no PayPal account necessary)!
+
+How to cite this package
+========================
+
+If you use this package for a publication (in a journal, on the web,
+etc.), please cite it by including as much information as possible
+from the following: *Uncertainties: a Python package for calculations
+with uncertainties*, Eric O. LEBIGOT,
+`<http://packages.python.org/uncertainties>`_.  Adding the version
+number is optional.
+
 
 Acknowledgments
 ===============
