@@ -757,9 +757,6 @@ class AffineScalarFunc(object):
         # vector of that space):
         return self != 0.  # Uses the AffineScalarFunc.__ne__ function
 
-    # Compatibility with Python 3:
-    __bool__ = __nonzero__
-    
     ########################################
     
     ## Logical operators: warning: the resulting value cannot always
