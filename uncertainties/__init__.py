@@ -1022,8 +1022,8 @@ def add_operators_to_AffineScalarFunc():
     for (op, derivatives) in _ops_with_reflection.iteritems():
         attribute_name = '__%s__' % op
         # float objects don't exactly have the same attributes between
-        # different versions of Python (for instance, __trunc__ was
-        # introduced with Python 2.6):
+        # different versions of Python (for instance, __div__ and
+        # __rdiv__ were removed, in Python 3):
         try:
             setattr(AffineScalarFunc, attribute_name,
                     wrap(getattr(float, attribute_name), derivatives))
