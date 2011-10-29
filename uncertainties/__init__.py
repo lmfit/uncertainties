@@ -992,7 +992,7 @@ def add_operators_to_AffineScalarFunc():
     ## Operators that return a numerical value:
 
     # Single-argument operators that should be adapted from floats to
-    # AffineScalarFunc objects:
+    # AffineScalarFunc objects, associated to their derivative:
     simple_numerical_operators_derivatives = {
         'abs': lambda x: 1. if x>=0 else -1.,
         'neg': lambda x: -1.,
@@ -1007,10 +1007,13 @@ def add_operators_to_AffineScalarFunc():
         # float objects don't exactly have the same attributes between
         # different versions of Python (for instance, __trunc__ was
         # introduced with Python 2.6):
-        if attribute_name in dir(float):
+        try:
             setattr(AffineScalarFunc, attribute_name,
                     wrap(getattr(float, attribute_name),
                                  [derivative]))
+        except AttributeError:
+            pass
+        else:
             _modified_operators.append(op)
             
     ########################################
@@ -1018,8 +1021,14 @@ def add_operators_to_AffineScalarFunc():
     # Reversed versions (useful for float*AffineScalarFunc, for instance):
     for (op, derivatives) in _ops_with_reflection.iteritems():
         attribute_name = '__%s__' % op
-        setattr(AffineScalarFunc, attribute_name,
-                wrap(getattr(float, attribute_name), derivatives))
+        # float objects don't exactly have the same attributes between
+        # different versions of Python (for instance, __trunc__ was
+        # introduced with Python 2.6):
+        try:
+            setattr(AffineScalarFunc, attribute_name,
+                    wrap(getattr(float, attribute_name), derivatives))
+        except AttributeError:
+            pass
 
     ########################################
     # Conversions to pure numbers are meaningless.  Note that the
