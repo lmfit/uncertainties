@@ -1136,6 +1136,13 @@ class Variable(AffineScalarFunc):
         return (num_repr if ((self.tag is None) or (to_string != repr))
                 else "< %s = %s >" % (self.tag, num_repr))
 
+    def __hash__(self):
+        # All Variable objects are by definition independent
+        # variables, so they never compare equal; therefore, their
+        # id() are therefore allowed to differ
+        # (http://docs.python.org/reference/datamodel.html#object.__hash__):
+        return id(self)
+            
     def __copy__(self):
         """
         Hook for the standard copy module.
