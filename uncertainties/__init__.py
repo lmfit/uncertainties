@@ -1503,8 +1503,9 @@ def ufloat(representation, tag=None):
         #! 'unicode' is removed in Python3:
         assert isinstance(tag, (str, unicode)), "The tag can only be a string."
 
-    #! init_args must contain all arguments, here:
-    return Variable(*representation, tag=tag)
+    #! The special ** syntax is for Python 2.5 and before (Python 2.6+
+    # understands tag=tag):
+    return Variable(*representation, **{'tag': tag})
 
 ###############################################################################
 # Support for legacy code (will be removed in the future):
