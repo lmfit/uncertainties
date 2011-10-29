@@ -41,7 +41,8 @@ except ImportError:
 # number; however, it fails when run from Python3 if the downloaded
 # code is not the Python 3 version.  An alternative approach would be
 # to run 2to3 just before, instead of using build_py_2to3 (which does
-# not modify the source):
+# not modify the source), but care should be taken so that users can
+# run the setup.py script many times anyway.
 ## Access to the local uncertainties package (and not to an already
 ## installed uncertainties package):
 # sys.path.insert(0, package_dir)
@@ -162,6 +163,7 @@ Version history
 
 Main changes:
 
+- 1.8: Compatibility with Python 3.2 added.
 - 1.7.2: Compatibility with Python 2.3, Python 2.4, Jython 2.5.1 and \
          Jython 2.5.2 added.
 - 1.7.1: New semantics: ``ufloat('12.3(78)')`` now represents 12.3+/-7.8 \
