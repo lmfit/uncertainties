@@ -975,6 +975,7 @@ _ops_with_reflection = get_ops_with_reflection()
 
 # Some effectively modified operators (for the automated tests):
 _modified_operators = []
+_modified_ops_with_reflection = []
 
 def add_operators_to_AffineScalarFunc():
     """
@@ -1029,6 +1030,8 @@ def add_operators_to_AffineScalarFunc():
                     wrap(getattr(float, attribute_name), derivatives))
         except AttributeError:
             pass
+        else:
+            _modified_ops_with_reflection.append(op)
 
     ########################################
     # Conversions to pure numbers are meaningless.  Note that the
