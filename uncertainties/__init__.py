@@ -1464,14 +1464,12 @@ def ufloat(representation, tag=None):
         representation = str_to_number_with_uncert(representation)
         
     #! The tag is forced to be a string, so that the user does not
-    # create a Variable(2.5, 0.5) in order to represent 2.5
-    # +/- 0.5.  Forcing 'tag' to be a string prevents errors from being
-    # considered as tags, here:
-
-    #! 'unicode' is removed in Python3:
+    # create a Variable(2.5, 0.5) in order to represent 2.5 +/- 0.5.
+    # Forcing 'tag' to be a string prevents numerical uncertainties
+    # from being considered as tags, here:
     if tag is not None:
-        assert ((type(tag) is str) or (type(tag) is unicode)), \
-               "The tag can only be a string."
+        #! 'unicode' is removed in Python3:
+        assert isinstance(tag, (str, unicode)), "The tag can only be a string."
 
     #! init_args must contain all arguments, here:
     return Variable(*representation, **{'tag': tag})
