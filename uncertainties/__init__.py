@@ -293,6 +293,82 @@ def set_doc(doc_string):
         return func
     return set_doc_string
 
+# Some types known to not depend on Variable objects are put in
+# CONSTANT_TYPES.  The most common types can be put in front, as this
+# may slightly improve the execution speed.
+CONSTANT_TYPES = (float, int, complex, long)
+
+###############################################################################
+
+## Definitions that depend on the availability of NumPy:
+
+
+try:
+    import numpy
+except ImportError:
+    pass
+else:
+
+    # NumPy numbers do not depend on Variable objects:    
+    CONSTANT_TYPES += (numpy.number,)
+    
+    # Entering variables as a block of correlated values.  Only available
+    # if NumPy is installed.
+
+    #! It would be possible to dispense with NumPy, but a routine should be
+    # written for obtaining the eigenvectors of a symmetric matrix.  See
+    # for instance Numerical Recipes: (1) reduction to tri-diagonal
+    # [Givens or Householder]; (2) QR / QL decomposition.
+    
+    def correlated_values(values, covariance_mat, tags=None):
+        """
+        Returns numbers with uncertainties (AffineScalarFunc objects)
+        that correctly reproduce the given covariance matrix, and have
+        the given values as their nominal value.
+
+        The list of values and the covariance matrix must have the
+        same length, and the matrix must be a square (symmetric) one.
+
+        The affine functions returned depend on newly created,
+        independent variables (Variable objects).
+
+        If 'tags' is not None, it must list the tag of each new
+        independent variable.
+        """
+
+        # If no tags were given, we prepare tags for the newly created
+        # variables:
+        if tags is None:
+            tags = (None,) * len(values)
+
+        # The covariance matrix is diagonalized in order to define
+        # the independent variables that model the given values:
+
+        (variances, transform) = numpy.linalg.eigh(covariance_mat)
+
+        # Numerical errors might make some variances negative: we set
+        # them to zero:
+        variances[variances < 0] = 0.
+        
+        # Creation of new, independent variables:
+
+        # We use the fact that the eigenvectors in 'transform' are
+        # special: 'transform' is unitary: its inverse is its transpose:
+
+        variables = tuple(
+            # The variables represent uncertainties only:
+            Variable(0, sqrt(variance), tag)
+            for (variance, tag) in zip(variances, tags))
+
+        # Representation of the initial correlated values:
+        values_funcs = tuple(
+            AffineScalarFunc(value, dict(zip(variables, coords)))
+            for (coords, value) in zip(transform, values))
+
+        return values_funcs
+
+    __all__.append('correlated_values')
+
 ###############################################################################
 
 # Mathematical operations with local approximations (affine scalar
@@ -316,7 +392,7 @@ def to_affine_scalar(x):
         return x
 
     #! In Python 2.6+, numbers.Number could be used instead, here:
-    if isinstance(x, (float, int, complex, long)):
+    if isinstance(x, CONSTANT_TYPES):
         # No variable => no derivative to define:
         return AffineScalarFunc(x, {})
 
@@ -777,9 +853,6 @@ class AffineScalarFunc(object):
         # vector of that space):
         return self != 0.  # Uses the AffineScalarFunc.__ne__ function
 
-    # Compatibility with Python 3:
-    __bool__ = __nonzero__
-    
     ########################################
     
     ## Logical operators: warning: the resulting value cannot always
@@ -1002,6 +1075,7 @@ _ops_with_reflection = get_ops_with_reflection()
 
 # Some effectively modified operators (for the automated tests):
 _modified_operators = []
+_modified_ops_with_reflection = []
 
 def add_operators_to_AffineScalarFunc():
     """
@@ -1018,14 +1092,14 @@ def add_operators_to_AffineScalarFunc():
 
     ## Operators that return a numerical value:
 
-    # Single-argument operators that should be adapted from floats to
-    # AffineScalarFunc objects:
     def _simple_add_deriv(x):
         if x >= 0:
             return 1.
         else:
             return -1.
         
+    # Single-argument operators that should be adapted from floats to
+    # AffineScalarFunc objects, associated to their derivative:        
     simple_numerical_operators_derivatives = {
         'abs': _simple_add_deriv,
         'neg': lambda x: -1.,
@@ -1040,10 +1114,13 @@ def add_operators_to_AffineScalarFunc():
         # float objects don't exactly have the same attributes between
         # different versions of Python (for instance, __trunc__ was
         # introduced with Python 2.6):
-        if attribute_name in dir(float):
+        try:
             setattr(AffineScalarFunc, attribute_name,
                     wrap(getattr(float, attribute_name),
                                  [derivative]))
+        except AttributeError:
+            pass
+        else:
             _modified_operators.append(op)
             
     ########################################
@@ -1051,8 +1128,16 @@ def add_operators_to_AffineScalarFunc():
     # Reversed versions (useful for float*AffineScalarFunc, for instance):
     for (op, derivatives) in _ops_with_reflection.iteritems():
         attribute_name = '__%s__' % op
-        setattr(AffineScalarFunc, attribute_name,
-                wrap(getattr(float, attribute_name), derivatives))
+        # float objects don't exactly have the same attributes between
+        # different versions of Python (for instance, __div__ and
+        # __rdiv__ were removed, in Python 3):
+        try:
+            setattr(AffineScalarFunc, attribute_name,
+                    wrap(getattr(float, attribute_name), derivatives))
+        except AttributeError:
+            pass
+        else:
+            _modified_ops_with_reflection.append(op)
 
     ########################################
     # Conversions to pure numbers are meaningless.  Note that the
@@ -1162,6 +1247,13 @@ class Variable(AffineScalarFunc):
         else:
             "< %s = %s >" % (self.tag, num_repr)
 
+    def __hash__(self):
+        # All Variable objects are by definition independent
+        # variables, so they never compare equal; therefore, their
+        # id() are therefore allowed to differ
+        # (http://docs.python.org/reference/datamodel.html#object.__hash__):
+        return id(self)
+            
     def __copy__(self):
         """
         Hook for the standard copy module.
@@ -1279,69 +1371,6 @@ def covariance_matrix(functions):
                                  for j in range(i+1, len(covariance_matrix))])
 
     return covariance_matrix
-
-# Entering variables as a block of correlated values.  Only available
-# if NumPy is installed.
-
-#! It would be possible to dispense with NumPy, but a routine should be
-# written for obtaining the eigenvectors of a symmetric matrix.  See
-# for instance Numerical Recipes: (1) reduction to tri-diagonal
-# [Givens or Householder]; (2) QR / QL decomposition.
-
-try:
-    import numpy
-except ImportError:
-    pass
-else:
-    
-    def correlated_values(values, covariance_mat, tags=None):
-        """
-        Returns numbers with uncertainties (AffineScalarFunc objects)
-        that correctly reproduce the given covariance matrix, and have
-        the given values as their nominal value.
-
-        The list of values and the covariance matrix must have the
-        same length, and the matrix must be a square (symmetric) one.
-
-        The affine functions returned depend on newly created,
-        independent variables (Variable objects).
-
-        If 'tags' is not None, it must list the tag of each new
-        independent variable.
-        """
-
-        # If no tags were given, we prepare tags for the newly created
-        # variables:
-        if tags is None:
-            tags = (None,) * len(values)
-
-        # The covariance matrix is diagonalized in order to define
-        # the independent variables that model the given values:
-
-        (variances, transform) = numpy.linalg.eigh(covariance_mat)
-
-        # Numerical errors might make some variances negative: we set
-        # them to zero:
-        variances[variances < 0] = 0.
-        
-        # Creation of new, independent variables:
-
-        # We use the fact that the eigenvectors in 'transform' are
-        # special: 'transform' is unitary: its inverse is its transpose:
-
-        variables = tuple([
-            # The variables represent uncertainties only:
-            Variable(0, sqrt(variance), tag)
-            for (variance, tag) in zip(variances, tags)])
-
-        # Representation of the initial correlated values:
-        values_funcs = tuple([
-            AffineScalarFunc(value, dict(zip(variables, coords)))
-            for (coords, value) in zip(transform, values)])
-
-        return values_funcs
-
-    __all__.append('correlated_values')
 
 ###############################################################################
 # Parsing of values with uncertainties:
@@ -1508,17 +1537,15 @@ def ufloat(representation, tag=None):
         representation = str_to_number_with_uncert(representation)
         
     #! The tag is forced to be a string, so that the user does not
-    # create a Variable(2.5, 0.5) in order to represent 2.5
-    # +/- 0.5.  Forcing 'tag' to be a string prevents errors from being
-    # considered as tags, here:
-
-    #! 'unicode' is removed in Python3:
+    # create a Variable(2.5, 0.5) in order to represent 2.5 +/- 0.5.
+    # Forcing 'tag' to be a string prevents numerical uncertainties
+    # from being considered as tags, here:
     if tag is not None:
-        assert ((type(tag) is str) or (type(tag) is unicode)), \
-               "The tag can only be a string."
+        #! 'unicode' is removed in Python3:
+        assert isinstance(tag, (str, unicode)), "The tag can only be a string."
 
     #! init_args must contain all arguments, here:
-    return Variable(*representation, **{'tag': tag})
+    return Variable(*representation, tag=tag)
 
 ###############################################################################
 # Support for legacy code (will be removed in the future):

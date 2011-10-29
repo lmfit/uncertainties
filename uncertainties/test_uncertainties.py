@@ -223,7 +223,7 @@ def test_fixed_derivatives_basic_funcs():
         check_op(op, 1)
 
     # Operators that take 2 values:
-    for op in uncertainties._ops_with_reflection.keys():
+    for op in uncertainties._modified_ops_with_reflection:
         check_op(op, 2)
 
 # Additional, more complex checks, for use with the nose unit testing
