@@ -1472,7 +1472,7 @@ def ufloat(representation, tag=None):
         assert isinstance(tag, (str, unicode)), "The tag can only be a string."
 
     #! init_args must contain all arguments, here:
-    return Variable(*representation, **{'tag': tag})
+    return Variable(*representation, tag=tag)
 
 ###############################################################################
 # Support for legacy code (will be removed in the future):
