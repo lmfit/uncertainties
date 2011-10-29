@@ -289,6 +289,82 @@ def set_doc(doc_string):
         return func
     return set_doc_string
 
+# Some types known to not depend on Variable objects are put in
+# CONSTANT_TYPES.  The most common types can be put in front, as this
+# may slightly improve the execution speed.
+CONSTANT_TYPES = (float, int, complex, long)
+
+###############################################################################
+
+## Definitions that depend on the availability of NumPy:
+
+
+try:
+    import numpy
+except ImportError:
+    pass
+else:
+
+    # NumPy numbers do not depend on Variable objects:    
+    CONSTANT_TYPES += (numpy.number,)
+    
+    # Entering variables as a block of correlated values.  Only available
+    # if NumPy is installed.
+
+    #! It would be possible to dispense with NumPy, but a routine should be
+    # written for obtaining the eigenvectors of a symmetric matrix.  See
+    # for instance Numerical Recipes: (1) reduction to tri-diagonal
+    # [Givens or Householder]; (2) QR / QL decomposition.
+    
+    def correlated_values(values, covariance_mat, tags=None):
+        """
+        Returns numbers with uncertainties (AffineScalarFunc objects)
+        that correctly reproduce the given covariance matrix, and have
+        the given values as their nominal value.
+
+        The list of values and the covariance matrix must have the
+        same length, and the matrix must be a square (symmetric) one.
+
+        The affine functions returned depend on newly created,
+        independent variables (Variable objects).
+
+        If 'tags' is not None, it must list the tag of each new
+        independent variable.
+        """
+
+        # If no tags were given, we prepare tags for the newly created
+        # variables:
+        if tags is None:
+            tags = (None,) * len(values)
+
+        # The covariance matrix is diagonalized in order to define
+        # the independent variables that model the given values:
+
+        (variances, transform) = numpy.linalg.eigh(covariance_mat)
+
+        # Numerical errors might make some variances negative: we set
+        # them to zero:
+        variances[variances < 0] = 0.
+        
+        # Creation of new, independent variables:
+
+        # We use the fact that the eigenvectors in 'transform' are
+        # special: 'transform' is unitary: its inverse is its transpose:
+
+        variables = tuple(
+            # The variables represent uncertainties only:
+            Variable(0, sqrt(variance), tag)
+            for (variance, tag) in zip(variances, tags))
+
+        # Representation of the initial correlated values:
+        values_funcs = tuple(
+            AffineScalarFunc(value, dict(zip(variables, coords)))
+            for (coords, value) in zip(transform, values))
+
+        return values_funcs
+
+    __all__.append('correlated_values')
+
 ###############################################################################
 
 # Mathematical operations with local approximations (affine scalar
@@ -312,7 +388,7 @@ def to_affine_scalar(x):
         return x
 
     #! In Python 2.6+, numbers.Number could be used instead, here:
-    if isinstance(x, (float, int, complex, long)):
+    if isinstance(x, CONSTANT_TYPES):
         # No variable => no derivative to define:
         return AffineScalarFunc(x, {})
 
@@ -1257,69 +1333,6 @@ def covariance_matrix(functions):
                                  for j in range(i+1, len(covariance_matrix)))
 
     return covariance_matrix
-
-# Entering variables as a block of correlated values.  Only available
-# if NumPy is installed.
-
-#! It would be possible to dispense with NumPy, but a routine should be
-# written for obtaining the eigenvectors of a symmetric matrix.  See
-# for instance Numerical Recipes: (1) reduction to tri-diagonal
-# [Givens or Householder]; (2) QR / QL decomposition.
-
-try:
-    import numpy
-except ImportError:
-    pass
-else:
-    
-    def correlated_values(values, covariance_mat, tags=None):
-        """
-        Returns numbers with uncertainties (AffineScalarFunc objects)
-        that correctly reproduce the given covariance matrix, and have
-        the given values as their nominal value.
-
-        The list of values and the covariance matrix must have the
-        same length, and the matrix must be a square (symmetric) one.
-
-        The affine functions returned depend on newly created,
-        independent variables (Variable objects).
-
-        If 'tags' is not None, it must list the tag of each new
-        independent variable.
-        """
-
-        # If no tags were given, we prepare tags for the newly created
-        # variables:
-        if tags is None:
-            tags = (None,) * len(values)
-
-        # The covariance matrix is diagonalized in order to define
-        # the independent variables that model the given values:
-
-        (variances, transform) = numpy.linalg.eigh(covariance_mat)
-
-        # Numerical errors might make some variances negative: we set
-        # them to zero:
-        variances[variances < 0] = 0.
-        
-        # Creation of new, independent variables:
-
-        # We use the fact that the eigenvectors in 'transform' are
-        # special: 'transform' is unitary: its inverse is its transpose:
-
-        variables = tuple(
-            # The variables represent uncertainties only:
-            Variable(0, sqrt(variance), tag)
-            for (variance, tag) in zip(variances, tags))
-
-        # Representation of the initial correlated values:
-        values_funcs = tuple(
-            AffineScalarFunc(value, dict(zip(variables, coords)))
-            for (coords, value) in zip(transform, values))
-
-        return values_funcs
-
-    __all__.append('correlated_values')
 
 ###############################################################################
 # Parsing of values with uncertainties:
