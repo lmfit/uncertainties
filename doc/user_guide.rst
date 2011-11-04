@@ -14,10 +14,9 @@ only require a simple import:
 
   >>> from uncertainties import ufloat
 
-The :func:`ufloat` function creates numbers with uncertainties.
-Existing calculation code can use such numbers as input, usually run
-with no or little modification, and automatically produce results with
-uncertainties.
+The :func:`ufloat` function creates numbers with uncertainties. Existing 
+calculation code can usually run with no or little modification and 
+automatically produce results with uncertainties.
 
 .. The "import uncertainties" is put here because some examples requires
    uncertainties to have been imported (and not only ufloat).
@@ -320,7 +319,7 @@ to study its impact on a final result.  With this package, the
 The relevant concept is that ``sum_value`` does depend on the
 variables ``u`` and ``v``: the :mod:`uncertainties` package keeps
 track of this fact, as detailed in the :ref:`Technical Guide
-<variable_tracking>`, and uncertainties can thus be updated any time.
+<variable_tracking>`, and uncertainties can thus be updated at any time.
 
 .. index::
    pair: nominal value; uniform access (scalar)
