@@ -29,7 +29,7 @@ def test_fixed_derivatives_math_funcs():
     This comparison is useful for derivatives that are analytical.
     """
 
-    for name in umath.many_scalar_to_scalar_funcs:
+    for name in umath.many_scalars_to_scalar_funcs:
         # print "Checking %s..." % name
         func = getattr(umath, name)
         # Numerical derivatives of func: the nominal value of func() results
@@ -38,7 +38,7 @@ def test_fixed_derivatives_math_funcs():
             lambda *args: func(*args))
         test_uncertainties._compare_derivatives(func, numerical_derivatives)
 
-    # Functions that are not in umath.many_scalar_to_scalar_funcs:
+    # Functions that are not in umath.many_scalars_to_scalar_funcs:
 
     ##
     # modf(): returns a tuple:
