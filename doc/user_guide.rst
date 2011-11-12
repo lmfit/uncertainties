@@ -280,8 +280,8 @@ rounding errors).
    single: Fortran code; wrapping
    single: wrapping (C, Fortran,…) functions
 
-Making functions accept numbers with uncertainties
-==================================================
+Making custom functions accept numbers with uncertainties
+=========================================================
 
 This package allows calculations that are performed through non-Python
 code (Fortran, C, etc.) to handle numbers with uncertainties instead
