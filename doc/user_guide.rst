@@ -99,7 +99,8 @@ matrices:
 Thus, usual operations on NumPy arrays can be performed transparently
 even when these arrays contain numbers with uncertainties.
 
-:doc:`More complex operations on NumPy arrays <numpy_guide>` can be
+:doc:`More complex operations on NumPy arrays and matrices 
+<numpy_guide>` can be
 performed through the dedicated :mod:`uncertainties.unumpy` module.
 
 .. index:: correlations; detailed example
