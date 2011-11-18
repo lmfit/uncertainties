@@ -74,6 +74,9 @@ Overview
 expressions involving numbers with uncertainties can also be evaluated
 directly.
 
+The :mod:`uncertainties` package **takes the pain and complexity out** 
+of uncertainty calculations.
+
 **Detailed information** about this package can be found on its `main
 website`_.
 

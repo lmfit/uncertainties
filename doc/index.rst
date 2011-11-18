@@ -8,8 +8,8 @@ transparently handles calculations with **numbers with uncertainties**
 expression.
 
 The :mod:`uncertainties` package **takes the pain and complexity out** 
-of dealing with uncertainty calculations. Error propagation is not to be 
-feared anymore!
+of uncertainty calculations. Error propagation is not to be feared 
+anymore!
 
 Whatever the complexity of the calculation, this package returns the 
 result with its uncertainty as predicted by linear `error propagation 
