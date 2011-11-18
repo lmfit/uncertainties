@@ -11,17 +11,17 @@ The :mod:`uncertainties` package **takes the pain and complexity out**
 of uncertainty calculations. Error propagation is not to be feared 
 anymore!
 
+Calculations of results with uncertainties, or of derivatives, can
+be performed either in an **interactive session**, or in **programs**
+written in the Python_ programming language.  Existing calculation
+code can **run with no or little change**.
+
 Whatever the complexity of the calculation, this package returns the 
 result with its uncertainty as predicted by linear `error propagation 
 theory`_. It automatically :ref:`calculates derivatives <derivatives>` 
 and uses them for calculating uncertainties. **Correlations** between 
 variables are thus autoamatically handled, which sets it apart from many 
 existing error propagation codes.
-
-Calculations of results with uncertainties, or of derivatives, can
-either be performed in an **interactive session**, or in **programs**
-written in the Python_ programming language.  Existing calculation
-code can **run with no or little change**.
 
 Let's now see how to use these unique features!
 
