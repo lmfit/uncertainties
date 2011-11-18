@@ -69,9 +69,9 @@ author.''',
 Overview
 ========
 
-``uncertainties`` allows calculations such as (2 +/- 0.1)*2 = 4
-+/- 0.2 to be performed transparently.  Much more complex mathematical
-expressions involving numbers with uncertainties can also be evaluated
+``uncertainties`` allows **calculations** such as (2 +/- 0.1)*2 = 4 +/- 
+0.2 to be **performed transparently**.  Much more complex mathematical 
+expressions involving numbers with uncertainties can also be evaluated 
 directly.
 
 The ``uncertainties`` package **takes the pain and complexity out** 
