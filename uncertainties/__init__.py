@@ -1,4 +1,4 @@
-#!! When the documentation below is updated, setup.py should be
+#!! Whenever the documentation below is updated, setup.py should be
 # checked for consistency.
 
 '''
