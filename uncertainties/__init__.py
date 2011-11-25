@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 #!! When the documentation below is updated, setup.py should be
 # checked for consistency.
 
