@@ -419,7 +419,10 @@ def partial_derivative(f, param_num):
         # shifting it does not suffer from finite precision:
         step = 1e-8*abs(shifted_args[param_num])
         if not step:
-            step = 1e-8  # Arbitrary, but "small" with respect to 1
+            # Arbitrary, but "small" with respect to 1, and of the
+            # order of the square root of the precision of double
+            # precision floats:
+            step = 1e-8
 
         shifted_args[param_num] += step
         shifted_f_plus = f(*shifted_args)
@@ -1077,8 +1080,8 @@ def add_operators_to_AffineScalarFunc():
         'trunc': lambda x: 0.
         }
 
-    for (op, derivative) in \
-          simple_numerical_operators_derivatives.iteritems():
+    for (op, derivative) in (
+          simple_numerical_operators_derivatives.iteritems()):
         
         attribute_name = "__%s__" % op
         # float objects don't exactly have the same attributes between

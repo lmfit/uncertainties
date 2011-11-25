@@ -214,8 +214,9 @@ def wrap_array_func(func):
 
             # Update of the list of variables and associated
             # derivatives, for each element:
-            for (derivative_dict, derivative_value) \
-                  in zip(derivatives.flat, numerical_deriv.flat):
+            for (derivative_dict, derivative_value) in (
+                zip(derivatives.flat, numerical_deriv.flat)):
+                
                 if derivative_value:
                     derivative_dict[var] = derivative_value
 

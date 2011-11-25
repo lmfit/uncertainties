@@ -94,7 +94,7 @@ def _derivatives_close(x, y):
     """
 
     # x and y must depend on the same variables:
-    if len(set(x.derivatives)\
+    if len(set(x.derivatives)
            .symmetric_difference(y.derivatives)):
         return False  # Not the same variables
 
