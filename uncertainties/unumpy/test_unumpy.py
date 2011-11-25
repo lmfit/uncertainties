@@ -94,12 +94,11 @@ def _derivatives_close(x, y):
     """
 
     # x and y must depend on the same variables:
-    if len(set(x.derivatives).symmetric_difference(y.derivatives)):
+    if set(x.derivatives) != set(y.derivatives):
         return False  # Not the same variables
 
-    return all( _numbers_close(x.derivatives[var],
-                               y.derivatives[var])
-                for var in x.derivatives)
+    return all(_numbers_close(x.derivatives[var], y.derivatives[var])
+               for var in x.derivatives)
 
 def test_inverse():
     "Tests of the matrix inverse"
