@@ -141,8 +141,8 @@ def _compare_derivatives(func, numerical_derivatives,
                 if isinstance(func_approx, AffineScalarFunc):
                     
                     # We compare all derivatives:
-                    for (arg_num, (arg, numerical_deriv)) in \
-                        enumerate(zip(args, numerical_derivatives)):
+                    for (arg_num, (arg, numerical_deriv)) in (
+                        enumerate(zip(args, numerical_derivatives))):
 
                         # Some arguments might not be differentiable:
                         if isinstance(arg, int):

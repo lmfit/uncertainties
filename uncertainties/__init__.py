@@ -239,7 +239,7 @@ import sys
 from backport import *
 
 # Numerical version:
-__version_info__ = (1, 7, 4)
+__version_info__ = (1, 8)
 __version__ = '.'.join([str(num) for num in __version_info__])
 
 __author__ = 'Eric O. LEBIGOT (EOL)'
@@ -423,7 +423,10 @@ def partial_derivative(f, param_num):
         # shifting it does not suffer from finite precision:
         step = 1e-8*abs(shifted_args[param_num])
         if not step:
-            step = 1e-8  # Arbitrary, but "small" with respect to 1
+            # Arbitrary, but "small" with respect to 1, and of the
+            # order of the square root of the precision of double
+            # precision floats:
+            step = 1e-8
 
         shifted_args[param_num] += step
         shifted_f_plus = f(*shifted_args)
@@ -1107,8 +1110,8 @@ def add_operators_to_AffineScalarFunc():
         'trunc': lambda x: 0.
         }
 
-    for (op, derivative) in \
-          simple_numerical_operators_derivatives.iteritems():
+    for (op, derivative) in (
+          simple_numerical_operators_derivatives.iteritems()):
         
         attribute_name = "__%s__" % op
         # float objects don't exactly have the same attributes between
@@ -1544,7 +1547,8 @@ def ufloat(representation, tag=None):
         #! 'unicode' is removed in Python3:
         assert isinstance(tag, (str, unicode)), "The tag can only be a string."
 
-    #! init_args must contain all arguments, here:
+    #! The special ** syntax is for Python 2.5 and before (Python 2.6+
+    # understands tag=tag):
     return Variable(*representation, **{'tag': tag})
 
 ###############################################################################

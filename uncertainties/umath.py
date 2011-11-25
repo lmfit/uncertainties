@@ -76,7 +76,7 @@ from uncertainties import __author__, to_affine_scalar, AffineScalarFunc
 
 # Math functions that have a standard interface: they take
 # one or more float arguments, and return a scalar:
-many_scalar_to_scalar_funcs = []
+many_scalars_to_scalar_funcs = []
 
 # Some functions require a specific treatment and must therefore be
 # excluded from standard wrapping.  Functions
@@ -86,7 +86,7 @@ many_scalar_to_scalar_funcs = []
 num_deriv_funcs = ['fmod', 'gamma', 'isinf', 'isnan',
                    'lgamma', 'trunc']
 
-# Functions that do not belong in many_scalar_to_scalar_funcs, but
+# Functions that do not belong in many_scalars_to_scalar_funcs, but
 # that have a version that handles uncertainties:
 non_std_wrapped_funcs = []
 
@@ -235,7 +235,7 @@ for name in dir(math):
     setattr(this_module, name,
             wraps(uncertainties.wrap(func, derivatives), func))
     
-    many_scalar_to_scalar_funcs.append(name)
+    many_scalars_to_scalar_funcs.append(name)
 
 ###############################################################################
     
@@ -313,7 +313,7 @@ def modf(x):
         return (frac_part, int_part)
 modf = uncertainties.set_doc(math.modf.__doc__)(modf)
     
-many_scalar_to_scalar_funcs.append('modf')
+many_scalars_to_scalar_funcs.append('modf')
 
 def ldexp(x, y):
     # The code below is inspired by uncertainties.wrap().  It is
@@ -345,7 +345,7 @@ def ldexp(x, y):
         return math.ldexp(x, y)
 ldexp = uncertainties.set_doc(math.ldexp.__doc__)(ldexp)
     
-many_scalar_to_scalar_funcs.append('ldexp')
+many_scalars_to_scalar_funcs.append('ldexp')
 
 def frexp(x):
     """
@@ -383,5 +383,5 @@ non_std_wrapped_funcs.append('frexp')
 ###############################################################################
 # Exported functions:
 
-__all__ = many_scalar_to_scalar_funcs + non_std_wrapped_funcs
+__all__ = many_scalars_to_scalar_funcs + non_std_wrapped_funcs
 

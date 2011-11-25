@@ -3,26 +3,25 @@ Welcome to the uncertainties package
 ====================================
 
 The `uncertainties package`_ is a free, cross-platform program that 
-handles calculations with **numbers with uncertainties** (like 
-3.14±0.01).  It also transparently yields the **derivatives** of any 
-expression (these derivatives are used for calculating uncertainties).
+transparently handles calculations with **numbers with uncertainties** 
+(like 3.14±0.01).  It can also yield the **derivatives** of any 
+expression.
 
-Whatever the complexity of the calculation, this package returns the
-result with its uncertainty as predicted by linear `error propagation
-theory`_.  In particular, it handles **correlations** between
-variables, which sets it apart from many existing error propagation
-codes.
-
-Calculations involving numbers with uncertainties are made **very 
-simple** thanks to this package.  In fact, it :ref:`transparently 
-<derivatives>` calculates the `numerous derivatives`_ required by linear 
-error propagation theory.  Performing the same calculations by hand and 
-implementing the resulting formulas is generally quite tedious.
+The :mod:`uncertainties` package **takes the pain and complexity out** 
+of uncertainty calculations. Error propagation is not to be feared 
+anymore!
 
 Calculations of results with uncertainties, or of derivatives, can
-either be performed in an **interactive session**, or in **programs**
+be performed either in an **interactive session**, or in **programs**
 written in the Python_ programming language.  Existing calculation
 code can **run with no or little change**.
+
+Whatever the complexity of the calculation, this package returns the 
+result with its uncertainty as predicted by linear `error propagation 
+theory`_. It automatically :ref:`calculates derivatives <derivatives>` 
+and uses them for calculating uncertainties. **Correlations** between 
+variables are thus autoamatically handled, which sets it apart from many 
+existing error propagation codes.
 
 Let's now see how to use these unique features!
 
@@ -31,11 +30,12 @@ Let's now see how to use these unique features!
 An easy-to-use calculator
 =========================
 
-Calculations involving **numbers with uncertainties** can be performed
-even without knowing anything about the Python_ programming language.
-After `installing this package`_ and `invoking the Python
-interpreter`_, calculations with automatic error propagation can be
-performed directly and transparently:
+Calculations involving **numbers with uncertainties** can be performed 
+even without knowing anything about the Python_ programming language. 
+After `installing this package`_ and `invoking the Python interpreter`_, 
+calculations with **automatic error propagation** can be performed 
+**transparently** (i.e., through the usual syntax for mathematical 
+formulas):
 
   >>> from uncertainties import ufloat
   >>> from uncertainties.umath import *  # sin(), etc.
@@ -45,8 +45,9 @@ performed directly and transparently:
   >>> sin(2*x)  # In a Python shell, "print" is optional
   0.90929742682568171+/-0.083229367309428481
 
-Thus, existing calculation code designed for floats can be run with
-numbers with uncertainties with :ref:`no or little modification <user guide>`.
+Thus, existing calculation code designed for regular numbers can run 
+with numbers with uncertainties with :ref:`no or little modification 
+<user guide>`.
 
 .. index:: correlations; simple example
 
@@ -104,7 +105,7 @@ One of the automatic installation or upgrade procedures below might work
 on your system, if you have a Python package installer or use certain 
 Linux distributions.
 
-Under **Unix**, it may be necessary to prefix the commands below with 
+Under Unix, it may be necessary to prefix the commands below with 
 ``sudo``, so that the installation program has **sufficient access 
 rights to the system**.
 
@@ -163,20 +164,23 @@ or, if additional access rights are needed (Unix):
 
    sudo python setup.py install
 
-You can also simply **move** the appropriate :file:`uncertainties-py*`
-directory to a location that Python can import from (directory in
-which scripts using :mod:`uncertainties` are run, etc.), and then
-rename it :file:`uncertainties`.
+You can also simply **move** the :file:`uncertainties-py*` directory 
+that corresponds best to your version of Python to a location that 
+Python can import from (directory in which scripts using 
+:mod:`uncertainties` are run, etc.); the chosen :file:`uncertainties-py*` 
+directory should then be renamed :file:`uncertainties`. Python 3 users 
+should finally run ``2to3 -w
+uncertainties`` so as to automatically adapt the code to Python 3.
 
 Source code
 -----------
 
 The latest `code
 <https://github.com/lebigot/uncertainties/tree/master/uncertainties>`_
-is available `on GitHub <https://github.com/lebigot/uncertainties/>`_,
-as well as the `documentation source
-<https://github.com/lebigot/uncertainties/tree/master/doc/>`_. The
-:mod:`uncertainties` package is written in pure Python and has no
+and `documentation source
+<https://github.com/lebigot/uncertainties/tree/master/doc/>`_ are
+available `on GitHub <https://github.com/lebigot/uncertainties/>`_.
+The :mod:`uncertainties` package is written in pure Python and has no
 external dependency (the NumPy_ package is optional).  It contains
 about 4000 lines of code.  75 % of those lines are documentation
 strings and comments.  The remaining 25 % are equally split between
@@ -253,12 +257,12 @@ Acknowledgments
 ===============
 
 The author wishes to thank Arnaud Delobelle, Pierre Cladé, and Sebastian 
-Walter for very useful technical input.  Patches by Pierre Cladé and 
-José Sabater Montes are gratefully acknowledged. I would also like to 
-thank Joaquin Abian, Jason Moore, Martin Lutz and many other users for 
-their feedback and suggestions, which greatly helped improve this 
-program. I am also grateful to the Linux distribution maintainers of 
-this package, and to Christoph Gohlke for including it in his Base 
+Walter for very useful technical input.  Patches by Pierre Cladé, Tim 
+Head, and José Sabater Montes are gratefully acknowledged. I would also 
+like to thank Joaquin Abian, Jason Moore, Martin Lutz and many other 
+users for their feedback and suggestions, which greatly helped improve 
+this program. I am also grateful to the Linux distribution maintainers 
+of this package, and to Christoph Gohlke for including it in his Base 
 distribution of scientific Python packages for Windows.
 
 .. _Python: http://python.org/
@@ -266,7 +270,6 @@ distribution of scientific Python packages for Windows.
 .. _invoking the Python interpreter: http://docs.python.org/tutorial/interpreter.html
 .. _setuptools: http://pypi.python.org/pypi/setuptools
 .. _download: http://pypi.python.org/pypi/uncertainties/#downloads
-.. _numerous derivatives: http://en.wikipedia.org/wiki/Propagation_of_uncertainty#Non-linear_combinations
 .. _donating $5: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
 .. _BSD license: http://creativecommons.org/licenses/BSD/

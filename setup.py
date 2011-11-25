@@ -29,14 +29,28 @@ else:
     else:
         package_dir = 'uncertainties-py23'
 
-# Access to the local uncertainties package (and not to an already
-# installed uncertainties package):
-sys.path.insert(0, package_dir)
-uncertainties = __import__(package_dir)
+# Building through 2to3, for Python 3 (see also setup(...,
+# cmdclass=...), below:
+try:
+    from distutils.command.build_py import build_py_2to3 as build_py
+except ImportError:
+    # 2.x
+    from distutils.command.build_py import build_py
+
+#! The following code was intended to automatically fetch the version
+# number; however, it fails when run from Python3 if the downloaded
+# code is not the Python 3 version.  An alternative approach would be
+# to run 2to3 just before, instead of using build_py_2to3 (which does
+# not modify the source), but care should be taken so that users can
+# run the setup.py script many times anyway.
+## Access to the local uncertainties package (and not to an already
+## installed uncertainties package):
+# sys.path.insert(0, package_dir)
+# uncertainties = __import__(package_dir)
 
 distutils.core.setup(
     name='uncertainties',
-    version=uncertainties.__version__,
+    version='1.8',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://packages.python.org/uncertainties/',
@@ -55,10 +69,13 @@ author.''',
 Overview
 ========
 
-``uncertainties`` allows calculations such as (2 +/- 0.1)*2 = 4
-+/- 0.2 to be performed transparently.  Much more complex mathematical
-expressions involving numbers with uncertainties can also be evaluated
+``uncertainties`` allows **calculations** such as (2 +/- 0.1)*2 = 4 +/- 
+0.2 to be **performed transparently**.  Much more complex mathematical 
+expressions involving numbers with uncertainties can also be evaluated 
 directly.
+
+The ``uncertainties`` package **takes the pain and complexity out** 
+of uncertainty calculations.
 
 **Detailed information** about this package can be found on its `main
 website`_.
@@ -149,6 +166,7 @@ Version history
 
 Main changes:
 
+- 1.8: Compatibility with Python 3.2 added.
 - 1.7.2: Compatibility with Python 2.3, Python 2.4, Jython 2.5.1 and \
          Jython 2.5.2 added.
 - 1.7.1: New semantics: ``ufloat('12.3(78)')`` now represents 12.3+/-7.8 \
@@ -237,6 +255,10 @@ _of_uncertainty
     'Programming Language :: Python :: 2.5',
     'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
+    'Programming Language :: Python :: 3',
+    # Python 3.1 fails because of a problem with NumPy 1.6.1 (whereas
+    # everything is fine with Python 3.2 and Python 2.7).
+    'Programming Language :: Python :: 3.2',    
     'Topic :: Education',
     'Topic :: Scientific/Engineering',
     'Topic :: Scientific/Engineering :: Mathematics',
@@ -251,5 +273,7 @@ _of_uncertainty
     package_dir={'uncertainties': package_dir},
 
     # Files are defined in MANIFEST
-    packages=['uncertainties', 'uncertainties.unumpy']
+    packages=['uncertainties', 'uncertainties.unumpy'],
+
+    cmdclass={'build_py': build_py}
     )  # End of setup definition
