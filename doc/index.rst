@@ -1,3 +1,8 @@
+.. meta::
+   :description: The uncertainties Python package
+   :keywords: error propagation, uncertainties, error calculations, Python,
+              calculator, library, package
+
 ====================================
 Welcome to the uncertainties package
 ====================================
