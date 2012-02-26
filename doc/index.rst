@@ -188,7 +188,7 @@ and `documentation source
 <https://github.com/lebigot/uncertainties/tree/master/doc/>`_ are
 available `on GitHub <https://github.com/lebigot/uncertainties/>`_.
 The :mod:`uncertainties` package is written in pure Python and has no
-external dependency (the NumPy_ package is optional).  It contains
+external dependency (the `NumPy`_ package is optional).  It contains
 about 4000 lines of code.  75 % of those lines are documentation
 strings and comments.  The remaining 25 % are equally split between
 unit tests and the calculation code proper.  :mod:`uncertainties` is
@@ -233,7 +233,7 @@ Planned future developments include:
 
 - `JSON <http://docs.python.org/library/json.html>`_ support;
 
-- increased support for `NumPy <http://numpy.org/>`_: new linear
+- increased support for `NumPy`_: new linear
   algebra methods (eigenvalue and QR decompositions, determinant,…),
   more convenient matrix creation, standard deviation of arrays,
   automatic wrapping of functions that accept arrays of numbers with
