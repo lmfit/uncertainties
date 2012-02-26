@@ -58,7 +58,7 @@ with numbers with uncertainties with :ref:`no or little modification
 
 Another strength of this package is its correct handling of
 **correlations**.  For instance, the following quantity is exactly
-zero even though ``x`` has an uncertainty:
+zero even though :data:`x` has an uncertainty:
 
   >>> x-x
   0.0
@@ -128,13 +128,15 @@ upgrade this package with
 
    easy_install --upgrade uncertainties
 
-The :mod:`uncertainties` package is also available on the following 
-**Linux distributions**: `Ubuntu 
-<https://launchpad.net/ubuntu/+source/uncertainties>`_, `openSUSE 
-<https://build.opensuse.org/package/show?package=python-uncertainties&project=home%3Aocefpaf>`_, 
-and `Debian <http://packages.debian.org/search?keywords=python-uncertainties>`_. It 
-may also be included in Christoph Gohlke's Base distribution of 
-`scientific Python packages 
+The :mod:`uncertainties` package is also available on the following
+**Linux distributions** and software platforms: `Ubuntu
+<https://launchpad.net/ubuntu/+source/uncertainties>`_, `openSUSE
+<https://build.opensuse.org/package/show?package=python-uncertainties&project=home%3Aocefpaf>`_,
+`Debian
+<http://packages.debian.org/search?keywords=python-uncertainties>`_
+and `Maemo <http://maemo.org/packages/view/python-uncertainties/>`_.
+It may also be included in Christoph Gohlke's Base distribution of
+`scientific Python packages
 <http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_ for **Windows**.
 
 Manual download and install
@@ -169,12 +171,12 @@ or, if additional access rights are needed (Unix):
 
    sudo python setup.py install
 
-You can also simply **move** the :file:`uncertainties-py*` directory 
-that corresponds best to your version of Python to a location that 
-Python can import from (directory in which scripts using 
-:mod:`uncertainties` are run, etc.); the chosen :file:`uncertainties-py*` 
-directory should then be renamed :file:`uncertainties`. Python 3 users 
-should finally run ``2to3 -w
+You can also simply **move** the :file:`uncertainties-py*` directory
+that corresponds best to your version of Python to a location that
+Python can import from (directory in which scripts using
+:mod:`uncertainties` are run, etc.); the chosen
+:file:`uncertainties-py*` directory should then be renamed
+:file:`uncertainties`. Python 3 users should finally run ``2to3 -w
 uncertainties`` so as to automatically adapt the code to Python 3.
 
 Source code
@@ -219,17 +221,39 @@ What others say
   semester*." (`reddit
   <http://www.reddit.com/r/Python/comments/am84v/now_you_can_do_calculations_with_uncertainties_5/>`_)
 
-.. index:: license
 
-License
-=======
+Future developments
+===================
 
-This software is released under a **dual license**; one of the
-following options can be chosen:
+Planned future developments include:
 
-1. The `BSD license`_.
-2. Any other license, as long as it is obtained from the creator of
-   this package.
+- support for Python `string formatting <http://docs.python.org/library/string.html#formatstrings>`_;
+
+- handling of complex numbers with uncertainties;
+
+- `JSON <http://docs.python.org/library/json.html>`_ support;
+
+- increased support for `NumPy <http://numpy.org/>`_: new linear
+  algebra methods (eigenvalue and QR decompositions, determinant,…),
+  more convenient matrix creation, standard deviation of arrays,
+  automatic wrapping of functions that accept arrays of numbers with
+  uncertainties, input of arrays with uncertainties as strings (like
+  in NumPy),…;
+
+- addition of new functions from the :mod:`math` module;
+
+- fitting routines that conveniently handle data with uncertainties;
+
+- a re-correlate function that puts correlations back between data
+  that was saved in separate files;
+
+- support for multi-precision numbers with uncertainties;
+
+- addition of :attr:`real` and :attr:`imag` attributes, for increased
+  compatibility with existing code (Python numbers have these attributes).
+
+**Please support the continued development of this program** by `donating 
+$10`_ or more through PayPal (no PayPal account necessary)!
 
 .. index:: support
 
@@ -245,9 +269,6 @@ of :mod:`uncertainties`, `Eric O. LEBIGOT (EOL)`_.
    :target: http://lebigot.pip.verisignlabs.com/
    :align: center
    :alt: Eric O. LEBIGOT (EOL)
-
-Please support the continued development of this program by `donating 
-$5`_ or more through PayPal (no PayPal account necessary)!
 
 How to cite this package
 ========================
@@ -272,12 +293,24 @@ this program. I am also grateful to the Linux distribution maintainers
 of this package, and to Christoph Gohlke for including it in his Base 
 distribution of scientific Python packages for Windows.
 
+.. index:: license
+
+License
+=======
+
+This software is released under a **dual license**; one of the
+following options can be chosen:
+
+1. The `BSD license`_.
+2. Any other license, as long as it is obtained from the creator of
+   this package.
+
 .. _Python: http://python.org/
 .. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
 .. _invoking the Python interpreter: http://docs.python.org/tutorial/interpreter.html
 .. _setuptools: http://pypi.python.org/pypi/setuptools
 .. _download: http://pypi.python.org/pypi/uncertainties/#downloads
-.. _donating $5: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
+.. _donating $10: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
 .. _BSD license: http://creativecommons.org/licenses/BSD/
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/

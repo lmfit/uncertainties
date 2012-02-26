@@ -77,11 +77,11 @@ NumPy matrices cannot be inverted, if they contain numbers with
 uncertainties (i.e., ``numpy.matrix([[ufloat(…),…]]).I`` does not
 work).  This is why the :class:`unumpy.matrix` class was created: both
 the inverse and the pseudo-inverse of a matrix can be calculated in
-the usual way: if ``mat`` is a :class:`unumpy.matrix`,
+the usual way: if :data:`mat` is a :class:`unumpy.matrix`,
 
   >>> print mat.I
 
-does calculate the inverse or pseudo-inverse of ``mat`` with
+does calculate the inverse or pseudo-inverse of :data:`mat` with
 uncertainties.
 
 .. index::
