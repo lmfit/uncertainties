@@ -284,13 +284,16 @@ number is optional.
 Acknowledgments
 ===============
 
-The author wishes to thank Arnaud Delobelle, Pierre Cladé, and Sebastian 
-Walter for very useful technical input.  Patches by Pierre Cladé, Tim 
-Head, and José Sabater Montes are gratefully acknowledged. I would also 
-like to thank Joaquin Abian, Jason Moore, Martin Lutz and many other 
-users for their feedback and suggestions, which greatly helped improve 
-this program. I am also grateful to the Linux distribution maintainers 
-of this package, and to Christoph Gohlke for including it in his Base 
+The author wishes to thank all the people who contributed through 
+generous `donations`_: they help keep this project alive by providing 
+positive feedback. I greatly appreciated getting key technical input 
+from Arnaud Delobelle, Pierre Cladé, and Sebastian Walter.  Patches by 
+Pierre Cladé, Tim Head, and José Sabater Montes are gratefully 
+acknowledged. I would also like to thank users who contributed with 
+feedback and suggestions, which greatly helped improve this program: 
+Joaquin Abian, Jason Moore, Martin Lutz, Víctor Terrón and many others. 
+I am also grateful to the Linux distribution maintainers of this 
+package, and to Christoph Gohlke for including it in his Base 
 distribution of scientific Python packages for Windows.
 
 .. index:: license
@@ -310,9 +313,10 @@ following options can be chosen:
 .. _invoking the Python interpreter: http://docs.python.org/tutorial/interpreter.html
 .. _setuptools: http://pypi.python.org/pypi/setuptools
 .. _download: http://pypi.python.org/pypi/uncertainties/#downloads
-.. _donating $10: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
+.. _donations: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
 .. _BSD license: http://creativecommons.org/licenses/BSD/
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
 .. _pydoc: http://docs.python.org/library/pydoc.html
 .. _NumPy: http://numpy.scipy.org/
+.. _donating $10: donations_
