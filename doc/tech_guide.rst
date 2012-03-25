@@ -174,7 +174,7 @@ with numbers with uncertainties.
 
 .. index:: boolean value
 
-The **boolean value** (``bool(x)``, ``if x…``) of a number with
+The **boolean value** (``bool(x)``, ``if x …``) of a number with
 uncertainty :data:`x` is defined as the result of ``x != 0``, as usual.
 
 However, since the objects defined in this module represent
