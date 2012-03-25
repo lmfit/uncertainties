@@ -74,7 +74,7 @@ uncertainties into matrices through the :class:`unumpy.matrix` class:
 objects of numbers with uncertainties, but with better support for
 some operations (such as matrix inversion).  For instance, regular
 NumPy matrices cannot be inverted, if they contain numbers with
-uncertainties (i.e., ``numpy.matrix([[ufloat(…),…]]).I`` does not
+uncertainties (i.e., ``numpy.matrix([[ufloat(…), …]]).I`` does not
 work).  This is why the :class:`unumpy.matrix` class was created: both
 the inverse and the pseudo-inverse of a matrix can be calculated in
 the usual way: if :data:`mat` is a :class:`unumpy.matrix`,
