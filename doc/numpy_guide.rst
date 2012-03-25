@@ -44,7 +44,7 @@ Arrays
 Arrays of numbers with uncertainties can be built from values and
 uncertainties:
 
-  >>> arr = unumpy.uarray(([1, 2], [0.01, 0.002])
+  >>> arr = unumpy.uarray(([1, 2], [0.01, 0.002]))
   >>> print arr
   [1.0+/-0.01 2.0+/-0.002]
 
