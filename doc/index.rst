@@ -284,14 +284,18 @@ number is optional.
 Acknowledgments
 ===============
 
-The author wishes to thank all the people who contributed through 
-generous `donations`_: they help keep this project alive by providing 
-positive feedback. I greatly appreciated getting key technical input 
-from Arnaud Delobelle, Pierre Cladé, and Sebastian Walter.  Patches by 
-Pierre Cladé, Tim Head, and José Sabater Montes are gratefully 
-acknowledged. I would also like to thank users who contributed with 
-feedback and suggestions, which greatly helped improve this program: 
-Joaquin Abian, Jason Moore, Martin Lutz, Víctor Terrón and many others. 
+The author wishes to thank all the people who made generous 
+`donations`_: they help keep this project alive by providing positive 
+feedback.
+
+I would also like to thank users who contributed with feedback and 
+suggestions, which greatly helped improve this program: Joaquin Abian, 
+Jason Moore, Martin Lutz, Víctor Terrón and many others.
+
+I greatly appreciated getting key technical input from Arnaud Delobelle, 
+Pierre Cladé, and Sebastian Walter.  Patches by Pierre Cladé, Tim Head, 
+and José Sabater Montes are gratefully acknowledged.
+
 I am also grateful to the Linux distribution maintainers of this 
 package, and to Christoph Gohlke for including it in his Base 
 distribution of scientific Python packages for Windows.
