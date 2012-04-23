@@ -32,4 +32,4 @@ echo "Python 2.3 version imported"
 # Packaging:
 python setup.py sdist && \
 echo "Package created.  The package can be uploaded with setup.py sdist upload."
-echo "WARNING: current git branch is", `git branch | head -1`
+echo "WARNING: current git branch is" `git branch | head -1`
