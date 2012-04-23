@@ -710,16 +710,14 @@ def test_power():
         pass
     else:
         raise Exception('An exception should have been raised')
-
     try:
         (-1)*9.1 == (-1)**9.1
     except Exception as err_float:
-        pass
+        # UFloat and floats should raise the same error:
+        assert err_ufloat.args == err_float.args
     else:
         raise Exception('An exception should have been raised')
 
-    # UFloat and floats should raise the same error:
-    assert err_ufloat.args == err_float.args
     
 ###############################################################################
 

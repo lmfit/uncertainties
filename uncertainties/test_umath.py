@@ -225,3 +225,31 @@ def test_math_module():
         # fsum is special because it does not take a fixed number of
         # variables:
         assert umath.fsum([x, x]).nominal_value == -3
+
+    # The same exceptions should be generated when numbers with uncertainties
+    # are used:
+
+    try:
+        math.log(0)
+    except err_math:
+        pass
+    else:
+        raise Exception('Exception expected')
+    try:
+        umath.log(0)
+    except err_ufloat:
+        assert err_math.args == err_ufloat.args
+    else:
+        raise Exception('Exception expected')
+    try:
+        umath.log(uncertainties.ufloat((0, 0)))
+    except err_ufloat:
+        assert err_math.args == err_ufloat.args
+    else:
+        raise Exception('Exception expected')
+    try:
+        umath.log(uncertainties.ufloat((0, 1)))
+    except err_ufloat:
+        assert err_math.args == err_ufloat.args
+    else:
+        raise Exception('Exception expected')
