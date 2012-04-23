@@ -44,7 +44,7 @@ Arrays
 Arrays of numbers with uncertainties can be built from values and
 uncertainties:
 
-  >>> arr = unumpy.uarray(([1, 2], [0.01, 0.002])
+  >>> arr = unumpy.uarray(([1, 2], [0.01, 0.002]))
   >>> print arr
   [1.0+/-0.01 2.0+/-0.002]
 
@@ -74,14 +74,14 @@ uncertainties into matrices through the :class:`unumpy.matrix` class:
 objects of numbers with uncertainties, but with better support for
 some operations (such as matrix inversion).  For instance, regular
 NumPy matrices cannot be inverted, if they contain numbers with
-uncertainties (i.e., ``numpy.matrix([[ufloat(…),…]]).I`` does not
+uncertainties (i.e., ``numpy.matrix([[ufloat(…), …]]).I`` does not
 work).  This is why the :class:`unumpy.matrix` class was created: both
 the inverse and the pseudo-inverse of a matrix can be calculated in
-the usual way: if ``mat`` is a :class:`unumpy.matrix`,
+the usual way: if :data:`mat` is a :class:`unumpy.matrix`,
 
   >>> print mat.I
 
-does calculate the inverse or pseudo-inverse of ``mat`` with
+does calculate the inverse or pseudo-inverse of :data:`mat` with
 uncertainties.
 
 .. index::

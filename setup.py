@@ -157,10 +157,6 @@ Contact
 Please send **feature requests, bug reports, or feedback** to
 `Eric O. LEBIGOT (EOL)`_.
 
-Please **support this program** and its future development by donating
-$5 or more through PayPal_.
-
-
 Version history
 ===============
 

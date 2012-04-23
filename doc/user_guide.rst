@@ -112,7 +112,7 @@ Correlations
 Correlations between variables are automatically handled whatever the
 number of variables involved, and whatever the complexity of the
 calculation.  Thus, each calculation result keeps track of how it is
-correlated to random variables.  For example, when ``x`` is the number
+correlated to random variables.  For example, when :data:`x` is the number
 with uncertainty defined above,
 
   >>> square = x**2
@@ -125,9 +125,9 @@ with uncertainty defined above,
   1.0
 
 The last two printed results above have a zero uncertainty despite the
-fact that ``x``, ``y`` and ``square`` have a non-zero uncertainty: the
+fact that :data:`x`, :data:`y` and :data:`square` have a non-zero uncertainty: the
 calculated functions give the same value for all samples of the random
-variable ``x``.
+variable :data:`x`.
 
 Thanks to the tracking of dependencies on random variables,
 calculations can therefore be performed in as many steps as necessary,
@@ -171,7 +171,7 @@ variables are tagged:
   u variable: 0.100000
   v variable: 0.200000
 
-The total uncertainty on the result (``sum_value``) is the quadratic
+The total uncertainty on the result (:data:`sum_value`) is the quadratic
 sum of these independent uncertainties, as it should be.
 
 .. index:: comparison operators
@@ -207,8 +207,8 @@ standard deviation are generally different:
   False
 
 In physical terms, two rods of the same nominal length and uncertainty
-on their length are generally of different sizes: ``y`` is different
-from ``z``.
+on their length are generally of different sizes: :data:`y` is different
+from :data:`z`.
 
 More detailed information on the semantics of comparison operators for
 numbers with uncertainties can be found in the :ref:`Technical Guide
@@ -234,8 +234,8 @@ has value
    [0.0,  0.01, 0.02],
    [0.01, 0.02, 0.05]]
 
-In this matrix, the zero covariances indicate that ``u`` and ``v`` are
-independent from each other; the last column shows that ``sum_value``
+In this matrix, the zero covariances indicate that :data:`u` and :data:`v` are
+independent from each other; the last column shows that :data:`sum_value`
 does depend on these variables.  The :mod:`uncertainties` package
 keeps track at all times of all correlations between quantities
 (variables and functions):
@@ -265,14 +265,14 @@ correlation matrix:
 
 The theoretical value of the last expression is exactly zero, like for
 ``sum - (u+2*v)``, but numerical errors yield a small uncertainty
-(3e-9 is indeed very small compared to the uncertainty on ``sum2``:
-correlations should in fact cancel the uncertainty on ``sum2``).
+(3e-9 is indeed very small compared to the uncertainty on :data:`sum2`:
+correlations should in fact cancel the uncertainty on :data:`sum2`).
 
 The correlation matrix is the desired one::
 
   >>> uncertainties.covariance_matrix([u2, v2, sum2])
 
-reproduces the desired covariance matrix ``cov_matrix`` (up to
+reproduces the desired covariance matrix :data:`cov_matrix` (up to
 rounding errors).
 
 .. index::
@@ -317,8 +317,8 @@ to study its impact on a final result.  With this package, the
   21.0+/-10.001999800039989
   >>> u.set_std_dev(prev_uncert)
 
-The relevant concept is that ``sum_value`` does depend on the
-variables ``u`` and ``v``: the :mod:`uncertainties` package keeps
+The relevant concept is that :data:`sum_value` does depend on the
+variables :data:`u` and :data:`v`: the :mod:`uncertainties` package keeps
 track of this fact, as detailed in the :ref:`Technical Guide
 <variable_tracking>`, and uncertainties can thus be updated at any time.
 
@@ -344,7 +344,7 @@ manner**.  This is what the :func:`nominal_value` and
 
 Finally, a utility method is provided that directly yields the
 **number of standard deviations** between a number and a result with
-uncertainty: with ``x`` equal to 0.20±0.01,
+uncertainty: with :data:`x` equal to 0.20±0.01,
 
   >>> x.position_in_sigmas(0.17)
   -3.0

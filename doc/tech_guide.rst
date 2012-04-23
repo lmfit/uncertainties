@@ -67,11 +67,11 @@ yield correct uncertainties.  For example:
   42.0
 
 Even though ``x*x`` has a non-zero uncertainty, the result has a zero
-uncertainty, because it is equal ``a``.
+uncertainty, because it is equal to :data:`a`.
 
 However, only the dependence of quantities on random variables created
-by this module is tracked.  Thus, if the variable ``a`` above is
-modified, the value of ``poly`` is not modified, as is usual in
+by this module is tracked.  Thus, if the variable :data:`a` above is
+modified, the value of :data:`poly` is not modified, as is usual in
 Python:
 
   >>> a = 123
@@ -80,16 +80,16 @@ Python:
 
 Random variables can, on the other hand, have their uncertainty
 updated on the fly, because quantities with uncertainties (like
-``poly``) keep track of them:
+:data:`poly`) keep track of them:
 
   >>> x.set_std_dev(0)
   >>> print poly
   46.0  # Zero uncertainty, now
 
 As usual, Python keeps track of objects as long as they are used.
-Thus, redefining the value of ``x`` does not change the fact that
-``poly`` depends on the quantity with uncertainty previously stored
-in ``x``:
+Thus, redefining the value of :data:`x` does not change the fact that
+:data:`poly` depends on the quantity with uncertainty previously stored
+in :data:`x`:
 
   >>> x = 10000
   >>> print poly
@@ -119,8 +119,8 @@ preserved:
   >>> y2 - 2*x2
   0.0
 
-The final result is exactly zero because the unpickled variables ``x2``
-and ``y2`` are completely correlated.
+The final result is exactly zero because the unpickled variables :data:`x2`
+and :data:`y2` are completely correlated.
 
 However, unpickling necessarily creates *new* variables that bear no
 relationship with the original variables (in fact, the pickled
@@ -130,7 +130,7 @@ after the program that did the pickling is finished).  Thus
   >>> x - x2
   0.0+/-0.14142135623730953
 
-which shows that the original variable ``x`` and the new variable ``x2``
+which shows that the original variable :data:`x` and the new variable :data:`x2`
 are completely uncorrelated.
 
 .. _linear_method:
@@ -174,8 +174,8 @@ with numbers with uncertainties.
 
 .. index:: boolean value
 
-The **boolean value** (``bool(x)``, ``if x…``) of a number with
-uncertainty ``x`` is defined as the result of ``x != 0``, as usual.
+The **boolean value** (``bool(x)``, ``if x …``) of a number with
+uncertainty :data:`x` is defined as the result of ``x != 0``, as usual.
 
 However, since the objects defined in this module represent
 probability distributions and not pure numbers, comparison operators
@@ -194,14 +194,14 @@ Example:
   >>> x == x
   True
 
-because a sample from the probability distribution of ``x`` is always
+because a sample from the probability distribution of :data:`x` is always
 equal to itself.  However:
 
   >>> y = ufloat((3.14, 0.01))
   >>> x != y
   True
 
-since ``x`` and ``y`` are independent random variables that *almost*
+since :data:`x` and :data:`y` are independent random variables that *almost*
 always give a different value.
 
 Similarly,
@@ -211,11 +211,11 @@ Similarly,
   >>> x > y
   True
 
-because ``x`` is supposed to have a probability distribution largely
-contained in the 3.14±~0.01 interval, while ``y`` is supposed to be
-well in the 3.00±~0.01 one: random samples of ``x`` and ``y`` will
-most of the time be such that the sample from ``x`` is larger than the
-sample from ``y``.  Therefore, it is natural to consider that for all
+because :data:`x` is supposed to have a probability distribution largely
+contained in the 3.14±~0.01 interval, while :data:`y` is supposed to be
+well in the 3.00±~0.01 one: random samples of :data:`x` and :data:`y` will
+most of the time be such that the sample from :data:`x` is larger than the
+sample from :data:`y`.  Therefore, it is natural to consider that for all
 practical purposes, ``x > y``.
 
 Since comparison operations are subject to the same constraints as
@@ -247,8 +247,8 @@ sometimes be compared unambiguously:
   >>> y > x
   True
 
-In fact, correlations guarantee that ``y`` is always larger than
-``x`` (by 0.0002).
+In fact, correlations guarantee that :data:`y` is always larger than
+:data:`x` (by 0.0002).
 
 
 .. index:: number with uncertainty; classes, Variable class
@@ -262,7 +262,7 @@ Classes
 Testing whether an object is a number with uncertainty
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The recommended way of testing whether ``value`` carries an
+The recommended way of testing whether :data:`value` carries an
 uncertainty handled by this module is by checking the value of
 ``isinstance(value, UFloat)``.
 

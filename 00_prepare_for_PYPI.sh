@@ -8,6 +8,11 @@
 ## Only committed versions are packaged, to help with debugging published code:
 git commit -a
 
+# The Python 2.3 version should always be up to date:
+git checkout python2.3
+
+git checkout master
+
 ## Getting the Python 2.5 version:
 
 rm -rf uncertainties-py25 && \
@@ -27,3 +32,5 @@ echo "Python 2.3 version imported"
 # Packaging:
 python setup.py sdist && \
 echo "Package created.  The package can be uploaded with setup.py sdist upload."
+echo "WARNING: current git branch is:"
+git branch | grep '^\*'

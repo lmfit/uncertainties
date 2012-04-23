@@ -13,6 +13,7 @@ import copy
 import weakref
 import math
 import random
+import sys
 
 # 3rd-party modules
 # import nose.tools
@@ -52,6 +53,7 @@ def _numbers_close(x, y, tolerance=1e-6):
 class DerivativesDiffer(Exception):
     pass
 
+    
 def _compare_derivatives(func, numerical_derivatives,
                          num_args_list=None):
     """
@@ -193,7 +195,7 @@ def _compare_derivatives(func, numerical_derivatives,
                 break
 
 ###############################################################################
-
+            
 # Test of correctness of the fixed (usually analytical) derivatives:
 def test_fixed_derivatives_basic_funcs():
     """
@@ -639,6 +641,96 @@ def test_covariances():
     # Non-diagonal elements:
     assert _numbers_close(covs[0][1], -0.02)
 
+###############################################################################
+    
+def test_power():
+    '''
+    Checks special cases of x**p.
+
+    The value x = 0 is special, as are positive, null and negative
+    and integral values of p.
+    '''
+
+    zero = ufloat((0, 0))
+    one = ufloat((1, 0))
+    p = ufloat((0.3, 0.01))
+
+    assert 0**p == 0
+    assert zero**p == 0
+
+    # Should raise the same errors as float operations:
+    try:
+        0**(-p)
+    except ZeroDivisionError:
+        pass
+    else:
+        raise Exception('An proper exception should have been raised')
+
+    try:
+        zero**(-p)
+    except ZeroDivisionError:
+        pass
+    else:
+        raise Exception('An proper exception should have been raised')
+
+    if sys.version_info >= (2, 6):
+        
+        # Reference: http://docs.python.org/library/math.html#math.pow
+        
+        # …**0 == 1.0:
+        assert p**0 == 1.0        
+        assert zero**0 == 1.0
+        assert (-p)**0 == 1.0
+        # …**zero:
+        assert (-10.3)**zero == 1.0        
+        assert 0**zero == 1.0        
+        assert 0.3**zero == 1.0
+        assert float('nan')**zero == 1.0
+        assert (-p)**zero == 1.0        
+        assert zero**zero == 1.0
+        assert p**zero == 1.0
+
+        # one**… == 1.0
+        assert one**-3 == 1.0
+        assert one**-3.1 == 1.0
+        assert one**0 == 1.0
+        assert one**3 == 1.0
+        assert one**3.1 == 1.0
+        assert one**float('nan') == 1.0
+        # … with two numbers with uncertainties:
+        assert one**(-p) == 1.0
+        assert one**zero == 1.0
+        assert one**p == 1.0
+        # 1**… == 1.0:
+        assert 1.**(-p) == 1.0
+        assert 1.**zero == 1.0
+        assert 1.**p == 1.0
+        
+        
+    # Negative numbers with unceratinty can be exponentiated to an integral
+    # power:
+    assert (ufloat((-1.1, 0.1))**-9).nominal_value == (-1.1)**-9
+
+    # Case of numbers with no uncertainty: should give the same result
+    # as numbers with uncertainties:
+    assert ufloat((-1, 0))**9 == (-1)**9
+    assert ufloat((-1.1, 0))**9 == (-1.1)**9
+    # Negative numbers cannot be raised to a non-integral power:
+    try:
+        ufloat((-1, 0))**9.1
+    except Exception as err_ufloat:
+        pass
+    else:
+        raise Exception('An exception should have been raised')
+    try:
+        (-1)*9.1 == (-1)**9.1
+    except Exception as err_float:
+        # UFloat and floats should raise the same error:
+        assert err_ufloat.args == err_float.args
+    else:
+        raise Exception('An exception should have been raised')
+
+    
 ###############################################################################
 
 # The tests below require NumPy, which is an optional package:
