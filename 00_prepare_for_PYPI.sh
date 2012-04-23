@@ -10,8 +10,7 @@ git commit -a
 
 # The Python 2.3 version should always be up to date:
 git checkout python2.3
-
-git checkout master
+git merge master
 
 ## Getting the Python 2.5 version:
 
