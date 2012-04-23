@@ -206,7 +206,7 @@ def test_math_module():
 
     # Python >=2.6 functions:
 
-    if sys.version_info[:2] >= (2, 6):
+    if sys.version_info >= (2, 6):
     
         # factorial() must not be "damaged" by the umath module, so as 
         # to help make it a drop-in replacement for math (even though 
