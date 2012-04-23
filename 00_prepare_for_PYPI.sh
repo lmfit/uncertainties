@@ -33,4 +33,4 @@ echo "Python 2.3 version imported"
 python setup.py sdist && \
 echo "Package created.  The package can be uploaded with setup.py sdist upload."
 echo "WARNING: current git branch is:"
-git branch | head -1
+git branch | grep '^\*'
