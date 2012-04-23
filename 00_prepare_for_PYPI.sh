@@ -8,6 +8,9 @@
 ## Only committed versions are packaged, to help with debugging published code:
 git commit -a
 
+# The Python 2.3 version should always be up to date:
+
+
 ## Getting the Python 2.5 version:
 
 rm -rf uncertainties-py25 && \
