@@ -205,6 +205,8 @@ What others say
   <http://biosport.ucdavis.edu/blog/2010/05/07/uncertainty-analysis>`_)
 - "*Utterly brilliant*" (`Jeffrey Simpson
   <http://twitter.com/#!/GeekyJeffrey>`_)
+- "*An amazing time saver*" (`Paul Nakroshis 
+  <http://scipyscriptrepo.com/wp/?p=41>`_)
 - "*This package has a great interface and makes error propagation
   something to stop fearing.*" (`Dr Dawes
   <http://dawes.wordpress.com/2011/01/02/scientific-python/>`_)
