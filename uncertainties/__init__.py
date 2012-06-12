@@ -471,7 +471,9 @@ def wrap(f, derivatives_funcs=None):
     missing derivatives are calculated numerically through
     partial_derivative().
 
-    Example: wrap(math.sin) is a sine function that can be applied to
+    Example (for illustration purposes only, as
+    uncertainties.umath.sin() is more efficient than the examples that
+    follow): wrap(math.sin) is a sine function that can be applied to
     numbers with uncertainties.  Its derivative will be calculated
     numerically.  wrap(math.sin, [None]) would have produced the same
     result.  wrap(math.sin, [math.cos]) is the same function, but with
