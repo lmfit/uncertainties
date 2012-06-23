@@ -262,7 +262,7 @@ __all__ = [
     'UFloat',
 
     # Wrapper for allowing non-pure-Python function to handle
-    # quantitites with uncertainties:
+    # quantitities with uncertainties:
     'wrap',
 
     # The documentation for wrap() indicates that numerical
