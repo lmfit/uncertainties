@@ -1049,7 +1049,7 @@ def get_ops_with_reflection():
 
     return ops_with_reflection
 
-# Operators that have a reflexion, along with their derivatives:
+# Operators that have a reflection, along with their derivatives:
 _ops_with_reflection = get_ops_with_reflection()
 
 # Some effectively modified operators (for the automated tests):
