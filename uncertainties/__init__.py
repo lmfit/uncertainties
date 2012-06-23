@@ -369,7 +369,7 @@ else:
 # functions)
 
 class NotUpcast(Exception):
-    pass
+    'Raised when an object cannot be converted to a number with uncertainty'
 
 def to_affine_scalar(x):
     """
