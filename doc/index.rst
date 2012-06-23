@@ -262,8 +262,10 @@ $10`_ or more through PayPal (no PayPal account necessary)!
 Contact
 =======
 
-Please send feature requests, bug reports, or feedback to the creator
-of :mod:`uncertainties`, `Eric O. LEBIGOT (EOL)`_.
+Please share how this package has helped you by sending an e-mail to the 
+creator of :mod:`uncertainties`, `Eric O. LEBIGOT (EOL)`_, and **have 
+your work be featured on this page**! Feature requests, bug reports, or 
+feedback are much welcome too.
 
 .. figure:: _static/eol.*
    :height: 64
