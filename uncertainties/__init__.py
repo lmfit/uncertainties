@@ -234,7 +234,7 @@ from math import sqrt, log  # Optimization: no attribute look-up
 import copy
 
 # Numerical version:
-__version_info__ = (1, 8)
+__version_info__ = (1, 8, '1b')
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL)'
