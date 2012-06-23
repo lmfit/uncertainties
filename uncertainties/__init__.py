@@ -235,7 +235,7 @@ import copy
 
 # Numerical version:
 __version_info__ = (1, 8)
-__version__ = '.'.join([str(num) for num in __version_info__])
+__version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL)'
 
