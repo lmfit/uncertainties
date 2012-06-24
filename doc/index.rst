@@ -24,9 +24,11 @@ code can **run with no or little change**.
 Whatever the complexity of the calculation, this package returns the 
 result with its uncertainty as predicted by linear `error propagation 
 theory`_. It automatically :ref:`calculates derivatives <derivatives>` 
-and uses them for calculating uncertainties. **Correlations** between 
-variables are thus autoamatically handled, which sets it apart from many 
-existing error propagation codes.
+and uses them for calculating uncertainties. Uncertainty calculations
+are almost all performed **analytically**.
+
+**Correlations** between variables are autoamatically handled, which 
+sets it apart from many existing error propagation codes.
 
 Let's now see how to use these unique features!
 
