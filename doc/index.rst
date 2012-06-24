@@ -27,7 +27,7 @@ theory`_. It automatically :ref:`calculates derivatives <derivatives>`
 and uses them for calculating uncertainties. Almost all uncertainty 
 calculations are performed **analytically**.
 
-**Correlations** between variables are autoamatically handled, which 
+**Correlations** between variables are automatically handled, which 
 sets it apart from many existing error propagation codes.
 
 Let's now see how to use these unique features!
