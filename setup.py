@@ -144,6 +144,8 @@ Main features
 - Many **fast operations on arrays and matrices** of numbers with
   uncertainties are supported.
 
+- Most uncertainty calculations are performed **analytically**.
+
 Installation or upgrade
 =======================
 
