@@ -21,8 +21,8 @@ be performed either in an **interactive session**, or in **programs**
 written in the Python_ programming language.  Existing calculation
 code can **run with no or little change**.
 
-Whatever the complexity of the calculation, this package returns the 
-result with its uncertainty as predicted by linear `error propagation 
+Whatever the complexity of a calculation, this package returns its
+result with an uncertainty as predicted by linear `error propagation 
 theory`_. It automatically :ref:`calculates derivatives <derivatives>` 
 and uses them for calculating uncertainties. Almost all uncertainty 
 calculations are performed **analytically**.
