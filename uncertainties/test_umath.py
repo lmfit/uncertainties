@@ -231,25 +231,25 @@ def test_math_module():
 
     try:
         math.log(0)
-    except err_math:
+    except ValueError, err_math:  # "as", for Python 2.6+
         pass
     else:
-        raise Exception('Exception expected')
+        raise Exception('ValueError exception expected')
     try:
         umath.log(0)
-    except err_ufloat:
+    except ValuerError, err_ufloat:  # "as", for Python 2.6+
         assert err_math.args == err_ufloat.args
     else:
-        raise Exception('Exception expected')
+        raise Exception('ValueError exception expected')
     try:
         umath.log(uncertainties.ufloat((0, 0)))
-    except err_ufloat:
+    except ValueError, err_ufloat:  # "as", for Python 2.6+
         assert err_math.args == err_ufloat.args
     else:
-        raise Exception('Exception expected')
+        raise Exception('ValueError exception expected')
     try:
         umath.log(uncertainties.ufloat((0, 1)))
-    except err_ufloat:
+    except ValueError, err_ufloat:  # "as", for Python 2.6+
         assert err_math.args == err_ufloat.args
     else:
-        raise Exception('Exception expected')
+        raise Exception('ValueError exception expected')

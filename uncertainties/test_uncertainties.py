@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Tests of the code in uncertainties/__init__.py.
 
@@ -706,13 +708,13 @@ def test_power():
     # Negative numbers cannot be raised to a non-integral power:
     try:
         ufloat((-1, 0))**9.1
-    except Exception as err_ufloat:
+    except Exception, err_ufloat:  # "as", for Python 2.6+
         pass
     else:
         raise Exception('An exception should have been raised')
     try:
         (-1)*9.1 == (-1)**9.1
-    except Exception as err_float:
+    except Exception, err_float:  # "as" for Python 2.6+
         # UFloat and floats should raise the same error:
         assert err_ufloat.args == err_float.args
     else:
