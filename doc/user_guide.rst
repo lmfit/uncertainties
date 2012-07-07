@@ -297,9 +297,10 @@ numbers with uncertainties:
 
   >>> wrapped_f = uncertainties.wrap(f)
 
-The new function :func:`wrapped_f` can be given numbers with
-uncertainties instead of Python floats.  It returns the same values as
-:func:`f`, but with uncertainties.
+The new function :func:`wrapped_f` accepts numbers with uncertainties
+as arguments wherever a Python float was used for :func:`f`.
+:func:`wrapped_f` returns the same values as :func:`f`, but with
+uncertainties.
 
 With a simple wrapping call like above, uncertainties in the function
 result are automatically calculated numerically. **Analytical
