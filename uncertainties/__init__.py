@@ -451,7 +451,7 @@ class NumericalDerivatives(object):
         """
         return partial_derivative(self._function, n)
   
-def wrap(f, derivatives_funcs=None):
+def wrap(f, derivatives_iter=None):
     """
     Wraps a function f into a function that also accepts numbers with
     uncertainties (UFloat objects) and returns a number with
@@ -466,20 +466,20 @@ def wrap(f, derivatives_funcs=None):
     If no argument to the wrapped function has an uncertainty, f
     simply returns its usual, scalar result.
 
-    If supplied, derivatives_funcs can be an iterable that generally
+    If supplied, derivatives_iter can be an iterable that generally
     contains functions; each successive function is the partial
     derivative of f with respect to the corresponding variable (one
     function for each argument of f, which takes as many arguments as
-    f).  If instead of a function, an element of derivatives_funcs
+    f).  If instead of a function, an element of derivatives_iter
     contains None, then it is automatically replaced by the relevant
     numerical derivative.
 
-    If derivatives_funcs is None, or if derivatives_funcs contains a
+    If derivatives_iter is None, or if derivatives_iter contains a
     fixed (and finite) number of elements, then missing derivatives
     are also calculated numerically.
 
     An infinite number of derivatives can be specified by having
-    derivatives_funcs be an infinite iterator; this can for instance
+    derivatives_iter be an infinite iterator; this can for instance
     be used for specifying the derivatives of functions with a
     undefined number of argument (like sum(), whose partial
     derivatives all return 1).
@@ -497,22 +497,22 @@ def wrap(f, derivatives_funcs=None):
     #!!!!! how to handle keyword arguments in f()?
     
     
-    if derivatives_funcs is None:
-        derivatives_funcs = NumericalDerivatives(f)
+    if derivatives_iter is None:
+        derivatives_iter = NumericalDerivatives(f)
     else:
         # Derivatives that are not defined are calculated numerically,
         # if there is a finite number of them (the function lambda
         # *args: fsum(args) has a non-defined number of arguments, as
         # it just performs a sum):
         try:  # Is the number of derivatives fixed?
-            len(derivatives_funcs)
+            len(derivatives_iter)
         except TypeError:
             pass
         else:
-            derivatives_funcs = [
+            derivatives_iter = [
                 partial_derivative(f, k) if derivative is None
                 else derivative
-                for (k, derivative) in enumerate(derivatives_funcs)]
+                for (k, derivative) in enumerate(derivatives_iter)]
 
     #! Setting the doc string after "def f_with...()" does not
     # seem to work.  We define it explicitly:
@@ -609,14 +609,14 @@ def wrap(f, derivatives_funcs=None):
         # caller to always provide derivatives.  When changing the
         # functions of the math module, this would force this module
         # to know about all the math functions.  Another possibility
-        # would be to force derivatives_funcs to contain, say, the
+        # would be to force derivatives_iter to contain, say, the
         # first 3 derivatives of f.  But any of these two ideas has a
         # chance to break, one day... (if new functions are added to
         # the math module, or if some function has more than 3
         # arguments).
 
         derivatives_wrt_args = []
-        for (arg, derivative) in zip(aff_funcs, derivatives_funcs):
+        for (arg, derivative) in zip(aff_funcs, derivatives_iter):
             derivatives_wrt_args.append(derivative(*args_values)
                                         if arg.derivatives
                                         else 0)
