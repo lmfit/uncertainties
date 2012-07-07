@@ -1558,7 +1558,7 @@ def NumberWithUncert(*args):
     Wrapper for legacy code.  Obsolete: do not use.  Use ufloat
     instead.
     """
-    deprecation("NumberWithUncert is obsolete.  Use ufloat instead."
+    deprecation("NumberWithUncert is obsolete.  Use ufloat instead.")
     return ufloat(*args)
 
 def num_with_uncert(*args):
