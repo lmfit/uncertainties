@@ -463,7 +463,7 @@ class NumericalDerivatives(object):
         """
         return partial_derivative(self._function, n)
   
-def wrap(f, derivatives_iter=None):
+def wrap(f, derivatives_iter=None, derivatives_dict):
     """
     Wraps a function f into a function that also accepts numbers with
     uncertainties (UFloat objects) and returns a number with
@@ -474,32 +474,41 @@ def wrap(f, derivatives_iter=None):
     f must return a scalar (not a list, etc.).
     
     In the wrapped function, the standard Python scalar arguments of f
-    (float, int, etc.) can be replaced by numbers with
-    uncertainties. The result will contain the appropriate
-    uncertainty.
+    (float, int, etc.) can be replaced by numbers with uncertainties
+    (including optional keyword arguments). The result will contain
+    the appropriate uncertainty.
     
     If no argument to the wrapped function has an uncertainty, f
     simply returns its usual, scalar result.
 
-    If supplied, derivatives_iter can be an iterable that generally
-    contains functions; each successive function is the partial
-    derivative of f with respect to the corresponding variable (one
-    function for each argument of f, which takes as many arguments as
-    f).  If instead of a function, an element of derivatives_iter
-    contains None, then it is automatically replaced by the relevant
-    numerical derivative; this can be used for non-scalar arguments of
-    f (like string arguments).
+    Arguments:
 
-    If derivatives_iter is None, or if derivatives_iter contains a
-    fixed (and finite) number of elements, then any missing derivative
-    is calculated numerically.
+    derivatives_iter --
+    
+        If supplied, derivatives_iter can be an iterable that
+        generally contains functions; each successive function is the
+        partial derivative of f with respect to the corresponding
+        variable (one function for each argument of f, which takes the
+        same arguments as f).  If instead of a function, an element of
+        derivatives_iter contains None, then it is automatically
+        replaced by the relevant numerical derivative; this can be
+        used for non-scalar arguments of f (like string arguments).
 
-    An infinite number of derivatives can be specified by having
-    derivatives_iter be an infinite iterator; this can for instance
-    be used for specifying the derivatives of functions with a
-    undefined number of argument (like sum(), whose partial
-    derivatives all return 1).
+        If derivatives_iter is None, or if derivatives_iter contains a
+        fixed (and finite) number of elements, then any missing derivative
+        is calculated numerically.
 
+        An infinite number of derivatives can be specified by having
+        derivatives_iter be an infinite iterator; this can for instance
+        be used for specifying the derivatives of functions with a
+        undefined number of argument (like sum(), whose partial
+        derivatives all return 1).
+
+    derivatives_dict --
+
+        Dictionary that maps optional keyword argument names to their
+        derivative (as in derivatives_iter).
+        
     Example (for illustration purposes only, as
     uncertainties.umath.sin() runs faster than the examples that
     follow): wrap(math.sin) is a sine function that can be applied to
