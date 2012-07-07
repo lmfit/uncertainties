@@ -164,6 +164,10 @@ Version history
 
 Main changes:
 
+- *.*: ``UFloat.position_in_sigmas()`` is now named
+       ``UFloat.std_score()``,  which represents the usual name
+       (`standard score
+       <http://en.wikipedia.org/wiki/Standard_score>`_) of the result.
 - 1.8: Compatibility with Python 3.2 added.
 - 1.7.2: Compatibility with Python 2.3, Python 2.4, Jython 2.5.1 and \
          Jython 2.5.2 added.

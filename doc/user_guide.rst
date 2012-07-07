@@ -343,10 +343,11 @@ manner**.  This is what the :func:`nominal_value` and
   0.0
 
 Finally, a utility method is provided that directly yields the
-**number of standard deviations** between a number and a result with
+`standard score <http://en.wikipedia.org/wiki/Standard_score>`_
+(number of standard deviations) between a number and a result with
 uncertainty: with :data:`x` equal to 0.20±0.01,
 
-  >>> x.position_in_sigmas(0.17)
+  >>> x.std_score(0.17)
   -3.0
 
 .. index:: derivatives
