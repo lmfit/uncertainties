@@ -291,15 +291,15 @@ control), including functions written in C or Fortran.  Similarly,
 automatically wrapped so as to also work with arguments that contain
 uncertainties.
 
-It is thus possible to have a function :func:`f` that takes any number
-of floats and returns a single float, and to automatically generalize
-it so that it also works with numbers with uncertainties:
+It is thus possible to have a function :func:`f` that returns a single
+float, and to automatically generalize it so that it also works with
+numbers with uncertainties:
 
   >>> wrapped_f = uncertainties.wrap(f)
 
 The new function :func:`wrapped_f` can be given numbers with
-uncertainties.  It returns the same values as :func:`f`, but with
-uncertainties.
+uncertainties instead of Python floats.  It returns the same values as
+:func:`f`, but with uncertainties.
 
 With a simple wrapping call like above, uncertainties in the function
 result are automatically calculated numerically. **Analytical

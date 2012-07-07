@@ -470,9 +470,13 @@ def wrap(f, derivatives_iter=None):
     uncertainties.  Doing so may be necessary when function f cannot
     be expressed analytically (with uncertainties-compatible operators
     and functions like +, *, umath.sin(), etc.).
+
+    f must return a scalar (not a list, etc.).
     
-    f must take only scalar arguments (and any kind of optional
-    keyword arguments), and must return a scalar.
+    In the wrapped function, the standard Python scalar arguments of f
+    (float, int, etc.) can be replaced by numbers with
+    uncertainties. The result will contain the appropriate
+    uncertainty.
     
     If no argument to the wrapped function has an uncertainty, f
     simply returns its usual, scalar result.
@@ -483,11 +487,12 @@ def wrap(f, derivatives_iter=None):
     function for each argument of f, which takes as many arguments as
     f).  If instead of a function, an element of derivatives_iter
     contains None, then it is automatically replaced by the relevant
-    numerical derivative.
+    numerical derivative; this can be used for non-scalar arguments of
+    f (like string arguments).
 
     If derivatives_iter is None, or if derivatives_iter contains a
-    fixed (and finite) number of elements, then missing derivatives
-    are also calculated numerically.
+    fixed (and finite) number of elements, then any missing derivative
+    is calculated numerically.
 
     An infinite number of derivatives can be specified by having
     derivatives_iter be an infinite iterator; this can for instance
