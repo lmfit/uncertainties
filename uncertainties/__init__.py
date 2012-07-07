@@ -457,10 +457,10 @@ def wrap(f, derivatives_funcs=None):
     uncertainties (UFloat objects) and returns a number with
     uncertainties.
 
+    f must take only scalar arguments, and must return a scalar.
+    
     If no argument to the wrapped function has an uncertainty, f
     simply returns its usual, scalar result.
-
-    f must take only scalar arguments, and must return a scalar.
 
     If supplied, 'derivatives_funcs' is a sequence or iterator that
     generally contains functions; each successive function is the
