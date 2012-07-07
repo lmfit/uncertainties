@@ -485,12 +485,12 @@ def test_basic_access_to_data():
     assert y.error_components()[x] == 5  # New error contribution!
 
     # Calculation of deviations in units of the standard deviations:
-    assert 10/x.std_dev() == x.position_in_sigmas(10 + x.nominal_value)
+    assert 10/x.std_dev() == x.std_score(10 + x.nominal_value)
 
     # "In units of the standard deviation" is not always meaningfull:
     x.set_std_dev(0)
     try:
-        x.position_in_sigmas(1)
+        x.std_score(1)
     except ValueError:
         pass  # Normal behavior
 
