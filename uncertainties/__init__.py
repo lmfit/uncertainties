@@ -471,12 +471,8 @@ def wrap(f, derivatives_iter=None):
     be expressed analytically (with uncertainties-compatible operators
     and functions like +, *, umath.sin(), etc.).
     
-    f must take only scalar arguments, and must return a scalar.
-
-    #!!!!!!!! mention compatibility with keyword arguments
-
-    #!!!!!!!! can non-float arguments be given (like strings, with a
-    #method for optimization, etc.).
+    f must take only scalar arguments (and any kind of optional
+    keyword arguments), and must return a scalar.
     
     If no argument to the wrapped function has an uncertainty, f
     simply returns its usual, scalar result.
@@ -508,10 +504,6 @@ def wrap(f, derivatives_iter=None):
     an analytically defined derivative.
     """
 
-        
-    #!!!!! how to handle keyword arguments in f()?
-    
-    
     if derivatives_iter is None:
         derivatives_iter = NumericalDerivatives(f)
     else:
