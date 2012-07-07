@@ -463,7 +463,7 @@ class NumericalDerivatives(object):
         """
         return partial_derivative(self._function, n)
   
-def wrap(f, derivatives_iter=None, derivatives_dict):
+def wrap(f, derivatives_iter=None, derivatives_dict={}):
     """
     Wraps a function f into a function that also accepts numbers with
     uncertainties (UFloat objects) and returns a number with
