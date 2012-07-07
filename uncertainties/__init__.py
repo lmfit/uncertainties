@@ -462,14 +462,13 @@ def wrap(f, derivatives_funcs=None):
     If no argument to the wrapped function has an uncertainty, f
     simply returns its usual, scalar result.
 
-    If supplied, 'derivatives_funcs' is a sequence or iterator that
-    generally contains functions; each successive function is the
-    partial derivatives of f with respect to the corresponding
-    variable (one function for each argument of f, which takes as many
-    arguments as f).  If derivatives_funcs is None, or if
-    derivatives_funcs contains a finite number of elements, then
-    missing derivatives are calculated numerically through
-    partial_derivative().
+    If supplied, 'derivatives_funcs' is an iterable that generally
+    contains functions; each successive function is the partial
+    derivatives of f with respect to the corresponding variable (one
+    function for each argument of f, which takes as many arguments as
+    f).  If derivatives_funcs is None, or if derivatives_funcs
+    contains a finite number of elements, then missing derivatives are
+    calculated numerically through partial_derivative().
 
     Example (for illustration purposes only, as
     uncertainties.umath.sin() is more efficient than the examples that
