@@ -110,9 +110,10 @@ wraps = functools.partial(functools.update_wrapper,
 
 # Functions that have singularities (possibly at infinity) benefit
 # from analytical calculations (instead of the default numerical
-# calculation).  Even slowly varying functions (e.g., abs()) yield
-# more precise results when differentiated analytically, because of
-# the loss of precision in numerical calculations.
+# calculation) because their derivatives generally change very fast.
+# Even slowly varying functions (e.g., abs()) yield more precise
+# results when differentiated analytically, because of the loss of
+# precision in numerical calculations.
 
 #def log_1arg_der(x):
 #    """
