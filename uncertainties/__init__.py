@@ -27,7 +27,7 @@ Examples:
   print x**2  # Square: prints "0.04+/-0.004"
   print sin(x**2)  # Prints "0.0399...+/-0.00399..."
 
-  print x.position_in_sigmas(0.17)  # Prints "-3.0": deviation of -3 sigmas
+  print x.std_score(0.17)  # Prints "-3.0": deviation of -3 sigmas
 
   # Access to the nominal value, and to the uncertainty:
   square = x**2  # Square
@@ -232,6 +232,7 @@ import re
 import math
 from math import sqrt, log  # Optimization: no attribute look-up
 import copy
+import warnings
 
 # Numerical version:
 __version_info__ = (1, 8, '1b')
@@ -291,6 +292,17 @@ def set_doc(doc_string):
 # CONSTANT_TYPES.  The most common types can be put in front, as this
 # may slightly improve the execution speed.
 CONSTANT_TYPES = (float, int, complex, long)
+
+###############################################################################
+# Utility for issuing deprecation warnings
+
+def deprecation(message):
+    '''
+    Warns the user with the given message, by issuing a
+    DeprecationWarning.
+    '''
+    warnings.warn(message, DeprecationWarning, stacklevel=2)
+
 
 ###############################################################################
 
@@ -462,6 +474,9 @@ def wrap(f, derivatives_iter=None):
     f must take only scalar arguments, and must return a scalar.
 
     #!!!!!!!! mention compatibility with keyword arguments
+
+    #!!!!!!!! can non-float arguments be given (like strings, with a
+    #method for optimization, etc.).
     
     If no argument to the wrapped function has an uncertainty, f
     simply returns its usual, scalar result.
@@ -774,7 +789,7 @@ class AffineScalarFunc(object):
       All the Variable objects on which the function depends are in
       'derivatives'.
 
-    - position_in_sigmas(x): position of number x with respect to the
+    - std_score(x): position of number x with respect to the
       nominal value, in units of the standard deviation.
     """
 
@@ -966,6 +981,14 @@ class AffineScalarFunc(object):
         return self._general_representation(str)
 
     def position_in_sigmas(self, value):
+        '''
+        Wrapper for legacy code.  Obsolete: do not use.  Use std_score
+        instead.
+        '''
+        deprecation("position_in_sigmas is obsolete.")
+        return self.std_score(value)
+    
+    def std_score(self, value):
         """
         Returns 'value' - nominal value, in units of the standard
         deviation.
@@ -1535,10 +1558,7 @@ def NumberWithUncert(*args):
     Wrapper for legacy code.  Obsolete: do not use.  Use ufloat
     instead.
     """
-    import warnings
-    warnings.warn("NumberWithUncert is obsolete."
-                  "  Use ufloat instead.", DeprecationWarning,
-                  stacklevel=2)
+    deprecation("NumberWithUncert is obsolete.  Use ufloat instead."
     return ufloat(*args)
 
 def num_with_uncert(*args):
@@ -1546,10 +1566,7 @@ def num_with_uncert(*args):
     Wrapper for legacy code.  Obsolete: do not use.  Use ufloat
     instead.
     """
-    import warnings
-    warnings.warn("num_with_uncert is obsolete."
-                  "  Use ufloat instead.", DeprecationWarning,
-                  stacklevel=2)
+    deprecation("num_with_uncert is obsolete.  Use ufloat instead.")
     return ufloat(*args)
 
 def array_u(*args):
@@ -1557,11 +1574,8 @@ def array_u(*args):
     Wrapper for legacy code.  Obsolete: do not use.  Use
     unumpy.uarray instead.
     """
-    import warnings
-    warnings.warn("uncertainties.array_u is obsolete."
-                  " Use uncertainties.unumpy.uarray instead.",
-                  DeprecationWarning,
-                  stacklevel=2)
+    deprecation('uncertainties.array_u is obsolete.  Use'
+                ' uncertainties.unumpy.uarray instead.')
     import uncertainties.unumpy
     return uncertainties.unumpy.uarray(*args)
 
@@ -1570,11 +1584,8 @@ def nominal_values(*args):
     Wrapper for legacy code.  Obsolete: do not use.  Use
     unumpy.nominal_values instead.
     """
-    import warnings
-    warnings.warn("uncertainties.nominal_values is obsolete."
-                  "  Use uncertainties.unumpy.nominal_values instead.",
-                  DeprecationWarning,
-                  stacklevel=2)
+    deprecation("uncertainties.nominal_values is obsolete."
+                "  Use uncertainties.unumpy.nominal_values instead.")
     import uncertainties.unumpy
     return uncertainties.unumpy.nominal_values(*args)
 
@@ -1583,11 +1594,8 @@ def std_devs(*args):
     Wrapper for legacy code.  Obsolete: do not use.  Use ufloat
     instead.
     """
-    import warnings
-    warnings.warn("uncertainties.std_devs is obsolete."
-                  "  Use uncertainties.unumpy.std_devs instead.",
-                  DeprecationWarning,
-                  stacklevel=2)
+    deprecation("uncertainties.std_devs is obsolete."
+                "  Use uncertainties.unumpy.std_devs instead.")
     import uncertainties.unumpy
     return uncertainties.unumpy.std_devs(*args)
 
