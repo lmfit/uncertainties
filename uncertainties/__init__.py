@@ -455,8 +455,10 @@ def wrap(f, derivatives_funcs=None):
     """
     Wraps a function f into a function that also accepts numbers with
     uncertainties (UFloat objects) and returns a number with
-    uncertainties.
-
+    uncertainties.  Doing so may be necessary when function f cannot
+    be expressed analytically (with uncertainties-compatible operators
+    and functions like +, *, umath.sin(), etc.).
+    
     f must take only scalar arguments, and must return a scalar.
 
     #!!!!!!!! mention compatibility with keyword arguments
@@ -527,7 +529,7 @@ def wrap(f, derivatives_funcs=None):
     
     Original documentation:
     %s""" % (f.__name__, f.__doc__))
-    def f_with_affine_output(*args):
+    def f_with_affine_output(*args, **kwargs):
         # Can this function perform the calculation of an
         # AffineScalarFunc (or maybe float) result?
         try:
