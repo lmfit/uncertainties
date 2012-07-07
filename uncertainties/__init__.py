@@ -458,27 +458,32 @@ def wrap(f, derivatives_funcs=None):
     uncertainties.
 
     f must take only scalar arguments, and must return a scalar.
+
+    #!!!!!!!! mention compatibility with keyword arguments
     
     If no argument to the wrapped function has an uncertainty, f
     simply returns its usual, scalar result.
 
-    If supplied, 'derivatives_funcs' is an iterable that generally
+    If supplied, derivatives_funcs can be an iterable that generally
     contains functions; each successive function is the partial
-    derivatives of f with respect to the corresponding variable (one
+    derivative of f with respect to the corresponding variable (one
     function for each argument of f, which takes as many arguments as
-    f).  If derivatives_funcs is None, or if derivatives_funcs
-    
-    #!!!!!! Can the derivative function be None?
-    
-    #!!!!!!! Finite??
+    f).  If instead of a function, an element of derivatives_funcs
+    contains None, then it is automatically replaced by the relevant
+    numerical derivative.
 
-    #!!!!! how to handle keyword arguments in f()?
-    
-    contains a finite number of elements, then missing derivatives are
-    calculated numerically through partial_derivative().
+    If derivatives_funcs is None, or if derivatives_funcs contains a
+    fixed (and finite) number of elements, then missing derivatives
+    are also calculated numerically.
+
+    An infinite number of derivatives can be specified by having
+    derivatives_funcs be an infinite iterator; this can for instance
+    be used for specifying the derivatives of functions with a
+    undefined number of argument (like sum(), whose partial
+    derivatives all return 1).
 
     Example (for illustration purposes only, as
-    uncertainties.umath.sin() is more efficient than the examples that
+    uncertainties.umath.sin() runs faster than the examples that
     follow): wrap(math.sin) is a sine function that can be applied to
     numbers with uncertainties.  Its derivative will be calculated
     numerically.  wrap(math.sin, [None]) would have produced the same
@@ -486,6 +491,10 @@ def wrap(f, derivatives_funcs=None):
     an analytically defined derivative.
     """
 
+        
+    #!!!!! how to handle keyword arguments in f()?
+    
+    
     if derivatives_funcs is None:
         derivatives_funcs = NumericalDerivatives(f)
     else:
