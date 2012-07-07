@@ -528,7 +528,7 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
         try:  # Is the number of derivatives fixed?
             len(derivatives_iter)
         except TypeError:
-            pass
+            pass  # Undefined number of derivatives (useful for, e.g., sum())
         else:
             derivatives_iter = [
                 partial_derivative(f, k) if derivative is None
