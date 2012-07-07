@@ -558,7 +558,7 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
 
         except NotUpcast:
 
-            # This function does not now how to itself perform
+            # This function does not know how to itself perform
             # calculations with non-float-like arguments (as they
             # might for instance be objects whose value really changes
             # if some Variable objects had different values):
