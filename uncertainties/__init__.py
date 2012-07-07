@@ -467,6 +467,13 @@ def wrap(f, derivatives_funcs=None):
     derivatives of f with respect to the corresponding variable (one
     function for each argument of f, which takes as many arguments as
     f).  If derivatives_funcs is None, or if derivatives_funcs
+    
+    #!!!!!! Can the derivative function be None?
+    
+    #!!!!!!! Finite??
+
+    #!!!!! how to handle keyword arguments in f()?
+    
     contains a finite number of elements, then missing derivatives are
     calculated numerically through partial_derivative().
 
@@ -485,7 +492,7 @@ def wrap(f, derivatives_funcs=None):
         # Derivatives that are not defined are calculated numerically,
         # if there is a finite number of them (the function lambda
         # *args: fsum(args) has a non-defined number of arguments, as
-        # it just performs a sum...
+        # it just performs a sum):
         try:  # Is the number of derivatives fixed?
             len(derivatives_funcs)
         except TypeError:
