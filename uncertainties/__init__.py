@@ -654,8 +654,15 @@ def wrap(f, derivatives_iter=None):
         return AffineScalarFunc(f_nominal_value, derivatives_wrt_vars)
 
     # It is easier to work with f_with_affine_output, which represents
-    # a wrapped version of 'f', when it bears the same name as 'f':
+    # a wrapped version of 'f', when it bears the same name as
+    # 'f'.
     f_with_affine_output.__name__ = f.__name__
+    # Note: Setting __name__ is however not fully sufficient: the name
+    # f_with_affine_output is stored in
+    # f_with_affine_output.__code__.co_name; being able to change it
+    # would be useful for instance when f_with_affine_output() is
+    # called with unexpected arguments (unexpected keyword argument,
+    # etc.). co_name is read-only, though.
 
     return f_with_affine_output
 
