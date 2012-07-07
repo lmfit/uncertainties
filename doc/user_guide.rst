@@ -283,11 +283,13 @@ rounding errors).
 Making custom functions accept numbers with uncertainties
 =========================================================
 
-This package allows calculations that are performed through non-Python
-code (Fortran, C, etc.) to handle numbers with uncertainties instead
-of floats.  Similarly, **functions that do not have a simple
-analytical form** can be automatically wrapped so as to also work on
-float parameters that contain uncertainties.
+This package allows **code which is not meant to be used with numbers
+with uncertainties to handle them anyway**. This is for instance
+useful when calling external functions (which are out of the user's
+control), including functions written in C or Fortran.  Similarly,
+**functions that do not have a simple analytical form** can be
+automatically wrapped so as to also work with arguments that contain
+uncertainties.
 
 It is thus possible to have a function :func:`f` that takes any number
 of floats and returns a single float, and to automatically generalize
@@ -298,6 +300,12 @@ it so that it also works with numbers with uncertainties:
 The new function :func:`wrapped_f` can be given numbers with
 uncertainties.  It returns the same values as :func:`f`, but with
 uncertainties.
+
+With a simple wrapping call like above, uncertainties in the function
+result are automatically calculated numerically. **Analytical
+uncertainty calculations can be performed** if derivatives are
+provided to :func:`wrap` (for details, see the documentation string of
+:func:`wrap` with the ``pydoc`` command, or ``help()``).
 
 Miscellaneous utilities
 =======================
