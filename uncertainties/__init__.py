@@ -411,9 +411,6 @@ def partial_derivative(f, param_num):
     Returns a function that numerically calculates the partial
     derivative of function f with respect to its argument number
     param_num.
-
-    The step parameter represents the shift of the parameter used in
-    the numerical approximation.
     """
 
     def partial_derivative_of_f(*args):
