@@ -313,14 +313,19 @@ Almost all the derivatives of the fundamental functions provided by
 few mathematical functions that are instead differentiated through
 numerical approximation are listed in ``umath.num_deriv_funcs``).
 
-The derivatives of mathematical *expressions* are evaluated through a
-fast and precise method: :mod:`uncertainties` transparently implements
-`automatic differentiation`_ with reverse accumulation. This method is
-faster than symbolic differentiation and more precise than numerical
-differentiation.
+The derivatives of mathematical *expressions* are evaluated through a 
+fast and precise method: :mod:`uncertainties` transparently implements 
+`automatic differentiation`_ with reverse accumulation. This method 
+essentially consists in keeping track of the value of derivatives, and 
+in automatically applying the `chain rule 
+<http://en.wikipedia.org/wiki/Chain_rule>`_. Automatic differentiation 
+is often faster than symbolic differentiation and more precise than 
+numerical differentiation (when used with analytical formulas, like in
+:mod:`uncertainties`).
 
-The derivatives of any expression can be obtained in a simple way, as
-demonstrated in the :ref:`User Guide <derivatives>`.
+The derivatives of any expression can be obtained with 
+:mod:`uncertainties` in a simple way, as demonstrated in the :ref:`User 
+Guide <derivatives>`.
 
 .. _automatic differentiation: http://en.wikipedia.org/wiki/Automatic_differentiation
 
