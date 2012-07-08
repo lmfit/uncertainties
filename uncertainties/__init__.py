@@ -524,6 +524,13 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
 
         Dictionary that maps optional keyword argument names to their
         derivative (as in derivatives_iter).
+
+    Note on efficiency: the wrapped function assumes that f cannot
+    accept numbers with uncertainties as arguments. If f actually does
+    handle some arguments even when they have an uncertainty, the
+    wrapped function ignores this fact, which might lead to a
+    performance hit: wrapping a function that actually accepts numbers
+    with uncertainty is likely to make it slower.
         
     Example (for illustration purposes only, as
     uncertainties.umath.sin() runs faster than the examples that
@@ -567,6 +574,13 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
     Original documentation:
     %s""" % (f.__name__, f.__doc__))
     def f_with_affine_output(*args, **kwargs):
+
+        # The arguments that contain an uncertainty (AffineScalarFunc
+        # objects) are gathered; they will be replaced by simple
+        # floats.
+
+        #!!!!!!!!!
+        
         # Can this function perform the calculation of an
         # AffineScalarFunc (or maybe float) result?
         try:
