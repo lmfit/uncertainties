@@ -576,84 +576,64 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
     def f_with_affine_output(*args, **kwargs):
 
         # The arguments that contain an uncertainty (AffineScalarFunc
-        # objects) are gathered; they will be replaced by simple
-        # floats.
-        args_w_uncert = [index for (index, value) in enumerate(args)
+        # objects) are gathered, as positions or names; they will be
+        # replaced by simple floats.
+        pos_w_uncert = [index for (index, value) in enumerate(args)
                          if isinstance(value, AffineScalarFunc)]
-        kwargs_w_uncert = [key for (key, value) in kwargs.iteritems()
+        names_w_uncert = [key for (key, value) in kwargs.iteritems()
                            if isinstance(value, AffineScalarFunc)]
-        
-        
-        #!!!!!!!!!
-        
-        # Can this function perform the calculation of an
-        # AffineScalarFunc (or maybe float) result?
-        try:
 
-            #!!!! What am I really doing here, in the perspective of allowing
-            # non AffineScalarFunc args?
+        # The behavior of f() is kept, if no number with uncertainty
+        # is provided:
+        if (not pos_w_uncert) and (not names_w_uncert):
+            return f(*args, **kwargs)
             
-            #!!!!!!!!! map only scalars that can be mapped
-            #!!!!!! rethink the exception handling
-            #!!!!!! also map keyword arguments
-            aff_funcs = map(to_affine_scalar, args)
+        ########################################
+        # Value of f() at the nominal value of the arguments with
+        # uncertainty:
 
-        except NotUpcast:
+        ## Nominal values of the (scalar) arguments:
 
-            # This function does not know how to itself perform
-            # calculations with non-float-like arguments (as they
-            # might for instance be objects whose value really changes
-            # if some Variable objects had different values):
+        # !! Possible optimization: If pos_w_uncert is empty, there
+        # is actually no need to create a mutable version of args and
+        # one could do args_values = args.  However, the wrapped
+        # function is typically called with numbers with uncertainties
+        # as positional arguments (i.e., pos_w_uncert is not emtpy),
+        # so this "optimization" is not implemented here.
+        
+        # Positional arguments:
+        args_values = list(args)  # Mutable: modified below
+        # Arguments with an uncertainty are converted to their nominal
+        # value:
+        for index in pos_w_uncert:
+            args_values[index] = args_values[index].nominal_value
 
-            # Is it clear that we can't delegate the calculation?
+        # Optional keyword arguments:
 
-            if any(isinstance(arg, AffineScalarFunc) for arg in args):
-                # This situation arises for instance when calculating
-                # AffineScalarFunc(...)*numpy.array(...).  In this
-                # case, we must let NumPy handle the multiplication
-                # (which is then performed element by element):
-                return NotImplemented
-            else:
-                # If none of the arguments is an AffineScalarFunc, we
-                # can delegate the calculation to the original
-                # function.  This can be useful when it is called with
-                # only one argument (as in
-                # numpy.log10(numpy.ndarray(...)):
-                return f(*args)
+        # For efficiency reasons, kwargs is not copied. Instead, its
+        # values with uncertainty are modified:
+        kwargs_uncert_values = {}  # Original values with uncertainty
+        for name in names_w_uncert:
+            value_with_uncert = kwargs[name]
+            kwargs_uncert_values[name] = value_with_uncert
+            # The original dictionary is modified (for efficiency reasons):
+            kwargs[name] = value_with_uncert.nominal_value
+            
+        f_nominal_value = f(*args_values, **kwargs)
 
         ########################################
-        # Nominal value of the constructed AffineScalarFunc:
-        args_values = [e.nominal_value for e in aff_funcs]
-        f_nominal_value = f(*args_values)
 
-        ########################################
-
-        # List of involved variables (Variable objects):
+        # Involved variables (Variable objects):
         variables = set()
-        for expr in aff_funcs:
+        for expr in ([args[index] for index in pos_w_uncert]
+                     +[kwargs[name] for name in names_w_uncert]):
+            # !! In Python 2.7+: |= expr.derivatives.viewkeys()
             variables |= set(expr.derivatives)
 
-        ## It is sometimes useful to only return a regular constant:
-
-        # (1) Optimization / convenience behavior: when 'f' is called
-        # on purely constant values (e.g., sin(2)), there is no need
-        # for returning a more complex AffineScalarFunc object.
-
-        # (2) Functions that do not return a "float-like" value might
-        # not have a relevant representation as an AffineScalarFunc.
-        # This includes boolean functions, since their derivatives are
-        # either 0 or are undefined: they are better represented as
-        # Python constants than as constant AffineScalarFunc functions.
-
-        if not variables or isinstance(f_nominal_value, bool):
-            return f_nominal_value
-
-        # The result of 'f' does depend on 'variables'...
-
         ########################################
 
-        # Calculation of the derivatives with respect to the arguments
-        # of f (aff_funcs):
+        # Calculation of the derivatives with respect to the variables
+        # of f that have a number with uncertainty.
 
         # The chain rule is applied.  This is because, in the case of
         # numerical derivatives, it allows for a better-controlled
