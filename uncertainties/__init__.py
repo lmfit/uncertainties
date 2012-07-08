@@ -658,6 +658,8 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
         # the math module, or if some function has more than 3
         # arguments).
 
+        #!!!!!!!
+        
         derivatives_wrt_args = []
         for (arg, derivative) in zip(aff_funcs, derivatives_iter):
             derivatives_wrt_args.append(derivative(*args_values)
