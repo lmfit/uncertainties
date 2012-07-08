@@ -399,7 +399,7 @@ def to_affine_scalar(x):
 
     #! In Python 2.6+, numbers.Number could be used instead, here:
     if isinstance(x, CONSTANT_TYPES):
-        # No variable => no derivative to define:
+        # No variable => no derivative:
         return AffineScalarFunc(x, {})
 
     # Case of lists, etc.
@@ -578,7 +578,12 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
         # The arguments that contain an uncertainty (AffineScalarFunc
         # objects) are gathered; they will be replaced by simple
         # floats.
-
+        args_w_uncert = [index for (index, value) in enumerate(args)
+                         if isinstance(value, AffineScalarFunc)]
+        kwargs_w_uncert = [key for (key, value) in kwargs.iteritems()
+                           if isinstance(value, AffineScalarFunc)]
+        
+        
         #!!!!!!!!!
         
         # Can this function perform the calculation of an
