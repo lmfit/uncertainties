@@ -585,7 +585,25 @@ def test_wrapped_func():
     assert f_wrapped(angle, [angle, angle]) == NotImplemented
     assert f_wrapped(angle, my_list) == NotImplemented
     
+    ##############################
+    # Non-float arguments:
 
+    x = uncertainties.ufloat((1, 0.1))
+    
+    # Implicit derivatives:
+    def f(x, y, z):
+        return x+z
+    f_wrapped = uncertainties.wrap(f)
+    assert fw(10, 'string argument', 1) == 11
+    assert fw(x, 'string argument', 1).std() == 1
+    
+    # Explicit derivatives:
+    def f(x, y, z):
+        return x+z
+    f_wrapped = uncertainties.wrap(f, [lambda *args: 1, None, lambda *args:1])
+    assert fw(10, 'string argument', 1) == 11.0
+    assert fw(x, 'string argument', 1).std() == 1
+    
 ###############################################################################
         
 def test_access_to_std_dev():

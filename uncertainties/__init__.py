@@ -554,6 +554,13 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
         # Can this function perform the calculation of an
         # AffineScalarFunc (or maybe float) result?
         try:
+
+            #!!!! What am I really doing here, in the perspective of allowing
+            # non AffineScalarFunc args?
+            
+            #!!!!!!!!! map only scalars that can be mapped
+            #!!!!!! rethink the exception handling
+            #!!!!!! also map keyword arguments
             aff_funcs = map(to_affine_scalar, args)
 
         except NotUpcast:
