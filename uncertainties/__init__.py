@@ -406,36 +406,55 @@ def to_affine_scalar(x):
     raise NotUpcast("%s cannot be converted to a number with"
                     " uncertainty" % type(x))
 
-def partial_derivative(f, param_num):
+def partial_derivative(f, arg_ref):
     """
     Returns a function that numerically calculates the partial
-    derivative of function f with respect to its argument number
-    param_num.
+    derivative of function f with respect to its argument arg_ref.
+
+    arg_ref -- describes which variable to use for the
+    differentiation. Can either be an integer with the index of a
+    positional argument, or a string with the name of an optional
+    keyword argument (not with the name of a mandatory keyword
+    argument, as such variables can be handled through an integer
+    arg_ref position).
     """
 
-    def partial_derivative_of_f(*args):
+    # Which set of function parameter contains the variable to be
+    # changed? the positional or the optional keyword arguments?
+    change_kwargs = isinstance(arg_ref, basestring)
+    
+    def partial_derivative_of_f(*args, **kwargs):
         """
         Partial derivative, calculated with the (-epsilon, +epsilon)
         method, which is more precise than the (0, +epsilon) method.
         """
         # f_nominal_value = f(*args)
 
-        shifted_args = list(args)  # Copy, and conversion to a mutable
-
+        # args_with_var contains the arguments (either args or kwargs)
+        # that contain the variable that must be shifted, as a mutable
+        # object (because the variable contents will be modified):
+        if change_kwargs:
+            args_with_var = kwargs
+        else:
+            # Only in this case do the positional argument need to be
+            # modified:
+            args = list(args)
+            args_with_var = args
+       
         # The step is relative to the parameter being varied, so that
-        # shifting it does not suffer from finite precision:
-        step = 1e-8*abs(shifted_args[param_num])
+        # shifting it does not suffer from finite precision limitations:
+        step = 1e-8*abs(args_with_var[arg_ref])
         if not step:
             # Arbitrary, but "small" with respect to 1, and of the
             # order of the square root of the precision of double
             # precision floats:
             step = 1e-8
 
-        shifted_args[param_num] += step
-        shifted_f_plus = f(*shifted_args)
+        args_with_var[arg_ref] += step
+        shifted_f_plus = f(*args, **kwargs)
         
-        shifted_args[param_num] -= 2*step  # Optimization: only 1 list copy
-        shifted_f_minus = f(*shifted_args)
+        args_with_var[arg_ref] -= 2*step  # Optimization: only 1 list copy
+        shifted_f_minus = f(*args, **kwargs)
 
         return (shifted_f_plus - shifted_f_minus)/2/step
 
