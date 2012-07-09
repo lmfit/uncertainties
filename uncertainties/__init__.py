@@ -518,13 +518,13 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
         derivatives_iter be an infinite iterator; this can for instance
         be used for specifying the derivatives of functions with a
         undefined number of argument (like sum(), whose partial
-        derivatives all return 1).
+        derivatives all return 1, but whose number if undefined).
 
     derivatives_dict --
 
         Dictionary that maps optional keyword argument names to their
         derivative (as in derivatives_iter).
-
+        
     Note on efficiency: the wrapped function assumes that f cannot
     accept numbers with uncertainties as arguments. If f actually does
     handle some arguments even when they have an uncertainty, the
@@ -541,6 +541,8 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
     an analytically defined derivative.
     """
 
+    #!!!!!!! handle derivatives_dict too?
+    
     if derivatives_iter is None:
         derivatives_iter = NumericalDerivatives(f)
     else:
@@ -635,9 +637,9 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
         # Calculation of the derivatives with respect to the variables
         # of f that have a number with uncertainty.
 
-        # The chain rule is applied.  This is because, in the case of
-        # numerical derivatives, it allows for a better-controlled
-        # numerical stability than numerically calculating the partial
+        # The chain rule is applied.  In the case of numerical
+        # derivatives, this method gives a better-controlled numerical
+        # stability than numerically calculating the partial
         # derivatives through '[f(x + dx, y + dy, ...) -
         # f(x,y,...)]/da' where dx, dy,... are calculated by varying
         # 'a'.  In fact, it is numerically better to control how big
@@ -658,8 +660,9 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
         # the math module, or if some function has more than 3
         # arguments).
 
-        #!!!!!!!
-        
+        #!!!!!!!!!!!!
+
+        # Mapping between 
         derivatives_wrt_args = []
         for (arg, derivative) in zip(aff_funcs, derivatives_iter):
             derivatives_wrt_args.append(derivative(*args_values)
@@ -670,7 +673,7 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
         # Calculation of the derivative of f with respect to all the
         # variables (Variable) involved.
 
-        # Initial value (is updated below):
+        # Initial value for the chain rule (is updated below):
         derivatives_wrt_vars = dict((var, 0.) for var in variables)
 
         # The chain rule is used (we already have
