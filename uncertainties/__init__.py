@@ -462,10 +462,11 @@ def partial_derivative(f, arg_ref):
 
 class NumericalDerivatives(object):
     """
-    Sequence with the successive numerical derivatives of a function.
+    Convenient access to the partial derivatives of a function,
+    calculated numerically.
     """
-    # This is a sequence and not a list because the number of
-    # arguments of the function is not known in advance, in general.
+    # This is not a list because the number of arguments of the
+    # function is not known in advance, in general.
 
     def __init__(self, function):
         """
