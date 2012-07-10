@@ -660,10 +660,24 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
         # the math module, or if some function has more than 3
         # arguments).
 
-        #!!!!!!!!!!!!
+        # The positional argument list (args) is handled separately
+        # from the optional keyword arguments kwargs because we must
+        # handle an indefinite number of arguments (for wrapping
+        # functions with a variable number of arguments):
 
-        # Mapping between 
-        derivatives_wrt_args = []
+        # Maps each relevant argument reference (numerical index in
+        # args, or name in kwargs) to the value of the corresponding
+        # partial derivative of f (only for those arguments that
+        # contain a number with uncertainty):
+        derivatives_wrt_args = {}
+        for index in pos_w_uncert:
+            # !!!!!! I need an equivalent of derivatives_iter that can
+            # be accessed by index (or can derivatives_iter be
+            # accessed by index?) OR MAYBE I COULD have a unique
+            # mapping-like thing that returns BOTH derivative
+            # functions for args and for kwargs
+            pass
+        
         for (arg, derivative) in zip(aff_funcs, derivatives_iter):
             derivatives_wrt_args.append(derivative(*args_values)
                                         if arg.derivatives
@@ -1210,6 +1224,10 @@ class Variable(AffineScalarFunc):
     """
     Representation of a float-like scalar random variable, along with
     its uncertainty.
+
+    Objects are meant to represent variables that are independent from
+    each other (correlations are handled through the AffineScalarFunc
+    class).
     """
 
     # To save memory in large arrays:
