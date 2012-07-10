@@ -563,6 +563,10 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
         try:  # Is the number of derivatives fixed?
             len(derivatives_iter)
         except TypeError:
+            # !!!!!!!! There is probably a bug, in this case: the
+            # iterator should be *copied* before each use in
+            # f_with_affine_output, probably.  SHOULD this case be
+            # removed OR handled separately?
             pass  # Undefined number of derivatives (useful for, e.g., sum())
         else:
             derivatives_iter = [
