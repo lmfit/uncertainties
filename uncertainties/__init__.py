@@ -1171,6 +1171,10 @@ class Variable(AffineScalarFunc):
     """
     Representation of a float-like scalar random variable, along with
     its uncertainty.
+
+    Objects are meant to represent variables that are independent from
+    each other (correlations are handled through the AffineScalarFunc
+    class).    
     """
 
     # To save memory in large arrays:
