@@ -550,7 +550,9 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
     """
 
     #!!!!!!! handle derivatives_dict too?
-    
+
+    # Construction of derivatives_iter, an iterable that gives the
+    # derivatives for the positional arguments of a function:
     if derivatives_iter is None:
         derivatives_iter = NumericalDerivatives(f)
     else:
@@ -564,9 +566,9 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
             pass  # Undefined number of derivatives (useful for, e.g., sum())
         else:
             derivatives_iter = [
-                partial_derivative(f, k) if derivative is None
+                partial_derivative(f, arg_num) if derivative is None
                 else derivative
-                for (k, derivative) in enumerate(derivatives_iter)]
+                for (arg_num, derivative) in enumerate(derivatives_iter)]
 
     #! Setting the doc string after "def f_with...()" does not
     # seem to work.  We define it explicitly:
