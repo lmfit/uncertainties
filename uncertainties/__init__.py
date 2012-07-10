@@ -460,6 +460,7 @@ def partial_derivative(f, arg_ref):
 
     return partial_derivative_of_f
 
+
 class NumericalDerivatives(object):
     """
     Convenient access to the partial derivatives of a function,
@@ -476,10 +477,16 @@ class NumericalDerivatives(object):
 
     def __getitem__(self, n):
         """
-        Returns the n-th numerical derivative of the function.
+        Returns the n-th numerical derivative of the function (if n is
+        an integer), or the numerical derivative with respect to the
+        given optional named parameter (if n is a string).
         """
+        # !!!! Couldn't this be restricted to integer values? maybe
+        # partial_derivative could be optimized for index (integer)
+        # values?
         return partial_derivative(self._function, n)
-  
+
+
 def wrap(f, derivatives_iter=None, derivatives_dict={}):
     """
     Wraps a function f into a function that also accepts numbers with
