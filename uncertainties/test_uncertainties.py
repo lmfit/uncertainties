@@ -565,17 +565,26 @@ def test_wrapped_func():
     Test uncertainty-aware functions obtained through wrapping.
     """
 
+    def sum_float(list_nums):
+        '''
+        Takes a list of numbers and adds them together with
+        the float addition (float.__add__).
+        '''
+        return reduce(float.__add__, list_nums, 0.)
+    
     # This function can be wrapped so that it works when 'angle' has
     # an uncertainty (math.cos does not handle numbers with
     # uncertainties):
     def f(angle, list_var):
-        return math.cos(angle) + sum(list_var)
+        # It is useful to also include a function that has a variable number
+        # of arguments like my_sum():
+        return math.cos(angle) + sum_float(list_var)
 
     f_wrapped = uncertainties.wrap(f)
     my_list = [1, 2, 3]
 
     # Test of a wrapped function that only calls the original function:
-    assert f_wrapped(0, my_list) == 1 + sum(my_list)
+    assert f_wrapped(0, my_list) == 1 + sum_float(my_list)
 
     # As a precaution, the wrapped function does not venture into
     # calculating f with uncertainties when one of the argument is not
