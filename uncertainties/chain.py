@@ -101,6 +101,9 @@ for the distribution at hand.
 	return Variable(mean(chain), std(chain))
 
 class Chain(Variable):
+"""
+	A enhanced ufloat/Variable representation of the chain.
+"""
 	def __init__(self, chain):
 		self.chain = chain
 		self.std = std(self.chain)
@@ -129,7 +132,9 @@ class Chain(Variable):
 			return "%s (+%s,-%s)" % (fmt % v,fmt % errplus, fmt % errmin)
 		else: # integer representation
 			return "%d (+%d,-%d)" % (numpy.round(v, i),numpy.round(errplus, i), numpy.round(errmin, i))
-		
+	def __repr__(self):
+		return "Chain(%s)" % repr(self.chain)
+	
 	def tex(self):
 		i = int(numpy.floor(-numpy.log10(self.std_dev()) + 1))
 		
@@ -141,7 +146,7 @@ class Chain(Variable):
 			return "{%d}^{+%d}_{-%d}" % (numpy.round(v, i),numpy.round(errplus, i), numpy.round(errmin, i))
 
 
-__all__ = [collapse, combine, cross, median, std, mean, quantiles]
+__all__ = [collapse, combine, cross, median, std, mean, quantiles, Chain]
 __doc__ += "\n".join([median.__doc__, cross.__doc__, collapse.__doc__])
 
 
