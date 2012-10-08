@@ -101,15 +101,21 @@ for the distribution at hand.
 	return Variable(mean(chain), std(chain))
 
 class Chain(Variable):
-"""
-	A enhanced ufloat/Variable representation of the chain.
-"""
+	"""
+	An enhanced ufloat/Variable representation of the chain.
+	
+	String representation is slightly modified (10% and 90% quantiles 
+	as errors). Access to the chain is still possible, while linear
+	error propagation calculations using the uncertainties module 
+	are possible.
+	"""
+	
 	def __init__(self, chain):
 		self.chain = chain
 		self.std = std(self.chain)
 		self.mean = mean(self.chain)
 		super(Chain, self).__init__(self.mean, self.std)
-		self.percentiles = quantiles(self.chain, prob=range(101))
+		self.percentiles = quantiles(self.chain, prob=numpy.linspace(0,1,101))
 	
 	def inverse_cdf(self):
 		"""
@@ -129,7 +135,7 @@ class Chain(Variable):
 		v, errmin, errplus = (self.percentiles[50], self.percentiles[10], self.percentiles[90])
 		if i > 0:
 			fmt = "%%.%df" % (i)
-			return "%s (+%s,-%s)" % (fmt % v,fmt % errplus, fmt % errmin)
+			return "%s (+%s,-%s)" % (fmt % v,fmt % (errplus - v), fmt % (v - errmin))
 		else: # integer representation
 			return "%d (+%d,-%d)" % (numpy.round(v, i),numpy.round(errplus, i), numpy.round(errmin, i))
 	def __repr__(self):
