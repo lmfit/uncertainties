@@ -946,7 +946,16 @@ class AffineScalarFunc(object):
         return self._general_representation(repr)
                     
     def __str__(self):
-        return self._general_representation(str)
+        # to avoid unnecessary (false) accuracy, we only put in
+        # as many digits as make sense from the std_dev
+        i = int(numpy.floor(-numpy.log10(self.std_dev()) + 1))
+        
+        if i > 0:
+            fmt = "%%.%df" % (i)
+            formatter = lambda x: fmt % x
+        else: # integer representation
+            formatter = lambda x: str(int(round(x, i)))
+        return self._general_representation(formatter)
 
     def position_in_sigmas(self, value):
         """
