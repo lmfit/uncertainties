@@ -16,6 +16,8 @@ def test_runthrough():
 	print "string   ", c
 
 	print "full repr", repr(c)
+	
+	assert c.inverse_cdf()(0.5) == c.median, [c.inverse_cdf()(0.5), c.median]
 
 def test_2chains():
 	chain1 = numpy.random.normal(size=100)

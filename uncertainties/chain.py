@@ -27,7 +27,7 @@ Example:
 """
 
 import numpy
-import scipy.stats
+import scipy.stats, scipy.interpolate
 from uncertainties import ufloat, Variable
 
 def mean(chain, **kwargs):
@@ -116,6 +116,7 @@ class Chain(Variable):
 		self.mean = mean(self.chain)
 		super(Chain, self).__init__(self.mean, self.std)
 		self.percentiles = quantiles(self.chain, prob=numpy.linspace(0,1,101))
+		self.median = median(self.chain)
 	
 	def inverse_cdf(self):
 		"""
@@ -124,9 +125,8 @@ class Chain(Variable):
 		"""
 		a = list(self.chain)
 		a.sort()
-		a = numpy.array(a)
-		yinc = a.cumsum()
-		x = numpy.linspace(0, 1, len(a))
+		x = numpy.array(a)
+		yinc = numpy.linspace(0, 1, len(a))
 		return scipy.interpolate.interp1d(x=[0] + list(yinc) + [1], y=[x[0]] + list(x) + [x[-1]])
 	
 	def __str__(self):
