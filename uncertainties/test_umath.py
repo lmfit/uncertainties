@@ -237,7 +237,7 @@ def test_math_module():
         raise Exception('ValueError exception expected')
     try:
         umath.log(0)
-    except ValuerError, err_ufloat:  # "as", for Python 2.6+
+    except ValueError, err_ufloat:  # "as", for Python 2.6+
         assert err_math.args == err_ufloat.args
     else:
         raise Exception('ValueError exception expected')
