@@ -606,7 +606,6 @@ def test_legacy():
     "Test of legacy code"
     x = (1, 0.1)
 
-    old1 = uncertainties.NumberWithUncert(x)  # Warnings are normal
     old2 = uncertainties.num_with_uncert(x)  # Warnings are normal
     new = uncertainties.ufloat(x)
     
