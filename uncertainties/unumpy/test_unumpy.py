@@ -253,18 +253,6 @@ def test_component_extraction():
     assert type(unumpy.nominal_values(mat)) == numpy.matrix
     
 
-def test_legacy_code():
-
-    "Test of legacy functions"
-    
-    arr_def = ([1, 2], [0.1, 0.01])
-
-    # uarray, nominal_values, std_devs from the uncertainties module
-    # (not the uncertainties.unumpy module):
-    
-    assert numpy.all(uncertainties.nominal_values(arr) == arr_def[0])  # Warning is normal
-    assert numpy.all(uncertainties.std_devs(arr) == arr_def[1])  # Warning is normal
-    
 def test_array_comparisons():
     "Test of array and matrix comparisons"
 
