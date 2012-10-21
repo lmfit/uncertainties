@@ -602,18 +602,6 @@ def test_access_to_std_dev():
     assert uncertainties.std_dev([]) == 0
     assert uncertainties.std_dev(None) == 0
     
-def test_legacy():
-    "Test of legacy code"
-    x = (1, 0.1)
-
-    old2 = uncertainties.num_with_uncert(x)  # Warnings are normal
-    new = uncertainties.ufloat(x)
-    
-    assert old1.nominal_value == new.nominal_value
-    assert old2.nominal_value == new.nominal_value
-    assert old1.std_dev() == new.std_dev()
-    assert old2.std_dev() == new.std_dev()
-
 ###############################################################################
 
 def test_covariances():
