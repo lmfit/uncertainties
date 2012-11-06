@@ -105,6 +105,19 @@ gives access to many of the documentation strings included in the code.
 Installation and download
 =========================
 
+Important note
+--------------
+
+The installation commands below should be run in a DOS or Unix
+**command shell** (*not* in a Python shell).
+
+Under Windows (version 7 and earlier), a command shell can be obtained
+by running ``cmd.exe`` (through the Run… menu item from the Start
+menu). Under Unix (Linux, Mac OS X,…), a Unix shell is available when
+opening a terminal (in Mac OS X, the Terminal program is found in the
+Utilities folder, which can be accessed through the Go menu in the
+Finder).
+
 Automatic install or upgrade
 ----------------------------
 
