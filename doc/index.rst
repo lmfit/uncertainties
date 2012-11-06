@@ -108,8 +108,8 @@ Installation and download
 Important note
 --------------
 
-The installation commands below should be run in a DOS or Unix
-**command shell** (*not* in a Python shell).
+The installation commands below should be **run in a DOS or Unix
+command shell** (*not* in a Python shell).
 
 Under Windows (version 7 and earlier), a command shell can be obtained
 by running ``cmd.exe`` (through the Run… menu item from the Start
