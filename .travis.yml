@@ -2,19 +2,20 @@
 
 language: python
 
-python:
-  - "2.6"
-  - "2.7"
-  - "3.2"
+env:
+    - PYTHON=python PYSUF='' # uses Python 2.7
+    - PYTHON=python3 PYSUF=3 # uses Python 3.2
 
 # command to install dependencies
 install:
-  - time pip install --use-mirrors numpy sphinx
+  # Deactivate the virtualenv to get fast install of dependencies
+  - deactivate
+  - sudo apt-get install -qq $PYTHON-numpy $PYTHON-sphinx $PYTHON-nose
 
 # command to run tests
 script:
   # Run unit tests
-  - nosetests
+  - nosetests$PYSUF
   # Generate documentation
   - cd doc
   - make html
