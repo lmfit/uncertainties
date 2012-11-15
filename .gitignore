@@ -1,1 +1,4 @@
 uncertainties-py23/
+*.pyc
+build
+doc/_build
