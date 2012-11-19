@@ -1,0 +1,21 @@
+# Config file for automatic testing at travis-ci.org
+
+language: python
+
+env:
+    - PYTHON=python PYSUF='' # uses Python 2.7
+    - PYTHON=python3 PYSUF=3 # uses Python 3.2
+
+# command to install dependencies
+install:
+  # Deactivate the virtualenv to get fast install of dependencies
+  - deactivate
+  - sudo apt-get install -qq $PYTHON-numpy $PYTHON-sphinx $PYTHON-nose
+
+# command to run tests
+script:
+  # Run unit tests
+  - nosetests$PYSUF
+  # Generate documentation
+  - cd doc
+  - make html
