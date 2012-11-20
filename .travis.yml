@@ -3,14 +3,17 @@
 language: python
 
 env:
-    - PYTHON=python PYSUF='' # uses Python 2.7
-    - PYTHON=python3 PYSUF=3 # uses Python 3.2
+    - NUMPY=false PYTHON=python PYSUF='' # uses Python 2.7
+    - NUMPY=true  PYTHON=python PYSUF='' # uses Python 2.7
+    - NUMPY=false PYTHON=python3 PYSUF=3 # uses Python 3.2
+    - NUMPY=true PYTHON=python3 PYSUF=3 # uses Python 3.2
 
 # command to install dependencies
 install:
   # Deactivate the virtualenv to get fast install of dependencies
   - deactivate
-  - sudo apt-get install -qq $PYTHON-numpy $PYTHON-sphinx $PYTHON-nose
+  - sudo apt-get install -qq $PYTHON-sphinx $PYTHON-nose
+  - if $NUMPY; then sudo apt-get install -qq $PYTHON-numpy; fi
 
 # command to run tests
 script:
