@@ -405,10 +405,10 @@ else:
 
         (nominal_values, std_devs) = numpy.transpose(values_with_std_dev)
 
-        std_devs = std_devs[numpy.newaxis]  # Now a 2D array
-
         return correlated_values(
-            nominal_values, correlation_mat*std_devs*std_devs.T, tags)
+            nominal_values,
+            correlation_mat*std_devs*std_devs[numpy.newaxis].T,
+            tags)
         
     __all__.append('correlated_values_norm')
     
