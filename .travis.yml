@@ -2,6 +2,13 @@
 
 language: python
 
+python:
+  - "2.5"
+  - "2.6"
+  - "2.7"
+  - "3.1"
+  - "3.2"
+
 env:
     - NUMPY=false PYTHON=python PYSUF='' # uses Python 2.7
     - NUMPY=true  PYTHON=python PYSUF='' # uses Python 2.7
