@@ -231,7 +231,7 @@ def test_math_module():
 
     # !!! The tests below should be made to work with Python 3 too!
 
-    if sys.version_info < (3,)
+    if sys.version_info < (3,):
         try:
             math.log(0)
         except ValueError, err_math:  # "as", for Python 2.6+
