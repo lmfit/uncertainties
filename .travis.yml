@@ -10,8 +10,8 @@ python:
   - "3.2"
 
 env:
-    - NUMPY=false
     - NUMPY=true
+    - NUMPY=false
     # - NUMPY=false PYTHON=python3 PYSUF=3 # uses Python 3.2
     # - NUMPY=true PYTHON=python3 PYSUF=3 # uses Python 3.2
 
@@ -19,7 +19,7 @@ env:
 install:
   # Deactivate the virtualenv to get fast install of dependencies
   - deactivate
-  - sudo apt-get install -qq python-sphinx python-nose
+  - sudo apt-get install -qq python-sphinx python-nose pdflatex
   - if $NUMPY; then sudo apt-get install -qq python-numpy; fi
   - python setup.py install --user
 
