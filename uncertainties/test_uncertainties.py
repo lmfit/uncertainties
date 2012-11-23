@@ -700,7 +700,7 @@ def test_power():
     else:
         raise Exception('An exception should have been raised')
     try:
-        (-1)*9.1 == (-1)**9.1
+        (-1)**9.1
     except Exception, err_float:  # "as" for Python 2.6+
         # UFloat and floats should raise the same error:
         assert err_ufloat.args == err_float.args
