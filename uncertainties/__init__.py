@@ -330,8 +330,11 @@ else:
         """
         Returns numbers with uncertainties (AffineScalarFunc objects)
         that correctly reproduce the given covariance matrix, and have
-        the given (real) values as their nominal value.
+        the given (float) values as their nominal value.
 
+        The correlated_values_norm() function returns the same result,
+        but takes a correlation matrix instead of a covariance matrix.
+        
         The list of values and the covariance matrix must have the
         same length, and the matrix must be a square (symmetric) one.
 
