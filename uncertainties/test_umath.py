@@ -229,30 +229,67 @@ def test_math_module():
     # The same exceptions should be generated when numbers with uncertainties
     # are used:
 
-    # !!! The tests below should be made to work with Python 3 too!
+    ## !! The Nose testing framework seems to catch an exception when
+    ## it is aliased: "exc = OverflowError; ... except exc:..."
+    ## surprisingly catches OverflowError. So, tests are written in a
+    ## version-specific manner (until the Nose issue is resolved).
 
-    if sys.version_info < (3,):
+    if sys.version_info < (2, 6):
+            
         try:
             math.log(0)
-        except ValueError, err_math:  # "as", for Python 2.6+
+        except OverflowError, err_math:  # "as", for Python 2.6+
+            pass
+        else:
+            raise Exception('OverflowError exception expected')
+        try:
+            umath.log(0)
+        except OverflowError, err_ufloat:  # "as", for Python 2.6+
+            assert err_math.args == err_ufloat.args
+        else:
+            raise Exception('OverflowError exception expected')
+        try:
+            umath.log(uncertainties.ufloat((0, 0)))
+        except OverflowError, err_ufloat:  # "as", for Python 2.6+
+            assert err_math.args == err_ufloat.args
+        else:
+            raise Exception('OverflowError exception expected')
+        try:
+            umath.log(uncertainties.ufloat((0, 1)))
+        except OverflowError, err_ufloat:  # "as", for Python 2.6+
+            assert err_math.args == err_ufloat.args
+        else:
+            raise Exception('OverflowError exception expected')
+
+    elif sys.version < (3,):
+
+        try:
+            math.log(0)
+        except ValueError, err_math:
             pass
         else:
             raise Exception('ValueError exception expected')
         try:
             umath.log(0)
-        except ValueError, err_ufloat:  # "as", for Python 2.6+
+        except ValueError, err_ufloat:
             assert err_math.args == err_ufloat.args
         else:
             raise Exception('ValueError exception expected')
         try:
             umath.log(uncertainties.ufloat((0, 0)))
-        except ValueError, err_ufloat:  # "as", for Python 2.6+
+        except ValueError, err_ufloat:
             assert err_math.args == err_ufloat.args
         else:
             raise Exception('ValueError exception expected')
         try:
             umath.log(uncertainties.ufloat((0, 1)))
-        except ValueError, err_ufloat:  # "as", for Python 2.6+
+        except ValueError, err_ufloat:
             assert err_math.args == err_ufloat.args
         else:
             raise Exception('ValueError exception expected')
+        
+    else:  # Python 3+
+        
+        # !!! The tests should be made to work with Python 3 too!
+        pass
+    
