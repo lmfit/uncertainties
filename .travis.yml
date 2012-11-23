@@ -19,11 +19,11 @@ env:
 
 # command to install dependencies
 install:
-  # Deactivate the virtualenv to get fast install of dependencies
-  # - deactivate  #!!! commenting this out because it seems to replace Python by a different version
-
   # !!! A package that contains pdflatex is needed for the Sphinx
   # !!! document generation.
+  
+  # - deactivate: not used, because it replaces the version of Python
+  # - selected by the "python:" entry.
   - sudo apt-get install -qq python-sphinx python-nose 
   - if $NUMPY; then sudo apt-get install -qq python-numpy; fi
   - python --version
@@ -31,11 +31,7 @@ install:
 # command to run tests
 script:
   # Run unit tests
-
-  # Trying to get information on which nosetests is run:
-  - cat =nosetests
-  - python --version
-  # Runs nosetests through the right Python interpreter
+  - python --version  # Additional check
   - nosetests -sv
   # Generate documentation
   - cd doc
