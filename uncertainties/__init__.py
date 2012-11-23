@@ -371,7 +371,7 @@ else:
         # special: 'transform' is unitary: its inverse is its transpose:
 
         variables = tuple(
-            # The variables represent uncertainties only:
+            # The variables represent "pure" uncertainties:
             Variable(0, sqrt(variance), tag)
             for (variance, tag) in zip(variances, tags))
 
