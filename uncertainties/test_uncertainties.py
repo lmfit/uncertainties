@@ -857,7 +857,7 @@ else:
         # it compares uncertainties too:
         assert matrices_close(numpy.array([u]), numpy.array([u2]))
         assert matrices_close(numpy.array([v]), numpy.array([v2]))
-        assert matrices_close(numpy.array([sum]), numpy.array([sum2]))        
+        assert matrices_close(numpy.array([sum_value]), numpy.array([sum2]))
         assert matrices_close(numpy.array([0]),
                               numpy.array([sum2-(u2+2*v2)]))
 
