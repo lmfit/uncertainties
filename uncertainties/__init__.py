@@ -1383,32 +1383,36 @@ def std_dev(x):
 
     return x.std_dev() if isinstance(x, AffineScalarFunc) else 0.
 
-def covariance_matrix(functions):
+def covariance_matrix(nums_with_uncert):
     """
     Returns a matrix that contains the covariances between the given
     sequence of numbers with uncertainties (AffineScalarFunc objects).
     The resulting matrix implicitly depends on their ordering in
-    'functions'.
+    'nums_with_uncert'.
 
     The covariances are floats (never int objects).
 
     The returned covariance matrix is the exact linear approximation
-    result, if the nominal values of the functions and of their
-    variables are their mean.  Otherwise, the returned covariance
-    matrix should be close to it linear approximation value.
+    result, if the nominal values of the numbers with uncertainties
+    and of their variables are their mean.  Otherwise, the returned
+    covariance matrix should be close to it linear approximation
+    value.
+
+    The returned matrix is a list of lists.
     """
     # See PSI.411.
 
     covariance_matrix = []
-    for (i1, expr1) in enumerate(functions):
+    for (i1, expr1) in enumerate(nums_with_uncert):
         derivatives1 = expr1.derivatives  # Optimization
         vars1 = set(derivatives1)
         coefs_expr1 = []
-        for (i2, expr2) in enumerate(functions[:i1+1]):
+        for (i2, expr2) in enumerate(nums_with_uncert[:i1+1]):
             derivatives2 = expr2.derivatives  # Optimization
             coef = 0.
             for var in vars1.intersection(derivatives2):
-                # var is a variable common to both functions:
+                # var is a variable common to both numbers with
+                # uncertainties:
                 coef += (derivatives1[var]*derivatives2[var]*var._std_dev**2)
             coefs_expr1.append(coef)
         covariance_matrix.append(coefs_expr1)
