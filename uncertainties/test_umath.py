@@ -229,27 +229,30 @@ def test_math_module():
     # The same exceptions should be generated when numbers with uncertainties
     # are used:
 
-    try:
-        math.log(0)
-    except ValueError, err_math:  # "as", for Python 2.6+
-        pass
-    else:
-        raise Exception('ValueError exception expected')
-    try:
-        umath.log(0)
-    except ValueError, err_ufloat:  # "as", for Python 2.6+
-        assert err_math.args == err_ufloat.args
-    else:
-        raise Exception('ValueError exception expected')
-    try:
-        umath.log(uncertainties.ufloat((0, 0)))
-    except ValueError, err_ufloat:  # "as", for Python 2.6+
-        assert err_math.args == err_ufloat.args
-    else:
-        raise Exception('ValueError exception expected')
-    try:
-        umath.log(uncertainties.ufloat((0, 1)))
-    except ValueError, err_ufloat:  # "as", for Python 2.6+
-        assert err_math.args == err_ufloat.args
-    else:
-        raise Exception('ValueError exception expected')
+    # !!! The tests below should be made to work with Python 3 too!
+
+    if sys.version_info < (3,)
+        try:
+            math.log(0)
+        except ValueError, err_math:  # "as", for Python 2.6+
+            pass
+        else:
+            raise Exception('ValueError exception expected')
+        try:
+            umath.log(0)
+        except ValueError, err_ufloat:  # "as", for Python 2.6+
+            assert err_math.args == err_ufloat.args
+        else:
+            raise Exception('ValueError exception expected')
+        try:
+            umath.log(uncertainties.ufloat((0, 0)))
+        except ValueError, err_ufloat:  # "as", for Python 2.6+
+            assert err_math.args == err_ufloat.args
+        else:
+            raise Exception('ValueError exception expected')
+        try:
+            umath.log(uncertainties.ufloat((0, 1)))
+        except ValueError, err_ufloat:  # "as", for Python 2.6+
+            assert err_math.args == err_ufloat.args
+        else:
+            raise Exception('ValueError exception expected')
