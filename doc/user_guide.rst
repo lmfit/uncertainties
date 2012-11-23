@@ -252,7 +252,7 @@ Correlation matrix
 If the NumPy_ package is available, the correlation matrix can be
 obtained as well:
 
-  >>> corr_matrix = uncertainties.correlation_matrix([u, v, z])
+  >>> corr_matrix = uncertainties.correlation_matrix([u, v, sum_value])
   >>> corr_matrix
   array([[ 1.        ,  0.        ,  0.4472136 ],
          [ 0.        ,  1.        ,  0.89442719],
@@ -263,16 +263,18 @@ obtained as well:
 Correlated variables
 ====================
 
+Reciprocally, **correlated variables can be created** transparently,
+provided that the NumPy_ package is available.
+
 Use of a covariance matrix
 --------------------------
 
-Reciprocally, **correlated variables can be created** transparently,
-provided that the NumPy_ package is available::
+Correlated variables can be created like so::
 
   >>> (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 21], cov_matrix)
 
 creates three new variables with the listed nominal values, and the given
-covariance matrix:
+covariance matrix::
 
   >>> sum_value
   21.0+/-0.22360679774997899
