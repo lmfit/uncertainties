@@ -27,6 +27,11 @@ from uncertainties import ufloat, AffineScalarFunc
 
 from uncertainties import __author__
 
+# The following information is useful for making sure that the right
+# version of Python is running the tests (for instance with the Travis
+# Continuous Integration system):
+print "Testing with Python", sys.version
+
 ###############################################################################
 
 # Utilities for unit testing
