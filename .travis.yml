@@ -29,3 +29,4 @@ script:
   # Generate documentation
   - cd doc
   - make html
+ 

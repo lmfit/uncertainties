@@ -261,7 +261,7 @@ def test_math_module():
         else:
             raise Exception('OverflowError exception expected')
 
-    elif sys.version < (3,):
+    elif sys.version_info < (3,):
 
         try:
             math.log(0)
