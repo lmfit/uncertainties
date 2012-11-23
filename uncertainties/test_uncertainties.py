@@ -33,7 +33,7 @@ from uncertainties import __author__
 
 def _numbers_close(x, y, tolerance=1e-6):
     """
-    Returns True if the numbers are close enough.
+    Returns True if the given (real) numbers are close enough.
 
     The given tolerance is the relative difference allowed, or the absolute
     difference, if one of the numbers is 0.
@@ -788,7 +788,10 @@ else:
         assert numpy.all((x >= numpy.arange(3)) == [True, False, False])
 
     def test_correlated_values():
-        "Correlated variables."
+        """
+        Correlated variables.
+        Test through the input of the (full) covariance matrix.
+        """
 
         u = uncertainties.ufloat((1, 0.1))
         cov = uncertainties.covariance_matrix([u])
@@ -839,14 +842,65 @@ else:
         # Covariance matrices:
         cov_matrix = uncertainties.covariance_matrix([u, v, sum_value])
 
-        # Correlated variables can be constructed from a covariance matrix, if
-        # NumPy is available:
+        # Correlated variables can be constructed from a covariance
+        # matrix, if NumPy is available:
         (u2, v2, sum2) = uncertainties.correlated_values(
             [x.nominal_value for x in [u, v, sum_value]],
             cov_matrix)
 
         # matrices_close() is used instead of _numbers_close() because
         # it compares uncertainties too:
+        assert matrices_close(numpy.array([u]), numpy.array([u2]))
+        assert matrices_close(numpy.array([v]), numpy.array([v2]))
+        assert matrices_close(numpy.array([sum]), numpy.array([sum2]))        
         assert matrices_close(numpy.array([0]),
                               numpy.array([sum2-(u2+2*v2)]))
+
+
+    def test_correlated_values_correlation_mat():
+        '''
+        Tests the input of correlated value.
+
+        Test through their correlation matrix (instead of the
+        covariance matrix).
+        '''
+        
+        x = ufloat((1, 0.1))
+        y = ufloat((2, 0.3))
+        z = -3*x+y
+
+        cov_mat = uncertainties.covariance_matrix([x, y, z])
+
+        std_devs = numpy.sqrt(numpy.array(cov_mat).diagonal())
+        
+        corr_mat = cov_mat/std_devs/std_devs[numpy.newaxis].T
+
+        # We make sure that the correlation matrix is indeed diagonal:
+        assert (corr_mat-corr_mat.T).max() <= 1e-15
+        # We make sure that there are indeed ones on the diagonal:
+        assert (corr_mat.diagonal()-1).max() <= 1e-15
+
+        # We try to recover the correlated variables through the
+        # correlation matrix (not through the covariance matrix):
+
+        nominal_values = [v.nominal_value for v in (x, y, z)]
+        std_devs = [v.std_dev() for v in (x, y, z)]
+        x2, y2, z2 = uncertainties.correlated_values_norm(
+            zip(nominal_values, std_devs), corr_mat)
+        
+        # matrices_close() is used instead of _numbers_close() because
+        # it compares uncertainties too:
+
+        # Test of individual variables:
+        assert matrices_close(numpy.array([x]), numpy.array([x2]))
+        assert matrices_close(numpy.array([y]), numpy.array([y2]))
+        assert matrices_close(numpy.array([z]), numpy.array([z2]))
+
+        # Partial correlation test:
+        assert matrices_close(numpy.array([0]), numpy.array([z2-(-3*x2+y2)]))
+
+        # Test of the full covariance matrix:
+        assert matrices_close(
+            numpy.array(cov_mat),
+            numpy.array(uncertainties.covariance_matrix([x2, y2, z2])))
 
