@@ -19,7 +19,8 @@ env:
 install:
   # Deactivate the virtualenv to get fast install of dependencies
   - deactivate
-  - sudo apt-get install -qq python-sphinx python-nose pdflatex
+  # texlive-latex is for pdflatex, which is run by the Sphinx Makefile
+  - sudo apt-get install -qq python-sphinx python-nose texlive-latex
   - if $NUMPY; then sudo apt-get install -qq python-numpy; fi
   - python setup.py install --user
 
