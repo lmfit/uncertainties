@@ -21,6 +21,7 @@ install:
   - deactivate
   - sudo apt-get install -qq $PYTHON-sphinx $PYTHON-nose
   - if $NUMPY; then sudo apt-get install -qq $PYTHON-numpy; fi
+  - sudo python setup.py install
 
 # command to run tests
 script:
