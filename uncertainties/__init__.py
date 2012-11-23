@@ -390,7 +390,7 @@ else:
         Returns correlated values like correlated_values(), but takes
         instead as input:
 
-        - nominal (real) values along with their standard deviation, and
+        - nominal (float) values along with their standard deviation, and
         
         - a correlation matrix (i.e. a normalized covariance matrix
           normalized with individual standard deviations).
