@@ -812,6 +812,11 @@ else:
 
         covs = uncertainties.covariance_matrix([x, y, z])
 
+        # Test of the diagonal covariance elements:
+        assert matrices_close(
+            numpy.array([v.std_dev()**2 for v in (x, y, z)]),
+            numpy.array(covs).diagonal())
+        
         # "Inversion" of the covariance matrix: creation of new
         # variables:
         (x_new, y_new, z_new) = uncertainties.correlated_values(
