@@ -235,7 +235,7 @@ import copy
 import warnings
 
 # Numerical version:
-__version_info__ = (1, 8, '1b')
+__version_info__ = (1, 9)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL)'
