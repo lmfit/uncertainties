@@ -269,7 +269,7 @@ provided that the NumPy_ package is available.
 Use of a covariance matrix
 --------------------------
 
-Correlated variables can be created like so::
+Correlated variables can be obtained through the *covariance* matrix::
 
   >>> (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 21], cov_matrix)
 
@@ -301,17 +301,16 @@ Use of a correlation matrix
 Alternatively, correlated values can be defined through a
 *correlation* matrix (the correlation matrix is the covariance matrix
 normalized with individual standard deviations; it has ones on its
-diagonal):
+diagonal), along with a list of nominal values and standard deviations::
 
   >>> (u3, v3, sum3) = uncertainties.correlated_values_norm(
   ...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)], corr_matrix)
+  >>> print u3
+  1.0+/-0.1
 
-The covariance matrix is the desired one:
-
-  >>> uncertainties.covariance_matrix([u3, v3, sum3])
-
-reproduces the original covariance matrix :data:`cov_matrix` (up to
-rounding errors).
+The three returned numbers with uncertainties have the correct
+uncertainties and correlations (:data:`corr_matrix` can be recovered
+through :func:`correlation_matrix`).
 
 .. index::
    single: C code; wrapping
@@ -344,7 +343,7 @@ With a simple wrapping call like above, uncertainties in the function
 result are automatically calculated numerically. **Analytical
 uncertainty calculations can be performed** if derivatives are
 provided to :func:`wrap` (for details, see the documentation string of
-:func:`wrap` with the ``pydoc`` command, or ``help()``).
+:func:`wrap` with the ``pydoc`` command, or :func:`help`).
 
 Miscellaneous utilities
 =======================
