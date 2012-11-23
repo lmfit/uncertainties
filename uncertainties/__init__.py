@@ -1398,7 +1398,7 @@ def covariance_matrix(nums_with_uncert):
     The returned covariance matrix is the exact linear approximation
     result, if the nominal values of the numbers with uncertainties
     and of their variables are their mean.  Otherwise, the returned
-    covariance matrix should be close to it linear approximation
+    covariance matrix should be close to its linear approximation
     value.
 
     The returned matrix is a list of lists.
