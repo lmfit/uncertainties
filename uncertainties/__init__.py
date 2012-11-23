@@ -330,16 +330,25 @@ else:
         """
         Returns numbers with uncertainties (AffineScalarFunc objects)
         that correctly reproduce the given covariance matrix, and have
-        the given values as their nominal value.
+        the given (real) values as their nominal value.
 
         The list of values and the covariance matrix must have the
         same length, and the matrix must be a square (symmetric) one.
 
-        The affine functions returned depend on newly created,
-        independent variables (Variable objects).
+        The numbers with uncertainties returned depend on newly
+        created, independent variables (Variable objects).
 
         If 'tags' is not None, it must list the tag of each new
         independent variable.
+
+        values -- sequence with the nominal (real) values of the
+        returned numbers with uncertainties.
+
+        covariance_mat -- full covariance matrix of the returned
+        numbers with uncertainties (not the statistical correlation
+        matrix, i.e., not the normalized covariance matrix). For
+        example, the first element of this matrix is the variance of
+        the first returned number with uncertainty.
         """
 
         # If no tags were given, we prepare tags for the newly created
