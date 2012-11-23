@@ -1427,6 +1427,25 @@ def covariance_matrix(nums_with_uncert):
 
     return covariance_matrix
 
+try:
+    import numpy
+except ImportError:
+    pass
+else:
+    def correlation_matrix(nums_with_uncert):
+        '''
+        Returns the correlation matrix of the given sequence of
+        numbers with uncertainties, as a NumPy array of floats.
+        '''
+
+        cov_mat = numpy.array(covariance_matrix(nums_with_uncert))
+
+        std_devs = numpy.sqrt(cov_mat.diagonal())
+        
+        return cov_mat/std_devs/std_devs[numpy.newaxis].T
+
+    __all__.append('correlation_matrix')
+        
 ###############################################################################
 # Parsing of values with uncertainties:
 
