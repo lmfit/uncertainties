@@ -254,7 +254,7 @@ provided that the NumPy_ package is available::
   >>> (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 21], cov_matrix)
 
 creates three new variables with the indicated values, and the given
-correlation matrix:
+covariance matrix:
 
   >>> sum_value
   21.0+/-0.22360679774997899
@@ -268,7 +268,7 @@ The theoretical value of the last expression is exactly zero, like for
 (3e-9 is indeed very small compared to the uncertainty on :data:`sum2`:
 correlations should in fact cancel the uncertainty on :data:`sum2`).
 
-The correlation matrix is the desired one::
+The covariance matrix is the desired one::
 
   >>> uncertainties.covariance_matrix([u2, v2, sum2])
 
