@@ -21,12 +21,14 @@ be performed either in an **interactive session**, or in **programs**
 written in the Python_ programming language.  Existing calculation
 code can **run with no or little change**.
 
-Whatever the complexity of the calculation, this package returns the 
-result with its uncertainty as predicted by linear `error propagation 
+Whatever the complexity of a calculation, this package returns its
+result with an uncertainty as predicted by linear `error propagation 
 theory`_. It automatically :ref:`calculates derivatives <derivatives>` 
-and uses them for calculating uncertainties. **Correlations** between 
-variables are thus autoamatically handled, which sets it apart from many 
-existing error propagation codes.
+and uses them for calculating uncertainties. Almost all uncertainty 
+calculations are performed **analytically**.
+
+**Correlations** between variables are automatically handled, which 
+sets it apart from many existing error propagation codes.
 
 Let's now see how to use these unique features!
 
@@ -102,6 +104,19 @@ gives access to many of the documentation strings included in the code.
 
 Installation and download
 =========================
+
+Important note
+--------------
+
+The installation commands below should be **run in a DOS or Unix
+command shell** (*not* in a Python shell).
+
+Under Windows (version 7 and earlier), a command shell can be obtained
+by running ``cmd.exe`` (through the Run… menu item from the Start
+menu). Under Unix (Linux, Mac OS X,…), a Unix shell is available when
+opening a terminal (in Mac OS X, the Terminal program is found in the
+Utilities folder, which can be accessed through the Go menu in the
+Finder).
 
 Automatic install or upgrade
 ----------------------------
@@ -205,6 +220,8 @@ What others say
   <http://biosport.ucdavis.edu/blog/2010/05/07/uncertainty-analysis>`_)
 - "*Utterly brilliant*" (`Jeffrey Simpson
   <http://twitter.com/#!/GeekyJeffrey>`_)
+- "*An amazing time saver*" (`Paul Nakroshis 
+  <http://scipyscriptrepo.com/wp/?p=41>`_)
 - "*This package has a great interface and makes error propagation
   something to stop fearing.*" (`Dr Dawes
   <http://dawes.wordpress.com/2011/01/02/scientific-python/>`_)
@@ -260,8 +277,10 @@ $10`_ or more through PayPal (no PayPal account necessary)!
 Contact
 =======
 
-Please send feature requests, bug reports, or feedback to the creator
-of :mod:`uncertainties`, `Eric O. LEBIGOT (EOL)`_.
+Please share how this package has helped you by sending an e-mail to the 
+creator of :mod:`uncertainties`, `Eric O. LEBIGOT (EOL)`_, and **have 
+your work be featured on this page**! Feature requests, bug reports, or 
+feedback are much welcome too.
 
 .. figure:: _static/eol.*
    :height: 64

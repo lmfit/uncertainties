@@ -27,7 +27,7 @@ Examples:
   print x**2  # Square: prints "0.04+/-0.004"
   print sin(x**2)  # Prints "0.0399...+/-0.00399..."
 
-  print x.position_in_sigmas(0.17)  # Prints "-3.0": deviation of -3 sigmas
+  print x.std_score(0.17)  # Prints "-3.0": deviation of -3 sigmas
 
   # Access to the nominal value, and to the uncertainty:
   square = x**2  # Square
@@ -232,13 +232,12 @@ import re
 import math
 from math import sqrt, log  # Optimization: no attribute look-up
 import copy
-import sys
-
 from backport import *
+import warnings
 
 # Numerical version:
-__version_info__ = (1, 8)
-__version__ = '.'.join([str(num) for num in __version_info__])
+__version_info__ = (1, 9)
+__version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL)'
 
@@ -265,7 +264,7 @@ __all__ = [
     'UFloat',
 
     # Wrapper for allowing non-pure-Python function to handle
-    # quantitites with uncertainties:
+    # quantitities with uncertainties:
     'wrap',
 
     # The documentation for wrap() indicates that numerical
@@ -297,6 +296,17 @@ def set_doc(doc_string):
 CONSTANT_TYPES = (float, int, complex, long)
 
 ###############################################################################
+# Utility for issuing deprecation warnings
+
+def deprecation(message):
+    '''
+    Warns the user with the given message, by issuing a
+    DeprecationWarning.
+    '''
+    warnings.warn(message, DeprecationWarning, stacklevel=2)
+
+
+###############################################################################
 
 ## Definitions that depend on the availability of NumPy:
 
@@ -318,26 +328,38 @@ else:
     # for instance Numerical Recipes: (1) reduction to tri-diagonal
     # [Givens or Householder]; (2) QR / QL decomposition.
     
-    def correlated_values(values, covariance_mat, tags=None):
+    def correlated_values(nom_values, covariance_mat, tags=None):
         """
         Returns numbers with uncertainties (AffineScalarFunc objects)
         that correctly reproduce the given covariance matrix, and have
-        the given values as their nominal value.
+        the given (float) values as their nominal value.
 
+        The correlated_values_norm() function returns the same result,
+        but takes a correlation matrix instead of a covariance matrix.
+        
         The list of values and the covariance matrix must have the
         same length, and the matrix must be a square (symmetric) one.
 
-        The affine functions returned depend on newly created,
-        independent variables (Variable objects).
+        The numbers with uncertainties returned depend on newly
+        created, independent variables (Variable objects).
 
         If 'tags' is not None, it must list the tag of each new
         independent variable.
+
+        nom_values -- sequence with the nominal (real) values of the
+        numbers with uncertainties to be returned.
+
+        covariance_mat -- full covariance matrix of the returned
+        numbers with uncertainties (not the statistical correlation
+        matrix, i.e., not the normalized covariance matrix). For
+        example, the first element of this matrix is the variance of
+        the first returned number with uncertainty.
         """
 
         # If no tags were given, we prepare tags for the newly created
         # variables:
         if tags is None:
-            tags = (None,) * len(values)
+            tags = (None,) * len(nom_values)
 
         # The covariance matrix is diagonalized in order to define
         # the independent variables that model the given values:
@@ -354,26 +376,54 @@ else:
         # special: 'transform' is unitary: its inverse is its transpose:
 
         variables = tuple(
-            # The variables represent uncertainties only:
+            # The variables represent "pure" uncertainties:
             Variable(0, sqrt(variance), tag)
             for (variance, tag) in zip(variances, tags))
 
         # Representation of the initial correlated values:
         values_funcs = tuple(
             AffineScalarFunc(value, dict(zip(variables, coords)))
-            for (coords, value) in zip(transform, values))
+            for (coords, value) in zip(transform, nom_values))
 
         return values_funcs
 
     __all__.append('correlated_values')
 
+    def correlated_values_norm(values_with_std_dev, correlation_mat,
+                               tags=None):
+        '''
+        Returns correlated values like correlated_values(), but takes
+        instead as input:
+
+        - nominal (float) values along with their standard deviation, and
+        
+        - a correlation matrix (i.e. a normalized covariance matrix
+          normalized with individual standard deviations).
+
+        values_with_std_dev -- sequence of (nominal value, standard
+        deviation) pairs. The returned, correlated values have these
+        nominal values and standard deviations.
+
+        correlation_mat -- correlation matrix (i.e. the normalized
+        covariance matrix, a matrix with ones on its diagonal).
+        '''
+
+        (nominal_values, std_devs) = numpy.transpose(values_with_std_dev)
+
+        return correlated_values(
+            nominal_values,
+            correlation_mat*std_devs*std_devs[numpy.newaxis].T,
+            tags)
+        
+    __all__.append('correlated_values_norm')
+    
 ###############################################################################
 
 # Mathematical operations with local approximations (affine scalar
 # functions)
 
 class NotUpcast(Exception):
-    pass
+    'Raised when an object cannot be converted to a number with uncertainty'
 
 def to_affine_scalar(x):
     """
@@ -403,9 +453,6 @@ def partial_derivative(f, param_num):
     Returns a function that numerically calculates the partial
     derivative of function f with respect to its argument number
     param_num.
-
-    The step parameter represents the shift of the parameter used in
-    the numerical approximation.
     """
 
     def partial_derivative_of_f(*args):
@@ -438,10 +485,11 @@ def partial_derivative(f, param_num):
 
 class NumericalDerivatives(object):
     """
-    Sequence with the successive numerical derivatives of a function.
+    Convenient access to the partial derivatives of a function,
+    calculated numerically.
     """
-    # This is a sequence and not a list because the number of
-    # arguments of the function is not known in advance, in general.
+    # This is not a list because the number of arguments of the
+    # function is not known in advance, in general.
 
     def __init__(self, function):
         """
@@ -454,63 +502,91 @@ class NumericalDerivatives(object):
         Returns the n-th numerical derivative of the function.
         """
         return partial_derivative(self._function, n)
-
-def wrap(f, derivatives_funcs=None):
+  
+def wrap(f, derivatives_iter=None):
     """
     Wraps a function f into a function that also accepts numbers with
     uncertainties (UFloat objects) and returns a number with
-    uncertainties.
+    uncertainties.  Doing so may be necessary when function f cannot
+    be expressed analytically (with uncertainties-compatible operators
+    and functions like +, *, umath.sin(), etc.).
 
+    f must return a scalar (not a list, etc.).
+    
+    In the wrapped function, the standard Python scalar arguments of f
+    (float, int, etc.) can be replaced by numbers with
+    uncertainties. The result will contain the appropriate
+    uncertainty.
+    
     If no argument to the wrapped function has an uncertainty, f
     simply returns its usual, scalar result.
 
-    f must take only scalar arguments, and must return a scalar.
+    If supplied, derivatives_iter can be an iterable that generally
+    contains functions; each successive function is the partial
+    derivative of f with respect to the corresponding variable (one
+    function for each argument of f, which takes as many arguments as
+    f).  If instead of a function, an element of derivatives_iter
+    contains None, then it is automatically replaced by the relevant
+    numerical derivative; this can be used for non-scalar arguments of
+    f (like string arguments).
 
-    If supplied, 'derivatives_funcs' is a sequence or iterator that
-    generally contains functions; each successive function is the
-    partial derivatives of f with respect to the corresponding
-    variable (one function for each argument of f, which takes as many
-    arguments as f).  If derivatives_funcs is None, or if
-    derivatives_funcs contains a finite number of elements, then
-    missing derivatives are calculated numerically through
-    partial_derivative().
+    If derivatives_iter is None, or if derivatives_iter contains a
+    fixed (and finite) number of elements, then any missing derivative
+    is calculated numerically.
 
-    Example: wrap(math.sin) is a sine function that can be applied to
+    An infinite number of derivatives can be specified by having
+    derivatives_iter be an infinite iterator; this can for instance
+    be used for specifying the derivatives of functions with a
+    undefined number of argument (like sum(), whose partial
+    derivatives all return 1).
+
+    Example (for illustration purposes only, as
+    uncertainties.umath.sin() runs faster than the examples that
+    follow): wrap(math.sin) is a sine function that can be applied to
     numbers with uncertainties.  Its derivative will be calculated
     numerically.  wrap(math.sin, [None]) would have produced the same
     result.  wrap(math.sin, [math.cos]) is the same function, but with
     an analytically defined derivative.
     """
 
-    if derivatives_funcs is None:
-        derivatives_funcs = NumericalDerivatives(f)
+    if derivatives_iter is None:
+        derivatives_iter = NumericalDerivatives(f)
     else:
         # Derivatives that are not defined are calculated numerically,
         # if there is a finite number of them (the function lambda
         # *args: fsum(args) has a non-defined number of arguments, as
-        # it just performs a sum...
+        # it just performs a sum):
         try:  # Is the number of derivatives fixed?
-            len(derivatives_funcs)
+            len(derivatives_iter)
         except TypeError:
             pass
         else:
-            xxx="""
-            derivatives_funcs = [
-                partial_derivative(f, k) if derivative is None
-                else derivative
-                for (k, derivative) in enumerate(derivatives_funcs)]"""
-            derivatives_funcs_ = []
-            for (k, derivative) in enumerate(derivatives_funcs):
+            derivatives_iter_ = []
+            for (k, derivative) in enumerate(derivatives_iter):
                 if derivative is None:
-                    derivatives_funcs_.append(partial_derivative(f, k))
+                    derivatives_iter_.append(partial_derivative(f, k))
                 else:
-                    derivatives_funcs_.append(derivative)
+                    derivatives_iter_.append(derivative)
                     
-            derivatives_funcs = derivatives_funcs_
+            derivatives_iter = derivatives_iter_
+
 
     #! Setting the doc string after "def f_with...()" does not
     # seem to work.  We define it explicitly:
-    def f_with_affine_output(*args):
+    @set_doc("""\
+    Version of %s(...) that returns an affine approximation
+    (AffineScalarFunc object), if its result depends on variables
+    (Variable objects).  Otherwise, returns a simple constant (when
+    applied to constant arguments).
+    
+    Warning: arguments of the function that are not AffineScalarFunc
+    objects must not depend on uncertainties.Variable objects in any
+    way.  Otherwise, the dependence of the result in
+    uncertainties.Variable objects will be incorrect.
+    
+    Original documentation:
+    %s""" % (f.__name__, f.__doc__))
+    def f_with_affine_output(*args, **kwargs):
         # Can this function perform the calculation of an
         # AffineScalarFunc (or maybe float) result?
         try:
@@ -518,7 +594,7 @@ def wrap(f, derivatives_funcs=None):
 
         except NotUpcast:
 
-            # This function does not now how to itself perform
+            # This function does not know how to itself perform
             # calculations with non-float-like arguments (as they
             # might for instance be objects whose value really changes
             # if some Variable objects had different values):
@@ -590,14 +666,14 @@ def wrap(f, derivatives_funcs=None):
         # caller to always provide derivatives.  When changing the
         # functions of the math module, this would force this module
         # to know about all the math functions.  Another possibility
-        # would be to force derivatives_funcs to contain, say, the
+        # would be to force derivatives_iter to contain, say, the
         # first 3 derivatives of f.  But any of these two ideas has a
         # chance to break, one day... (if new functions are added to
         # the math module, or if some function has more than 3
         # arguments).
 
         derivatives_wrt_args = []
-        for (arg, derivative) in zip(aff_funcs, derivatives_funcs):
+        for (arg, derivative) in zip(aff_funcs, derivatives_iter):
             #derivatives_wrt_args.append(derivative(*args_values)
             #                            if arg.derivatives
             #                            else 0)
@@ -775,7 +851,7 @@ class AffineScalarFunc(object):
       All the Variable objects on which the function depends are in
       'derivatives'.
 
-    - position_in_sigmas(x): position of number x with respect to the
+    - std_score(x): position of number x with respect to the
       nominal value, in units of the standard deviation.
     """
 
@@ -971,6 +1047,14 @@ class AffineScalarFunc(object):
         return self._general_representation(str)
 
     def position_in_sigmas(self, value):
+        '''
+        Wrapper for legacy code.  Obsolete: do not use.  Use std_score
+        instead.
+        '''
+        deprecation("position_in_sigmas is obsolete.  Use std_score instead")
+        return self.std_score(value)
+    
+    def std_score(self, value):
         """
         Returns 'value' - nominal value, in units of the standard
         deviation.
@@ -1071,7 +1155,7 @@ def get_ops_with_reflection():
 
     return ops_with_reflection
 
-# Operators that have a reflexion, along with their derivatives:
+# Operators that have a reflection, along with their derivatives:
 _ops_with_reflection = get_ops_with_reflection()
 
 # Some effectively modified operators (for the automated tests):
@@ -1158,6 +1242,10 @@ class Variable(AffineScalarFunc):
     """
     Representation of a float-like scalar random variable, along with
     its uncertainty.
+
+    Objects are meant to represent variables that are independent from
+    each other (correlations are handled through the AffineScalarFunc
+    class).    
     """
 
     # To save memory in large arrays:
@@ -1336,32 +1424,36 @@ def std_dev(x):
     else:
         return 0.
 
-def covariance_matrix(functions):
+def covariance_matrix(nums_with_uncert):
     """
     Returns a matrix that contains the covariances between the given
     sequence of numbers with uncertainties (AffineScalarFunc objects).
     The resulting matrix implicitly depends on their ordering in
-    'functions'.
+    'nums_with_uncert'.
 
     The covariances are floats (never int objects).
 
     The returned covariance matrix is the exact linear approximation
-    result, if the nominal values of the functions and of their
-    variables are their mean.  Otherwise, the returned covariance
-    matrix should be close to it linear approximation value.
+    result, if the nominal values of the numbers with uncertainties
+    and of their variables are their mean.  Otherwise, the returned
+    covariance matrix should be close to its linear approximation
+    value.
+
+    The returned matrix is a list of lists.
     """
-    # See PSI.411.
+    # See PSI.411 in EOL's notes.
 
     covariance_matrix = []
-    for (i1, expr1) in enumerate(functions):
+    for (i1, expr1) in enumerate(nums_with_uncert):
         derivatives1 = expr1.derivatives  # Optimization
         vars1 = set(derivatives1)
         coefs_expr1 = []
-        for (i2, expr2) in enumerate(functions[:i1+1]):
+        for (i2, expr2) in enumerate(nums_with_uncert[:i1+1]):
             derivatives2 = expr2.derivatives  # Optimization
             coef = 0.
             for var in vars1.intersection(derivatives2):
-                # var is a variable common to both functions:
+                # var is a variable common to both numbers with
+                # uncertainties:
                 coef += (derivatives1[var]*derivatives2[var]*var._std_dev**2)
             coefs_expr1.append(coef)
         covariance_matrix.append(coefs_expr1)
@@ -1373,6 +1465,25 @@ def covariance_matrix(functions):
 
     return covariance_matrix
 
+try:
+    import numpy
+except ImportError:
+    pass
+else:
+    def correlation_matrix(nums_with_uncert):
+        '''
+        Returns the correlation matrix of the given sequence of
+        numbers with uncertainties, as a NumPy array of floats.
+        '''
+
+        cov_mat = numpy.array(covariance_matrix(nums_with_uncert))
+
+        std_devs = numpy.sqrt(cov_mat.diagonal())
+        
+        return cov_mat/std_devs/std_devs[numpy.newaxis].T
+
+    __all__.append('correlation_matrix')
+        
 ###############################################################################
 # Parsing of values with uncertainties:
 
@@ -1548,68 +1659,4 @@ def ufloat(representation, tag=None):
     #! The special ** syntax is for Python 2.5 and before (Python 2.6+
     # understands tag=tag):
     return Variable(*representation, **{'tag': tag})
-
-###############################################################################
-# Support for legacy code (will be removed in the future):
-    
-def NumberWithUncert(*args):
-    """
-    Wrapper for legacy code.  Obsolete: do not use.  Use ufloat
-    instead.
-    """
-    import warnings
-    warnings.warn("NumberWithUncert is obsolete."
-                  "  Use ufloat instead.", DeprecationWarning,
-                  stacklevel=2)
-    return ufloat(*args)
-
-def num_with_uncert(*args):
-    """
-    Wrapper for legacy code.  Obsolete: do not use.  Use ufloat
-    instead.
-    """
-    import warnings
-    warnings.warn("num_with_uncert is obsolete."
-                  "  Use ufloat instead.", DeprecationWarning,
-                  stacklevel=2)
-    return ufloat(*args)
-
-def array_u(*args):
-    """
-    Wrapper for legacy code.  Obsolete: do not use.  Use
-    unumpy.uarray instead.
-    """
-    import warnings
-    warnings.warn("uncertainties.array_u is obsolete."
-                  " Use uncertainties.unumpy.uarray instead.",
-                  DeprecationWarning,
-                  stacklevel=2)
-    import uncertainties.unumpy
-    return uncertainties.unumpy.uarray(*args)
-
-def nominal_values(*args):
-    """
-    Wrapper for legacy code.  Obsolete: do not use.  Use
-    unumpy.nominal_values instead.
-    """
-    import warnings
-    warnings.warn("uncertainties.nominal_values is obsolete."
-                  "  Use uncertainties.unumpy.nominal_values instead.",
-                  DeprecationWarning,
-                  stacklevel=2)
-    import uncertainties.unumpy
-    return uncertainties.unumpy.nominal_values(*args)
-
-def std_devs(*args):
-    """
-    Wrapper for legacy code.  Obsolete: do not use.  Use ufloat
-    instead.
-    """
-    import warnings
-    warnings.warn("uncertainties.std_devs is obsolete."
-                  "  Use uncertainties.unumpy.std_devs instead.",
-                  DeprecationWarning,
-                  stacklevel=2)
-    import uncertainties.unumpy
-    return uncertainties.unumpy.std_devs(*args)
 
