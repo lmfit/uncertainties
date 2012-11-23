@@ -326,7 +326,7 @@ else:
     # for instance Numerical Recipes: (1) reduction to tri-diagonal
     # [Givens or Householder]; (2) QR / QL decomposition.
     
-    def correlated_values(values, covariance_mat, tags=None):
+    def correlated_values(nom_values, covariance_mat, tags=None):
         """
         Returns numbers with uncertainties (AffineScalarFunc objects)
         that correctly reproduce the given covariance matrix, and have
@@ -341,8 +341,8 @@ else:
         If 'tags' is not None, it must list the tag of each new
         independent variable.
 
-        values -- sequence with the nominal (real) values of the
-        returned numbers with uncertainties.
+        nom_values -- sequence with the nominal (real) values of the
+        numbers with uncertainties to be returned.
 
         covariance_mat -- full covariance matrix of the returned
         numbers with uncertainties (not the statistical correlation
@@ -354,7 +354,7 @@ else:
         # If no tags were given, we prepare tags for the newly created
         # variables:
         if tags is None:
-            tags = (None,) * len(values)
+            tags = (None,) * len(nom_values)
 
         # The covariance matrix is diagonalized in order to define
         # the independent variables that model the given values:
@@ -378,12 +378,40 @@ else:
         # Representation of the initial correlated values:
         values_funcs = tuple(
             AffineScalarFunc(value, dict(zip(variables, coords)))
-            for (coords, value) in zip(transform, values))
+            for (coords, value) in zip(transform, nom_values))
 
         return values_funcs
 
     __all__.append('correlated_values')
 
+    def correlated_values_norm(values_with_std_dev, correlation_mat,
+                               tags=None):
+        '''
+        Returns correlated values like correlated_values(), but takes
+        instead as input:
+
+        - nominal (real) values along with their standard deviation, and
+        
+        - a correlation matrix (i.e. a normalized covariance matrix
+          normalized with individual standard deviations).
+
+        values_with_std_dev -- sequence of (nominal value, standard
+        deviation) pairs. The returned, correlated values have these
+        nominal values and standard deviations.
+
+        correlation_mat -- correlation matrix (i.e. the normalized
+        covariance matrix, a matrix with ones on its diagonal).
+        '''
+
+        (nominal_values, std_devs) = numpy.transpose(values_with_std_dev)
+
+        std_devs = std_devs[:, numpy.newaxis]  # Now a 2D array
+
+        return correlated_values(
+            nominal_values, correlation_mat*std_devs*std_devs.T, tags)
+        
+    __all__.append('correlated_values_norm')
+    
 ###############################################################################
 
 # Mathematical operations with local approximations (affine scalar
@@ -1388,7 +1416,7 @@ def covariance_matrix(functions):
     # We symmetrize the matrix:
     for (i, covariance_coefs) in enumerate(covariance_matrix):
         covariance_coefs.extend(covariance_matrix[j][i]
-                                 for j in range(i+1, len(covariance_matrix)))
+                                for j in range(i+1, len(covariance_matrix)))
 
     return covariance_matrix
 
