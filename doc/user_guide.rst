@@ -217,8 +217,11 @@ numbers with uncertainties can be found in the :ref:`Technical Guide
 
 .. index:: covariance matrix
 
-Covariance matrix
+Covariance and correlation matrices
 =================
+
+Covariance matrix
+-----------------
 
 The covariance matrix between various variables or calculated
 quantities can be simply obtained::
@@ -243,17 +246,32 @@ keeps track at all times of all correlations between quantities
   >>> sum_value - (u+2*v)
   >>> 0.0
 
+Correlation matrix
+------------------
+
+If the NumPy_ package is available, the correlation matrix can be
+obtained as well:
+
+  >>> corr_matrix = uncertainties.correlation_matrix([u, v, z])
+  >>> corr_matrix
+  array([[ 1.        ,  0.        ,  0.4472136 ],
+         [ 0.        ,  1.        ,  0.89442719],
+         [ 0.4472136 ,  0.89442719,  1.        ]])
+  
 .. index:: correlations; correlated variables
 
 Correlated variables
 ====================
+
+Use of a covariance matrix
+--------------------------
 
 Reciprocally, **correlated variables can be created** transparently,
 provided that the NumPy_ package is available::
 
   >>> (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 21], cov_matrix)
 
-creates three new variables with the indicated values, and the given
+creates three new variables with the listed nominal values, and the given
 covariance matrix:
 
   >>> sum_value
@@ -274,6 +292,27 @@ The covariance matrix is the desired one::
 
 reproduces the desired covariance matrix :data:`cov_matrix` (up to
 rounding errors).
+
+Use of a correlation matrix
+---------------------------
+
+Alternatively, correlated values can be defined through a
+*correlation* matrix (the correlation matrix is the covariance matrix
+normalized with individual standard deviations; it has ones on its
+diagonal):
+
+  >>> (u3, v3, sum3) = uncertainties.correlated_values_norm(
+  ...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)], corr_matrix)
+
+correctly returns a :data:`sum3` variable which is strongly correlated
+with :data:`u3` and :data:`v3`:
+
+  >>> print sum3
+  21.0+/-0.22360679775
+  >>> print sum3-(u3+2*v3)
+  0.0+/-3.98661504799e-09
+
+(This is the same result as with ``correlated_values()``.)
 
 .. index::
    single: C code; wrapping
