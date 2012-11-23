@@ -1400,7 +1400,7 @@ def covariance_matrix(nums_with_uncert):
 
     The returned matrix is a list of lists.
     """
-    # See PSI.411.
+    # See PSI.411 in EOL's notes.
 
     covariance_matrix = []
     for (i1, expr1) in enumerate(nums_with_uncert):
