@@ -290,7 +290,7 @@ The covariance matrix is the desired one::
 
   >>> uncertainties.covariance_matrix([u2, v2, sum2])
 
-reproduces the desired covariance matrix :data:`cov_matrix` (up to
+reproduces the original covariance matrix :data:`cov_matrix` (up to
 rounding errors).
 
 Use of a correlation matrix
@@ -304,15 +304,12 @@ diagonal):
   >>> (u3, v3, sum3) = uncertainties.correlated_values_norm(
   ...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)], corr_matrix)
 
-correctly returns a :data:`sum3` variable which is strongly correlated
-with :data:`u3` and :data:`v3`:
+The covariance matrix is the desired one:
 
-  >>> print sum3
-  21.0+/-0.22360679775
-  >>> print sum3-(u3+2*v3)
-  0.0+/-3.98661504799e-09
+  >>> uncertainties.covariance_matrix([u3, v3, sum3])
 
-(This is the same result as with ``correlated_values()``.)
+reproduces the original covariance matrix :data:`cov_matrix` (up to
+rounding errors).
 
 .. index::
    single: C code; wrapping
