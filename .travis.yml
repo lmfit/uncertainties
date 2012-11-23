@@ -20,7 +20,8 @@ env:
 # command to install dependencies
 install:
   # Deactivate the virtualenv to get fast install of dependencies
-  - deactivate
+  # - deactivate  #!!! commenting this out because it seems to replace Python by a different version
+
   # !!! A package that contains pdflatex is needed for the Sphinx
   # !!! document generation.
   - sudo apt-get install -qq python-sphinx python-nose 
