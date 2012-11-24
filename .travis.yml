@@ -31,10 +31,10 @@ install:
 script:
   # nosetests uncertainties does not find the module, with a local
   # install:
-  #- python setup.py install --user
+  - python setup.py install
   #
   # Automatically installs the version adapted to the Python version:
-  - pip install --upgrade uncertainties
+  # - pip install --upgrade uncertainties  # Fetches the published version
   #
   # Run unit tests
   - python --version  # Additional check: did the install change anything?
