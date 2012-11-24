@@ -24,7 +24,7 @@ install:
   
   # - deactivate: not used, because it replaces the version of Python
   # - selected by the "python:" entry.
-  - sudo apt-get install -qq python-sphinx python-nose 
+  - sudo apt-get install -qq python-sphinx python-nose texlive-full
   - if $NUMPY; then sudo apt-get install -qq python-numpy; fi
   - python --version
 
