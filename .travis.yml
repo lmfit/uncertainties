@@ -13,18 +13,14 @@ python:
 env:
     - NUMPY=true
     # - NUMPY=false  #!!!!!! to be put back later
-
     # - NUMPY=false PYTHON=python3 PYSUF=3 # uses Python 3.2
     # - NUMPY=true PYTHON=python3 PYSUF=3 # uses Python 3.2
 
 # command to install dependencies
 install:
-  # !!! A package that contains pdflatex is needed for the Sphinx
-  # !!! document generation.
-  
   # - deactivate: not used, because it replaces the version of Python
-  # - selected by the "python:" entry.
-
+  # selected by the "python:" entry.
+  #
   # The Sphinx document requires pdflatex. It can be found in
   # textlive-latex-base; however this leads to an error (ecrm10...).
   - sudo apt-get install -qq python-sphinx python-nose texlive-full
@@ -33,19 +29,16 @@ install:
 
 # command to run tests
 script:
-
-  # In order for the Python 3 version to be installed if needed, we
-  # rely on the setup.py script:
-
   # nosetests uncertainties does not find the module, with a local
   # install:
   #- python setup.py install --user
-  
+  #
+  # Automatically installs the version adapted to the Python version:
   pip install --upgrade uncertainties
-
+  #
   # Run unit tests
   - python --version  # Additional check: did the install change anything?
-
+  #
   # Nosetests can automatically run the tests from the *installed
   # package*, but we must move away from the local uncertainties
   # module:
