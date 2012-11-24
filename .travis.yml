@@ -3,12 +3,12 @@
 language: python
 
 python:
-  - "2.5"
   # !!!!! All version to be put back later
+  # - "2.5"
   # - "2.6"
   # - "2.7"
   # - "3.1"
-  # - "3.2"
+  - "3.2"
 
 env:
     - NUMPY=true
@@ -31,8 +31,8 @@ install:
 # command to run tests
 script:
   # Run unit tests
-  - python --version  # Additional check
-  - nosetests -sv
+  - python --version  # Additional check: did the install change anything?
+  - nosetests -sv  # Is the Python 3 version built?
   # Generate documentation
   - cd doc
   - make html
