@@ -25,14 +25,16 @@ install:
   # - deactivate: not used, because it replaces the version of Python
   # - selected by the "python:" entry.
 
-  # Creation of the Python 3 version of the module:
-  - if [[ $TRAVIS_PYTHON_VERSION < '3' ]]; then echo "Python 2 running" else echo "Converting to Python 3..."; 2to3 -w uncertainties; fi
+  # The Sphinx document requires pdflatex. It can be found in
+  # textlive-latex-base; however this leads to an error (ecrm10...).
   - sudo apt-get install -qq python-sphinx python-nose texlive-full
   - if $NUMPY; then sudo apt-get install -qq python-numpy; fi
   - python --version
 
 # command to run tests
 script:
+  # Creation of the Python 3 version of the module:
+  - if [[ $TRAVIS_PYTHON_VERSION < '3' ]]; then echo "Python 2 running" else echo "Converting to Python 3..."; 2to3 -w uncertainties; fi
   # Run unit tests
   - python --version  # Additional check: did the install change anything?
   - nosetests -sv  # Is the Python 3 version built?
