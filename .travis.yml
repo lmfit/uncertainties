@@ -22,6 +22,7 @@ install:
   # selected by the "python:" entry.
   #
   #!!!!!!!! python3-numpy should be installed, if Travis selects Python 3
+  - dpkg -L python3  #!!! Where is the apt-get Python3?
   - if $NUMPY; then sudo apt-get install python3.2-numpy; fi
   # NumPy test:
   - python --version
