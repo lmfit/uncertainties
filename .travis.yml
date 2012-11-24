@@ -23,6 +23,10 @@ install:
   #
   #!!!!!!!! python3-numpy should be installed, if Travis selects Python 3
   - if $NUMPY; then sudo apt-get install -qq python3.2-numpy; fi
+  # NumPy test:
+  - python --version
+  - python -c "import numpy"
+
   # The Sphinx document requires pdflatex. It can be found in
   # textlive-latex-base; however this leads to an error (ecrm10...).
   - sudo apt-get install -qq python-sphinx python-nose texlive-full
@@ -31,7 +35,7 @@ install:
 # command to run tests
 script:
   # nosetests uncertainties does not find the module, with a local
-  # install:
+  # install (python setup.py install --user):
   - python setup.py install
   #
   # Automatically installs the version adapted to the Python version:
