@@ -33,9 +33,16 @@ install:
 
 # command to run tests
 script:
+
   # In order for the Python 3 version to be installed if needed, we
   # rely on the setup.py script:
-  - python setup.py install --user
+
+  # nosetests uncertainties does not find the module, with a local
+  # install:
+  #- python setup.py install --user
+  
+  pip install --upgrade uncertainties
+
   # Run unit tests
   - python --version  # Additional check: did the install change anything?
 
