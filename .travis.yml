@@ -33,11 +33,17 @@ install:
 
 # command to run tests
 script:
-  # Creation of the Python 3 version of the module:
-  - if [[ $TRAVIS_PYTHON_VERSION < '3' ]]; then echo "Python 2 running" else echo "Converting to Python 3..."; 2to3 -w uncertainties; fi
+  # In order for the Python 3 version to be installed if needed, we
+  # rely on the setup.py script:
+  - python setup.py install --user
   # Run unit tests
   - python --version  # Additional check: did the install change anything?
-  - nosetests -sv  # Is the Python 3 version built?
+
+  # Nosetests can automatically run the tests from the *installed
+  # package*, but we must move away from the local uncertainties
+  # module:
+  - cd /tmp
+  - nosetests -sv uncertainties
   # Generate documentation
   - cd doc
   - make html
