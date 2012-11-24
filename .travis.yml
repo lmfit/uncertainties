@@ -7,8 +7,8 @@ python:
   # - "2.5"
   # - "2.6"
   # - "2.7"
-  # - "3.1"
-  - "3.2"
+  - "3.1"
+  # "3.2"
 
 env:
     - NUMPY=true
@@ -21,9 +21,9 @@ install:
   # - deactivate: not used, because it replaces the version of Python
   # selected by the "python:" entry.
   #
+  - if $NUMPY; then sudo apt-get install python3-numpy; fi
   #!!!!!!!! python3-numpy should be installed, if Travis selects Python 3
   - dpkg -L python3  #!!! Where is the apt-get Python3?
-  - if $NUMPY; then sudo apt-get install python3.2-numpy; fi
   # NumPy test:
   - python --version
   - python -c "import numpy"
