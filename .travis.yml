@@ -24,7 +24,8 @@ install:
   # The Sphinx document requires pdflatex. It can be found in
   # textlive-latex-base; however this leads to an error (ecrm10...).
   - sudo apt-get install -qq python-sphinx python-nose texlive-full
-  - if $NUMPY; then sudo apt-get install -qq python-numpy; fi
+  #!!!!!!!! python3-numpy should be installed, if Travis selects Python 3
+  - if $NUMPY; then sudo apt-get install -qq python3-numpy; fi
   - python --version
 
 # command to run tests
