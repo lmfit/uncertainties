@@ -21,11 +21,12 @@ install:
   # - deactivate: not used, because it replaces the version of Python
   # selected by the "python:" entry.
   #
-  - if $NUMPY; then sudo apt-get install python3-numpy; fi
+  # - if $NUMPY; then sudo apt-get install python3-numpy; fi
   #!!!!!!!! python3-numpy should be installed, if Travis selects Python 3
-  - dpkg -L python3  #!!! Where is the apt-get Python3?
+  # - dpkg -L python3  #!!! Where is the apt-get Python3?
   # NumPy test:
   - python --version
+  - pip install numpy  # Uses the current Python version
   - python -c "import numpy"
 
   # The Sphinx document requires pdflatex. It can be found in
