@@ -34,7 +34,7 @@ script:
   #- python setup.py install --user
   #
   # Automatically installs the version adapted to the Python version:
-  pip install --upgrade uncertainties
+  - pip install --upgrade uncertainties
   #
   # Run unit tests
   - python --version  # Additional check: did the install change anything?
