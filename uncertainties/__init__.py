@@ -238,7 +238,7 @@ import warnings
 __version_info__ = (1, 9)
 __version__ = '.'.join(map(str, __version_info__))
 
-__author__ = 'Eric O. LEBIGOT (EOL)'
+__author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
 
 # Attributes that are always exported (some other attributes are
 # exported only if the NumPy module is available...):
