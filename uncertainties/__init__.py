@@ -559,8 +559,9 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
         used for non-scalar arguments of f (like string arguments).
 
         If derivatives_iter is None, or if derivatives_iter contains a
-        fixed (and finite) number of elements, then any missing derivative
-        is calculated numerically.
+        fixed (and finite) number of elements, then any missing
+        derivative is calculated numerically. This is less precise
+        than using analytical derivatives.
 
         An infinite number of derivatives can be specified by having
         derivatives_iter be an infinite iterator; this can for instance
