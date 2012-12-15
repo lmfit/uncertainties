@@ -217,8 +217,11 @@ numbers with uncertainties can be found in the :ref:`Technical Guide
 
 .. index:: covariance matrix
 
-Covariance matrix
+Covariance and correlation matrices
 =================
+
+Covariance matrix
+-----------------
 
 The covariance matrix between various variables or calculated
 quantities can be simply obtained::
@@ -243,18 +246,35 @@ keeps track at all times of all correlations between quantities
   >>> sum_value - (u+2*v)
   >>> 0.0
 
+Correlation matrix
+------------------
+
+If the NumPy_ package is available, the correlation matrix can be
+obtained as well:
+
+  >>> corr_matrix = uncertainties.correlation_matrix([u, v, sum_value])
+  >>> corr_matrix
+  array([[ 1.        ,  0.        ,  0.4472136 ],
+         [ 0.        ,  1.        ,  0.89442719],
+         [ 0.4472136 ,  0.89442719,  1.        ]])
+  
 .. index:: correlations; correlated variables
 
 Correlated variables
 ====================
 
 Reciprocally, **correlated variables can be created** transparently,
-provided that the NumPy_ package is available::
+provided that the NumPy_ package is available.
+
+Use of a covariance matrix
+--------------------------
+
+Correlated variables can be obtained through the *covariance* matrix::
 
   >>> (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 21], cov_matrix)
 
-creates three new variables with the indicated values, and the given
-correlation matrix:
+creates three new variables with the listed nominal values, and the given
+covariance matrix::
 
   >>> sum_value
   21.0+/-0.22360679774997899
@@ -268,12 +288,29 @@ The theoretical value of the last expression is exactly zero, like for
 (3e-9 is indeed very small compared to the uncertainty on :data:`sum2`:
 correlations should in fact cancel the uncertainty on :data:`sum2`).
 
-The correlation matrix is the desired one::
+The covariance matrix is the desired one::
 
   >>> uncertainties.covariance_matrix([u2, v2, sum2])
 
-reproduces the desired covariance matrix :data:`cov_matrix` (up to
+reproduces the original covariance matrix :data:`cov_matrix` (up to
 rounding errors).
+
+Use of a correlation matrix
+---------------------------
+
+Alternatively, correlated values can be defined through a
+*correlation* matrix (the correlation matrix is the covariance matrix
+normalized with individual standard deviations; it has ones on its
+diagonal), along with a list of nominal values and standard deviations::
+
+  >>> (u3, v3, sum3) = uncertainties.correlated_values_norm(
+  ...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)], corr_matrix)
+  >>> print u3
+  1.0+/-0.1
+
+The three returned numbers with uncertainties have the correct
+uncertainties and correlations (:data:`corr_matrix` can be recovered
+through :func:`correlation_matrix`).
 
 .. index::
    single: C code; wrapping
@@ -306,7 +343,7 @@ With a simple wrapping call like above, uncertainties in the function
 result are automatically calculated numerically. **Analytical
 uncertainty calculations can be performed** if derivatives are
 provided to :func:`wrap` (for details, see the documentation string of
-:func:`wrap` with the ``pydoc`` command, or ``help()``).
+:func:`wrap` with the ``pydoc`` command, or :func:`help`).
 
 Miscellaneous utilities
 =======================

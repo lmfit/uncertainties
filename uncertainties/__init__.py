@@ -235,7 +235,7 @@ import copy
 import warnings
 
 # Numerical version:
-__version_info__ = (1, 8, '1b')
+__version_info__ = (1, 9)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL)'
@@ -326,26 +326,38 @@ else:
     # for instance Numerical Recipes: (1) reduction to tri-diagonal
     # [Givens or Householder]; (2) QR / QL decomposition.
     
-    def correlated_values(values, covariance_mat, tags=None):
+    def correlated_values(nom_values, covariance_mat, tags=None):
         """
         Returns numbers with uncertainties (AffineScalarFunc objects)
         that correctly reproduce the given covariance matrix, and have
-        the given values as their nominal value.
+        the given (float) values as their nominal value.
 
+        The correlated_values_norm() function returns the same result,
+        but takes a correlation matrix instead of a covariance matrix.
+        
         The list of values and the covariance matrix must have the
         same length, and the matrix must be a square (symmetric) one.
 
-        The affine functions returned depend on newly created,
-        independent variables (Variable objects).
+        The numbers with uncertainties returned depend on newly
+        created, independent variables (Variable objects).
 
         If 'tags' is not None, it must list the tag of each new
         independent variable.
+
+        nom_values -- sequence with the nominal (real) values of the
+        numbers with uncertainties to be returned.
+
+        covariance_mat -- full covariance matrix of the returned
+        numbers with uncertainties (not the statistical correlation
+        matrix, i.e., not the normalized covariance matrix). For
+        example, the first element of this matrix is the variance of
+        the first returned number with uncertainty.
         """
 
         # If no tags were given, we prepare tags for the newly created
         # variables:
         if tags is None:
-            tags = (None,) * len(values)
+            tags = (None,) * len(nom_values)
 
         # The covariance matrix is diagonalized in order to define
         # the independent variables that model the given values:
@@ -362,19 +374,47 @@ else:
         # special: 'transform' is unitary: its inverse is its transpose:
 
         variables = tuple(
-            # The variables represent uncertainties only:
+            # The variables represent "pure" uncertainties:
             Variable(0, sqrt(variance), tag)
             for (variance, tag) in zip(variances, tags))
 
         # Representation of the initial correlated values:
         values_funcs = tuple(
             AffineScalarFunc(value, dict(zip(variables, coords)))
-            for (coords, value) in zip(transform, values))
+            for (coords, value) in zip(transform, nom_values))
 
         return values_funcs
 
     __all__.append('correlated_values')
 
+    def correlated_values_norm(values_with_std_dev, correlation_mat,
+                               tags=None):
+        '''
+        Returns correlated values like correlated_values(), but takes
+        instead as input:
+
+        - nominal (float) values along with their standard deviation, and
+        
+        - a correlation matrix (i.e. a normalized covariance matrix
+          normalized with individual standard deviations).
+
+        values_with_std_dev -- sequence of (nominal value, standard
+        deviation) pairs. The returned, correlated values have these
+        nominal values and standard deviations.
+
+        correlation_mat -- correlation matrix (i.e. the normalized
+        covariance matrix, a matrix with ones on its diagonal).
+        '''
+
+        (nominal_values, std_devs) = numpy.transpose(values_with_std_dev)
+
+        return correlated_values(
+            nominal_values,
+            correlation_mat*std_devs*std_devs[numpy.newaxis].T,
+            tags)
+        
+    __all__.append('correlated_values_norm')
+    
 ###############################################################################
 
 # Mathematical operations with local approximations (affine scalar
@@ -1412,32 +1452,36 @@ def std_dev(x):
 
     return x.std_dev() if isinstance(x, AffineScalarFunc) else 0.
 
-def covariance_matrix(functions):
+def covariance_matrix(nums_with_uncert):
     """
     Returns a matrix that contains the covariances between the given
     sequence of numbers with uncertainties (AffineScalarFunc objects).
     The resulting matrix implicitly depends on their ordering in
-    'functions'.
+    'nums_with_uncert'.
 
     The covariances are floats (never int objects).
 
     The returned covariance matrix is the exact linear approximation
-    result, if the nominal values of the functions and of their
-    variables are their mean.  Otherwise, the returned covariance
-    matrix should be close to it linear approximation value.
+    result, if the nominal values of the numbers with uncertainties
+    and of their variables are their mean.  Otherwise, the returned
+    covariance matrix should be close to its linear approximation
+    value.
+
+    The returned matrix is a list of lists.
     """
-    # See PSI.411.
+    # See PSI.411 in EOL's notes.
 
     covariance_matrix = []
-    for (i1, expr1) in enumerate(functions):
+    for (i1, expr1) in enumerate(nums_with_uncert):
         derivatives1 = expr1.derivatives  # Optimization
         vars1 = set(derivatives1)
         coefs_expr1 = []
-        for (i2, expr2) in enumerate(functions[:i1+1]):
+        for (i2, expr2) in enumerate(nums_with_uncert[:i1+1]):
             derivatives2 = expr2.derivatives  # Optimization
             coef = 0.
             for var in vars1.intersection(derivatives2):
-                # var is a variable common to both functions:
+                # var is a variable common to both numbers with
+                # uncertainties:
                 coef += (derivatives1[var]*derivatives2[var]*var._std_dev**2)
             coefs_expr1.append(coef)
         covariance_matrix.append(coefs_expr1)
@@ -1445,10 +1489,29 @@ def covariance_matrix(functions):
     # We symmetrize the matrix:
     for (i, covariance_coefs) in enumerate(covariance_matrix):
         covariance_coefs.extend(covariance_matrix[j][i]
-                                 for j in range(i+1, len(covariance_matrix)))
+                                for j in range(i+1, len(covariance_matrix)))
 
     return covariance_matrix
 
+try:
+    import numpy
+except ImportError:
+    pass
+else:
+    def correlation_matrix(nums_with_uncert):
+        '''
+        Returns the correlation matrix of the given sequence of
+        numbers with uncertainties, as a NumPy array of floats.
+        '''
+
+        cov_mat = numpy.array(covariance_matrix(nums_with_uncert))
+
+        std_devs = numpy.sqrt(cov_mat.diagonal())
+        
+        return cov_mat/std_devs/std_devs[numpy.newaxis].T
+
+    __all__.append('correlation_matrix')
+        
 ###############################################################################
 # Parsing of values with uncertainties:
 
