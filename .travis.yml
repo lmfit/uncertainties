@@ -26,8 +26,9 @@ install:
   # - dpkg -L python3  #!!! Where is the apt-get Python3?
   # NumPy test:
   - python --version
-  - which python
-  - pip install numpy  # Uses the current Python version
+  - which python  # This is found in virtualenv
+  # !!!!!!!! How to install NumPy for the (virtualenv version of) Python?
+  # pip install numpy does not work
   - python -c "import numpy"
 
   # The Sphinx document requires pdflatex. It can be found in
