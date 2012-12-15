@@ -1087,14 +1087,6 @@ class AffineScalarFunc(object):
                     
     def __str__(self):
         return self._general_representation(str)
-
-    def position_in_sigmas(self, value):
-        '''
-        Wrapper for legacy code.  Obsolete: do not use.  Use std_score
-        instead.
-        '''
-        deprecation("position_in_sigmas is obsolete.  Use std_score instead")
-        return self.std_score(value)
     
     def std_score(self, value):
         """
