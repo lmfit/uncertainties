@@ -617,6 +617,13 @@ def test_wrapped_func():
     f_wrapped = uncertainties.wrap(f, [lambda *args: 1, None, lambda *args:1])
     assert fw(10, 'string argument', 1) == 11.0
     assert fw(x, 'string argument', 1).std() == 1
+
+def test_wrap_with_keywords():
+    '''
+    Tests wrap() on functions that accept keywords.
+    '''
+
+    #!!!!!!!!!!!
     
 ###############################################################################
         
