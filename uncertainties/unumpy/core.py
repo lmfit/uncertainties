@@ -1,7 +1,7 @@
 """
 Core functions used by unumpy and some of its submodules.
 
-(c) 2010 by Eric O. LEBIGOT (EOL).
+(c) 2010-2013 by Eric O. LEBIGOT (EOL).
 """
 
 # The functions found in this module cannot be defined in unumpy or

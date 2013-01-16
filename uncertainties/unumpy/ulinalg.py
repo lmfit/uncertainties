@@ -2,7 +2,7 @@
 This module provides uncertainty-aware functions that generalize some
 of the functions from numpy.linalg.
 
-(c) 2010 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
+(c) 2010-2013 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 """
 
 from uncertainties import __author__
