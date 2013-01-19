@@ -117,7 +117,7 @@ def test_monte_carlo_comparison():
 
     # Works on numpy.arrays of Variable objects (whereas umath.sin()
     # does not):
-    sin_uarrayncert = numpy.vectorize(umath.sin, otypes=[object])
+    sin_uarray_uncert = numpy.vectorize(umath.sin, otypes=[object])
     
     # Example expression (with correlations, and multiple variables combined
     # in a non-linear way):
@@ -127,7 +127,7 @@ def test_monte_carlo_comparison():
         """
         # The uncertainty due to x is about equal to the uncertainty
         # due to y:
-        return 10 * x**2 - x * sin_uarrayncert(y**3)
+        return 10 * x**2 - x * sin_uarray_uncert(y**3)
 
     x = uncertainties.ufloat((0.2, 0.01))
     y = uncertainties.ufloat((10, 0.001))
