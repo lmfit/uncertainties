@@ -15,7 +15,7 @@ Mathematically, **numbers with uncertainties** are, in this package,
 **probability distributions**.  They are *not restricted* to normal
 (Gaussian) distributions and can be any kind of distribution.  These
 probability distributions are reduced to two numbers: a nominal value
-and a standard deviation.
+and an uncertainty.
 
 Thus, both variables (:class:`Variable` objects) and the result of
 mathematical operations (:class:`AffineScalarFunc` objects) contain
@@ -25,7 +25,7 @@ attribute and through their :meth:`std_dev` method).
 .. index:: uncertainty; definition
 
 The **uncertainty** of a number with uncertainty is simply defined in
-this package as the standard deviation of the underlying probability
+this package as the **standard deviation** of the underlying probability
 distribution.
 
 The numbers with uncertainties manipulated by this package are assumed
