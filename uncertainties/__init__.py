@@ -1071,6 +1071,7 @@ class AffineScalarFunc(object):
         # Support subclasses that do not use __slots__ (except through
         # inheritance):
         all_attrs.update(getattr(self, '__dict__', {}))
+
         return all_attrs
 
     def __setstate__(self, data_dict):
