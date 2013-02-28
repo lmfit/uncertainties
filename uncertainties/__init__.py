@@ -1065,7 +1065,7 @@ class AffineScalarFunc(object):
         # Support subclasses that do not use __slots__ (except through
         # inheritance): instances have a __dict__ attribute. The
         # corresponding values are stored before those from the slots
-        # (apparently: reference?)
+        # (apparently: http://stackoverflow.com/questions/15139067/attribute-access-in-python-first-slots-then-dict/15139208#15139208)
         all_attrs.update(getattr(self, '__dict__', {}))
 
         # All the slot attributes are gathered.
