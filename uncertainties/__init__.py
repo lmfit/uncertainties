@@ -1060,6 +1060,8 @@ class AffineScalarFunc(object):
             # Include all values of all slots in the class hierarchy
             obj_slot_values.update((k, getattr(self, k))
                 for k in getattr(cls, '__slots__', ()))
+        # support subclasses that do not use __slots__
+        obj_slot_values.update(getattr(self, '__dict__', {}))
         return obj_slot_values
 
     def __setstate__(self, data_dict):
