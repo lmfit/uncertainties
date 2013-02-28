@@ -276,7 +276,23 @@ def test_copy():
     gc.collect()
 
     assert y in y.derivatives.keys()
+
+## Classes for the pickling tests (put at the module level, so that
+## they can be unpickled):
     
+# Subclass without slots:
+class NewVariable(uncertainties.Variable):
+    def __init__(self, n, s):
+        super(NewVariable, self).__init__(n, s)
+        self.addtl_dict_attr = 'Dictionary attribute'
+
+# Subclass with slots:
+class NewNewVariable(NewVariable):
+    __slots__ = ('slot_attr',)
+    def __init__(self, n, s):
+        super(NewNewVariable, self).__init__(n, s)
+        self.slot_attr = 'Slot attribute'
+
 def test_pickling():
     "Standard pickle module integration."
 
@@ -295,7 +311,21 @@ def test_pickling():
     # Correlations must be preserved:
     assert f_unpickled - x_unpickled2 - x_unpickled2 == 0
     
+    ## Tests with subclasses:
+
+
+    x = NewVariable(3, 0.14)
+    x_unpickled = pickle.loads(pickle.dumps(x))
+    x_unpickled.addtl_dict_attr  # Must exist
+
+
+    y = NewNewVariable(3, 0.14)
+    y_unpickled = pickle.loads(pickle.dumps(y))
+    y_unpickled.addtl_dict_attr  # Must exist    
+    y_unpickled.slot_attr  # Must exist
+        
     
+            
 def test_int_div():
     "Integer division"
     # We perform all operations on floats, because derivatives can
