@@ -1054,15 +1054,24 @@ class AffineScalarFunc(object):
     def __getstate__(self):
         """
         Hook for the pickle module.
+
+        The slot attributes of the parent classes are returned, as
+        well as those of the __dict__ attribute of the object (if
+        any).
         """
-        obj_slot_values = {}
+        
+        all_attrs = {}
+        
         for cls in type(self).mro():
             # Include all values of all slots in the class hierarchy
-            obj_slot_values.update((k, getattr(self, k))
-                for k in getattr(cls, '__slots__', ()))
-        # support subclasses that do not use __slots__
-        obj_slot_values.update(getattr(self, '__dict__', {}))
-        return obj_slot_values
+            all_attrs.update(
+                (name, getattr(self, name))
+                for name in getattr(cls, '__slots__', ()))
+            
+        # Support subclasses that do not use __slots__ (except through
+        # inheritance):
+        all_attrs.update(getattr(self, '__dict__', {}))
+        return all_attrs
 
     def __setstate__(self, data_dict):
         """
