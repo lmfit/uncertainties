@@ -282,17 +282,16 @@ def test_copy():
     
 # Subclass without slots:
 class NewVariable_dict(uncertainties.Variable):
-    def __init__(self, n, s):
-        super(NewVariable_dict, self).__init__(n, s)
-        self.addtl_dict_attr = 'Dictionary attribute'
+    pass
 
-# Subclass with slots:
-class NewVariable_slots(uncertainties.Variable):
-    __slots__ = ('slot_attr',)
-    def __init__(self, n, s):
-        super(NewVariable_slots, self).__init__(n, s)
-        self.slot_attr = 'Slot attribute'
+# Subclass with slots defined by a tuple:
+class NewVariable_slots_tuple(uncertainties.Variable):
+    __slots__ = ('new_attr',)
 
+# Subclass with slots defined by a string:
+class NewVariable_slots_str(uncertainties.Variable):
+    __slots__ = 'new_attr'
+        
 def test_pickling():
     "Standard pickle module integration."
 
@@ -313,18 +312,15 @@ def test_pickling():
     
     ## Tests with subclasses:
 
-    # Subclass that has instances with a __dict__ attribute:
-    x = NewVariable_dict(3, 0.14)
-    x_unpickled = pickle.loads(pickle.dumps(x))
-    x.nominal_value  # Must exist (From the slots of the parent class)
-    x_unpickled.addtl_dict_attr  # Must exist
-
-    # Subclass with instances with no __dict__ attribute:
-    y = NewVariable_slots(3, 0.14)
-    y_unpickled = pickle.loads(pickle.dumps(y))
-    x.nominal_value  # Must exist (From the slots of the parent class)
-    y_unpickled.slot_attr  # Must exist
-    
+    for subclass in (NewVariable_dict, NewVariable_slots_tuple,
+                     NewVariable_slots_str):
+        
+        # Subclass that has instances with a __dict__ attribute:
+        x = subclass(3, 0.14)
+        x.new_attr = 'New attr value'
+        x_unpickled = pickle.loads(pickle.dumps(x))
+        x.nominal_value  # Must exist (From the slots of the parent class)
+        x_unpickled.new_attr  # Must exist    
             
 def test_int_div():
     "Integer division"
