@@ -281,16 +281,16 @@ def test_copy():
 ## they can be unpickled):
     
 # Subclass without slots:
-class NewVariable(uncertainties.Variable):
+class NewVariable_dict(uncertainties.Variable):
     def __init__(self, n, s):
-        super(NewVariable, self).__init__(n, s)
+        super(NewVariable_dict, self).__init__(n, s)
         self.addtl_dict_attr = 'Dictionary attribute'
 
 # Subclass with slots:
-class NewNewVariable(NewVariable):
+class NewVariable_slots(uncertainties.Variable):
     __slots__ = ('slot_attr',)
     def __init__(self, n, s):
-        super(NewNewVariable, self).__init__(n, s)
+        super(NewVariable_slots, self).__init__(n, s)
         self.slot_attr = 'Slot attribute'
 
 def test_pickling():
@@ -313,17 +313,17 @@ def test_pickling():
     
     ## Tests with subclasses:
 
-
-    x = NewVariable(3, 0.14)
+    # Subclass that has instances with a __dict__ attribute:
+    x = NewVariable_dict(3, 0.14)
     x_unpickled = pickle.loads(pickle.dumps(x))
+    x.nominal_value  # Must exist (From the slots of the parent class)
     x_unpickled.addtl_dict_attr  # Must exist
 
-
-    y = NewNewVariable(3, 0.14)
+    # Subclass with instances with no __dict__ attribute:
+    y = NewVariable_slots(3, 0.14)
     y_unpickled = pickle.loads(pickle.dumps(y))
-    y_unpickled.addtl_dict_attr  # Must exist    
+    x.nominal_value  # Must exist (From the slots of the parent class)
     y_unpickled.slot_attr  # Must exist
-        
     
             
 def test_int_div():
