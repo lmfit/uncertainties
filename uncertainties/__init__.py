@@ -1056,12 +1056,14 @@ class AffineScalarFunc(object):
         Hook for the pickle module.
         """
         obj_slot_values = {}
+        # support subclasses that do not use __slots__
+        # Copy these first, as values in slots take precedence (see
+        # http://stackoverflow.com/a/15139208/100297
+        obj_slot_values.update(getattr(self, '__dict__', {}))
         for cls in type(self).mro():
             # Include all values of all slots in the class hierarchy
             obj_slot_values.update((k, getattr(self, k))
                 for k in getattr(cls, '__slots__', ()))
-        # support subclasses that do not use __slots__
-        obj_slot_values.update(getattr(self, '__dict__', {}))
         return obj_slot_values
 
     def __setstate__(self, data_dict):
