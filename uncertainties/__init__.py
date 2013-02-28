@@ -1061,17 +1061,38 @@ class AffineScalarFunc(object):
         """
         
         all_attrs = {}
-        
-        for cls in type(self).mro():
-            # Include all values of all slots in the class hierarchy
-            all_attrs.update(
-                (name, getattr(self, name))
-                for name in getattr(cls, '__slots__', ()))
-            
+
         # Support subclasses that do not use __slots__ (except through
-        # inheritance):
+        # inheritance): instances have a __dict__ attribute. The
+        # corresponding values are stored before those from the slots
+        # (apparently: reference?)
         all_attrs.update(getattr(self, '__dict__', {}))
 
+        # All the slot attributes are gathered.
+
+        # Classes that do not define __slots__ have the __slots__ of
+        # one of their parents (the first parent with their own
+        # __slots__ in MRO). This is why the slot names are first
+        # gathered (with repetitions removed, in general), and their
+        # values obtained later.
+        
+        all_slots = set()
+        
+        for cls in type(self).mro():
+            
+            slot_names = getattr(cls, '__slots__', ())
+
+            # Slot names can be given in various forms (string,
+            # sequence, iterable):
+            if isinstance(slot_names, str):
+                all_slots.add(slot_names)  # Single name
+            else:
+                all_slots.update(slot_names)
+
+        # The slot values are stored:
+        # !! Python 2.7+: {name: getattr...}:
+        all_attrs.update((name, getattr(self, name)) for name in all_slots)
+                
         return all_attrs
 
     def __setstate__(self, data_dict):
