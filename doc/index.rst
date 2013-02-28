@@ -287,11 +287,12 @@ Acknowledgments
 The author wishes to thank Arnaud Delobelle, Pierre Cladé, and Sebastian 
 Walter for very useful technical input.  Patches by Pierre Cladé, Tim 
 Head, and José Sabater Montes are gratefully acknowledged. I would also 
-like to thank Joaquin Abian, Jason Moore, Martin Lutz and many other 
-users for their feedback and suggestions, which greatly helped improve 
-this program. I am also grateful to the Linux distribution maintainers 
-of this package, and to Christoph Gohlke for including it in his Base 
-distribution of scientific Python packages for Windows.
+like to thank Joaquin Abian, Jason Moore, Martin Lutz, Matt Newville, 
+Matthew Peel, Don Peterson and many other users for their feedback and 
+suggestions, which greatly helped improve this program. I am also 
+grateful to the Linux distribution maintainers of this package, and to 
+Christoph Gohlke for including it in his Base distribution of scientific 
+Python packages for Windows.
 
 .. index:: license
 
