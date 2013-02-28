@@ -1055,10 +1055,13 @@ class AffineScalarFunc(object):
         """
         Hook for the pickle module.
         """
-        obj_slot_values = dict((k, getattr(self, k)) for k in
-                               # self.__slots__ would not work when
-                               # self is an instance of a subclass:
-                               AffineScalarFunc.__slots__)
+        obj_slot_values = {}
+        for cls in type(self).mro():
+            # Include all values of all slots in the class hierarchy
+            obj_slot_values.update((k, getattr(self, k))
+                for k in getattr(cls, '__slots__', ()))
+        # support subclasses that do not use __slots__
+        obj_slot_values.update(getattr(self, '__dict__', {}))
         return obj_slot_values
 
     def __setstate__(self, data_dict):
@@ -1334,21 +1337,6 @@ class Variable(AffineScalarFunc):
         
         return self.__copy__()
 
-    def __getstate__(self):
-        """
-        Hook for the standard pickle module.
-        """
-        obj_slot_values = dict((k, getattr(self, k)) for k in self.__slots__)
-        obj_slot_values.update(AffineScalarFunc.__getstate__(self))
-        # Conversion to a usual dictionary:
-        return obj_slot_values
-
-    def __setstate__(self, data_dict):
-        """
-        Hook for the standard pickle module.
-        """        
-        for (name, value) in data_dict.iteritems():
-            setattr(self, name, value)
         
 ###############################################################################
 
