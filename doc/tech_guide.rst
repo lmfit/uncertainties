@@ -148,7 +148,7 @@ are thus meaningful approximations as long as the functions involved
 have precise linear expansions in the region where the probability
 distribution of their variables is the largest.  It is therefore
 important that **uncertainties be "small"**.  Mathematically, this
-means that the linear terms of functions around the nominal values of
+implies that the linear terms of functions around the nominal values of
 their variables should be much larger than the remaining higher-order
 terms over the region of significant probability.
 
