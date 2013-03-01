@@ -1075,9 +1075,12 @@ class AffineScalarFunc(object):
         # The method below not only preserves this behavior, but also
         # saves the full contents of __dict__. This is robust:
         # unpickling gives back the original __dict__ even if __dict__
-        # contains keys that are shadowed by slot names: try:
-        # all_attrs['__dict__'] = self.__dict__ except AttributeError:
-        # pass
+        # contains keys that are shadowed by slot names:
+
+        try:
+            all_attrs['__dict__'] = self.__dict__
+        except AttributeError:
+            pass
         
         # All the slot attributes are gathered.
 
