@@ -121,8 +121,8 @@ Basic examples
 Main features
 =============
 
-- **Transparent calculations with uncertainties**: no or little
-  modification of existing code is needed.  Similarly, the Python_ (or
+- **Transparent calculations with uncertainties**: **no or little
+  modification of existing code** is needed.  Similarly, the Python_ (or
   IPython_) shell can be used as **a powerful calculator** that
   handles quantities with uncertainties (``print`` statements are
   optional, which is convenient).
@@ -135,16 +135,17 @@ Main features
 - **Almost all mathematical operations** are supported, including most
   functions from the standard math_ module (sin,...).  Comparison
   operators (``>``, ``==``, etc.) are supported too.
+  
+- Many **fast operations on arrays and matrices** of numbers with
+  uncertainties are supported.
 
+- Most uncertainty calculations are performed **analytically**.
+  
 - This module also gives access to the **derivatives** of any 
   mathematical expression (they are used by error
   propagation theory, and are thus automatically calculated by this
   module).
 
-- Many **fast operations on arrays and matrices** of numbers with
-  uncertainties are supported.
-
-- Most uncertainty calculations are performed **analytically**.
 
 Installation or upgrade
 =======================
