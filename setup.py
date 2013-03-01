@@ -121,7 +121,7 @@ Basic examples
 Main features
 =============
 
-- **Transparent calculations** with uncertainties: no or little
+- **Transparent calculations with uncertainties**: no or little
   modification of existing code is needed.  Similarly, the Python_ (or
   IPython_) shell can be used as **a powerful calculator** that
   handles quantities with uncertainties (``print`` statements are
@@ -164,7 +164,7 @@ Version history
 
 Main changes:
 
-- 1.9.1: Support added for pickling subclasses of ``Variable``.
+- 1.9.1: Support added for pickling subclasses of ``UFloat`` (= ``Variable``).
 - 1.9: Added functions for handling correlation matrices: \
        ``correlation_matrix()`` and \
        ``correlated_values_norm()``. (These new functions mirror the \
