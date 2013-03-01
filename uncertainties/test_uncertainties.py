@@ -315,11 +315,11 @@ def test_pickling():
     for subclass in (NewVariable_dict, NewVariable_slots_tuple,
                      NewVariable_slots_str):
         
-        # Subclass that has instances with a __dict__ attribute:
         x = subclass(3, 0.14)
         x.new_attr = 'New attr value'
         x_unpickled = pickle.loads(pickle.dumps(x))
-        x.nominal_value  # Must exist (From the slots of the parent class)
+        # Must exist (From the slots of the parent class):        
+        x_unpickled.nominal_value
         x_unpickled.new_attr  # Must exist    
             
 def test_int_div():
