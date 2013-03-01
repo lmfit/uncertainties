@@ -3,7 +3,7 @@ Tests of the code in uncertainties/unumpy/__init__.py.
 
 These tests can be run through the Nose testing framework.
 
-(c) 2010 by Eric O. LEBIGOT (EOL).
+(c) 2010-2013 by Eric O. LEBIGOT (EOL).
 """
 
 from __future__ import division

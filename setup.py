@@ -164,20 +164,18 @@ Version history
 
 Main changes:
 
-- 1.9: Added functions for handling correlation matrices:
-       ``correlation_matrix()`` and
-       ``correlated_values_norm()``. (These new functions mirror the
-       covariance-matrix based ``covariance_matrix()`` and
-       ``correlated_values()``.) ``UFloat.position_in_sigmas()`` is
-       now named ``UFloat.std_score()``, so as to follow the common
-       naming convention (`standard score
-       <http://en.wikipedia.org/wiki/Standard_score>`_).  Obsolete
-       functions were removed (from the main module:
-       `NumberWithUncert`, `num_with_uncert`, `array_u`,
-       `nominal_values`, `std_devs`).
-       
+- 1.9: Added functions for handling correlation matrices: \
+       ``correlation_matrix()`` and \
+       ``correlated_values_norm()``. (These new functions mirror the \
+       covariance-matrix based ``covariance_matrix()`` and \
+       ``correlated_values()``.) ``UFloat.position_in_sigmas()`` is \
+       now named ``UFloat.std_score()``, so as to follow the common \
+       naming convention (`standard score \
+       <http://en.wikipedia.org/wiki/Standard_score>`_).  Obsolete \
+       functions were removed (from the main module: \
+       ``NumberWithUncert``, ``num_with_uncert``, ``array_u``, \
+       ``nominal_values``, ``std_devs``).
 - 1.8: Compatibility with Python 3.2 added.
-
 - 1.7.2: Compatibility with Python 2.3, Python 2.4, Jython 2.5.1 and \
          Jython 2.5.2 added.
 - 1.7.1: New semantics: ``ufloat('12.3(78)')`` now represents 12.3+/-7.8 \

@@ -209,7 +209,7 @@ is the result of x != 0.
 - This package contains tests.  They can be run either manually or
 automatically with the nose unit testing framework (nosetests).
 
-(c) 2009-2010 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
+(c) 2009-2013 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 Please send feature requests, bug reports, or feedback to this address.
 
 Please support future development by donating $5 or more through PayPal!
@@ -239,7 +239,7 @@ import warnings
 __version_info__ = (1, 9)
 __version__ = '.'.join(map(str, __version_info__))
 
-__author__ = 'Eric O. LEBIGOT (EOL)'
+__author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
 
 # Attributes that are always exported (some other attributes are
 # exported only if the NumPy module is available...):
@@ -1045,14 +1045,6 @@ class AffineScalarFunc(object):
                     
     def __str__(self):
         return self._general_representation(str)
-
-    def position_in_sigmas(self, value):
-        '''
-        Wrapper for legacy code.  Obsolete: do not use.  Use std_score
-        instead.
-        '''
-        deprecation("position_in_sigmas is obsolete.  Use std_score instead")
-        return self.std_score(value)
     
     def std_score(self, value):
         """
@@ -1086,12 +1078,70 @@ class AffineScalarFunc(object):
     def __getstate__(self):
         """
         Hook for the pickle module.
+
+        The slot attributes of the parent classes are returned, as
+        well as those of the __dict__ attribute of the object (if
+        any).
         """
-        obj_slot_values = dict([(k, getattr(self, k)) for k in
-                                # self.__slots__ would not work when
-                                # self is an instance of a subclass:
-                                AffineScalarFunc.__slots__])
-        return obj_slot_values
+
+        # In general (case where this class is subclassed), data
+        # attribute are stored in two places: possibly in __dict_, and
+        # in slots. Data from both locations is returned by this
+        # method.
+        
+        all_attrs = {}
+
+        # Support for subclasses that do not use __slots__ (except
+        # through inheritance): instances have a __dict__
+        # attribute. The keys in this __dict__ are shadowed by the
+        # slot attribute names (reference:
+        # http://stackoverflow.com/questions/15139067/attribute-access-in-python-first-slots-then-dict/15139208#15139208).
+        # The method below not only preserves this behavior, but also
+        # saves the full contents of __dict__. This is robust:
+        # unpickling gives back the original __dict__ even if __dict__
+        # contains keys that are shadowed by slot names:
+
+        try:
+            all_attrs['__dict__'] = self.__dict__
+        except AttributeError:
+            pass
+        
+        # All the slot attributes are gathered.
+
+        # Classes that do not define __slots__ have the __slots__ of
+        # one of their parents (the first parent with their own
+        # __slots__ in MRO). This is why the slot names are first
+        # gathered (with repetitions removed, in general), and their
+        # values obtained later.
+        
+        all_slots = set()
+        
+        for cls in type(self).mro():
+
+            # In the diamond inheritance pattern, some parent classes
+            # may not have __slots__:
+            slot_names = getattr(cls, '__slots__', ())
+
+            # Slot names can be given in various forms (string,
+            # sequence, iterable):
+            if isinstance(slot_names, str):
+                all_slots.add(slot_names)  # Single name
+            else:
+                all_slots.update(slot_names)
+
+        # The slot values are stored:
+        # !! Python 2.7+: {name: getattr...}:
+        for name in all_slots:
+            try:
+                # !! It might happen that '__dict__' is itself a slot
+                # name. In this case, its value is saved
+                # again. Alternatively, the loop could be done on
+                # all_slots - set(('__dict__',)):
+                all_attrs[name] = getattr(self, name)
+            except AttributeError:
+                pass  # Undefined slot attribute
+                
+        return all_attrs
 
     def __setstate__(self, data_dict):
         """
@@ -1100,7 +1150,9 @@ class AffineScalarFunc(object):
         for (name, value) in data_dict.iteritems():
             setattr(self, name, value)
 
-# Nicer name, for users: isinstance(ufloat(...), UFloat) is True:
+# Nicer name, for users: isinstance(ufloat(...), UFloat) is
+# True. Also: isinstance(..., UFloat) is the test for "is this a
+# number with uncertainties from the uncertainties package?".
 UFloat = AffineScalarFunc
 
 def get_ops_with_reflection():
@@ -1374,21 +1426,6 @@ class Variable(AffineScalarFunc):
         
         return self.__copy__()
 
-    def __getstate__(self):
-        """
-        Hook for the standard pickle module.
-        """
-        obj_slot_values = dict([(k, getattr(self, k)) for k in self.__slots__])
-        obj_slot_values.update(AffineScalarFunc.__getstate__(self))
-        # Conversion to a usual dictionary:
-        return obj_slot_values
-
-    def __setstate__(self, data_dict):
-        """
-        Hook for the standard pickle module.
-        """        
-        for (name, value) in data_dict.iteritems():
-            setattr(self, name, value)
         
 ###############################################################################
 

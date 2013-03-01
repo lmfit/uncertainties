@@ -5,7 +5,7 @@ Tests of the code in uncertainties/__init__.py.
 
 These tests can be run through the Nose testing framework.
 
-(c) 2010 by Eric O. LEBIGOT (EOL).
+(c) 2010-2013 by Eric O. LEBIGOT (EOL).
 """
 
 from __future__ import division
@@ -28,6 +28,11 @@ from uncertainties import ufloat, AffineScalarFunc
 from uncertainties import __author__
 
 from backport import *
+
+# The following information is useful for making sure that the right
+# version of Python is running the tests (for instance with the Travis
+# Continuous Integration system):
+print "Testing with Python", sys.version
 
 ###############################################################################
 
@@ -280,7 +285,22 @@ def test_copy():
     gc.collect()
 
     assert y in y.derivatives.keys()
+
+## Classes for the pickling tests (put at the module level, so that
+## they can be unpickled):
     
+# Subclass without slots:
+class NewVariable_dict(uncertainties.Variable):
+    pass
+
+# Subclass with slots defined by a tuple:
+class NewVariable_slots_tuple(uncertainties.Variable):
+    __slots__ = ('new_attr',)
+
+# Subclass with slots defined by a string:
+class NewVariable_slots_str(uncertainties.Variable):
+    __slots__ = 'new_attr'
+        
 def test_pickling():
     "Standard pickle module integration."
 
@@ -299,7 +319,46 @@ def test_pickling():
     # Correlations must be preserved:
     assert f_unpickled - x_unpickled2 - x_unpickled2 == 0
     
+    ## Tests with subclasses:
+
+    for subclass in (NewVariable_dict, NewVariable_slots_tuple,
+                     NewVariable_slots_str):
+        
+        x = subclass(3, 0.14)
+
+        # Pickling test with possibly uninitialized slots:
+        pickle.loads(pickle.dumps(x))
+        
+        # Unpickling test:
+        x.new_attr = 'New attr value'
+        x_unpickled = pickle.loads(pickle.dumps(x))
+        # Must exist (From the slots of the parent class):        
+        x_unpickled.nominal_value
+        x_unpickled.new_attr  # Must exist    
+
+    ##
+        
+    # Corner case test: when an attribute is present both in __slots__
+    # and in __dict__, it is first looked up from the slots
+    # (references:
+    # http://docs.python.org/2/reference/datamodel.html#invoking-descriptors,
+    # http://stackoverflow.com/a/15139208/42973). As a consequence,
+    # the pickling process must pickle the correct value (i.e., not
+    # the value from __dict__):
+    x = NewVariable_dict(3, 0.14)
+    x._nominal_value = 'in slots'
+    # Corner case: __dict__ key which is also a slot name (it is
+    # shadowed by the corresponding slot, so this is very unusual,
+    # though):
+    x.__dict__['_nominal_value'] = 'in dict'
+    # Additional __dict__ attribute:
+    x.dict_attr = 'dict attribute'
     
+    x_unpickled = pickle.loads(pickle.dumps(x))
+    # We make sure that the data is still there and untouched:
+    assert x_unpickled._nominal_value == 'in slots'
+    assert x_unpickled.__dict__ == x.__dict__
+        
 def test_int_div():
     "Integer division"
     # We perform all operations on floats, because derivatives can

@@ -143,16 +143,20 @@ upgrade this package with
 
    easy_install --upgrade uncertainties
 
-The :mod:`uncertainties` package is also available on the following
-**Linux distributions** and software platforms: `Ubuntu
+The :mod:`uncertainties` package is also available for **Windows**
+through the `Python(x,y) distribution <http://www.pythonxy.com/>`_. It
+may also be included in Christoph Gohlke's Base distribution of
+`scientific Python packages
+<http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_.
+
+The :mod:`uncertainties` package is also available through the
+following **Linux** distributions and software platforms: `Ubuntu
 <https://launchpad.net/ubuntu/+source/uncertainties>`_, `openSUSE
 <https://build.opensuse.org/package/show?package=python-uncertainties&project=home%3Aocefpaf>`_,
 `Debian
 <http://packages.debian.org/search?keywords=python-uncertainties>`_
 and `Maemo <http://maemo.org/packages/view/python-uncertainties/>`_.
-It may also be included in Christoph Gohlke's Base distribution of
-`scientific Python packages
-<http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_ for **Windows**.
+
 
 Manual download and install
 ---------------------------
@@ -191,7 +195,7 @@ that corresponds best to your version of Python to a location that
 Python can import from (directory in which scripts using
 :mod:`uncertainties` are run, etc.); the chosen
 :file:`uncertainties-py*` directory should then be renamed
-:file:`uncertainties`. Python 3 users should finally run ``2to3 -w
+:file:`uncertainties`. Python 3 users should then run ``2to3 -w
 uncertainties`` so as to automatically adapt the code to Python 3.
 
 Source code
@@ -307,16 +311,18 @@ The author wishes to thank all the people who made generous
 `donations`_: they help keep this project alive by providing positive 
 feedback.
 
-I would also like to thank users who contributed with feedback and 
-suggestions, which greatly helped improve this program: Joaquin Abian, 
-Jason Moore, Martin Lutz, Víctor Terrón and many others.
+I would also like to thank users who contributed with feedback and
+suggestions, which greatly helped improve this program: Joaquin Abian,
+Jason Moore, Martin Lutz, Víctor Terrón, Matt Newville, Matthew Peel,
+Don Peterson and many others.
 
-I greatly appreciated getting key technical input from Arnaud Delobelle, 
-Pierre Cladé, and Sebastian Walter.  Patches by Pierre Cladé, Tim Head, 
-and José Sabater Montes are gratefully acknowledged.
+I greatly appreciated getting key technical input from Arnaud
+Delobelle, Pierre Cladé, and Sebastian Walter.  Patches by Pierre
+Cladé, Tim Head, José Sabater Montes and Martijn Pieters are
+gratefully acknowledged.
 
-I am also grateful to the Linux distribution maintainers of this 
-package, and to Christoph Gohlke for including it in his Base 
+I am also grateful to the Linux distribution maintainers of this
+package, and to Christoph Gohlke for including it in his Base
 distribution of scientific Python packages for Windows.
 
 .. index:: license
