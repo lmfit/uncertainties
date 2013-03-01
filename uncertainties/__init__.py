@@ -232,8 +232,9 @@ import re
 import math
 from math import sqrt, log  # Optimization: no attribute look-up
 import copy
-from backport import *
 import warnings
+
+from backport import *
 
 # Numerical version:
 __version_info__ = (1, 9, 1)
