@@ -1110,7 +1110,9 @@ class AffineScalarFunc(object):
         for (name, value) in data_dict.iteritems():
             setattr(self, name, value)
 
-# Nicer name, for users: isinstance(ufloat(...), UFloat) is True:
+# Nicer name, for users: isinstance(ufloat(...), UFloat) is
+# True. Also: isinstance(..., UFloat) is the test for "is this a
+# number with uncertainties from the uncertainties package?".
 UFloat = AffineScalarFunc
 
 def get_ops_with_reflection():
