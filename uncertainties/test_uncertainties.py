@@ -326,7 +326,20 @@ def test_pickling():
         # Must exist (From the slots of the parent class):        
         x_unpickled.nominal_value
         x_unpickled.new_attr  # Must exist    
-            
+
+    # Corner case test: when an attribute is present both in __slots__
+    # and in __dict__, it is first looked up from the slots
+    # (references:
+    # http://docs.python.org/2/reference/datamodel.html#invoking-descriptors,
+    # http://stackoverflow.com/a/15139208/42973). As a consequence,
+    # the pickling process must pickle the correct value (i.e., not
+    # the value from __dict__):
+    x = NewVariable_dict(3, 0.14)
+    x._nominal_value = 'in slots'
+    x.__dict__['_nominal_value'] = 'in dict'
+    x_unpickled = pickle.loads(pickle.dumps(x))
+    assert x_unpickled._nominal_value == 'in slots'
+        
 def test_int_div():
     "Integer division"
     # We perform all operations on floats, because derivatives can
