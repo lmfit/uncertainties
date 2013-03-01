@@ -1064,11 +1064,15 @@ class AffineScalarFunc(object):
 
         # Support for subclasses that do not use __slots__ (except
         # through inheritance): instances have a __dict__
-        # attribute. The corresponding values are stored before those
-        # from the slots, so that they do not shadow them in the
-        # pickled object (reference:
-        # http://stackoverflow.com/questions/15139067/attribute-access-in-python-first-slots-then-dict/15139208#15139208)
-        all_attrs.update(getattr(self, '__dict__', {}))
+        # attribute. The keys in this __dict__ are shadowed by the
+        # slot attribute names (reference:
+        # http://stackoverflow.com/questions/15139067/attribute-access-in-python-first-slots-then-dict/15139208#15139208). The
+        # method below not only preserves this behavior, but also
+        # saves the full contents of __dict__. This is robust:
+        # unpickling works even if __dict__ contains keys that are
+        # slot names:
+        if hasattr(self, '__dict__'):
+            all_attrs['__dict__'] = self.__dict__
 
         # All the slot attributes are gathered.
 
