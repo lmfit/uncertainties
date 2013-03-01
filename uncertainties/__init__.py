@@ -1074,8 +1074,8 @@ class AffineScalarFunc(object):
         # http://stackoverflow.com/questions/15139067/attribute-access-in-python-first-slots-then-dict/15139208#15139208). The
         # method below not only preserves this behavior, but also
         # saves the full contents of __dict__. This is robust:
-        # unpickling works even if __dict__ contains keys that are
-        # slot names:
+        # unpickling gives back the original __dict__ even if __dict__
+        # contains keys that are shadowed by slot names:
         try:
             all_attrs['__dict__'] = self.__dict__
         except AttributeError:
