@@ -347,6 +347,7 @@ def test_pickling():
     
     x_unpickled = pickle.loads(pickle.dumps(x))
     # We make sure that the data is still there and untouched:
+    assert x_unpickled.__dict__['_nominal_value'] == 'in dict'
     assert x_unpickled._nominal_value == 'in slots'
     assert x_unpickled.__dict__ == x.__dict__
         
