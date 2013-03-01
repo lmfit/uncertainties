@@ -316,6 +316,11 @@ def test_pickling():
                      NewVariable_slots_str):
         
         x = subclass(3, 0.14)
+
+        # Pickling test with possibly uninitialized slots:
+        pickle.loads(pickle.dumps(x))
+        
+        # Unpickling test:
         x.new_attr = 'New attr value'
         x_unpickled = pickle.loads(pickle.dumps(x))
         # Must exist (From the slots of the parent class):        

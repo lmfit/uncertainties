@@ -1081,7 +1081,9 @@ class AffineScalarFunc(object):
         all_slots = set()
         
         for cls in type(self).mro():
-            
+
+            # In the diamond inheritance pattern, some parent classes
+            # may not have __slots__:
             slot_names = getattr(cls, '__slots__', ())
 
             # Slot names can be given in various forms (string,
@@ -1093,7 +1095,11 @@ class AffineScalarFunc(object):
 
         # The slot values are stored:
         # !! Python 2.7+: {name: getattr...}:
-        all_attrs.update((name, getattr(self, name)) for name in all_slots)
+        for name in all_slots:
+            try:
+                all_attrs[name] = getattr(self, name)
+            except AttributeError:
+                pass  # Undefined slot attribute
                 
         return all_attrs
 
