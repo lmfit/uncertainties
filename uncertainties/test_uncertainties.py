@@ -327,6 +327,8 @@ def test_pickling():
         x_unpickled.nominal_value
         x_unpickled.new_attr  # Must exist    
 
+    ##
+        
     # Corner case test: when an attribute is present both in __slots__
     # and in __dict__, it is first looked up from the slots
     # (references:
@@ -336,9 +338,16 @@ def test_pickling():
     # the value from __dict__):
     x = NewVariable_dict(3, 0.14)
     x._nominal_value = 'in slots'
+    # Corner case: __dict__ key (it is shadowed by the corresponding
+    # slot, so this is very unusual, though):    
     x.__dict__['_nominal_value'] = 'in dict'
+    # Additional __dict__ attribute:
+    x.dict_attr = 'dict attribute'
+    
     x_unpickled = pickle.loads(pickle.dumps(x))
+    # We make sure that the data is still there and untouched:
     assert x_unpickled._nominal_value == 'in slots'
+    assert x_unpickled.__dict__ == x.__dict__
         
 def test_int_div():
     "Integer division"
