@@ -237,7 +237,7 @@ import warnings
 from backport import *
 
 # Numerical version:
-__version_info__ = (1, 9)
+__version_info__ = (1, 9, 1)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
