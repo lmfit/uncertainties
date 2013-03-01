@@ -1059,6 +1059,11 @@ class AffineScalarFunc(object):
         well as those of the __dict__ attribute of the object (if
         any).
         """
+
+        # In general (case where this class is subclassed), data
+        # attribute are stored in two places: possibly in __dict_, and
+        # in slots. Data from both locations is returned by this
+        # method.
         
         all_attrs = {}
 
@@ -1071,9 +1076,11 @@ class AffineScalarFunc(object):
         # saves the full contents of __dict__. This is robust:
         # unpickling works even if __dict__ contains keys that are
         # slot names:
-        if hasattr(self, '__dict__'):
+        try:
             all_attrs['__dict__'] = self.__dict__
-
+        except AttributeError:
+            pass
+        
         # All the slot attributes are gathered.
 
         # Classes that do not define __slots__ have the __slots__ of
