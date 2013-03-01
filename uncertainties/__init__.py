@@ -1108,6 +1108,10 @@ class AffineScalarFunc(object):
         # !! Python 2.7+: {name: getattr...}:
         for name in all_slots:
             try:
+                # !! It might happen that '__dict__' is itself a slot
+                # name. In this case, its value is saved
+                # again. Alternatively, the loop could be done on
+                # all_slots - set(('__dict__',)):
                 all_attrs[name] = getattr(self, name)
             except AttributeError:
                 pass  # Undefined slot attribute
