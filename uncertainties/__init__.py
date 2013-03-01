@@ -1071,15 +1071,13 @@ class AffineScalarFunc(object):
         # through inheritance): instances have a __dict__
         # attribute. The keys in this __dict__ are shadowed by the
         # slot attribute names (reference:
-        # http://stackoverflow.com/questions/15139067/attribute-access-in-python-first-slots-then-dict/15139208#15139208). The
-        # method below not only preserves this behavior, but also
+        # http://stackoverflow.com/questions/15139067/attribute-access-in-python-first-slots-then-dict/15139208#15139208).
+        # The method below not only preserves this behavior, but also
         # saves the full contents of __dict__. This is robust:
         # unpickling gives back the original __dict__ even if __dict__
-        # contains keys that are shadowed by slot names:
-        try:
-            all_attrs['__dict__'] = self.__dict__
-        except AttributeError:
-            pass
+        # contains keys that are shadowed by slot names: try:
+        # all_attrs['__dict__'] = self.__dict__ except AttributeError:
+        # pass
         
         # All the slot attributes are gathered.
 
