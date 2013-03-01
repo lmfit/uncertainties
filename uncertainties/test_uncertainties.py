@@ -338,8 +338,9 @@ def test_pickling():
     # the value from __dict__):
     x = NewVariable_dict(3, 0.14)
     x._nominal_value = 'in slots'
-    # Corner case: __dict__ key (it is shadowed by the corresponding
-    # slot, so this is very unusual, though):    
+    # Corner case: __dict__ key which is also a slot name (it is
+    # shadowed by the corresponding slot, so this is very unusual,
+    # though):
     x.__dict__['_nominal_value'] = 'in dict'
     # Additional __dict__ attribute:
     x.dict_attr = 'dict attribute'
