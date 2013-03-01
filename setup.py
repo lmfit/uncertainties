@@ -53,7 +53,7 @@ distutils.core.setup(
     version='1.9.1',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
-    url='http://packages.python.org/uncertainties/',
+    url='http://pythonhosted.org/uncertainties/',
       
     license='''\
 This software can be used under one of the following two licenses: \
@@ -150,7 +150,7 @@ Installation or upgrade
 =======================
 
 Installation instructions are available on the `main web site
-<http://packages.python.org/uncertainties/#installation-and-download>`_
+<http://pythonhosted.org/uncertainties/#installation-and-download>`_
 for this package.
 
 Contact
@@ -164,6 +164,7 @@ Version history
 
 Main changes:
 
+- 1.9.1: Support added for pickling subclasses of ``Variable``.
 - 1.9: Added functions for handling correlation matrices: \
        ``correlation_matrix()`` and \
        ``correlated_values_norm()``. (These new functions mirror the \
@@ -242,7 +243,7 @@ _of_uncertainty
 .. _setuptools: http://pypi.python.org/pypi/setuptools
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
 .. _PayPal: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
-.. _main website: http://packages.python.org/uncertainties/
+.. _main website: http://pythonhosted.org/uncertainties/
 ''',
       
     keywords=['error propagation', 'uncertainties',
