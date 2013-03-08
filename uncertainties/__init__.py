@@ -1026,7 +1026,7 @@ class AffineScalarFunc(object):
         #not need to have their std_dev calculated: only the final
         #AffineScalarFunc returned to the user does).
         return CallableStdDev(sqrt(sum([
-            delta**2 for delta in self.error_components().itervalues())]))
+            delta**2 for delta in self.error_components().itervalues()])))
 
     def _general_representation(self, to_string):
         """
