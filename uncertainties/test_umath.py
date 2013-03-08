@@ -92,7 +92,7 @@ def test_numerical_example():
     # for all analytical and numerical derivatives, which would make
     # test_fixed_derivatives_math_funcs() succeed despite incorrect
     # calculations:
-    assert ("%.6f +/- %.6f" % (result.nominal_value, result.std_dev())
+    assert ("%.6f +/- %.6f" % (result.nominal_value, result.std_dev)
             == "0.001593 +/- 0.010000")
 
     # Regular calculations should still work:
@@ -144,9 +144,9 @@ def test_monte_carlo_comparison():
         median, and the covariances between (x, y, function(x, y)).
         """
         # Result of a Monte-Carlo simulation:
-        x_samples = numpy.random.normal(x.nominal_value, x.std_dev(),
+        x_samples = numpy.random.normal(x.nominal_value, x.std_dev,
                                         n_samples)
-        y_samples = numpy.random.normal(y.nominal_value, y.std_dev(),
+        y_samples = numpy.random.normal(y.nominal_value, y.std_dev,
                                         n_samples)
         function_samples = function(x_samples, y_samples)
 

@@ -33,7 +33,7 @@ Examples:
   square = x**2  # Square
   print square  # Prints "0.04+/-0.004"  
   print square.nominal_value  # Prints "0.04"
-  print square.std_dev()  # Prints "0.004..."
+  print square.std_dev  # Prints "0.004..."
 
   print square.derivatives[x]  # Partial derivative: 0.4 (= 2*0.20)
 
@@ -237,7 +237,7 @@ import warnings
 from backport import *
 
 # Numerical version:
-__version_info__ = (1, 9, 1)
+__version_info__ = (2, 0)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
@@ -246,7 +246,7 @@ __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
 # exported only if the NumPy module is available...):
 __all__ = [
 
-    # All sub-modules and packages are not imported by default,
+    # All sub-modules .and packages are not imported by default,
     # in particular because NumPy might be unavailable.
 
     'ufloat',  # Main function: returns a number with uncertainty
@@ -777,7 +777,7 @@ def _eq_on_aff_funcs(self, y_with_uncert):
     difference = self - y_with_uncert
     # Only an exact zero difference means that self and y are
     # equal numerically:
-    return not(difference._nominal_value or difference.std_dev())
+    return not(difference._nominal_value or difference.std_dev)
 
 def _ne_on_aff_funcs(self, y_with_uncert):
     """
@@ -821,6 +821,18 @@ def _le_on_aff_funcs(self, y_with_uncert):
 
 ########################################
 
+class CallableStdDev(float):
+    '''
+    Class for standard deviation results, which used to be
+    callable. Provided for compatibility with old code. Issues an
+    obsolescence warning upon call.
+    '''
+    
+    def __call__ (self):
+        warnings.warn('Obsolete: The std_dev attribute should not be called'
+                      ' anymore: use .std_dev instead of .std_dev().')
+        return self
+        
 class AffineScalarFunc(object):
     """
     Affine functions that support basic mathematical operations
@@ -995,7 +1007,8 @@ class AffineScalarFunc(object):
             error_components[variable] = abs(derivative*variable._std_dev)
 
         return error_components
-
+    
+    @property
     def std_dev(self):
         """
         Standard deviation of the affine function.
@@ -1003,7 +1016,7 @@ class AffineScalarFunc(object):
         This method assumes that the function returns scalar results.
 
         This returned standard deviation depends on the current
-        standard deviations [std_dev()] of the variables (Variable
+        standard deviations [std_dev] of the variables (Variable
         objects) involved.
         """
         #! It would be possible to not allow the user to update the
@@ -1012,8 +1025,8 @@ class AffineScalarFunc(object):
         #std_dev value (in fact, many intermediate AffineScalarFunc do
         #not need to have their std_dev calculated: only the final
         #AffineScalarFunc returned to the user does).
-        return sqrt(sum([
-            delta**2 for delta in self.error_components().itervalues()]))
+        return CallableStdDev(sqrt(sum([
+            delta**2 for delta in self.error_components().itervalues())]))
 
     def _general_representation(self, to_string):
         """
@@ -1024,7 +1037,7 @@ class AffineScalarFunc(object):
         to_string() is typically repr() or str().
         """
 
-        (nominal_value, std_dev) = (self._nominal_value, self.std_dev())
+        (nominal_value, std_dev) = (self._nominal_value, self.std_dev)
 
         # String representation:
 
@@ -1057,7 +1070,7 @@ class AffineScalarFunc(object):
         try:
             # The ._nominal_value is a float: there is no integer division,
             # here:
-            return (value - self._nominal_value) / self.std_dev()
+            return (value - self._nominal_value) / self.std_dev
         except ZeroDivisionError:
             raise ValueError("The standard deviation is zero:"
                              " undefined result.")
@@ -1410,7 +1423,7 @@ class Variable(AffineScalarFunc):
         #! The following assumes that the arguments to Variable are
         # *not* copied upon construction, since __copy__ is not supposed
         # to copy "inside" information:
-        return Variable(self.nominal_value, self.std_dev(), self.tag)
+        return Variable(self.nominal_value, self.std_dev, self.tag)
 
     def __deepcopy__(self, memo):
         """
@@ -1458,7 +1471,7 @@ def std_dev(x):
     """
 
     if isinstance(x, AffineScalarFunc):
-        return x.std_dev()
+        return x.std_dev
     else:
         return 0.
 
@@ -1596,7 +1609,7 @@ def parse_error_in_parentheses(representation):
     
 # The following function is not exposed because it can in effect be
 # obtained by doing x = ufloat(representation) and
-# x.nominal_value and x.std_dev():
+# x.nominal_value and x.std_dev:
 def str_to_number_with_uncert(representation):
     """
     Given a string that represents a number with uncertainty, returns the
