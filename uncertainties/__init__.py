@@ -1323,23 +1323,26 @@ class Variable(AffineScalarFunc):
         
         self.tag = tag
 
-    @property
-    def std_dev(self):
-        return self._std_dev
-        
+    # !! In Python 2.6+, the std_dev property would be more simply
+    # implemented with @property(getter), then @std_dev.setter(setter).
+
     # Standard deviations can be modified (this is a feature).
     # AffineScalarFunc objects that depend on the Variable have their
     # std_dev automatically modified (recalculated with the new
     # std_dev of their Variables):
-    @std_dev.setter
-    def std_dev(self, std_dev):
+    def _set_std_dev(self, std_dev):
     
         # We force the error to be float-like.  Since it is considered
         # as a standard deviation, it must be positive:
         assert std_dev >= 0, "the error must be a positive number"
 
         self._std_dev = CallableStdDev(std_dev)
+    
+    def _get_std_dev(self):
+        return self._std_dev
         
+    std_dev = property(_get_std_dev, _set_std_dev)
+    
     # Support for legacy method:
     def set_std_dev(self, value):  # Obsolete
         warnings.warn('Obsolete: instead of set_std_dev(), please use'
