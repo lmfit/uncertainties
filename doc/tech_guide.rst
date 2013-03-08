@@ -20,7 +20,7 @@ and an uncertainty.
 Thus, both variables (:class:`Variable` objects) and the result of
 mathematical operations (:class:`AffineScalarFunc` objects) contain
 these two values (respectively in their :attr:`nominal_value`
-attribute and through their :meth:`std_dev` method).
+and :attr:`std_dev` attributes).
 
 .. index:: uncertainty; definition
 
@@ -82,7 +82,7 @@ Random variables can, on the other hand, have their uncertainty
 updated on the fly, because quantities with uncertainties (like
 :data:`poly`) keep track of them:
 
-  >>> x.set_std_dev(0)
+  >>> x.std_dev = 0
   >>> print poly
   46.0  # Zero uncertainty, now
 
