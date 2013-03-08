@@ -359,7 +359,7 @@ def test_int_div():
     # All errors are supposed to be small, so the ufloat()
     # in x violates the assumption.  Therefore, the following is
     # correct:
-    assert x.std_dev() == 0.0
+    assert x.std_dev == 0.0
 
 def test_comparison_ops():
     "Test of comparison operators"
@@ -440,7 +440,7 @@ def test_comparison_ops():
             infinitesimal interval withing its uncertainty.  The case
             of a zero uncertainty is special.
             """
-            return ((random.random()-0.5) * min(var.std_dev(), 1e-5)
+            return ((random.random()-0.5) * min(var.std_dev, 1e-5)
                     + var.nominal_value)
 
         # All operations are tested:
@@ -520,13 +520,13 @@ def test_basic_access_to_data():
     x = ufloat((3.14, 0.01), "x var")
     assert x.tag == "x var"
     assert x.nominal_value == 3.14
-    assert x.std_dev() == 0.01
+    assert x.std_dev == 0.01
 
     # Case of AffineScalarFunc objects:
     y = x + 0
     assert type(y) == AffineScalarFunc
     assert y.nominal_value == 3.14
-    assert y.std_dev() == 0.01
+    assert y.std_dev == 0.01
 
     # Details on the sources of error:
     a = ufloat((-1, 0.001))
@@ -544,7 +544,7 @@ def test_basic_access_to_data():
     assert y.error_components()[x] == 5  # New error contribution!
 
     # Calculation of deviations in units of the standard deviations:
-    assert 10/x.std_dev() == x.std_score(10 + x.nominal_value)
+    assert 10/x.std_dev == x.std_score(10 + x.nominal_value)
 
     # "In units of the standard deviation" is not always meaningfull:
     x.set_std_dev(0)
@@ -560,10 +560,10 @@ def test_correlations():
     x = ufloat((4, 0.1))
     y = x*2 + a
     # Correlations cancel "naive" additions of uncertainties:
-    assert y.std_dev() != 0
+    assert y.std_dev != 0
     normally_zero = y - (x*2 + 1)
     assert normally_zero.nominal_value == 0
-    assert normally_zero.std_dev() == 0
+    assert normally_zero.std_dev == 0
 
 def test_str_input():
 
@@ -601,7 +601,7 @@ def test_str_input():
         num = ufloat(representation)
 
         assert _numbers_close(num.nominal_value, values[0])
-        assert _numbers_close(num.std_dev(), values[1])
+        assert _numbers_close(num.std_dev, values[1])
 
     
 def test_no_coercion():
@@ -654,8 +654,8 @@ def test_access_to_std_dev():
     y = 2*x
 
     # std_dev for Variable and AffineScalarFunc objects:
-    assert uncertainties.std_dev(x) == x.std_dev()
-    assert uncertainties.std_dev(y) == y.std_dev()
+    assert uncertainties.std_dev(x) == x.std_dev
+    assert uncertainties.std_dev(y) == y.std_dev
 
     # std_dev for other objects:
     assert uncertainties.std_dev([]) == 0
@@ -806,8 +806,8 @@ else:
                                   elmt2.nominal_value, precision):
                 return False
 
-            if not _numbers_close(elmt1.std_dev(),
-                                  elmt2.std_dev(), precision):
+            if not _numbers_close(elmt1.std_dev,
+                                  elmt2.std_dev, precision):
                 return False
         return True
 
@@ -878,7 +878,7 @@ else:
 
         # Test of the diagonal covariance elements:
         assert matrices_close(
-            numpy.array([v.std_dev()**2 for v in (x, y, z)]),
+            numpy.array([v.std_dev**2 for v in (x, y, z)]),
             numpy.array(covs).diagonal())
         
         # "Inversion" of the covariance matrix: creation of new
@@ -953,7 +953,7 @@ else:
         # correlation matrix (not through the covariance matrix):
 
         nominal_values = [v.nominal_value for v in (x, y, z)]
-        std_devs = [v.std_dev() for v in (x, y, z)]
+        std_devs = [v.std_dev for v in (x, y, z)]
         x2, y2, z2 = uncertainties.correlated_values_norm(
             zip(nominal_values, std_devs), corr_mat)
         

@@ -33,7 +33,7 @@ Examples:
   square = x**2  # Square
   print square  # Prints "0.04+/-0.004"  
   print square.nominal_value  # Prints "0.04"
-  print square.std_dev()  # Prints "0.004..."
+  print square.std_dev  # Prints "0.004..."
 
   print square.derivatives[x]  # Partial derivative: 0.4 (= 2*0.20)
 
@@ -756,7 +756,7 @@ def _eq_on_aff_funcs(self, y_with_uncert):
     difference = self - y_with_uncert
     # Only an exact zero difference means that self and y are
     # equal numerically:
-    return not(difference._nominal_value or difference.std_dev())
+    return not(difference._nominal_value or difference.std_dev)
 
 def _ne_on_aff_funcs(self, y_with_uncert):
     """
@@ -1003,7 +1003,7 @@ class AffineScalarFunc(object):
         to_string() is typically repr() or str().
         """
 
-        (nominal_value, std_dev) = (self._nominal_value, self.std_dev())
+        (nominal_value, std_dev) = (self._nominal_value, self.std_dev)
 
         # String representation:
 
@@ -1032,7 +1032,7 @@ class AffineScalarFunc(object):
         try:
             # The ._nominal_value is a float: there is no integer division,
             # here:
-            return (value - self._nominal_value) / self.std_dev()
+            return (value - self._nominal_value) / self.std_dev
         except ZeroDivisionError:
             raise ValueError("The standard deviation is zero:"
                              " undefined result.")
@@ -1377,7 +1377,7 @@ class Variable(AffineScalarFunc):
         #! The following assumes that the arguments to Variable are
         # *not* copied upon construction, since __copy__ is not supposed
         # to copy "inside" information:
-        return Variable(self.nominal_value, self.std_dev(), self.tag)
+        return Variable(self.nominal_value, self.std_dev, self.tag)
 
     def __deepcopy__(self, memo):
         """
@@ -1421,7 +1421,7 @@ def std_dev(x):
     numbers, when only some of them generally carry an uncertainty.
     """
 
-    return x.std_dev() if isinstance(x, AffineScalarFunc) else 0.
+    return x.std_dev if isinstance(x, AffineScalarFunc) else 0.
 
 def covariance_matrix(nums_with_uncert):
     """
@@ -1554,7 +1554,7 @@ def parse_error_in_parentheses(representation):
     
 # The following function is not exposed because it can in effect be
 # obtained by doing x = ufloat(representation) and
-# x.nominal_value and x.std_dev():
+# x.nominal_value and x.std_dev:
 def str_to_number_with_uncert(representation):
     """
     Given a string that represents a number with uncertainty, returns the
