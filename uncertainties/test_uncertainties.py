@@ -512,7 +512,11 @@ def test_logic():
     assert bool(z) == True
     assert bool(t) == True  # Only infinitseimal neighborhood are used
 
-        
+def test_obsolete():
+    'Tests obsolete functions'
+    x = ufloat((3, 0.1))
+    x.set_std_dev(0.2)  # Obsolete function
+    assert x.std_dev() == 0.2  # Obsolete use with a call
     
 def test_basic_access_to_data():
     "Access to data from Variable and AffineScalarFunc objects."
@@ -540,14 +544,24 @@ def test_basic_access_to_data():
     assert y.derivatives[x] == 5
 
     # Modification of the standard deviation of variables:
-    x.set_std_dev(1)
+    x.std_dev = 1
     assert y.error_components()[x] == 5  # New error contribution!
 
+    # Calculated values with uncertainties should not have a settable
+    # standard deviation:
+    y = 2*x
+    try:
+        y.std_dev = 1
+    except AttributeError:
+        pass
+    else:
+        raise "std_dev should not be settable for calculated results"
+    
     # Calculation of deviations in units of the standard deviations:
     assert 10/x.std_dev == x.std_score(10 + x.nominal_value)
 
-    # "In units of the standard deviation" is not always meaningfull:
-    x.set_std_dev(0)
+    # "In units of the standard deviation" is not always meaningful:
+    x.std_dev = 0
     try:
         x.std_score(1)
     except ValueError:

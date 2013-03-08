@@ -42,7 +42,7 @@ Examples:
   v = ufloat((10, 0.1), "v variable")
   sum_value = u+v
   
-  u.set_std_dev(0.1)  # Standard deviations can be updated on the fly
+  u.set_std_dev = 0.1  # Standard deviations can be updated on the fly
   print sum_value - u - v  # Prints "0.0" (exact result)
 
   # List of all sources of error:
@@ -1322,34 +1322,33 @@ class Variable(AffineScalarFunc):
         # a 3 % speed loss (Python 2.6, Mac OS X):
         super(Variable, self).__init__(value, {self: 1.})
 
-        # We force the error to be float-like.  Since it is considered
-        # as a Gaussian standard deviation, it is semantically
-        # positive (even though there would be no problem defining it
-        # as a sigma, where sigma can be negative and still define a
-        # Gaussian):
-
-        assert std_dev >= 0, "the error must be a positive number"
-        # Since AffineScalarFunc.std_dev is a property, we cannot do
-        # "self.std_dev = ...":
-        self._std_dev = std_dev
+        self.std_dev = std_dev  # Assignment through a Python property
         
         self.tag = tag
 
+    @property
+    def std_dev(self):
+        return self._std_dev
+        
     # Standard deviations can be modified (this is a feature).
     # AffineScalarFunc objects that depend on the Variable have their
-    # std_dev() automatically modified (recalculated with the new
+    # std_dev automatically modified (recalculated with the new
     # std_dev of their Variables):
-    def set_std_dev(self, value):
-        """
-        Updates the standard deviation of the variable to a new value.
-        """
+    @std_dev.setter
+    def std_dev(self, std_dev):
+    
+        # We force the error to be float-like.  Since it is considered
+        # as a standard deviation, it must be positive:
+        assert std_dev >= 0, "the error must be a positive number"
+
+        self._std_dev = CallableStdDev(std_dev)
         
-        # A zero variance is accepted.  Thus, it is possible to
-        # conveniently use infinitely precise variables, for instance
-        # to study special cases.
-
-        self._std_dev = value
-
+    # Support for legacy method:
+    def set_std_dev(self, value):  # Obsolete
+        warnings.warn('Obsolete: instead of set_std_dev(), please use'
+                      ' .std_dev = ...')
+        self.std_dev = value
+        
     # The following method is overridden so that we can represent the tag:
     def _general_representation(self, to_string):
         """
