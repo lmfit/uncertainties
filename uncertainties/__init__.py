@@ -42,7 +42,7 @@ Examples:
   v = ufloat((10, 0.1), "v variable")
   sum_value = u+v
   
-  u.set_std_dev = 0.1  # Standard deviations can be updated on the fly
+  u.std_dev = 0.1  # Standard deviations can be updated on the fly
   print sum_value - u - v  # Prints "0.0" (exact result)
 
   # List of all sources of error:
