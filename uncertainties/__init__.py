@@ -800,6 +800,18 @@ def _le_on_aff_funcs(self, y_with_uncert):
 
 ########################################
 
+class CallableStdDev(float):
+    '''
+    Class for standard deviation results, which used to be
+    callable. Provided for compatibility with old code. Issues an
+    obsolescence warning upon call.
+    '''
+    
+    def __call__ (self):
+        warnings.warn('Obsolete: The std_dev attribute should not be called'
+                      ' anymore: use .std_dev instead of .std_dev().')
+        return self
+        
 class AffineScalarFunc(object):
     """
     Affine functions that support basic mathematical operations
@@ -974,7 +986,8 @@ class AffineScalarFunc(object):
             error_components[variable] = abs(derivative*variable._std_dev)
 
         return error_components
-
+    
+    @property
     def std_dev(self):
         """
         Standard deviation of the affine function.
@@ -982,7 +995,7 @@ class AffineScalarFunc(object):
         This method assumes that the function returns scalar results.
 
         This returned standard deviation depends on the current
-        standard deviations [std_dev()] of the variables (Variable
+        standard deviations [std_dev] of the variables (Variable
         objects) involved.
         """
         #! It would be possible to not allow the user to update the
@@ -991,8 +1004,8 @@ class AffineScalarFunc(object):
         #std_dev value (in fact, many intermediate AffineScalarFunc do
         #not need to have their std_dev calculated: only the final
         #AffineScalarFunc returned to the user does).
-        return sqrt(sum(
-            delta**2 for delta in self.error_components().itervalues()))
+        return CallableStdDev(sqrt(sum(
+            delta**2 for delta in self.error_components().itervalues())))
 
     def _general_representation(self, to_string):
         """
