@@ -150,7 +150,7 @@ calculated square can also be accessed independently:
   0.04+/-0.004
   >>> print square.nominal_value
   0.04
-  >>> print square.std_dev()
+  >>> print square.std_dev
   0.004
 
 Details on the classes made available by this package can be found in
@@ -357,11 +357,11 @@ to study its impact on a final result.  With this package, the
   >>> sum_value = u+2*v
   >>> sum_value
   21.0+/-0.22360679774997899
-  >>> prev_uncert = u.std_dev()
-  >>> u.set_std_dev(10)
+  >>> prev_uncert = u.std_dev
+  >>> u.std_dev = 10
   >>> sum_value
   21.0+/-10.001999800039989
-  >>> u.set_std_dev(prev_uncert)
+  >>> u.std_dev = prev_uncert
 
 The relevant concept is that :data:`sum_value` does depend on the
 variables :data:`u` and :data:`v`: the :mod:`uncertainties` package keeps
