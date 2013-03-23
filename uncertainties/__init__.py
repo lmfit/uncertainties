@@ -301,8 +301,11 @@ def deprecation(message):
     Warns the user with the given message, by issuing a
     DeprecationWarning.
     '''
-    warnings.warn(message, DeprecationWarning, stacklevel=2)
 
+    # stacklevel = 3 points to the original user call (not to the
+    # function from this module that called deprecation()).
+    # DeprecationWarning is ignored by default: not used.
+    warnings.warn(message, stacklevel=3)
 
 ###############################################################################
 
@@ -808,8 +811,8 @@ class CallableStdDev(float):
     '''
     
     def __call__ (self):
-        warnings.warn('Obsolete: The std_dev attribute should not be called'
-                      ' anymore: use .std_dev instead of .std_dev().')
+        deprecation('Obsolete: The std_dev attribute should not be called'
+                    ' anymore: use .std_dev instead of .std_dev().')
         return self
         
 class AffineScalarFunc(object):
@@ -1119,7 +1122,6 @@ class AffineScalarFunc(object):
                 all_slots.update(slot_names)
 
         # The slot values are stored:
-        # !! Python 2.7+: {name: getattr...}:
         for name in all_slots:
             try:
                 # !! It might happen that '__dict__' is itself a slot
@@ -1345,8 +1347,8 @@ class Variable(AffineScalarFunc):
     
     # Support for legacy method:
     def set_std_dev(self, value):  # Obsolete
-        warnings.warn('Obsolete: instead of set_std_dev(), please use'
-                      ' .std_dev = ...')
+        deprecation('Obsolete: instead of set_std_dev(), please use'
+                    ' .std_dev = ...')
         self.std_dev = value
         
     # The following method is overridden so that we can represent the tag:
