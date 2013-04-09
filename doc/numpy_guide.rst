@@ -101,6 +101,7 @@ too):
   >>> unumpy.std_devs(mat)
   matrix([[ 0.1  ,  0.002]])
 
+
 .. index:: mathematical operation; on an array of numbers
 
 Mathematical functions
@@ -120,6 +121,41 @@ The definition of the mathematical quantities calculated by these
 functions is available in the documentation for
 :mod:`uncertainties.umath` (which is accessible through :func:`help`
 or ``pydoc``).
+
+
+.. index:: saving to file; array
+.. index:: reading from file; array
+
+Storing arrays in text format
+-----------------------------
+
+Arrays of numbers with uncertainties can be directly :ref:`pickled
+<pickling>`, saved to file and read from a file. Pickling has the
+advantage of preserving correlations between errors.
+
+Storing instead arrays in **text format** approach loses correlations
+between errors but has the advantage of being human-readable. This can
+be done through NumPy's :func:`savetxt` and :func:`loadtxt`.
+
+Writing the array to file can be done by asking NumPy to use the
+*representation* of numbers with uncertainties (instead of the default
+float conversion):
+
+  >>> numpy.savetxt('arr.txt', arr, fmt='%r')
+
+This produces a file that contains a text representation of the array::
+
+   1.0+/-0.01
+   2.0+/-0.002
+
+The file can then be read back by instructing NumPy to convert all the
+columns with :func:`uncertainties.ufloat`. The number :data:`num_cols`
+of columns in the input file (1, in our example) must be determined in
+advance, because NumPy requires a converter for each column
+separately:
+
+  >>> converters = dict.fromkeys(range(num_cols), uncertainties.ufloat)
+  >>> arr = numpy.loadtxt('arr.txt', converters=converters, dtype=object)
 
 .. index:: linear algebra; additional functions, ulinalg
 

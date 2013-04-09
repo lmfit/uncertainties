@@ -100,7 +100,11 @@ regular numbers, while providing a fully transparent way of handling
 correlations between quantities.
 
 .. index:: pickling
- 
+.. index:: saving to file; number with uncertainty
+.. index:: reading from file; number with uncertainty 
+
+.. _pickling:
+
 Pickling
 --------
 
@@ -108,8 +112,8 @@ The quantities with uncertainties created by the :mod:`uncertainties`
 package can be `pickled <http://docs.python.org/library/pickle.html>`_
 (they can be stored in a file, for instance).
 
-If multiple variables are pickled together, their correlations are
-preserved:
+If multiple variables are pickled together (including when pickling
+:doc:`NumPy arrays <numpy_guide>`), their correlations are preserved:
 
   >>> import pickle
   >>> x = ufloat((2, 0.1))
