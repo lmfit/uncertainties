@@ -143,7 +143,8 @@ float conversion):
 
   >>> numpy.savetxt('arr.txt', arr, fmt='%r')
 
-This produces a file that contains a text representation of the array::
+This produces a file `arr.txt` that contains a text representation of
+the array::
 
    1.0+/-0.01
    2.0+/-0.002
