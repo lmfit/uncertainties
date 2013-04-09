@@ -65,8 +65,8 @@ zero even though :data:`x` has an uncertainty:
   >>> x-x
   0.0
 
-Many other error propagation codes return the incorrect value
-0±0.1414… because they assume that the two subtracted quantities are
+Many other error propagation codes return the incorrect value 0±0.1414… 
+because they incorrectly assume that the two subtracted quantities are 
 *independent* random variables.
 
 **Arrays** of numbers with uncertainties are :ref:`transparently
