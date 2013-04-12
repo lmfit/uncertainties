@@ -301,8 +301,8 @@ correlations between quantities.
 .. _classes:
 
 
-Variables and functions with uncertainty
-----------------------------------------
+Python classes for variables and functions with uncertainty
+-----------------------------------------------------------
 
 Numbers with uncertainties are represented through two different
 classes:
