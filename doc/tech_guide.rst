@@ -217,6 +217,34 @@ since it is a constant "random" function (with value 0.0002, even
 though :data:`y` and :data:`x` are random). Thus, it is indeed true
 that :data:`y` > :data:`x`.
 
+
+.. _differentiation method:
+
+Differentiation method
+----------------------
+
+The :mod:`uncertainties` package automatically calculates the
+derivatives required by linear error propagation theory.
+
+Almost all the derivatives of the fundamental functions provided by
+:mod:`uncertainties` are obtained through a analytical formulas (the
+few mathematical functions that are instead differentiated through
+numerical approximation are listed in ``umath.num_deriv_funcs``).
+
+The derivatives of mathematical *expressions* are evaluated through a 
+fast and precise method: :mod:`uncertainties` transparently implements 
+`automatic differentiation`_ with reverse accumulation. This method 
+essentially consists in keeping track of the value of derivatives, and 
+in automatically applying the `chain rule 
+<http://en.wikipedia.org/wiki/Chain_rule>`_. Automatic differentiation 
+is often faster than symbolic differentiation and more precise than 
+numerical differentiation (when used with analytical formulas, like in
+:mod:`uncertainties`).
+
+The derivatives of any expression can be obtained with 
+:mod:`uncertainties` in a simple way, as demonstrated in the :ref:`User 
+Guide <derivatives>`.
+
 .. _variable_tracking:
 
 Tracking of random variables
@@ -265,33 +293,6 @@ These mechanisms make quantities with uncertainties behave mostly like
 regular numbers, while providing a fully transparent way of handling
 correlations between quantities.
 
-
-.. _differentiation method:
-
-Differentiation method
-----------------------
-
-The :mod:`uncertainties` package automatically calculates the
-derivatives required by linear error propagation theory.
-
-Almost all the derivatives of the fundamental functions provided by
-:mod:`uncertainties` are obtained through a analytical formulas (the
-few mathematical functions that are instead differentiated through
-numerical approximation are listed in ``umath.num_deriv_funcs``).
-
-The derivatives of mathematical *expressions* are evaluated through a 
-fast and precise method: :mod:`uncertainties` transparently implements 
-`automatic differentiation`_ with reverse accumulation. This method 
-essentially consists in keeping track of the value of derivatives, and 
-in automatically applying the `chain rule 
-<http://en.wikipedia.org/wiki/Chain_rule>`_. Automatic differentiation 
-is often faster than symbolic differentiation and more precise than 
-numerical differentiation (when used with analytical formulas, like in
-:mod:`uncertainties`).
-
-The derivatives of any expression can be obtained with 
-:mod:`uncertainties` in a simple way, as demonstrated in the :ref:`User 
-Guide <derivatives>`.
 
 
 .. index:: number with uncertainty; classes, Variable class
