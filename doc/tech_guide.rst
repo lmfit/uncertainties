@@ -4,6 +4,76 @@
 Technical Guide
 ===============
 
+Testing whether an object is a number with uncertainty
+------------------------------------------------------
+
+The recommended way of testing whether :data:`value` carries an
+uncertainty handled by this module is by checking whether
+:data:`value` is an instance of :class:`UFloat`, through
+``isinstance(value, UFloat)``.
+
+.. index:: pickling
+.. index:: saving to file; number with uncertainty
+.. index:: reading from file; number with uncertainty 
+
+.. _pickling:
+
+Pickling
+--------
+
+The quantities with uncertainties created by the :mod:`uncertainties`
+package can be `pickled <http://docs.python.org/library/pickle.html>`_
+(they can be stored in a file, for instance).
+
+If multiple variables are pickled together (including when pickling
+:doc:`NumPy arrays <numpy_guide>`), their correlations are preserved:
+
+  >>> import pickle
+  >>> x = ufloat((2, 0.1))
+  >>> y = 2*x
+  >>> p = pickle.dumps([x, y])  # Pickling to a string
+  >>> (x2, y2) = pickle.loads(p)  # Unpickling into new variables
+  >>> y2 - 2*x2
+  0.0
+
+The final result is exactly zero because the unpickled variables :data:`x2`
+and :data:`y2` are completely correlated.
+
+However, unpickling necessarily creates *new* variables that bear no
+relationship with the original variables (in fact, the pickled
+representation can be stored in a file and read from another program
+after the program that did the pickling is finished).  Thus
+
+  >>> x - x2
+  0.0+/-0.14142135623730953
+
+which shows that the original variable :data:`x` and the new variable :data:`x2`
+are completely uncorrelated.
+
+.. _linear_method:
+
+Uncertainties must be small
+---------------------------
+
+This package calculates the standard deviation of mathematical
+expressions through the linear approximation of `error propagation
+theory`_.
+
+The standard deviations and nominal values calculated by this package
+are thus meaningful approximations as long as the functions involved
+have precise linear expansions in the region where the probability
+distribution of their variables is the largest.  It is therefore
+important that **uncertainties be "small"**.  Mathematically, this
+implies that the linear terms of functions around the nominal values of
+their variables should be much larger than the remaining higher-order
+terms over the region of significant probability.
+
+For instance, ``sin(0+/-0.01)`` yields a meaningful standard deviation
+since it is quite linear over 0±0.01.  However, ``cos(0+/-0.01)``,
+yields an approximate standard deviation of 0 because it is parabolic
+around 0 instead of linear; this might not be precise enough for all
+applications.
+
 
 Mathematical definition of numbers with uncertainties
 -----------------------------------------------------
@@ -13,7 +83,7 @@ Mathematical definition of numbers with uncertainties
 
 Mathematically, **numbers with uncertainties** are, in this package,
 **probability distributions**.  They are *not restricted* to normal
-(Gaussian) distributions and can be any kind of distribution.  These
+(Gaussian) distributions and can be **any distribution**.  These
 probability distributions are reduced to two numbers: a nominal value
 and an uncertainty.
 
@@ -48,6 +118,104 @@ but this does not imply any property on the nominal value (beyond the
 fact that the nominal value is normally inside the region of high
 probability density), or that the probability distribution of the
 result is symmetrical (this is rarely strictly the case).
+
+.. index:: comparison operators; technical details
+
+.. _comparison_operators:
+
+
+Comparison operators
+--------------------
+
+Comparison operations (>, ==, etc.) on numbers with uncertainties have
+a **pragmatic semantics**, in this package: numbers with uncertainties
+can be used wherever Python numbers are used, most of the time with a
+result identical to the one that would be obtained with their nominal
+value only.  This allows code that runs with pure numbers to also work
+with numbers with uncertainties.
+
+.. index:: boolean value
+
+The **boolean value** (``bool(x)``, ``if x …``) of a number with
+uncertainty :data:`x` is defined as the result of ``x != 0``, as usual.
+
+However, since the objects defined in this module represent
+probability distributions and not pure numbers, comparison operators
+are interpreted in a specific way.
+
+The result of a comparison operation is defined so as to be
+essentially consistent with the requirement that uncertainties be
+small: the **value of a comparison operation** is True only if the
+operation yields True for all *infinitesimal* variations of its random
+variables around their nominal values, *except*, possibly, for an
+*infinitely small number* of cases.
+
+Example:
+
+  >>> x = ufloat((3.14, 0.01))
+  >>> x == x
+  True
+
+because a sample from the probability distribution of :data:`x` is always
+equal to itself.  However:
+
+  >>> y = ufloat((3.14, 0.01))
+  >>> x != y
+  True
+
+since :data:`x` and :data:`y` are independent random variables that
+*almost* always give a different value. Note that this is different
+from the result of ``z = 3.14; t = 3.14; print z != t``, because
+:data:`x` and :data:`y` are *random variables*, not pure numbers.
+
+Similarly,
+
+  >>> x = ufloat((3.14, 0.01))
+  >>> y = ufloat((3.00, 0.01))
+  >>> x > y
+  True
+
+because :data:`x` is supposed to have a probability distribution largely
+contained in the 3.14±~0.01 interval, while :data:`y` is supposed to be
+well in the 3.00±~0.01 one: random samples of :data:`x` and :data:`y` will
+most of the time be such that the sample from :data:`x` is larger than the
+sample from :data:`y`.  Therefore, it is natural to consider that for all
+practical purposes, ``x > y``.
+
+Since comparison operations are subject to the same constraints as
+other operations, as required by the :ref:`linear approximation
+<linear_method>` method, their result should be essentially *constant*
+over the regions of highest probability of their variables (this is
+the equivalent of the linearity of a real function, for boolean
+values).  Thus, it is not meaningful to compare the following two
+independent variables, whose probability distributions overlap:
+
+  >>> x = ufloat((3, 0.01))
+  >>> y = ufloat((3.0001, 0.01))
+
+In fact the function (x, y) → (x > y) is not even continuous over the
+region where x and y are concentrated, which violates the assumption
+of approximate linearity made in this package on operations involving
+numbers with uncertainties.  Comparing such numbers therefore returns
+a boolean result whose meaning is undefined.
+
+However, values with largely overlapping probability distributions can
+sometimes be compared unambiguously:
+
+  >>> x = ufloat((3, 1))
+  >>> x
+  3.0+/-1.0
+  >>> y = x + 0.0002
+  >>> y
+  3.0002+/-1.0
+  >>> y > x
+  True
+
+In fact, correlations guarantee that :data:`y` is always larger than
+:data:`x`: ``y-x`` correctly satisfies the assumption of linearity,
+since it is a constant "random" function (with value 0.0002, even
+though :data:`y` and :data:`x` are random). Thus, it is indeed true
+that :data:`y` > :data:`x`.
 
 .. _variable_tracking:
 
@@ -97,160 +265,33 @@ These mechanisms make quantities with uncertainties behave mostly like
 regular numbers, while providing a fully transparent way of handling
 correlations between quantities.
 
-.. index:: pickling
-.. index:: saving to file; number with uncertainty
-.. index:: reading from file; number with uncertainty 
 
-.. _pickling:
+.. _differentiation method:
 
-Pickling
---------
+Differentiation method
+----------------------
 
-The quantities with uncertainties created by the :mod:`uncertainties`
-package can be `pickled <http://docs.python.org/library/pickle.html>`_
-(they can be stored in a file, for instance).
+The :mod:`uncertainties` package automatically calculates the
+derivatives required by linear error propagation theory.
 
-If multiple variables are pickled together (including when pickling
-:doc:`NumPy arrays <numpy_guide>`), their correlations are preserved:
+Almost all the derivatives of the fundamental functions provided by
+:mod:`uncertainties` are obtained through a analytical formulas (the
+few mathematical functions that are instead differentiated through
+numerical approximation are listed in ``umath.num_deriv_funcs``).
 
-  >>> import pickle
-  >>> x = ufloat((2, 0.1))
-  >>> y = 2*x
-  >>> p = pickle.dumps([x, y])  # Pickling to a string
-  >>> (x2, y2) = pickle.loads(p)  # Unpickling into new variables
-  >>> y2 - 2*x2
-  0.0
+The derivatives of mathematical *expressions* are evaluated through a 
+fast and precise method: :mod:`uncertainties` transparently implements 
+`automatic differentiation`_ with reverse accumulation. This method 
+essentially consists in keeping track of the value of derivatives, and 
+in automatically applying the `chain rule 
+<http://en.wikipedia.org/wiki/Chain_rule>`_. Automatic differentiation 
+is often faster than symbolic differentiation and more precise than 
+numerical differentiation (when used with analytical formulas, like in
+:mod:`uncertainties`).
 
-The final result is exactly zero because the unpickled variables :data:`x2`
-and :data:`y2` are completely correlated.
-
-However, unpickling necessarily creates *new* variables that bear no
-relationship with the original variables (in fact, the pickled
-representation can be stored in a file and read from another program
-after the program that did the pickling is finished).  Thus
-
-  >>> x - x2
-  0.0+/-0.14142135623730953
-
-which shows that the original variable :data:`x` and the new variable :data:`x2`
-are completely uncorrelated.
-
-.. _linear_method:
-
-Uncertainties must be small
----------------------------
-
-This package calculates the standard deviation of mathematical
-expressions through the linear approximation of `error propagation
-theory`_.  This is why this package also calculates partial
-:ref:`derivatives <derivatives>`.
-
-The standard deviations and nominal values calculated by this package
-are thus meaningful approximations as long as the functions involved
-have precise linear expansions in the region where the probability
-distribution of their variables is the largest.  It is therefore
-important that **uncertainties be "small"**.  Mathematically, this
-implies that the linear terms of functions around the nominal values of
-their variables should be much larger than the remaining higher-order
-terms over the region of significant probability.
-
-For instance, ``sin(0+/-0.01)`` yields a meaningful standard deviation
-since it is quite linear over 0±0.01.  However, ``cos(0+/-0.01)``,
-yields an approximate standard deviation of 0 (because around 0, the
-cosine is parabolic, not linear), which might not be precise enough
-for all applications.
-
-.. index:: comparison operators; technical details
-
-.. _comparison_operators:
-
-Comparison operators
---------------------
-
-Comparison operations (>, ==, etc.) on numbers with uncertainties have
-a **pragmatic semantics**, in this package: numbers with uncertainties
-can be used wherever Python numbers are used, most of the time with a
-result identical to the one that would be obtained with their nominal
-value only.  This allows code that runs with pure numbers to also work
-with numbers with uncertainties.
-
-.. index:: boolean value
-
-The **boolean value** (``bool(x)``, ``if x …``) of a number with
-uncertainty :data:`x` is defined as the result of ``x != 0``, as usual.
-
-However, since the objects defined in this module represent
-probability distributions and not pure numbers, comparison operators
-are interpreted in a specific way.
-
-The result of a comparison operation is defined so as to be
-essentially consistent with the requirement that uncertainties be
-small: the **value of a comparison operation** is True only if the
-operation yields True for all *infinitesimal* variations of its random
-variables around their nominal values, *except*, possibly, for an
-*infinitely small number* of cases.
-
-Example:
-
-  >>> x = ufloat((3.14, 0.01))
-  >>> x == x
-  True
-
-because a sample from the probability distribution of :data:`x` is always
-equal to itself.  However:
-
-  >>> y = ufloat((3.14, 0.01))
-  >>> x != y
-  True
-
-since :data:`x` and :data:`y` are independent random variables that *almost*
-always give a different value.
-
-Similarly,
-
-  >>> x = ufloat((3.14, 0.01))
-  >>> y = ufloat((3.00, 0.01))
-  >>> x > y
-  True
-
-because :data:`x` is supposed to have a probability distribution largely
-contained in the 3.14±~0.01 interval, while :data:`y` is supposed to be
-well in the 3.00±~0.01 one: random samples of :data:`x` and :data:`y` will
-most of the time be such that the sample from :data:`x` is larger than the
-sample from :data:`y`.  Therefore, it is natural to consider that for all
-practical purposes, ``x > y``.
-
-Since comparison operations are subject to the same constraints as
-other operations, as required by the :ref:`linear approximation
-<linear_method>` method, their result should be essentially *constant*
-over the regions of highest probability of their variables (this is
-the equivalent of the linearity of a real function, for boolean
-values).  Thus, it is not meaningful to compare the following two
-independent variables, whose probability distributions overlap:
-
-  >>> x = ufloat((3, 0.01))
-  >>> y = ufloat((3.0001, 0.01))
-
-In fact the function (x, y) → (x > y) is not even continuous over the
-region where x and y are concentrated, which violates the assumption
-made in this package about operations involving numbers with
-uncertainties.  Comparing such numbers therefore returns a boolean
-result whose meaning is undefined.
-
-However, values with largely overlapping probability distributions can
-sometimes be compared unambiguously:
-
-  >>> x = ufloat((3, 1))
-  >>> x
-  3.0+/-1.0
-  >>> y = x + 0.0002
-  >>> y
-  3.0002+/-1.0
-  >>> y > x
-  True
-
-In fact, correlations guarantee that :data:`y` is always larger than
-:data:`x` (by 0.0002).
+The derivatives of any expression can be obtained with 
+:mod:`uncertainties` in a simple way, as demonstrated in the :ref:`User 
+Guide <derivatives>`.
 
 
 .. index:: number with uncertainty; classes, Variable class
@@ -258,18 +299,9 @@ In fact, correlations guarantee that :data:`y` is always larger than
 
 .. _classes:
 
-Classes
--------
 
-Testing whether an object is a number with uncertainty
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The recommended way of testing whether :data:`value` carries an
-uncertainty handled by this module is by checking the value of
-``isinstance(value, UFloat)``.
-
-Variables and functions
-^^^^^^^^^^^^^^^^^^^^^^^
+Variables and functions with uncertainty
+----------------------------------------
 
 Numbers with uncertainties are represented through two different
 classes:
@@ -301,33 +333,6 @@ objects store all the variables they depend from:
   >>> type(umath.sin(x))
   <class 'uncertainties.AffineScalarFunc'>
 
-
-.. _differentiation method:
-
-Differentiation method
-----------------------
-
-The :mod:`uncertainties` package automatically calculates the
-derivatives required by linear error propagation theory.
-
-Almost all the derivatives of the fundamental functions provided by
-:mod:`uncertainties` are obtained through a analytical formulas (the
-few mathematical functions that are instead differentiated through
-numerical approximation are listed in ``umath.num_deriv_funcs``).
-
-The derivatives of mathematical *expressions* are evaluated through a 
-fast and precise method: :mod:`uncertainties` transparently implements 
-`automatic differentiation`_ with reverse accumulation. This method 
-essentially consists in keeping track of the value of derivatives, and 
-in automatically applying the `chain rule 
-<http://en.wikipedia.org/wiki/Chain_rule>`_. Automatic differentiation 
-is often faster than symbolic differentiation and more precise than 
-numerical differentiation (when used with analytical formulas, like in
-:mod:`uncertainties`).
-
-The derivatives of any expression can be obtained with 
-:mod:`uncertainties` in a simple way, as demonstrated in the :ref:`User 
-Guide <derivatives>`.
 
 .. _automatic differentiation: http://en.wikipedia.org/wiki/Automatic_differentiation
 
