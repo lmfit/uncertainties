@@ -143,8 +143,8 @@ All of this is done completely transparently.
 Access to the uncertainty and to the nominal value
 ==================================================
 
-The nominal value and the uncertainty (standard deviation) on the
-calculated square can also be accessed independently:
+The nominal value and the uncertainty (standard deviation) can also be
+accessed independently:
 
   >>> print square
   0.04+/-0.004
@@ -153,12 +153,12 @@ calculated square can also be accessed independently:
   >>> print square.std_dev
   0.004
 
-Details on the classes made available by this package can be found in
-the :ref:`Technical Guide <classes>`.
+Access to the individual sources of uncertainty
+===============================================
 
 The various independent contributions to an uncertainty can be
 directly obtained.  This information is more easily usable when the
-variables are tagged:
+variables are **tagged**:
 
   >>> u = ufloat((1, 0.1), "u variable")  # Tag
   >>> v = ufloat((10, 0.1), "v variable")
@@ -171,8 +171,28 @@ variables are tagged:
   u variable: 0.100000
   v variable: 0.200000
 
-The total uncertainty on the result (:data:`sum_value`) is the quadratic
-sum of these independent uncertainties, as it should be.
+The variance (i.e. squared uncertainty) of the result
+(:data:`sum_value`) is the quadratic sum of these independent
+uncertainties, as it should be.
+
+The tags *do not have to be distinct*. For instance, *multiple* random
+variables can be tagged as ``"systematic"``, and their contribution to
+the total uncertainty of :data:`result` can simply be obtained as:
+
+  >>> syst_error = math.sqrt(sum(
+  ...     error**2
+  ...     for (var, error) in result.error_components().items()
+  ...     if var.tag == "systematic"))
+          
+This contribution, when added quadratically to the other contribution
+
+  >>> other_error = math.sqrt(sum(
+  ...     error**2
+  ...     for (var, error) in result.error_components().items()
+  ...     if var.tag != "systematic"))
+
+gives the squared uncertainty of :data:`result` (``syst_error**2 +
+other_error**2``).
 
 .. index:: comparison operators
 
