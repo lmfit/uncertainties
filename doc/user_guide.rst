@@ -446,7 +446,8 @@ Additional information
 The capabilities of the :mod:`uncertainties` package in terms of array
 handling are detailed in :doc:`numpy_guide`.
 
-Details about the theory behind this package are given in the
+Details about the theory behind this package and implementation 
+information are given in the
 :doc:`tech_guide`.
 
 .. _NumPy: http://numpy.scipy.org/
