@@ -69,10 +69,8 @@ yield correct uncertainties.  For example:
 Even though ``x*x`` has a non-zero uncertainty, the result has a zero
 uncertainty, because it is equal to :data:`a`.
 
-However, only the dependence of quantities on random variables created
-by this module is tracked.  Thus, if the variable :data:`a` above is
-modified, the value of :data:`poly` is not modified, as is usual in
-Python:
+If the variable :data:`a` above is modified, the value of :data:`poly` 
+is not modified, as is usual in Python:
 
   >>> a = 123
   >>> print poly
