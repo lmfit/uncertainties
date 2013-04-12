@@ -328,7 +328,7 @@ numbers (the summation, etc. of these objects is defined).
 Mathematical expressions involving numbers with uncertainties
 generally return :class:`AffineScalarFunc` objects, because they
 represent mathematical functions and not simple variables; these
-objects store all the variables they depend from:
+objects store all the variables they depend on:
 
   >>> type(umath.sin(x))
   <class 'uncertainties.AffineScalarFunc'>
