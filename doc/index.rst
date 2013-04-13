@@ -201,7 +201,7 @@ uncertainties`` so as to automatically adapt the code to Python 3.
 Source code
 -----------
 
-The latest `code
+The latest, bleeding-edge but working `code
 <https://github.com/lebigot/uncertainties/tree/master/uncertainties>`_
 and `documentation source
 <https://github.com/lebigot/uncertainties/tree/master/doc/>`_ are
