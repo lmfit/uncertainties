@@ -156,9 +156,15 @@ accessed independently:
 Access to the individual sources of uncertainty
 ===============================================
 
-The various independent contributions to an uncertainty can be
-directly obtained.  This information is more easily usable when the
-variables are **tagged**:
+The various contributions to an uncertainty can be obtained through
+the :func:`error_components` method, which maps the **independent
+variables a quantity depends on** to their **contribution to the total
+uncertainty**. According to the :ref:`linear error propagation theory
+<linear_method>` implemented in :mod:`uncertainties`, the sum of the
+squares of these contributions is the squared uncertainty.
+
+The individual contributions to the uncertainty are more easily usable
+when the variables are **tagged**:
 
   >>> u = ufloat((1, 0.1), "u variable")  # Tag
   >>> v = ufloat((10, 0.1), "v variable")
@@ -179,7 +185,7 @@ The tags *do not have to be distinct*. For instance, *multiple* random
 variables can be tagged as ``"systematic"``, and their contribution to
 the total uncertainty of :data:`result` can simply be obtained as:
 
-  >>> syst_error = math.sqrt(sum(
+  >>> syst_error = math.sqrt(sum(  # Error from *all* systematic errors
   ...     error**2
   ...     for (var, error) in result.error_components().items()
   ...     if var.tag == "systematic"))
