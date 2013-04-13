@@ -192,7 +192,7 @@ the total uncertainty of :data:`result` can simply be obtained as:
           
 The remaining contribution to the uncertainty is:
 
-  >>> other_error = math.sqrt(result.std_dev()**2 - syst_error**2)
+  >>> other_error = math.sqrt(result.std_dev**2 - syst_error**2)
 
 The variance of :data:`result` is in fact simply the quadratic sum of
 these two errors, since the variables from
