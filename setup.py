@@ -271,9 +271,11 @@ _of_uncertainty
     'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
-    # Python 3.1 fails because of a problem with NumPy 1.6.1 (whereas
-    # everything is fine with Python 3.2 and Python 2.7).
-    'Programming Language :: Python :: 3.2',    
+    # Python 3.1 failed because of a problem with NumPy 1.6.1 (whereas
+    # everything was fine with Python 3.2 and Python 2.7).
+    'Programming Language :: Python :: 3.1',
+    'Programming Language :: Python :: 3.2',
+    'Programming Language :: Python :: 3.3',
     'Topic :: Education',
     'Topic :: Scientific/Engineering',
     'Topic :: Scientific/Engineering :: Mathematics',
