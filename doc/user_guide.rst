@@ -143,22 +143,22 @@ All of this is done completely transparently.
 Access to the uncertainty and to the nominal value
 ==================================================
 
-The nominal value and the uncertainty (standard deviation) on the
-calculated square can also be accessed independently:
+The nominal value and the uncertainty (standard deviation) can also be
+accessed independently:
 
   >>> print square
   0.04+/-0.004
   >>> print square.nominal_value
   0.04
-  >>> print square.std_dev()
+  >>> print square.std_dev
   0.004
 
-Details on the classes made available by this package can be found in
-the :ref:`Technical Guide <classes>`.
+Access to the individual sources of uncertainty
+===============================================
 
 The various independent contributions to an uncertainty can be
 directly obtained.  This information is more easily usable when the
-variables are tagged:
+variables are **tagged**:
 
   >>> u = ufloat((1, 0.1), "u variable")  # Tag
   >>> v = ufloat((10, 0.1), "v variable")
@@ -171,8 +171,28 @@ variables are tagged:
   u variable: 0.100000
   v variable: 0.200000
 
-The total uncertainty on the result (:data:`sum_value`) is the quadratic
-sum of these independent uncertainties, as it should be.
+The variance (i.e. squared uncertainty) of the result
+(:data:`sum_value`) is the quadratic sum of these independent
+uncertainties, as it should be.
+
+The tags *do not have to be distinct*. For instance, *multiple* random
+variables can be tagged as ``"systematic"``, and their contribution to
+the total uncertainty of :data:`result` can simply be obtained as:
+
+  >>> syst_error = math.sqrt(sum(
+  ...     error**2
+  ...     for (var, error) in result.error_components().items()
+  ...     if var.tag == "systematic"))
+          
+This contribution, when added quadratically to the other contribution
+
+  >>> other_error = math.sqrt(sum(
+  ...     error**2
+  ...     for (var, error) in result.error_components().items()
+  ...     if var.tag != "systematic"))
+
+gives the squared uncertainty of :data:`result` (``syst_error**2 +
+other_error**2``).
 
 .. index:: comparison operators
 
@@ -357,11 +377,11 @@ to study its impact on a final result.  With this package, the
   >>> sum_value = u+2*v
   >>> sum_value
   21.0+/-0.22360679774997899
-  >>> prev_uncert = u.std_dev()
-  >>> u.set_std_dev(10)
+  >>> prev_uncert = u.std_dev
+  >>> u.std_dev = 10
   >>> sum_value
   21.0+/-10.001999800039989
-  >>> u.set_std_dev(prev_uncert)
+  >>> u.std_dev = prev_uncert
 
 The relevant concept is that :data:`sum_value` does depend on the
 variables :data:`u` and :data:`v`: the :mod:`uncertainties` package keeps
@@ -426,7 +446,8 @@ Additional information
 The capabilities of the :mod:`uncertainties` package in terms of array
 handling are detailed in :doc:`numpy_guide`.
 
-Details about the theory behind this package are given in the
+Details about the theory behind this package and implementation 
+information are given in the
 :doc:`tech_guide`.
 
 .. _NumPy: http://numpy.scipy.org/

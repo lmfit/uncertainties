@@ -16,10 +16,10 @@ The :mod:`uncertainties` package **takes the pain and complexity out**
 of uncertainty calculations. Error propagation is not to be feared 
 anymore!
 
-Calculations of results with uncertainties, or of derivatives, can
-be performed either in an **interactive session**, or in **programs**
-written in the Python_ programming language.  Existing calculation
-code can **run with no or little change**.
+Calculations of results with uncertainties, or of derivatives, can be 
+performed either in an **interactive session** (as with a calculator), 
+or in **programs** written in the Python_ programming language.  
+Existing calculation code can **run with no or little change**.
 
 Whatever the complexity of a calculation, this package returns its
 result with an uncertainty as predicted by linear `error propagation 
@@ -65,8 +65,8 @@ zero even though :data:`x` has an uncertainty:
   >>> x-x
   0.0
 
-Many other error propagation codes return the incorrect value
-0±0.1414… because they assume that the two subtracted quantities are
+Many other error propagation codes return the incorrect value 0±0.1414… 
+because they wrongly assume that the two subtracted quantities are 
 *independent* random variables.
 
 **Arrays** of numbers with uncertainties are :ref:`transparently
