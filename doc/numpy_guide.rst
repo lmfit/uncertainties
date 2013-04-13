@@ -127,7 +127,7 @@ or ``pydoc``).
 .. index:: reading from file; array
 
 Storing arrays in text format
------------------------------
+=============================
 
 Arrays of numbers with uncertainties can be directly :ref:`pickled
 <pickling>`, saved to file and read from a file. Pickling has the
