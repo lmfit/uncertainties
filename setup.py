@@ -165,7 +165,7 @@ Version history
 
 Main changes:
 
-- 2.0: The standard deviation is now be obtained without an explicit \
+- 2.0: The standard deviation is now obtained without an explicit \
        call (``x.std_dev`` instead of ``x.std_dev()``). ``x.std_dev()`` \
        will be supported for some time. Users are encouraged to update \
        their code.
