@@ -972,7 +972,8 @@ class AffineScalarFunc(object):
         """
         Individual components of the standard deviation of the affine
         function (in absolute value), returned as a dictionary with
-        Variable objects as keys.
+        Variable objects as keys. The returned variables are the
+        independent variables that the affine function depends on.
 
         This method assumes that the derivatives contained in the
         object take scalar values (and are not a tuple, like what

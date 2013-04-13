@@ -156,9 +156,15 @@ accessed independently:
 Access to the individual sources of uncertainty
 ===============================================
 
-The various independent contributions to an uncertainty can be
-directly obtained.  This information is more easily usable when the
-variables are **tagged**:
+The various contributions to an uncertainty can be obtained through
+the :func:`error_components` method, which maps the **independent
+variables a quantity depends on** to their **contribution to the total
+uncertainty**. According to the :ref:`linear error propagation theory
+<linear_method>` implemented in :mod:`uncertainties`, the sum of the
+squares of these contributions is the squared uncertainty.
+
+The individual contributions to the uncertainty are more easily usable
+when the variables are **tagged**:
 
   >>> u = ufloat((1, 0.1), "u variable")  # Tag
   >>> v = ufloat((10, 0.1), "v variable")
@@ -173,26 +179,24 @@ variables are **tagged**:
 
 The variance (i.e. squared uncertainty) of the result
 (:data:`sum_value`) is the quadratic sum of these independent
-uncertainties, as it should be.
+uncertainties, as it should be (``0.1**2 + 0.2**2``).
 
 The tags *do not have to be distinct*. For instance, *multiple* random
 variables can be tagged as ``"systematic"``, and their contribution to
 the total uncertainty of :data:`result` can simply be obtained as:
 
-  >>> syst_error = math.sqrt(sum(
+  >>> syst_error = math.sqrt(sum(  # Error from *all* systematic errors
   ...     error**2
   ...     for (var, error) in result.error_components().items()
   ...     if var.tag == "systematic"))
           
-This contribution, when added quadratically to the other contribution
+The remaining contribution to the uncertainty is:
 
-  >>> other_error = math.sqrt(sum(
-  ...     error**2
-  ...     for (var, error) in result.error_components().items()
-  ...     if var.tag != "systematic"))
+  >>> other_error = math.sqrt(result.std_dev()**2 - syst_error**2)
 
-gives the squared uncertainty of :data:`result` (``syst_error**2 +
-other_error**2``).
+The variance of :data:`result` is in fact simply the quadratic sum of
+these two errors, since the variables from
+:func:`result.error_components` are independent.
 
 .. index:: comparison operators
 
