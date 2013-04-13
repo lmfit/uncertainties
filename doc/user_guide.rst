@@ -173,7 +173,7 @@ variables are **tagged**:
 
 The variance (i.e. squared uncertainty) of the result
 (:data:`sum_value`) is the quadratic sum of these independent
-uncertainties, as it should be.
+uncertainties, as it should be (``0.1**2 + 0.2**2``).
 
 The tags *do not have to be distinct*. For instance, *multiple* random
 variables can be tagged as ``"systematic"``, and their contribution to
@@ -184,15 +184,13 @@ the total uncertainty of :data:`result` can simply be obtained as:
   ...     for (var, error) in result.error_components().items()
   ...     if var.tag == "systematic"))
           
-This contribution, when added quadratically to the other contribution
+The remaining contribution to the uncertainty is:
 
-  >>> other_error = math.sqrt(sum(
-  ...     error**2
-  ...     for (var, error) in result.error_components().items()
-  ...     if var.tag != "systematic"))
+  >>> other_error = math.sqrt(result.std_dev()**2 - syst_error**2)
 
-gives the squared uncertainty of :data:`result` (``syst_error**2 +
-other_error**2``).
+The variance of :data:`result` is in fact simply the quadratic sum of
+these two errors, since the variables from
+:func:`result.error_components` are independent.
 
 .. index:: comparison operators
 
