@@ -10,7 +10,7 @@ Testing whether an object is a number with uncertainty
 The recommended way of testing whether :data:`value` carries an
 uncertainty handled by this module is by checking whether
 :data:`value` is an instance of :class:`UFloat`, through
-``isinstance(value, UFloat)``.
+``isinstance(value, uncertainties.UFloat)``.
 
 .. index:: pickling
 .. index:: saving to file; number with uncertainty
