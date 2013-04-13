@@ -6,7 +6,7 @@ uncertainties
 
 This is the uncertainties Python package.
 
-* Documentation: http://packages.python.org/uncertainties/
+* Documentation: http://pythonhosted.org/uncertainties/
 * PyPI: http://pypi.python.org/pypi/uncertainties/
 * Code: https://github.com/lebigot/uncertainties/
 * Issues: https://github.com/lebigot/uncertainties/issues/

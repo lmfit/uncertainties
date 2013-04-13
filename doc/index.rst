@@ -65,8 +65,8 @@ zero even though :data:`x` has an uncertainty:
   >>> x-x
   0.0
 
-Many other error propagation codes return the incorrect value
-0±0.1414… because they assume that the two subtracted quantities are
+Many other error propagation codes return the incorrect value 0±0.1414… 
+because they wrongly assume that the two subtracted quantities are 
 *independent* random variables.
 
 **Arrays** of numbers with uncertainties are :ref:`transparently
@@ -201,7 +201,7 @@ uncertainties`` so as to automatically adapt the code to Python 3.
 Source code
 -----------
 
-The latest `code
+The latest, bleeding-edge but working `code
 <https://github.com/lebigot/uncertainties/tree/master/uncertainties>`_
 and `documentation source
 <https://github.com/lebigot/uncertainties/tree/master/doc/>`_ are
