@@ -134,8 +134,9 @@ Arrays of numbers with uncertainties can be directly :ref:`pickled
 advantage of preserving correlations between errors.
 
 Storing instead arrays in **text format** loses correlations between
-errors but has the advantage of being human-readable. This can be done
-through NumPy's :func:`savetxt` and :func:`loadtxt`.
+errors but has the advantage of being both computer- and
+human-readable. This can be done through NumPy's :func:`savetxt` and
+:func:`loadtxt`.
 
 Writing the array to file can be done by asking NumPy to use the
 *representation* of numbers with uncertainties (instead of the default
