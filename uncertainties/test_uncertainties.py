@@ -206,7 +206,7 @@ def test_value_construction():
     assert x.std_dev == 0.14
     assert x.tag is None
     
-    # ... with tag:
+    # ... with tag as positional argument:
     x = ufloat(3, 0.14, 'pi')
     assert x.nominal_value == 3
     assert x.std_dev == 0.14
@@ -227,7 +227,7 @@ def test_value_construction():
     assert x.tag is None
     assert x2.tag is None
     
-    # With tag:
+    # With tag as positional argument:
     x = ufloat(3, 0.14, "pi")
     x2 = ufloat((3, 0.14), "pi")  # Obsolete
     assert x.nominal_value == x2.nominal_value
@@ -275,14 +275,31 @@ def test_str_input():
           
     for (representation, values) in tests.iteritems():
 
+        # Without tag:
+        num = ufloat_from_str(representation)
+        assert _numbers_close(num.nominal_value, values[0])
+        assert _numbers_close(num.std_dev, values[1])
+        assert num.tag is None
         
+        # With a tag as positional argument:
+        num = ufloat_from_str(representation, 'test variable')
+        assert _numbers_close(num.nominal_value, values[0])
+        assert _numbers_close(num.std_dev, values[1])
+        assert num.tag == 'test variable'
+
+        # With a tag as keyword argument:
+        num = ufloat_from_str(representation, tag='test variable')
+        assert _numbers_close(num.nominal_value, values[0])
+        assert _numbers_close(num.std_dev, values[1])
+        assert num.tag == 'test variable'
         
         ## Obsolete forms
         
         num = ufloat(representation)
         assert _numbers_close(num.nominal_value, values[0])
         assert _numbers_close(num.std_dev, values[1])
-
+        assert num.tag is None
+        
         # Call with a tag list argument:
         num = ufloat(representation, 'test variable')
         assert _numbers_close(num.nominal_value, values[0])
