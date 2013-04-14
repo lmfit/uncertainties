@@ -1659,7 +1659,7 @@ def ufloat_from_str(representation, tag=None):
 
     #! The special ** syntax is for Python 2.5 and before (Python 2.6+
     # understands tag=tag):
-    nominal_value, std_dev = str_to_number_with_uncert(representation)
+    (nominal_value, std_dev) = str_to_number_with_uncert(representation)
     return ufloat(nominal_value, std_dev, tag)
 
 # The arguments are named for the new version, instead of bearing
