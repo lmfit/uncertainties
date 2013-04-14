@@ -1626,17 +1626,41 @@ def _ufloat_obsolete(representation, tag=None):
     if isinstance(representation, basestring):
         representation = str_to_number_with_uncert(representation)
         
-    #! The tag is forced to be a string, so that the user does not
-    # create a Variable(2.5, 0.5) in order to represent 2.5 +/- 0.5.
-    # Forcing 'tag' to be a string prevents numerical uncertainties
-    # from being considered as tags, here:
-    if tag is not None:
-        #! 'unicode' is removed in Python3:
-        assert isinstance(tag, (str, unicode)), "The tag can only be a string."
-
     return Variable(*representation, **{'tag': tag})
 
-def ufloat_from_str
+def ufloat_from_str(representation, tag=None):
+    """
+    Returns a new random variable (Variable object) from a string.
+    
+    Strings 'representation' of the form '12.345+/-0.015',
+    '12.345(15)', or '12.3' are recognized (see full list below).  In
+    the last case, an uncertainty of +/-1 is assigned to the last
+    digit.
+    
+    Examples of valid string representations:
+
+        -1.23(3.4)
+        -1.34(5)
+        1(6)
+        3(4.2)
+        -9(2)
+        1234567(1.2)
+        12.345(15)
+        -12.3456(78)e-6
+        12.3(0.4)e-5        
+        0.29
+        31.
+        -31.
+        31
+        -3.1e10
+        169.0(7)
+        169.1(15)
+    """
+
+    #! The special ** syntax is for Python 2.5 and before (Python 2.6+
+    # understands tag=tag):
+    nominal_value, std_dev = str_to_number_with_uncert(representation)
+    return ufloat(nominal_value, std_dev, tag)
 
 # The arguments are named for the new version, instead of bearing
 # names that are closer to their obsolete use (e.g., std_dev could be
@@ -1661,42 +1685,20 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     - ufloat(str_representation),
     - ufloat(str_representation, tag).
 
-    Valid string representations
-    
-    Strings str_representation of the form '12.345+/-0.015',
-    '12.345(15)', or '12.3' are recognized (see full list below).  In
-    the last case, an uncertainty of +/-1 is assigned to the last
-    digit.
+    Valid string representations str_representation are listed in
+    the documentation for ufloat_from_str().
 
     'tag' is an optional string tag for the variable.  Variables
     don't have to have distinct tags.  Tags are useful for tracing
     what values (and errors) enter in a given result (through the
     error_components() method).
-
-    Examples of valid string representations:
-
-        -1.23(3.4)
-        -1.34(5)
-        1(6)
-        3(4.2)
-        -9(2)
-        1234567(1.2)
-        12.345(15)
-        -12.3456(78)e-6
-        12.3(0.4)e-5        
-        0.29
-        31.
-        -31.
-        31
-        -3.1e10
-        169.0(7)
-        169.1(15)
     """
 
-    #! The special ** syntax is for Python 2.5 and before (Python 2.6+
-    # understands tag=tag):
     try:
-        # Standard case
+        # Standard case:
+
+        #! The special ** syntax is for Python 2.5 and before (Python 2.6+
+        # understands tag=tag):
         return Variable(nominal_value, std_dev, **{'tag': tag})
     except (TypeError, ValueError):  # Cases of tuple and string, resp.
         # Obsolete, two-argument call:
