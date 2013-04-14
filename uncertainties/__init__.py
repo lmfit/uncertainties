@@ -975,7 +975,8 @@ class AffineScalarFunc(object):
         """
         Individual components of the standard deviation of the affine
         function (in absolute value), returned as a dictionary with
-        Variable objects as keys.
+        Variable objects as keys. The returned variables are the
+        independent variables that the affine function depends on.
 
         This method assumes that the derivatives contained in the
         object take scalar values (and are not a tuple, like what
@@ -1457,11 +1458,13 @@ def covariance_matrix(nums_with_uncert):
     # See PSI.411 in EOL's notes.
 
     covariance_matrix = []
+    # ! In Python 2.6+, this could be replaced by enumerate(..., 1),
+    # along with updating places where i1 is used (i1+1 => i1).
     for (i1, expr1) in enumerate(nums_with_uncert):
         derivatives1 = expr1.derivatives  # Optimization
         vars1 = set(derivatives1)
         coefs_expr1 = []
-        for (i2, expr2) in enumerate(nums_with_uncert[:i1+1]):
+        for expr2 in nums_with_uncert[:i1+1]:
             derivatives2 = expr2.derivatives  # Optimization
             coef = 0.
             for var in vars1.intersection(derivatives2):

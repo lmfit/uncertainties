@@ -96,7 +96,7 @@ Basic examples
     4.0+/-1.0
     >>> square.nominal_value
     4.0
-    >>> square.std_dev()  # Standard deviation
+    >>> square.std_dev  # Standard deviation
     1.0
 
     >>> square - x*x
@@ -165,6 +165,10 @@ Version history
 
 Main changes:
 
+- 2.0: The standard deviation is now obtained without an explicit \
+       call (``x.std_dev`` instead of ``x.std_dev()``). ``x.std_dev()`` \
+       will be supported for some time. Users are encouraged to update \
+       their code.
 - 1.9.1: Support added for pickling subclasses of ``UFloat`` (= ``Variable``).
 - 1.9: Added functions for handling correlation matrices: \
        ``correlation_matrix()`` and \
@@ -267,9 +271,11 @@ _of_uncertainty
     'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
-    # Python 3.1 fails because of a problem with NumPy 1.6.1 (whereas
-    # everything is fine with Python 3.2 and Python 2.7).
-    'Programming Language :: Python :: 3.2',    
+    # Python 3.1 failed because of a problem with NumPy 1.6.1 (whereas
+    # everything was fine with Python 3.2 and Python 2.7).
+    'Programming Language :: Python :: 3.1',
+    'Programming Language :: Python :: 3.2',
+    'Programming Language :: Python :: 3.3',
     'Topic :: Education',
     'Topic :: Scientific/Engineering',
     'Topic :: Scientific/Engineering :: Mathematics',
