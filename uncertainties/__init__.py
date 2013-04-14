@@ -811,7 +811,7 @@ class CallableStdDev(float):
     '''
     
     def __call__ (self):
-        deprecation('Obsolete: The std_dev attribute should not be called'
+        deprecation('Obsolete: the std_dev attribute should not be called'
                     ' anymore: use .std_dev instead of .std_dev().')
         return self
         
