@@ -200,6 +200,20 @@ def test_value_construction():
     uncertainty *without a string* (see test_str_input(), for this).
     '''
 
+    ## Simple construction:
+    x = ufloat(3, 0.14)
+    assert x.nominal_value == 3
+    assert x.std_dev == 0.14
+    assert x.tag is None
+    
+    # ... with tag:
+    x = ufloat(3, 0.14, 'pi')
+    assert x.nominal_value == 3
+    assert x.std_dev == 0.14
+    assert x.tag == 'pi'
+
+    ## Comparison with the obsolete tuple form:
+    
     x = ufloat(3, 0.14)
     x2 = ufloat((3, 0.14))  # Obsolete
     assert x.nominal_value == x2.nominal_value
