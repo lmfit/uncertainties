@@ -23,7 +23,7 @@ import sys
 # Local modules
 
 import uncertainties
-from uncertainties import ufloat, AffineScalarFunc
+from uncertainties import ufloat, AffineScalarFunc, ufloat_from_str
 
 from uncertainties import __author__
 
@@ -294,7 +294,7 @@ def test_str_input():
         assert num.tag == 'test variable'
         
         ## Obsolete forms
-        
+
         num = ufloat(representation)
         assert _numbers_close(num.nominal_value, values[0])
         assert _numbers_close(num.std_dev, values[1])

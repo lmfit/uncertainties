@@ -1646,8 +1646,6 @@ def _ufloat_obsolete(representation, tag=None):
     string representation of a number with uncertainty, in a format
     recognized by ufloat_from_str().
     '''
-    
-
     return (ufloat(representation[0], representation[1], tag)
             if isinstance(representation, tuple)
             else ufloat_from_str(representation, tag))
@@ -1690,12 +1688,15 @@ def ufloat(nominal_value, std_dev=None, tag=None):
         #! The special ** syntax is for Python 2.5 and before (Python 2.6+
         # understands tag=tag):
         return Variable(nominal_value, std_dev, **{'tag': tag})
-    except (TypeError, ValueError):  # Cases of tuple and string, resp.
+    # Exception types raised by, respectively: tuple, string that
+    # cannot be converted through float(), and string that can be
+    # converted through float() (case of a number with no uncertainty):
+    except (TypeError, ValueError, AssertionError):
         # Obsolete, two-argument call:
         deprecation('Obsolete: either use ufloat(nominal_value, std_dev),'
                     ' ufloat(nominal_value, std_dev, tag), or the'
                     ' ufloat_from_str() function, for string representations.')
-        return _ufloat_obsolete(nominal_value,
+        return _ufloat_obsolete(nominal_value,  # Tuple or string
                                 # tag keyword used:
                                 tag if tag is not None
                                 # 2 positional arguments form:
