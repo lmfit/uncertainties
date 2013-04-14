@@ -50,7 +50,7 @@ except ImportError:
 
 distutils.core.setup(
     name='uncertainties',
-    version='2.0',
+    version='2.0.1',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://pythonhosted.org/uncertainties/',
