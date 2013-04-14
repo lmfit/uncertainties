@@ -1604,20 +1604,69 @@ def str_to_number_with_uncert(representation):
 
     return parsed_value
 
-def ufloat(representation, tag=None):
+def _ufloat_obsolete(representation, tag=None):
+    '''
+    Legacy version of ufloat(). Will eventually be removed.
+    '''
+    
+    # This function is somewhat optimized so as to help with the
+    # creation of lots of Variable objects (through unumpy.uarray, for
+    # instance).
+
+    # representations is "normalized" so as to be a valid sequence of
+    # 2 arguments for Variable().
+
+    #! Accepting strings and any kind of sequence slows down the code
+    # by about 5 %.  On the other hand, massive initializations of
+    # numbers with uncertainties are likely to be performed with
+    # unumpy.uarray, which does not support parsing from strings and
+    # thus does not have any overhead.
+
+    #! Different, in Python 3:
+    if isinstance(representation, basestring):
+        representation = str_to_number_with_uncert(representation)
+        
+    #! The tag is forced to be a string, so that the user does not
+    # create a Variable(2.5, 0.5) in order to represent 2.5 +/- 0.5.
+    # Forcing 'tag' to be a string prevents numerical uncertainties
+    # from being considered as tags, here:
+    if tag is not None:
+        #! 'unicode' is removed in Python3:
+        assert isinstance(tag, (str, unicode)), "The tag can only be a string."
+
+    return Variable(*representation, **{'tag': tag})
+
+def ufloat_from_str
+
+# The arguments are named for the new version, instead of bearing
+# names that are closer to their obsolete use (e.g., std_dev could be
+# instead std_dev_or_tag, since it can be the tag, in the obsolete
+# ufloat((3, 0.14), "pi") form). This has the advantage of allowing
+# new code to use keyword arguments as in ufloat(nominal_value=3,
+# std_dev=0.14), without breaking when the obsolete form is not
+# supported anymore.
+def ufloat(nominal_value, std_dev=None, tag=None):
     """
-    Returns a random variable (Variable object).
+    Returns a new random variable (Variable object).
+    
+    The only non-obsolete use is:
 
-    Converts the representation of a number into a number with
-    uncertainty (a random variable, defined by a nominal value and
-    a standard deviation).
+    - ufloat(nominal_value, std_dev),
+    - ufloat(nominal_value, std_dev, tag=...).
 
-    The representation can be a (value, standard deviation) sequence,
-    or a string.
+    Other input parameters are temporarily supported:
 
-    Strings of the form '12.345+/-0.015', '12.345(15)', or '12.3' are
-    recognized (see full list below).  In the last case, an
-    uncertainty of +/-1 is assigned to the last digit.
+    - ufloat((nominal_value, std_dev)),
+    - ufloat((nominal_value, std_dev), tag),
+    - ufloat(str_representation),
+    - ufloat(str_representation, tag).
+
+    Valid string representations
+    
+    Strings str_representation of the form '12.345+/-0.015',
+    '12.345(15)', or '12.3' are recognized (see full list below).  In
+    the last case, an uncertainty of +/-1 is assigned to the last
+    digit.
 
     'tag' is an optional string tag for the variable.  Variables
     don't have to have distinct tags.  Tags are useful for tracing
@@ -1644,32 +1693,20 @@ def ufloat(representation, tag=None):
         169.1(15)
     """
 
-    # This function is somewhat optimized so as to help with the
-    # creation of lots of Variable objects (through unumpy.uarray, for
-    # instance).
-
-    # representations is "normalized" so as to be a valid sequence of
-    # 2 arguments for Variable().
-
-    #! Accepting strings and any kind of sequence slows down the code
-    # by about 5 %.  On the other hand, massive initializations of
-    # numbers with uncertainties are likely to be performed with
-    # unumpy.uarray, which does not support parsing from strings and
-    # thus does not have any overhead.
-
-    #! Different, in Python 3:
-    if isinstance(representation, basestring):
-        representation = str_to_number_with_uncert(representation)
-        
-    #! The tag is forced to be a string, so that the user does not
-    # create a Variable(2.5, 0.5) in order to represent 2.5 +/- 0.5.
-    # Forcing 'tag' to be a string prevents numerical uncertainties
-    # from being considered as tags, here:
-    if tag is not None:
-        #! 'unicode' is removed in Python3:
-        assert isinstance(tag, (str, unicode)), "The tag can only be a string."
-
     #! The special ** syntax is for Python 2.5 and before (Python 2.6+
     # understands tag=tag):
-    return Variable(*representation, **{'tag': tag})
+    try:
+        # Standard case
+        return Variable(nominal_value, std_dev, **{'tag': tag})
+    except (TypeError, ValueError):  # Cases of tuple and string, resp.
+        # Obsolete, two-argument call:
+        deprecation('Obsolete: either use ufloat(nominal_value, std_dev),'
+                    ' ufloat(nominal_value, std_dev, tag), or the'
+                    ' ufloat_from_str() function, for string representations.')
+        return _ufloat_obsolete(nominal_value,
+                                # tag keyword used:
+                                tag if tag is not None
+                                # 2 positional arguments form:
+                                else std_dev)
+
 
