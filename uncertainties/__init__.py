@@ -1647,10 +1647,10 @@ def _ufloat_obsolete(representation, tag=None):
     recognized by ufloat_from_str().
     '''
     
-    if isinstance(representation, tuple):
-        return ufloat(representation[0], representation[1], tag)
-    else:
-        return ufloat_from_str(representation, tag)
+
+    return (ufloat(representation[0], representation[1], tag)
+            if isinstance(representation, tuple)
+            else ufloat_from_str(representation, tag))
 
 # The arguments are named for the new version, instead of bearing
 # names that are closer to their obsolete use (e.g., std_dev could be
