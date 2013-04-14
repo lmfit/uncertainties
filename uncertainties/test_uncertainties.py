@@ -212,20 +212,36 @@ def test_value_construction():
     assert x.std_dev == 0.14
     assert x.tag == 'pi'
 
+    # ... with tag keyword:
+    x = ufloat(3, 0.14, tag='pi')
+    assert x.nominal_value == 3
+    assert x.std_dev == 0.14
+    assert x.tag == 'pi'
+
     ## Comparison with the obsolete tuple form:
     
     x = ufloat(3, 0.14)
     x2 = ufloat((3, 0.14))  # Obsolete
     assert x.nominal_value == x2.nominal_value
     assert x.std_dev == x2.std_dev
-
+    assert x.tag is None
+    assert x2.tag is None
+    
     # With tag:
     x = ufloat(3, 0.14, "pi")
     x2 = ufloat((3, 0.14), "pi")  # Obsolete
     assert x.nominal_value == x2.nominal_value
     assert x.std_dev == x2.std_dev
-
+    assert x.tag == 'pi'
+    assert x2.tag == 'pi'
     
+    # With tag keyword:
+    x = ufloat(3, 0.14, tag="pi")
+    x2 = ufloat((3, 0.14), tag="pi")  # Obsolete
+    assert x.nominal_value == x2.nominal_value
+    assert x.std_dev == x2.std_dev
+    assert x.tag == 'pi'
+    assert x2.tag == 'pi'
     
 def test_str_input():
     "Input of numbers with uncertainties as a string"
@@ -258,17 +274,27 @@ def test_str_input():
         }
           
     for (representation, values) in tests.iteritems():
+
+        
+        
+        ## Obsolete forms
         
         num = ufloat(representation)
         assert _numbers_close(num.nominal_value, values[0])
         assert _numbers_close(num.std_dev, values[1])
 
-        # Case with a tag:
-        num = ufloat(representation, tag="test variable")
+        # Call with a tag list argument:
+        num = ufloat(representation, 'test variable')
         assert _numbers_close(num.nominal_value, values[0])
         assert _numbers_close(num.std_dev, values[1])
+        assert num.tag == 'test variable'
         
-        
+        # Call with a tag keyword argument:
+        num = ufloat(representation, tag='test variable')
+        assert _numbers_close(num.nominal_value, values[0])
+        assert _numbers_close(num.std_dev, values[1])
+        assert num.tag == 'test variable'
+
 ###############################################################################
             
 # Test of correctness of the fixed (usually analytical) derivatives:
