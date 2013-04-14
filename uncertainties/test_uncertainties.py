@@ -193,6 +193,69 @@ def _compare_derivatives(func, numerical_derivatives,
                 break
 
 ###############################################################################
+
+def test_value_construction():
+    '''
+    Tests the various means of constructing a constant number with
+    uncertainty *without a string* (see test_str_input(), for this).
+    '''
+
+    x = ufloat(3, 0.14)
+    x2 = ufloat((3, 0.14))  # Obsolete
+    assert x.nominal_value == x2.nominal_value
+    assert x.std_dev == x2.std_dev
+
+    # With tag:
+    x = ufloat(3, 0.14, "pi")
+    x2 = ufloat((3, 0.14), "pi")  # Obsolete
+    assert x.nominal_value == x2.nominal_value
+    assert x.std_dev == x2.std_dev
+
+    
+    
+def test_str_input():
+    "Input of numbers with uncertainties as a string"
+
+    # String representation, and numerical values:
+    tests = {
+        "-1.23(3.4)": (-1.23, 3.4),  # (Nominal value, error)
+        "-1.34(5)": (-1.34, 0.05),
+        "1(6)": (1, 6),
+        "3(4.2)": (3, 4.2),
+        "-9(2)": (-9, 2),
+        "1234567(1.2)": (1234567, 1.2),
+        "12.345(15)": (12.345, 0.015),
+        "-12.3456(78)e-6": (-12.3456e-6, 0.0078e-6),
+        "0.29": (0.29, 0.01),
+        "31.": (31, 1),
+        "-31.": (-31, 1),
+        # The following tests that the ufloat() routine does
+        # not consider '31' like the tuple ('3', '1'), which would
+        # make it expect two numbers (instead of 2 1-character
+        # strings):
+        "31": (31, 1),
+        "-3.1e10": (-3.1e10, 0.1e10),
+        "169.0(7)": (169, 0.7),
+        "-0.1+/-1": (-0.1, 1),
+        "-13e-2+/-1e2": (-13e-2, 1e2),
+        '-14.(15)': (-14, 15),
+        '-100.0(15)': (-100, 1.5),
+        '14.(15)': (14, 15)
+        }
+          
+    for (representation, values) in tests.iteritems():
+        
+        num = ufloat(representation)
+        assert _numbers_close(num.nominal_value, values[0])
+        assert _numbers_close(num.std_dev, values[1])
+
+        # Case with a tag:
+        num = ufloat(representation, tag="test variable")
+        assert _numbers_close(num.nominal_value, values[0])
+        assert _numbers_close(num.std_dev, values[1])
+        
+        
+###############################################################################
             
 # Test of correctness of the fixed (usually analytical) derivatives:
 def test_fixed_derivatives_basic_funcs():
@@ -578,44 +641,6 @@ def test_correlations():
     normally_zero = y - (x*2 + 1)
     assert normally_zero.nominal_value == 0
     assert normally_zero.std_dev == 0
-
-def test_str_input():
-
-    "Input of numbers with uncertainties as a string"
-
-    # String representation, and numerical values:
-    tests = {
-        "-1.23(3.4)": (-1.23, 3.4),  # (Nominal value, error)
-        "-1.34(5)": (-1.34, 0.05),
-        "1(6)": (1, 6),
-        "3(4.2)": (3, 4.2),
-        "-9(2)": (-9, 2),
-        "1234567(1.2)": (1234567, 1.2),
-        "12.345(15)": (12.345, 0.015),
-        "-12.3456(78)e-6": (-12.3456e-6, 0.0078e-6),
-        "0.29": (0.29, 0.01),
-        "31.": (31, 1),
-        "-31.": (-31, 1),
-        # The following tests that the ufloat() routine does
-        # not consider '31' like the tuple ('3', '1'), which would
-        # make it expect two numbers (instead of 2 1-character
-        # strings):
-        "31": (31, 1),
-        "-3.1e10": (-3.1e10, 0.1e10),
-        "169.0(7)": (169, 0.7),
-        "-0.1+/-1": (-0.1, 1),
-        "-13e-2+/-1e2": (-13e-2, 1e2),
-        '-14.(15)': (-14, 15),
-        '-100.0(15)': (-100, 1.5),
-        '14.(15)': (14, 15)
-        }
-          
-    for (representation, values) in tests.iteritems():
-        
-        num = ufloat(representation)
-
-        assert _numbers_close(num.nominal_value, values[0])
-        assert _numbers_close(num.std_dev, values[1])
 
     
 def test_no_coercion():
