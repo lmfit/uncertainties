@@ -244,7 +244,7 @@ __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
 # exported only if the NumPy module is available...):
 __all__ = [
 
-    # All sub-modules .and packages are not imported by default,
+    # All sub-modules and packages are not imported by default,
     # in particular because NumPy might be unavailable.
 
     'ufloat',  # Main function: returns a number with uncertainty
