@@ -1570,9 +1570,9 @@ def parse_error_in_parentheses(representation):
 
     
 # The following function is not exposed because it can in effect be
-# obtained by doing x = ufloat(representation) and
+# obtained by doing x = ufloat_from_str(representation) and reading
 # x.nominal_value and x.std_dev:
-def str_to_number_with_uncert(representation):
+def _str_to_number_with_uncert(representation):
     """
     Given a string that represents a number with uncertainty, returns the
     nominal value and the uncertainty.
@@ -1607,6 +1607,10 @@ def str_to_number_with_uncert(representation):
 def _ufloat_obsolete(representation, tag=None):
     '''
     Legacy version of ufloat(). Will eventually be removed.
+
+    representation -- either a (nominal_value, std_dev) tuple, or a
+    string representation of a number with uncertainty, in a format
+    recognized by ufloat_from_str().
     '''
     
     # This function is somewhat optimized so as to help with the
@@ -1624,7 +1628,7 @@ def _ufloat_obsolete(representation, tag=None):
 
     #! Different, in Python 3:
     if isinstance(representation, basestring):
-        representation = str_to_number_with_uncert(representation)
+        return ufloat_from_str(representation, tag)
         
     return Variable(*representation, **{'tag': tag})
 
@@ -1659,7 +1663,7 @@ def ufloat_from_str(representation, tag=None):
 
     #! The special ** syntax is for Python 2.5 and before (Python 2.6+
     # understands tag=tag):
-    (nominal_value, std_dev) = str_to_number_with_uncert(representation)
+    (nominal_value, std_dev) = _str_to_number_with_uncert(representation)
     return ufloat(nominal_value, std_dev, tag)
 
 # The arguments are named for the new version, instead of bearing
