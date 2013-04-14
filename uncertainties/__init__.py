@@ -1604,34 +1604,6 @@ def _str_to_number_with_uncert(representation):
 
     return parsed_value
 
-def _ufloat_obsolete(representation, tag=None):
-    '''
-    Legacy version of ufloat(). Will eventually be removed.
-
-    representation -- either a (nominal_value, std_dev) tuple, or a
-    string representation of a number with uncertainty, in a format
-    recognized by ufloat_from_str().
-    '''
-    
-    # This function is somewhat optimized so as to help with the
-    # creation of lots of Variable objects (through unumpy.uarray, for
-    # instance).
-
-    # representations is "normalized" so as to be a valid sequence of
-    # 2 arguments for Variable().
-
-    #! Accepting strings and any kind of sequence slows down the code
-    # by about 5 %.  On the other hand, massive initializations of
-    # numbers with uncertainties are likely to be performed with
-    # unumpy.uarray, which does not support parsing from strings and
-    # thus does not have any overhead.
-
-    #! Different, in Python 3:
-    if isinstance(representation, basestring):
-        return ufloat_from_str(representation, tag)
-        
-    return Variable(*representation, **{'tag': tag})
-
 def ufloat_from_str(representation, tag=None):
     """
     Returns a new random variable (Variable object) from a string.
@@ -1665,6 +1637,20 @@ def ufloat_from_str(representation, tag=None):
     # understands tag=tag):
     (nominal_value, std_dev) = _str_to_number_with_uncert(representation)
     return ufloat(nominal_value, std_dev, tag)
+
+def _ufloat_obsolete(representation, tag=None):
+    '''
+    Legacy version of ufloat(). Will eventually be removed.
+
+    representation -- either a (nominal_value, std_dev) tuple, or a
+    string representation of a number with uncertainty, in a format
+    recognized by ufloat_from_str().
+    '''
+    
+    if isinstance(representation, tuple):
+        return ufloat(representation[0], representation[1], tag)
+    else:
+        return ufloat_from_str(representation, tag)
 
 # The arguments are named for the new version, instead of bearing
 # names that are closer to their obsolete use (e.g., std_dev could be
