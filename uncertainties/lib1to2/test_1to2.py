@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-Unit tests for the uncertainties.1to2 package.
+Unit tests for the uncertainties.lib1to2 code update package.
 
 Meant to be run through nosetests.
 
@@ -13,23 +13,28 @@ Meant to be run through nosetests.
 # - lib2to3.tests.test_fixers.py
 
 import sys
-import lib2to3.tests.support as support
 import os
+import lib2to3.tests.support as support
 
 # The following lib1to2 module must refer to the *local* package (not
 # to any other installed module):
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.pardir))
 
-refactor = support.get_refactorer(fixer_pkg='lib1to2')
+def check_refactor(refactorer, source, expected):
+    """
+    Raises an AssertionError if the given
+    lib2to3.refactor.RefactoringTool does not refactor 'source' into
+    'expected'.
 
-def test_fix1():
+    source, expected -- strings (typically with Python code).
+    """
     
-    before = support.reformat("oldname = 123")
-    expected = support.reformat("newname = 123")
-    new = refactor.refactor_string(before, '<string>')
+    new = unicode(
+        refactorer.refactor_string(support.reformat(source), '<string>'))
 
-    print before
-    print expected
-    print new
-    assert expected == unicode(new)
-
+    assert support.reformat(expected) == new
+    
+def test_fix_name1():
+    
+    refactorer = support.get_refactorer(fixer_pkg='lib1to2', fixers=['name1'])
+    check_refactor(refactorer, "oldname = 123", "newname = 123")
