@@ -33,6 +33,9 @@ def check_refactor(refactorer, source, expected):
     new = unicode(
         refactorer.refactor_string(support.reformat(source), '<string>'))
 
+    print source
+    print '=>', new
+    
     assert support.reformat(expected) == new
 
 def check_all(fixer, tests):
