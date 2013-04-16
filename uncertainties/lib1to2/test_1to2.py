@@ -24,11 +24,17 @@ import lib2to3.tests.support as support
 
 refactor = support.get_refactorer(fixer_pkg='uncertainties.lib1to2')
 
-before = support.reformat("oldname = 123")
-expected = support.reformat("newname = 123")
-new = refactor.refactor_string(before, '<string>')
+def test_fix1():
+    
+    before = support.reformat("oldname = 123")
+    expected = support.reformat("newname = 123")
+    new = refactor.refactor_string(before, '<string>')
 
-print before
-print expected
-print new
-assert expected == unicode(new)
+    print before
+    print expected
+    print new
+    assert expected == unicode(new)
+
+if __name__ == '__main__':
+
+    test_fix1()
