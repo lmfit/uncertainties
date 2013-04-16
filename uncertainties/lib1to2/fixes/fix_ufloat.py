@@ -2,13 +2,14 @@
 Fixer for lib2to3.
 
 Transforms ufloat(tuple,...) and ufloat(string,...) into
-ufloat(nominal_value, std_dev,...) and ufloat_from_str
+ufloat(nominal_value, std_dev,...) and ufloat_fromstr
 
 (c) 2013 by Eric O. LEBIGOT.
 '''
 
 from lib2to3.fixer_base import BaseFix
 from lib2to3.fixer_util import Call, Name, Comma
+import lib2to3.pgen2.token as token
 
 class FixUfloat(BaseFix):
     
@@ -23,19 +24,33 @@ class FixUfloat(BaseFix):
                 ',' tag=any
             >
         ')' > >
+        |
+        power< 'ufloat' trailer< '(' single_arg=any ')' > >
         """
     
     def transform(self, node, results):
 
-        # print "ARG0", repr(results['arg0'])
-        # print "ARG0", repr(results['arg1'])
-        
-        # New arguments:
-        args = [results['arg0'].clone(), Comma(), results['arg1'].clone()]
 
-        # Call with a tag:
-        if 'tag' in results:
-            args.extend([Comma(), results['tag'].clone()])
+        if 'single_arg' in results:
+            # Single argument form:
+            
+            # A constant string can be handled:
+            
+            single_arg = results['single_arg']
+            print dir(single_arg)
+            if single_arg.type == token.STRING:
+                node.replace(Call('ufloat_fromstr'))
+                print "SINGLE", repr(single_arg)
 
-        # Replacement by a direct call with the arguments:
-        node.replace(Call(Name('ufloat'), prefix=node.prefix, args=args))
+        else:
+            # Tuple as first argument:
+            
+            # New arguments:
+            args = [results['arg0'].clone(), Comma(), results['arg1'].clone()]
+
+            # Call with a tag:
+            if 'tag' in results:
+                args.extend([Comma(), results['tag'].clone()])
+
+            # Replacement by a direct call with the arguments:
+            node.replace(Call(Name('ufloat'), prefix=node.prefix, args=args))

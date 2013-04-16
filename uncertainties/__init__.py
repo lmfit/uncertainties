@@ -1570,7 +1570,7 @@ def parse_error_in_parentheses(representation):
 
     
 # The following function is not exposed because it can in effect be
-# obtained by doing x = ufloat_from_str(representation) and reading
+# obtained by doing x = ufloat_fromstr(representation) and reading
 # x.nominal_value and x.std_dev:
 def _str_to_number_with_uncert(representation):
     """
@@ -1604,7 +1604,7 @@ def _str_to_number_with_uncert(representation):
 
     return parsed_value
 
-def ufloat_from_str(representation, tag=None):
+def ufloat_fromstr(representation, tag=None):
     """
     Returns a new random variable (Variable object) from a string.
     
@@ -1644,11 +1644,11 @@ def _ufloat_obsolete(representation, tag=None):
 
     representation -- either a (nominal_value, std_dev) tuple, or a
     string representation of a number with uncertainty, in a format
-    recognized by ufloat_from_str().
+    recognized by ufloat_fromstr().
     '''
     return (ufloat(representation[0], representation[1], tag)
             if isinstance(representation, tuple)
-            else ufloat_from_str(representation, tag))
+            else ufloat_fromstr(representation, tag))
 
 # The arguments are named for the new version, instead of bearing
 # names that are closer to their obsolete use (e.g., std_dev could be
@@ -1674,7 +1674,7 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     - ufloat(str_representation, tag).
 
     Valid string representations str_representation are listed in
-    the documentation for ufloat_from_str().
+    the documentation for ufloat_fromstr().
 
     'tag' is an optional string tag for the variable.  Variables
     don't have to have distinct tags.  Tags are useful for tracing
@@ -1695,7 +1695,7 @@ def ufloat(nominal_value, std_dev=None, tag=None):
         # Obsolete, two-argument call:
         deprecation('Obsolete: either use ufloat(nominal_value, std_dev),'
                     ' ufloat(nominal_value, std_dev, tag), or the'
-                    ' ufloat_from_str() function, for string representations.')
+                    ' ufloat_fromstr() function, for string representations.')
         return _ufloat_obsolete(nominal_value,  # Tuple or string
                                 # tag keyword used:
                                 tag if tag is not None

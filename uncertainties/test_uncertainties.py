@@ -23,7 +23,7 @@ import sys
 # Local modules
 
 import uncertainties
-from uncertainties import ufloat, AffineScalarFunc, ufloat_from_str
+from uncertainties import ufloat, AffineScalarFunc, ufloat_fromstr
 
 from uncertainties import __author__
 
@@ -276,19 +276,19 @@ def test_str_input():
     for (representation, values) in tests.iteritems():
 
         # Without tag:
-        num = ufloat_from_str(representation)
+        num = ufloat_fromstr(representation)
         assert _numbers_close(num.nominal_value, values[0])
         assert _numbers_close(num.std_dev, values[1])
         assert num.tag is None
         
         # With a tag as positional argument:
-        num = ufloat_from_str(representation, 'test variable')
+        num = ufloat_fromstr(representation, 'test variable')
         assert _numbers_close(num.nominal_value, values[0])
         assert _numbers_close(num.std_dev, values[1])
         assert num.tag == 'test variable'
 
         # With a tag as keyword argument:
-        num = ufloat_from_str(representation, tag='test variable')
+        num = ufloat_fromstr(representation, tag='test variable')
         assert _numbers_close(num.nominal_value, values[0])
         assert _numbers_close(num.std_dev, values[1])
         assert num.tag == 'test variable'
