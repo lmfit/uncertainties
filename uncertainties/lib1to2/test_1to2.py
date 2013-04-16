@@ -12,9 +12,10 @@ Meant to be run through nosetests.
 #
 # - lib2to3.tests.test_fixers.py
 
-import lib1to2
-
 import lib2to3.tests.support as support
+import re
+
+import lib1to2
 
 # import lib1to2  # Sets the module path so that lib2to3 can find the fixers
 
@@ -95,6 +96,12 @@ def test_ufloat():
         'ufloat("-1.23(3.4)", "var")': 'ufloat_fromstr("-1.23(3.4)", "var")',
         'ufloat("-1.23(3.4)", tag="var")':
             'ufloat_fromstr("-1.23(3.4)", tag="var")'
+
     }
 
+    # Automatic addition of a dotted access:
+    tests.update({re.sub('ufloat', 'unc.ufloat', orig):
+                  re.sub('ufloat', 'unc.ufloat', new)
+                  for (orig, new) in tests.iteritems()})
+    
     check_all('ufloat', tests)
