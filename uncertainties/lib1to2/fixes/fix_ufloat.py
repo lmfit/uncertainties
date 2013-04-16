@@ -37,9 +37,12 @@ class FixUfloat(BaseFix):
             # A constant string can be handled:
             
             single_arg = results['single_arg']
-            print dir(single_arg)
+
             if single_arg.type == token.STRING:
-                node.replace(Call('ufloat_fromstr'))
+                node.replace(Call(
+                    Name('ufloat_fromstr'),
+                    args=[single_arg.clone()],
+                    prefix=node.prefix))
                 print "SINGLE", repr(single_arg)
 
         else:
@@ -53,4 +56,4 @@ class FixUfloat(BaseFix):
                 args.extend([Comma(), results['tag'].clone()])
 
             # Replacement by a direct call with the arguments:
-            node.replace(Call(Name('ufloat'), prefix=node.prefix, args=args))
+            node.replace(Call(Name('ufloat'), args=args, prefix=node.prefix))
