@@ -12,14 +12,9 @@ Meant to be run through nosetests.
 #
 # - lib2to3.tests.test_fixers.py
 
-import sys
-import os
 import lib2to3.tests.support as support
 
-# The lib1to2 module must refer (through the __import__() used via
-# support.get_refactorer()) to the *local* package (not to any other
-# installed module):
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.pardir))
+# import lib1to2  # Sets the module path so that lib2to3 can find the fixers
 
 def check_refactor(refactorer, source, expected):
     """
