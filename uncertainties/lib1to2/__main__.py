@@ -9,6 +9,7 @@ directory.
 
 # Code inspired by the 2to3 Python code.
 
+import sys
 import lib2to3.main
 
 sys.exit(lib2to3.main.main('uncertainties.lib1to2.fixes'))
