@@ -295,19 +295,19 @@ def test_str_input():
         
         ## Obsolete forms
 
-        num = ufloat(representation)
+        num = ufloat(representation)  # Obsolete
         assert _numbers_close(num.nominal_value, values[0])
         assert _numbers_close(num.std_dev, values[1])
         assert num.tag is None
         
         # Call with a tag list argument:
-        num = ufloat(representation, 'test variable')
+        num = ufloat(representation, 'test variable')  # Obsolete
         assert _numbers_close(num.nominal_value, values[0])
         assert _numbers_close(num.std_dev, values[1])
         assert num.tag == 'test variable'
         
         # Call with a tag keyword argument:
-        num = ufloat(representation, tag='test variable')
+        num = ufloat(representation, tag='test variable')  # Obsolete
         assert _numbers_close(num.nominal_value, values[0])
         assert _numbers_close(num.std_dev, values[1])
         assert num.tag == 'test variable'
