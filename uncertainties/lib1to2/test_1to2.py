@@ -2,15 +2,23 @@
 
 '''
 Unit tests for the uncertainties.1to2 package.
+
+(c) 2013 by Eric O. LEBIGOT (EOL).
 '''
 
-from lib2to3.tests.support import get_refactorer
+# Code inspired by:
+#
+# - lib2to3.tests.test_fixers.py
 
-refactor = get_refactorer(fixer_pkg='uncertainties.1to2')
+import lib2to3.tests.support as support
 
-before = "oldname = 123"
-expected = "othername = 42"
-tree = refactor.refactor_string(before, self.filename)
+refactor = support.get_refactorer(fixer_pkg='uncertainties.lib1to2')
+
+before = support.reformat("oldname = 123")
+expected = support.reformat("newname = 123")
+new = refactor.refactor_string(before, '<string>')
+
+print before
 print expected
-print tree
-assert expected == tree
+print new
+assert expected == unicode(new)
