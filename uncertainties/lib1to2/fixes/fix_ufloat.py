@@ -25,25 +25,35 @@ class FixUfloat(BaseFix):
             >
         ')' > >
         |
-        power< 'ufloat' trailer< '(' single_arg=any ')' > >
+        power< 'ufloat' trailer< '(' string=STRING ')' > >
+        |
+        power< 'ufloat' trailer< '('
+            arglist<
+                string=STRING
+                ',' tag=any
+            >
+        ')' > >
         """
     
     def transform(self, node, results):
 
 
-        if 'single_arg' in results:
+        if 'string' in results:
             # Single argument form:
             
             # A constant string can be handled:
             
-            single_arg = results['single_arg']
+            string_leaf = results['string']
 
-            if single_arg.type == token.STRING:
-                node.replace(Call(
-                    Name('ufloat_fromstr'),
-                    args=[single_arg.clone()],
-                    prefix=node.prefix))
-                print "SINGLE", repr(single_arg)
+            # New arguments:
+            args=[string_leaf.clone()]
+
+            # Call with a tag:
+            if 'tag' in results:
+                args.extend([Comma(), results['tag'].clone()])            
+            
+            node.replace(Call(
+                Name('ufloat_fromstr'), args = args, prefix=node.prefix))
 
         else:
             # Tuple as first argument:
