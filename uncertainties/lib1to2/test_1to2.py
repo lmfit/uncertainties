@@ -6,8 +6,6 @@ Unit tests for the uncertainties.1to2 package.
 (c) 2013 by Eric O. LEBIGOT (EOL).
 '''
 
-#!!!!!!! test
-
 import lib2to3.refactor
 print lib2to3.refactor.get_fixers_from_package('lib2to3.fixes')
 
@@ -35,6 +33,3 @@ def test_fix1():
     print new
     assert expected == unicode(new)
 
-if __name__ == '__main__':
-
-    test_fix1()
