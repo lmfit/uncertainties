@@ -33,7 +33,7 @@ def check_refactor(refactorer, source, expected):
     new = unicode(
         refactorer.refactor_string(support.reformat(source), '<string>'))
 
-    # print source, '=>', new
+    print source.strip(), '=>', new.strip()
     
     assert support.reformat(expected) == new
 
@@ -58,7 +58,15 @@ def test_fix_std_dev():
         'x.std_dev()': 'x.std_dev',
         'y.std_dev();  unc.std_dev(z)': 'y.std_dev;  unc.std_dev(z)',
         'uncertainties.std_dev(x)': 'uncertainties.std_dev(x)',
-        'std_dev(x)': 'std_dev(x)'
+        'std_dev(x)': 'std_dev(x)',
+        
+        """
+        long_name.std_dev(
+        # No argument!
+        )""":
+        
+        """
+        long_name.std_dev"""
     }
 
     check_all('std_dev', tests)
