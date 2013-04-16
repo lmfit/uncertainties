@@ -84,24 +84,36 @@ def test_ufloat():
         "ufloat((3, 0.14), 'pi')": "ufloat(3, 0.14, 'pi')",
         "x = ufloat((3, 0.14), tag='pi')": "x = ufloat(3, 0.14, tag='pi')",
 
+        # Simple expressions that can be transformed:
+        'ufloat((n, s), tag="var")': 'ufloat(n, s, tag="var")',
+
+        # Simple expressions that cannot be transformed automatically:
+        'ufloat(str_repr, tag="var")': 'ufloat(str_repr, tag="var")',
+        'ufloat(*tuple_repr, tag="var")': 'ufloat(*tuple_repr, tag="var")',
+        'ufloat(*t[0, 0])': 'ufloat(*t[0, 0])',        
+
         # Strings:
         'ufloat("-1.23(3.4)")': 'ufloat_from_str("-1.23(3.4)")',
         "ufloat('-1.23(3.4)')": "ufloat_from_str('-1.23(3.4)')",
         'ufloat("-1.23(3.4)", "var")': 'ufloat_from_str("-1.23(3.4)", "var")',
         'ufloat("-1.23(3.4)", tag="var")':
-            'ufloat_from_str("-1.23(3.4)", tag="var")',
-
-        # Simple expressions that can be transformed:
-        'ufloat((n, s), tag="var")': 'ufloat(n, s, tag="var")',
-
-        # Simple expressions that cannot be transformed:
-        'ufloat(str_repr, tag="var")': 'ufloat(str_repr, tag="var")',
-        'ufloat(*tuple_repr, tag="var")': 'ufloat(*tuple_repr, tag="var")',
-        'ufloat(*t[0, 0])': 'ufloat(*t[0, 0])'
+            'ufloat_from_str("-1.23(3.4)", tag="var")'
     }
 
     tests = {
         # Tuples:
-        'ufloat((3, 0.14))': 'ufloat(3, 0.14)'
+        'ufloat((3, 0.14))': 'ufloat(3, 0.14)',
+        'ufloat((3, 0.14), "pi")': 'ufloat(3, 0.14, "pi")',
+        "ufloat((3, 0.14), 'pi')": "ufloat(3, 0.14, 'pi')",
+        "x = ufloat((3, 0.14), tag='pi')": "x = ufloat(3, 0.14, tag='pi')",
+
+        # Simple expressions that can be transformed:
+        'ufloat((n, s), tag="var")': 'ufloat(n, s, tag="var")',
+
+        # Simple expressions that cannot be transformed automatically:
+        'ufloat(str_repr, tag="var")': 'ufloat(str_repr, tag="var")',
+        'ufloat(*tuple_repr, tag="var")': 'ufloat(*tuple_repr, tag="var")',
+        'ufloat(*t[0, 0])': 'ufloat(*t[0, 0])'
         }
+
     check_all('ufloat', tests)

@@ -14,16 +14,28 @@ class FixUfloat(BaseFix):
     
     PATTERN = """
         power< 'ufloat' trailer< '('
-        atom< '(' testlist_gexp< arg0=any ',' arg1=any > ')' >
-        ')' > >"""
+            atom< '(' testlist_gexp< arg0=any ',' arg1=any > ')' >
+        ')' > >
+        |
+        power< 'ufloat' trailer< '('
+            arglist<
+                atom< '(' testlist_gexp< arg0=any ',' arg1=any > ')' >
+                ',' tag=any
+            >
+        ')' > >
+        """
     
     def transform(self, node, results):
 
         # print "ARG0", repr(results['arg0'])
         # print "ARG0", repr(results['arg1'])
         
+        # New arguments:
+        args = [results['arg0'].clone(), Comma(), results['arg1'].clone()]
+
+        # Call with a tag:
+        if 'tag' in results:
+            args.extend([Comma(), results['tag'].clone()])
+
         # Replacement by a direct call with the arguments:
-        node.replace(Call(Name('ufloat'), prefix=node.prefix,
-                     args=(results['arg0'].clone(),
-                           Comma(),
-                           results['arg1'].clone())))
+        node.replace(Call(Name('ufloat'), prefix=node.prefix, args=args))
