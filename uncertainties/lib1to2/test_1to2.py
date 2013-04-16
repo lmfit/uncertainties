@@ -3,24 +3,24 @@
 '''
 Unit tests for the uncertainties.1to2 package.
 
+Meant to be run through nosetests.
+
 (c) 2013 by Eric O. LEBIGOT (EOL).
 '''
 
-import lib2to3.refactor
-print lib2to3.refactor.get_fixers_from_package('lib2to3.fixes')
-
-import sys
-sys.path.insert(0, '.')
-import uncertainties.lib1to2.fixes
-
-###############################################################################
 # Code inspired by:
 #
 # - lib2to3.tests.test_fixers.py
 
+import sys
 import lib2to3.tests.support as support
+import os
 
-refactor = support.get_refactorer(fixer_pkg='uncertainties.lib1to2')
+# The following lib1to2 module must refer to the *local* package (not
+# to any other installed module):
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.pardir))
+
+refactor = support.get_refactorer(fixer_pkg='lib1to2')
 
 def test_fix1():
     
