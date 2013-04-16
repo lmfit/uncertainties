@@ -100,4 +100,8 @@ def test_ufloat():
         'ufloat(*t[0, 0])': 'ufloat(*t[0, 0])'
     }
 
+    tests = {
+        # Tuples:
+        'ufloat((3, 0.14))': 'ufloat(3, 0.14)'
+        }
     check_all('ufloat', tests)
