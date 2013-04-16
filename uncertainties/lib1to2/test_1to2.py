@@ -12,6 +12,8 @@ Meant to be run through nosetests.
 #
 # - lib2to3.tests.test_fixers.py
 
+import lib1to2
+
 import lib2to3.tests.support as support
 
 # import lib1to2  # Sets the module path so that lib2to3 can find the fixers

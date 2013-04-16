@@ -29,7 +29,7 @@ def test_numpy():
     """
 
     arr = numpy.array(range(3))
-    num = ufloat((3.14, 0.01))
+    num = ufloat(3.14, 0.01)
 
     # NumPy arrays can be multiplied by Variable objects,
     # whatever the order of the operands:
@@ -48,19 +48,19 @@ def test_numpy():
     # Usual behavior:
     assert len(arr[arr > 1.5]) == 1
     # Comparisons with Variable objects:
-    assert len(arr[arr > ufloat((1.5, 0.1))]) == 1
+    assert len(arr[arr > ufloat(1.5, 0.1)]) == 1
 
     assert len(prod1[prod1 < prod1*prod2]) == 2
 
     # The following can be calculated (special NumPy abs() function):
-    numpy.abs(arr + ufloat((-1, 0.1)))
+    numpy.abs(arr + ufloat(-1, 0.1))
 
     # The following does not completely work, because NumPy does not
     # implement numpy.exp on an array of general objects, apparently:
     assert numpy.exp(arr).all()  # All elements > 0
     # Equivalent with an array of AffineScalarFunc objects:
     try:
-        numpy.exp(arr + ufloat((0, 0)))
+        numpy.exp(arr + ufloat(0, 0))
     except AttributeError:
         pass  # ! This is usual (but could be avoided)
     else:
@@ -73,8 +73,8 @@ def test_matrix():
     # Matrix with a mix of Variable objects and regular
     # Python numbers:
 
-    m = unumpy.matrix([[ufloat((10, 1)), -3.1],
-                       [0, ufloat((3, 0))]])
+    m = unumpy.matrix([[ufloat(10, 1), -3.1],
+                       [0, ufloat(3, 0)]])
     m_nominal_values = unumpy.nominal_values(m)
 
     # Test of the nominal_value attribute:
@@ -103,8 +103,8 @@ def _derivatives_close(x, y):
 def test_inverse():
     "Tests of the matrix inverse"
 
-    m = unumpy.matrix([[ufloat((10, 1)), -3.1],
-                       [0, ufloat((3, 0))]])
+    m = unumpy.matrix([[ufloat(10, 1), -3.1],
+                       [0, ufloat(3, 0)]])
     m_nominal_values = unumpy.nominal_values(m)
 
     # "Regular" inverse matrix, when uncertainties are not taken
@@ -134,7 +134,7 @@ def test_inverse():
     ####################
 
     # Checks of the covariances between elements:
-    x = ufloat((10, 1))
+    x = ufloat(10, 1)
     m = unumpy.matrix([[x, x],
                        [0, 3+2*x]])
 
@@ -176,8 +176,8 @@ def test_pseudo_inverse():
 
     ##########
     # Full rank rectangular matrix:
-    m = unumpy.matrix([[ufloat((10, 1)), -3.1],
-                       [0, ufloat((3, 0))],
+    m = unumpy.matrix([[ufloat(10, 1), -3.1],
+                       [0, ufloat(3, 0)],
                        [1, -3.1]])
 
     # Numerical and package (analytical) pseudo-inverses: they must be
@@ -189,7 +189,7 @@ def test_pseudo_inverse():
 
     ##########
     # Example with a non-full rank rectangular matrix:
-    vector = [ufloat((10, 1)), -3.1, 11]
+    vector = [ufloat(10, 1), -3.1, 11]
     m = unumpy.matrix([vector, vector])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core._pinv(m, rcond)
@@ -197,7 +197,7 @@ def test_pseudo_inverse():
     
     ##########
     # Example with a non-full-rank square matrix:
-    m = unumpy.matrix([[ufloat((10, 1)), 0], [3, 0]])
+    m = unumpy.matrix([[ufloat(10, 1), 0], [3, 0]])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core._pinv(m, rcond)
     assert matrices_close(m_pinv_num, m_pinv_package)

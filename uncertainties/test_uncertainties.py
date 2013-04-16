@@ -353,7 +353,7 @@ def test_copy():
     "Standard copy module integration"
     import gc
     
-    x = ufloat((3, 0.1))
+    x = ufloat(3, 0.1)
     assert x == x
     
     y = copy.copy(x)
@@ -417,7 +417,7 @@ def test_pickling():
 
     import pickle
 
-    x = ufloat((2, 0.1))
+    x = ufloat(2, 0.1)
 
     x_unpickled = pickle.loads(pickle.dumps(x))
 
@@ -474,7 +474,7 @@ def test_int_div():
     "Integer division"
     # We perform all operations on floats, because derivatives can
     # otherwise be meaningless:
-    x = ufloat((3.9, 2))//2
+    x = ufloat(3.9, 2)//2
     assert x.nominal_value == 1.
     # All errors are supposed to be small, so the ufloat()
     # in x violates the assumption.  Therefore, the following is
@@ -488,15 +488,15 @@ def test_comparison_ops():
     
     # Operations on quantities equivalent to Python numbers must still
     # be correct:
-    a = ufloat((-3, 0))
-    b = ufloat((10, 0))
-    c = ufloat((10, 0))
+    a = ufloat(-3, 0)
+    b = ufloat(10, 0)
+    c = ufloat(10, 0)
     assert a < b
     assert a < 3
     assert 3 < b  # This is first given to int.__lt__()
     assert b == c
 
-    x = ufloat((3, 0.1))
+    x = ufloat(3, 0.1)
     
     # One constraint is that usual Python code for inequality testing
     # still work in a reasonable way (for instance, it is generally
@@ -518,12 +518,12 @@ def test_comparison_ops():
     assert x/2 == x/2
     # With uncorrelated result that have the same behavior (value and
     # standard error):
-    assert 2*ufloat((1, 0.1)) != ufloat((2, 0.2))    
+    assert 2*ufloat(1, 0.1) != ufloat(2, 0.2)    
     # Comparaison between 2 _different_ Variable objects
     # that are uncorrelated:
-    assert x != ufloat((3, 0.1))
+    assert x != ufloat(3, 0.1)
     
-    assert x != ufloat((3, 0.2))
+    assert x != ufloat(3, 0.2)
 
     # Comparison to other types should work:
     assert x != None  # Not comparable
@@ -606,26 +606,26 @@ def test_comparison_ops():
                                 % (x, op, y, correct_result))
 
     # With different numbers:
-    test_all_comparison_ops(ufloat((3, 0.1)),
-                            ufloat((-2, 0.1)))
-    test_all_comparison_ops(ufloat((0, 0)),  # Special number
-                            ufloat((1, 1)))
-    test_all_comparison_ops(ufloat((0, 0)),  # Special number
-                            ufloat((0, 0.1)))
+    test_all_comparison_ops(ufloat(3, 0.1),
+                            ufloat(-2, 0.1))
+    test_all_comparison_ops(ufloat(0, 0),  # Special number
+                            ufloat(1, 1))
+    test_all_comparison_ops(ufloat(0, 0),  # Special number
+                            ufloat(0, 0.1))
     # With identical numbers:
-    test_all_comparison_ops(ufloat((0, 0)),
-                            ufloat((0, 0)))
-    test_all_comparison_ops(ufloat((1, 1)),
-                            ufloat((1, 1)))
+    test_all_comparison_ops(ufloat(0, 0),
+                            ufloat(0, 0))
+    test_all_comparison_ops(ufloat(1, 1),
+                            ufloat(1, 1))
 
     
 def test_logic():
     "Boolean logic: __nonzero__, bool."
 
-    x = ufloat((3, 0))
-    y = ufloat((0, 0))
-    z = ufloat((0, 0.1))
-    t = ufloat((-1, 2))
+    x = ufloat(3, 0)
+    y = ufloat(0, 0)
+    z = ufloat(0, 0.1)
+    t = ufloat(-1, 2)
 
     assert bool(x) == True
     assert bool(y) == False
@@ -634,14 +634,14 @@ def test_logic():
 
 def test_obsolete():
     'Tests obsolete functions'
-    x = ufloat((3, 0.1))
+    x = ufloat(3, 0.1)
     x.set_std_dev(0.2)  # Obsolete function
     assert x.std_dev() == 0.2  # Obsolete use with a call
     
 def test_basic_access_to_data():
     "Access to data from Variable and AffineScalarFunc objects."
 
-    x = ufloat((3.14, 0.01), "x var")
+    x = ufloat(3.14, 0.01, "x var")
     assert x.tag == "x var"
     assert x.nominal_value == 3.14
     assert x.std_dev == 0.01
@@ -653,7 +653,7 @@ def test_basic_access_to_data():
     assert y.std_dev == 0.01
 
     # Details on the sources of error:
-    a = ufloat((-1, 0.001))
+    a = ufloat(-1, 0.001)
     y = 2*x + 3*x + 2 + a
     error_sources = y.error_components()
     assert len(error_sources) == 2  # 'a' and 'x'
@@ -690,8 +690,8 @@ def test_basic_access_to_data():
 def test_correlations():
     "Correlations between variables"
 
-    a = ufloat((1, 0))
-    x = ufloat((4, 0.1))
+    a = ufloat(1, 0)
+    x = ufloat(4, 0.1)
     y = x*2 + a
     # Correlations cancel "naive" additions of uncertainties:
     assert y.std_dev != 0
@@ -707,7 +707,7 @@ def test_no_coercion():
     The coercion should be impossible, like for complex numbers.
     """
 
-    x = ufloat((4, 1))
+    x = ufloat(4, 1)
     try:
         assert float(x) == 4
     except TypeError:
@@ -735,7 +735,7 @@ def test_wrapped_func():
     # As a precaution, the wrapped function does not venture into
     # calculating f with uncertainties when one of the argument is not
     # a simple number, because this argument might contain variables:
-    angle = ufloat((0, 0.1))
+    angle = ufloat(0, 0.1)
 
     assert f_wrapped(angle, [angle, angle]) == NotImplemented
     assert f_wrapped(angle, my_list) == NotImplemented
@@ -746,7 +746,7 @@ def test_wrapped_func():
 def test_access_to_std_dev():
     "Uniform access to the standard deviation"
 
-    x = ufloat((1, 0.1))
+    x = ufloat(1, 0.1)
     y = 2*x
 
     # std_dev for Variable and AffineScalarFunc objects:
@@ -762,7 +762,7 @@ def test_access_to_std_dev():
 def test_covariances():
     "Covariance matrix"
 
-    x = ufloat((1, 0.1))
+    x = ufloat(1, 0.1)
     y = -2*x+10
     z = -3*x
     covs = uncertainties.covariance_matrix([x, y, z])
@@ -783,9 +783,9 @@ def test_power():
     and integral values of p.
     '''
 
-    zero = ufloat((0, 0))
-    one = ufloat((1, 0))
-    p = ufloat((0.3, 0.01))
+    zero = ufloat(0, 0)
+    one = ufloat(1, 0)
+    p = ufloat(0.3, 0.01)
 
     # assert 0**p == 0  # !!! Should pass
     # assert zero**p == 0  # !!! Should pass
@@ -911,7 +911,7 @@ else:
     def test_numpy_comparison():
         "Comparison with a Numpy array."
 
-        x = ufloat((1, 0.1))
+        x = ufloat(1, 0.1)
         
         # Comparison with a different type:
         assert x != [x, x]
@@ -966,8 +966,8 @@ else:
 
         # Covariances between output and input variables:
 
-        x = ufloat((1, 0.1))
-        y = ufloat((2, 0.3))
+        x = ufloat(1, 0.1)
+        y = ufloat(2, 0.3)
         z = -3*x+y
 
         covs = uncertainties.covariance_matrix([x, y, z])
@@ -1000,8 +1000,8 @@ else:
 
         # ... as well as functional relations:
 
-        u = ufloat((1, 0.05))
-        v = ufloat((10, 0.1))
+        u = ufloat(1, 0.05)
+        v = ufloat(10, 0.1)
         sum_value = u+2*v
 
         # Covariance matrices:
@@ -1030,8 +1030,8 @@ else:
         covariance matrix).
         '''
         
-        x = ufloat((1, 0.1))
-        y = ufloat((2, 0.3))
+        x = ufloat(1, 0.1)
+        y = ufloat(2, 0.3)
         z = -3*x+y
 
         cov_mat = uncertainties.covariance_matrix([x, y, z])
