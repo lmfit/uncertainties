@@ -21,9 +21,9 @@ Examples:
 
   # Mathematical operations:
   x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
-  x = ufloat("0.20+/-0.01")  # Other representation
-  x = ufloat("0.20(1)")  # Other representation
-  x = ufloat("0.20")  # Implicit uncertainty of +/-1 on the last digit
+  x = ufloat_fromstr("0.20+/-0.01")  # Other representation
+  x = ufloat_fromstr("0.20(1)")  # Other representation
+  x = ufloat_fromstr("0.20")  # Implicit uncertainty of +/-1 on the last digit
   print x**2  # Square: prints "0.04+/-0.004"
   print sin(x**2)  # Prints "0.0399...+/-0.00399..."
 
@@ -75,7 +75,7 @@ on numbers with uncertainties by using their generalization from the
 uncertainties.umath module:
 
   from uncertainties.umath import sin
-  print sin(ufloat("1+/-0.01"))  # 0.841...+/-0.005...
+  print sin(ufloat_fromstr("1+/-0.01"))  # 0.841...+/-0.005...
   print sin(1)  # umath.sin() also works on floats, exactly like math.sin()
 
 Logical operations (>, ==, etc.) are also supported.
@@ -139,7 +139,7 @@ average value.
 uncertainties, it can be useful to access the nominal value and
 uncertainty of all numbers in a uniform manner:
 
-  x = ufloat("3+/-0.1")
+  x = ufloat_fromstr("3+/-0.1")
   print nominal_value(x)  # Prints 3
   print std_dev(x)  # Prints 0.1
   print nominal_value(3)  # Prints 3: nominal_value works on floats
