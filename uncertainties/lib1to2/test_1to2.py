@@ -12,10 +12,10 @@ Meant to be run through nosetests.
 #
 # - lib2to3.tests.test_fixers.py
 
-import lib2to3.tests.support as support
-import re
 import sys
+import re
 import os
+import lib2to3.tests.support as support
 
 # The lib1to2.fixes package given to lib2to3 is the *local* package
 # (not to any other installed module) (this is done through the
