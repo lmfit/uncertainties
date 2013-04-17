@@ -234,15 +234,7 @@ def wrap_array_func(func):
 ###############################################################################
 # Arrays
 
-# Vectorized creation of an array of variables:
-
-# ! Looking up uncertainties.Variable beforehand through '_Variable =
-# uncertainties.Variable' does not result in a significant speed up:
-
-_uarray = numpy.vectorize(lambda v, s: uncertainties.Variable(v, s),
-                          otypes=[object])
-
-def uarray((values, std_devs)):
+def uarray(values, std_devs):
     """
     Returns a NumPy array of numbers with uncertainties
     initialized with the given nominal values and standard
@@ -253,7 +245,12 @@ def uarray((values, std_devs)):
     etc.).
     """
 
-    return _uarray(values, std_devs)
+    return (numpy.vectorize(
+        # ! Looking up uncertainties.Variable beforehand through
+        # '_Variable = uncertainties.Variable' does not result in a
+        # significant speed up:
+        lambda v, s: uncertainties.Variable(v, s), otypes=[object])
+        (values, std_devs))
 
 ###############################################################################
 
@@ -551,7 +548,7 @@ class matrix(numpy.matrix):
     
     std_devs = std_devs
     
-def umatrix(*args):
+def umatrix(*args, **kwargs):
     """
     Constructs a matrix that contains numbers with uncertainties.
 
@@ -562,7 +559,7 @@ def umatrix(*args):
     a unumpy.matrix object instead of a numpy.matrix one.
     """
 
-    return uarray(*args).view(matrix)
+    return uarray(*args, **kwargs).view(matrix)
 
 ###############################################################################
 
