@@ -24,7 +24,7 @@ tuple_call = """
 
 ###############################################################################
 
-class FixUarray(BaseFix):
+class FixUarray_umatrix(BaseFix):
 
     # Non dotted access, then dotted access.
     # Tuple call, then single-argument call

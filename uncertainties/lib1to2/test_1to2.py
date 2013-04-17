@@ -141,7 +141,7 @@ else:
 
         check_all('ufloat', tests)
 
-    def test_uarray():
+    def test_uarray_umatrix():
         '''
         Test of the transformation of uarray(tuple,...) into
         uarray(nominal_values, std_devs).
