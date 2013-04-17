@@ -112,16 +112,19 @@ else:
         }
 
         # Automatic addition of a dotted access:
-        tests.update({re.sub('ufloat', 'unc.ufloat', orig):
-                      re.sub('ufloat', 'unc.ufloat', new)
-                      for (orig, new) in tests.iteritems()})
+        tests.update(dict(
+            # !! Dictionary comprehension usable with Python 2.7+
+            (re.sub('ufloat', 'unc.ufloat', orig),
+             re.sub('ufloat', 'unc.ufloat', new))
+            for (orig, new) in tests.iteritems()))
 
         # Test for space consistency:
         tests[' t  =  u.ufloat("3")'] = ' t  =  u.ufloat_fromstr("3")'
 
         # Exponentiation test:
-        tests.update({orig+'**2': new+'**2'
-                      for (orig, new) in tests.iteritems()})
+        tests.update(dict(
+            (orig+'**2', new+'**2')
+            for (orig, new) in tests.iteritems()))
 
         # Exponent test:
         tests['2**ufloat("3")'] = '2**ufloat_fromstr("3")'
