@@ -29,7 +29,7 @@ If multiple variables are pickled together (including when pickling
 :doc:`NumPy arrays <numpy_guide>`), their correlations are preserved:
 
   >>> import pickle
-  >>> x = ufloat((2, 0.1))
+  >>> x = ufloat(2, 0.1)
   >>> y = 2*x
   >>> p = pickle.dumps([x, y])  # Pickling to a string
   >>> (x2, y2) = pickle.loads(p)  # Unpickling into new variables
@@ -152,14 +152,14 @@ variables around their nominal values, *except*, possibly, for an
 
 Example:
 
-  >>> x = ufloat((3.14, 0.01))
+  >>> x = ufloat(3.14, 0.01)
   >>> x == x
   True
 
 because a sample from the probability distribution of :data:`x` is always
 equal to itself.  However:
 
-  >>> y = ufloat((3.14, 0.01))
+  >>> y = ufloat(3.14, 0.01)
   >>> x != y
   True
 
@@ -170,8 +170,8 @@ from the result of ``z = 3.14; t = 3.14; print z != t``, because
 
 Similarly,
 
-  >>> x = ufloat((3.14, 0.01))
-  >>> y = ufloat((3.00, 0.01))
+  >>> x = ufloat(3.14, 0.01)
+  >>> y = ufloat(3.00, 0.01)
   >>> x > y
   True
 
@@ -190,8 +190,8 @@ the equivalent of the linearity of a real function, for boolean
 values).  Thus, it is not meaningful to compare the following two
 independent variables, whose probability distributions overlap:
 
-  >>> x = ufloat((3, 0.01))
-  >>> y = ufloat((3.0001, 0.01))
+  >>> x = ufloat(3, 0.01)
+  >>> y = ufloat(3.0001, 0.01)
 
 In fact the function (x, y) → (x > y) is not even continuous over the
 region where x and y are concentrated, which violates the assumption
@@ -202,7 +202,7 @@ a boolean result whose meaning is undefined.
 However, values with largely overlapping probability distributions can
 sometimes be compared unambiguously:
 
-  >>> x = ufloat((3, 1))
+  >>> x = ufloat(3, 1)
   >>> x
   3.0+/-1.0
   >>> y = x + 0.0002
@@ -254,7 +254,7 @@ This package keeps track of all the random variables a quantity
 depends on, which allows one to perform transparent calculations that
 yield correct uncertainties.  For example:
 
-  >>> x = ufloat((2, 0.1))
+  >>> x = ufloat(2, 0.1)
   >>> a = 42
   >>> poly = x**2 + a
   >>> poly
@@ -319,7 +319,7 @@ docstring, which can for instance displayed through pydoc_.
 The factory function :func:`ufloat` creates variables and thus returns
 a :class:`Variable` object:
 
-  >>> x = ufloat((1, 0.1))
+  >>> x = ufloat(1, 0.1)
   >>> type(x)
   <class 'uncertainties.Variable'>
 
