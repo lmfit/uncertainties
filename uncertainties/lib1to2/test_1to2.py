@@ -163,7 +163,7 @@ else:
         tests[' t  =  u.uarray(args)'] = ' t  =  u.uarray(*args)'
         tests.update({
             'uarray( ( arange(3),  std_devs ) ) ':
-                'uarray( arange(3),  std_devs ) ',
+                'uarray( arange(3),  std_devs) ',
             'uarray(  tuple_arg )': 'uarray(  *tuple_arg )'
             })
                      
@@ -174,3 +174,4 @@ else:
             for (orig, new) in tests.iteritems()))
 
         check_all('uarray', tests)
+
