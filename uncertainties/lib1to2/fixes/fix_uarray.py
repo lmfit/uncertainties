@@ -51,11 +51,15 @@ class FixUarray(BaseFix):
         if 'arg' in results: # Non-tuple argument
 
             # A star will be inserted in from of the single argument:
-            arg_name = args.children[1]
-            arg_name.value = '*{}'.format(arg_name.value)
-            arg_name.changed()
-            # ! The following keeps spaces in front of the argument, if any:
-            # new_args = [String('*'), results['arg'].clone()]
+            
+            # ! The following keeps spaces in front of the argument,
+            # if any (but this is safer than adding forcefully a star
+            # in front of the value of the argument: the argument can
+            # be a name (where it works), but also anything else,
+            # including a lib2to3.pytree.Node that has no value.) This
+            # is OK, as the syntax f(* (2, 1)) is valid.
+            
+            new_args = [String('*'), results['arg'].clone()]
             
         else:  # Tuple argument
 
@@ -63,5 +67,5 @@ class FixUarray(BaseFix):
             new_args = [results['arg0'].clone(),
                         Comma(), results['arg1'].clone()]
             
-            # Argument list update:
-            args.replace(ArgList(new_args))
+        # Argument list update:
+        args.replace(ArgList(new_args))

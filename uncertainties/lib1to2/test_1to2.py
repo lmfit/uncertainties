@@ -164,7 +164,7 @@ else:
         tests.update({
             'uarray( ( arange(3),  std_devs ) ) ':
                 'uarray( arange(3),  std_devs) ',
-            'uarray(  tuple_arg )': 'uarray(  *tuple_arg )'
+            'uarray(  tuple_arg )': 'uarray(*  tuple_arg)'
             })
                      
         # Exponentiation test:
