@@ -113,5 +113,8 @@ def test_ufloat():
 
     # Exponent test:
     tests['2**ufloat("3")'] = '2**ufloat_fromstr("3")'
-    
+
+    # Opposite test:
+    tests['-ufloat("3")'] = '-ufloat_fromstr("3")'
+        
     check_all('ufloat', tests)
