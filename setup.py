@@ -296,7 +296,8 @@ _of_uncertainty
     # Where to find the source code:
     package_dir={'uncertainties': package_dir},
 
-    # Files are defined in MANIFEST (which is automatically created):
+    # Files are defined in MANIFEST (which is automatically created by
+    # python setup.py sdist):
     packages=['uncertainties', 'uncertainties.unumpy',
               'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes'],
 
