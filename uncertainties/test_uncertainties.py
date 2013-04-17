@@ -641,10 +641,12 @@ def test_logic():
     assert bool(t) == True  # Only infinitseimal neighborhood are used
 
 def test_obsolete():
-    'Tests obsolete functions'
+    'Tests some obsolete functions'
     x = ufloat(3, 0.1)
     x.set_std_dev(0.2)  # Obsolete function
-    assert x.std_dev() == 0.2  # Obsolete use with a call
+
+    x_std_dev = x.std_dev
+    assert x_std_dev() == 0.2  # Obsolete call
     
 def test_basic_access_to_data():
     "Access to data from Variable and AffineScalarFunc objects."
