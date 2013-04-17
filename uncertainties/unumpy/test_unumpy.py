@@ -226,7 +226,7 @@ def test_broadcast_funcs():
 def test_array_and_matrix_creation():
     "Test of custom array creation"
 
-    arr = unumpy.uarray(([1, 2], [0.1, 0.2]))
+    arr = unumpy.uarray([1, 2], [0.1, 0.2])
 
     assert arr[1].nominal_value == 2
     assert arr[1].std_dev == 0.2
@@ -239,7 +239,7 @@ def test_array_and_matrix_creation():
 def test_component_extraction():
     "Extracting the nominal values and standard deviations from an array"
 
-    arr = unumpy.uarray(([1, 2], [0.1, 0.2]))
+    arr = unumpy.uarray([1, 2], [0.1, 0.2])
 
     assert numpy.all(unumpy.nominal_values(arr) == [1, 2])
     assert numpy.all(unumpy.std_devs(arr) == [0.1, 0.2])
@@ -256,7 +256,7 @@ def test_component_extraction():
 def test_array_comparisons():
     "Test of array and matrix comparisons"
 
-    arr = unumpy.uarray(([1, 2], [1, 4]))
+    arr = unumpy.uarray([1, 2], [1, 4])
     assert numpy.all((arr == [arr[0], 4]) == [True, False])
 
     # For matrices, 1D arrays are converted to 2D arrays:
