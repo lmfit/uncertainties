@@ -12,7 +12,7 @@ with arrays that contain numbers with uncertainties.
 
 - Arrays of numbers with uncertainties can be built as follows:
 
-  arr = unumpy.uarray(([1, 2], [0.01, 0.002]))  # (values, uncertainties)
+  arr = unumpy.uarray([1, 2], [0.01, 0.002])  # (values, uncertainties)
 
 NumPy arrays of numbers with uncertainties can also be built directly
 through NumPy, thanks to NumPy's support of arrays of arbitrary objects:
