@@ -167,7 +167,7 @@ Main changes:
 
 - 2.1: Numbers with uncertainties are now created like \
        ``ufloat(3, 0.1)``, ``ufloat(3, 0.1, "pi"``, \
-       ``ufloat_fromstr("3.0(1)")``, ``ufloat_fromstr("3.0(1)", "pi")``.
+       ``ufloat_fromstr("3.0(1)")``, ``ufloat_fromstr("3.0(1)", "pi")``. \
        The previous ``ufloat((3, 0.1))`` and ``ufloat("3.0(1)")`` forms \
        will be supported for some time. Users are encouraged to update \
        their code, for instance through the newly provided code updater.
