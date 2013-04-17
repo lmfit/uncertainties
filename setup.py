@@ -50,10 +50,10 @@ except ImportError:
 
 distutils.core.setup(
     name='uncertainties',
-    version='1.8',
+    version='2.1',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
-    url='http://packages.python.org/uncertainties/',
+    url='http://pythonhosted.org/uncertainties/',
       
     license='''\
 This software can be used under one of the following two licenses: \
@@ -96,7 +96,7 @@ Basic examples
     4.0+/-1.0
     >>> square.nominal_value
     4.0
-    >>> square.std_dev()  # Standard deviation
+    >>> square.std_dev  # Standard deviation
     1.0
 
     >>> square - x*x
@@ -121,8 +121,8 @@ Basic examples
 Main features
 =============
 
-- **Transparent calculations** with uncertainties: no or little
-  modification of existing code is needed.  Similarly, the Python_ (or
+- **Transparent calculations with uncertainties**: **no or little
+  modification of existing code** is needed.  Similarly, the Python_ (or
   IPython_) shell can be used as **a powerful calculator** that
   handles quantities with uncertainties (``print`` statements are
   optional, which is convenient).
@@ -135,20 +135,23 @@ Main features
 - **Almost all mathematical operations** are supported, including most
   functions from the standard math_ module (sin,...).  Comparison
   operators (``>``, ``==``, etc.) are supported too.
+  
+- Many **fast operations on arrays and matrices** of numbers with
+  uncertainties are supported.
 
+- Most uncertainty calculations are performed **analytically**.
+  
 - This module also gives access to the **derivatives** of any 
   mathematical expression (they are used by error
   propagation theory, and are thus automatically calculated by this
   module).
 
-- Many **fast operations on arrays and matrices** of numbers with
-  uncertainties are supported.
 
 Installation or upgrade
 =======================
 
 Installation instructions are available on the `main web site
-<http://packages.python.org/uncertainties/#installation-and-download>`_
+<http://pythonhosted.org/uncertainties/#installation-and-download>`_
 for this package.
 
 Contact
@@ -162,10 +165,34 @@ Version history
 
 Main changes:
 
+- 2.1: Numbers with uncertainties are now created like \
+       ``ufloat(3, 0.1)``, ``ufloat(3, 0.1, "pi")``, \
+       ``ufloat_fromstr("3.0(1)")``, ``ufloat_fromstr("3.0(1)", "pi")``. \
+       The previous ``ufloat((3, 0.1))`` and ``ufloat("3.0(1)")`` forms \
+       will be supported for some time. Users are encouraged to update \
+       their code, for instance through the newly provided `code updater`_.
+- 2.0: The standard deviation is now obtained without an explicit \
+       call (``x.std_dev`` instead of ``x.std_dev()``). ``x.std_dev()`` \
+       will be supported for some time. Users are encouraged to update \
+       their code. The standard deviation of a variable can now be \
+       directly updated with ``x.std_dev = 0.1``. As a consequence, \
+       ``x.set_std_dev()`` is deprecated.
+- 1.9.1: Support added for pickling subclasses of ``UFloat`` (= ``Variable``).
+- 1.9: Added functions for handling correlation matrices: \
+       ``correlation_matrix()`` and \
+       ``correlated_values_norm()``. (These new functions mirror the \
+       covariance-matrix based ``covariance_matrix()`` and \
+       ``correlated_values()``.) ``UFloat.position_in_sigmas()`` is \
+       now named ``UFloat.std_score()``, so as to follow the common \
+       naming convention (`standard score \
+       <http://en.wikipedia.org/wiki/Standard_score>`_).  Obsolete \
+       functions were removed (from the main module: \
+       ``NumberWithUncert``, ``num_with_uncert``, ``array_u``, \
+       ``nominal_values``, ``std_devs``).
 - 1.8: Compatibility with Python 3.2 added.
 - 1.7.2: Compatibility with Python 2.3, Python 2.4, Jython 2.5.1 and \
          Jython 2.5.2 added.
-- 1.7.1: New semantics: ``ufloat('12.3(78)')`` now represents 12.3+/-7.8 \
+- 1.7.1: New semantics: ``ufloat("12.3(78)")`` now represents 12.3+/-7.8 \
          instead of 12.3+/-78.
 - 1.7: ``ufloat()`` now raises ValueError instead of a generic Exception, \
        when given an incorrect \
@@ -229,7 +256,8 @@ _of_uncertainty
 .. _setuptools: http://pypi.python.org/pypi/setuptools
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
 .. _PayPal: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
-.. _main website: http://packages.python.org/uncertainties/
+.. _main website: http://pythonhosted.org/uncertainties/
+.. _code updater: http://pythonhosted.org/uncertainties/#migration-from-version-1-to-version-2
 ''',
       
     keywords=['error propagation', 'uncertainties',
@@ -252,9 +280,11 @@ _of_uncertainty
     'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
-    # Python 3.1 fails because of a problem with NumPy 1.6.1 (whereas
-    # everything is fine with Python 3.2 and Python 2.7).
-    'Programming Language :: Python :: 3.2',    
+    # Python 3.1 failed because of a problem with NumPy 1.6.1 (whereas
+    # everything was fine with Python 3.2 and Python 2.7).
+    'Programming Language :: Python :: 3.1',
+    'Programming Language :: Python :: 3.2',
+    'Programming Language :: Python :: 3.3',
     'Topic :: Education',
     'Topic :: Scientific/Engineering',
     'Topic :: Scientific/Engineering :: Mathematics',
@@ -268,8 +298,10 @@ _of_uncertainty
     # Where to find the source code:
     package_dir={'uncertainties': package_dir},
 
-    # Files are defined in MANIFEST
-    packages=['uncertainties', 'uncertainties.unumpy'],
+    # Files are defined in MANIFEST (which is automatically created by
+    # python setup.py sdist):
+    packages=['uncertainties', 'uncertainties.unumpy',
+              'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes'],
 
     cmdclass={'build_py': build_py}
     )  # End of setup definition

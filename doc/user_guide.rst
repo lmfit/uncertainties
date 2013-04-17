@@ -41,11 +41,11 @@ one of many string representations, so that files containing numbers
 with uncertainties can easily be parsed.  Thus, x = 0.20±0.01 can be
 expressed in many convenient ways:
 
-  >>> x = ufloat((0.20, 0.01))  # x = 0.20+/-0.01
-  >>> x = ufloat("0.20+/-0.01")
-  >>> x = ufloat("0.20(1)")
-  >>> x = ufloat("20(1)e-2")  # Exponential notation supported
-  >>> x = ufloat("0.20")  # Automatic uncertainty of +/-1 on last digit
+  >>> x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
+  >>> x = ufloat_fromstr("0.20+/-0.01")
+  >>> x = ufloat_fromstr("0.20(1)")
+  >>> x = ufloat_fromstr("20(1)e-2")  # Exponential notation supported
+  >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
 
 The available representations can be listed with ``pydoc
 uncertainties.ufloat``.  Representations that are invalid raise a
@@ -90,7 +90,7 @@ Arrays of numbers with uncertainties
 It is possible to put numbers with uncertainties in NumPy_ arrays and
 matrices:
 
-  >>> arr = numpy.array([ufloat((1, 0.01)), ufloat((2, 0.1))])
+  >>> arr = numpy.array([ufloat(1, 0.01), ufloat(2, 0.1)])
   >>> 2*arr
   [2.0+/-0.02 4.0+/-0.2]
   >>> print arr.sum()
@@ -143,25 +143,31 @@ All of this is done completely transparently.
 Access to the uncertainty and to the nominal value
 ==================================================
 
-The nominal value and the uncertainty (standard deviation) on the
-calculated square can also be accessed independently:
+The nominal value and the uncertainty (standard deviation) can also be
+accessed independently:
 
   >>> print square
   0.04+/-0.004
   >>> print square.nominal_value
   0.04
-  >>> print square.std_dev()
+  >>> print square.std_dev
   0.004
 
-Details on the classes made available by this package can be found in
-the :ref:`Technical Guide <classes>`.
+Access to the individual sources of uncertainty
+===============================================
 
-The various independent contributions to an uncertainty can be
-directly obtained.  This information is more easily usable when the
-variables are tagged:
+The various contributions to an uncertainty can be obtained through
+the :func:`error_components` method, which maps the **independent
+variables a quantity depends on** to their **contribution to the total
+uncertainty**. According to the :ref:`linear error propagation theory
+<linear_method>` implemented in :mod:`uncertainties`, the sum of the
+squares of these contributions is the squared uncertainty.
 
-  >>> u = ufloat((1, 0.1), "u variable")  # Tag
-  >>> v = ufloat((10, 0.1), "v variable")
+The individual contributions to the uncertainty are more easily usable
+when the variables are **tagged**:
+
+  >>> u = ufloat(1, 0.1, "u variable")  # Tag
+  >>> v = ufloat(10, 0.1, "v variable")
   >>> sum_value = u+2*v
   >>> sum_value
   21.0+/-0.22360679774997899
@@ -171,8 +177,26 @@ variables are tagged:
   u variable: 0.100000
   v variable: 0.200000
 
-The total uncertainty on the result (:data:`sum_value`) is the quadratic
-sum of these independent uncertainties, as it should be.
+The variance (i.e. squared uncertainty) of the result
+(:data:`sum_value`) is the quadratic sum of these independent
+uncertainties, as it should be (``0.1**2 + 0.2**2``).
+
+The tags *do not have to be distinct*. For instance, *multiple* random
+variables can be tagged as ``"systematic"``, and their contribution to
+the total uncertainty of :data:`result` can simply be obtained as:
+
+  >>> syst_error = math.sqrt(sum(  # Error from *all* systematic errors
+  ...     error**2
+  ...     for (var, error) in result.error_components().items()
+  ...     if var.tag == "systematic"))
+          
+The remaining contribution to the uncertainty is:
+
+  >>> other_error = math.sqrt(result.std_dev**2 - syst_error**2)
+
+The variance of :data:`result` is in fact simply the quadratic sum of
+these two errors, since the variables from
+:func:`result.error_components` are independent.
 
 .. index:: comparison operators
 
@@ -195,8 +219,8 @@ One important concept to keep in mind is that :func:`ufloat` creates a
 random variable, so that two numbers with the same nominal value and
 standard deviation are generally different:
 
-  >>> y = ufloat((1, 0.1))
-  >>> z = ufloat((1, 0.1))
+  >>> y = ufloat(1, 0.1)
+  >>> z = ufloat(1, 0.1)
   >>> print y
   1.0+/-0.1
   >>> print z
@@ -217,8 +241,11 @@ numbers with uncertainties can be found in the :ref:`Technical Guide
 
 .. index:: covariance matrix
 
+Covariance and correlation matrices
+===================================
+
 Covariance matrix
-=================
+-----------------
 
 The covariance matrix between various variables or calculated
 quantities can be simply obtained::
@@ -243,18 +270,35 @@ keeps track at all times of all correlations between quantities
   >>> sum_value - (u+2*v)
   >>> 0.0
 
+Correlation matrix
+------------------
+
+If the NumPy_ package is available, the correlation matrix can be
+obtained as well:
+
+  >>> corr_matrix = uncertainties.correlation_matrix([u, v, sum_value])
+  >>> corr_matrix
+  array([[ 1.        ,  0.        ,  0.4472136 ],
+         [ 0.        ,  1.        ,  0.89442719],
+         [ 0.4472136 ,  0.89442719,  1.        ]])
+  
 .. index:: correlations; correlated variables
 
 Correlated variables
 ====================
 
 Reciprocally, **correlated variables can be created** transparently,
-provided that the NumPy_ package is available::
+provided that the NumPy_ package is available.
+
+Use of a covariance matrix
+--------------------------
+
+Correlated variables can be obtained through the *covariance* matrix::
 
   >>> (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 21], cov_matrix)
 
-creates three new variables with the indicated values, and the given
-correlation matrix:
+creates three new variables with the listed nominal values, and the given
+covariance matrix::
 
   >>> sum_value
   21.0+/-0.22360679774997899
@@ -268,12 +312,29 @@ The theoretical value of the last expression is exactly zero, like for
 (3e-9 is indeed very small compared to the uncertainty on :data:`sum2`:
 correlations should in fact cancel the uncertainty on :data:`sum2`).
 
-The correlation matrix is the desired one::
+The covariance matrix is the desired one::
 
   >>> uncertainties.covariance_matrix([u2, v2, sum2])
 
-reproduces the desired covariance matrix :data:`cov_matrix` (up to
+reproduces the original covariance matrix :data:`cov_matrix` (up to
 rounding errors).
+
+Use of a correlation matrix
+---------------------------
+
+Alternatively, correlated values can be defined through a
+*correlation* matrix (the correlation matrix is the covariance matrix
+normalized with individual standard deviations; it has ones on its
+diagonal), along with a list of nominal values and standard deviations::
+
+  >>> (u3, v3, sum3) = uncertainties.correlated_values_norm(
+  ...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)], corr_matrix)
+  >>> print u3
+  1.0+/-0.1
+
+The three returned numbers with uncertainties have the correct
+uncertainties and correlations (:data:`corr_matrix` can be recovered
+through :func:`correlation_matrix`).
 
 .. index::
    single: C code; wrapping
@@ -283,21 +344,30 @@ rounding errors).
 Making custom functions accept numbers with uncertainties
 =========================================================
 
-This package allows calculations that are performed through non-Python
-code (Fortran, C, etc.) to handle numbers with uncertainties instead
-of floats.  Similarly, **functions that do not have a simple
-analytical form** can be automatically wrapped so as to also work on
-float parameters that contain uncertainties.
+This package allows **code which is not meant to be used with numbers
+with uncertainties to handle them anyway**. This is for instance
+useful when calling external functions (which are out of the user's
+control), including functions written in C or Fortran.  Similarly,
+**functions that do not have a simple analytical form** can be
+automatically wrapped so as to also work with arguments that contain
+uncertainties.
 
-It is thus possible to have a function :func:`f` that takes any number
-of floats and returns a single float, and to automatically generalize
-it so that it also works with numbers with uncertainties:
+It is thus possible to have a function :func:`f` that returns a single
+float, and to automatically generalize it so that it also works with
+numbers with uncertainties:
 
   >>> wrapped_f = uncertainties.wrap(f)
 
-The new function :func:`wrapped_f` can be given numbers with
-uncertainties.  It returns the same values as :func:`f`, but with
+The new function :func:`wrapped_f` accepts numbers with uncertainties
+as arguments wherever a Python float was used for :func:`f`.
+:func:`wrapped_f` returns the same values as :func:`f`, but with
 uncertainties.
+
+With a simple wrapping call like above, uncertainties in the function
+result are automatically calculated numerically. **Analytical
+uncertainty calculations can be performed** if derivatives are
+provided to :func:`wrap` (for details, see the documentation string of
+:func:`wrap` with the ``pydoc`` command, or :func:`help`).
 
 Miscellaneous utilities
 =======================
@@ -311,11 +381,11 @@ to study its impact on a final result.  With this package, the
   >>> sum_value = u+2*v
   >>> sum_value
   21.0+/-0.22360679774997899
-  >>> prev_uncert = u.std_dev()
-  >>> u.set_std_dev(10)
+  >>> prev_uncert = u.std_dev
+  >>> u.std_dev = 10
   >>> sum_value
   21.0+/-10.001999800039989
-  >>> u.set_std_dev(prev_uncert)
+  >>> u.std_dev = prev_uncert
 
 The relevant concept is that :data:`sum_value` does depend on the
 variables :data:`u` and :data:`v`: the :mod:`uncertainties` package keeps
@@ -343,10 +413,11 @@ manner**.  This is what the :func:`nominal_value` and
   0.0
 
 Finally, a utility method is provided that directly yields the
-**number of standard deviations** between a number and a result with
+`standard score <http://en.wikipedia.org/wiki/Standard_score>`_
+(number of standard deviations) between a number and a result with
 uncertainty: with :data:`x` equal to 0.20±0.01,
 
-  >>> x.position_in_sigmas(0.17)
+  >>> x.std_score(0.17)
   -3.0
 
 .. index:: derivatives
@@ -362,8 +433,8 @@ package automatically performs such calculations; users can thus
 easily get the derivative of an expression with respect to any of its
 variables:
 
-  >>> u = ufloat((1, 0.1))
-  >>> v = ufloat((10, 0.1))
+  >>> u = ufloat(1, 0.1)
+  >>> v = ufloat(10, 0.1)
   >>> sum_value = u+2*v
   >>> sum_value.derivatives[u]
   1.0
@@ -379,7 +450,8 @@ Additional information
 The capabilities of the :mod:`uncertainties` package in terms of array
 handling are detailed in :doc:`numpy_guide`.
 
-Details about the theory behind this package are given in the
+Details about the theory behind this package and implementation 
+information are given in the
 :doc:`tech_guide`.
 
 .. _NumPy: http://numpy.scipy.org/

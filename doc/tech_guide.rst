@@ -4,103 +4,20 @@
 Technical Guide
 ===============
 
+Testing whether an object is a number with uncertainty
+------------------------------------------------------
 
-Mathematical definition of numbers with uncertainties
------------------------------------------------------
-
-.. index:: number with uncertainty; definition
-.. index:: probability distribution
-
-Mathematically, **numbers with uncertainties** are, in this package,
-**probability distributions**.  They are *not restricted* to normal
-(Gaussian) distributions and can be any kind of distribution.  These
-probability distributions are reduced to two numbers: a nominal value
-and a standard deviation.
-
-Thus, both variables (:class:`Variable` objects) and the result of
-mathematical operations (:class:`AffineScalarFunc` objects) contain
-these two values (respectively in their :attr:`nominal_value`
-attribute and through their :meth:`std_dev` method).
-
-.. index:: uncertainty; definition
-
-The **uncertainty** of a number with uncertainty is simply defined in
-this package as the standard deviation of the underlying probability
-distribution.
-
-The numbers with uncertainties manipulated by this package are assumed
-to have a probability distribution mostly contained around their
-nominal value, in an interval of about the size of their standard
-deviation.  This should cover most practical cases.
-
-.. index:: nominal value; definition
-
-A good choice of **nominal value** for a number with uncertainty is thus
-the median of its probability distribution, the location of highest
-probability, or the average value.
-
-Probability distributions (random variables and calculation results)
-are printed as::
-
-  nominal value +/- standard deviation
-
-but this does not imply any property on the nominal value (beyond the
-fact that the nominal value is normally inside the region of high
-probability density), or that the probability distribution of the
-result is symmetrical (this is rarely strictly the case).
-
-.. _variable_tracking:
-
-Tracking of random variables
-----------------------------
-
-This package keeps track of all the random variables a quantity
-depends on, which allows one to perform transparent calculations that
-yield correct uncertainties.  For example:
-
-  >>> x = ufloat((2, 0.1))
-  >>> a = 42
-  >>> poly = x**2 + a
-  >>> poly
-  46.0+/-0.4
-  >>> poly - x*x
-  42.0
-
-Even though ``x*x`` has a non-zero uncertainty, the result has a zero
-uncertainty, because it is equal to :data:`a`.
-
-However, only the dependence of quantities on random variables created
-by this module is tracked.  Thus, if the variable :data:`a` above is
-modified, the value of :data:`poly` is not modified, as is usual in
-Python:
-
-  >>> a = 123
-  >>> print poly
-  46.0+/-0.4  # Still equal to x**2 + 42, not x**2 + 123
-
-Random variables can, on the other hand, have their uncertainty
-updated on the fly, because quantities with uncertainties (like
-:data:`poly`) keep track of them:
-
-  >>> x.set_std_dev(0)
-  >>> print poly
-  46.0  # Zero uncertainty, now
-
-As usual, Python keeps track of objects as long as they are used.
-Thus, redefining the value of :data:`x` does not change the fact that
-:data:`poly` depends on the quantity with uncertainty previously stored
-in :data:`x`:
-
-  >>> x = 10000
-  >>> print poly
-  46.0  # Unchanged
-
-These mechanisms make quantities with uncertainties behave mostly like
-regular numbers, while providing a fully transparent way of handling
-correlations between quantities.
+The recommended way of testing whether :data:`value` carries an
+uncertainty handled by this module is by checking whether
+:data:`value` is an instance of :class:`UFloat`, through
+``isinstance(value, uncertainties.UFloat)``.
 
 .. index:: pickling
- 
+.. index:: saving to file; number with uncertainty
+.. index:: reading from file; number with uncertainty 
+
+.. _pickling:
+
 Pickling
 --------
 
@@ -108,11 +25,11 @@ The quantities with uncertainties created by the :mod:`uncertainties`
 package can be `pickled <http://docs.python.org/library/pickle.html>`_
 (they can be stored in a file, for instance).
 
-If multiple variables are pickled together, their correlations are
-preserved:
+If multiple variables are pickled together (including when pickling
+:doc:`NumPy arrays <numpy_guide>`), their correlations are preserved:
 
   >>> import pickle
-  >>> x = ufloat((2, 0.1))
+  >>> x = ufloat(2, 0.1)
   >>> y = 2*x
   >>> p = pickle.dumps([x, y])  # Pickling to a string
   >>> (x2, y2) = pickle.loads(p)  # Unpickling into new variables
@@ -140,27 +57,72 @@ Uncertainties must be small
 
 This package calculates the standard deviation of mathematical
 expressions through the linear approximation of `error propagation
-theory`_.  This is why this package also calculates partial
-:ref:`derivatives <derivatives>`.
+theory`_.
 
 The standard deviations and nominal values calculated by this package
 are thus meaningful approximations as long as the functions involved
 have precise linear expansions in the region where the probability
 distribution of their variables is the largest.  It is therefore
 important that **uncertainties be "small"**.  Mathematically, this
-means that the linear terms of functions around the nominal values of
+implies that the linear terms of functions around the nominal values of
 their variables should be much larger than the remaining higher-order
 terms over the region of significant probability.
 
 For instance, ``sin(0+/-0.01)`` yields a meaningful standard deviation
 since it is quite linear over 0±0.01.  However, ``cos(0+/-0.01)``,
-yields an approximate standard deviation of 0 (because around 0, the
-cosine is parabolic, not linear), which might not be precise enough
-for all applications.
+yields an approximate standard deviation of 0 because it is parabolic
+around 0 instead of linear; this might not be precise enough for all
+applications.
+
+
+Mathematical definition of numbers with uncertainties
+-----------------------------------------------------
+
+.. index:: number with uncertainty; definition
+.. index:: probability distribution
+
+Mathematically, **numbers with uncertainties** are, in this package,
+**probability distributions**.  They are *not restricted* to normal
+(Gaussian) distributions and can be **any distribution**.  These
+probability distributions are reduced to two numbers: a nominal value
+and an uncertainty.
+
+Thus, both variables (:class:`Variable` objects) and the result of
+mathematical operations (:class:`AffineScalarFunc` objects) contain
+these two values (respectively in their :attr:`nominal_value`
+and :attr:`std_dev` attributes).
+
+.. index:: uncertainty; definition
+
+The **uncertainty** of a number with uncertainty is simply defined in
+this package as the **standard deviation** of the underlying probability
+distribution.
+
+The numbers with uncertainties manipulated by this package are assumed
+to have a probability distribution mostly contained around their
+nominal value, in an interval of about the size of their standard
+deviation.  This should cover most practical cases.
+
+.. index:: nominal value; definition
+
+A good choice of **nominal value** for a number with uncertainty is thus
+the median of its probability distribution, the location of highest
+probability, or the average value.
+
+Probability distributions (random variables and calculation results)
+are printed as::
+
+  nominal value +/- standard deviation
+
+but this does not imply any property on the nominal value (beyond the
+fact that the nominal value is normally inside the region of high
+probability density), or that the probability distribution of the
+result is symmetrical (this is rarely strictly the case).
 
 .. index:: comparison operators; technical details
 
 .. _comparison_operators:
+
 
 Comparison operators
 --------------------
@@ -174,7 +136,7 @@ with numbers with uncertainties.
 
 .. index:: boolean value
 
-The **boolean value** (``bool(x)``, ``if x…``) of a number with
+The **boolean value** (``bool(x)``, ``if x …``) of a number with
 uncertainty :data:`x` is defined as the result of ``x != 0``, as usual.
 
 However, since the objects defined in this module represent
@@ -190,24 +152,26 @@ variables around their nominal values, *except*, possibly, for an
 
 Example:
 
-  >>> x = ufloat((3.14, 0.01))
+  >>> x = ufloat(3.14, 0.01)
   >>> x == x
   True
 
 because a sample from the probability distribution of :data:`x` is always
 equal to itself.  However:
 
-  >>> y = ufloat((3.14, 0.01))
+  >>> y = ufloat(3.14, 0.01)
   >>> x != y
   True
 
-since :data:`x` and :data:`y` are independent random variables that *almost*
-always give a different value.
+since :data:`x` and :data:`y` are independent random variables that
+*almost* always give a different value. Note that this is different
+from the result of ``z = 3.14; t = 3.14; print z != t``, because
+:data:`x` and :data:`y` are *random variables*, not pure numbers.
 
 Similarly,
 
-  >>> x = ufloat((3.14, 0.01))
-  >>> y = ufloat((3.00, 0.01))
+  >>> x = ufloat(3.14, 0.01)
+  >>> y = ufloat(3.00, 0.01)
   >>> x > y
   True
 
@@ -226,19 +190,19 @@ the equivalent of the linearity of a real function, for boolean
 values).  Thus, it is not meaningful to compare the following two
 independent variables, whose probability distributions overlap:
 
-  >>> x = ufloat((3, 0.01))
-  >>> y = ufloat((3.0001, 0.01))
+  >>> x = ufloat(3, 0.01)
+  >>> y = ufloat(3.0001, 0.01)
 
 In fact the function (x, y) → (x > y) is not even continuous over the
 region where x and y are concentrated, which violates the assumption
-made in this package about operations involving numbers with
-uncertainties.  Comparing such numbers therefore returns a boolean
-result whose meaning is undefined.
+of approximate linearity made in this package on operations involving
+numbers with uncertainties.  Comparing such numbers therefore returns
+a boolean result whose meaning is undefined.
 
 However, values with largely overlapping probability distributions can
 sometimes be compared unambiguously:
 
-  >>> x = ufloat((3, 1))
+  >>> x = ufloat(3, 1)
   >>> x
   3.0+/-1.0
   >>> y = x + 0.0002
@@ -248,7 +212,87 @@ sometimes be compared unambiguously:
   True
 
 In fact, correlations guarantee that :data:`y` is always larger than
-:data:`x` (by 0.0002).
+:data:`x`: ``y-x`` correctly satisfies the assumption of linearity,
+since it is a constant "random" function (with value 0.0002, even
+though :data:`y` and :data:`x` are random). Thus, it is indeed true
+that :data:`y` > :data:`x`.
+
+
+.. _differentiation method:
+
+Differentiation method
+----------------------
+
+The :mod:`uncertainties` package automatically calculates the
+derivatives required by linear error propagation theory.
+
+Almost all the derivatives of the fundamental functions provided by
+:mod:`uncertainties` are obtained through a analytical formulas (the
+few mathematical functions that are instead differentiated through
+numerical approximation are listed in ``umath.num_deriv_funcs``).
+
+The derivatives of mathematical *expressions* are evaluated through a 
+fast and precise method: :mod:`uncertainties` transparently implements 
+`automatic differentiation`_ with reverse accumulation. This method 
+essentially consists in keeping track of the value of derivatives, and 
+in automatically applying the `chain rule 
+<http://en.wikipedia.org/wiki/Chain_rule>`_. Automatic differentiation 
+is often faster than symbolic differentiation and more precise than 
+numerical differentiation (when used with analytical formulas, like in
+:mod:`uncertainties`).
+
+The derivatives of any expression can be obtained with 
+:mod:`uncertainties` in a simple way, as demonstrated in the :ref:`User 
+Guide <derivatives>`.
+
+.. _variable_tracking:
+
+Tracking of random variables
+----------------------------
+
+This package keeps track of all the random variables a quantity
+depends on, which allows one to perform transparent calculations that
+yield correct uncertainties.  For example:
+
+  >>> x = ufloat(2, 0.1)
+  >>> a = 42
+  >>> poly = x**2 + a
+  >>> poly
+  46.0+/-0.4
+  >>> poly - x*x
+  42.0
+
+Even though ``x*x`` has a non-zero uncertainty, the result has a zero
+uncertainty, because it is equal to :data:`a`.
+
+If the variable :data:`a` above is modified, the value of :data:`poly` 
+is not modified, as is usual in Python:
+
+  >>> a = 123
+  >>> print poly
+  46.0+/-0.4  # Still equal to x**2 + 42, not x**2 + 123
+
+Random variables can, on the other hand, have their uncertainty
+updated on the fly, because quantities with uncertainties (like
+:data:`poly`) keep track of them:
+
+  >>> x.std_dev = 0
+  >>> print poly
+  46.0  # Zero uncertainty, now
+
+As usual, Python keeps track of objects as long as they are used.
+Thus, redefining the value of :data:`x` does not change the fact that
+:data:`poly` depends on the quantity with uncertainty previously stored
+in :data:`x`:
+
+  >>> x = 10000
+  >>> print poly
+  46.0  # Unchanged
+
+These mechanisms make quantities with uncertainties behave mostly like
+regular numbers, while providing a fully transparent way of handling
+correlations between quantities.
+
 
 
 .. index:: number with uncertainty; classes, Variable class
@@ -256,18 +300,9 @@ In fact, correlations guarantee that :data:`y` is always larger than
 
 .. _classes:
 
-Classes
--------
 
-Testing whether an object is a number with uncertainty
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The recommended way of testing whether :data:`value` carries an
-uncertainty handled by this module is by checking the value of
-``isinstance(value, UFloat)``.
-
-Variables and functions
-^^^^^^^^^^^^^^^^^^^^^^^
+Python classes for variables and functions with uncertainty
+-----------------------------------------------------------
 
 Numbers with uncertainties are represented through two different
 classes:
@@ -284,7 +319,7 @@ docstring, which can for instance displayed through pydoc_.
 The factory function :func:`ufloat` creates variables and thus returns
 a :class:`Variable` object:
 
-  >>> x = ufloat((1, 0.1))
+  >>> x = ufloat(1, 0.1)
   >>> type(x)
   <class 'uncertainties.Variable'>
 
@@ -294,33 +329,11 @@ numbers (the summation, etc. of these objects is defined).
 Mathematical expressions involving numbers with uncertainties
 generally return :class:`AffineScalarFunc` objects, because they
 represent mathematical functions and not simple variables; these
-objects store all the variables they depend from:
+objects store all the variables they depend on:
 
   >>> type(umath.sin(x))
   <class 'uncertainties.AffineScalarFunc'>
 
-
-.. _differentiation method:
-
-Differentiation method
-----------------------
-
-The :mod:`uncertainties` package automatically calculates the
-derivatives required by linear error propagation theory.
-
-Almost all the derivatives of the fundamental functions provided by
-:mod:`uncertainties` are obtained through a analytical formulas (the
-few mathematical functions that are instead differentiated through
-numerical approximation are listed in ``umath.num_deriv_funcs``).
-
-The derivatives of mathematical *expressions* are evaluated through a
-fast and precise method: :mod:`uncertainties` transparently implements
-`automatic differentiation`_ with reverse accumulation. This method is
-faster than symbolic differentiation and more precise than numerical
-differentiation.
-
-The derivatives of any expression can be obtained in a simple way, as
-demonstrated in the :ref:`User Guide <derivatives>`.
 
 .. _automatic differentiation: http://en.wikipedia.org/wiki/Automatic_differentiation
 

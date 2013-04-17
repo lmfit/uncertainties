@@ -1,9 +1,11 @@
+# coding=utf-8
+
 """
 Tests of the code in uncertainties/__init__.py.
 
 These tests can be run through the Nose testing framework.
 
-(c) 2010 by Eric O. LEBIGOT (EOL).
+(c) 2010-2013 by Eric O. LEBIGOT (EOL).
 """
 
 from __future__ import division
@@ -13,6 +15,7 @@ import copy
 import weakref
 import math
 import random
+import sys
 
 # 3rd-party modules
 # import nose.tools
@@ -20,9 +23,14 @@ import random
 # Local modules
 
 import uncertainties
-from uncertainties import ufloat, AffineScalarFunc
+from uncertainties import ufloat, AffineScalarFunc, ufloat_fromstr
 
 from uncertainties import __author__
+
+# The following information is useful for making sure that the right
+# version of Python is running the tests (for instance with the Travis
+# Continuous Integration system):
+print "Testing with Python", sys.version
 
 ###############################################################################
 
@@ -30,7 +38,7 @@ from uncertainties import __author__
 
 def _numbers_close(x, y, tolerance=1e-6):
     """
-    Returns True if the numbers are close enough.
+    Returns True if the given (real) numbers are close enough.
 
     The given tolerance is the relative difference allowed, or the absolute
     difference, if one of the numbers is 0.
@@ -50,6 +58,7 @@ def _numbers_close(x, y, tolerance=1e-6):
 class DerivativesDiffer(Exception):
     pass
 
+    
 def _compare_derivatives(func, numerical_derivatives,
                          num_args_list=None):
     """
@@ -185,6 +194,134 @@ def _compare_derivatives(func, numerical_derivatives,
 
 ###############################################################################
 
+def test_value_construction():
+    '''
+    Tests the various means of constructing a constant number with
+    uncertainty *without a string* (see test_str_input(), for this).
+    '''
+
+    ## Simple construction:
+    x = ufloat(3, 0.14)
+    assert x.nominal_value == 3
+    assert x.std_dev == 0.14
+    assert x.tag is None
+    
+    # ... with tag as positional argument:
+    x = ufloat(3, 0.14, 'pi')
+    assert x.nominal_value == 3
+    assert x.std_dev == 0.14
+    assert x.tag == 'pi'
+
+    # ... with tag keyword:
+    x = ufloat(3, 0.14, tag='pi')
+    assert x.nominal_value == 3
+    assert x.std_dev == 0.14
+    assert x.tag == 'pi'
+
+    ## Comparison with the obsolete tuple form:
+
+    # The following tuple is stored in a variable instead of being
+    # repeated in the calls below, so that the automatic code update
+    # does not replace ufloat((3, 0.14)) by ufloat(3, 14): the goal
+    # here is to make sure that the obsolete form gives the same
+    # result as the new form.
+    
+    representation = (3, 0.14)  # Obsolete representation
+    
+    x = ufloat(3, 0.14)
+    x2 = ufloat(representation)  # Obsolete
+    assert x.nominal_value == x2.nominal_value
+    assert x.std_dev == x2.std_dev
+    assert x.tag is None
+    assert x2.tag is None
+    
+    # With tag as positional argument:
+    x = ufloat(3, 0.14, "pi")
+    x2 = ufloat(representation, "pi")  # Obsolete
+    assert x.nominal_value == x2.nominal_value
+    assert x.std_dev == x2.std_dev
+    assert x.tag == 'pi'
+    assert x2.tag == 'pi'
+    
+    # With tag keyword:
+    x = ufloat(3, 0.14, tag="pi")
+    x2 = ufloat(representation, tag="pi")  # Obsolete
+    assert x.nominal_value == x2.nominal_value
+    assert x.std_dev == x2.std_dev
+    assert x.tag == 'pi'
+    assert x2.tag == 'pi'
+    
+def test_str_input():
+    "Input of numbers with uncertainties as a string"
+
+    # String representation, and numerical values:
+    tests = {
+        "-1.23(3.4)": (-1.23, 3.4),  # (Nominal value, error)
+        "-1.34(5)": (-1.34, 0.05),
+        "1(6)": (1, 6),
+        "3(4.2)": (3, 4.2),
+        "-9(2)": (-9, 2),
+        "1234567(1.2)": (1234567, 1.2),
+        "12.345(15)": (12.345, 0.015),
+        "-12.3456(78)e-6": (-12.3456e-6, 0.0078e-6),
+        "0.29": (0.29, 0.01),
+        "31.": (31, 1),
+        "-31.": (-31, 1),
+        # The following tests that the ufloat() routine does
+        # not consider '31' like the tuple ('3', '1'), which would
+        # make it expect two numbers (instead of 2 1-character
+        # strings):
+        "31": (31, 1),
+        "-3.1e10": (-3.1e10, 0.1e10),
+        "169.0(7)": (169, 0.7),
+        "-0.1+/-1": (-0.1, 1),
+        "-13e-2+/-1e2": (-13e-2, 1e2),
+        '-14.(15)': (-14, 15),
+        '-100.0(15)': (-100, 1.5),
+        '14.(15)': (14, 15)
+        }
+          
+    for (representation, values) in tests.iteritems():
+
+        # Without tag:
+        num = ufloat_fromstr(representation)
+        assert _numbers_close(num.nominal_value, values[0])
+        assert _numbers_close(num.std_dev, values[1])
+        assert num.tag is None
+        
+        # With a tag as positional argument:
+        num = ufloat_fromstr(representation, 'test variable')
+        assert _numbers_close(num.nominal_value, values[0])
+        assert _numbers_close(num.std_dev, values[1])
+        assert num.tag == 'test variable'
+
+        # With a tag as keyword argument:
+        num = ufloat_fromstr(representation, tag='test variable')
+        assert _numbers_close(num.nominal_value, values[0])
+        assert _numbers_close(num.std_dev, values[1])
+        assert num.tag == 'test variable'
+        
+        ## Obsolete forms
+
+        num = ufloat(representation)  # Obsolete
+        assert _numbers_close(num.nominal_value, values[0])
+        assert _numbers_close(num.std_dev, values[1])
+        assert num.tag is None
+        
+        # Call with a tag list argument:
+        num = ufloat(representation, 'test variable')  # Obsolete
+        assert _numbers_close(num.nominal_value, values[0])
+        assert _numbers_close(num.std_dev, values[1])
+        assert num.tag == 'test variable'
+        
+        # Call with a tag keyword argument:
+        num = ufloat(representation, tag='test variable')  # Obsolete
+        assert _numbers_close(num.nominal_value, values[0])
+        assert _numbers_close(num.std_dev, values[1])
+        assert num.tag == 'test variable'
+
+###############################################################################
+            
 # Test of correctness of the fixed (usually analytical) derivatives:
 def test_fixed_derivatives_basic_funcs():
     """
@@ -224,7 +361,7 @@ def test_copy():
     "Standard copy module integration"
     import gc
     
-    x = ufloat((3, 0.1))
+    x = ufloat(3, 0.1)
     assert x == x
     
     y = copy.copy(x)
@@ -267,13 +404,28 @@ def test_copy():
     gc.collect()
 
     assert y in y.derivatives.keys()
+
+## Classes for the pickling tests (put at the module level, so that
+## they can be unpickled):
     
+# Subclass without slots:
+class NewVariable_dict(uncertainties.Variable):
+    pass
+
+# Subclass with slots defined by a tuple:
+class NewVariable_slots_tuple(uncertainties.Variable):
+    __slots__ = ('new_attr',)
+
+# Subclass with slots defined by a string:
+class NewVariable_slots_str(uncertainties.Variable):
+    __slots__ = 'new_attr'
+        
 def test_pickling():
     "Standard pickle module integration."
 
     import pickle
 
-    x = ufloat((2, 0.1))
+    x = ufloat(2, 0.1)
 
     x_unpickled = pickle.loads(pickle.dumps(x))
 
@@ -286,17 +438,56 @@ def test_pickling():
     # Correlations must be preserved:
     assert f_unpickled - x_unpickled2 - x_unpickled2 == 0
     
+    ## Tests with subclasses:
+
+    for subclass in (NewVariable_dict, NewVariable_slots_tuple,
+                     NewVariable_slots_str):
+        
+        x = subclass(3, 0.14)
+
+        # Pickling test with possibly uninitialized slots:
+        pickle.loads(pickle.dumps(x))
+        
+        # Unpickling test:
+        x.new_attr = 'New attr value'
+        x_unpickled = pickle.loads(pickle.dumps(x))
+        # Must exist (From the slots of the parent class):        
+        x_unpickled.nominal_value
+        x_unpickled.new_attr  # Must exist    
+
+    ##
+        
+    # Corner case test: when an attribute is present both in __slots__
+    # and in __dict__, it is first looked up from the slots
+    # (references:
+    # http://docs.python.org/2/reference/datamodel.html#invoking-descriptors,
+    # http://stackoverflow.com/a/15139208/42973). As a consequence,
+    # the pickling process must pickle the correct value (i.e., not
+    # the value from __dict__):
+    x = NewVariable_dict(3, 0.14)
+    x._nominal_value = 'in slots'
+    # Corner case: __dict__ key which is also a slot name (it is
+    # shadowed by the corresponding slot, so this is very unusual,
+    # though):
+    x.__dict__['_nominal_value'] = 'in dict'
+    # Additional __dict__ attribute:
+    x.dict_attr = 'dict attribute'
     
+    x_unpickled = pickle.loads(pickle.dumps(x))
+    # We make sure that the data is still there and untouched:
+    assert x_unpickled._nominal_value == 'in slots'
+    assert x_unpickled.__dict__ == x.__dict__
+        
 def test_int_div():
     "Integer division"
     # We perform all operations on floats, because derivatives can
     # otherwise be meaningless:
-    x = ufloat((3.9, 2))//2
+    x = ufloat(3.9, 2)//2
     assert x.nominal_value == 1.
     # All errors are supposed to be small, so the ufloat()
     # in x violates the assumption.  Therefore, the following is
     # correct:
-    assert x.std_dev() == 0.0
+    assert x.std_dev == 0.0
 
 def test_comparison_ops():
     "Test of comparison operators"
@@ -305,15 +496,15 @@ def test_comparison_ops():
     
     # Operations on quantities equivalent to Python numbers must still
     # be correct:
-    a = ufloat((-3, 0))
-    b = ufloat((10, 0))
-    c = ufloat((10, 0))
+    a = ufloat(-3, 0)
+    b = ufloat(10, 0)
+    c = ufloat(10, 0)
     assert a < b
     assert a < 3
     assert 3 < b  # This is first given to int.__lt__()
     assert b == c
 
-    x = ufloat((3, 0.1))
+    x = ufloat(3, 0.1)
     
     # One constraint is that usual Python code for inequality testing
     # still work in a reasonable way (for instance, it is generally
@@ -335,12 +526,12 @@ def test_comparison_ops():
     assert x/2 == x/2
     # With uncorrelated result that have the same behavior (value and
     # standard error):
-    assert 2*ufloat((1, 0.1)) != ufloat((2, 0.2))    
+    assert 2*ufloat(1, 0.1) != ufloat(2, 0.2)    
     # Comparaison between 2 _different_ Variable objects
     # that are uncorrelated:
-    assert x != ufloat((3, 0.1))
+    assert x != ufloat(3, 0.1)
     
-    assert x != ufloat((3, 0.2))
+    assert x != ufloat(3, 0.2)
 
     # Comparison to other types should work:
     assert x != None  # Not comparable
@@ -377,7 +568,7 @@ def test_comparison_ops():
             infinitesimal interval withing its uncertainty.  The case
             of a zero uncertainty is special.
             """
-            return ((random.random()-0.5) * min(var.std_dev(), 1e-5)
+            return ((random.random()-0.5) * min(var.std_dev, 1e-5)
                     + var.nominal_value)
 
         # All operations are tested:
@@ -423,50 +614,56 @@ def test_comparison_ops():
                                 % (x, op, y, correct_result))
 
     # With different numbers:
-    test_all_comparison_ops(ufloat((3, 0.1)),
-                            ufloat((-2, 0.1)))
-    test_all_comparison_ops(ufloat((0, 0)),  # Special number
-                            ufloat((1, 1)))
-    test_all_comparison_ops(ufloat((0, 0)),  # Special number
-                            ufloat((0, 0.1)))
+    test_all_comparison_ops(ufloat(3, 0.1),
+                            ufloat(-2, 0.1))
+    test_all_comparison_ops(ufloat(0, 0),  # Special number
+                            ufloat(1, 1))
+    test_all_comparison_ops(ufloat(0, 0),  # Special number
+                            ufloat(0, 0.1))
     # With identical numbers:
-    test_all_comparison_ops(ufloat((0, 0)),
-                            ufloat((0, 0)))
-    test_all_comparison_ops(ufloat((1, 1)),
-                            ufloat((1, 1)))
+    test_all_comparison_ops(ufloat(0, 0),
+                            ufloat(0, 0))
+    test_all_comparison_ops(ufloat(1, 1),
+                            ufloat(1, 1))
 
     
 def test_logic():
     "Boolean logic: __nonzero__, bool."
 
-    x = ufloat((3, 0))
-    y = ufloat((0, 0))
-    z = ufloat((0, 0.1))
-    t = ufloat((-1, 2))
+    x = ufloat(3, 0)
+    y = ufloat(0, 0)
+    z = ufloat(0, 0.1)
+    t = ufloat(-1, 2)
 
     assert bool(x) == True
     assert bool(y) == False
     assert bool(z) == True
     assert bool(t) == True  # Only infinitseimal neighborhood are used
 
-        
+def test_obsolete():
+    'Tests some obsolete functions'
+    x = ufloat(3, 0.1)
+    x.set_std_dev(0.2)  # Obsolete function
+
+    x_std_dev = x.std_dev
+    assert x_std_dev() == 0.2  # Obsolete call
     
 def test_basic_access_to_data():
     "Access to data from Variable and AffineScalarFunc objects."
 
-    x = ufloat((3.14, 0.01), "x var")
+    x = ufloat(3.14, 0.01, "x var")
     assert x.tag == "x var"
     assert x.nominal_value == 3.14
-    assert x.std_dev() == 0.01
+    assert x.std_dev == 0.01
 
     # Case of AffineScalarFunc objects:
     y = x + 0
     assert type(y) == AffineScalarFunc
     assert y.nominal_value == 3.14
-    assert y.std_dev() == 0.01
+    assert y.std_dev == 0.01
 
     # Details on the sources of error:
-    a = ufloat((-1, 0.001))
+    a = ufloat(-1, 0.001)
     y = 2*x + 3*x + 2 + a
     error_sources = y.error_components()
     assert len(error_sources) == 2  # 'a' and 'x'
@@ -477,68 +674,40 @@ def test_basic_access_to_data():
     assert y.derivatives[x] == 5
 
     # Modification of the standard deviation of variables:
-    x.set_std_dev(1)
+    x.std_dev = 1
     assert y.error_components()[x] == 5  # New error contribution!
 
-    # Calculation of deviations in units of the standard deviations:
-    assert 10/x.std_dev() == x.position_in_sigmas(10 + x.nominal_value)
-
-    # "In units of the standard deviation" is not always meaningfull:
-    x.set_std_dev(0)
+    # Calculated values with uncertainties should not have a settable
+    # standard deviation:
+    y = 2*x
     try:
-        x.position_in_sigmas(1)
+        y.std_dev = 1
+    except AttributeError:
+        pass
+    else:
+        raise "std_dev should not be settable for calculated results"
+    
+    # Calculation of deviations in units of the standard deviations:
+    assert 10/x.std_dev == x.std_score(10 + x.nominal_value)
+
+    # "In units of the standard deviation" is not always meaningful:
+    x.std_dev = 0
+    try:
+        x.std_score(1)
     except ValueError:
         pass  # Normal behavior
 
 def test_correlations():
     "Correlations between variables"
 
-    a = ufloat((1, 0))
-    x = ufloat((4, 0.1))
+    a = ufloat(1, 0)
+    x = ufloat(4, 0.1)
     y = x*2 + a
     # Correlations cancel "naive" additions of uncertainties:
-    assert y.std_dev() != 0
+    assert y.std_dev != 0
     normally_zero = y - (x*2 + 1)
     assert normally_zero.nominal_value == 0
-    assert normally_zero.std_dev() == 0
-
-def test_str_input():
-
-    "Input of numbers with uncertainties as a string"
-
-    # String representation, and numerical values:
-    tests = {
-        "-1.23(3.4)": (-1.23, 3.4),  # (Nominal value, error)
-        "-1.34(5)": (-1.34, 0.05),
-        "1(6)": (1, 6),
-        "3(4.2)": (3, 4.2),
-        "-9(2)": (-9, 2),
-        "1234567(1.2)": (1234567, 1.2),
-        "12.345(15)": (12.345, 0.015),
-        "-12.3456(78)e-6": (-12.3456e-6, 0.0078e-6),
-        "0.29": (0.29, 0.01),
-        "31.": (31, 1),
-        "-31.": (-31, 1),
-        # The following tests that the ufloat() routine does
-        # not consider '31' like the tuple ('3', '1'), which would
-        # make it expect two numbers (instead of 2 1-character
-        # strings):
-        "31": (31, 1),
-        "-3.1e10": (-3.1e10, 0.1e10),
-        "169.0(7)": (169, 0.7),
-        "-0.1+/-1": (-0.1, 1),
-        "-13e-2+/-1e2": (-13e-2, 1e2),
-        '-14.(15)': (-14, 15),
-        '-100.0(15)': (-100, 1.5),
-        '14.(15)': (14, 15)
-        }
-          
-    for (representation, values) in tests.iteritems():
-        
-        num = ufloat(representation)
-
-        assert _numbers_close(num.nominal_value, values[0])
-        assert _numbers_close(num.std_dev(), values[1])
+    assert normally_zero.std_dev == 0
 
     
 def test_no_coercion():
@@ -548,7 +717,7 @@ def test_no_coercion():
     The coercion should be impossible, like for complex numbers.
     """
 
-    x = ufloat((4, 1))
+    x = ufloat(4, 1)
     try:
         assert float(x) == 4
     except TypeError:
@@ -585,7 +754,7 @@ def test_wrapped_func():
     # As a precaution, the wrapped function does not venture into
     # calculating f with uncertainties when one of the argument is not
     # a simple number, because this argument might contain variables:
-    angle = ufloat((0, 0.1))
+    angle = ufloat(0, 0.1)
 
     assert f_wrapped(angle, [angle, angle]) == NotImplemented
     assert f_wrapped(angle, my_list) == NotImplemented
@@ -596,36 +765,23 @@ def test_wrapped_func():
 def test_access_to_std_dev():
     "Uniform access to the standard deviation"
 
-    x = ufloat((1, 0.1))
+    x = ufloat(1, 0.1)
     y = 2*x
 
     # std_dev for Variable and AffineScalarFunc objects:
-    assert uncertainties.std_dev(x) == x.std_dev()
-    assert uncertainties.std_dev(y) == y.std_dev()
+    assert uncertainties.std_dev(x) == x.std_dev
+    assert uncertainties.std_dev(y) == y.std_dev
 
     # std_dev for other objects:
     assert uncertainties.std_dev([]) == 0
     assert uncertainties.std_dev(None) == 0
     
-def test_legacy():
-    "Test of legacy code"
-    x = (1, 0.1)
-
-    old1 = uncertainties.NumberWithUncert(x)  # Warnings are normal
-    old2 = uncertainties.num_with_uncert(x)  # Warnings are normal
-    new = uncertainties.ufloat(x)
-    
-    assert old1.nominal_value == new.nominal_value
-    assert old2.nominal_value == new.nominal_value
-    assert old1.std_dev() == new.std_dev()
-    assert old2.std_dev() == new.std_dev()
-
 ###############################################################################
 
 def test_covariances():
     "Covariance matrix"
 
-    x = ufloat((1, 0.1))
+    x = ufloat(1, 0.1)
     y = -2*x+10
     z = -3*x
     covs = uncertainties.covariance_matrix([x, y, z])
@@ -636,6 +792,101 @@ def test_covariances():
     # Non-diagonal elements:
     assert _numbers_close(covs[0][1], -0.02)
 
+###############################################################################
+    
+def test_power():
+    '''
+    Checks special cases of x**p.
+
+    The value x = 0 is special, as are positive, null and negative
+    and integral values of p.
+    '''
+
+    zero = ufloat(0, 0)
+    one = ufloat(1, 0)
+    p = ufloat(0.3, 0.01)
+
+    # assert 0**p == 0  # !!! Should pass
+    # assert zero**p == 0  # !!! Should pass
+
+    # Should raise the same errors as float operations:
+    try:
+        0**(-p)
+    except ZeroDivisionError:
+        pass
+    else:
+        raise Exception('An proper exception should have been raised')
+
+    try:
+        zero**(-p)
+    except ZeroDivisionError:
+        pass
+    else:
+        raise Exception('An proper exception should have been raised')
+
+    if sys.version_info >= (2, 6):
+        
+        # Reference: http://docs.python.org/library/math.html#math.pow
+        
+        # …**0 == 1.0:
+        assert p**0 == 1.0        
+        # assert zero**0 == 1.0  # !!! Should pass
+        assert (-p)**0 == 1.0
+        # …**zero:
+        # assert (-10.3)**zero == 1.0  # !!! Should pass
+        # assert 0**zero == 1.0  # !!! Should pass
+        assert 0.3**zero == 1.0
+        # assert float('nan')**zero == 1.0  # !!! Should pass
+        # assert (-p)**zero == 1.0  # !!! Should pass
+        # assert zero**zero == 1.0  # !!! Should pass
+        assert p**zero == 1.0
+
+        # one**… == 1.0
+        assert one**-3 == 1.0
+        assert one**-3.1 == 1.0
+        assert one**0 == 1.0
+        assert one**3 == 1.0
+        assert one**3.1 == 1.0
+        # assert one**float('nan') == 1.0  # !!! Should pass
+        # … with two numbers with uncertainties:
+        assert one**(-p) == 1.0
+        assert one**zero == 1.0
+        assert one**p == 1.0
+        # 1**… == 1.0:
+        assert 1.**(-p) == 1.0
+        assert 1.**zero == 1.0
+        assert 1.**p == 1.0
+        
+        
+    # Negative numbers with unceratinty can be exponentiated to an integral
+    # power:
+    assert (ufloat(-1.1, 0.1)**-9).nominal_value == (-1.1)**-9
+
+    # Case of numbers with no uncertainty: should give the same result
+    # as numbers with uncertainties:
+    assert ufloat(-1, 0)**9 == (-1)**9
+    assert ufloat(-1.1, 0)**9 == (-1.1)**9
+    
+    # Negative numbers cannot be raised to a non-integral power, in
+    # Python 2 (in Python 3, complex numbers are returned; this cannot
+    # (yet) be represented in the uncertainties package, because it
+    # does not handle complex numbers):
+    if sys.version_info < (3,):
+        try:
+            ufloat(-1, 0)**9.1
+        except Exception, err_ufloat:  # "as", for Python 2.6+
+            pass
+        else:
+            raise Exception('An exception should have been raised')
+        try:
+            (-1)**9.1
+        except Exception, err_float:  # "as" for Python 2.6+
+            # UFloat and floats should raise the same error:
+            assert err_ufloat.args == err_float.args
+        else:
+            raise Exception('An exception should have been raised')
+
+    
 ###############################################################################
 
 # The tests below require NumPy, which is an optional package:
@@ -670,8 +921,8 @@ else:
                                   elmt2.nominal_value, precision):
                 return False
 
-            if not _numbers_close(elmt1.std_dev(),
-                                  elmt2.std_dev(), precision):
+            if not _numbers_close(elmt1.std_dev,
+                                  elmt2.std_dev, precision):
                 return False
         return True
 
@@ -679,7 +930,7 @@ else:
     def test_numpy_comparison():
         "Comparison with a Numpy array."
 
-        x = ufloat((1, 0.1))
+        x = ufloat(1, 0.1)
         
         # Comparison with a different type:
         assert x != [x, x]
@@ -716,9 +967,12 @@ else:
         assert numpy.all((x >= numpy.arange(3)) == [True, False, False])
 
     def test_correlated_values():
-        "Correlated variables."
+        """
+        Correlated variables.
+        Test through the input of the (full) covariance matrix.
+        """
 
-        u = uncertainties.ufloat((1, 0.1))
+        u = uncertainties.ufloat(1, 0.1)
         cov = uncertainties.covariance_matrix([u])
         # "1" is used instead of u.nominal_value because
         # u.nominal_value might return a float.  The idea is to force
@@ -731,12 +985,17 @@ else:
 
         # Covariances between output and input variables:
 
-        x = ufloat((1, 0.1))
-        y = ufloat((2, 0.3))
+        x = ufloat(1, 0.1)
+        y = ufloat(2, 0.3)
         z = -3*x+y
 
         covs = uncertainties.covariance_matrix([x, y, z])
 
+        # Test of the diagonal covariance elements:
+        assert matrices_close(
+            numpy.array([v.std_dev**2 for v in (x, y, z)]),
+            numpy.array(covs).diagonal())
+        
         # "Inversion" of the covariance matrix: creation of new
         # variables:
         (x_new, y_new, z_new) = uncertainties.correlated_values(
@@ -760,21 +1019,72 @@ else:
 
         # ... as well as functional relations:
 
-        u = ufloat((1, 0.05))
-        v = ufloat((10, 0.1))
+        u = ufloat(1, 0.05)
+        v = ufloat(10, 0.1)
         sum_value = u+2*v
 
         # Covariance matrices:
         cov_matrix = uncertainties.covariance_matrix([u, v, sum_value])
 
-        # Correlated variables can be constructed from a covariance matrix, if
-        # NumPy is available:
+        # Correlated variables can be constructed from a covariance
+        # matrix, if NumPy is available:
         (u2, v2, sum2) = uncertainties.correlated_values(
             [x.nominal_value for x in [u, v, sum_value]],
             cov_matrix)
 
         # matrices_close() is used instead of _numbers_close() because
         # it compares uncertainties too:
+        assert matrices_close(numpy.array([u]), numpy.array([u2]))
+        assert matrices_close(numpy.array([v]), numpy.array([v2]))
+        assert matrices_close(numpy.array([sum_value]), numpy.array([sum2]))
         assert matrices_close(numpy.array([0]),
                               numpy.array([sum2-(u2+2*v2)]))
+
+
+    def test_correlated_values_correlation_mat():
+        '''
+        Tests the input of correlated value.
+
+        Test through their correlation matrix (instead of the
+        covariance matrix).
+        '''
+        
+        x = ufloat(1, 0.1)
+        y = ufloat(2, 0.3)
+        z = -3*x+y
+
+        cov_mat = uncertainties.covariance_matrix([x, y, z])
+
+        std_devs = numpy.sqrt(numpy.array(cov_mat).diagonal())
+        
+        corr_mat = cov_mat/std_devs/std_devs[numpy.newaxis].T
+
+        # We make sure that the correlation matrix is indeed diagonal:
+        assert (corr_mat-corr_mat.T).max() <= 1e-15
+        # We make sure that there are indeed ones on the diagonal:
+        assert (corr_mat.diagonal()-1).max() <= 1e-15
+
+        # We try to recover the correlated variables through the
+        # correlation matrix (not through the covariance matrix):
+
+        nominal_values = [v.nominal_value for v in (x, y, z)]
+        std_devs = [v.std_dev for v in (x, y, z)]
+        x2, y2, z2 = uncertainties.correlated_values_norm(
+            zip(nominal_values, std_devs), corr_mat)
+        
+        # matrices_close() is used instead of _numbers_close() because
+        # it compares uncertainties too:
+
+        # Test of individual variables:
+        assert matrices_close(numpy.array([x]), numpy.array([x2]))
+        assert matrices_close(numpy.array([y]), numpy.array([y2]))
+        assert matrices_close(numpy.array([z]), numpy.array([z2]))
+
+        # Partial correlation test:
+        assert matrices_close(numpy.array([0]), numpy.array([z2-(-3*x2+y2)]))
+
+        # Test of the full covariance matrix:
+        assert matrices_close(
+            numpy.array(cov_mat),
+            numpy.array(uncertainties.covariance_matrix([x2, y2, z2])))
 

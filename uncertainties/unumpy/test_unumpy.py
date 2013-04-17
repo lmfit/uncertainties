@@ -3,7 +3,7 @@ Tests of the code in uncertainties/unumpy/__init__.py.
 
 These tests can be run through the Nose testing framework.
 
-(c) 2010 by Eric O. LEBIGOT (EOL).
+(c) 2010-2013 by Eric O. LEBIGOT (EOL).
 """
 
 from __future__ import division
@@ -28,8 +28,8 @@ def test_numpy():
     Interaction with NumPy, including matrix inversion and correlated_values.
     """
 
-    arr = numpy.array(range(3))
-    num = ufloat((3.14, 0.01))
+    arr = numpy.arange(3)
+    num = ufloat(3.14, 0.01)
 
     # NumPy arrays can be multiplied by Variable objects,
     # whatever the order of the operands:
@@ -48,19 +48,19 @@ def test_numpy():
     # Usual behavior:
     assert len(arr[arr > 1.5]) == 1
     # Comparisons with Variable objects:
-    assert len(arr[arr > ufloat((1.5, 0.1))]) == 1
+    assert len(arr[arr > ufloat(1.5, 0.1)]) == 1
 
     assert len(prod1[prod1 < prod1*prod2]) == 2
 
     # The following can be calculated (special NumPy abs() function):
-    numpy.abs(arr + ufloat((-1, 0.1)))
+    numpy.abs(arr + ufloat(-1, 0.1))
 
     # The following does not completely work, because NumPy does not
     # implement numpy.exp on an array of general objects, apparently:
     assert numpy.exp(arr).all()  # All elements > 0
     # Equivalent with an array of AffineScalarFunc objects:
     try:
-        numpy.exp(arr + ufloat((0, 0)))
+        numpy.exp(arr + ufloat(0, 0))
     except AttributeError:
         pass  # ! This is usual (but could be avoided)
     else:
@@ -73,8 +73,8 @@ def test_matrix():
     # Matrix with a mix of Variable objects and regular
     # Python numbers:
 
-    m = unumpy.matrix([[ufloat((10, 1)), -3.1],
-                       [0, ufloat((3, 0))]])
+    m = unumpy.matrix([[ufloat(10, 1), -3.1],
+                       [0, ufloat(3, 0)]])
     m_nominal_values = unumpy.nominal_values(m)
 
     # Test of the nominal_value attribute:
@@ -103,8 +103,8 @@ def _derivatives_close(x, y):
 def test_inverse():
     "Tests of the matrix inverse"
 
-    m = unumpy.matrix([[ufloat((10, 1)), -3.1],
-                       [0, ufloat((3, 0))]])
+    m = unumpy.matrix([[ufloat(10, 1), -3.1],
+                       [0, ufloat(3, 0)]])
     m_nominal_values = unumpy.nominal_values(m)
 
     # "Regular" inverse matrix, when uncertainties are not taken
@@ -134,7 +134,7 @@ def test_inverse():
     ####################
 
     # Checks of the covariances between elements:
-    x = ufloat((10, 1))
+    x = ufloat(10, 1)
     m = unumpy.matrix([[x, x],
                        [0, 3+2*x]])
 
@@ -146,8 +146,8 @@ def test_inverse():
     # derivatives, which define covariances:
     assert _numbers_close(m_double_inverse[0, 0].nominal_value,
                           m[0, 0].nominal_value)
-    assert _numbers_close(m_double_inverse[0, 0].std_dev(),
-                          m[0, 0].std_dev())
+    assert _numbers_close(m_double_inverse[0, 0].std_dev,
+                          m[0, 0].std_dev)
 
     assert matrices_close(m_double_inverse, m)
 
@@ -176,8 +176,8 @@ def test_pseudo_inverse():
 
     ##########
     # Full rank rectangular matrix:
-    m = unumpy.matrix([[ufloat((10, 1)), -3.1],
-                       [0, ufloat((3, 0))],
+    m = unumpy.matrix([[ufloat(10, 1), -3.1],
+                       [0, ufloat(3, 0)],
                        [1, -3.1]])
 
     # Numerical and package (analytical) pseudo-inverses: they must be
@@ -189,7 +189,7 @@ def test_pseudo_inverse():
 
     ##########
     # Example with a non-full rank rectangular matrix:
-    vector = [ufloat((10, 1)), -3.1, 11]
+    vector = [ufloat(10, 1), -3.1, 11]
     m = unumpy.matrix([vector, vector])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core._pinv(m, rcond)
@@ -197,7 +197,7 @@ def test_pseudo_inverse():
     
     ##########
     # Example with a non-full-rank square matrix:
-    m = unumpy.matrix([[ufloat((10, 1)), 0], [3, 0]])
+    m = unumpy.matrix([[ufloat(10, 1), 0], [3, 0]])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core._pinv(m, rcond)
     assert matrices_close(m_pinv_num, m_pinv_package)
@@ -208,7 +208,7 @@ def test_broadcast_funcs():
     numbers with uncertainties.
     """
 
-    x = uncertainties.ufloat((0.2, 0.1))
+    x = uncertainties.ufloat(0.2, 0.1)
     arr = numpy.array([x, 2*x])
     assert unumpy.cos(arr)[1] == uncertainties.umath.cos(arr[1])
 
@@ -229,12 +229,12 @@ def test_array_and_matrix_creation():
     arr = unumpy.uarray(([1, 2], [0.1, 0.2]))
 
     assert arr[1].nominal_value == 2
-    assert arr[1].std_dev() == 0.2
+    assert arr[1].std_dev == 0.2
 
     # Same thing for matrices:
     mat = unumpy.umatrix(([1, 2], [0.1, 0.2]))
     assert mat[0,1].nominal_value == 2
-    assert mat[0,1].std_dev() == 0.2
+    assert mat[0,1].std_dev == 0.2
     
 def test_component_extraction():
     "Extracting the nominal values and standard deviations from an array"
@@ -253,18 +253,6 @@ def test_component_extraction():
     assert type(unumpy.nominal_values(mat)) == numpy.matrix
     
 
-def test_legacy_code():
-
-    "Test of legacy functions"
-    
-    arr_def = ([1, 2], [0.1, 0.01])
-
-    # uarray, nominal_values, std_devs from the uncertainties module
-    # (not the uncertainties.unumpy module):
-    arr = uncertainties.array_u(arr_def)  # Warning is normal
-    assert numpy.all(uncertainties.nominal_values(arr) == arr_def[0])  # Warning is normal
-    assert numpy.all(uncertainties.std_devs(arr) == arr_def[1])  # Warning is normal
-    
 def test_array_comparisons():
     "Test of array and matrix comparisons"
 

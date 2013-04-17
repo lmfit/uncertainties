@@ -1,0 +1,59 @@
+# Config file for automatic testing at travis-ci.org
+
+language: python
+
+python:
+  # !!!!! All version to be put back later
+  # - "2.5"
+  # - "2.6"
+  # - "2.7"
+  - "3.1"
+  # "3.2"
+
+env:
+    - NUMPY=true
+    # - NUMPY=false  #!!!!!! to be put back later
+    # - NUMPY=false PYTHON=python3 PYSUF=3 # uses Python 3.2
+    # - NUMPY=true PYTHON=python3 PYSUF=3 # uses Python 3.2
+
+# command to install dependencies
+install:
+  # - deactivate: not used, because it replaces the version of Python
+  # selected by the "python:" entry.
+  #
+  # - if $NUMPY; then sudo apt-get install python3-numpy; fi
+  #!!!!!!!! python3-numpy should be installed, if Travis selects Python 3
+  # - dpkg -L python3  #!!! Where is the apt-get Python3?
+  # NumPy test:
+  - python --version
+  - which python  # This is found in virtualenv
+  # !!!!!!!! How to install NumPy for the (virtualenv version of) Python?
+  # pip install numpy does not work
+  - python -c "import numpy"
+
+  # The Sphinx document requires pdflatex. It can be found in
+  # textlive-latex-base; however this leads to an error (ecrm10...).
+  - sudo apt-get install -qq python-sphinx python-nose texlive-full
+  - python --version
+
+# command to run tests
+script:
+  # nosetests uncertainties does not find the module, with a local
+  # install (python setup.py install --user):
+  - python setup.py install
+  #
+  # Automatically installs the version adapted to the Python version:
+  # - pip install --upgrade uncertainties  # Fetches the published version
+  #
+  # Run unit tests
+  - python --version  # Additional check: did the install change anything?
+  #
+  # Nosetests can automatically run the tests from the *installed
+  # package*, but we must move away from the local uncertainties
+  # module:
+  - cd /tmp
+  - nosetests -sv uncertainties
+  # Generate documentation
+  - cd doc
+  - make html
+ 

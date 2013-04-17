@@ -20,29 +20,29 @@ Examples:
   from uncertainties.umath import *  # sin(), etc.
 
   # Mathematical operations:
-  x = ufloat((0.20, 0.01))  # x = 0.20+/-0.01
-  x = ufloat("0.20+/-0.01")  # Other representation
-  x = ufloat("0.20(1)")  # Other representation
-  x = ufloat("0.20")  # Implicit uncertainty of +/-1 on the last digit
+  x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
+  x = ufloat_fromstr("0.20+/-0.01")  # Other representation
+  x = ufloat_fromstr("0.20(1)")  # Other representation
+  x = ufloat_fromstr("0.20")  # Implicit uncertainty of +/-1 on the last digit
   print x**2  # Square: prints "0.04+/-0.004"
   print sin(x**2)  # Prints "0.0399...+/-0.00399..."
 
-  print x.position_in_sigmas(0.17)  # Prints "-3.0": deviation of -3 sigmas
+  print x.std_score(0.17)  # Prints "-3.0": deviation of -3 sigmas
 
   # Access to the nominal value, and to the uncertainty:
   square = x**2  # Square
   print square  # Prints "0.04+/-0.004"
   print square.nominal_value  # Prints "0.04"
-  print square.std_dev()  # Prints "0.004..."
+  print square.std_dev  # Prints "0.004..."
 
   print square.derivatives[x]  # Partial derivative: 0.4 (= 2*0.20)
 
   # Correlations:
-  u = ufloat((1, 0.05), "u variable")  # Tag
-  v = ufloat((10, 0.1), "v variable")
+  u = ufloat(1, 0.05, "u variable")  # Tag
+  v = ufloat(10, 0.1, "v variable")
   sum_value = u+v
-
-  u.set_std_dev(0.1)  # Standard deviations can be updated on the fly
+  
+  u.std_dev = 0.1  # Standard deviations can be updated on the fly
   print sum_value - u - v  # Prints "0.0" (exact result)
 
   # List of all sources of error:
@@ -75,7 +75,7 @@ on numbers with uncertainties by using their generalization from the
 uncertainties.umath module:
 
   from uncertainties.umath import sin
-  print sin(ufloat("1+/-0.01"))  # 0.841...+/-0.005...
+  print sin(ufloat_fromstr("1+/-0.01"))  # 0.841...+/-0.005...
   print sin(1)  # umath.sin() also works on floats, exactly like math.sin()
 
 Logical operations (>, ==, etc.) are also supported.
@@ -83,7 +83,7 @@ Logical operations (>, ==, etc.) are also supported.
 Basic operations on NumPy arrays or matrices of numbers with
 uncertainties can be performed:
 
-  2*numpy.array([ufloat((1, 0.01)), ufloat((2, 0.1))])
+  2*numpy.array([ufloat(1, 0.01), ufloat(2, 0.1)])
 
 More complex operations on NumPy arrays can be performed through the
 dedicated uncertainties.unumpy sub-module (see its documentation).
@@ -139,7 +139,7 @@ average value.
 uncertainties, it can be useful to access the nominal value and
 uncertainty of all numbers in a uniform manner:
 
-  x = ufloat("3+/-0.1")
+  x = ufloat_fromstr("3+/-0.1")
   print nominal_value(x)  # Prints 3
   print std_dev(x)  # Prints 0.1
   print nominal_value(3)  # Prints 3: nominal_value works on floats
@@ -194,8 +194,8 @@ Example:
 
 but
 
-  x = ufloat((3.14, 0.01))
-  y = ufloat((3.14, 0.01))
+  x = ufloat(3.14, 0.01)
+  y = ufloat(3.14, 0.01)
 
 is not such that x == y, since x and y are independent random
 variables that almost never give the same value.  However, x == x
@@ -209,7 +209,7 @@ is the result of x != 0.
 - This package contains tests.  They can be run either manually or
 automatically with the nose unit testing framework (nosetests).
 
-(c) 2009-2010 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
+(c) 2009-2013 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 Please send feature requests, bug reports, or feedback to this address.
 
 Please support future development by donating $5 or more through PayPal!
@@ -232,12 +232,13 @@ import re
 import math
 from math import sqrt, log  # Optimization: no attribute look-up
 import copy
+import warnings
 
 # Numerical version:
-__version_info__ = (1, 8)
-__version__ = '.'.join([str(num) for num in __version_info__])
+__version_info__ = (2, 1)
+__version__ = '.'.join(map(str, __version_info__))
 
-__author__ = 'Eric O. LEBIGOT (EOL)'
+__author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
 
 # Attributes that are always exported (some other attributes are
 # exported only if the NumPy module is available...):
@@ -262,7 +263,7 @@ __all__ = [
     'UFloat',
 
     # Wrapper for allowing non-pure-Python function to handle
-    # quantitites with uncertainties:
+    # quantitities with uncertainties:
     'wrap',
 
     # The documentation for wrap() indicates that numerical
@@ -293,6 +294,20 @@ def set_doc(doc_string):
 CONSTANT_TYPES = (float, int, complex, long)
 
 ###############################################################################
+# Utility for issuing deprecation warnings
+
+def deprecation(message):
+    '''
+    Warns the user with the given message, by issuing a
+    DeprecationWarning.
+    '''
+
+    # stacklevel = 3 points to the original user call (not to the
+    # function from this module that called deprecation()).
+    # DeprecationWarning is ignored by default: not used.
+    warnings.warn(message, stacklevel=3)
+
+###############################################################################
 
 ## Definitions that depend on the availability of NumPy:
 
@@ -313,27 +328,39 @@ else:
     # written for obtaining the eigenvectors of a symmetric matrix.  See
     # for instance Numerical Recipes: (1) reduction to tri-diagonal
     # [Givens or Householder]; (2) QR / QL decomposition.
-
-    def correlated_values(values, covariance_mat, tags=None):
+    
+    def correlated_values(nom_values, covariance_mat, tags=None):
         """
         Returns numbers with uncertainties (AffineScalarFunc objects)
         that correctly reproduce the given covariance matrix, and have
-        the given values as their nominal value.
+        the given (float) values as their nominal value.
 
+        The correlated_values_norm() function returns the same result,
+        but takes a correlation matrix instead of a covariance matrix.
+        
         The list of values and the covariance matrix must have the
         same length, and the matrix must be a square (symmetric) one.
 
-        The affine functions returned depend on newly created,
-        independent variables (Variable objects).
+        The numbers with uncertainties returned depend on newly
+        created, independent variables (Variable objects).
 
         If 'tags' is not None, it must list the tag of each new
         independent variable.
+
+        nom_values -- sequence with the nominal (real) values of the
+        numbers with uncertainties to be returned.
+
+        covariance_mat -- full covariance matrix of the returned
+        numbers with uncertainties (not the statistical correlation
+        matrix, i.e., not the normalized covariance matrix). For
+        example, the first element of this matrix is the variance of
+        the first returned number with uncertainty.
         """
 
         # If no tags were given, we prepare tags for the newly created
         # variables:
         if tags is None:
-            tags = (None,) * len(values)
+            tags = (None,) * len(nom_values)
 
         # The covariance matrix is diagonalized in order to define
         # the independent variables that model the given values:
@@ -350,26 +377,54 @@ else:
         # special: 'transform' is unitary: its inverse is its transpose:
 
         variables = tuple(
-            # The variables represent uncertainties only:
+            # The variables represent "pure" uncertainties:
             Variable(0, sqrt(variance), tag)
             for (variance, tag) in zip(variances, tags))
 
         # Representation of the initial correlated values:
         values_funcs = tuple(
             AffineScalarFunc(value, dict(zip(variables, coords)))
-            for (coords, value) in zip(transform, values))
+            for (coords, value) in zip(transform, nom_values))
 
         return values_funcs
 
     __all__.append('correlated_values')
 
+    def correlated_values_norm(values_with_std_dev, correlation_mat,
+                               tags=None):
+        '''
+        Returns correlated values like correlated_values(), but takes
+        instead as input:
+
+        - nominal (float) values along with their standard deviation, and
+        
+        - a correlation matrix (i.e. a normalized covariance matrix
+          normalized with individual standard deviations).
+
+        values_with_std_dev -- sequence of (nominal value, standard
+        deviation) pairs. The returned, correlated values have these
+        nominal values and standard deviations.
+
+        correlation_mat -- correlation matrix (i.e. the normalized
+        covariance matrix, a matrix with ones on its diagonal).
+        '''
+
+        (nominal_values, std_devs) = numpy.transpose(values_with_std_dev)
+
+        return correlated_values(
+            nominal_values,
+            correlation_mat*std_devs*std_devs[numpy.newaxis].T,
+            tags)
+        
+    __all__.append('correlated_values_norm')
+    
 ###############################################################################
 
 # Mathematical operations with local approximations (affine scalar
 # functions)
 
 class NotUpcast(Exception):
-    pass
+    'Raised when an object cannot be converted to a number with uncertainty'
 
 def to_affine_scalar(x):
     """
@@ -399,9 +454,6 @@ def partial_derivative(f, param_num):
     Returns a function that numerically calculates the partial
     derivative of function f with respect to its argument number
     param_num.
-
-    The step parameter represents the shift of the parameter used in
-    the numerical approximation.
     """
 
     def partial_derivative_of_f(*args, **kws):
@@ -444,10 +496,11 @@ def partial_derivative(f, param_num):
 
 class NumericalDerivatives(object):
     """
-    Sequence with the successive numerical derivatives of a function.
+    Convenient access to the partial derivatives of a function,
+    calculated numerically.
     """
-    # This is a sequence and not a list because the number of
-    # arguments of the function is not known in advance, in general.
+    # This is not a list because the number of arguments of the
+    # function is not known in advance, in general.
 
     def __init__(self, function):
         """
@@ -460,49 +513,70 @@ class NumericalDerivatives(object):
         Returns the n-th numerical derivative of the function.
         """
         return partial_derivative(self._function, n)
-
-def wrap(f, derivatives_funcs=None):
+  
+def wrap(f, derivatives_iter=None):
     """
     Wraps a function f into a function that also accepts numbers with
     uncertainties (UFloat objects) and returns a number with
-    uncertainties.
+    uncertainties.  Doing so may be necessary when function f cannot
+    be expressed analytically (with uncertainties-compatible operators
+    and functions like +, *, umath.sin(), etc.).
 
+    f must return a scalar (not a list, etc.).
+    
+    In the wrapped function, the standard Python scalar arguments of f
+    (float, int, etc.) can be replaced by numbers with
+    uncertainties. The result will contain the appropriate
+    uncertainty.
+    
     If no argument to the wrapped function has an uncertainty, f
     simply returns its usual, scalar result.
 
-    f must take only scalar arguments, and must return a scalar.
+    If supplied, derivatives_iter can be an iterable that generally
+    contains functions; each successive function is the partial
+    derivative of f with respect to the corresponding variable (one
+    function for each argument of f, which takes as many arguments as
+    f).  If instead of a function, an element of derivatives_iter
+    contains None, then it is automatically replaced by the relevant
+    numerical derivative; this can be used for non-scalar arguments of
+    f (like string arguments).
 
-    If supplied, 'derivatives_funcs' is a sequence or iterator that
-    generally contains functions; each successive function is the
-    partial derivatives of f with respect to the corresponding
-    variable (one function for each argument of f, which takes as many
-    arguments as f).  If derivatives_funcs is None, or if
-    derivatives_funcs contains a finite number of elements, then
-    missing derivatives are calculated numerically through
-    partial_derivative().
+    If derivatives_iter is None, or if derivatives_iter contains a
+    fixed (and finite) number of elements, then any missing derivative
+    is calculated numerically.
 
-    Example: wrap(math.sin) is a sine function that can be applied to
+    An infinite number of derivatives can be specified by having
+    derivatives_iter be an infinite iterator; this can for instance
+    be used for specifying the derivatives of functions with a
+    undefined number of argument (like sum(), whose partial
+    derivatives all return 1).
+
+    Example (for illustration purposes only, as
+    uncertainties.umath.sin() runs faster than the examples that
+    follow): wrap(math.sin) is a sine function that can be applied to
     numbers with uncertainties.  Its derivative will be calculated
     numerically.  wrap(math.sin, [None]) would have produced the same
     result.  wrap(math.sin, [math.cos]) is the same function, but with
     an analytically defined derivative.
     """
-    if derivatives_funcs is None:
-        derivatives_funcs = NumericalDerivatives(f)
+
+    if derivatives_iter is None:
+        derivatives_iter = NumericalDerivatives(f)
     else:
         # Derivatives that are not defined are calculated numerically,
         # if there is a finite number of them (the function lambda
         # *args: fsum(args) has a non-defined number of arguments, as
-        # it just performs a sum...
+        # it just performs a sum):
         try:  # Is the number of derivatives fixed?
-            len(derivatives_funcs)
+            len(derivatives_iter)
         except TypeError:
             pass
         else:
-            derivatives_funcs = [
+            derivatives_iter = [
                 partial_derivative(f, k) if derivative is None
                 else derivative
-                for (k, derivative) in enumerate(derivatives_funcs)]
+                for (k, derivative) in enumerate(derivatives_iter)]
+
     #! Setting the doc string after "def f_with...()" does not
     # seem to work.  We define it explicitly:
     @set_doc("""\
@@ -518,9 +592,7 @@ def wrap(f, derivatives_funcs=None):
 
     Original documentation:
     %s""" % (f.__name__, f.__doc__))
-
-
-    def f_with_affine_output(*args, **kws):
+    def f_with_affine_output(*args, **kwargs):
         # Can this function perform the calculation of an
         # AffineScalarFunc (or maybe float) result?
         try:
@@ -535,7 +607,7 @@ def wrap(f, derivatives_funcs=None):
 
         except NotUpcast:
 
-            # This function does not now how to itself perform
+            # This function does not know how to itself perform
             # calculations with non-float-like arguments (as they
             # might for instance be objects whose value really changes
             # if some Variable objects had different values):
@@ -613,15 +685,15 @@ def wrap(f, derivatives_funcs=None):
         # caller to always provide derivatives.  When changing the
         # functions of the math module, this would force this module
         # to know about all the math functions.  Another possibility
-        # would be to force derivatives_funcs to contain, say, the
+        # would be to force derivatives_iter to contain, say, the
         # first 3 derivatives of f.  But any of these two ideas has a
         # chance to break, one day... (if new functions are added to
         # the math module, or if some function has more than 3
         # arguments).
 
         derivatives_wrt_args = []
-        for (arg, derivative) in zip(aff_funcs, derivatives_funcs):
-            derivatives_wrt_args.append(derivative(*args_values, **aff_kws)
+        for (arg, derivative) in zip(aff_funcs, derivatives_iter):
+            derivatives_wrt_args.append(derivative(*args_values)
                                         if arg.derivatives
                                         else 0)
 
@@ -657,8 +729,15 @@ def wrap(f, derivatives_funcs=None):
         return AffineScalarFunc(f_nominal_value, derivatives_wrt_vars)
 
     # It is easier to work with f_with_affine_output, which represents
-    # a wrapped version of 'f', when it bears the same name as 'f':
+    # a wrapped version of 'f', when it bears the same name as
+    # 'f'.
     f_with_affine_output.__name__ = f.__name__
+    # !! Note: Setting __name__ is however not fully sufficient: the
+    # name f_with_affine_output is stored in
+    # f_with_affine_output.__code__.co_name; being able to change it
+    # would be useful for instance when f_with_affine_output() is
+    # called with unexpected arguments (unexpected keyword argument,
+    # etc.). co_name is read-only, though.
 
     return f_with_affine_output
 
@@ -717,7 +796,7 @@ def _eq_on_aff_funcs(self, y_with_uncert):
     difference = self - y_with_uncert
     # Only an exact zero difference means that self and y are
     # equal numerically:
-    return not(difference._nominal_value or difference.std_dev())
+    return not(difference._nominal_value or difference.std_dev)
 
 def _ne_on_aff_funcs(self, y_with_uncert):
     """
@@ -761,6 +840,18 @@ def _le_on_aff_funcs(self, y_with_uncert):
 
 ########################################
 
+class CallableStdDev(float):
+    '''
+    Class for standard deviation results, which used to be
+    callable. Provided for compatibility with old code. Issues an
+    obsolescence warning upon call.
+    '''
+    
+    def __call__ (self):
+        deprecation('Obsolete: the std_dev attribute should not be called'
+                    ' anymore: use .std_dev instead of .std_dev().')
+        return self
+        
 class AffineScalarFunc(object):
     """
     Affine functions that support basic mathematical operations
@@ -792,7 +883,7 @@ class AffineScalarFunc(object):
       All the Variable objects on which the function depends are in
       'derivatives'.
 
-    - position_in_sigmas(x): position of number x with respect to the
+    - std_score(x): position of number x with respect to the
       nominal value, in units of the standard deviation.
     """
 
@@ -921,7 +1012,8 @@ class AffineScalarFunc(object):
         """
         Individual components of the standard deviation of the affine
         function (in absolute value), returned as a dictionary with
-        Variable objects as keys.
+        Variable objects as keys. The returned variables are the
+        independent variables that the affine function depends on.
 
         This method assumes that the derivatives contained in the
         object take scalar values (and are not a tuple, like what
@@ -935,7 +1027,8 @@ class AffineScalarFunc(object):
             error_components[variable] = abs(derivative*variable._std_dev)
 
         return error_components
-
+    
+    @property
     def std_dev(self):
         """
         Standard deviation of the affine function.
@@ -943,7 +1036,7 @@ class AffineScalarFunc(object):
         This method assumes that the function returns scalar results.
 
         This returned standard deviation depends on the current
-        standard deviations [std_dev()] of the variables (Variable
+        standard deviations [std_dev] of the variables (Variable
         objects) involved.
         """
         #! It would be possible to not allow the user to update the
@@ -952,8 +1045,8 @@ class AffineScalarFunc(object):
         #std_dev value (in fact, many intermediate AffineScalarFunc do
         #not need to have their std_dev calculated: only the final
         #AffineScalarFunc returned to the user does).
-        return sqrt(sum(
-            delta**2 for delta in self.error_components().itervalues()))
+        return CallableStdDev(sqrt(sum(
+            delta**2 for delta in self.error_components().itervalues())))
 
     def _general_representation(self, to_string):
         """
@@ -964,7 +1057,7 @@ class AffineScalarFunc(object):
         to_string() is typically repr() or str().
         """
 
-        (nominal_value, std_dev) = (self._nominal_value, self.std_dev())
+        (nominal_value, std_dev) = (self._nominal_value, self.std_dev)
 
         # String representation:
 
@@ -982,8 +1075,8 @@ class AffineScalarFunc(object):
 
     def __str__(self):
         return self._general_representation(str)
-
-    def position_in_sigmas(self, value):
+    
+    def std_score(self, value):
         """
         Returns 'value' - nominal value, in units of the standard
         deviation.
@@ -993,7 +1086,7 @@ class AffineScalarFunc(object):
         try:
             # The ._nominal_value is a float: there is no integer division,
             # here:
-            return (value - self._nominal_value) / self.std_dev()
+            return (value - self._nominal_value) / self.std_dev
         except ZeroDivisionError:
             raise ValueError("The standard deviation is zero:"
                              " undefined result.")
@@ -1015,12 +1108,69 @@ class AffineScalarFunc(object):
     def __getstate__(self):
         """
         Hook for the pickle module.
+
+        The slot attributes of the parent classes are returned, as
+        well as those of the __dict__ attribute of the object (if
+        any).
         """
-        obj_slot_values = dict((k, getattr(self, k)) for k in
-                               # self.__slots__ would not work when
-                               # self is an instance of a subclass:
-                               AffineScalarFunc.__slots__)
-        return obj_slot_values
+
+        # In general (case where this class is subclassed), data
+        # attribute are stored in two places: possibly in __dict_, and
+        # in slots. Data from both locations is returned by this
+        # method.
+        
+        all_attrs = {}
+
+        # Support for subclasses that do not use __slots__ (except
+        # through inheritance): instances have a __dict__
+        # attribute. The keys in this __dict__ are shadowed by the
+        # slot attribute names (reference:
+        # http://stackoverflow.com/questions/15139067/attribute-access-in-python-first-slots-then-dict/15139208#15139208).
+        # The method below not only preserves this behavior, but also
+        # saves the full contents of __dict__. This is robust:
+        # unpickling gives back the original __dict__ even if __dict__
+        # contains keys that are shadowed by slot names:
+
+        try:
+            all_attrs['__dict__'] = self.__dict__
+        except AttributeError:
+            pass
+        
+        # All the slot attributes are gathered.
+
+        # Classes that do not define __slots__ have the __slots__ of
+        # one of their parents (the first parent with their own
+        # __slots__ in MRO). This is why the slot names are first
+        # gathered (with repetitions removed, in general), and their
+        # values obtained later.
+        
+        all_slots = set()
+        
+        for cls in type(self).mro():
+
+            # In the diamond inheritance pattern, some parent classes
+            # may not have __slots__:
+            slot_names = getattr(cls, '__slots__', ())
+
+            # Slot names can be given in various forms (string,
+            # sequence, iterable):
+            if isinstance(slot_names, str):
+                all_slots.add(slot_names)  # Single name
+            else:
+                all_slots.update(slot_names)
+
+        # The slot values are stored:
+        for name in all_slots:
+            try:
+                # !! It might happen that '__dict__' is itself a slot
+                # name. In this case, its value is saved
+                # again. Alternatively, the loop could be done on
+                # all_slots - set(('__dict__',)):
+                all_attrs[name] = getattr(self, name)
+            except AttributeError:
+                pass  # Undefined slot attribute
+                
+        return all_attrs
 
     def __setstate__(self, data_dict):
         """
@@ -1029,7 +1179,9 @@ class AffineScalarFunc(object):
         for (name, value) in data_dict.iteritems():
             setattr(self, name, value)
 
-# Nicer name, for users: isinstance(ufloat(...), UFloat) is True:
+# Nicer name, for users: isinstance(ufloat(...), UFloat) is
+# True. Also: isinstance(..., UFloat) is the test for "is this a
+# number with uncertainties from the uncertainties package?".
 UFloat = AffineScalarFunc
 
 def get_ops_with_reflection():
@@ -1084,7 +1236,7 @@ def get_ops_with_reflection():
 
     return ops_with_reflection
 
-# Operators that have a reflexion, along with their derivatives:
+# Operators that have a reflection, along with their derivatives:
 _ops_with_reflection = get_ops_with_reflection()
 
 # Some effectively modified operators (for the automated tests):
@@ -1165,6 +1317,10 @@ class Variable(AffineScalarFunc):
     """
     Representation of a float-like scalar random variable, along with
     its uncertainty.
+
+    Objects are meant to represent variables that are independent from
+    each other (correlations are handled through the AffineScalarFunc
+    class).    
     """
 
     # To save memory in large arrays:
@@ -1201,39 +1357,38 @@ class Variable(AffineScalarFunc):
         # takes much more memory.  Thus, this implementation chooses
         # more cycles and a smaller memory footprint instead of no
         # cycles and a larger memory footprint.
-
-        # ! Using AffineScalarFunc instead of super() results only in
-        # a 3 % speed loss (Python 2.6, Mac OS X):
         super(Variable, self).__init__(value, {self: 1.})
 
-        # We force the error to be float-like.  Since it is considered
-        # as a Gaussian standard deviation, it is semantically
-        # positive (even though there would be no problem defining it
-        # as a sigma, where sigma can be negative and still define a
-        # Gaussian):
-
-        assert std_dev >= 0, "the error must be a positive number"
-        # Since AffineScalarFunc.std_dev is a property, we cannot do
-        # "self.std_dev = ...":
-        self._std_dev = std_dev
-
+        self.std_dev = std_dev  # Assignment through a Python property
+        
         self.tag = tag
+
+    # !! In Python 2.6+, the std_dev property would be more simply
+    # implemented with @property(getter), then @std_dev.setter(setter).
 
     # Standard deviations can be modified (this is a feature).
     # AffineScalarFunc objects that depend on the Variable have their
-    # std_dev() automatically modified (recalculated with the new
+    # std_dev automatically modified (recalculated with the new
     # std_dev of their Variables):
-    def set_std_dev(self, value):
-        """
-        Updates the standard deviation of the variable to a new value.
-        """
+    def _set_std_dev(self, std_dev):
+    
+        # We force the error to be float-like.  Since it is considered
+        # as a standard deviation, it must be positive:
+        assert std_dev >= 0, "the error must be a positive number"
 
-        # A zero variance is accepted.  Thus, it is possible to
-        # conveniently use infinitely precise variables, for instance
-        # to study special cases.
-
-        self._std_dev = value
-
+        self._std_dev = CallableStdDev(std_dev)
+    
+    def _get_std_dev(self):
+        return self._std_dev
+        
+    std_dev = property(_get_std_dev, _set_std_dev)
+    
+    # Support for legacy method:
+    def set_std_dev(self, value):  # Obsolete
+        deprecation('Obsolete: instead of set_std_dev(), please use'
+                    ' .std_dev = ...')
+        self.std_dev = value
+        
     # The following method is overridden so that we can represent the tag:
     def _general_representation(self, to_string):
         """
@@ -1274,7 +1429,7 @@ class Variable(AffineScalarFunc):
         #! The following assumes that the arguments to Variable are
         # *not* copied upon construction, since __copy__ is not supposed
         # to copy "inside" information:
-        return Variable(self.nominal_value, self.std_dev(), self.tag)
+        return Variable(self.nominal_value, self.std_dev, self.tag)
 
     def __deepcopy__(self, memo):
         """
@@ -1291,22 +1446,7 @@ class Variable(AffineScalarFunc):
 
         return self.__copy__()
 
-    def __getstate__(self):
-        """
-        Hook for the standard pickle module.
-        """
-        obj_slot_values = dict((k, getattr(self, k)) for k in self.__slots__)
-        obj_slot_values.update(AffineScalarFunc.__getstate__(self))
-        # Conversion to a usual dictionary:
-        return obj_slot_values
-
-    def __setstate__(self, data_dict):
-        """
-        Hook for the standard pickle module.
-        """
-        for (name, value) in data_dict.iteritems():
-            setattr(self, name, value)
-
+        
 ###############################################################################
 
 # Utilities
@@ -1333,34 +1473,40 @@ def std_dev(x):
     numbers, when only some of them generally carry an uncertainty.
     """
 
-    return x.std_dev() if isinstance(x, AffineScalarFunc) else 0.
+    return x.std_dev if isinstance(x, AffineScalarFunc) else 0.
 
-def covariance_matrix(functions):
+def covariance_matrix(nums_with_uncert):
     """
     Returns a matrix that contains the covariances between the given
     sequence of numbers with uncertainties (AffineScalarFunc objects).
     The resulting matrix implicitly depends on their ordering in
-    'functions'.
+    'nums_with_uncert'.
 
     The covariances are floats (never int objects).
 
     The returned covariance matrix is the exact linear approximation
-    result, if the nominal values of the functions and of their
-    variables are their mean.  Otherwise, the returned covariance
-    matrix should be close to it linear approximation value.
+    result, if the nominal values of the numbers with uncertainties
+    and of their variables are their mean.  Otherwise, the returned
+    covariance matrix should be close to its linear approximation
+    value.
+
+    The returned matrix is a list of lists.
     """
-    # See PSI.411.
+    # See PSI.411 in EOL's notes.
 
     covariance_matrix = []
-    for (i1, expr1) in enumerate(functions):
+    # ! In Python 2.6+, this could be replaced by enumerate(..., 1),
+    # along with updating places where i1 is used (i1+1 => i1).
+    for (i1, expr1) in enumerate(nums_with_uncert):
         derivatives1 = expr1.derivatives  # Optimization
         vars1 = set(derivatives1)
         coefs_expr1 = []
-        for (i2, expr2) in enumerate(functions[:i1+1]):
+        for expr2 in nums_with_uncert[:i1+1]:
             derivatives2 = expr2.derivatives  # Optimization
             coef = 0.
             for var in vars1.intersection(derivatives2):
-                # var is a variable common to both functions:
+                # var is a variable common to both numbers with
+                # uncertainties:
                 coef += (derivatives1[var]*derivatives2[var]*var._std_dev**2)
             coefs_expr1.append(coef)
         covariance_matrix.append(coefs_expr1)
@@ -1368,10 +1514,29 @@ def covariance_matrix(functions):
     # We symmetrize the matrix:
     for (i, covariance_coefs) in enumerate(covariance_matrix):
         covariance_coefs.extend(covariance_matrix[j][i]
-                                 for j in range(i+1, len(covariance_matrix)))
+                                for j in range(i+1, len(covariance_matrix)))
 
     return covariance_matrix
 
+try:
+    import numpy
+except ImportError:
+    pass
+else:
+    def correlation_matrix(nums_with_uncert):
+        '''
+        Returns the correlation matrix of the given sequence of
+        numbers with uncertainties, as a NumPy array of floats.
+        '''
+
+        cov_mat = numpy.array(covariance_matrix(nums_with_uncert))
+
+        std_devs = numpy.sqrt(cov_mat.diagonal())
+        
+        return cov_mat/std_devs/std_devs[numpy.newaxis].T
+
+    __all__.append('correlation_matrix')
+        
 ###############################################################################
 # Parsing of values with uncertainties:
 
@@ -1442,9 +1607,9 @@ def parse_error_in_parentheses(representation):
 
 
 # The following function is not exposed because it can in effect be
-# obtained by doing x = ufloat(representation) and
-# x.nominal_value and x.std_dev():
-def str_to_number_with_uncert(representation):
+# obtained by doing x = ufloat_fromstr(representation) and reading
+# x.nominal_value and x.std_dev:
+def _str_to_number_with_uncert(representation):
     """
     Given a string that represents a number with uncertainty, returns the
     nominal value and the uncertainty.
@@ -1476,26 +1641,15 @@ def str_to_number_with_uncert(representation):
 
     return parsed_value
 
-def ufloat(representation, tag=None):
+def ufloat_fromstr(representation, tag=None):
     """
-    Returns a random variable (Variable object).
-
-    Converts the representation of a number into a number with
-    uncertainty (a random variable, defined by a nominal value and
-    a standard deviation).
-
-    The representation can be a (value, standard deviation) sequence,
-    or a string.
-
-    Strings of the form '12.345+/-0.015', '12.345(15)', or '12.3' are
-    recognized (see full list below).  In the last case, an
-    uncertainty of +/-1 is assigned to the last digit.
-
-    'tag' is an optional string tag for the variable.  Variables
-    don't have to have distinct tags.  Tags are useful for tracing
-    what values (and errors) enter in a given result (through the
-    error_components() method).
-
+    Returns a new random variable (Variable object) from a string.
+    
+    Strings 'representation' of the form '12.345+/-0.015',
+    '12.345(15)', or '12.3' are recognized (see full list below).  In
+    the last case, an uncertainty of +/-1 is assigned to the last
+    digit.
+    
     Examples of valid string representations:
 
         -1.23(3.4)
@@ -1516,96 +1670,72 @@ def ufloat(representation, tag=None):
         169.1(15)
     """
 
-    # This function is somewhat optimized so as to help with the
-    # creation of lots of Variable objects (through unumpy.uarray, for
-    # instance).
-
-    # representations is "normalized" so as to be a valid sequence of
-    # 2 arguments for Variable().
-
-    #! Accepting strings and any kind of sequence slows down the code
-    # by about 5 %.  On the other hand, massive initializations of
-    # numbers with uncertainties are likely to be performed with
-    # unumpy.uarray, which does not support parsing from strings and
-    # thus does not have any overhead.
-
-    #! Different, in Python 3:
-    if isinstance(representation, basestring):
-        representation = str_to_number_with_uncert(representation)
-
-    #! The tag is forced to be a string, so that the user does not
-    # create a Variable(2.5, 0.5) in order to represent 2.5 +/- 0.5.
-    # Forcing 'tag' to be a string prevents numerical uncertainties
-    # from being considered as tags, here:
-    if tag is not None:
-        #! 'unicode' is removed in Python3:
-        assert isinstance(tag, (str, unicode)), "The tag can only be a string."
-
     #! The special ** syntax is for Python 2.5 and before (Python 2.6+
     # understands tag=tag):
-    return Variable(*representation, **{'tag': tag})
+    (nominal_value, std_dev) = _str_to_number_with_uncert(representation)
+    return ufloat(nominal_value, std_dev, tag)
 
-###############################################################################
-# Support for legacy code (will be removed in the future):
+def _ufloat_obsolete(representation, tag=None):
+    '''
+    Legacy version of ufloat(). Will eventually be removed.
 
-def NumberWithUncert(*args):
-    """
-    Wrapper for legacy code.  Obsolete: do not use.  Use ufloat
-    instead.
-    """
-    import warnings
-    warnings.warn("NumberWithUncert is obsolete."
-                  "  Use ufloat instead.", DeprecationWarning,
-                  stacklevel=2)
-    return ufloat(*args)
+    representation -- either a (nominal_value, std_dev) tuple, or a
+    string representation of a number with uncertainty, in a format
+    recognized by ufloat_fromstr().
+    '''
+    return (ufloat(representation[0], representation[1], tag)
+            if isinstance(representation, tuple)
+            else ufloat_fromstr(representation, tag))
 
-def num_with_uncert(*args):
+# The arguments are named for the new version, instead of bearing
+# names that are closer to their obsolete use (e.g., std_dev could be
+# instead std_dev_or_tag, since it can be the tag, in the obsolete
+# ufloat((3, 0.14), "pi") form). This has the advantage of allowing
+# new code to use keyword arguments as in ufloat(nominal_value=3,
+# std_dev=0.14), without breaking when the obsolete form is not
+# supported anymore.
+def ufloat(nominal_value, std_dev=None, tag=None):
     """
-    Wrapper for legacy code.  Obsolete: do not use.  Use ufloat
-    instead.
-    """
-    import warnings
-    warnings.warn("num_with_uncert is obsolete."
-                  "  Use ufloat instead.", DeprecationWarning,
-                  stacklevel=2)
-    return ufloat(*args)
+    Returns a new random variable (Variable object).
+    
+    The only non-obsolete use is:
 
-def array_u(*args):
-    """
-    Wrapper for legacy code.  Obsolete: do not use.  Use
-    unumpy.uarray instead.
-    """
-    import warnings
-    warnings.warn("uncertainties.array_u is obsolete."
-                  " Use uncertainties.unumpy.uarray instead.",
-                  DeprecationWarning,
-                  stacklevel=2)
-    import uncertainties.unumpy
-    return uncertainties.unumpy.uarray(*args)
+    - ufloat(nominal_value, std_dev),
+    - ufloat(nominal_value, std_dev, tag=...).
 
-def nominal_values(*args):
-    """
-    Wrapper for legacy code.  Obsolete: do not use.  Use
-    unumpy.nominal_values instead.
-    """
-    import warnings
-    warnings.warn("uncertainties.nominal_values is obsolete."
-                  "  Use uncertainties.unumpy.nominal_values instead.",
-                  DeprecationWarning,
-                  stacklevel=2)
-    import uncertainties.unumpy
-    return uncertainties.unumpy.nominal_values(*args)
+    Other input parameters are temporarily supported:
 
-def std_devs(*args):
+    - ufloat((nominal_value, std_dev)),
+    - ufloat((nominal_value, std_dev), tag),
+    - ufloat(str_representation),
+    - ufloat(str_representation, tag).
+
+    Valid string representations str_representation are listed in
+    the documentation for ufloat_fromstr().
+
+    'tag' is an optional string tag for the variable.  Variables
+    don't have to have distinct tags.  Tags are useful for tracing
+    what values (and errors) enter in a given result (through the
+    error_components() method).
     """
-    Wrapper for legacy code.  Obsolete: do not use.  Use ufloat
-    instead.
-    """
-    import warnings
-    warnings.warn("uncertainties.std_devs is obsolete."
-                  "  Use uncertainties.unumpy.std_devs instead.",
-                  DeprecationWarning,
-                  stacklevel=2)
-    import uncertainties.unumpy
-    return uncertainties.unumpy.std_devs(*args)
+
+    try:
+        # Standard case:
+
+        #! The special ** syntax is for Python 2.5 and before (Python 2.6+
+        # understands tag=tag):
+        return Variable(nominal_value, std_dev, **{'tag': tag})
+    # Exception types raised by, respectively: tuple, string that
+    # cannot be converted through float(), and string that can be
+    # converted through float() (case of a number with no uncertainty):
+    except (TypeError, ValueError, AssertionError):
+        # Obsolete, two-argument call:
+        deprecation('Obsolete: either use ufloat(nominal_value, std_dev),'
+                    ' ufloat(nominal_value, std_dev, tag), or the'
+                    ' ufloat_fromstr() function, for string representations.')
+        return _ufloat_obsolete(nominal_value,  # Tuple or string
+                                # tag keyword used:
+                                tag if tag is not None
+                                # 2 positional arguments form:
+                                else std_dev)
 

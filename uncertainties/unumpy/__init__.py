@@ -17,7 +17,7 @@ with arrays that contain numbers with uncertainties.
 NumPy arrays of numbers with uncertainties can also be built directly
 through NumPy, thanks to NumPy's support of arrays of arbitrary objects:
 
-  arr = numpy.array([uncertainties.ufloat((1, 0.1)),...])
+  arr = numpy.array([uncertainties.ufloat(1, 0.1),...])
   
 - Matrices of numbers with uncertainties are best created in one of
 two ways:
@@ -60,7 +60,7 @@ documentation for this module).
 
 This module requires the NumPy package.
 
-(c) 2009-2010 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
+(c) 2009-2013 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 Please send feature requests, bug reports, or feedback to this address.
 
 This software is released under a dual license.  (1) The BSD license.
