@@ -851,12 +851,12 @@ def test_power():
         
     # Negative numbers with unceratinty can be exponentiated to an integral
     # power:
-    assert (ufloat((-1.1, 0.1))**-9).nominal_value == (-1.1)**-9
+    assert (ufloat(-1.1, 0.1)**-9).nominal_value == (-1.1)**-9
 
     # Case of numbers with no uncertainty: should give the same result
     # as numbers with uncertainties:
-    assert ufloat((-1, 0))**9 == (-1)**9
-    assert ufloat((-1.1, 0))**9 == (-1.1)**9
+    assert ufloat(-1, 0)**9 == (-1)**9
+    assert ufloat(-1.1, 0)**9 == (-1.1)**9
     
     # Negative numbers cannot be raised to a non-integral power, in
     # Python 2 (in Python 3, complex numbers are returned; this cannot
@@ -864,7 +864,7 @@ def test_power():
     # does not handle complex numbers):
     if sys.version_info < (3,):
         try:
-            ufloat((-1, 0))**9.1
+            ufloat(-1, 0)**9.1
         except Exception, err_ufloat:  # "as", for Python 2.6+
             pass
         else:
