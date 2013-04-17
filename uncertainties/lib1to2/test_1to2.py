@@ -14,10 +14,13 @@ Meant to be run through nosetests.
 
 import lib2to3.tests.support as support
 import re
+import sys
+import os
 
-import lib1to2
-
-# import lib1to2  # Sets the module path so that lib2to3 can find the fixers
+# The lib1to2.fixes package given to lib2to3 is the *local* package
+# (not to any other installed module) (this is done through the
+# __import__() used via support.get_refactorer()):
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.pardir))
 
 def check_refactor(refactorer, source, expected):
     """
