@@ -20,7 +20,7 @@ Examples:
   from uncertainties.umath import *  # sin(), etc.
 
   # Mathematical operations:
-  x = ufloat((0.20, 0.01))  # x = 0.20+/-0.01
+  x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
   x = ufloat("0.20+/-0.01")  # Other representation
   x = ufloat("0.20(1)")  # Other representation
   x = ufloat("0.20")  # Implicit uncertainty of +/-1 on the last digit
@@ -38,8 +38,8 @@ Examples:
   print square.derivatives[x]  # Partial derivative: 0.4 (= 2*0.20)
 
   # Correlations:
-  u = ufloat((1, 0.05), "u variable")  # Tag
-  v = ufloat((10, 0.1), "v variable")
+  u = ufloat(1, 0.05, "u variable")  # Tag
+  v = ufloat(10, 0.1, "v variable")
   sum_value = u+v
   
   u.std_dev = 0.1  # Standard deviations can be updated on the fly
@@ -83,7 +83,7 @@ Logical operations (>, ==, etc.) are also supported.
 Basic operations on NumPy arrays or matrices of numbers with
 uncertainties can be performed:
 
-  2*numpy.array([ufloat((1, 0.01)), ufloat((2, 0.1))])
+  2*numpy.array([ufloat(1, 0.01), ufloat(2, 0.1)])
 
 More complex operations on NumPy arrays can be performed through the
 dedicated uncertainties.unumpy sub-module (see its documentation).
@@ -194,8 +194,8 @@ Example:
 
 but
 
-  x = ufloat((3.14, 0.01))
-  y = ufloat((3.14, 0.01))
+  x = ufloat(3.14, 0.01)
+  y = ufloat(3.14, 0.01)
 
 is not such that x == y, since x and y are independent random
 variables that almost never give the same value.  However, x == x
