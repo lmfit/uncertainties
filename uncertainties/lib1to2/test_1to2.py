@@ -71,7 +71,7 @@ def test_fix_std_dev():
     
 def test_ufloat():
     '''
-    Test of the transformation of: ufloat(tuple,...) and
+    Test of the transformation of ufloat(tuple,...) and
     ufloat(string,...) into ufloat(nominal_value, std_dev, tag=...).
     '''
     
