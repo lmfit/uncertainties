@@ -230,13 +230,13 @@ The automatic updater works like Python's `2to3
 
 .. code-block:: sh
 
-   python -m uncertainties.lib1to2
+   python -m uncertainties.1to2
 
 For example, updating a single Python program can be done with
 
 .. code-block:: sh
 
-   python -m uncertainties.lib1to2 -w example.py
+   python -m uncertainties.1to2 -w example.py
 
 All the Python programs contained under a directory ``Programs``
 (including in nested sub-directories) can be automatically updated
@@ -244,7 +244,7 @@ with
 
 .. code-block:: sh
 
-   python -m uncertainties.lib1to2 -w Programs
+   python -m uncertainties.1to2 -w Programs
 
 Backups are automatically created, unless the ``-n`` option is given.
 
