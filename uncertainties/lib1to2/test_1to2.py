@@ -140,3 +140,37 @@ else:
         tests['-ufloat("3")'] = '-ufloat_fromstr("3")'
 
         check_all('ufloat', tests)
+
+    def test_uarray():
+        '''
+        Test of the transformation of uarray(tuple,...) into
+        uarray(nominal_values, std_devs).
+        '''
+        
+        tests = {
+            'uarray((arange(3), std_devs))': 'uarray(arange(3), std_devs)',
+            'uarray(tuple_arg)': 'uarray(*tuple_arg)'
+        }
+
+        # Automatic addition of a dotted access:
+        tests.update(dict(
+            # !! Dictionary comprehension usable with Python 2.7+
+            (re.sub('uarray', 'un.uarray', orig),
+             re.sub('uarray', 'un.uarray', new))
+            for (orig, new) in tests.iteritems()))
+
+        # Test for space consistency:
+        tests[' t  =  u.uarray(args)'] = ' t  =  u.uarray(*args)'
+        tests.update({
+            'uarray( ( arange(3),  std_devs ) ) ':
+                'uarray( arange(3),  std_devs ) ',
+            'uarray(  tuple_arg )': 'uarray(  *tuple_arg )'
+            })
+                     
+        # Exponentiation test:
+        tests.update(dict(
+            # !! Dictionary comprehension usable with Python 2.7+
+            (orig+'**2', new+'**2')
+            for (orig, new) in tests.iteritems()))
+
+        check_all('uarray', tests)
