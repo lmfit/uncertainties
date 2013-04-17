@@ -14,6 +14,10 @@ Meant to be run through nosetests.
 
 import sys
 
+# !! Would it be possible to use an import hook so as to stop the
+# import if the Python version is not high enough, instead of having
+# like here a whole indented block?
+
 if sys.version_info < (2, 6):
     pass  # This package uses lib2to3, which requires Python 2.6+
 else:
@@ -100,7 +104,8 @@ else:
             # Strings:
             'ufloat("-1.23(3.4)")': 'ufloat_fromstr("-1.23(3.4)")',
             "ufloat('-1.23(3.4)')": "ufloat_fromstr('-1.23(3.4)')",
-            'ufloat("-1.23(3.4)", "var")': 'ufloat_fromstr("-1.23(3.4)", "var")',
+            'ufloat("-1.23(3.4)", "var")':
+            'ufloat_fromstr("-1.23(3.4)", "var")',
             'ufloat("-1.23(3.4)", tag="var")':
                 'ufloat_fromstr("-1.23(3.4)", tag="var")'
 
