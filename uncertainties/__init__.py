@@ -1688,9 +1688,11 @@ def _ufloat_obsolete(representation, tag=None):
     string representation of a number with uncertainty, in a format
     recognized by ufloat_fromstr().
     '''
-    return (ufloat(representation[0], representation[1], tag)
-            if isinstance(representation, tuple)
-            else ufloat_fromstr(representation, tag))
+
+    if isinstance(representation, tuple):
+        return ufloat(representation[0], representation[1], tag)
+    else:
+        return ufloat_fromstr(representation, tag)
 
 # The arguments are named for the new version, instead of bearing
 # names that are closer to their obsolete use (e.g., std_dev could be
@@ -1738,9 +1740,11 @@ def ufloat(nominal_value, std_dev=None, tag=None):
         deprecation('Obsolete: either use ufloat(nominal_value, std_dev),'
                     ' ufloat(nominal_value, std_dev, tag), or the'
                     ' ufloat_fromstr() function, for string representations.')
-        return _ufloat_obsolete(nominal_value,  # Tuple or string
-                                # tag keyword used:
-                                tag if tag is not None
-                                # 2 positional arguments form:
-                                else std_dev)
+
+        if tag is not None:
+            tag_arg = tag  # tag keyword used:
+        else:
+            tag_arg = std_dev  # 2 positional arguments form
+            
+        return _ufloat_obsolete(nominal_value, tag_arg)
 
