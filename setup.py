@@ -255,7 +255,7 @@ _of_uncertainty
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
 .. _PayPal: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _main website: http://pythonhosted.org/uncertainties/
-.. _updater: http://pythonhosted.org/uncertainties/ #!!!!!!!
+.. _updater: http://pythonhosted.org/uncertainties/index.html#migration-from-version-1-to-version-2
 ''',
       
     keywords=['error propagation', 'uncertainties',
