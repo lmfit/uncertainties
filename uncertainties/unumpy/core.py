@@ -548,18 +548,18 @@ class matrix(numpy.matrix):
     
     std_devs = std_devs
     
-def umatrix(*args, **kwargs):
+def umatrix(values, std_devs):
     """
     Constructs a matrix that contains numbers with uncertainties.
 
-    The input data is the same as for uarray(...): a tuple with the
-    nominal values, and the standard deviations.
+    The input data is the same as for uarray(...): nominal values, and
+    standard deviations.
 
     The returned matrix can be inverted, thanks to the fact that it is
     a unumpy.matrix object instead of a numpy.matrix one.
     """
 
-    return uarray(*args, **kwargs).view(matrix)
+    return uarray(values, std_devs).view(matrix)
 
 ###############################################################################
 
