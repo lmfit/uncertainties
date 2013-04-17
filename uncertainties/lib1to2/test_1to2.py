@@ -18,8 +18,14 @@ import sys
 # import if the Python version is not high enough, instead of having
 # like here a whole indented block?
 
-if sys.version_info < (2, 6):
-    pass  # This package uses lib2to3, which requires Python 2.6+
+if sys.version_info < (2, 7):
+    # This package uses lib2to3, which requires Python 2.6+.
+
+    # !!  Nosetests also fails (it looks like it tries to run tests
+    # via lib2to3/tests/test_refactor.py):
+    
+    pass
+
 else:
     import re
     import os
