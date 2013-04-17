@@ -9,7 +9,7 @@ Core functions used by unumpy and some of its submodules.
 # imports one of the submodules in order to make it available to the
 # user.
 
-
+from __future__ import division
 
 # Standard modules:
 import sys
@@ -157,7 +157,7 @@ def wrap_array_func(func):
         for element in arr.flat:
             # floats, etc. might be present
             if isinstance(element, uncertainties.AffineScalarFunc):
-                variables |= set(element.derivatives.keys())
+                variables |= set(element.derivatives.iterkeys())
 
         # If the matrix has no variables, then the function value can be
         # directly returned:
@@ -215,7 +215,7 @@ def wrap_array_func(func):
             # Update of the list of variables and associated
             # derivatives, for each element:
             for (derivative_dict, derivative_value) in (
-                list(zip(derivatives.flat, numerical_deriv.flat))):
+                zip(derivatives.flat, numerical_deriv.flat)):
                 
                 if derivative_value:
                     derivative_dict[var] = derivative_value
@@ -242,7 +242,7 @@ def wrap_array_func(func):
 _uarray = numpy.vectorize(lambda v, s: uncertainties.Variable(v, s),
                           otypes=[object])
 
-def uarray(xxx_todo_changeme):
+def uarray((values, std_devs)):
     """
     Returns a NumPy array of numbers with uncertainties
     initialized with the given nominal values and standard
@@ -252,7 +252,7 @@ def uarray(xxx_todo_changeme):
     identical shapes (list of numbers, list of lists, numpy.ndarray,
     etc.).
     """
-    (values, std_devs) = xxx_todo_changeme
+
     return _uarray(values, std_devs)
 
 ###############################################################################
@@ -331,7 +331,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         for element in array_version.flat:
             # floats, etc. might be present
             if isinstance(element, uncertainties.AffineScalarFunc):
-                variables |= set(element.derivatives.keys())
+                variables |= set(element.derivatives.iterkeys())
 
         array_nominal = nominal_values(array_version)
         # Function value, and derivatives at array_nominal (the
@@ -343,7 +343,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
             (array_derivative(array_version, var) for var in variables),
             *args)
 
-        func_nominal_value = next(func_and_derivs)
+        func_nominal_value = func_and_derivs.next()
 
         if not variables:
             return func_nominal_value
@@ -354,7 +354,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         # Calculation of the derivatives of the result with respect to
         # the variables.
         derivatives = numpy.array(
-            [{} for _ in range(func_nominal_value.size)], dtype=object)
+            [{} for _ in xrange(func_nominal_value.size)], dtype=object)
         derivatives.resize(func_nominal_value.shape)
 
         # Memory-efficient approach.  A memory-hungry approach would
