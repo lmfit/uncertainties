@@ -110,5 +110,8 @@ def test_ufloat():
     # Exponentiation test:
     tests.update({orig+'**2': new+'**2'
                   for (orig, new) in tests.iteritems()})
+
+    # Exponent test:
+    tests['2**ufloat("3")'] = '2**ufloat_fromstr("3")'
     
     check_all('ufloat', tests)
