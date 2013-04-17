@@ -77,7 +77,7 @@ def test_compound_expression():
     Test equality between different formulas.
     """
     
-    x = uncertainties.ufloat((3, 0.1))
+    x = uncertainties.ufloat(3, 0.1)
     
     # Prone to numerical errors (but not much more than floats):
     assert umath.tan(x) == umath.sin(x)/umath.cos(x)
@@ -86,7 +86,7 @@ def test_compound_expression():
 def test_numerical_example():
     "Test specific numerical examples"
 
-    x = uncertainties.ufloat((3.14, 0.01))
+    x = uncertainties.ufloat(3.14, 0.01)
     result = umath.sin(x)
     # In order to prevent big errors such as a wrong, constant value
     # for all analytical and numerical derivatives, which would make
@@ -129,8 +129,8 @@ def test_monte_carlo_comparison():
         # due to y:
         return 10 * x**2 - x * sin_uarray_uncert(y**3)
 
-    x = uncertainties.ufloat((0.2, 0.01))
-    y = uncertainties.ufloat((10, 0.001))
+    x = uncertainties.ufloat(0.2, 0.01)
+    y = uncertainties.ufloat(10, 0.001)
     function_result_this_module = function(x, y)
     nominal_value_this_module = function_result_this_module.nominal_value
 
@@ -194,7 +194,7 @@ def test_monte_carlo_comparison():
 def test_math_module():
     "Operations with the math module"
 
-    x = uncertainties.ufloat((-1.5, 0.1))
+    x = uncertainties.ufloat(-1.5, 0.1)
     
     # The exponent must not be differentiated, when calculating the
     # following (the partial derivative with respect to the exponent
@@ -249,13 +249,13 @@ def test_math_module():
         else:
             raise Exception('OverflowError exception expected')
         try:
-            umath.log(uncertainties.ufloat((0, 0)))
+            umath.log(uncertainties.ufloat(0, 0))
         except OverflowError, err_ufloat:  # "as", for Python 2.6+
             assert err_math.args == err_ufloat.args
         else:
             raise Exception('OverflowError exception expected')
         try:
-            umath.log(uncertainties.ufloat((0, 1)))
+            umath.log(uncertainties.ufloat(0, 1))
         except OverflowError, err_ufloat:  # "as", for Python 2.6+
             assert err_math.args == err_ufloat.args
         else:
@@ -276,13 +276,13 @@ def test_math_module():
         else:
             raise Exception('ValueError exception expected')
         try:
-            umath.log(uncertainties.ufloat((0, 0)))
+            umath.log(uncertainties.ufloat(0, 0))
         except ValueError, err_ufloat:
             assert err_math.args == err_ufloat.args
         else:
             raise Exception('ValueError exception expected')
         try:
-            umath.log(uncertainties.ufloat((0, 1)))
+            umath.log(uncertainties.ufloat(0, 1))
         except ValueError, err_ufloat:
             assert err_math.args == err_ufloat.args
         else:
