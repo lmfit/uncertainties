@@ -246,7 +246,7 @@ __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
 # exported only if the NumPy module is available...):
 __all__ = [
 
-    # All sub-modules .and packages are not imported by default,
+    # All sub-modules and packages are not imported by default,
     # in particular because NumPy might be unavailable.
 
     'ufloat',  # Main function: returns a number with uncertainty
@@ -832,7 +832,7 @@ class CallableStdDev(float):
     '''
     
     def __call__ (self):
-        deprecation('Obsolete: The std_dev attribute should not be called'
+        deprecation('Obsolete: the std_dev attribute should not be called'
                     ' anymore: use .std_dev instead of .std_dev().')
         return self
         
