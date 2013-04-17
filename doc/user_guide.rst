@@ -41,11 +41,11 @@ one of many string representations, so that files containing numbers
 with uncertainties can easily be parsed.  Thus, x = 0.20±0.01 can be
 expressed in many convenient ways:
 
-  >>> x = ufloat((0.20, 0.01))  # x = 0.20+/-0.01
-  >>> x = ufloat("0.20+/-0.01")
-  >>> x = ufloat("0.20(1)")
-  >>> x = ufloat("20(1)e-2")  # Exponential notation supported
-  >>> x = ufloat("0.20")  # Automatic uncertainty of +/-1 on last digit
+  >>> x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
+  >>> x = ufloat_fromstr("0.20+/-0.01")
+  >>> x = ufloat_fromstr("0.20(1)")
+  >>> x = ufloat_fromstr("20(1)e-2")  # Exponential notation supported
+  >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
 
 The available representations can be listed with ``pydoc
 uncertainties.ufloat``.  Representations that are invalid raise a
@@ -90,7 +90,7 @@ Arrays of numbers with uncertainties
 It is possible to put numbers with uncertainties in NumPy_ arrays and
 matrices:
 
-  >>> arr = numpy.array([ufloat((1, 0.01)), ufloat((2, 0.1))])
+  >>> arr = numpy.array([ufloat(1, 0.01), ufloat(2, 0.1)])
   >>> 2*arr
   [2.0+/-0.02 4.0+/-0.2]
   >>> print arr.sum()
@@ -166,8 +166,8 @@ squares of these contributions is the squared uncertainty.
 The individual contributions to the uncertainty are more easily usable
 when the variables are **tagged**:
 
-  >>> u = ufloat((1, 0.1), "u variable")  # Tag
-  >>> v = ufloat((10, 0.1), "v variable")
+  >>> u = ufloat(1, 0.1, "u variable")  # Tag
+  >>> v = ufloat(10, 0.1, "v variable")
   >>> sum_value = u+2*v
   >>> sum_value
   21.0+/-0.22360679774997899
@@ -219,8 +219,8 @@ One important concept to keep in mind is that :func:`ufloat` creates a
 random variable, so that two numbers with the same nominal value and
 standard deviation are generally different:
 
-  >>> y = ufloat((1, 0.1))
-  >>> z = ufloat((1, 0.1))
+  >>> y = ufloat(1, 0.1)
+  >>> z = ufloat(1, 0.1)
   >>> print y
   1.0+/-0.1
   >>> print z
@@ -242,7 +242,7 @@ numbers with uncertainties can be found in the :ref:`Technical Guide
 .. index:: covariance matrix
 
 Covariance and correlation matrices
-=================
+===================================
 
 Covariance matrix
 -----------------
@@ -433,8 +433,8 @@ package automatically performs such calculations; users can thus
 easily get the derivative of an expression with respect to any of its
 variables:
 
-  >>> u = ufloat((1, 0.1))
-  >>> v = ufloat((10, 0.1))
+  >>> u = ufloat(1, 0.1)
+  >>> v = ufloat(10, 0.1)
   >>> sum_value = u+2*v
   >>> sum_value.derivatives[u]
   1.0

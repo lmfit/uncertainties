@@ -51,8 +51,8 @@ def test_list_inverse():
     assert isinstance(mat_list_inv[1,1], float)    
     assert mat_list_inv[1,1] == -1
 
-    x = ufloat((1, 0.1))
-    y = ufloat((2, 0.1))
+    x = ufloat(1, 0.1)
+    y = ufloat(2, 0.1)
     mat = unumpy.matrix([[x, x], [y, 0]])
     
     # Internal consistency: ulinalg.inv() must coincide with the
@@ -64,8 +64,8 @@ def test_list_inverse():
 def test_list_pseudo_inverse():
     "Test of the pseudo-inverse"
 
-    x = ufloat((1, 0.1))
-    y = ufloat((2, 0.1))
+    x = ufloat(1, 0.1)
+    y = ufloat(2, 0.1)
     mat = unumpy.matrix([[x, x], [y, 0]])
 
     # Internal consistency: the inverse and the pseudo-inverse yield
@@ -77,8 +77,8 @@ def test_list_pseudo_inverse():
                           unumpy.ulinalg.pinv(mat, 1e-15), 1e-4)
     
     # Non-square matrices:
-    x = ufloat((1, 0.1))
-    y = ufloat((2, 0.1))
+    x = ufloat(1, 0.1)
+    y = ufloat(2, 0.1)
     mat1 = unumpy.matrix([[x, y]])  # "Long" matrix
     mat2 = unumpy.matrix([[x, y], [1, 3+x], [y, 2*x]])  # "Tall" matrix
 
