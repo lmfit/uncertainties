@@ -514,7 +514,7 @@ class NumericalDerivatives(object):
         """
         return partial_derivative(self._function, n)
   
-def wrap(f, derivatives_iter=None):
+def wrap(f, derivatives_funcs=None):
     """
     Wraps a function f into a function that also accepts numbers with
     uncertainties (UFloat objects) and returns a number with
@@ -532,21 +532,21 @@ def wrap(f, derivatives_iter=None):
     If no argument to the wrapped function has an uncertainty, f
     simply returns its usual, scalar result.
 
-    If supplied, derivatives_iter can be an iterable that generally
+    If supplied, derivatives_funcs can be an iterable that generally
     contains functions; each successive function is the partial
     derivative of f with respect to the corresponding variable (one
     function for each argument of f, which takes as many arguments as
-    f).  If instead of a function, an element of derivatives_iter
+    f).  If instead of a function, an element of derivatives_funcs
     contains None, then it is automatically replaced by the relevant
     numerical derivative; this can be used for non-scalar arguments of
     f (like string arguments).
 
-    If derivatives_iter is None, or if derivatives_iter contains a
+    If derivatives_funcs is None, or if derivatives_funcs contains a
     fixed (and finite) number of elements, then any missing derivative
     is calculated numerically.
 
     An infinite number of derivatives can be specified by having
-    derivatives_iter be an infinite iterator; this can for instance
+    derivatives_funcs be an infinite iterator; this can for instance
     be used for specifying the derivatives of functions with a
     undefined number of argument (like sum(), whose partial
     derivatives all return 1).
@@ -560,22 +560,22 @@ def wrap(f, derivatives_iter=None):
     an analytically defined derivative.
     """
 
-    if derivatives_iter is None:
-        derivatives_iter = NumericalDerivatives(f)
+    if derivatives_funcs is None:
+        derivatives_funcs = NumericalDerivatives(f)
     else:
         # Derivatives that are not defined are calculated numerically,
         # if there is a finite number of them (the function lambda
         # *args: fsum(args) has a non-defined number of arguments, as
         # it just performs a sum):
         try:  # Is the number of derivatives fixed?
-            len(derivatives_iter)
+            len(derivatives_funcs)
         except TypeError:
             pass
         else:
-            derivatives_iter = [
+            derivatives_funcs = [
                 partial_derivative(f, k) if derivative is None
                 else derivative
-                for (k, derivative) in enumerate(derivatives_iter)]
+                for (k, derivative) in enumerate(derivatives_funcs)]
 
     #! Setting the doc string after "def f_with...()" does not
     # seem to work.  We define it explicitly:
@@ -592,7 +592,7 @@ def wrap(f, derivatives_iter=None):
 
     Original documentation:
     %s""" % (f.__name__, f.__doc__))
-    def f_with_affine_output(*args, **kwargs):
+    def f_with_affine_output(*args, **kws):
         # Can this function perform the calculation of an
         # AffineScalarFunc (or maybe float) result?
         try:
@@ -685,14 +685,14 @@ def wrap(f, derivatives_iter=None):
         # caller to always provide derivatives.  When changing the
         # functions of the math module, this would force this module
         # to know about all the math functions.  Another possibility
-        # would be to force derivatives_iter to contain, say, the
+        # would be to force derivatives_funcs to contain, say, the
         # first 3 derivatives of f.  But any of these two ideas has a
         # chance to break, one day... (if new functions are added to
         # the math module, or if some function has more than 3
         # arguments).
 
         derivatives_wrt_args = []
-        for (arg, derivative) in zip(aff_funcs, derivatives_iter):
+        for (arg, derivative) in zip(aff_funcs, derivatives_funcs):
             derivatives_wrt_args.append(derivative(*args_values)
                                         if arg.derivatives
                                         else 0)
