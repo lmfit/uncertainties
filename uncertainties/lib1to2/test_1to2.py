@@ -149,7 +149,14 @@ else:
         
         tests = {
             'uarray((arange(3), std_devs))': 'uarray(arange(3), std_devs)',
-            'uarray(tuple_arg)': 'uarray(*tuple_arg)'
+            'uarray(tuple_arg)': 'uarray(*tuple_arg)',
+            # Unmodified, correct code:
+            'uarray(values, std_devs)': 'uarray(values, std_devs)',
+            # Spaces tests:
+            'uarray( ( arange(3),  std_devs ) ) ':
+            'uarray( arange(3),  std_devs) ',
+            'uarray(  tuple_arg )': 'uarray(*  tuple_arg)'
+
         }
 
         # Automatic addition of a dotted access:
@@ -158,20 +165,15 @@ else:
             (re.sub('uarray', 'un.uarray', orig),
              re.sub('uarray', 'un.uarray', new))
             for (orig, new) in tests.iteritems()))
-
-        # Test for space consistency:
-        tests[' t  =  u.uarray(args)'] = ' t  =  u.uarray(*args)'
-        tests.update({
-            'uarray( ( arange(3),  std_devs ) ) ':
-                'uarray( arange(3),  std_devs) ',
-            'uarray(  tuple_arg )': 'uarray(*  tuple_arg)'
-            })
-                     
+                             
         # Exponentiation test:
         tests.update(dict(
             # !! Dictionary comprehension usable with Python 2.7+
             (orig+'**2', new+'**2')
             for (orig, new) in tests.iteritems()))
+
+        # Test for space consistency:
+        tests[' t  =  u.uarray(args)'] = ' t  =  u.uarray(*args)'
 
         check_all('uarray', tests)
 

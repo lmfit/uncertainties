@@ -8,7 +8,7 @@ uarray(single_arg) into uarray(*single_arg).
 '''
 
 from lib2to3.fixer_base import BaseFix
-from lib2to3.fixer_util import String, ArgList, Comma
+from lib2to3.fixer_util import String, ArgList, Comma, syms
 
 ###############################################################################
 # lib2to3 grammar parts.
@@ -33,10 +33,10 @@ class FixUarray(BaseFix):
         |
         power< object=NAME trailer< '.' 'uarray' > {tuple_call} any* >
         |
-        power< 'uarray' trailer< '(' arg=any ')' > any* >
+        power< 'uarray' trailer< '(' args=any ')' > any* >
         |
         power< object=NAME trailer< '.' 'uarray' >
-            trailer< '(' arg=any ')' >
+            trailer< '(' args=any ')' >
         any* >
         """.format(tuple_call=tuple_call)
 
@@ -48,7 +48,7 @@ class FixUarray(BaseFix):
         else:
             args = node.children[1]
 
-        if 'arg' in results: # Non-tuple argument
+        if 'args' in results: # Non-tuple argument
 
             # A star will be inserted in from of the single argument:
             
@@ -58,8 +58,15 @@ class FixUarray(BaseFix):
             # be a name (where it works), but also anything else,
             # including a lib2to3.pytree.Node that has no value.) This
             # is OK, as the syntax f(* (2, 1)) is valid.
-            
-            new_args = [String('*'), results['arg'].clone()]
+
+            args_node = results['args']
+
+            # We must make sure that there is a single argument:
+            if args_node.type == syms.arglist:
+                return  # Nothing modified
+
+            # Single argument (in position 1):
+            new_args = [String('*'), args.children[1].clone()]
             
         else:  # Tuple argument
 
