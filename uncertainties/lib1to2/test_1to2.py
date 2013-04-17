@@ -103,5 +103,8 @@ def test_ufloat():
     tests.update({re.sub('ufloat', 'unc.ufloat', orig):
                   re.sub('ufloat', 'unc.ufloat', new)
                   for (orig, new) in tests.iteritems()})
+
+    # Test for space consistency:
+    tests[' t  =  u.ufloat("3")'] = ' t  =  u.ufloat_fromstr("3")'
     
     check_all('ufloat', tests)

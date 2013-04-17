@@ -8,8 +8,7 @@ ufloat(nominal_value, std_dev,...) and ufloat_fromstr
 '''
 
 from lib2to3.fixer_base import BaseFix
-from lib2to3.fixer_util import Call, Name, Comma
-import lib2to3.pgen2.token as token
+from lib2to3.fixer_util import ArgList, Call, Comma, Name, syms
 
 ###############################################################################
 # lib2to3 grammar parts.
@@ -58,49 +57,49 @@ class FixUfloat(BaseFix):
         power< object=NAME trailer< '.' 'ufloat' > {tuple_any_call} >
         |
         power< object=NAME trailer< '.' 'ufloat' >
-        trailer< '(' string=STRING ')' > >
+        trailer< '(' string=STRING ')' >
+        >
         |
-        power< object=NAME trailer< '.' 'ufloat' > trailer< '('
-            arglist<
-                string=STRING
-                ',' tag=any
-            >
-        ')' > >
-
+        power< object=NAME trailer< '.' 'ufloat' >
+        trailer< '(' arglist< string=STRING ',' tag=any > ')' >
+        >
         """.format(tuple_call=tuple_call,
                    tuple_any_call=tuple_any_call)
 
     
     def transform(self, node, results):
-
-        if 'string' in results:
-            # Single argument form:
-
-            func_name = 'ufloat_fromstr'
-            
-            # A constant string can be handled:
-
-            # New arguments:
-            args=[results['string'].clone()]
-
-        else:
-            # Tuple as first argument:
-
-            func_name = 'ufloat'
-            
-            # New arguments:
-            args = [results['arg0'].clone(), Comma(), results['arg1'].clone()]
-
-
-        if 'object' in results:
-            func_name = '{}.{}'.format(results['object'], func_name)
         
-        # Call with a tag:
-        if 'tag' in results:
-            args.extend([Comma(), results['tag'].clone()])            
+        # Handling of the first argument:
+        
+        if 'string' in results:  # String as first argument
+            
+            new_func_name = 'ufloat_fromstr'
 
-        # Replacement by a direct call with the arguments:
-        node.replace(Call(Name(func_name), args=args, prefix=node.prefix))
+            # New arguments:
+            new_args=[results['string'].clone()]
+
+        else:  # Tuple as first argument
+
+            new_func_name = 'ufloat'
             
+            # New arguments:
+            new_args = [results['arg0'].clone(),
+                        Comma(), results['arg1'].clone()]
+
+        # Handling of the second argument (call with a tag):
+        if 'tag' in results:
+            new_args.extend([Comma(), results['tag'].clone()])            
+
+        if 'object' in results:  # If dotted access: unc.ufloat()
+            func_name = node.children[1].children[1]
+            args = node.children[2]
+        else:
+            func_name = node.children[0]
+            args = node.children[1]
             
-# print FixUfloat.PATTERN
+        # Function name update:
+        func_name.value = new_func_name
+        #! func_name.changed()  # Necessary when only .value is changed
+        
+        # Argument list update:
+        args.replace(ArgList(new_args))
