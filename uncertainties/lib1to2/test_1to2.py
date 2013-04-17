@@ -106,5 +106,8 @@ def test_ufloat():
 
     # Test for space consistency:
     tests[' t  =  u.ufloat("3")'] = ' t  =  u.ufloat_fromstr("3")'
+
+    # Negative number test:
+    tests['ufloat((-1, 0))**9.1'] = 'ufloat(-1, 0)**9.1'
     
     check_all('ufloat', tests)
