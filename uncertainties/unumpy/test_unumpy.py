@@ -30,7 +30,7 @@ def test_numpy():
     Interaction with NumPy, including matrix inversion and correlated_values.
     """
 
-    arr = numpy.array(range(3))
+    arr = numpy.arange(3)
     num = ufloat(3.14, 0.01)
 
     # NumPy arrays can be multiplied by Variable objects,
