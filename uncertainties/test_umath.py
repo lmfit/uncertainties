@@ -261,7 +261,7 @@ def test_math_module():
         else:
             raise Exception('OverflowError exception expected')
 
-    elif sys.version_info < (3,):
+    else:
 
         try:
             math.log(0)
@@ -287,9 +287,4 @@ def test_math_module():
             assert err_math.args == err_ufloat.args
         else:
             raise Exception('ValueError exception expected')
-        
-    else:  # Python 3+
-        
-        # !!! The tests should be made to work with Python 3 too!
-        pass
     
