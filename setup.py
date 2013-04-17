@@ -174,7 +174,9 @@ Main changes:
 - 2.0: The standard deviation is now obtained without an explicit \
        call (``x.std_dev`` instead of ``x.std_dev()``). ``x.std_dev()`` \
        will be supported for some time. Users are encouraged to update \
-       their code.
+       their code. The standard deviation of a variable can now be \
+       directly updated with ``x.std_dev = 0.1``. As a consequence, \
+       ``x.set_std_dev()`` is deprecated.
 - 1.9.1: Support added for pickling subclasses of ``UFloat`` (= ``Variable``).
 - 1.9: Added functions for handling correlation matrices: \
        ``correlation_matrix()`` and \
