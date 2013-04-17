@@ -6,14 +6,15 @@
 # found in the current directory.
 
 ## Only committed versions are packaged, to help with debugging published code:
+git checkout release
 git commit -a
 
 # The Python 2.3 version should always be up to date:
-git checkout python2.3
-git merge master
+git checkout release_python2.3
+git merge release
 
 # Default branch for working on the code:
-git checkout master
+git checkout release
 
 ## Getting the Python 2.5 version:
 
@@ -21,12 +22,12 @@ rm -rf uncertainties-py25 && \
 git archive --output /tmp/u.tar master uncertainties && \
 tar -C /tmp -xf /tmp/u.tar && \
 mv /tmp/uncertainties uncertainties-py25 && \
-echo "Python 2.5 version imported"
+echo "Python 2.5+ version imported"
 
 ## Getting the Python 2.3 version:
 
 rm -rf uncertainties-py23 && \
-git archive --output /tmp/u.tar python2.3 uncertainties && \
+git archive --output /tmp/u.tar release_python2.3 uncertainties && \
 tar -C /tmp -xf /tmp/u.tar && \
 mv /tmp/uncertainties uncertainties-py23 && \
 echo "Python 2.3 version imported"
