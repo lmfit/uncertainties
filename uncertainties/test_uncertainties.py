@@ -963,7 +963,7 @@ else:
         Test through the input of the (full) covariance matrix.
         """
 
-        u = uncertainties.ufloat((1, 0.1))
+        u = uncertainties.ufloat(1, 0.1)
         cov = uncertainties.covariance_matrix([u])
         # "1" is used instead of u.nominal_value because
         # u.nominal_value might return a float.  The idea is to force

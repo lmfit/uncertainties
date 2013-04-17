@@ -208,7 +208,7 @@ def test_broadcast_funcs():
     numbers with uncertainties.
     """
 
-    x = uncertainties.ufloat((0.2, 0.1))
+    x = uncertainties.ufloat(0.2, 0.1)
     arr = numpy.array([x, 2*x])
     assert unumpy.cos(arr)[1] == uncertainties.umath.cos(arr[1])
 
