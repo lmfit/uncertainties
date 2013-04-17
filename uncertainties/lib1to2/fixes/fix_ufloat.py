@@ -39,30 +39,30 @@ class FixUfloat(BaseFix):
     # Tuple call, then string call.
     # No-tag call, then tag call.
     PATTERN = """
-        power< 'ufloat' {tuple_call} >
+        power< 'ufloat' {tuple_call} any* >
         |
-        power< 'ufloat' {tuple_any_call} >
+        power< 'ufloat' {tuple_any_call} any* >
         |
-        power< 'ufloat' trailer< '(' string=STRING ')' > >
+        power< 'ufloat' trailer< '(' string=STRING ')' > any* >
         |
         power< 'ufloat' trailer< '('
             arglist<
                 string=STRING
                 ',' tag=any
             >
-        ')' > >
+        ')' > any* >
         |
-        power< object=NAME trailer< '.' 'ufloat' > {tuple_call} >
+        power< object=NAME trailer< '.' 'ufloat' > {tuple_call} any* >
         |
-        power< object=NAME trailer< '.' 'ufloat' > {tuple_any_call} >
+        power< object=NAME trailer< '.' 'ufloat' > {tuple_any_call} any* >
         |
         power< object=NAME trailer< '.' 'ufloat' >
         trailer< '(' string=STRING ')' >
-        >
+        any* >
         |
         power< object=NAME trailer< '.' 'ufloat' >
         trailer< '(' arglist< string=STRING ',' tag=any > ')' >
-        >
+        any* >
         """.format(tuple_call=tuple_call,
                    tuple_any_call=tuple_any_call)
 
