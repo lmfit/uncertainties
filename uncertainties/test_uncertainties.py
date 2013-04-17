@@ -219,9 +219,17 @@ def test_value_construction():
     assert x.tag == 'pi'
 
     ## Comparison with the obsolete tuple form:
+
+    # The following tuple is stored in a variable instead of being
+    # repeated in the calls below, so that the automatic code update
+    # does not replace ufloat((3, 0.14)) by ufloat(3, 14): the goal
+    # here is to make sure that the obsolete form gives the same
+    # result as the new form.
+    
+    representation = (3, 0.14)  # Obsolete representation
     
     x = ufloat(3, 0.14)
-    x2 = ufloat((3, 0.14))  # Obsolete
+    x2 = ufloat(representation)  # Obsolete
     assert x.nominal_value == x2.nominal_value
     assert x.std_dev == x2.std_dev
     assert x.tag is None
@@ -229,7 +237,7 @@ def test_value_construction():
     
     # With tag as positional argument:
     x = ufloat(3, 0.14, "pi")
-    x2 = ufloat((3, 0.14), "pi")  # Obsolete
+    x2 = ufloat(representation, "pi")  # Obsolete
     assert x.nominal_value == x2.nominal_value
     assert x.std_dev == x2.std_dev
     assert x.tag == 'pi'
@@ -237,7 +245,7 @@ def test_value_construction():
     
     # With tag keyword:
     x = ufloat(3, 0.14, tag="pi")
-    x2 = ufloat((3, 0.14), tag="pi")  # Obsolete
+    x2 = ufloat(representation, tag="pi")  # Obsolete
     assert x.nominal_value == x2.nominal_value
     assert x.std_dev == x2.std_dev
     assert x.tag == 'pi'
