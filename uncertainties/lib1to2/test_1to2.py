@@ -31,9 +31,9 @@ def check_refactor(refactorer, source, expected):
     new = unicode(
         refactorer.refactor_string(support.reformat(source), '<string>'))
 
-    print source.strip(), '=>', new.strip()
-    
-    assert support.reformat(expected) == new
+    assert support.reformat(expected) == new, (
+        "Refactoring failed: '{}' => '{}' instead of '{}'".format(
+        source, new.strip(), expected))
 
 def check_all(fixer, tests):
     '''
