@@ -144,9 +144,9 @@ upgrade this package with
    easy_install --upgrade uncertainties
 
 The :mod:`uncertainties` package is also available for **Windows**
-through the `Python(x,y) distribution <http://www.pythonxy.com/>`_. It
-may also be included in Christoph Gohlke's Base distribution of
-`scientific Python packages
+through the `Python(x,y) distribution
+<https://code.google.com/p/pythonxy/>`_. It may also be included in
+Christoph Gohlke's Base distribution of `scientific Python packages
 <http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_.
 
 The :mod:`uncertainties` package is also available through the
