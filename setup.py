@@ -166,11 +166,11 @@ Version history
 Main changes:
 
 - 2.1: Numbers with uncertainties are now created like \
-       ``ufloat(3, 0.1)``, ``ufloat(3, 0.1, "pi"``, \
+       ``ufloat(3, 0.1)``, ``ufloat(3, 0.1, "pi")``, \
        ``ufloat_fromstr("3.0(1)")``, ``ufloat_fromstr("3.0(1)", "pi")``. \
        The previous ``ufloat((3, 0.1))`` and ``ufloat("3.0(1)")`` forms \
        will be supported for some time. Users are encouraged to update \
-       their code, for instance through the newly provided code updater.
+       their code, for instance through the newly provided `code updater`_.
 - 2.0: The standard deviation is now obtained without an explicit \
        call (``x.std_dev`` instead of ``x.std_dev()``). ``x.std_dev()`` \
        will be supported for some time. Users are encouraged to update \
@@ -257,7 +257,7 @@ _of_uncertainty
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
 .. _PayPal: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _main website: http://pythonhosted.org/uncertainties/
-.. _updater: http://pythonhosted.org/uncertainties/index.html#migration-from-version-1-to-version-2
+.. _code updater: http://pythonhosted.org/uncertainties/#migration-from-version-1-to-version-2
 ''',
       
     keywords=['error propagation', 'uncertainties',
