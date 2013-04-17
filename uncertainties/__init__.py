@@ -20,10 +20,10 @@ Examples:
   from uncertainties.umath import *  # sin(), etc.
 
   # Mathematical operations:
-  x = ufloat((0.20, 0.01))  # x = 0.20+/-0.01
-  x = ufloat("0.20+/-0.01")  # Other representation
-  x = ufloat("0.20(1)")  # Other representation
-  x = ufloat("0.20")  # Implicit uncertainty of +/-1 on the last digit
+  x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
+  x = ufloat_fromstr("0.20+/-0.01")  # Other representation
+  x = ufloat_fromstr("0.20(1)")  # Other representation
+  x = ufloat_fromstr("0.20")  # Implicit uncertainty of +/-1 on the last digit
   print x**2  # Square: prints "0.04+/-0.004"
   print sin(x**2)  # Prints "0.0399...+/-0.00399..."
 
@@ -38,8 +38,8 @@ Examples:
   print square.derivatives[x]  # Partial derivative: 0.4 (= 2*0.20)
 
   # Correlations:
-  u = ufloat((1, 0.05), "u variable")  # Tag
-  v = ufloat((10, 0.1), "v variable")
+  u = ufloat(1, 0.05, "u variable")  # Tag
+  v = ufloat(10, 0.1, "v variable")
   sum_value = u+v
   
   u.std_dev = 0.1  # Standard deviations can be updated on the fly
@@ -75,7 +75,7 @@ on numbers with uncertainties by using their generalization from the
 uncertainties.umath module:
 
   from uncertainties.umath import sin
-  print sin(ufloat("1+/-0.01"))  # 0.841...+/-0.005...
+  print sin(ufloat_fromstr("1+/-0.01"))  # 0.841...+/-0.005...
   print sin(1)  # umath.sin() also works on floats, exactly like math.sin()
 
 Logical operations (>, ==, etc.) are also supported.
@@ -83,7 +83,7 @@ Logical operations (>, ==, etc.) are also supported.
 Basic operations on NumPy arrays or matrices of numbers with
 uncertainties can be performed:
 
-  2*numpy.array([ufloat((1, 0.01)), ufloat((2, 0.1))])
+  2*numpy.array([ufloat(1, 0.01), ufloat(2, 0.1)])
 
 More complex operations on NumPy arrays can be performed through the
 dedicated uncertainties.unumpy sub-module (see its documentation).
@@ -139,7 +139,7 @@ average value.
 uncertainties, it can be useful to access the nominal value and
 uncertainty of all numbers in a uniform manner:
 
-  x = ufloat("3+/-0.1")
+  x = ufloat_fromstr("3+/-0.1")
   print nominal_value(x)  # Prints 3
   print std_dev(x)  # Prints 0.1
   print nominal_value(3)  # Prints 3: nominal_value works on floats
@@ -194,8 +194,8 @@ Example:
 
 but
 
-  x = ufloat((3.14, 0.01))
-  y = ufloat((3.14, 0.01))
+  x = ufloat(3.14, 0.01)
+  y = ufloat(3.14, 0.01)
 
 is not such that x == y, since x and y are independent random
 variables that almost never give the same value.  However, x == x
@@ -237,7 +237,7 @@ import warnings
 from backport import *
 
 # Numerical version:
-__version_info__ = (2, 0, 1)
+__version_info__ = (2, 1)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
@@ -1612,9 +1612,9 @@ def parse_error_in_parentheses(representation):
 
     
 # The following function is not exposed because it can in effect be
-# obtained by doing x = ufloat(representation) and
+# obtained by doing x = ufloat_fromstr(representation) and reading
 # x.nominal_value and x.std_dev:
-def str_to_number_with_uncert(representation):
+def _str_to_number_with_uncert(representation):
     """
     Given a string that represents a number with uncertainty, returns the
     nominal value and the uncertainty.
@@ -1646,26 +1646,15 @@ def str_to_number_with_uncert(representation):
 
     return parsed_value
 
-def ufloat(representation, tag=None):
+def ufloat_fromstr(representation, tag=None):
     """
-    Returns a random variable (Variable object).
-
-    Converts the representation of a number into a number with
-    uncertainty (a random variable, defined by a nominal value and
-    a standard deviation).
-
-    The representation can be a (value, standard deviation) sequence,
-    or a string.
-
-    Strings of the form '12.345+/-0.015', '12.345(15)', or '12.3' are
-    recognized (see full list below).  In the last case, an
-    uncertainty of +/-1 is assigned to the last digit.
-
-    'tag' is an optional string tag for the variable.  Variables
-    don't have to have distinct tags.  Tags are useful for tracing
-    what values (and errors) enter in a given result (through the
-    error_components() method).
-
+    Returns a new random variable (Variable object) from a string.
+    
+    Strings 'representation' of the form '12.345+/-0.015',
+    '12.345(15)', or '12.3' are recognized (see full list below).  In
+    the last case, an uncertainty of +/-1 is assigned to the last
+    digit.
+    
     Examples of valid string representations:
 
         -1.23(3.4)
@@ -1686,32 +1675,72 @@ def ufloat(representation, tag=None):
         169.1(15)
     """
 
-    # This function is somewhat optimized so as to help with the
-    # creation of lots of Variable objects (through unumpy.uarray, for
-    # instance).
-
-    # representations is "normalized" so as to be a valid sequence of
-    # 2 arguments for Variable().
-
-    #! Accepting strings and any kind of sequence slows down the code
-    # by about 5 %.  On the other hand, massive initializations of
-    # numbers with uncertainties are likely to be performed with
-    # unumpy.uarray, which does not support parsing from strings and
-    # thus does not have any overhead.
-
-    #! Different, in Python 3:
-    if isinstance(representation, basestring):
-        representation = str_to_number_with_uncert(representation)
-        
-    #! The tag is forced to be a string, so that the user does not
-    # create a Variable(2.5, 0.5) in order to represent 2.5 +/- 0.5.
-    # Forcing 'tag' to be a string prevents numerical uncertainties
-    # from being considered as tags, here:
-    if tag is not None:
-        #! 'unicode' is removed in Python3:
-        assert isinstance(tag, (str, unicode)), "The tag can only be a string."
-
     #! The special ** syntax is for Python 2.5 and before (Python 2.6+
     # understands tag=tag):
-    return Variable(*representation, **{'tag': tag})
+    (nominal_value, std_dev) = _str_to_number_with_uncert(representation)
+    return ufloat(nominal_value, std_dev, tag)
+
+def _ufloat_obsolete(representation, tag=None):
+    '''
+    Legacy version of ufloat(). Will eventually be removed.
+
+    representation -- either a (nominal_value, std_dev) tuple, or a
+    string representation of a number with uncertainty, in a format
+    recognized by ufloat_fromstr().
+    '''
+    return (ufloat(representation[0], representation[1], tag)
+            if isinstance(representation, tuple)
+            else ufloat_fromstr(representation, tag))
+
+# The arguments are named for the new version, instead of bearing
+# names that are closer to their obsolete use (e.g., std_dev could be
+# instead std_dev_or_tag, since it can be the tag, in the obsolete
+# ufloat((3, 0.14), "pi") form). This has the advantage of allowing
+# new code to use keyword arguments as in ufloat(nominal_value=3,
+# std_dev=0.14), without breaking when the obsolete form is not
+# supported anymore.
+def ufloat(nominal_value, std_dev=None, tag=None):
+    """
+    Returns a new random variable (Variable object).
+    
+    The only non-obsolete use is:
+
+    - ufloat(nominal_value, std_dev),
+    - ufloat(nominal_value, std_dev, tag=...).
+
+    Other input parameters are temporarily supported:
+
+    - ufloat((nominal_value, std_dev)),
+    - ufloat((nominal_value, std_dev), tag),
+    - ufloat(str_representation),
+    - ufloat(str_representation, tag).
+
+    Valid string representations str_representation are listed in
+    the documentation for ufloat_fromstr().
+
+    'tag' is an optional string tag for the variable.  Variables
+    don't have to have distinct tags.  Tags are useful for tracing
+    what values (and errors) enter in a given result (through the
+    error_components() method).
+    """
+
+    try:
+        # Standard case:
+
+        #! The special ** syntax is for Python 2.5 and before (Python 2.6+
+        # understands tag=tag):
+        return Variable(nominal_value, std_dev, **{'tag': tag})
+    # Exception types raised by, respectively: tuple, string that
+    # cannot be converted through float(), and string that can be
+    # converted through float() (case of a number with no uncertainty):
+    except (TypeError, ValueError, AssertionError):
+        # Obsolete, two-argument call:
+        deprecation('Obsolete: either use ufloat(nominal_value, std_dev),'
+                    ' ufloat(nominal_value, std_dev, tag), or the'
+                    ' ufloat_fromstr() function, for string representations.')
+        return _ufloat_obsolete(nominal_value,  # Tuple or string
+                                # tag keyword used:
+                                tag if tag is not None
+                                # 2 positional arguments form:
+                                else std_dev)
 

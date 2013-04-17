@@ -51,7 +51,7 @@ uncertainties:
 NumPy arrays of numbers with uncertainties can also be built directly
 through NumPy, thanks to NumPy's support of arrays of arbitrary objects:
 
- >>> arr = numpy.array([ufloat((1, 0.1)), ufloat((2, 0.002))])
+ >>> arr = numpy.array([ufloat(1, 0.1), ufloat(2, 0.002)])
 
 .. index::
    single: matrices; creation and manipulation
@@ -171,7 +171,7 @@ It currently offers generalizations of two functions from
 :mod:`numpy.linalg` that work on arrays (or matrices) that contain
 numbers with uncertainties, the **matrix inverse and pseudo-inverse**:
 
-  >>> unumpy.ulinalg.inv([[ufloat((2, 0.1))]])
+  >>> unumpy.ulinalg.inv([[ufloat(2, 0.1)]])
   array([[0.5+/-0.025]], dtype=object)
   >>> unumpy.ulinalg.pinv(mat)
   matrix([[0.2+/-0.0012419339757],
