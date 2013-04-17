@@ -11,7 +11,7 @@ directory.
 
 import sys
 
-if sys.version_info < (2.6):
+if sys.version_info < (2, 6):
     print >> sys.stderr, "Please run this program with Python 2.6+"
     
 import lib2to3.main    
