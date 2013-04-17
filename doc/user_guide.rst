@@ -242,7 +242,7 @@ numbers with uncertainties can be found in the :ref:`Technical Guide
 .. index:: covariance matrix
 
 Covariance and correlation matrices
-=================
+===================================
 
 Covariance matrix
 -----------------

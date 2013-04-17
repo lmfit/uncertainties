@@ -252,8 +252,9 @@ Some **manual adjustments** might be necessary after running the
 updater (incorrectly modified lines, untouched obsolete syntax).
 
 It is generally useful to **first create a backup** of the modified
-directory, or alternatively to use some **version control
-system**. Reviewing the modifications with a `file comparison tool
+directory, or alternatively to use some `version control
+<http://en.wikipedia.org/wiki/Version_control_system>`_
+system. Reviewing the modifications with a `file comparison tool
 <http://en.wikipedia.org/wiki/File_comparison>`_ might also be useful.
 
 What others say

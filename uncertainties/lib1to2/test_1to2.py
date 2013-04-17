@@ -87,6 +87,9 @@ def test_ufloat():
 
         # Simple expressions that can be transformed:
         'ufloat((n, s), tag="var")': 'ufloat(n, s, tag="var")',
+        # Nested parentheses:
+        'ufloat((atan2(y, x), s), tag="var")':
+        'ufloat(atan2(y, x), s, tag="var")',
 
         # Simple expressions that cannot be transformed automatically:
         'ufloat(str_repr, tag="var")': 'ufloat(str_repr, tag="var")',
