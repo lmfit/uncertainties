@@ -123,6 +123,7 @@ else:
 
         # Exponentiation test:
         tests.update(dict(
+            # !! Dictionary comprehension usable with Python 2.7+
             (orig+'**2', new+'**2')
             for (orig, new) in tests.iteritems()))
 
