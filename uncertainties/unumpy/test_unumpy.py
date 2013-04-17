@@ -6,7 +6,7 @@ These tests can be run through the Nose testing framework.
 (c) 2010-2013 by Eric O. LEBIGOT (EOL).
 """
 
-from __future__ import division
+
 
 # 3rd-party modules:
 try:
@@ -28,7 +28,7 @@ def test_numpy():
     Interaction with NumPy, including matrix inversion and correlated_values.
     """
 
-    arr = numpy.array(range(3))
+    arr = numpy.array(list(range(3)))
     num = ufloat(3.14, 0.01)
 
     # NumPy arrays can be multiplied by Variable objects,

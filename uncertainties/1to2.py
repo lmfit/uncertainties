@@ -10,6 +10,9 @@ directory.
 # Code inspired by the 2to3 Python code.
 
 import sys
-import lib2to3.main
 
+if sys.version_info < (2.6):
+    print >> sys.stderr, "Please run this program with Python 2.6+"
+    
+import lib2to3.main    
 sys.exit(lib2to3.main.main('uncertainties.lib1to2.fixes'))

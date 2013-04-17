@@ -8,7 +8,7 @@ These tests can be run through the Nose testing framework.
 (c) 2010-2013 by Eric O. LEBIGOT (EOL).
 """
 
-from __future__ import division
+
 
 # Standard modules
 import copy
@@ -30,7 +30,7 @@ from uncertainties import __author__
 # The following information is useful for making sure that the right
 # version of Python is running the tests (for instance with the Travis
 # Continuous Integration system):
-print "Testing with Python", sys.version
+print("Testing with Python", sys.version)
 
 ###############################################################################
 
@@ -124,7 +124,7 @@ def _compare_derivatives(func, numerical_derivatives,
 
                 # We include negative numbers, for more thorough tests:
                 args = [
-                    random.choice(range(-10, 10))
+                    random.choice(list(range(-10, 10)))
                     if arg_num in integer_arg_nums
                     else uncertainties.Variable(random.random()*4-2, 0)
                     for arg_num in range(num_args)]
@@ -142,7 +142,7 @@ def _compare_derivatives(func, numerical_derivatives,
                     
                     # We compare all derivatives:
                     for (arg_num, (arg, numerical_deriv)) in (
-                        enumerate(zip(args, numerical_derivatives))):
+                        enumerate(list(zip(args, numerical_derivatives)))):
 
                         # Some arguments might not be differentiable:
                         if isinstance(arg, int):
@@ -155,8 +155,8 @@ def _compare_derivatives(func, numerical_derivatives,
                         # This message is useful: the user can see that
                         # tests are really performed (instead of not being
                         # performed, silently):
-                        print "Testing %s at %s, arg #%d" % (
-                            func.__name__, args, arg_num)
+                        print("Testing %s at %s, arg #%d" % (
+                            func.__name__, args, arg_num))
                         
                         if not _numbers_close(fixed_deriv_value,
                                               num_deriv_value, 1e-4):
@@ -174,7 +174,7 @@ def _compare_derivatives(func, numerical_derivatives,
                                     % (arg_num, func.__name__, args,
                                        fixed_deriv_value, num_deriv_value))
 
-            except ValueError, err:  # Arguments out of range, or of wrong type
+            except ValueError as err:  # Arguments out of range, or of wrong type
                 # Factorial(real) lands here:
                 if str(err).startswith('factorial'):
                     integer_arg_nums = set([0])
@@ -187,7 +187,7 @@ def _compare_derivatives(func, numerical_derivatives,
                                     % func.__name__)
 
                 # Another argument might be forced to be an integer:
-                integer_arg_nums.add(random.choice(range(num_args)))
+                integer_arg_nums.add(random.choice(list(range(num_args))))
             else:
                 # We have found reasonable arguments, and the test passed:
                 break
@@ -281,7 +281,7 @@ def test_str_input():
         '14.(15)': (14, 15)
         }
           
-    for (representation, values) in tests.iteritems():
+    for (representation, values) in tests.items():
 
         # Without tag:
         num = ufloat_fromstr(representation)
@@ -343,7 +343,7 @@ def test_fixed_derivatives_basic_funcs():
             # by definition, to AffineScalarFunc objects: we first map
             # possible scalar arguments (used for calculating
             # derivatives) to AffineScalarFunc objects:
-            lambda *args: func(*map(uncertainties.to_affine_scalar, args)))
+            lambda *args: func(*list(map(uncertainties.to_affine_scalar, args))))
         _compare_derivatives(func, numerical_derivatives, [num_args])
 
     # Operators that take 1 value:
@@ -367,7 +367,7 @@ def test_copy():
     y = copy.copy(x)
     assert x != y
     assert not(x == y)
-    assert y in y.derivatives.keys()  # y must not copy the dependence on x
+    assert y in list(y.derivatives.keys())  # y must not copy the dependence on x
     
     z = copy.deepcopy(x)
     assert x != z
@@ -403,7 +403,7 @@ def test_copy():
 
     gc.collect()
 
-    assert y in y.derivatives.keys()
+    assert y in list(y.derivatives.keys())
 
 ## Classes for the pickling tests (put at the module level, so that
 ## they can be unpickled):
@@ -608,7 +608,7 @@ def test_comparison_ops():
             try:
                 assert correct_result == getattr(x, op)(y)
             except AssertionError:
-                print "Sampling results:", sampled_results
+                print("Sampling results:", sampled_results)
                 raise Exception("Semantic value of %s %s (%s) %s not"
                                 " correctly reproduced."
                                 % (x, op, y, correct_result))
@@ -865,13 +865,13 @@ def test_power():
     if sys.version_info < (3,):
         try:
             ufloat(-1, 0)**9.1
-        except Exception, err_ufloat:  # "as", for Python 2.6+
+        except Exception as err_ufloat:  # "as", for Python 2.6+
             pass
         else:
             raise Exception('An exception should have been raised')
         try:
             (-1)**9.1
-        except Exception, err_float:  # "as" for Python 2.6+
+        except Exception as err_float:  # "as" for Python 2.6+
             # UFloat and floats should raise the same error:
             assert err_ufloat.args == err_float.args
         else:
@@ -1061,7 +1061,7 @@ else:
         nominal_values = [v.nominal_value for v in (x, y, z)]
         std_devs = [v.std_dev for v in (x, y, z)]
         x2, y2, z2 = uncertainties.correlated_values_norm(
-            zip(nominal_values, std_devs), corr_mat)
+            list(zip(nominal_values, std_devs)), corr_mat)
         
         # matrices_close() is used instead of _numbers_close() because
         # it compares uncertainties too:

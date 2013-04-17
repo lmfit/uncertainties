@@ -31,7 +31,7 @@ def check_refactor(refactorer, source, expected):
     source, expected -- strings (typically with Python code).
     """
     
-    new = unicode(
+    new = str(
         refactorer.refactor_string(support.reformat(source), '<string>'))
 
     assert support.reformat(expected) == new, (
@@ -48,7 +48,7 @@ def check_all(fixer, tests):
     refactorer = support.get_refactorer(
         fixer_pkg='lib1to2', fixers=[fixer])
 
-    for (input_str, out_str) in tests.items():
+    for (input_str, out_str) in list(tests.items()):
         check_refactor(refactorer, input_str, out_str)
     
 def test_fix_std_dev():
@@ -105,14 +105,14 @@ def test_ufloat():
     # Automatic addition of a dotted access:
     tests.update({re.sub('ufloat', 'unc.ufloat', orig):
                   re.sub('ufloat', 'unc.ufloat', new)
-                  for (orig, new) in tests.iteritems()})
+                  for (orig, new) in tests.items()})
 
     # Test for space consistency:
     tests[' t  =  u.ufloat("3")'] = ' t  =  u.ufloat_fromstr("3")'
 
     # Exponentiation test:
     tests.update({orig+'**2': new+'**2'
-                  for (orig, new) in tests.iteritems()})
+                  for (orig, new) in tests.items()})
 
     # Exponent test:
     tests['2**ufloat("3")'] = '2**ufloat_fromstr("3")'

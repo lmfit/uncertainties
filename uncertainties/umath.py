@@ -35,7 +35,7 @@ This software is released under a dual license.  (1) The BSD license.
 (2) Any other license, as long as it is obtained from the original
 author.'''
 
-from __future__ import division  # Many analytical derivatives depend on this
+  # Many analytical derivatives depend on this
 
 # Standard modules
 import math
@@ -300,7 +300,7 @@ def ldexp(x, y):
             math.ldexp(aff_func.nominal_value, y),
             # Chain rule:
             dict((var, factor*deriv)
-                 for (var, deriv) in aff_func.derivatives.iteritems()))
+                 for (var, deriv) in aff_func.derivatives.items()))
     else:
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
@@ -335,7 +335,7 @@ def frexp(x):
                 result[0],
                 # Chain rule:
                 dict((var, factor*deriv)
-                     for (var, deriv) in aff_func.derivatives.iteritems())),
+                     for (var, deriv) in aff_func.derivatives.items())),
             # The exponent is an integer and is supposed to be
             # continuous (small errors):
             result[1])

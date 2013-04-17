@@ -9,7 +9,7 @@ These tests can be run through the Nose testing framework.
 # Some tests are already performed in test_unumpy (unumpy contains a
 # matrix inversion, for instance).  They are not repeated here.
 
-from __future__ import division
+
 
 try:
     import numpy
