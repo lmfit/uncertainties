@@ -309,9 +309,9 @@ def deprecation(message):
     # function from this module that called deprecation()).
     # DeprecationWarning is ignored by default: not used.
     
-    warnings.warn('Obsolete: {} Code can be automatically updated with'
+    warnings.warn('Obsolete: %s Code can be automatically updated with'
                   ' python -m uncertainties.1to2 -w ProgramDirectory.'
-                  .format(message), stacklevel=3)
+                  % message, stacklevel=3)
 
 ###############################################################################
 
