@@ -27,7 +27,7 @@ if sys.version_info < (2, 7):
     pass
 
 else:
-    import re
+
     import os
     import lib2to3.tests.support as support
 
@@ -52,6 +52,8 @@ else:
             "Refactoring failed: '{}' => '{}' instead of '{}'".format(
             source, new.strip(), expected))
 
+        # print 'Checked:', source, '=>', expected
+        
     def check_all(fixer, tests):
         '''
         Takes a fixer name (module from fixes) and a mapping that maps
@@ -74,14 +76,20 @@ else:
             'y.std_dev();  unc.std_dev(z)': 'y.std_dev;  unc.std_dev(z)',
             'uncertainties.std_dev(x)': 'uncertainties.std_dev(x)',
             'std_dev(x)': 'std_dev(x)',
+            'obj.x.std_dev()': 'obj.x.std_dev',
 
             """
             long_name.std_dev(
             # No argument!
             )""":
-
             """
-            long_name.std_dev"""
+            long_name.std_dev""",
+
+            # set_std_dev => .std_dev:
+            'x.set_std_dev(3)': 'x.std_dev = 3',
+            'y = set_std_dev(3)': 'y = set_std_dev(3)',  # None
+            'func = x.set_std_dev': 'func = x.set_std_dev',
+            'obj.x.set_std_dev(sin(y))': 'obj.x.std_dev = sin(y)'
         }
 
         check_all('std_dev', tests)
@@ -120,8 +128,8 @@ else:
         # Automatic addition of a dotted access:
         tests.update(dict(
             # !! Dictionary comprehension usable with Python 2.7+
-            (re.sub('ufloat', 'unc.ufloat', orig),
-             re.sub('ufloat', 'unc.ufloat', new))
+            (orig.replace('ufloat', 'unc.ufloat'),
+             new.replace('ufloat', 'unc.ufloat'))
             for (orig, new) in tests.iteritems()))
 
         # Test for space consistency:
@@ -140,3 +148,47 @@ else:
         tests['-ufloat("3")'] = '-ufloat_fromstr("3")'
 
         check_all('ufloat', tests)
+
+    def test_uarray_umatrix():
+        '''
+        Test of the transformation of uarray(tuple,...) into
+        uarray(nominal_values, std_devs). Also performs the same tests
+        on umatrix().
+        '''
+        
+        tests = {
+            'uarray((arange(3), std_devs))': 'uarray(arange(3), std_devs)',
+            'uarray(tuple_arg)': 'uarray(*tuple_arg)',
+            # Unmodified, correct code:
+            'uarray(values, std_devs)': 'uarray(values, std_devs)',
+            # Spaces tests:
+            'uarray( ( arange(3),  std_devs ) ) ':
+            'uarray( arange(3),  std_devs) ',
+            'uarray(  tuple_arg )': 'uarray(*  tuple_arg)'
+
+        }
+
+        # Automatic addition of a dotted access:
+        tests.update(dict(
+            # !! Dictionary comprehension usable with Python 2.7+
+            (orig.replace('uarray', 'un.uarray'),
+             new.replace('uarray', 'un.uarray'))
+            for (orig, new) in tests.iteritems()))
+                             
+        # Exponentiation test:
+        tests.update(dict(
+            # !! Dictionary comprehension usable with Python 2.7+
+            (orig+'**2', new+'**2')
+            for (orig, new) in tests.iteritems()))
+
+        # Test for space consistency:
+        tests[' t  =  u.uarray(args)'] = ' t  =  u.uarray(*args)'
+
+        # Same tests, but for umatrix:
+        tests.update(dict(
+            (orig.replace('uarray', 'umatrix'),
+             new.replace('uarray', 'umatrix'))
+            for (orig, new) in tests.iteritems()))
+        
+        check_all('uarray_umatrix', tests)
+

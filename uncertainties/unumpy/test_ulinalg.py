@@ -18,7 +18,7 @@ except ImportError:
     sys.exit()  # There is no reason to test the interface to NumPy
 
 from uncertainties import unumpy, ufloat
-from uncertainties.unumpy.test_unumpy import matrices_close
+from uncertainties.unumpy.test_unumpy import arrays_close
 
 from uncertainties import __author__
 
@@ -58,7 +58,7 @@ def test_list_inverse():
     # Internal consistency: ulinalg.inv() must coincide with the
     # unumpy.matrix inverse, for square matrices (.I is the
     # pseudo-inverse, for non-square matrices, but inv() is not).
-    assert matrices_close(unumpy.ulinalg.inv(mat), mat.I)
+    assert arrays_close(unumpy.ulinalg.inv(mat), mat.I)
 
 
 def test_list_pseudo_inverse():
@@ -70,8 +70,8 @@ def test_list_pseudo_inverse():
 
     # Internal consistency: the inverse and the pseudo-inverse yield
     # the same result on square matrices:
-    assert matrices_close(mat.I, unumpy.ulinalg.pinv(mat), 1e-4)
-    assert matrices_close(unumpy.ulinalg.inv(mat),
+    assert arrays_close(mat.I, unumpy.ulinalg.pinv(mat), 1e-4)
+    assert arrays_close(unumpy.ulinalg.inv(mat),
                           # Support for the optional pinv argument is
                           # tested:
                           unumpy.ulinalg.pinv(mat, 1e-15), 1e-4)
@@ -83,5 +83,5 @@ def test_list_pseudo_inverse():
     mat2 = unumpy.matrix([[x, y], [1, 3+x], [y, 2*x]])  # "Tall" matrix
 
     # Internal consistency:
-    assert matrices_close(mat1.I, unumpy.ulinalg.pinv(mat1, 1e-10))
-    assert matrices_close(mat2.I, unumpy.ulinalg.pinv(mat2, 1e-8))
+    assert arrays_close(mat1.I, unumpy.ulinalg.pinv(mat1, 1e-10))
+    assert arrays_close(mat2.I, unumpy.ulinalg.pinv(mat2, 1e-8))
