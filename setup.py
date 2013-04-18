@@ -166,7 +166,7 @@ Version history
 Main changes:
 
 - 2.2: Creating arrays and matrices of numbers with uncertainties \
-       with ``uarray()`` and ``umatrix()`` now requires two arguments \
+       with ``uarray()`` and ``umatrix()`` now requires two simple arguments \
        (nominal values and standard deviations) instead of a tuple argument. \
        This is consistent with the new, simpler ``ufloat()`` interface. \
        The previous \
@@ -180,7 +180,7 @@ Main changes:
        The previous ``ufloat((3, 0.1))`` and ``ufloat("3.0(1)")`` forms \
        will be supported for some time. Users are encouraged to update \
        their code, for instance through the newly provided `code updater`_.
-- 2.0: The standard deviation is now obtained more directly without an
+- 2.0: The standard deviation is now obtained more directly without an \
        explicit \
        call (``x.std_dev`` instead of ``x.std_dev()``). ``x.std_dev()`` \
        will be supported for some time. Users are encouraged to update \
