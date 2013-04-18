@@ -52,6 +52,8 @@ else:
             "Refactoring failed: '{}' => '{}' instead of '{}'".format(
             source, new.strip(), expected))
 
+        # print 'Checked:', source, '=>', expected
+        
     def check_all(fixer, tests):
         '''
         Takes a fixer name (module from fixes) and a mapping that maps
@@ -85,8 +87,9 @@ else:
 
             # set_std_dev => .std_dev:
             'x.set_std_dev(3)': 'x.std_dev = 3',
-            'y = set_std_dev(3)': 'y = set_std_dev(3)',
-            'func = x.set_std_dev': 'func = x.set_std_dev'
+            'y = set_std_dev(3)': 'y = set_std_dev(3)',  # None
+            'func = x.set_std_dev': 'func = x.set_std_dev',
+            'obj.x.set_std_dev(sin(y))': 'obj.x.std_dev = sin(y)'
         }
 
         check_all('std_dev', tests)
