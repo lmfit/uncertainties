@@ -173,13 +173,14 @@ Main changes:
        their code, for instance through the newly provided `code updater`_, \
        which in addition now automatically converts ``.set_std_dev(v)`` to \
        ``.std_dev = v``.
-- 2.1: Numbers with uncertainties are now created like \
+- 2.1: Numbers with uncertainties are now created more directly like \
        ``ufloat(3, 0.1)``, ``ufloat(3, 0.1, "pi")``, \
        ``ufloat_fromstr("3.0(1)")``, ``ufloat_fromstr("3.0(1)", "pi")``. \
        The previous ``ufloat((3, 0.1))`` and ``ufloat("3.0(1)")`` forms \
        will be supported for some time. Users are encouraged to update \
        their code, for instance through the newly provided `code updater`_.
-- 2.0: The standard deviation is now obtained without an explicit \
+- 2.0: The standard deviation is now obtained more directly without an
+       explicit \
        call (``x.std_dev`` instead of ``x.std_dev()``). ``x.std_dev()`` \
        will be supported for some time. Users are encouraged to update \
        their code. The standard deviation of a variable can now be \
