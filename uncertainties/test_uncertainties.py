@@ -641,9 +641,10 @@ def test_logic():
     assert bool(t) == True  # Only infinitseimal neighborhood are used
 
 def test_obsolete():
-    'Tests some obsolete functions'
+    'Tests some obsolete creation of number with uncertainties'
     x = ufloat(3, 0.1)
-    x.set_std_dev(0.2)  # Obsolete function
+    # Obsolete function, protected against automatic modification:
+    x.set_std_dev.__call__(0.2)
 
     x_std_dev = x.std_dev
     assert x_std_dev() == 0.2  # Obsolete call
