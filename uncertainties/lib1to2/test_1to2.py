@@ -21,8 +21,8 @@ import sys
 if sys.version_info < (2, 7):
     # This package uses lib2to3, which requires Python 2.6+.
 
-    # !!  Nosetests also fails (it looks like it tries to run tests
-    # via lib2to3/tests/test_refactor.py):
+    # !!  Nosetests for Python 2.6 also fails (it looks like it tries
+    # to run tests via lib2to3/tests/test_refactor.py):
     
     pass
 
