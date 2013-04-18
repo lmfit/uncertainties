@@ -27,7 +27,7 @@ if sys.version_info < (2, 7):
     pass
 
 else:
-    import re
+
     import os
     import lib2to3.tests.support as support
 
@@ -120,8 +120,8 @@ else:
         # Automatic addition of a dotted access:
         tests.update(dict(
             # !! Dictionary comprehension usable with Python 2.7+
-            (re.sub('ufloat', 'unc.ufloat', orig),
-             re.sub('ufloat', 'unc.ufloat', new))
+            (orig.replace('ufloat', 'unc.ufloat'),
+             new.replace('ufloat', 'unc.ufloat'))
             for (orig, new) in tests.iteritems()))
 
         # Test for space consistency:
@@ -162,8 +162,8 @@ else:
         # Automatic addition of a dotted access:
         tests.update(dict(
             # !! Dictionary comprehension usable with Python 2.7+
-            (re.sub('uarray', 'un.uarray', orig),
-             re.sub('uarray', 'un.uarray', new))
+            (orig.replace('uarray', 'un.uarray'),
+             new.replace('uarray', 'un.uarray'))
             for (orig, new) in tests.iteritems()))
                              
         # Exponentiation test:
