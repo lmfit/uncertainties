@@ -263,3 +263,15 @@ def test_array_comparisons():
     mat = unumpy.umatrix([1, 2], [1, 4])
     assert numpy.all((mat == [mat[0,0], 4]) == [True, False])
 
+def test_obsolete():
+    'Test of obsolete functions'
+
+    # The new and old calls should give the same results:
+    arr_obs = unumpy.uarray(([1, 2], [1, 4]))  # Obsolete call
+    arr = unumpy.uarray([1, 2], [1, 4])
+    assert (arr_obs == arr).all()
+
+    # The new and old calls should give the same results:
+    mat_obs = unumpy.umatrix(([1, 2], [1, 4]))  # Obsolete call
+    mat = unumpy.umatrix([1, 2], [1, 4])
+    assert (mat_obs == mat).all()
