@@ -20,7 +20,7 @@ from numpy.core import numeric
 
 # Local modules:
 import uncertainties
-from uncertainties import umath
+from uncertainties import umath, deprecation
 
 from uncertainties import __author__
 
@@ -250,6 +250,7 @@ def uarray(nominal_values, std_devs=None):
     """
 
     if std_devs is None:  # Obsolete, single tuple argument call
+        deprecation('uarray() should now be called with two arguments.')
         (nominal_values, std_devs) = nominal_values
         
     return (numpy.vectorize(
@@ -566,6 +567,10 @@ def umatrix(nominal_values, std_devs=None):
     a unumpy.matrix object instead of a numpy.matrix one.
     """
 
+    if std_devs is None:  # Obsolete, single tuple argument call
+        deprecation('umatrix() should now be called with two arguments.')
+        (nominal_values, std_devs) = nominal_values
+            
     return uarray(nominal_values, std_devs).view(matrix)
 
 ###############################################################################
