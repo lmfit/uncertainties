@@ -168,7 +168,8 @@ Main changes:
 - 2.2: Creating arrays and matrices of numbers with uncertainties \
        with ``uarray()`` and ``umatrix()`` now requires two arguments \
        (nominal values and standard deviations) instead of a tuple argument. \
-       This is consistent with the new ``ufloat()`` interface.  The previous \
+       This is consistent with the new, simpler ``ufloat()`` interface. \
+       The previous \
        usage will be supported for some time. Users are encouraged to update \
        their code, for instance through the newly provided `code updater`_, \
        which in addition now automatically converts ``.set_std_dev(v)`` to \
