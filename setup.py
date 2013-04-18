@@ -165,6 +165,14 @@ Version history
 
 Main changes:
 
+- 2.2: Creating arrays and matrices of numbers with uncertainties \
+       with ``uarray()`` and ``umatrix()`` now requires two arguments \
+       (nominal values and standard deviations) instead of a tuple argument. \
+       This is consistent with the new ``ufloat()`` interface.  The previous \
+       usage will be supported for some time. Users are encouraged to update \
+       their code, for instance through the newly provided `code updater`_, \
+       which in addition now automatically converts `.set_std_dev(v)` to \
+       ``.std_dev = v``.
 - 2.1: Numbers with uncertainties are now created like \
        ``ufloat(3, 0.1)``, ``ufloat(3, 0.1, "pi")``, \
        ``ufloat_fromstr("3.0(1)")``, ``ufloat_fromstr("3.0(1)", "pi")``. \
