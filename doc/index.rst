@@ -315,8 +315,9 @@ Planned future developments include:
 - addition of :attr:`real` and :attr:`imag` attributes, for increased
   compatibility with existing code (Python numbers have these attributes).
 
-**Please support the continued development of this program** by `donating 
-$10`_ or more through PayPal (no PayPal account necessary)!
+**Please support the continued development of this program** by using
+`gittip <https://www.gittip.com/lebigot/>`_ or by `donating $10`_ or
+more through PayPal (no PayPal account necessary),
 
 .. index:: support
 
