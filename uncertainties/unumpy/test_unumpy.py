@@ -232,7 +232,7 @@ def test_array_and_matrix_creation():
     assert arr[1].std_dev == 0.2
 
     # Same thing for matrices:
-    mat = unumpy.umatrix(([1, 2], [0.1, 0.2]))
+    mat = unumpy.umatrix([1, 2], [0.1, 0.2])
     assert mat[0,1].nominal_value == 2
     assert mat[0,1].std_dev == 0.2
     
@@ -260,6 +260,6 @@ def test_array_comparisons():
     assert numpy.all((arr == [arr[0], 4]) == [True, False])
 
     # For matrices, 1D arrays are converted to 2D arrays:
-    mat = unumpy.umatrix(([1, 2], [1, 4]))
+    mat = unumpy.umatrix([1, 2], [1, 4])
     assert numpy.all((mat == [mat[0,0], 4]) == [True, False])
 
