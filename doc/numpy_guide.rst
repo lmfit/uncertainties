@@ -44,7 +44,7 @@ Arrays
 Arrays of numbers with uncertainties can be built from values and
 uncertainties:
 
-  >>> arr = unumpy.uarray(([1, 2], [0.01, 0.002]))
+  >>> arr = unumpy.uarray([1, 2], [0.01, 0.002])
   >>> print arr
   [1.0+/-0.01 2.0+/-0.002]
 
@@ -63,7 +63,7 @@ Matrices
 Matrices of numbers with uncertainties are best created in one of
 two ways.  The first way is similar to using :func:`uarray`:
 
-  >>> mat = unumpy.umatrix(([1, 2], [0.01, 0.002]))
+  >>> mat = unumpy.umatrix([1, 2], [0.01, 0.002])
 
 Matrices can also be built by converting arrays of numbers with
 uncertainties into matrices through the :class:`unumpy.matrix` class:
