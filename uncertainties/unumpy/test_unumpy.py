@@ -19,7 +19,7 @@ except ImportError:
 import uncertainties
 from uncertainties import ufloat, unumpy, test_uncertainties
 from uncertainties.unumpy import core
-from uncertainties.test_uncertainties import _numbers_close, matrices_close
+from uncertainties.test_uncertainties import _numbers_close, arrays_close
 from uncertainties import __author__
 
 def test_numpy():
@@ -149,7 +149,7 @@ def test_inverse():
     assert _numbers_close(m_double_inverse[0, 0].std_dev,
                           m[0, 0].std_dev)
 
-    assert matrices_close(m_double_inverse, m)
+    assert arrays_close(m_double_inverse, m)
 
     # Partial test:
     assert _derivatives_close(m_double_inverse[0, 0], m[0, 0])
@@ -166,7 +166,7 @@ def test_inverse():
 
     # Correlations between m and m_inverse should create a perfect
     # inversion:
-    assert matrices_close(m * m_inverse,  numpy.eye(m.shape[0]))
+    assert arrays_close(m * m_inverse,  numpy.eye(m.shape[0]))
 
 def test_pseudo_inverse():
     "Tests of the pseudo-inverse"
@@ -185,7 +185,7 @@ def test_pseudo_inverse():
     rcond = 1e-8  # Test of the second argument to pinv()
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core._pinv(m, rcond)
-    assert matrices_close(m_pinv_num, m_pinv_package)
+    assert arrays_close(m_pinv_num, m_pinv_package)
 
     ##########
     # Example with a non-full rank rectangular matrix:
@@ -193,14 +193,14 @@ def test_pseudo_inverse():
     m = unumpy.matrix([vector, vector])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core._pinv(m, rcond)
-    assert matrices_close(m_pinv_num, m_pinv_package)
+    assert arrays_close(m_pinv_num, m_pinv_package)
     
     ##########
     # Example with a non-full-rank square matrix:
     m = unumpy.matrix([[ufloat(10, 1), 0], [3, 0]])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core._pinv(m, rcond)
-    assert matrices_close(m_pinv_num, m_pinv_package)
+    assert arrays_close(m_pinv_num, m_pinv_package)
     
 def test_broadcast_funcs():
     """
@@ -226,20 +226,20 @@ def test_broadcast_funcs():
 def test_array_and_matrix_creation():
     "Test of custom array creation"
 
-    arr = unumpy.uarray(([1, 2], [0.1, 0.2]))
+    arr = unumpy.uarray([1, 2], [0.1, 0.2])
 
     assert arr[1].nominal_value == 2
     assert arr[1].std_dev == 0.2
 
     # Same thing for matrices:
-    mat = unumpy.umatrix(([1, 2], [0.1, 0.2]))
+    mat = unumpy.umatrix([1, 2], [0.1, 0.2])
     assert mat[0,1].nominal_value == 2
     assert mat[0,1].std_dev == 0.2
     
 def test_component_extraction():
     "Extracting the nominal values and standard deviations from an array"
 
-    arr = unumpy.uarray(([1, 2], [0.1, 0.2]))
+    arr = unumpy.uarray([1, 2], [0.1, 0.2])
 
     assert numpy.all(unumpy.nominal_values(arr) == [1, 2])
     assert numpy.all(unumpy.std_devs(arr) == [0.1, 0.2])
@@ -256,10 +256,23 @@ def test_component_extraction():
 def test_array_comparisons():
     "Test of array and matrix comparisons"
 
-    arr = unumpy.uarray(([1, 2], [1, 4]))
+    arr = unumpy.uarray([1, 2], [1, 4])
     assert numpy.all((arr == [arr[0], 4]) == [True, False])
 
     # For matrices, 1D arrays are converted to 2D arrays:
-    mat = unumpy.umatrix(([1, 2], [1, 4]))
+    mat = unumpy.umatrix([1, 2], [1, 4])
     assert numpy.all((mat == [mat[0,0], 4]) == [True, False])
+
+def test_obsolete():
+    'Test of obsolete functions'
+
+    # The new and old calls should give the same results:
+    arr_obs = unumpy.uarray(([1, 2], [1, 4]))  # Obsolete call
+    arr = unumpy.uarray([1, 2], [1, 4])
+    assert arrays_close(arr_obs, arr)
+
+    # The new and old calls should give the same results:
+    mat_obs = unumpy.umatrix(([1, 2], [1, 4]))  # Obsolete call
+    mat = unumpy.umatrix([1, 2], [1, 4])
+    assert arrays_close(mat_obs, mat)
 
