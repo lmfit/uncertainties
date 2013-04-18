@@ -555,7 +555,7 @@ class matrix(numpy.matrix):
     
     std_devs = std_devs
     
-def umatrix(values, std_devs=None):
+def umatrix(nominal_values, std_devs=None):
     """
     Constructs a matrix that contains numbers with uncertainties.
 
@@ -566,7 +566,7 @@ def umatrix(values, std_devs=None):
     a unumpy.matrix object instead of a numpy.matrix one.
     """
 
-    return uarray(values, std_devs).view(matrix)
+    return uarray(nominal_values, std_devs).view(matrix)
 
 ###############################################################################
 
