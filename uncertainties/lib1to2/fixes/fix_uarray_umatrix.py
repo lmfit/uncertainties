@@ -24,7 +24,7 @@ tuple_call = """
 
 ###############################################################################
 
-class FixUarray_umatrix(BaseFix):
+class FixUarrayUmatrix(BaseFix):
 
     # Non dotted access, then dotted access.
     # Tuple call, then single-argument call
@@ -40,6 +40,8 @@ class FixUarray_umatrix(BaseFix):
         any* >
         """.format(tuple_call=tuple_call)
 
+    # Same pattern, for umatrix():
+    PATTERN = '{}|{}'.format(PATTERN, PATTERN.replace('uarray', 'umatrix'))
     
     def transform(self, node, results):
 

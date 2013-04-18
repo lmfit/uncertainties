@@ -144,7 +144,8 @@ else:
     def test_uarray_umatrix():
         '''
         Test of the transformation of uarray(tuple,...) into
-        uarray(nominal_values, std_devs).
+        uarray(nominal_values, std_devs). Also performs the same tests
+        on umatrix().
         '''
         
         tests = {
@@ -175,5 +176,11 @@ else:
         # Test for space consistency:
         tests[' t  =  u.uarray(args)'] = ' t  =  u.uarray(*args)'
 
-        check_all('uarray', tests)
+        # Same tests, but for umatrix:
+        tests.update(dict(
+            (orig.replace('uarray', 'umatrix'),
+             new.replace('uarray', 'umatrix'))
+            for (orig, new) in tests.iteritems()))
+        
+        check_all('uarray_umatrix', tests)
 
