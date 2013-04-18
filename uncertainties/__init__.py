@@ -237,7 +237,7 @@ import warnings
 from backport import *
 
 # Numerical version:
-__version_info__ = (2, 1)
+__version_info__ = (2, 2)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
@@ -308,7 +308,10 @@ def deprecation(message):
     # stacklevel = 3 points to the original user call (not to the
     # function from this module that called deprecation()).
     # DeprecationWarning is ignored by default: not used.
-    warnings.warn(message, stacklevel=3)
+    
+    warnings.warn('Obsolete: %s Code can be automatically updated with'
+                  ' python -m uncertainties.1to2 -w ProgramDirectory.'
+                  % message, stacklevel=3)
 
 ###############################################################################
 
@@ -832,7 +835,7 @@ class CallableStdDev(float):
     '''
     
     def __call__ (self):
-        deprecation('Obsolete: the std_dev attribute should not be called'
+        deprecation('the std_dev attribute should not be called'
                     ' anymore: use .std_dev instead of .std_dev().')
         return self
         
@@ -1379,7 +1382,7 @@ class Variable(AffineScalarFunc):
     
     # Support for legacy method:
     def set_std_dev(self, value):  # Obsolete
-        deprecation('Obsolete: instead of set_std_dev(), please use'
+        deprecation('instead of set_std_dev(), please use'
                     ' .std_dev = ...')
         self.std_dev = value
         
@@ -1737,7 +1740,7 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     # converted through float() (case of a number with no uncertainty):
     except (TypeError, ValueError, AssertionError):
         # Obsolete, two-argument call:
-        deprecation('Obsolete: either use ufloat(nominal_value, std_dev),'
+        deprecation('either use ufloat(nominal_value, std_dev),'
                     ' ufloat(nominal_value, std_dev, tag), or the'
                     ' ufloat_fromstr() function, for string representations.')
 
