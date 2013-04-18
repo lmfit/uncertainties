@@ -32,7 +32,7 @@ else:
     import lib2to3.tests.support as support
 
     # The lib1to2.fixes package given to lib2to3 is the *local* package
-    # (not to any other installed module) (this is done through the
+    # (not to another installed module) (this is done through the
     # __import__() used via support.get_refactorer()):
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.pardir))
 
