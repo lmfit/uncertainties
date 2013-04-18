@@ -7,14 +7,37 @@ Transforms .std_dev() calls into .std_dev attribute access.
 '''
 
 from lib2to3.fixer_base import BaseFix
+from lib2to3.fixer_util import Name, Assign
 
 class FixStdDev(BaseFix):
     
-    PATTERN = "power< any trailer< '.' 'std_dev' > trailer< '(' ')' > >"
+    PATTERN = """
+    power< any trailer< '.' 'std_dev' > trailer< '(' ')' > >
+    |
+    power< any trailer< '.' 'set_std_dev' > trailer< '(' set_arg=any ')' > >
+    """
     
     def transform(self, node, results):
 
-        # '.std_dev' is followed by a call with no argument: the call
-        # is removed:
-        node.children[2].remove()
+        if 'set_arg' in results:  # Case of .set_std_dev()
 
+            print 
+            print 'NODE =', node
+            print "NODE repr =", repr(node)
+
+            # set_std_dev => std_dev
+            attribute = node.children[1]  # .set_std_dev
+            print "ATTR =", attribute
+            attribute.children[1].replace(Name('std_dev'))
+
+            # Call "(arg)": removed
+            node.children[2].remove()
+
+            # Replacement by an assignment:
+            node.replace(Assign(node.clone(), results['set_arg'].clone()))
+            
+        else:
+            # '.std_dev' is followed by a call with no argument: the call
+            # is removed:
+            node.children[2].remove()
+        

@@ -74,14 +74,19 @@ else:
             'y.std_dev();  unc.std_dev(z)': 'y.std_dev;  unc.std_dev(z)',
             'uncertainties.std_dev(x)': 'uncertainties.std_dev(x)',
             'std_dev(x)': 'std_dev(x)',
+            'obj.x.std_dev()': 'obj.x.std_dev',
 
             """
             long_name.std_dev(
             # No argument!
             )""":
-
             """
-            long_name.std_dev"""
+            long_name.std_dev""",
+
+            # set_std_dev => .std_dev:
+            'x.set_std_dev(3)': 'x.std_dev = 3',
+            'y = set_std_dev(3)': 'y = set_std_dev(3)',
+            'func = x.set_std_dev': 'func = x.set_std_dev'
         }
 
         check_all('std_dev', tests)
