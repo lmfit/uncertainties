@@ -269,12 +269,18 @@ def test_obsolete():
     'Test of obsolete functions'
 
     # The new and old calls should give the same results:
-    arr_obs = unumpy.uarray(([1, 2], [1, 4]))  # Obsolete call
+
+    # The unusual syntax is here to protect against automatic code
+    # update:
+    arr_obs = unumpy.uarray.__call__(([1, 2], [1, 4]))  # Obsolete call
     arr = unumpy.uarray([1, 2], [1, 4])
     assert arrays_close(arr_obs, arr)
 
     # The new and old calls should give the same results:
-    mat_obs = unumpy.umatrix(([1, 2], [1, 4]))  # Obsolete call
+    
+    # The unusual syntax is here to protect against automatic code
+    # update:
+    mat_obs = unumpy.umatrix.__call__(([1, 2], [1, 4]))  # Obsolete call
     mat = unumpy.umatrix([1, 2], [1, 4])
     assert arrays_close(mat_obs, mat)
 
