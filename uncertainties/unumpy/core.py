@@ -234,23 +234,30 @@ def wrap_array_func(func):
 ###############################################################################
 # Arrays
 
-def uarray(values, std_devs):
+def uarray(nominal_values, std_devs=None):
     """
     Returns a NumPy array of numbers with uncertainties
     initialized with the given nominal values and standard
     deviations.
 
-    values, std_devs -- valid arguments for numpy.array, with
+    nominal_values, std_devs -- valid arguments for numpy.array, with
     identical shapes (list of numbers, list of lists, numpy.ndarray,
     etc.).
+
+    std_devs=None is only used for supporting legacy code, where
+    nominal_values can be the tuple of nominal values and standard
+    deviations.
     """
 
+    if std_devs is None:  # Obsolete, single tuple argument call
+        (nominal_values, std_devs) = nominal_values
+        
     return (numpy.vectorize(
         # ! Looking up uncertainties.Variable beforehand through
         # '_Variable = uncertainties.Variable' does not result in a
         # significant speed up:
         lambda v, s: uncertainties.Variable(v, s), otypes=[object])
-        (values, std_devs))
+        (nominal_values, std_devs))
 
 ###############################################################################
 
@@ -548,11 +555,11 @@ class matrix(numpy.matrix):
     
     std_devs = std_devs
     
-def umatrix(values, std_devs):
+def umatrix(values, std_devs=None):
     """
     Constructs a matrix that contains numbers with uncertainties.
 
-    The input data is the same as for uarray(...): nominal values, and
+    The arguments are the same as for uarray(...): nominal values, and
     standard deviations.
 
     The returned matrix can be inverted, thanks to the fact that it is

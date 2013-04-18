@@ -269,9 +269,10 @@ def test_obsolete():
     # The new and old calls should give the same results:
     arr_obs = unumpy.uarray(([1, 2], [1, 4]))  # Obsolete call
     arr = unumpy.uarray([1, 2], [1, 4])
-    assert (arr_obs == arr).all()
+    assert matrices_close(arr_obs, arr)
 
     # The new and old calls should give the same results:
     mat_obs = unumpy.umatrix(([1, 2], [1, 4]))  # Obsolete call
     mat = unumpy.umatrix([1, 2], [1, 4])
-    assert (mat_obs == mat).all()
+    assert matrices_close(mat_obs, mat)
+
