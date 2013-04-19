@@ -804,25 +804,43 @@ def test_wrap_with_kwargs():
     '''
 
     # We also add keyword arguments in the function which is wrapped:
-    def f(x, y, **kwargs):
+    def f(x, y, *args, **kwargs):
         # We make sure that f is not called directly with a number with
         # uncertainty:
         assert isinstance(x, float)
         assert isinstance(y, float)
         
-        return x + 2*y + kwargs['t']*3
+        return x + math.sin(y) + 2*args[0] + kwargs['t']*3
     
     f_wrapped = uncertainties.wrap(f)
 
     # Version of f() that works with numbers with uncertainties:
-    f_auto_unc = lambda x, y, t: x+2*y+3*t
+    f_auto_unc = lambda x, y, z, t: x+2*y+3*t
 
     x = ufloat((1, 0.1))
     y = ufloat((10, 0.11))
-    t = ufloat((0.1, 0.1))
+    z = ufloat((100, 0.111))
+    t = ufloat((0.1, 0.1111))
 
-    assert _ufloats_close(f_wrapped(x, y=y, t=t), f_auto_unc(x, y, t=t))
+    assert _ufloats_close(f_wrapped(x, y=y, z=z, t=t),
+                          f_auto_unc(x, y, z=z, t=t))
 
+    ########################################
+
+    # We make sure that analytical derivatives are indeed used. We
+    # also test the automatic handling of additional *args arguments
+    # beyond the number of supplied derivatives.
+
+    f_wrapped2 = uncertainties.wrap(f, [None, math.cos])
+
+    # The derivatives must be perfectly identical:
+
+    # The *args parameter of f() is given as a keyword argument, so as
+    # to try to confuse the code:
+    
+    assert (f_wrapped2(x, y=y, z=z, t=t).derivatives[y]
+            == f_auto_unc(x, y=y, z=z, t=t).derivatives[y])
+    
     
 ###############################################################################
         
