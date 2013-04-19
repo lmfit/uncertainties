@@ -1584,8 +1584,8 @@ NUMBER_WITH_UNCERT_RE_STR = '''
     ([eE][+-]?\d+)?  # Optional exponent
     ''' % (POSITIVE_DECIMAL_UNSIGNED, POSITIVE_DECIMAL_UNSIGNED)
 
-NUMBER_WITH_UNCERT_RE = re.compile(
-    "^%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE)
+NUMBER_WITH_UNCERT_RE_SEARCH = re.compile(
+    "^%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).search
 
 def parse_error_in_parentheses(representation):
     """
@@ -1597,7 +1597,7 @@ def parse_error_in_parentheses(representation):
     Raises ValueError if the string cannot be parsed.    
     """
 
-    match = NUMBER_WITH_UNCERT_RE.search(representation)
+    match = NUMBER_WITH_UNCERT_RE_SEARCH(representation)
 
     if match:
         # The 'main' part is the nominal value, with 'int'eger part, and
