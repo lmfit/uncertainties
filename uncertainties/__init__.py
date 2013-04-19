@@ -503,6 +503,25 @@ def partial_derivative(f, arg_ref):
 
     return partial_derivative_of_f
 
+class NumericalDerivatives(object):
+    """
+    Convenient access to the partial derivatives of a function,
+    calculated numerically.
+    """
+    # This is not a list because the number of arguments of the
+    # function is not known in advance, in general.
+
+    def __init__(self, function):
+        """
+        'function' is the function whose derivatives can be computed.
+        """
+        self._function = function
+
+    def __getitem__(self, n):
+        """
+        Returns the n-th numerical derivative of the function.
+        """
+        return partial_derivative(self._function, n)
 
 def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     """
