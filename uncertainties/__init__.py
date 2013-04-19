@@ -556,19 +556,25 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
 
     derivatives_args --
     
-        If not None, derivatives_args can be an iterable that
-        generally contains functions; each successive function is the
-        partial derivative of f with respect to the corresponding
-        variable (one function for each argument of f, which takes the
-        same arguments as f).  If instead of a function, an element of
-        derivatives_args contains None, then it is automatically
-        replaced by the relevant numerical derivative; this can be
-        used for non-scalar arguments of f (like string arguments).
+        Iterable that, when iterated over, returns either derivatives
+        (functions) or None. derivatives_args can be a simple
+        sequence (list or tuple).
+         
+        Each function must be the partial derivative of f with respect
+        to the corresponding variable in sequence args when f is
+        called as f(*args, **kwargs).  These functions take the same
+        arguments as f.
 
-        If derivatives_args is None, or if derivatives_args contains a
-        fixed (and finite) number of elements, then any missing
-        derivative is calculated numerically. This is less precise
-        than using analytical derivatives.
+        A value of None (instead of a function) is automatically
+        replaced by the relevant numerical derivative. This derivative
+        is not used if the corresponding argument is not a number with
+        uncertainty. A None value can therefore be used for non-scalar
+        arguments of f (like string arguments).
+
+        If the derivatives_args iterable yields fewer derivatives than
+        there are arguments in args if f was called as f(*args,
+        **kwargs), wrap() automatically sets these elements to None
+        (automatic numerical calculation of derivatives).
 
         An indefinite number of derivatives can be specified by having
         derivatives_args be an infinite iterator; this can for
@@ -576,17 +582,17 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         with a undefined number of argument (like sum(), whose partial
         derivatives all return 1).
 
-    derivatives_dict --
+    derivatives_kwargs --
 
-        Dictionary that maps optional keyword argument names to their
-        derivative (as in derivatives_args).
-        
-    Note on efficiency: the wrapped function assumes that f cannot
-    accept numbers with uncertainties as arguments. If f actually does
-    handle some arguments even when they have an uncertainty, the
-    wrapped function ignores this fact, which might lead to a
-    performance hit: wrapping a function that actually accepts numbers
-    with uncertainty is likely to make it slower.
+        Dictionary that maps keyword parameters to their derivatives,
+        or None (as in derivatives_args). Keyword parameters are
+        defined as being those of kwargs in a call of the form
+        f(*args, **kwargs).
+
+        Non-mapped keyword parameters are replaced automatically by
+        None: the wrapped function will use, if necessary, numerical
+        differentiation for these parameters (as with
+        derivatives_args).
         
     Example (for illustration purposes only, as
     uncertainties.umath.sin() runs faster than the examples that
@@ -595,8 +601,29 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     numerically.  wrap(math.sin, [None]) would have produced the same
     result.  wrap(math.sin, [math.cos]) is the same function, but with
     an analytically defined derivative.
+
+    The correctness of the supplied analytical derivatives an be
+    tested by setting them to None instead and comparing the
+    analytical and the numerical differentiation results.
+    
+    Note on efficiency: the wrapped function assumes that f cannot
+    accept numbers with uncertainties as arguments. If f actually does
+    handle some arguments even when they have an uncertainty, the
+    wrapped function ignores this fact, which might lead to a
+    performance hit: wrapping a function that actually accepts numbers
+    with uncertainty is likely to make it slower.
     """
 
+    # None "derivatives" are automatically added in case the supplied
+    # derivatives_args is shorter than 
+    derivatives_args_iter = itertools.chain(derivatives_args,
+                                            itertools.repeat(None))
+
+    #!!!!!!! the iterator must be copied before each use!
+    # (derivatives_args_iter, derivatives_args_iter_copy) = itertools.tee(
+    #    derivatives_args_iter)
+
+    
     #!!!!!!! handle derivatives_dict too?
 
     # Construction of derivatives_args, an iterable that gives the
