@@ -690,12 +690,8 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
 
 
         ########################################
-            
-        # Calculation of the derivatives with respect to the variables
-        # of f that have a number with uncertainty. The result goes to
-        # the derivatives_wrt_args dictionary.
 
-        # The chain rule is applied.  In the case of numerical
+        # The chain rule will be applied.  In the case of numerical
         # derivatives, this method gives a better-controlled numerical
         # stability than numerically calculating the partial
         # derivatives through '[f(x + dx, y + dy, ...) -
@@ -703,6 +699,11 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # 'a' by 'da'.  In fact, this allows the program to control
         # how big the dx, dy, etc. are, which is numerically more
         # precise.
+        
+        ########################################
+            
+        # Calculation of the derivatives with respect to the variables
+        # of f that have a number with uncertainty.
         
         # Necessary derivatives for args that are not yet in the cache
         # are added:
@@ -715,30 +716,27 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
 
                 derivatives_args_cache.append(derivative)
 
-        # Maps each relevant argument reference (numerical index in
-        # args, or name in kwargs, which is made possible by the fact
-        # that argument names are not integers) to the value of the
+        # Mappings of each relevant argument reference (numerical
+        # index in args, or name in kwargs to the value of the
         # corresponding partial derivative of f (only for those
-        # arguments that contain a number with uncertainty):
-        derivatives_wrt_args = {}
-
+        # arguments that contain a number with uncertainty).
+        
+        derivatives_num_args = {}
         for pos in pos_w_uncert:
-            derivatives_wrt_args[pos] = derivatives_args_cache[pos](
+            derivatives_num_args[pos] = derivatives_args_cache[pos](
                 *args_values, **kwargs)
-            
+
+        derivatives_num_kwargs = {}
         for name in names_w_uncert:
-            derivatives_wrt_args[name] = derivatives_kwargs[name](
+            derivatives_num_kwargs[name] = derivatives_kwargs[name](
                 *args_values, **kwargs)
 
         ########################################
         # Calculation of the derivative of f with respect to all the
-        # variables (Variable) involved.
+        # variables (Variable objects) involved.
 
         # Involved variables (Variable objects):
         variables = set()
-        
-        #!!!!!!! could be obtained if we had a mapping from pos/name
-        #to variable (and derivative), no?
         
         for expr in itertools.chain(
             (args[index] for index in pos_w_uncert),  # From args
@@ -750,13 +748,19 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # Initial value for the chain rule (is updated below):
         derivatives_wrt_vars = dict((var, 0.) for var in variables)
 
-        # The chain rule is used (we already have
-        # derivatives_wrt_args):
+        ## The chain rule is used...
 
-        for (func, f_derivative) in zip(aff_funcs, derivatives_wrt_args):
-            for (var, func_derivative) in func.derivatives.iteritems():
-                derivatives_wrt_vars[var] += f_derivative * func_derivative
+        # ... on args:
+        for (pos, f_derivative) in derivatives_num_args.iteritems():
+            for (var, arg_derivative) in args[pos].derivatives.iteritems():
+                derivatives_wrt_vars[var] += f_derivative * arg_derivative
+        # ... on kwargs:
+        for (name, f_derivative) in derivatives_num_kwargs.iteritems():
+            for (var, arg_derivative) in (kwargs_uncert_values[name]
+                                          .derivatives.iteritems()):
+                derivatives_wrt_vars[var] += f_derivative * arg_derivative
 
+                
         # The function now returns an AffineScalarFunc object:
         return AffineScalarFunc(f_nominal_value, derivatives_wrt_vars)
 
