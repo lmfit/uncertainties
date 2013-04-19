@@ -24,6 +24,7 @@ import sys
 
 import uncertainties
 from uncertainties import ufloat, AffineScalarFunc, ufloat_fromstr
+from  uncertainties umath
 
 from uncertainties import __author__
 
@@ -55,6 +56,20 @@ def _numbers_close(x, y, tolerance=1e-6):
         else:
             return abs(x) < tolerance
 
+def _ufloats_close(x, y, tolerance=1e-6):
+    '''
+    Tests if two numbers with uncertainties (or floats) are close (as
+    random variables: this is stronger than testing whether their
+    nominal value and standard deviation are close).
+
+    The tolerance is applied to both the nominal value and the
+    standard deviation of the difference between the numbers.
+    '''
+
+    diff = x-y
+    return (_numbers_close(diff.nominal_value, 0, tolerance)
+            and _numbers_close(diff.std_dev, 0, tolerance))
+    
 class DerivativesDiffer(Exception):
     pass
 
@@ -731,87 +746,83 @@ def test_wrapped_func():
     Test uncertainty-aware functions obtained through wrapping.
     """
 
-    def sum_float(list_nums):
-        '''
-        Takes a list of numbers and adds them together with
-        the float addition (float.__add__).
-        '''
-        return reduce(float.__add__, list_nums, 0.)
-    
-    # This function can be wrapped so that it works when 'angle' has
-    # an uncertainty (math.cos does not handle numbers with
-    # uncertainties):
-    def f(angle, list_var):
-        # It is useful to also include a function that has a variable number
-        # of arguments like my_sum():
-        return math.cos(angle) + sum_float(list_var)
+    ########################################
 
+    def f(angle, *list_var):
+        # We make sure that this function is only ever called with
+        # floats:
+        assert all(isinstance(arg, float) in list_var)
+        return math.cos(angle) + sum(list_var)
+    
     f_wrapped = uncertainties.wrap(f)
+
+    # Same function as f(), but with an automatic uncertainty
+    # calculation:
+    def f_auto_unc(angle, *list_var):
+        return umath.cos(angle) + sum(list_var)
+
     my_list = [1, 2, 3]
 
-    # Test of a wrapped function that only calls the original function:
-    assert f_wrapped(0, my_list) == 1 + sum_float(my_list)
+    ########################################
+    # Test of a wrapped function that only calls the original
+    # function: it should obtain the exact same result:
+    assert f_wrapped(0, my_list) == f(0, my_list)
+    # 1 == 1 +/- 0, so the type must be checked too:
+    assert type(f_wrapped(0, my_list)) == type(f(0, my_list))
 
-    # As a precaution, the wrapped function does not venture into
-    # calculating f with uncertainties when one of the argument is not
-    # a simple number, because this argument might contain variables:
-    angle = ufloat(0, 0.1)
+    ########################################
+    # Call with uncertainties:
+    
+    angle = uncertainties.ufloat(1, 0.1)
+    list_value = uncertainties.ufloat(3, 0.2)
 
-    assert f_wrapped(angle, [angle, angle]) == NotImplemented
-    assert f_wrapped(angle, my_list) == NotImplemented
+    # The random variables must be the same (full correlation):
     
-    ##############################
-    # Non-float arguments:
+    assert _ufloats_close(f_wrapped(angle, [1, angle]),
+                          f_auto_unc(angle, [1, angle]))
+    
+    assert _ufloats_close(f_wrapped(angle, [list_value, angle]),
+                          f_auto_unc(angle, [list_value, angle]))
+    
+    ########################################
+    # Non-numerical arguments, and  explicit and implicit derivatives:
+    def f(x, y, z, t, u):
+        return x+2*z+3*t+4*u
+    
+    f_wrapped = uncertainties.wrap(
+        f, [lambda *args: 1, None, lambda *args:1, None])  # No deriv. for u
 
-    x = uncertainties.ufloat((1, 0.1))
-    
-    # Implicit derivatives:
-    def f(x, y, z):
-        return x+z
-    f_wrapped = uncertainties.wrap(f)
-    assert fw(10, 'string argument', 1) == 11
-    assert fw(x, 'string argument', 1).std() == 1
-    
-    # Explicit derivatives:
-    def f(x, y, z):
-        return x+z
-    f_wrapped = uncertainties.wrap(f, [lambda *args: 1, None, lambda *args:1])
-    assert fw(10, 'string argument', 1) == 11.0
-    assert fw(x, 'string argument', 1).std() == 1
+    assert f_wrapped(10, 'string argument', 1, 0, 0) == 12
+
+    x = uncertainties.ufloat(10, 1)
+    assert _numbers_close(f_wrapped(x, 'string argument', x, x, x).std_dev,
+                          1+2+3+4)
 
 def test_wrap_with_kwargs():
     '''
-    Tests wrap() on functions with positional-or-keyword parameters
-    called with keyword arguments.
+    Tests wrap() on wrapped functions with called with keyword arguments.
     '''
 
-    def f(x, y):
+    # We also add keyword arguments in the function which is wrapped:
+    def f(x, y, **kwargs):
         # We make sure that f is not called directly with a number with
         # uncertainty:
         assert isinstance(x, float)
         assert isinstance(y, float)
         
-        return 2*x + 2*y
-
+        return x + 2*y + kwargs['t']*3
+    
     f_wrapped = uncertainties.wrap(f)
 
+    # Version of f() that works with numbers with uncertainties:
+    f_auto_unc = lambda x, y, t: x+2*y+3*t
+
     x = ufloat((1, 0.1))
-    y = ufloat((10, 1))
-    result = f_wrapped(x, y=y)  # Call with a keyword argument
+    y = ufloat((10, 0.11))
+    t = ufloat((0.1, 0.1))
 
-    # Numerical check:
-    assert _numbers_close(2*x.nominal_value, result.nominal_value)
-    assert _numbers_close(2*x.std_dev, result.std_dev)
-    assert _numbers_close(2*y.nominal_value, result.nominal_value)
-    assert _numbers_close(2*y.std_dev, result.std_dev)
-    
-def test_wrap_func_with_kwargs():
-    '''
-    Tests wrap() on functions that accept arbitrary keyword arguments.
-    '''
+    assert _ufloats_close(f_wrapped(x, y=y, t=t), f_auto_unc(x, y, t=t))
 
-    
-    #!!!!!!!!!!!
     
 ###############################################################################
         
