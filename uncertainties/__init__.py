@@ -509,7 +509,7 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     Wraps a function f into a function that also accepts numbers with
     uncertainties (UFloat objects) where f accepts float arguments;
     the wrapped function returns the value of f with the correct
-    uncertainty (and correlations with the input variables).
+    uncertainty.
 
     Doing so may be necessary when function f cannot be expressed
     analytically (with uncertainties-compatible operators and
@@ -708,7 +708,7 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # Necessary derivatives for args that are not yet in the cache
         # are added:
         if pos_w_uncert:
-            for pos in range(len(derivatives_args_cache):pos_w_uncert[-1]+1):
+            for pos in range(len(derivatives_args_cache), pos_w_uncert[-1]+1):
 
                 derivative = next(derivatives_args_iter)
                 if derivative is None:
