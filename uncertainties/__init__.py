@@ -637,8 +637,10 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # The arguments that contain an uncertainty (AffineScalarFunc
         # objects) are gathered, as positions or names; they will be
         # replaced by simple floats.
-        pos_w_uncert = set(index for (index, value) in enumerate(args)
-                           if isinstance(value, AffineScalarFunc))
+
+        # *Increasing* indexes in args:
+        pos_w_uncert = [index for (index, value) in enumerate(args)
+                        if isinstance(value, AffineScalarFunc)]
         names_w_uncert = set(key for (key, value) in kwargs.iteritems()
                              if isinstance(value, AffineScalarFunc))
 
@@ -686,22 +688,12 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
             
         f_nominal_value = f(*args_values, **kwargs)
 
-        ########################################
-
-        # Involved variables (Variable objects):
-        variables = set()
-        
-        for expr in itertools.chain(
-            (args[index] for index in pos_w_uncert),  # From args
-            kwargs_uncert_values.itervalues()):  # From kwargs
-            
-            # !! In Python 2.7+: |= expr.derivatives.viewkeys()
-            variables |= set(expr.derivatives)
 
         ########################################
             
         # Calculation of the derivatives with respect to the variables
-        # of f that have a number with uncertainty.
+        # of f that have a number with uncertainty. The result goes to
+        # the derivatives_wrt_args dictionary.
 
         # The chain rule is applied.  In the case of numerical
         # derivatives, this method gives a better-controlled numerical
@@ -712,43 +704,49 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # how big the dx, dy, etc. are, which is numerically more
         # precise.
         
+        # Necessary derivatives for args that are not yet in the cache
+        # are added:
+        if pos_w_uncert:
+            for pos in range(len(derivatives_args_cache):pos_w_uncert[-1]+1):
+
+                derivative = next(derivatives_args_iter)
+                if derivative is None:
+                    derivative = partial_derivative(f, pos)
+
+                derivatives_args_cache.append(derivative)
+
         # Maps each relevant argument reference (numerical index in
-        # args, or name in kwargs) to the value of the corresponding
-        # partial derivative of f (only for those arguments that
-        # contain a number with uncertainty):
+        # args, or name in kwargs, which is made possible by the fact
+        # that argument names are not integers) to the value of the
+        # corresponding partial derivative of f (only for those
+        # arguments that contain a number with uncertainty):
         derivatives_wrt_args = {}
 
-        # More derivatives for args than found in the cache might be
-        # necessary:
-
-def numerical_deriv_if_None(derivative, pos):
-    '''
-    Returns the numerical differentiation operator for argument at
-    position pos if derivative is None.
-
-    Otherwise, returns derivative untouched.
-    '''
-
-    if derivative is None:
-        return #!!!!!!!!!!
-    
-    
-        derivatives_args_cache.extend(
-            numerical_deriv_if_None(next(derivatives_args_iter), pos)
-            for pos in range(len(derivatives_args_cache):max(pos_w_uncert)+1))
-        
         for pos in pos_w_uncert:
-            derivatives_wrt_args
-        
-        for (arg, derivative) in zip(aff_funcs, derivatives_args):
-            derivatives_wrt_args.append(derivative(*args_values)
-                                        if arg.derivatives
-                                        else 0)
+            derivatives_wrt_args[pos] = derivatives_args_cache[pos](
+                *args_values, **kwargs)
+            
+        for name in names_w_uncert:
+            derivatives_wrt_args[name] = derivatives_kwargs[name](
+                *args_values, **kwargs)
 
         ########################################
         # Calculation of the derivative of f with respect to all the
         # variables (Variable) involved.
 
+        # Involved variables (Variable objects):
+        variables = set()
+        
+        #!!!!!!! could be obtained if we had a mapping from pos/name
+        #to variable (and derivative), no?
+        
+        for expr in itertools.chain(
+            (args[index] for index in pos_w_uncert),  # From args
+            kwargs_uncert_values.itervalues()):  # From kwargs
+            
+            # !! In Python 2.7+: |= expr.derivatives.viewkeys()
+            variables |= set(expr.derivatives)
+        
         # Initial value for the chain rule (is updated below):
         derivatives_wrt_vars = dict((var, 0.) for var in variables)
 
