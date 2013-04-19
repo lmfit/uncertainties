@@ -817,10 +817,10 @@ def test_wrap_with_kwargs():
     # Version of f() that works with numbers with uncertainties:
     f_auto_unc = lambda x, y, z, t: x+2*y+3*t
 
-    x = ufloat((1, 0.1))
-    y = ufloat((10, 0.11))
-    z = ufloat((100, 0.111))
-    t = ufloat((0.1, 0.1111))
+    x = ufloat(1, 0.1)
+    y = ufloat(10, 0.11)
+    z = ufloat(100, 0.111)
+    t = ufloat(0.1, 0.1111)
 
     assert _ufloats_close(f_wrapped(x, y=y, z=z, t=t),
                           f_auto_unc(x, y, z=z, t=t))
