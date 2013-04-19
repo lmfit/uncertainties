@@ -779,11 +779,38 @@ def test_wrapped_func():
     assert fw(10, 'string argument', 1) == 11.0
     assert fw(x, 'string argument', 1).std() == 1
 
-def test_wrap_with_keywords():
+def test_wrap_with_kwargs():
     '''
-    Tests wrap() on functions that accept keywords.
+    Tests wrap() on functions with positional-or-keyword parameters
+    called with keyword arguments.
     '''
 
+    def f(x, y):
+        # We make sure that f is not called directly with a number with
+        # uncertainty:
+        assert isinstance(x, float)
+        assert isinstance(y, float)
+        
+        return 2*x + 2*y
+
+    f_wrapped = uncertainties.wrap(f)
+
+    x = ufloat((1, 0.1))
+    y = ufloat((10, 1))
+    result = f_wrapped(x, y=y)  # Call with a keyword argument
+
+    # Numerical check:
+    assert _numbers_close(2*x.nominal_value, result.nominal_value)
+    assert _numbers_close(2*x.std_dev, result.std_dev)
+    assert _numbers_close(2*y.nominal_value, result.nominal_value)
+    assert _numbers_close(2*y.std_dev, result.std_dev)
+    
+def test_wrap_func_with_kwargs():
+    '''
+    Tests wrap() on functions that accept arbitrary keyword arguments.
+    '''
+
+    
     #!!!!!!!!!!!
     
 ###############################################################################
