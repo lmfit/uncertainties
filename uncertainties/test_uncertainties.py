@@ -659,7 +659,7 @@ def test_obsolete():
     'Tests some obsolete creation of number with uncertainties'
     x = ufloat(3, 0.1)
     # Obsolete function, protected against automatic modification:
-    x.set_std_dev.__call__(0.2)
+    x.set_std_dev.__call__(0.2)  # Obsolete
 
     x_std_dev = x.std_dev
     assert x_std_dev() == 0.2  # Obsolete call
