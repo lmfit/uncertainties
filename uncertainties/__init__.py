@@ -604,12 +604,6 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
 
     ##
 
-    
-    #!!!!!!! the iterator must be copied before each use!
-    # (derivatives_args_iter, derivatives_args_iter_copy) = itertools.tee(
-    #    derivatives_args_iter)
-
-
     #! Setting the doc string after "def f_with...()" does not
     # seem to work.  We define it explicitly:
     @set_doc("""\
@@ -625,26 +619,31 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     
     Original documentation:
     %s""" % (f.__name__, f.__doc__))
+    
     def f_with_affine_output(*args, **kwargs):
 
+        ########################################
+        # The involved random variables must first be gathered, so
+        # that they can be independently updated.
+        
         # The arguments that contain an uncertainty (AffineScalarFunc
         # objects) are gathered, as positions or names; they will be
         # replaced by simple floats.
         pos_w_uncert = [index for (index, value) in enumerate(args)
-                         if isinstance(value, AffineScalarFunc)]
+                        if isinstance(value, AffineScalarFunc)]
         names_w_uncert = [key for (key, value) in kwargs.iteritems()
-                           if isinstance(value, AffineScalarFunc)]
+                          if isinstance(value, AffineScalarFunc)]
 
-        # The behavior of f() is kept, if no number with uncertainty
-        # is provided:
-        if (not pos_w_uncert) and (not names_w_uncert):
-            return f(*args, **kwargs)
-            
         ########################################
         # Value of f() at the nominal value of the arguments with
         # uncertainty:
 
-        ## Nominal values of the (scalar) arguments:
+        # The usual behavior of f() is kept, if no number with
+        # uncertainty is provided:
+        if (not pos_w_uncert) and (not names_w_uncert):
+            return f(*args, **kwargs)
+                    
+        ### Nominal values of the (scalar) arguments:
 
         # !! Possible optimization: If pos_w_uncert is empty, there
         # is actually no need to create a mutable version of args and
@@ -653,20 +652,26 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # as positional arguments (i.e., pos_w_uncert is not emtpy),
         # so this "optimization" is not implemented here.
         
-        # Positional arguments:
-        args_values = list(args)  # Mutable: modified below
+        ## Positional arguments:
+        args_values = list(args)  # Now mutable: modified below
         # Arguments with an uncertainty are converted to their nominal
         # value:
         for index in pos_w_uncert:
-            args_values[index] = args_values[index].nominal_value
+            args_values[index] = args[index].nominal_value
 
-        # Optional keyword arguments:
+        ## Keyword arguments:
 
         # For efficiency reasons, kwargs is not copied. Instead, its
         # values with uncertainty are modified:
-        kwargs_uncert_values = {}  # Original values with uncertainty
+
+        # The original values with uncertainties are needed: they are
+        # saved in the following dictionary:
+
+        kwargs_uncert_values = {}
+
         for name in names_w_uncert:
             value_with_uncert = kwargs[name]
+            # Saving for future use:
             kwargs_uncert_values[name] = value_with_uncert
             # The original dictionary is modified (for efficiency reasons):
             kwargs[name] = value_with_uncert.nominal_value
@@ -677,13 +682,20 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
 
         # Involved variables (Variable objects):
         variables = set()
-        for expr in ([args[index] for index in pos_w_uncert]
-                     +[kwargs[name] for name in names_w_uncert]):
+        
+        for expr in itertools.chain(
+            (args[index] for index in pos_w_uncert),  # From args
+            kwargs_uncert_values.itervalues()):  # From kwargs
+            
             # !! In Python 2.7+: |= expr.derivatives.viewkeys()
             variables |= set(expr.derivatives)
 
         ########################################
 
+        #!!!!!!! the iterator must be copied before each use!
+        # (derivatives_args_iter, derivatives_args_iter_copy) = itertools.tee(
+        #    derivatives_args_iter)
+            
         # Calculation of the derivatives with respect to the variables
         # of f that have a number with uncertainty.
 
