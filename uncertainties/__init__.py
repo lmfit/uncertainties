@@ -233,6 +233,7 @@ import math
 from math import sqrt, log  # Optimization: no attribute look-up
 import copy
 import warnings
+import itertools
 
 # Numerical version:
 __version_info__ = (2, 2)
@@ -533,52 +534,52 @@ class NumericalDerivatives(object):
         return partial_derivative(self._function, n)
 
 
-def wrap(f, derivatives_iter=None, derivatives_dict={}):
+def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     """
     Wraps a function f into a function that also accepts numbers with
-    uncertainties (UFloat objects) and returns a number with
-    uncertainties.  Doing so may be necessary when function f cannot
-    be expressed analytically (with uncertainties-compatible operators
-    and functions like +, *, umath.sin(), etc.).
+    uncertainties (UFloat objects) where f accepts float arguments;
+    the wrapped function returns the value of f with the correct
+    uncertainty (and correlations with the input variables).
+
+    Doing so may be necessary when function f cannot be expressed
+    analytically (with uncertainties-compatible operators and
+    functions like +, *, umath.sin(), etc.).
 
     f must return a scalar (not a list, etc.).
-    
-    In the wrapped function, the standard Python scalar arguments of f
-    (float, int, etc.) can be replaced by numbers with uncertainties
-    (including optional keyword arguments). The result will contain
-    the appropriate uncertainty.
-    
+        
     If no argument to the wrapped function has an uncertainty, f
     simply returns its usual, scalar result.
 
-    Arguments:
+    Parameters: the derivatives_* parameters define the derivatives of
+    arguments args and kwargs if function f was called as f(*args,
+    **kwargs).
 
-    derivatives_iter --
+    derivatives_args --
     
-        If supplied, derivatives_iter can be an iterable that
+        If not None, derivatives_args can be an iterable that
         generally contains functions; each successive function is the
         partial derivative of f with respect to the corresponding
         variable (one function for each argument of f, which takes the
         same arguments as f).  If instead of a function, an element of
-        derivatives_iter contains None, then it is automatically
+        derivatives_args contains None, then it is automatically
         replaced by the relevant numerical derivative; this can be
         used for non-scalar arguments of f (like string arguments).
 
-        If derivatives_iter is None, or if derivatives_iter contains a
+        If derivatives_args is None, or if derivatives_args contains a
         fixed (and finite) number of elements, then any missing
         derivative is calculated numerically. This is less precise
         than using analytical derivatives.
 
-        An infinite number of derivatives can be specified by having
-        derivatives_iter be an infinite iterator; this can for instance
-        be used for specifying the derivatives of functions with a
-        undefined number of argument (like sum(), whose partial
-        derivatives all return 1, but whose number if undefined).
+        An indefinite number of derivatives can be specified by having
+        derivatives_args be an infinite iterator; this can for
+        instance be used for specifying the derivatives of functions
+        with a undefined number of argument (like sum(), whose partial
+        derivatives all return 1).
 
     derivatives_dict --
 
         Dictionary that maps optional keyword argument names to their
-        derivative (as in derivatives_iter).
+        derivative (as in derivatives_args).
         
     Note on efficiency: the wrapped function assumes that f cannot
     accept numbers with uncertainties as arguments. If f actually does
@@ -598,17 +599,17 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
 
     #!!!!!!! handle derivatives_dict too?
 
-    # Construction of derivatives_iter, an iterable that gives the
+    # Construction of derivatives_args, an iterable that gives the
     # derivatives for the positional arguments of a function:
-    if derivatives_iter is None:
-        derivatives_iter = NumericalDerivatives(f)
+    if derivatives_args is None:
+        derivatives_args = NumericalDerivatives(f)
     else:
         # Derivatives that are not defined are calculated numerically,
         # if there is a finite number of them (the function lambda
         # *args: fsum(args) has a non-defined number of arguments, as
         # it just performs a sum):
         try:  # Is the number of derivatives fixed?
-            len(derivatives_iter)
+            len(derivatives_args)
         except TypeError:
             # !!!!!!!! There is probably a bug, in this case: the
             # iterator should be *copied* before each use in
@@ -616,10 +617,10 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
             # removed OR handled separately?
             pass  # Undefined number of derivatives (useful for, e.g., sum())
         else:
-            derivatives_iter = [
+            derivatives_args = [
                 partial_derivative(f, arg_num) if derivative is None
                 else derivative
-                for (arg_num, derivative) in enumerate(derivatives_iter)]
+                for (arg_num, derivative) in enumerate(derivatives_args)]
 
     #! Setting the doc string after "def f_with...()" does not
     # seem to work.  We define it explicitly:
@@ -715,7 +716,7 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
         # caller to always provide derivatives.  When changing the
         # functions of the math module, this would force this module
         # to know about all the math functions.  Another possibility
-        # would be to force derivatives_iter to contain, say, the
+        # would be to force derivatives_args to contain, say, the
         # first 3 derivatives of f.  But any of these two ideas has a
         # chance to break, one day... (if new functions are added to
         # the math module, or if some function has more than 3
@@ -732,14 +733,14 @@ def wrap(f, derivatives_iter=None, derivatives_dict={}):
         # contain a number with uncertainty):
         derivatives_wrt_args = {}
         for index in pos_w_uncert:
-            # !!!!!! I need an equivalent of derivatives_iter that can
-            # be accessed by index (or can derivatives_iter be
+            # !!!!!! I need an equivalent of derivatives_args that can
+            # be accessed by index (or can derivatives_args be
             # accessed by index?) OR MAYBE I COULD have a unique
             # mapping-like thing that returns BOTH derivative
             # functions for args and for kwargs
             pass
         
-        for (arg, derivative) in zip(aff_funcs, derivatives_iter):
+        for (arg, derivative) in zip(aff_funcs, derivatives_args):
             derivatives_wrt_args.append(derivative(*args_values)
                                         if arg.derivatives
                                         else 0)
