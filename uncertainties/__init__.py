@@ -13,6 +13,7 @@ Correlations between expressions are correctly taken into account (for
 instance, with x = 0.2+/-0.01, 2*x-x-x is exactly zero, as is y-x-x
 with y = 2*x).
 
+
 Examples:
 
   import uncertainties
@@ -234,6 +235,7 @@ from math import sqrt, log  # Optimization: no attribute look-up
 import copy
 import warnings
 import itertools
+import collections
 
 # Numerical version:
 __version_info__ = (2, 2)
@@ -508,32 +510,6 @@ def partial_derivative(f, arg_ref):
     return partial_derivative_of_f
 
 
-class NumericalDerivatives(object):
-    """
-    Convenient access to the partial derivatives of a function,
-    calculated numerically.
-    """
-    # This is not a list because the number of arguments of the
-    # function is not known in advance, in general.
-
-    def __init__(self, function):
-        """
-        'function' is the function whose derivatives can be computed.
-        """
-        self._function = function
-
-    def __getitem__(self, n):
-        """
-        Returns the n-th numerical derivative of the function (if n is
-        an integer), or the numerical derivative with respect to the
-        given optional named parameter (if n is a string).
-        """
-        # !!!! Couldn't this be restricted to integer values? maybe
-        # partial_derivative could be optimized for index (integer)
-        # values?
-        return partial_derivative(self._function, n)
-
-
 def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     """
     Wraps a function f into a function that also accepts numbers with
@@ -573,8 +549,9 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
 
         If the derivatives_args iterable yields fewer derivatives than
         there are arguments in args if f was called as f(*args,
-        **kwargs), wrap() automatically sets these elements to None
-        (automatic numerical calculation of derivatives).
+        **kwargs), wrap() automatically sets the remaining unspecified
+        derivatives to None (automatic numerical calculation of
+        derivatives).
 
         An indefinite number of derivatives can be specified by having
         derivatives_args be an infinite iterator; this can for
@@ -614,40 +591,24 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     with uncertainty is likely to make it slower.
     """
 
-    # None "derivatives" are automatically added in case the supplied
-    # derivatives_args is shorter than 
+    ## None "derivatives" for unspecified derivatives:
+
+    # Automatic addition in case the supplied derivatives_args is
+    # shorter than the number of arguments in *args:
     derivatives_args_iter = itertools.chain(derivatives_args,
                                             itertools.repeat(None))
+    # Unspecified derivatives for **kwargs are set to None (numerical
+    # differentiation):
+    derivatives_kwargs_default = collections.defaultdict(lambda: None,
+                                                         derivatives_kwargs)
 
+    ##
+
+    
     #!!!!!!! the iterator must be copied before each use!
     # (derivatives_args_iter, derivatives_args_iter_copy) = itertools.tee(
     #    derivatives_args_iter)
 
-    
-    #!!!!!!! handle derivatives_dict too?
-
-    # Construction of derivatives_args, an iterable that gives the
-    # derivatives for the positional arguments of a function:
-    if derivatives_args is None:
-        derivatives_args = NumericalDerivatives(f)
-    else:
-        # Derivatives that are not defined are calculated numerically,
-        # if there is a finite number of them (the function lambda
-        # *args: fsum(args) has a non-defined number of arguments, as
-        # it just performs a sum):
-        try:  # Is the number of derivatives fixed?
-            len(derivatives_args)
-        except TypeError:
-            # !!!!!!!! There is probably a bug, in this case: the
-            # iterator should be *copied* before each use in
-            # f_with_affine_output, probably.  SHOULD this case be
-            # removed OR handled separately?
-            pass  # Undefined number of derivatives (useful for, e.g., sum())
-        else:
-            derivatives_args = [
-                partial_derivative(f, arg_num) if derivative is None
-                else derivative
-                for (arg_num, derivative) in enumerate(derivatives_args)]
 
     #! Setting the doc string after "def f_with...()" does not
     # seem to work.  We define it explicitly:
