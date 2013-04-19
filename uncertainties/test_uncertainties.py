@@ -751,7 +751,7 @@ def test_wrapped_func():
     def f(angle, *list_var):
         # We make sure that this function is only ever called with
         # floats:
-        assert all(isinstance(arg, float) in list_var)
+        assert all(isinstance(arg, float) for arg in list_var)
         return math.cos(angle) + sum(list_var)
     
     f_wrapped = uncertainties.wrap(f)
