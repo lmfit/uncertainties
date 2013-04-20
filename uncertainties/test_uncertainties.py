@@ -89,6 +89,12 @@ def _compare_derivatives(func, numerical_derivatives,
     Tests are done on random arguments.
     """
 
+    #!!!!! test
+    print
+    print "FUNC", func
+    print "NUM DERIV", numerical_derivatives
+    print 'NUM ARG LIST', num_args_list
+    
     # print "Testing", func.__name__
 
     if not num_args_list: 

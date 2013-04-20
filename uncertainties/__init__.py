@@ -522,6 +522,7 @@ class NumericalDerivatives(object):
         Returns the n-th numerical derivative of the function.
         """
         return partial_derivative(self._function, n)
+    
 
 def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     """
@@ -794,6 +795,19 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     # called with unexpected arguments (unexpected keyword argument,
     # etc.). co_name is read-only, though.
 
+    #!!!!!!!! check if name and doc correctly set
+
+    #!!!!!!! test
+    import decorator
+    try:
+        f_with_affine_output = decorator.decorator(
+            (lambda func, *args, **kw: f_with_affine_output(*args, **kw)),
+            f)
+    # Preserving the signature is impossible, with some built-in
+    # functions:
+    except AttributeError:
+        pass
+    
     return f_with_affine_output
 
 def _force_aff_func_args(func):
