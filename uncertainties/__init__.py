@@ -672,12 +672,12 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         
     # Unspecified derivatives for **kwargs are set to None (numerical
     # differentiation):
-    derivatives_kwargs_default = collections.defaultdict(lambda: None,
-                                                         derivatives_kwargs)
+    derivatives_all_kwargs = collections.defaultdict(lambda: None,
+                                                     derivatives_kwargs)
 
     # When the wrapped function is called with keyword arguments that
     # map to positional-or-keyword parameters, their derivative is
-    # looked for in derivatives_kwargs_default.  We define these
+    # looked for in derivatives_all_kwargs.  We define these
     # additional derivatives:
 
     try:
@@ -693,7 +693,7 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # arguments (and therefore to use inspect.getfullargspec())
         # because they are already handled by derivatives_kwargs.
         for (index, name) in enumerate(argspec.args):
-            derivatives_kwargs_default[name] = derivatives_args_index[index]
+            derivatives_all_kwargs[name] = derivatives_args_index[index]
     
     ## Wrapped function:
 
@@ -801,8 +801,14 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
 
         derivatives_num_kwargs = {}
         for name in names_w_uncert:
-            derivatives_num_kwargs[name] = derivatives_kwargs_default[name](
-                *args_values, **kwargs)
+            
+            derivative = derivatives_all_kwargs[name]
+
+            if derivative is None:
+                derivative = partial_derivative(f, name)
+                
+                derivatives_num_kwargs[name] = derivative(
+                    *args_values, **kwargs)
 
         ########################################
         # Calculation of the derivative of f with respect to all the
