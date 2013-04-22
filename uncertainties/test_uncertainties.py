@@ -748,28 +748,30 @@ def test_wrapped_func():
 
     ########################################
 
+    # Function which can automatically handle numbers with
+    # uncertainties:
+    def f_auto_unc(angle, *list_var):
+        return umath.cos(angle) + sum(list_var)
+    
     def f(angle, *list_var):
         # We make sure that this function is only ever called with
         # numbers with no uncertainty (since it is wrapped):
         assert not any(isinstance(arg, uncertainties.UFloat)
                        for arg in list_var)
-        return math.cos(angle) + sum(list_var)
+        print angle, list_var
+        return f_auto_unc(angle, *list_var)
     
     f_wrapped = uncertainties.wrap(f)
 
-    # Same function as f(), but with an automatic uncertainty
-    # calculation:
-    def f_auto_unc(angle, *list_var):
-        return umath.cos(angle) + sum(list_var)
 
     my_list = [1, 2, 3]
 
     ########################################
     # Test of a wrapped function that only calls the original
     # function: it should obtain the exact same result:
-    assert f_wrapped(0, my_list) == f(0, my_list)
+    assert f_wrapped(0, *my_list) == f(0, *my_list)
     # 1 == 1 +/- 0, so the type must be checked too:
-    assert type(f_wrapped(0, my_list)) == type(f(0, my_list))
+    assert type(f_wrapped(0, *my_list)) == type(f(0, *my_list))
 
     ########################################
     # Call with uncertainties:
@@ -779,11 +781,11 @@ def test_wrapped_func():
 
     # The random variables must be the same (full correlation):
     
-    assert _ufloats_close(f_wrapped(angle, [1, angle]),
-                          f_auto_unc(angle, [1, angle]))
+    assert _ufloats_close(f_wrapped(angle, *[1, angle]),
+                          f_auto_unc(angle, *[1, angle]))
     
-    assert _ufloats_close(f_wrapped(angle, [list_value, angle]),
-                          f_auto_unc(angle, [list_value, angle]))
+    assert _ufloats_close(f_wrapped(angle, *[list_value, angle]),
+                          f_auto_unc(angle, *[list_value, angle]))
     
     ########################################
     # Non-numerical arguments, and  explicit and implicit derivatives:
