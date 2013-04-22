@@ -814,8 +814,10 @@ def test_wrap_with_kwargs():
     
     f_wrapped = uncertainties.wrap(f)
 
-    # Version of f() that works with numbers with uncertainties:
-    f_auto_unc = lambda x, y, z, t: x+2*y+3*t
+    # Version of f() that automatically works with numbers with
+    # uncertainties:
+    def f_auto_unc(x, y, *args, **kwargs):
+        return x + math.sin(y) + 2*args[0] + kwargs['t']*3
 
     x = ufloat(1, 0.1)
     y = ufloat(10, 0.11)
@@ -831,7 +833,8 @@ def test_wrap_with_kwargs():
     # also test the automatic handling of additional *args arguments
     # beyond the number of supplied derivatives.
 
-    f_wrapped2 = uncertainties.wrap(f, [None, math.cos])
+    f_wrapped2 = uncertainties.wrap(
+        f, [None, lambda x, y, *args, **kwargs: math.cos(y)])
 
     # The derivatives must be perfectly identical:
 
@@ -841,6 +844,21 @@ def test_wrap_with_kwargs():
     assert (f_wrapped2(x, y=y, z=z, t=t).derivatives[y]
             == f_auto_unc(x, y=y, z=z, t=t).derivatives[y])
     
+    # Derivatives supplied through the keyword-parameter dictionary of
+    # derivatives, and also derivatives supplied for the
+    # var-positional arguments (*args[0]):
+
+    f_wrapped3 = uncertainties.wrap(
+        f,
+        [None, lambda x, y, *args, **kwargs: 2*args[0]],
+        {'t': lambda x, y, *args, **kwargs: 3*kwargs['t']})
+
+    # The derivatives should be exactly the same, because they are
+    # obtained with the exact same analytic formula:
+    assert (f_wrapped3(x, y=y, z=z, t=t).derivatives[y]
+            == f_auto_unc(x, y=y, z=z, t=t).derivatives[y])
+    assert (f_wrapped3(x, y=y, z=z, t=t).derivatives[z]
+            == f_auto_unc(x, y=y, z=z, t=t).derivatives[z])
     
 ###############################################################################
         
