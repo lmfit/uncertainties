@@ -553,12 +553,12 @@ class IndexableIter(object):
         
         except IndexError:
             
-            for index in range(len(returned_elements), index+1):
+            for pos in range(len(returned_elements), index+1):
 
                 value = next(self.iterable)
 
                 if value is None:
-                    value = none_converter(index)
+                    value = none_converter(pos)
                     
                 returned_elements.append(value)
             
