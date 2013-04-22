@@ -236,6 +236,7 @@ import copy
 import warnings
 import itertools
 import collections
+import inspect
 
 # Numerical version:
 __version_info__ = (2, 2)
@@ -523,12 +524,52 @@ class NumericalDerivatives(object):
         """
         return partial_derivative(self._function, n)
 
+class IndexableIter(object):
+    '''
+    Iterable whose values can also be accessed through indexing.
+
+    The input iterable values are cached.
+    '''
+
+    def __init__(self, iterable, none_converter=lambda index: None):
+        '''
+        iterable -- iterable whose values will be returned.
+        
+        none_converter -- function applied to None returned
+        values. The value that replaces None is none_converter(index),
+        where index is the index of the element.
+        '''
+        self.iterable = iterable
+        self.returned_elements = []
+        self.none_converter = none_converter
+        
+    def __getitem__(self, index):
+
+        returned_elements = self.returned_elements
+        
+        try:
+            
+            return returned_elements[index]  # Cached
+        
+        except IndexError:
+            
+            for index in range(len(returned_elements), index+1):
+
+                value = next(self.iterable)
+
+                if value is None:
+                    value = none_converter(index)
+                    
+                returned_elements.append(value)
+            
+            return returned_elements[index]
+    
 def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     """
     Wraps a function f into a function that also accepts numbers with
     uncertainties (UFloat objects) where f accepts float arguments;
     the wrapped function returns the value of f with the correct
-    uncertainty.
+    uncertainty and correlations.
 
     Doing so may be necessary when function f cannot be expressed
     analytically (with uncertainties-compatible operators and
@@ -536,35 +577,43 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
 
     f must return a scalar (not a list, etc.).
         
-    If no argument to the wrapped function has an uncertainty, f
-    simply returns its usual, scalar result.
+    If the wrapped function is called with no argument that has an
+    uncertainty, the value of f is returned.
 
-    Parameters: the derivatives_* parameters define the derivatives of
-    arguments args and kwargs if function f was called as f(*args,
-    **kwargs).
+    Parameters: the derivatives_* parameters can be used for defining
+    some of the partial derivatives of f. All the (non-None)
+    derivatives must have the same signature as f.
 
     derivatives_args --
     
         Iterable that, when iterated over, returns either derivatives
-        (functions) or None. derivatives_args can be a simple
-        sequence (list or tuple).
-         
-        Each function must be the partial derivative of f with respect
-        to the corresponding variable in sequence args when f is
-        called as f(*args, **kwargs).  These functions take the same
-        arguments as f.
+        (functions) or None. derivatives_args can in particular be a
+        simple sequence (list or tuple) that gives the derivatives of
+        the first positional parameters of f.
 
-        A value of None (instead of a function) is automatically
-        replaced by the relevant numerical derivative. This derivative
-        is not used if the corresponding argument is not a number with
+        Each function must be the partial derivative of f with respect
+        to the corresponding positional parameters.  These functions
+        take the same arguments as f.
+
+        The positional parameters of a function are usually
+        positional-or-keyword parameters like in func(a,
+        b=None). However, they also include var-positional parameters
+        given through the func(a, b, *args) *args syntax. In the last
+        example, derivatives_args can be an iterable that returns the
+        derivative with respect to a, b and then to each optional
+        argument in args.
+
+        A value of None (instead of a function) obtained when
+        iterating over derivatives_args is automatically replaced by
+        the relevant numerical derivative. This derivative is not used
+        if the corresponding argument is not a number with
         uncertainty. A None value can therefore be used for non-scalar
         arguments of f (like string arguments).
 
         If the derivatives_args iterable yields fewer derivatives than
-        there are arguments in args if f was called as f(*args,
-        **kwargs), wrap() automatically sets the remaining unspecified
-        derivatives to None (automatic numerical calculation of
-        derivatives).
+        needed, wrap() automatically sets the remaining unspecified
+        derivatives to None (i.e. to the automatic numerical
+        calculation of derivatives).
 
         An indefinite number of derivatives can be specified by having
         derivatives_args be an infinite iterator; this can for
@@ -575,14 +624,22 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     derivatives_kwargs --
 
         Dictionary that maps keyword parameters to their derivatives,
-        or None (as in derivatives_args). Keyword parameters are
-        defined as being those of kwargs in a call of the form
-        f(*args, **kwargs).
+        or None (as in derivatives_args).
 
+        Keyword parameters are defined as being those of kwargs when f
+        has a signature of the form f(..., **kwargs). In Python 3,
+        these keyword parameters also include keyword-only parameters.
+        
         Non-mapped keyword parameters are replaced automatically by
         None: the wrapped function will use, if necessary, numerical
         differentiation for these parameters (as with
         derivatives_args).
+
+        Note that this dictionary only maps keyword *parameters* from
+        the *signature* of f. The way the wrapped function is called
+        is immaterial: for example, if f has signature f(a, b=None),
+        then derivatives_kwargs should be the empty dictionary, even
+        if the wrapped f can be called a wrapped_f(a=123, b=42).
         
     Example (for illustration purposes only, as
     uncertainties.umath.sin() runs faster than the examples that
@@ -604,31 +661,40 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     with uncertainty is likely to make it slower.
     """
 
-    ## None "derivatives" for unspecified derivatives:
-
-    # Automatic addition in case the supplied derivatives_args is
-    # shorter than the number of arguments in *args:
-    derivatives_args_iter = itertools.chain(derivatives_args,
-                                            itertools.repeat(None))
+    derivatives_args_index = IndexableIter(
+        # Automatic addition of numerical derivatives in case the
+        # supplied derivatives_args is shorter than the number of
+        # arguments in *args:
+        itertools.chain(derivatives_args, itertools.repeat(None)),
+        # None = numerical partial derivative of the variable #index:
+        none_converter=lambda index: partial_derivative(f, index)
+        )
+        
     # Unspecified derivatives for **kwargs are set to None (numerical
     # differentiation):
     derivatives_kwargs_default = collections.defaultdict(lambda: None,
                                                          derivatives_kwargs)
 
-    ## Cached derivatives from derivatives_args_iter:
+    # When the wrapped function is called with keyword arguments that
+    # map to positional-or-keyword parameters, their derivative is
+    # looked for in derivatives_kwargs_default.  We define these
+    # additional derivatives:
 
-    # Caching the output of derivatives_args_iter is useful for
-    # optimization purposes. If the wrapped function is called
-    # repeatedly, this bypasses the need for iterating over
-    # derivatives_args_iter over and over. This also gives a direct
-    # access to, say, the 3rd derivative, which is useful when f() is
-    # called mostly with a number with uncertainty in this 3rd
-    # position only.
-
-    # Values obtained from derivatives_args_iter all go here (in the
-    # same order):
-    derivatives_args_cache = []
-
+    try:
+        argspec = inspect.getargspec(f)
+    except TypeError:
+        # Some functions do not provide meta-data about their
+        # arguments (see PEP 362). One cannot use keyword arguments
+        # for positional-or-keyword parameters with them: nothing has
+        # to be done:
+        pass
+    else:
+        # With Python 3, there is no need to handle keyword-only
+        # arguments (and therefore to use inspect.getfullargspec())
+        # because they are already handled by derivatives_kwargs.
+        for (index, name) in enumerate(argspec.args):
+            derivatives_kwargs_default[name] = derivatives_args_index[index]
+    
     ## Wrapped function:
 
     #! Setting the doc string after "def f_with...()" does not
@@ -657,7 +723,6 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # objects) are gathered, as positions or names; they will be
         # replaced by simple floats.
 
-        # *Increasing* indexes in args:
         pos_w_uncert = [index for (index, value) in enumerate(args)
                         if isinstance(value, AffineScalarFunc)]
         names_w_uncert = set(key for (key, value) in kwargs.iteritems()
@@ -724,17 +789,6 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # Calculation of the derivatives with respect to the variables
         # of f that have a number with uncertainty.
         
-        # Necessary derivatives for args that are not yet in the cache
-        # are added:
-        if pos_w_uncert:
-            for pos in range(len(derivatives_args_cache), pos_w_uncert[-1]+1):
-
-                derivative = next(derivatives_args_iter)
-                if derivative is None:
-                    derivative = partial_derivative(f, pos)
-
-                derivatives_args_cache.append(derivative)
-
         # Mappings of each relevant argument reference (numerical
         # index in args, or name in kwargs to the value of the
         # corresponding partial derivative of f (only for those
@@ -742,12 +796,12 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         
         derivatives_num_args = {}
         for pos in pos_w_uncert:
-            derivatives_num_args[pos] = derivatives_args_cache[pos](
+            derivatives_num_args[pos] = derivatives_args_index[pos](
                 *args_values, **kwargs)
 
         derivatives_num_kwargs = {}
         for name in names_w_uncert:
-            derivatives_num_kwargs[name] = derivatives_kwargs[name](
+            derivatives_num_kwargs[name] = derivatives_kwargs_default[name](
                 *args_values, **kwargs)
 
         ########################################
