@@ -558,7 +558,7 @@ class IndexableIter(object):
                 value = next(self.iterable)
 
                 if value is None:
-                    value = none_converter(pos)
+                    value = self.none_converter(pos)
                     
                 returned_elements.append(value)
             
