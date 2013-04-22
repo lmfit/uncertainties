@@ -549,9 +549,9 @@ class IndexableIter(object):
         
         try:
             
-            return returned_elements[index]  # Cached
+            return returned_elements[index]
         
-        except IndexError:
+        except IndexError:  # Element not yet cached
             
             for pos in range(len(returned_elements), index+1):
 
