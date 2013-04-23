@@ -742,7 +742,7 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     # Optimization: None derivatives for the positional arguments are
     # converted to the corresponding numerical differentiation function:
 
-    none_converter=lambda index: partial_derivative(f, index)
+    none_converter = lambda index: partial_derivative(f, index)
     
     derivatives_args_index.returned_elements = [
         none_converter(index) if derivative is None
