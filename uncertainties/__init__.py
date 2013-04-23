@@ -745,10 +745,10 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     none_converter=lambda index: partial_derivative(f, index)
     
     derivatives_args_index.returned_elements = [
-        none_converter(index)
+        none_converter(index) if derivative is None
+        else derivative
         for (index, derivative) in enumerate(
-            derivatives_args_index.returned_elements)
-        if derivative is None]
+            derivatives_args_index.returned_elements)]
 
     # Future None values are also automatically converted:
     derivatives_args_index.none_converter = none_converter
@@ -855,7 +855,8 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         derivatives_num_args = {}
 
         #!!!!! test
-        print "pos_w_uncert", pos_w_uncert
+        print "ARGS", args
+        print "POS_W_UNCERT", pos_w_uncert
         
         for pos in pos_w_uncert:
             derivatives_num_args[pos] = derivatives_args_index[pos](

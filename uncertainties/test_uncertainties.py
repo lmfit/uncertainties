@@ -753,7 +753,7 @@ def test_wrapped_func_no_args_no_kwargs():
     def f(x, y):
         assert not isinstance(x, uncertainties.UFloat)
         assert not isinstance(y, uncertainties.UFloat)
-        return f_auto_unc(, xy)
+        return f_auto_unc(x, y)
 
     x = uncertainties.ufloat(1, 0.1)
     y = uncertainties.ufloat(10, 2)
@@ -791,6 +791,8 @@ def test_wrapped_func_no_args_no_kwargs():
 
     # Call with keyword arguments:
     assert _ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+
+
     
 def test_wrapped_func():
     """
