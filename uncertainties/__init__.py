@@ -495,10 +495,16 @@ def partial_derivative(f, arg_ref):
             step = 1e-8
 
         args_with_var[arg_ref] += step
-        shifted_f_plus = f(*args, **kwargs)
-        
+
+        shifted_f_plus = (
+            f(*args, **args_with_var) if change_kwargs
+            else f(*args_with_var, **kwargs))
+
         args_with_var[arg_ref] -= 2*step  # Optimization: only 1 list copy
-        shifted_f_minus = f(*args, **kwargs)
+        
+        shifted_f_minus = (
+            f(*args, **args_with_var) if change_kwargs
+            else f(*args_with_var, **kwargs))
 
         return (shifted_f_plus - shifted_f_minus)/2/step
 
@@ -563,7 +569,12 @@ class IndexableIter(object):
                 returned_elements.append(value)
             
             return returned_elements[index]
-    
+
+    def __str__(self):
+        return '<{}: [{}...]>'.format(
+            self.__class__.__name__,
+            ', '.join(map(str, self.returned_elements)))
+        
 def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     """
     Wraps a function f into a function that also accepts numbers with
@@ -809,7 +820,7 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
                 
                 derivatives_num_kwargs[name] = derivative(
                     *args_values, **kwargs)
-
+        
         ########################################
         # Calculation of the derivative of f with respect to all the
         # variables (Variable objects) involved.
