@@ -792,7 +792,7 @@ def test_wrapped_func():
         return x+2*z+3*t+4*u
     
     f_wrapped = uncertainties.wrap(
-        f, [lambda *args: 1, None, lambda *args:1, None])  # No deriv. for u
+        f, [lambda *args: 1, None, lambda *args:2, None])  # No deriv. for u
 
     assert f_wrapped(10, 'string argument', 1, 0, 0) == 12
 
@@ -803,7 +803,7 @@ def test_wrapped_func():
                           1+2+3+4)
 
     assert _numbers_close(f_wrapped(x, 'string argument', x, x, x).std_dev,
-                          1+2+3+4)
+                          (1+2+3+4)*x.std_dev)
 
 def test_wrap_with_kwargs():
     '''
