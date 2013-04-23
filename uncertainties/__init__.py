@@ -789,7 +789,7 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     Original documentation:
     %s""" % (f.__name__, f.__doc__))    
     def f_with_affine_output(*args, **kwargs):
-        
+
         ########################################
         # The involved random variables must first be gathered, so
         # that they can be independently updated.
@@ -922,6 +922,11 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
 
                 
         # The function now returns an AffineScalarFunc object:
+        
+        print "F_NOM", f_nominal_value  #!!!!!! test
+        if f_nominal_value is NotImplemented:
+            pass  #!!!!!!!!! OR BETTER: handle AffineScalarFunc*Array in a different way: its derivative cannot be calculated automatically, normally, why does the program even try?
+        
         return AffineScalarFunc(f_nominal_value, derivatives_wrt_vars)
 
     # It is easier to work with f_with_affine_output, which represents
@@ -1412,7 +1417,7 @@ def get_ops_with_reflection():
         # AffineScalarFunc._nominal_value numbers, it is applied on
         # floats, and is therefore the "usual" mathematical division.
         'div': ("1/y", "-x/y**2"),
-        'floordiv': ("0.", "0."),  # Non exact: there is a discontinuities
+        'floordiv': ("0.", "0."),  # Non exact: there is a discontinuity
         # The derivative wrt the 2nd arguments is something like (..., x//y),
         # but it is calculated numerically, for convenience:
         'mod': ("1.", "partial_derivative(float.__mod__, 1)(x, y)"),
