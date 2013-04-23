@@ -241,7 +241,7 @@ import inspect
 from backport import *
 
 # Numerical version:
-__version_info__ = (2, 2)
+__version_info__ = (2, 3)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
@@ -604,7 +604,7 @@ class IndexableIter(object):
             self.__class__.__name__,
             ', '.join(map(str, self.returned_elements)))
     
-def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
+def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     """
     Wraps a function f into a function that also accepts numbers with
     uncertainties (UFloat objects); the wrapped function returns the
