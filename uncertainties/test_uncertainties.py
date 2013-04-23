@@ -24,7 +24,7 @@ import sys
 
 import uncertainties
 from uncertainties import ufloat, AffineScalarFunc, ufloat_fromstr
-from  uncertainties import umath
+from uncertainties import umath
 
 from uncertainties import __author__
 
