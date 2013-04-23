@@ -848,7 +848,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
             kwargs_uncert_values[name] = value_with_uncert
             # The original dictionary is modified (for efficiency reasons):
             kwargs[name] = value_with_uncert.nominal_value
-            
+
         f_nominal_value = f(*args_values, **kwargs)
 
         # If the value is not a float, then this code cannot provide
