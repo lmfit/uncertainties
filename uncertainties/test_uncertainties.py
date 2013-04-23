@@ -833,12 +833,9 @@ def test_wrap_with_kwargs():
     y = ufloat(10, 0.11)
     z = ufloat(100, 0.111)
     t = ufloat(0.1, 0.1111)
-
-    print "TEST", f_wrapped(x, y, z, t=t)
-    print "TRSET2", f_auto_unc(x, y, z, t=t)
-    
+        
     assert _ufloats_close(f_wrapped(x, y, z, t=t),
-                          f_auto_unc(x, y, z, t=t))
+                          f_auto_unc(x, y, z, t=t), tolerance=1e-5)
 
     ########################################
 
