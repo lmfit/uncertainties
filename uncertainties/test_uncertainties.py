@@ -701,7 +701,8 @@ def test_basic_access_to_data():
     except AttributeError:
         pass
     else:
-        raise "std_dev should not be settable for calculated results"
+        raise Exception(
+            "std_dev should not be settable for calculated results")
     
     # Calculation of deviations in units of the standard deviations:
     assert 10/x.std_dev == x.std_score(10 + x.nominal_value)
