@@ -756,6 +756,7 @@ def test_wrapped_func():
     def f(angle, *list_var):
         # We make sure that this function is only ever called with
         # numbers with no uncertainty (since it is wrapped):
+        assert not isinstance(angle, uncertainties.UFloat)
         assert not any(isinstance(arg, uncertainties.UFloat)
                        for arg in list_var)
         return f_auto_unc(angle, *list_var)
@@ -810,27 +811,32 @@ def test_wrap_with_kwargs():
     (optional or not).
     '''
 
+    # Version of f() that automatically works with numbers with
+    # uncertainties:
+    def f_auto_unc(x, y, *args, **kwargs):
+        return x + umath.sin(y) + 2*args[0] + kwargs['t']*3
+    
     # We also add keyword arguments in the function which is wrapped:
     def f(x, y, *args, **kwargs):
         # We make sure that f is not called directly with a number with
         # uncertainty:
-        assert isinstance(x, float)
-        assert isinstance(y, float)
+
+        for value in [x, y]+list(args)+kwargs.values():
+            assert not isinstance(value, uncertainties.UFloat)
         
-        return x + math.sin(y) + 2*args[0] + kwargs['t']*3
+        return f_auto_unc(x, y, *args, **kwargs)
     
     f_wrapped = uncertainties.wrap(f)
 
-    # Version of f() that automatically works with numbers with
-    # uncertainties:
-    def f_auto_unc(x, y, *args, **kwargs):
-        return x + math.sin(y) + 2*args[0] + kwargs['t']*3
 
     x = ufloat(1, 0.1)
     y = ufloat(10, 0.11)
     z = ufloat(100, 0.111)
     t = ufloat(0.1, 0.1111)
 
+    print "TEST", f_wrapped(x, y, z, t=t)
+    print "TRSET2", f_auto_unc(x, y, z, t=t)
+    
     assert _ufloats_close(f_wrapped(x, y, z, t=t),
                           f_auto_unc(x, y, z, t=t))
 
