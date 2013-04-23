@@ -58,9 +58,9 @@ def _numbers_close(x, y, tolerance=1e-6):
 
 def _ufloats_close(x, y, tolerance=1e-6):
     '''
-    Tests if two numbers with uncertainties (or floats) are close (as
+    Tests if two numbers with uncertainties (or floats) are close, as
     random variables: this is stronger than testing whether their
-    nominal value and standard deviation are close).
+    nominal value and standard deviation are close.
 
     The tolerance is applied to both the nominal value and the
     standard deviation of the difference between the numbers.
@@ -741,6 +741,57 @@ def test_no_coercion():
     else:
         raise Exception("Conversion to float() should fail with TypeError")
 
+def test_wrapped_func_no_args_no_kwargs():
+    '''
+    Wraps a function that takes only positional-or-keyword parameters.
+    '''
+    
+    def f_auto_unc(x, y):
+        return 2*x+umath.sin(y)
+
+    # Like f_auto_unc, but does not accept numbers with uncertainties:
+    def f(x, y):
+        assert not isinstance(x, uncertainties.UFloat)
+        assert not isinstance(y, uncertainties.UFloat)
+        return f_auto_unc(, xy)
+
+    x = uncertainties.ufloat(1, 0.1)
+    y = uncertainties.ufloat(10, 2)
+
+    ### Automatic numerical derivatives:
+    
+    ## Fully automatic numerical derivatives:
+    f_wrapped = uncertainties.wrap(f)
+    assert _ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+
+    # Call with keyword arguments:
+    assert _ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+
+    ## Automatic additional derivatives for non-defined derivatives:
+    f_wrapped = uncertainties.wrap(f, [None])  # No derivative for y
+    assert _ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+
+    # Call with keyword arguments:
+    assert _ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+
+    ### Explicit derivatives:
+
+    ## Fully defined derivatives:
+    f_wrapped = uncertainties.wrap(f, [lambda x, y: 2,
+                                       lambda x, y: math.cos(y)])
+    
+    assert _ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+
+    # Call with keyword arguments:
+    assert _ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+
+    ## Automatic additional derivatives for non-defined derivatives:
+    f_wrapped = uncertainties.wrap(f, [lambda x, y: 2])  # No derivative for y
+    assert _ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+
+    # Call with keyword arguments:
+    assert _ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+    
 def test_wrapped_func():
     """
     Test uncertainty-aware functions obtained through wrapping.
