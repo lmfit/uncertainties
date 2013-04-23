@@ -194,9 +194,7 @@ for name in dir(math):
     elif name in num_deriv_funcs:
         # Functions whose derivatives are calculated numerically by
         # this module fall here (isinf, fmod,...):
-        #!!!!!!!!!!!
-        import itertools
-        derivatives = itertools.repeat(None)  # Means: numerical calculation required
+        derivatives = []  # Means: numerical calculation required
     else:
         continue  # 'name' not wrapped by this module (__doc__, e, etc.)
 

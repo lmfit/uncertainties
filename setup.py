@@ -167,7 +167,9 @@ Main changes:
 
 - 2.3: Full support for keyword arguments when wrapping a function \
        so that it accepts numbers with uncertainties instead of floats \
-       (improved ``wrap()`` function).
+       (improved ``wrap()`` function). Incompatible change: \
+       ``wrap(..., None)`` should be replaced by ``wrap(...)`` or \
+       ``wrap(..., [])``.
 - 2.2: Creating arrays and matrices of numbers with uncertainties \
        with ``uarray()`` and ``umatrix()`` now requires two simple arguments \
        (nominal values and standard deviations) instead of a tuple argument. \

@@ -596,7 +596,7 @@ class IndexableIter(object):
             self.__class__.__name__,
             ', '.join(map(str, self.returned_elements)))
     
-def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
+def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     """
     Wraps a function f into a function that also accepts numbers with
     uncertainties (UFloat objects); the wrapped function returns the
