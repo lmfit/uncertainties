@@ -939,6 +939,16 @@ def test_wrapped_func_no_args_kwargs():
     assert _ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                           f_wrapped(y=y, x=x, **kwargs))
 
+    # No derivative for positional-or-keyword parameter y, no
+    # derivative for optional-keyword parameter z:
+    f_wrapped = uncertainties.wrap(f, [None], {'z': None})
+    assert _ufloats_close(f_auto_unc(x, y, **kwargs),
+                          f_wrapped(x, y, **kwargs))
+
+    # Call with keyword arguments:
+    assert _ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
+                          f_wrapped(y=y, x=x, **kwargs))
+    
     # No derivative for positional-or-keyword parameter y, derivative
     # for optional-keyword parameter z:
     f_wrapped = uncertainties.wrap(f, [None],
@@ -975,6 +985,99 @@ def test_wrapped_func_no_args_kwargs():
     assert _ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                           f_wrapped(y=y, x=x, **kwargs))
 
+def test_wrapped_func_args_kwargs():
+    '''
+    Wraps a function that takes positional-or-keyword, var-positional
+    and var-keyword parameters.
+    '''
+    
+    def f_auto_unc(x, y, *args, **kwargs):
+        return 2*x+umath.sin(y)+4*args[1]+3*kwargs['z']
+
+    # Like f_auto_unc, but does not accept numbers with uncertainties:
+    def f(x, y, *args, **kwargs):
+        assert not any(isinstance(value, uncertainties.UFloat)
+                       for value in [x, y]+list(args)+kwargs.values())
+        return f_auto_unc(x, y, *args, **kwargs)
+
+    x = uncertainties.ufloat(1, 0.1)
+    y = uncertainties.ufloat(10, 2)
+    t = uncertainties.ufloat(1000, 4)
+    s = 'string arg'
+    z = uncertainties.ufloat(100, 3)
+
+    args = [s, t]
+    kwargs = {'u': s, 'z': z}  # Arguments not in signature
+
+    ### Automatic numerical derivatives:
+    
+    ## Fully automatic numerical derivatives:
+    f_wrapped = uncertainties.wrap(f)
+    assert _ufloats_close(f_auto_unc(x, y, *args, **kwargs),
+                          f_wrapped(x, y, *args, **kwargs))
+
+    # Call with keyword arguments:
+    assert _ufloats_close(f_auto_unc(y=y, x=x, *args, **kwargs),
+                          f_wrapped(y=y, x=x, *args, **kwargs))
+    
+    ## Automatic additional derivatives for non-defined derivatives,
+    ## and explicit None derivative:
+
+    # No derivative for positional-or-keyword parameter y, no
+    # derivative for optional-keyword parameter z:
+    f_wrapped = uncertainties.wrap(f, [None, None,
+                                       lambda x, y, *args, **kwargs: 4])
+    assert _ufloats_close(f_auto_unc(x, y, *args, **kwargs),
+                          f_wrapped(x, y, *args, **kwargs))
+    # Call with keyword arguments:
+    assert _ufloats_close(f_auto_unc(y=y, x=x, *args, **kwargs),
+                          f_wrapped(y=y, x=x, *args, **kwargs))
+
+    # No derivative for positional-or-keyword parameter y, no
+    # derivative for optional-keyword parameter z:
+    f_wrapped = uncertainties.wrap(f, [None], {'z': None})
+    assert _ufloats_close(f_auto_unc(x, y, *args, **kwargs),
+                          f_wrapped(x, y, *args, **kwargs))
+    # Call with keyword arguments:
+    assert _ufloats_close(f_auto_unc(y=y, x=x, *args, **kwargs),
+                          f_wrapped(y=y, x=x, *args, **kwargs))
+    
+    # No derivative for positional-or-keyword parameter y, derivative
+    # for optional-keyword parameter z:
+    f_wrapped = uncertainties.wrap(f, [None],
+                                   {'z': lambda x, y, *args, **kwargs: 3})
+    assert _ufloats_close(f_auto_unc(x, y, *args, **kwargs),
+                          f_wrapped(x, y, *args, **kwargs))
+
+    # Call with keyword arguments:
+    assert _ufloats_close(f_auto_unc(y=y, x=x, *args, **kwargs),
+                          f_wrapped(y=y, x=x, *args, **kwargs))
+    
+    ### Explicit derivatives:
+
+    ## Fully defined derivatives:
+    f_wrapped = uncertainties.wrap(
+        f,
+        [lambda x, y, *args, **kwargs: 2, lambda x, y, *args, **kwargs: math.cos(y)],
+        {'z:': lambda x, y, *args, **kwargs: 3})
+    
+    assert _ufloats_close(f_auto_unc(x, y, *args, **kwargs),
+                          f_wrapped(x, y, *args, **kwargs))
+    # Call with keyword arguments:
+    assert _ufloats_close(f_auto_unc(y=y, x=x, *args, **kwargs),
+                          f_wrapped(y=y, x=x, *args, **kwargs))
+    
+    ## Automatic additional derivatives for non-defined derivatives:
+    
+    # No derivative for y or z:    
+    f_wrapped = uncertainties.wrap(f, [lambda x, y, *args, **kwargs: 2])
+    assert _ufloats_close(f_auto_unc(x, y, *args, **kwargs),
+                          f_wrapped(x, y, *args, **kwargs))
+
+    # Call with keyword arguments:
+    assert _ufloats_close(f_auto_unc(y=y, x=x, *args, **kwargs),
+                          f_wrapped(y=y, x=x, *args, **kwargs))
+    
 def test_wrapped_func():
     """
     Test uncertainty-aware functions obtained through wrapping.
