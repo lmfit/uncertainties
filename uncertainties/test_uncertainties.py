@@ -1184,8 +1184,6 @@ def test_wrap_with_kwargs():
 
     # The derivatives should be exactly the same, because they are
     # obtained with the exact same analytic formula:
-    print "ASSER BEG", f_wrapped3(x, y, z, t=t).derivatives[y], "ASSER END"
-    print "ASSER", f_auto_unc(x, y, z, t=t).derivatives[y], "ASSER END"
     assert (f_wrapped3(x, y, z, t=t).derivatives[z]
             == f_auto_unc(x, y, z, t=t).derivatives[z])
     assert (f_wrapped3(x, y, z, t=t).derivatives[t]
