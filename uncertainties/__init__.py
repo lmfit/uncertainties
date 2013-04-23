@@ -773,7 +773,8 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     for (index, derivative) in enumerate(
         derivatives_args_index.returned_elements):
         if derivative is None:
-            derivatives_args_index[index] = none_converter(index)
+            derivatives_args_index.returned_elements[index] = (
+                none_converter(index))
 
     # Future None values are also automatically converted:
     derivatives_args_index.none_converter = none_converter
