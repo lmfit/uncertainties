@@ -860,7 +860,7 @@ def test_wrap_with_kwargs():
 
     f_wrapped3 = uncertainties.wrap(
         f,
-        [None, None, lambda x, y, *args, **kwargs: 2*args[0]],
+        [None, None, lambda x, y, *args, **kwargs: 2],
         {'t': lambda x, y, *args, **kwargs: 3*kwargs['t']})
 
     # The derivatives should be exactly the same, because they are
