@@ -456,6 +456,12 @@ def to_affine_scalar(x):
     raise NotUpcast("%s cannot be converted to a number with"
                     " uncertainty" % type(x))
 
+# !! It would be possible to split the partial derivative calculation
+# into two functions: one for positional arguments (case of integer
+# arg_ref) and one for keyword arguments (case of string
+# arg_ref). However, this would either duplicate the code for the
+# numerical differentiation, or require a call, which is probably more
+# expensive in time than the tests done here.
 def partial_derivative(f, arg_ref):
     """
     Returns a function that numerically calculates the partial
@@ -535,6 +541,17 @@ class IndexableIter(object):
     Iterable whose values can also be accessed through indexing.
 
     The input iterable values are cached.
+
+    Some attributes:
+
+    iterable -- iterable used for returning the elements one by one.
+    
+    returned_elements -- list with the elements directly accessible.
+    through indexing. Additional elements are obtained from self.iterable.
+
+    none_converter -- function that takes an index and returns the
+    value to be returned when None is obtained form the iterable
+    (instead of None).
     '''
 
     def __init__(self, iterable, none_converter=lambda index: None):
@@ -574,7 +591,7 @@ class IndexableIter(object):
         return '<{}: [{}...]>'.format(
             self.__class__.__name__,
             ', '.join(map(str, self.returned_elements)))
-        
+    
 def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     """
     Wraps a function f into a function that also accepts numbers with
@@ -679,15 +696,13 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # Automatic addition of numerical derivatives in case the
         # supplied derivatives_args is shorter than the number of
         # arguments in *args:
-        itertools.chain(derivatives_args, itertools.repeat(None)),
-        # None = numerical partial derivative of the variable #index:
-        none_converter=lambda index: partial_derivative(f, index)
-        )
+        itertools.chain(derivatives_args, itertools.repeat(None)))
         
     # Unspecified derivatives for **kwargs are set to None (numerical
-    # differentiation):
-    derivatives_all_kwargs = collections.defaultdict(lambda: None,
-                                                     derivatives_kwargs)
+    # differentiation). They cannot be pre-computed (as
+    # partial_derivative(f, param_name)) because var-keyword parameters
+    # (**kwargs) are not known in advance:
+    derivatives_all_kwargs = derivatives_kwargs.copy()
 
     # When the wrapped function is called with keyword arguments that
     # map to positional-or-keyword parameters, their derivative is
@@ -707,8 +722,37 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # arguments (and therefore to use inspect.getfullargspec())
         # because they are already handled by derivatives_kwargs.
         for (index, name) in enumerate(argspec.args):
-            derivatives_all_kwargs[name] = derivatives_args_index[index]
+            
+            # The following test handles the case of
+            # positional-or-keyword parameter for which automatic
+            # numerical differentiation is used: when the wrapped
+            # function is called with a keyword argument for this
+            # parameter, the numerical derivative must be calculated
+            # with respect to the parameter name. In the other case,
+            # where the wrapped function is called with a positional
+            # argument, the derivative with respect to its index must
+            # be used:
+            
+            derivative = derivatives_args_index[index]
+
+            derivatives_all_kwargs[name] = (
+                partial_derivative(f, name)
+                if derivative is None else derivative)
+
+    # Optimization: None derivatives for the positional arguments are
+    # converted to the corresponding numerical differentiation function:
+
+    none_converter=lambda index: partial_derivative(f, index)
     
+    derivatives_args_index.returned_elements = [
+        none_converter(index)
+        for (index, derivative) in enumerate(
+            derivatives_args_index.returned_elements)
+        if derivative is None]
+
+    # Future None values are also automatically converted:
+    derivatives_args_index.none_converter = none_converter
+            
     ## Wrapped function:
 
     #! Setting the doc string after "def f_with...()" does not
@@ -816,11 +860,15 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         derivatives_num_kwargs = {}
         for name in names_w_uncert:
             
-            derivative = derivatives_all_kwargs[name]
+            derivative = derivatives_all_kwargs.setdefault(
+                name,
+                # Derivative never needed before:
+                partial_derivative(f, name))
 
-            if derivative is None:
-                derivative = partial_derivative(f, name)
-                
+            # !!!!!!! test
+            print "NAME", name
+            print derivatives_all_kwargs
+            
             derivatives_num_kwargs[name] = derivative(
                 *args_values, **kwargs)
 
