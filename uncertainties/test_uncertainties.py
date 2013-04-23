@@ -870,13 +870,15 @@ def test_wrap_with_kwargs():
     assert (f_wrapped3(x, y=y, z=z, t=t).derivatives[z]
             == f_auto_unc(x, y=y, z=z, t=t).derivatives[z])
 
+    ########################################
+    # Making sure that user-supplied derivatives are indeed called:
+    
     class FunctionCalled(Exception):
         '''
         Raised to signal that a function is indeed called.
         '''
         pass
     
-    # Making sure that user-supplied derivatives are indeed called:
     def failing_func(x, y, *args, **kwargs):
         raise FunctionCalled
 
