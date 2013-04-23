@@ -787,10 +787,9 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     uncertainties.Variable objects will be incorrect.
     
     Original documentation:
-    %s""" % (f.__name__, f.__doc__))
-    
+    %s""" % (f.__name__, f.__doc__))    
     def f_with_affine_output(*args, **kwargs):
-
+        
         ########################################
         # The involved random variables must first be gathered, so
         # that they can be independently updated.
@@ -1118,6 +1117,7 @@ class AffineScalarFunc(object):
         # make sense to have a complex nominal value, here (it would
         # not be handled correctly at all): converting to float should
         # be possible.
+
         self._nominal_value = float(nominal_value)
         self.derivatives = derivatives
 
