@@ -853,13 +853,22 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # arguments that contain a number with uncertainty).
         
         derivatives_num_args = {}
+
+        #!!!!! test
+        print "pos_w_uncert", pos_w_uncert
+        
         for pos in pos_w_uncert:
             derivatives_num_args[pos] = derivatives_args_index[pos](
                 *args_values, **kwargs)
 
         derivatives_num_kwargs = {}
         for name in names_w_uncert:
-            
+
+            # Optimization: caching of the automatic numerical
+            # derivatives for keyword arguments that are
+            # discovered. This gives a speedup when the original
+            # function is called repeatedly with the same keyword
+            # arguments:
             derivative = derivatives_all_kwargs.setdefault(
                 name,
                 # Derivative never needed before:
