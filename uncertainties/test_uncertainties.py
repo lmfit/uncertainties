@@ -758,7 +758,6 @@ def test_wrapped_func():
         # numbers with no uncertainty (since it is wrapped):
         assert not any(isinstance(arg, uncertainties.UFloat)
                        for arg in list_var)
-        print angle, list_var
         return f_auto_unc(angle, *list_var)
     
     f_wrapped = uncertainties.wrap(f)
@@ -780,6 +779,9 @@ def test_wrapped_func():
     list_value = uncertainties.ufloat(3, 0.2)
 
     # The random variables must be the same (full correlation):
+
+    print "TWO", (f_wrapped(angle, *[1, angle]),
+                          f_auto_unc(angle, *[1, angle]))
     
     assert _ufloats_close(f_wrapped(angle, *[1, angle]),
                           f_auto_unc(angle, *[1, angle]))
@@ -803,7 +805,11 @@ def test_wrapped_func():
 
 def test_wrap_with_kwargs():
     '''
-    Tests wrap() on wrapped functions with called with keyword arguments.
+    Tests wrap() on functions with keyword arguments.
+
+    Includes both wrapping a function that takes optional keyword
+    arguments and calling a wrapped function with keyword arguments
+    (optional or not).
     '''
 
     # We also add keyword arguments in the function which is wrapped:
