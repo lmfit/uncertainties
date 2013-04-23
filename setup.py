@@ -50,7 +50,7 @@ except ImportError:
 
 distutils.core.setup(
     name='uncertainties',
-    version='2.2',
+    version='2.3',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://pythonhosted.org/uncertainties/',
@@ -165,6 +165,9 @@ Version history
 
 Main changes:
 
+- 2.3: Full support for keyword arguments when wrapping a function \
+       so that it accepts numbers with uncertainties instead of floats \
+       (improved ``wrap()`` function).
 - 2.2: Creating arrays and matrices of numbers with uncertainties \
        with ``uarray()`` and ``umatrix()`` now requires two simple arguments \
        (nominal values and standard deviations) instead of a tuple argument. \
