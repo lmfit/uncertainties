@@ -298,7 +298,10 @@ def set_doc(doc_string):
 # Some types known to not depend on Variable objects are put in
 # CONSTANT_TYPES.  The most common types can be put in front, as this
 # may slightly improve the execution speed.
-CONSTANT_TYPES = (float, int, complex, long)
+#
+#! In Python 2.6+, numbers.Number could be used instead, here:
+FLOAT_LIKE_TYPES = (float, int, long)
+CONSTANT_TYPES = FLOAT_LIKE_TYPES+(complex,)
 
 ###############################################################################
 # Utility for issuing deprecation warnings
@@ -328,8 +331,9 @@ except ImportError:
     pass
 else:
 
-    # NumPy numbers do not depend on Variable objects:    
-    CONSTANT_TYPES += (numpy.number,)
+    # NumPy numbers do not depend on Variable objects:
+    FLOAT_LIKE_TYPES += (numpy.number,)
+    CONSTANT_TYPES += FLOAT_LIKE_TYPES[-1:]
     
     # Entering variables as a block of correlated values.  Only available
     # if NumPy is installed.
@@ -450,7 +454,6 @@ def to_affine_scalar(x):
     if isinstance(x, AffineScalarFunc):
         return x
 
-    #! In Python 2.6+, numbers.Number could be used instead, here:
     if isinstance(x, CONSTANT_TYPES):
         # No variable => no derivative:
         return AffineScalarFunc(x, {})
@@ -615,7 +618,8 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     analytically (with uncertainties-compatible operators and
     functions like +, *, umath.sin(), etc.).
 
-    f must return a scalar (not a list, etc.).
+    f must return a float-like (i.e. a float, an int, etc., not a
+    list, etc.), unless when called with no number with uncertainty.
 
     If the wrapped function is called with no argument that has an
     uncertainty, the value of f is returned.
@@ -796,8 +800,7 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     uncertainties.Variable objects will be incorrect.
     
     Original documentation:
-    %s""" % (f.__name__, f.__doc__))
-    
+    %s""" % (f.__name__, f.__doc__))    
     def f_with_affine_output(*args, **kwargs):
 
         ########################################
@@ -857,7 +860,15 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
             
         f_nominal_value = f(*args_values, **kwargs)
 
-
+        # If the value is not a float, then this code cannot provide
+        # the result, as it returns a UFloat, which represents a
+        # random real variable. This happens for instance when
+        # ufloat()*numpy.array() is calculated: the
+        # AffineScalarFunc.__mul__ operator, obtained through wrap(),
+        # returns a NumPy array, not a float:
+        if not isinstance(f_nominal_value, FLOAT_LIKE_TYPES):
+            return NotImplemented
+        
         ########################################
 
         # The chain rule will be applied.  In the case of numerical
@@ -932,7 +943,7 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
                 derivatives_wrt_vars[var] += f_derivative * arg_derivative
 
                 
-        # The function now returns an AffineScalarFunc object:
+        # The function now returns an AffineScalarFunc object:        
         return AffineScalarFunc(f_nominal_value, derivatives_wrt_vars)
 
     f_with_affine_output = set_doc("""\
@@ -1136,6 +1147,7 @@ class AffineScalarFunc(object):
         # make sense to have a complex nominal value, here (it would
         # not be handled correctly at all): converting to float should
         # be possible.
+
         self._nominal_value = float(nominal_value)
         self.derivatives = derivatives
 
@@ -1434,7 +1446,7 @@ def get_ops_with_reflection():
         # AffineScalarFunc._nominal_value numbers, it is applied on
         # floats, and is therefore the "usual" mathematical division.
         'div': ("1/y", "-x/y**2"),
-        'floordiv': ("0.", "0."),  # Non exact: there is a discontinuities
+        'floordiv': ("0.", "0."),  # Non exact: there is a discontinuity
         # The derivative wrt the 2nd arguments is something like (..., x//y),
         # but it is calculated numerically, for convenience:
         'mod': ("1.", "partial_derivative(float.__mod__, 1)(x, y)"),
