@@ -814,7 +814,7 @@ def test_wrap_with_kwargs():
     # Version of f() that automatically works with numbers with
     # uncertainties:
     def f_auto_unc(x, y, *args, **kwargs):
-        return x + umath.sin(y) + 2*args[0] + kwargs['t']*3
+        return x + umath.sin(y) + 2*args[0] + 3*kwargs['t']
     
     # We also add keyword arguments in the function which is wrapped:
     def f(x, y, *args, **kwargs):
