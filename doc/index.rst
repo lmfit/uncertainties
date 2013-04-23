@@ -317,7 +317,7 @@ Planned future developments include:
 
 **Please support the continued development of this program** by using
 `gittip <https://www.gittip.com/lebigot/>`_ or by `donating $10`_ or
-more through PayPal (no PayPal account necessary),
+more through PayPal (no PayPal account necessary).
 
 .. index:: support
 
