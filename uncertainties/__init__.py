@@ -578,16 +578,19 @@ class IndexableIter(object):
 def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     """
     Wraps a function f into a function that also accepts numbers with
-    uncertainties (UFloat objects) where f accepts float arguments;
-    the wrapped function returns the value of f with the correct
-    uncertainty and correlations.
+    uncertainties (UFloat objects); the wrapped function returns the
+    value of f with the correct uncertainty and correlations. The
+    wrapped function is intended to be used as a drop-in replacement
+    for the original function: they can be called in the exact same
+    way, the only difference being that numbers with uncertainties can
+    be given to the wrapped function where f accepts float arguments.
 
     Doing so may be necessary when function f cannot be expressed
     analytically (with uncertainties-compatible operators and
     functions like +, *, umath.sin(), etc.).
 
     f must return a scalar (not a list, etc.).
-        
+
     If the wrapped function is called with no argument that has an
     uncertainty, the value of f is returned.
 
