@@ -856,7 +856,7 @@ def test_wrapped_func_args_no_kwargs():
     # Like f_auto_unc, but does not accept numbers with uncertainties:
     def f(x, y, *args):
         assert not any(isinstance(value, uncertainties.UFloat)
-                       for value in [x, y] + args)
+                       for value in [x, y] + list(args))
         return f_auto_unc(x, y, *args)
 
     x = uncertainties.ufloat(1, 0.1)
@@ -1003,8 +1003,8 @@ def test_wrap_with_kwargs():
     # The *args parameter of f() is given as a keyword argument, so as
     # to try to confuse the code:
     
-    assert (f_wrapped2(x, y=y, z=z, t=t).derivatives[y]
-            == f_auto_unc(x, y=y, z=z, t=t).derivatives[y])
+    assert (f_wrapped2(x, y, z, t=t).derivatives[y]
+            == f_auto_unc(x, y, z, t=t).derivatives[y])
     
     # Derivatives supplied through the keyword-parameter dictionary of
     # derivatives, and also derivatives supplied for the
@@ -1013,14 +1013,16 @@ def test_wrap_with_kwargs():
     f_wrapped3 = uncertainties.wrap(
         f,
         [None, None, lambda x, y, *args, **kwargs: 2],
-        {'t': lambda x, y, *args, **kwargs: 3*kwargs['t']})
+        {'t': lambda x, y, *args, **kwargs: 3})
 
     # The derivatives should be exactly the same, because they are
     # obtained with the exact same analytic formula:
-    assert (f_wrapped3(x, y=y, z=z, t=t).derivatives[y]
-            == f_auto_unc(x, y=y, z=z, t=t).derivatives[y])
-    assert (f_wrapped3(x, y=y, z=z, t=t).derivatives[z]
-            == f_auto_unc(x, y=y, z=z, t=t).derivatives[z])
+    print "ASSER BEG", f_wrapped3(x, y, z, t=t).derivatives[y], "ASSER END"
+    print "ASSER", f_auto_unc(x, y, z, t=t).derivatives[y], "ASSER END"
+    assert (f_wrapped3(x, y, z, t=t).derivatives[z]
+            == f_auto_unc(x, y, z, t=t).derivatives[z])
+    assert (f_wrapped3(x, y, z, t=t).derivatives[t]
+            == f_auto_unc(x, y, z, t=t).derivatives[t])
 
     ########################################
     # Making sure that user-supplied derivatives are indeed called:
