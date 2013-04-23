@@ -780,9 +780,6 @@ def test_wrapped_func():
 
     # The random variables must be the same (full correlation):
 
-    print "TWO", (f_wrapped(angle, *[1, angle]),
-                          f_auto_unc(angle, *[1, angle]))
-    
     assert _ufloats_close(f_wrapped(angle, *[1, angle]),
                           f_auto_unc(angle, *[1, angle]))
     
@@ -800,6 +797,11 @@ def test_wrapped_func():
     assert f_wrapped(10, 'string argument', 1, 0, 0) == 12
 
     x = uncertainties.ufloat(10, 1)
+
+    #!!!!!!!!!!!!
+    print "RESULTS",  (f_wrapped(x, 'string argument', x, x, x).std_dev,
+                          1+2+3+4)
+
     assert _numbers_close(f_wrapped(x, 'string argument', x, x, x).std_dev,
                           1+2+3+4)
 
