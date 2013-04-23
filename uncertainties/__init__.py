@@ -297,7 +297,8 @@ def set_doc(doc_string):
 # may slightly improve the execution speed.
 #
 #! In Python 2.6+, numbers.Number could be used instead, here:
-CONSTANT_TYPES = (float, int, complex, long)
+FLOAT_LIKE_TYPES = (float, int, long)
+CONSTANT_TYPES = FLOAT_LIKE_TYPES+(complex,)
 
 ###############################################################################
 # Utility for issuing deprecation warnings
@@ -327,8 +328,9 @@ except ImportError:
     pass
 else:
 
-    # NumPy numbers do not depend on Variable objects:    
-    CONSTANT_TYPES += (numpy.number,)
+    # NumPy numbers do not depend on Variable objects:
+    FLOAT_LIKE_TYPES += (numpy.number,)
+    CONSTANT_TYPES += FLOAT_LIKE_TYPES[-1:]
     
     # Entering variables as a block of correlated values.  Only available
     # if NumPy is installed.
@@ -855,7 +857,7 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # ufloat()*numpy.array() is calculated: the
         # AffineScalarFunc.__mul__ operator, obtained through wrap(),
         # returns a NumPy array, not a float:
-        if not isinstance(f_nominal_value, float):
+        if not isinstance(f_nominal_value, FLOAT_LIKE_TYPES):
             return NotImplemented
         
         ########################################
