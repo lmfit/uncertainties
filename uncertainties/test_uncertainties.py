@@ -1290,38 +1290,36 @@ def test_power():
     else:
         raise Exception('An proper exception should have been raised')
 
-    if sys.version_info >= (2, 6):
-        
-        # Reference: http://docs.python.org/library/math.html#math.pow
-        
-        # …**0 == 1.0:
-        assert p**0 == 1.0        
-        assert zero**0 == 1.0
-        assert (-p)**0 == 1.0
-        # …**zero:
-        assert (-10.3)**zero == 1.0        
-        assert 0**zero == 1.0        
-        assert 0.3**zero == 1.0
-        assert float('nan')**zero == 1.0
-        assert (-p)**zero == 1.0        
-        assert zero**zero == 1.0
-        assert p**zero == 1.0
+    # Reference: http://docs.python.org/library/math.html#math.pow
 
-        # one**… == 1.0
-        assert one**-3 == 1.0
-        assert one**-3.1 == 1.0
-        assert one**0 == 1.0
-        assert one**3 == 1.0
-        assert one**3.1 == 1.0
-        assert one**float('nan') == 1.0
-        # … with two numbers with uncertainties:
-        assert one**(-p) == 1.0
-        assert one**zero == 1.0
-        assert one**p == 1.0
-        # 1**… == 1.0:
-        assert 1.**(-p) == 1.0
-        assert 1.**zero == 1.0
-        assert 1.**p == 1.0
+    # …**0 == 1.0:
+    assert p**0 == 1.0        
+    assert zero**0 == 1.0
+    assert (-p)**0 == 1.0
+    # …**zero:
+    assert (-10.3)**zero == 1.0        
+    assert 0**zero == 1.0        
+    assert 0.3**zero == 1.0
+    assert float('nan')**zero == 1.0
+    assert (-p)**zero == 1.0        
+    assert zero**zero == 1.0
+    assert p**zero == 1.0
+
+    # one**… == 1.0
+    assert one**-3 == 1.0
+    assert one**-3.1 == 1.0
+    assert one**0 == 1.0
+    assert one**3 == 1.0
+    assert one**3.1 == 1.0
+    assert one**float('nan') == 1.0
+    # … with two numbers with uncertainties:
+    assert one**(-p) == 1.0
+    assert one**zero == 1.0
+    assert one**p == 1.0
+    # 1**… == 1.0:
+    assert 1.**(-p) == 1.0
+    assert 1.**zero == 1.0
+    assert 1.**p == 1.0
         
         
     # Negative numbers with unceratinty can be exponentiated to an integral
