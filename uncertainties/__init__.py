@@ -1233,8 +1233,13 @@ class AffineScalarFunc(object):
         error_components = {}
         for (variable, derivative) in self.derivatives.iteritems():            
             # Individual standard error due to variable:
-            error_components[variable] = abs(derivative*variable._std_dev)
-
+            error_components[variable] = (
+                0.
+                # 0 is returned even for a NaN derivative, since an
+                # exact number has a 0 uncertainty:
+                if variable._std_dev == 0
+                else abs(derivative*variable._std_dev))
+            
         return error_components
     
     @property
@@ -1470,7 +1475,7 @@ def get_ops_with_reflection():
             try:
                 return f(x, y)
             except exceptions:
-                return float('NaN')
+                return float('nan')
 
         return wrapped_f
     
