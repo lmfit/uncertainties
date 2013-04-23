@@ -820,7 +820,7 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
                 
                 derivatives_num_kwargs[name] = derivative(
                     *args_values, **kwargs)
-        
+
         ########################################
         # Calculation of the derivative of f with respect to all the
         # variables (Variable objects) involved.
