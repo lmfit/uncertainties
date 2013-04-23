@@ -847,7 +847,15 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
             
         f_nominal_value = f(*args_values, **kwargs)
 
-
+        # If the value is not a float, then this code cannot provide
+        # the result, as it returns a UFloat, which represents a
+        # random real variable. This happens for instance when
+        # ufloat()*numpy.array() is calculated: the
+        # AffineScalarFunc.__mul__ operator, obtained through wrap(),
+        # returns a NumPy array, not a float:
+        if not isinstance(f_nominal_value, float):
+            return NotImplemented
+        
         ########################################
 
         # The chain rule will be applied.  In the case of numerical
@@ -921,12 +929,7 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
                 derivatives_wrt_vars[var] += f_derivative * arg_derivative
 
                 
-        # The function now returns an AffineScalarFunc object:
-        
-        print "F_NOM", f_nominal_value  #!!!!!! test
-        if f_nominal_value is NotImplemented:
-            pass  #!!!!!!!!! OR BETTER: handle AffineScalarFunc*Array in a different way: its derivative cannot be calculated automatically, normally, why does the program even try?
-        
+        # The function now returns an AffineScalarFunc object:        
         return AffineScalarFunc(f_nominal_value, derivatives_wrt_vars)
 
     # It is easier to work with f_with_affine_output, which represents
