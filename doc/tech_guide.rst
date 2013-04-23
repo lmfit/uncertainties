@@ -60,13 +60,14 @@ expressions through the linear approximation of `error propagation
 theory`_.
 
 The standard deviations and nominal values calculated by this package
-are thus meaningful approximations as long as the functions involved
-have precise linear expansions in the region where the probability
-distribution of their variables is the largest.  It is therefore
-important that **uncertainties be "small"**.  Mathematically, this
-implies that the linear terms of functions around the nominal values of
-their variables should be much larger than the remaining higher-order
-terms over the region of significant probability.
+are thus meaningful approximations as long as the final calculated
+functions have precise linear expansions in the region where the
+probability distribution of their variables is the largest.  It is
+therefore important that **uncertainties be "small"**.
+Mathematically, this implies that the linear terms of functions around
+the nominal values of their variables should be much larger than the
+remaining higher-order terms over the region of significant
+probability.
 
 For instance, ``sin(0+/-0.01)`` yields a meaningful standard deviation
 since it is quite linear over 0±0.01.  However, ``cos(0+/-0.01)``,
