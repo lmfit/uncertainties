@@ -21,8 +21,8 @@ import sys
 if sys.version_info < (2, 7):
     # This package uses lib2to3, which requires Python 2.6+.
 
-    # !!  Nosetests also fails (it looks like it tries to run tests
-    # via lib2to3/tests/test_refactor.py):
+    # !!  Nosetests for Python 2.6 also fails (it looks like it tries
+    # to run tests via lib2to3/tests/test_refactor.py):
     
     pass
 
@@ -32,8 +32,8 @@ else:
     import lib2to3.tests.support as support
 
     # The lib1to2.fixes package given to lib2to3 is the *local* package
-    # (not to any other installed module) (this is done through the
-    # __import__() used via support.get_refactorer()):
+    # (not to another installed module). This is important for the
+    # __import__() used via support.get_refactorer().
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.pardir))
 
     def check_refactor(refactorer, source, expected):
