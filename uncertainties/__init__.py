@@ -13,6 +13,7 @@ Correlations between expressions are correctly taken into account (for
 instance, with x = 0.2+/-0.01, 2*x-x-x is exactly zero, as is y-x-x
 with y = 2*x).
 
+
 Examples:
 
   import uncertainties
@@ -233,9 +234,12 @@ import math
 from math import sqrt, log  # Optimization: no attribute look-up
 import copy
 import warnings
+import itertools
+import collections
+import inspect
 
 # Numerical version:
-__version_info__ = (2, 2)
+__version_info__ = (2, 3)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
@@ -291,7 +295,10 @@ def set_doc(doc_string):
 # Some types known to not depend on Variable objects are put in
 # CONSTANT_TYPES.  The most common types can be put in front, as this
 # may slightly improve the execution speed.
-CONSTANT_TYPES = (float, int, complex, long)
+#
+#! In Python 2.6+, numbers.Number could be used instead, here:
+FLOAT_LIKE_TYPES = (float, int, long)
+CONSTANT_TYPES = FLOAT_LIKE_TYPES+(complex,)
 
 ###############################################################################
 # Utility for issuing deprecation warnings
@@ -321,8 +328,9 @@ except ImportError:
     pass
 else:
 
-    # NumPy numbers do not depend on Variable objects:    
-    CONSTANT_TYPES += (numpy.number,)
+    # NumPy numbers do not depend on Variable objects:
+    FLOAT_LIKE_TYPES += (numpy.number,)
+    CONSTANT_TYPES += FLOAT_LIKE_TYPES[-1:]
     
     # Entering variables as a block of correlated values.  Only available
     # if NumPy is installed.
@@ -443,45 +451,69 @@ def to_affine_scalar(x):
     if isinstance(x, AffineScalarFunc):
         return x
 
-    #! In Python 2.6+, numbers.Number could be used instead, here:
     if isinstance(x, CONSTANT_TYPES):
-        # No variable => no derivative to define:
+        # No variable => no derivative:
         return AffineScalarFunc(x, {})
 
     # Case of lists, etc.
     raise NotUpcast("%s cannot be converted to a number with"
                     " uncertainty" % type(x))
 
-def partial_derivative(f, param_num):
+# !! It would be possible to split the partial derivative calculation
+# into two functions: one for positional arguments (case of integer
+# arg_ref) and one for keyword arguments (case of string
+# arg_ref). However, this would either duplicate the code for the
+# numerical differentiation, or require a call, which is probably more
+# expensive in time than the tests done here.
+def partial_derivative(f, arg_ref):
     """
     Returns a function that numerically calculates the partial
-    derivative of function f with respect to its argument number
-    param_num.
+    derivative of function f with respect to its argument arg_ref.
+
+    arg_ref -- describes which variable to use for the
+    differentiation. If f is called with f(*args, **kwargs) arguments,
+    an integer represents the index of an argument in args, and a
+    string represents the name of an argument in kwargs.
     """
 
-    def partial_derivative_of_f(*args):
+    # Which set of function parameter contains the variable to be
+    # changed? the positional or the optional keyword arguments?
+    change_kwargs = isinstance(arg_ref, basestring)
+    
+    def partial_derivative_of_f(*args, **kwargs):
         """
         Partial derivative, calculated with the (-epsilon, +epsilon)
         method, which is more precise than the (0, +epsilon) method.
         """
-        # f_nominal_value = f(*args)
 
-        shifted_args = list(args)  # Copy, and conversion to a mutable
+        # args_with_var contains the arguments (either args or kwargs)
+        # that contain the variable that must be shifted, as a mutable
+        # object (because the variable contents will be modified):
 
+        # The values in args need to be modified, for the
+        # differentiation: it is converted to a list:
+        args_with_var = kwargs if change_kwargs else list(args)
+       
         # The step is relative to the parameter being varied, so that
-        # shifting it does not suffer from finite precision:
-        step = 1e-8*abs(shifted_args[param_num])
+        # shifting it does not suffer from finite precision limitations:
+        step = 1e-8*abs(args_with_var[arg_ref])
         if not step:
             # Arbitrary, but "small" with respect to 1, and of the
             # order of the square root of the precision of double
             # precision floats:
             step = 1e-8
 
-        shifted_args[param_num] += step
-        shifted_f_plus = f(*shifted_args)
+        args_with_var[arg_ref] += step
+
+        shifted_f_plus = (
+            f(*args, **args_with_var) if change_kwargs
+            else f(*args_with_var, **kwargs))
+
+        args_with_var[arg_ref] -= 2*step  # Optimization: only 1 list copy
         
-        shifted_args[param_num] -= 2*step  # Optimization: only 1 list copy
-        shifted_f_minus = f(*shifted_args)
+        shifted_f_minus = (
+            f(*args, **args_with_var) if change_kwargs
+            else f(*args_with_var, **kwargs))
 
         return (shifted_f_plus - shifted_f_minus)/2/step
 
@@ -506,44 +538,145 @@ class NumericalDerivatives(object):
         Returns the n-th numerical derivative of the function.
         """
         return partial_derivative(self._function, n)
-  
-def wrap(f, derivatives_iter=None):
+
+class IndexableIter(object):
+    '''
+    Iterable whose values can also be accessed through indexing.
+
+    The input iterable values are cached.
+
+    Some attributes:
+
+    iterable -- iterable used for returning the elements one by one.
+    
+    returned_elements -- list with the elements directly accessible.
+    through indexing. Additional elements are obtained from self.iterable.
+
+    none_converter -- function that takes an index and returns the
+    value to be returned when None is obtained form the iterable
+    (instead of None).
+    '''
+
+    def __init__(self, iterable, none_converter=lambda index: None):
+        '''
+        iterable -- iterable whose values will be returned.
+        
+        none_converter -- function applied to None returned
+        values. The value that replaces None is none_converter(index),
+        where index is the index of the element.
+        '''
+        self.iterable = iterable
+        self.returned_elements = []
+        self.none_converter = none_converter
+        
+    def __getitem__(self, index):
+
+        returned_elements = self.returned_elements
+        
+        try:
+            
+            return returned_elements[index]
+        
+        except IndexError:  # Element not yet cached
+            
+            for pos in range(len(returned_elements), index+1):
+
+                # ! Python 2.6+: next(...)
+                value = self.iterable.next()
+
+                if value is None:
+                    value = self.none_converter(pos)
+                    
+                returned_elements.append(value)
+            
+            return returned_elements[index]
+
+    def __str__(self):
+        return '<{}: [{}...]>'.format(
+            self.__class__.__name__,
+            ', '.join(map(str, self.returned_elements)))
+    
+def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     """
     Wraps a function f into a function that also accepts numbers with
-    uncertainties (UFloat objects) and returns a number with
-    uncertainties.  Doing so may be necessary when function f cannot
-    be expressed analytically (with uncertainties-compatible operators
-    and functions like +, *, umath.sin(), etc.).
+    uncertainties (UFloat objects); the wrapped function returns the
+    value of f with the correct uncertainty and correlations. The
+    wrapped function is intended to be used as a drop-in replacement
+    for the original function: they can be called in the exact same
+    way, the only difference being that numbers with uncertainties can
+    be given to the wrapped function where f accepts float arguments.
 
-    f must return a scalar (not a list, etc.).
+    Doing so may be necessary when function f cannot be expressed
+    analytically (with uncertainties-compatible operators and
+    functions like +, *, umath.sin(), etc.).
+
+    f must return a float-like (i.e. a float, an int, etc., not a
+    list, etc.), unless when called with no number with uncertainty.
+
+    If the wrapped function is called with no argument that has an
+    uncertainty, the value of f is returned.
+
+    Parameters: the derivatives_* parameters can be used for defining
+    some of the partial derivatives of f. All the (non-None)
+    derivatives must have the same signature as f.
+
+    derivatives_args --
     
-    In the wrapped function, the standard Python scalar arguments of f
-    (float, int, etc.) can be replaced by numbers with
-    uncertainties. The result will contain the appropriate
-    uncertainty.
-    
-    If no argument to the wrapped function has an uncertainty, f
-    simply returns its usual, scalar result.
+        Iterable that, when iterated over, returns either derivatives
+        (functions) or None. derivatives_args can in particular be a
+        simple sequence (list or tuple) that gives the derivatives of
+        the first positional parameters of f.
 
-    If supplied, derivatives_iter can be an iterable that generally
-    contains functions; each successive function is the partial
-    derivative of f with respect to the corresponding variable (one
-    function for each argument of f, which takes as many arguments as
-    f).  If instead of a function, an element of derivatives_iter
-    contains None, then it is automatically replaced by the relevant
-    numerical derivative; this can be used for non-scalar arguments of
-    f (like string arguments).
+        Each function must be the partial derivative of f with respect
+        to the corresponding positional parameters.  These functions
+        take the same arguments as f.
 
-    If derivatives_iter is None, or if derivatives_iter contains a
-    fixed (and finite) number of elements, then any missing derivative
-    is calculated numerically.
+        The positional parameters of a function are usually
+        positional-or-keyword parameters like in func(a,
+        b=None). However, they also include var-positional parameters
+        given through the func(a, b, *args) *args syntax. In the last
+        example, derivatives_args can be an iterable that returns the
+        derivative with respect to a, b and then to each optional
+        argument in args.
 
-    An infinite number of derivatives can be specified by having
-    derivatives_iter be an infinite iterator; this can for instance
-    be used for specifying the derivatives of functions with a
-    undefined number of argument (like sum(), whose partial
-    derivatives all return 1).
+        A value of None (instead of a function) obtained when
+        iterating over derivatives_args is automatically replaced by
+        the relevant numerical derivative. This derivative is not used
+        if the corresponding argument is not a number with
+        uncertainty. A None value can therefore be used for non-scalar
+        arguments of f (like string arguments).
 
+        If the derivatives_args iterable yields fewer derivatives than
+        needed, wrap() automatically sets the remaining unspecified
+        derivatives to None (i.e. to the automatic numerical
+        calculation of derivatives).
+
+        An indefinite number of derivatives can be specified by having
+        derivatives_args be an infinite iterator; this can for
+        instance be used for specifying the derivatives of functions
+        with a undefined number of argument (like sum(), whose partial
+        derivatives all return 1).
+
+    derivatives_kwargs --
+
+        Dictionary that maps keyword parameters to their derivatives,
+        or None (as in derivatives_args).
+
+        Keyword parameters are defined as being those of kwargs when f
+        has a signature of the form f(..., **kwargs). In Python 3,
+        these keyword parameters also include keyword-only parameters.
+        
+        Non-mapped keyword parameters are replaced automatically by
+        None: the wrapped function will use, if necessary, numerical
+        differentiation for these parameters (as with
+        derivatives_args).
+
+        Note that this dictionary only maps keyword *parameters* from
+        the *signature* of f. The way the wrapped function is called
+        is immaterial: for example, if f has signature f(a, b=None),
+        then derivatives_kwargs should be the empty dictionary, even
+        if the wrapped f can be called a wrapped_f(a=123, b=42).
+        
     Example (for illustration purposes only, as
     uncertainties.umath.sin() runs faster than the examples that
     follow): wrap(math.sin) is a sine function that can be applied to
@@ -551,24 +684,98 @@ def wrap(f, derivatives_iter=None):
     numerically.  wrap(math.sin, [None]) would have produced the same
     result.  wrap(math.sin, [math.cos]) is the same function, but with
     an analytically defined derivative.
+
+    The correctness of the supplied analytical derivatives an be
+    tested by setting them to None instead and comparing the
+    analytical and the numerical differentiation results.
+    
+    Note on efficiency: the wrapped function assumes that f cannot
+    accept numbers with uncertainties as arguments. If f actually does
+    handle some arguments even when they have an uncertainty, the
+    wrapped function ignores this fact, which might lead to a
+    performance hit: wrapping a function that actually accepts numbers
+    with uncertainty is likely to make it slower.
     """
 
-    if derivatives_iter is None:
-        derivatives_iter = NumericalDerivatives(f)
+    derivatives_args_index = IndexableIter(
+        # Automatic addition of numerical derivatives in case the
+        # supplied derivatives_args is shorter than the number of
+        # arguments in *args:
+        itertools.chain(derivatives_args, itertools.repeat(None)))
+        
+
+    # Derivatives for keyword arguments (includes var-keyword
+    # parameters **kwargs, but also var-or-keyword parameters, and
+    # keyword-only parameters (Python 3):
+    
+    derivatives_all_kwargs = dict(
+        
+        # Python 2.7+: {name: ...}
+        (name,
+         # Optimization: None keyword-argument derivatives are converted
+         # right away to derivatives (instead of doing this every time a
+         # None derivative is encountered when calculating derivatives):
+         partial_derivative(f, name) if derivative is None
+         else derivative)
+
+        for (name, derivative) in derivatives_kwargs.iteritems()
+    )
+
+    # When the wrapped function is called with keyword arguments that
+    # map to positional-or-keyword parameters, their derivative is
+    # looked for in derivatives_all_kwargs.  We define these
+    # additional derivatives:
+
+    try:
+        argspec = inspect.getargspec(f)
+    except TypeError:
+        # Some functions do not provide meta-data about their
+        # arguments (see PEP 362). One cannot use keyword arguments
+        # for positional-or-keyword parameters with them: nothing has
+        # to be done:
+        pass
     else:
-        # Derivatives that are not defined are calculated numerically,
-        # if there is a finite number of them (the function lambda
-        # *args: fsum(args) has a non-defined number of arguments, as
-        # it just performs a sum):
-        try:  # Is the number of derivatives fixed?
-            len(derivatives_iter)
-        except TypeError:
-            pass
-        else:
-            derivatives_iter = [
-                partial_derivative(f, k) if derivative is None
-                else derivative
-                for (k, derivative) in enumerate(derivatives_iter)]
+        # With Python 3, there is no need to handle keyword-only
+        # arguments (and therefore to use inspect.getfullargspec())
+        # because they are already handled by derivatives_kwargs.
+
+        # ! Python 2.6+: argspec.args
+        for (index, name) in enumerate(argspec[0]):
+            
+            # The following test handles the case of
+            # positional-or-keyword parameter for which automatic
+            # numerical differentiation is used: when the wrapped
+            # function is called with a keyword argument for this
+            # parameter, the numerical derivative must be calculated
+            # with respect to the parameter name. In the other case,
+            # where the wrapped function is called with a positional
+            # argument, the derivative with respect to its index must
+            # be used:
+            
+            derivative = derivatives_args_index[index]
+
+            derivatives_all_kwargs[name] = (
+                partial_derivative(f, name)
+                if derivative is None else derivative)
+
+    # Optimization: None derivatives for the positional arguments are
+    # converted to the corresponding numerical differentiation
+    # function (instead of doing this over and over later every time a
+    # None derivative is found):
+
+    none_converter = lambda index: partial_derivative(f, index)
+    
+    derivatives_args_index.returned_elements = [
+        none_converter(index) if derivative is None
+        else derivative
+        for (index, derivative) in enumerate(
+            derivatives_args_index.returned_elements)]
+
+    # Future None values are also automatically converted:
+    derivatives_args_index.none_converter = none_converter
+
+    
+    ## Wrapped function:
 
     #! Setting the doc string after "def f_with...()" does not
     # seem to work.  We define it explicitly:
@@ -584,114 +791,149 @@ def wrap(f, derivatives_iter=None):
     uncertainties.Variable objects will be incorrect.
     
     Original documentation:
-    %s""" % (f.__name__, f.__doc__))
+    %s""" % (f.__name__, f.__doc__))    
     def f_with_affine_output(*args, **kwargs):
-        # Can this function perform the calculation of an
-        # AffineScalarFunc (or maybe float) result?
-        try:
-            aff_funcs = map(to_affine_scalar, args)
-
-        except NotUpcast:
-
-            # This function does not know how to itself perform
-            # calculations with non-float-like arguments (as they
-            # might for instance be objects whose value really changes
-            # if some Variable objects had different values):
-
-            # Is it clear that we can't delegate the calculation?
-
-            if any(isinstance(arg, AffineScalarFunc) for arg in args):
-                # This situation arises for instance when calculating
-                # AffineScalarFunc(...)*numpy.array(...).  In this
-                # case, we must let NumPy handle the multiplication
-                # (which is then performed element by element):
-                return NotImplemented
-            else:
-                # If none of the arguments is an AffineScalarFunc, we
-                # can delegate the calculation to the original
-                # function.  This can be useful when it is called with
-                # only one argument (as in
-                # numpy.log10(numpy.ndarray(...)):
-                return f(*args)
 
         ########################################
-        # Nominal value of the constructed AffineScalarFunc:
-        args_values = [e.nominal_value for e in aff_funcs]
-        f_nominal_value = f(*args_values)
+        # The involved random variables must first be gathered, so
+        # that they can be independently updated.
+        
+        # The arguments that contain an uncertainty (AffineScalarFunc
+        # objects) are gathered, as positions or names; they will be
+        # replaced by simple floats.
+
+        pos_w_uncert = [index for (index, value) in enumerate(args)
+                        if isinstance(value, AffineScalarFunc)]
+        names_w_uncert = set(key for (key, value) in kwargs.iteritems()
+                             if isinstance(value, AffineScalarFunc))
 
         ########################################
+        # Value of f() at the nominal value of the arguments with
+        # uncertainty:
 
-        # List of involved variables (Variable objects):
-        variables = set()
-        for expr in aff_funcs:
-            variables |= set(expr.derivatives)
+        # The usual behavior of f() is kept, if no number with
+        # uncertainty is provided:
+        if (not pos_w_uncert) and (not names_w_uncert):
+            return f(*args, **kwargs)
+                    
+        ### Nominal values of the (scalar) arguments:
 
-        ## It is sometimes useful to only return a regular constant:
+        # !! Possible optimization: If pos_w_uncert is empty, there
+        # is actually no need to create a mutable version of args and
+        # one could do args_values = args.  However, the wrapped
+        # function is typically called with numbers with uncertainties
+        # as positional arguments (i.e., pos_w_uncert is not emtpy),
+        # so this "optimization" is not implemented here.
+        
+        ## Positional arguments:
+        args_values = list(args)  # Now mutable: modified below
+        # Arguments with an uncertainty are converted to their nominal
+        # value:
+        for index in pos_w_uncert:
+            args_values[index] = args[index].nominal_value
 
-        # (1) Optimization / convenience behavior: when 'f' is called
-        # on purely constant values (e.g., sin(2)), there is no need
-        # for returning a more complex AffineScalarFunc object.
+        ## Keyword arguments:
 
-        # (2) Functions that do not return a "float-like" value might
-        # not have a relevant representation as an AffineScalarFunc.
-        # This includes boolean functions, since their derivatives are
-        # either 0 or are undefined: they are better represented as
-        # Python constants than as constant AffineScalarFunc functions.
+        # For efficiency reasons, kwargs is not copied. Instead, its
+        # values with uncertainty are modified:
 
-        if not variables or isinstance(f_nominal_value, bool):
-            return f_nominal_value
+        # The original values with uncertainties are needed: they are
+        # saved in the following dictionary:
 
-        # The result of 'f' does depend on 'variables'...
+        kwargs_uncert_values = {}
 
+        for name in names_w_uncert:
+            value_with_uncert = kwargs[name]
+            # Saving for future use:
+            kwargs_uncert_values[name] = value_with_uncert
+            # The original dictionary is modified (for efficiency reasons):
+            kwargs[name] = value_with_uncert.nominal_value
+            
+        f_nominal_value = f(*args_values, **kwargs)
+
+        # If the value is not a float, then this code cannot provide
+        # the result, as it returns a UFloat, which represents a
+        # random real variable. This happens for instance when
+        # ufloat()*numpy.array() is calculated: the
+        # AffineScalarFunc.__mul__ operator, obtained through wrap(),
+        # returns a NumPy array, not a float:
+        if not isinstance(f_nominal_value, FLOAT_LIKE_TYPES):
+            return NotImplemented
+        
         ########################################
 
-        # Calculation of the derivatives with respect to the arguments
-        # of f (aff_funcs):
-
-        # The chain rule is applied.  This is because, in the case of
-        # numerical derivatives, it allows for a better-controlled
-        # numerical stability than numerically calculating the partial
+        # The chain rule will be applied.  In the case of numerical
+        # derivatives, this method gives a better-controlled numerical
+        # stability than numerically calculating the partial
         # derivatives through '[f(x + dx, y + dy, ...) -
         # f(x,y,...)]/da' where dx, dy,... are calculated by varying
-        # 'a'.  In fact, it is numerically better to control how big
-        # (dx, dy,...) are: 'f' is a simple mathematical function and
-        # it is possible to know how precise the df/dx are (which is
-        # not possible with the numerical df/da calculation above).
+        # 'a' by 'da'.  In fact, this allows the program to control
+        # how big the dx, dy, etc. are, which is numerically more
+        # precise.
+        
+        ########################################
+            
+        # Calculation of the derivatives with respect to the variables
+        # of f that have a number with uncertainty.
+        
+        # Mappings of each relevant argument reference (numerical
+        # index in args, or name in kwargs to the value of the
+        # corresponding partial derivative of f (only for those
+        # arguments that contain a number with uncertainty).
+        
+        derivatives_num_args = {}
 
-        # We use numerical derivatives, if we don't already have a
-        # list of derivatives:
+        for pos in pos_w_uncert:
+            derivatives_num_args[pos] = derivatives_args_index[pos](
+                *args_values, **kwargs)
 
-        #! Note that this test could be avoided by requiring the
-        # caller to always provide derivatives.  When changing the
-        # functions of the math module, this would force this module
-        # to know about all the math functions.  Another possibility
-        # would be to force derivatives_iter to contain, say, the
-        # first 3 derivatives of f.  But any of these two ideas has a
-        # chance to break, one day... (if new functions are added to
-        # the math module, or if some function has more than 3
-        # arguments).
+        derivatives_num_kwargs = {}
+        for name in names_w_uncert:
 
-        derivatives_wrt_args = []
-        for (arg, derivative) in zip(aff_funcs, derivatives_iter):
-            derivatives_wrt_args.append(derivative(*args_values)
-                                        if arg.derivatives
-                                        else 0)
+            # Optimization: caching of the automatic numerical
+            # derivatives for keyword arguments that are
+            # discovered. This gives a speedup when the original
+            # function is called repeatedly with the same keyword
+            # arguments:
+            derivative = derivatives_all_kwargs.setdefault(
+                name,
+                # Derivative never needed before:
+                partial_derivative(f, name))
+
+            derivatives_num_kwargs[name] = derivative(
+                *args_values, **kwargs)
 
         ########################################
         # Calculation of the derivative of f with respect to all the
-        # variables (Variable) involved.
+        # variables (Variable objects) involved.
 
-        # Initial value (is updated below):
+        # Involved variables (Variable objects):
+        variables = set()
+        
+        for expr in itertools.chain(
+            (args[index] for index in pos_w_uncert),  # From args
+            kwargs_uncert_values.itervalues()):  # From kwargs
+            
+            # !! In Python 2.7+: |= expr.derivatives.viewkeys()
+            variables |= set(expr.derivatives)
+        
+        # Initial value for the chain rule (is updated below):
         derivatives_wrt_vars = dict((var, 0.) for var in variables)
 
-        # The chain rule is used (we already have
-        # derivatives_wrt_args):
+        ## The chain rule is used...
 
-        for (func, f_derivative) in zip(aff_funcs, derivatives_wrt_args):
-            for (var, func_derivative) in func.derivatives.iteritems():
-                derivatives_wrt_vars[var] += f_derivative * func_derivative
+        # ... on args:
+        for (pos, f_derivative) in derivatives_num_args.iteritems():
+            for (var, arg_derivative) in args[pos].derivatives.iteritems():
+                derivatives_wrt_vars[var] += f_derivative * arg_derivative
+        # ... on kwargs:
+        for (name, f_derivative) in derivatives_num_kwargs.iteritems():
+            for (var, arg_derivative) in (kwargs_uncert_values[name]
+                                          .derivatives.iteritems()):
+                derivatives_wrt_vars[var] += f_derivative * arg_derivative
 
-        # The function now returns an AffineScalarFunc object:
+                
+        # The function now returns an AffineScalarFunc object:        
         return AffineScalarFunc(f_nominal_value, derivatives_wrt_vars)
 
     # It is easier to work with f_with_affine_output, which represents
@@ -887,6 +1129,7 @@ class AffineScalarFunc(object):
         # make sense to have a complex nominal value, here (it would
         # not be handled correctly at all): converting to float should
         # be possible.
+
         self._nominal_value = float(nominal_value)
         self.derivatives = derivatives
 
@@ -1181,7 +1424,7 @@ def get_ops_with_reflection():
         # AffineScalarFunc._nominal_value numbers, it is applied on
         # floats, and is therefore the "usual" mathematical division.
         'div': ("1/y", "-x/y**2"),
-        'floordiv': ("0.", "0."),  # Non exact: there is a discontinuities
+        'floordiv': ("0.", "0."),  # Non exact: there is a discontinuity
         # The derivative wrt the 2nd arguments is something like (..., x//y),
         # but it is calculated numerically, for convenience:
         'mod': ("1.", "partial_derivative(float.__mod__, 1)(x, y)"),
@@ -1286,7 +1529,7 @@ class Variable(AffineScalarFunc):
 
     Objects are meant to represent variables that are independent from
     each other (correlations are handled through the AffineScalarFunc
-    class).    
+    class).
     """
 
     # To save memory in large arrays:
@@ -1517,8 +1760,8 @@ NUMBER_WITH_UNCERT_RE_STR = '''
     ([eE][+-]?\d+)?  # Optional exponent
     ''' % (POSITIVE_DECIMAL_UNSIGNED, POSITIVE_DECIMAL_UNSIGNED)
 
-NUMBER_WITH_UNCERT_RE = re.compile(
-    "^%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE)
+NUMBER_WITH_UNCERT_RE_SEARCH = re.compile(
+    "^%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).search
 
 def parse_error_in_parentheses(representation):
     """
@@ -1530,7 +1773,7 @@ def parse_error_in_parentheses(representation):
     Raises ValueError if the string cannot be parsed.    
     """
 
-    match = NUMBER_WITH_UNCERT_RE.search(representation)
+    match = NUMBER_WITH_UNCERT_RE_SEARCH(representation)
 
     if match:
         # The 'main' part is the nominal value, with 'int'eger part, and
