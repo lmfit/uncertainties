@@ -578,7 +578,8 @@ class IndexableIter(object):
             
             for pos in range(len(returned_elements), index+1):
 
-                value = next(self.iterable)
+                # ! Python 2.6+: next(...)
+                value = self.iterable.next()
 
                 if value is None:
                     value = self.none_converter(pos)
@@ -733,7 +734,9 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # With Python 3, there is no need to handle keyword-only
         # arguments (and therefore to use inspect.getfullargspec())
         # because they are already handled by derivatives_kwargs.
-        for (index, name) in enumerate(argspec.args):
+
+        # ! Python 2.6+: argspec.args
+        for (index, name) in enumerate(argspec[0]):
             
             # The following test handles the case of
             # positional-or-keyword parameter for which automatic
