@@ -698,11 +698,23 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         # arguments in *args:
         itertools.chain(derivatives_args, itertools.repeat(None)))
         
-    # Unspecified derivatives for **kwargs are set to None (numerical
-    # differentiation). They cannot be pre-computed (as
-    # partial_derivative(f, param_name)) because var-keyword parameters
-    # (**kwargs) are not known in advance:
-    derivatives_all_kwargs = derivatives_kwargs.copy()
+
+    # Derivatives for keyword arguments (includes var-keyword
+    # parameters **kwargs, but also var-or-keyword parameters, and
+    # keyword-only parameters (Python 3):
+    
+    derivatives_all_kwargs = dict(
+        
+        # Python 2.7+: {name: ...}
+        (name,
+         # Optimization: None keyword-argument derivatives are converted
+         # right away to derivatives (instead of doing this every time a
+         # None derivative is encountered when calculating derivatives):
+         partial_derivative(f, name) if derivative is None
+         else derivative)
+
+        for (name, derivative) in derivatives_kwargs.iteritems()
+    )
 
     # When the wrapped function is called with keyword arguments that
     # map to positional-or-keyword parameters, their derivative is
@@ -740,7 +752,9 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
                 if derivative is None else derivative)
 
     # Optimization: None derivatives for the positional arguments are
-    # converted to the corresponding numerical differentiation function:
+    # converted to the corresponding numerical differentiation
+    # function (instead of doing this over and over later every time a
+    # None derivative is found):
 
     none_converter = lambda index: partial_derivative(f, index)
     
@@ -752,7 +766,8 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
 
     # Future None values are also automatically converted:
     derivatives_args_index.none_converter = none_converter
-            
+
+    
     ## Wrapped function:
 
     #! Setting the doc string after "def f_with...()" does not
