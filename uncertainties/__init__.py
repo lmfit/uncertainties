@@ -869,10 +869,6 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
         
         derivatives_num_args = {}
 
-        #!!!!! test
-        print "ARGS", args
-        print "POS_W_UNCERT", pos_w_uncert
-        
         for pos in pos_w_uncert:
             derivatives_num_args[pos] = derivatives_args_index[pos](
                 *args_values, **kwargs)
@@ -890,10 +886,6 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
                 # Derivative never needed before:
                 partial_derivative(f, name))
 
-            # !!!!!!! test
-            print "NAME", name
-            print derivatives_all_kwargs
-            
             derivatives_num_kwargs[name] = derivative(
                 *args_values, **kwargs)
 
