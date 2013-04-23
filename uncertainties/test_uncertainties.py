@@ -798,10 +798,6 @@ def test_wrapped_func():
 
     x = uncertainties.ufloat(10, 1)
 
-    #!!!!!!!!!!!!
-    print "RESULTS",  (f_wrapped(x, 'string argument', x, x, x).std_dev,
-                          1+2+3+4)
-
     assert _numbers_close(f_wrapped(x, 'string argument', x, x, x).std_dev,
                           (1+2+3+4)*x.std_dev)
 
