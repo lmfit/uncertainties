@@ -1513,8 +1513,7 @@ def add_operators_to_AffineScalarFunc():
         # introduced with Python 2.6):
         try:
             setattr(AffineScalarFunc, attribute_name,
-                    wrap(getattr(float, attribute_name),
-                                 [derivative]))
+                    wrap(getattr(float, attribute_name), [derivative]))
         except AttributeError:
             pass
         else:

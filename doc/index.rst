@@ -268,6 +268,8 @@ What others say
   <http://twitter.com/#!/GeekyJeffrey>`_)
 - "*An amazing time saver*" (`Paul Nakroshis 
   <http://scipyscriptrepo.com/wp/?p=41>`_)
+- "*Seems to be the gold standard for this kind of thing*" (`Peter Williams
+  <http://newton.cx/~peter/work/?p=660>`_)
 - "*This package has a great interface and makes error propagation
   something to stop fearing.*" (`Dr Dawes
   <http://dawes.wordpress.com/2011/01/02/scientific-python/>`_)
