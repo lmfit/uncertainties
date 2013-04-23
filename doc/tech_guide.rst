@@ -68,8 +68,11 @@ final calculated functions around the nominal values of their
 variables should be much larger than the remaining higher-order terms
 over the region of significant probability.
 
-For example, calculating ``x*10`` with :data:`x` = 5±3 gives a *perfect
-result* since the calculated function is linear.
+For example, calculating ``x*10`` with :data:`x` = 5±3 gives a
+*perfect result* since the calculated function is linear. So does
+``umath.atan(umath.tan(x))`` for :data:`x` = 0±1, since only the
+*final* function counts (not an intermediate function like
+:func:`tan`).
 
 Another example is ``sin(0+/-0.01)``, for which :mod:`uncertainties`
 yields a meaningful standard deviation since the sine is quite linear
