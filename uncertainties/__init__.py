@@ -607,7 +607,8 @@ def wrap(f, derivatives_args=itertools.repeat(None), derivatives_kwargs={}):
     analytically (with uncertainties-compatible operators and
     functions like +, *, umath.sin(), etc.).
 
-    f must return a scalar (not a list, etc.).
+    f must return a float-like (not a list, etc.), unless when called
+    with no number with uncertainty.
 
     If the wrapped function is called with no argument that has an
     uncertainty, the value of f is returned.
