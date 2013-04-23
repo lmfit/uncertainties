@@ -295,6 +295,8 @@ def set_doc(doc_string):
 # Some types known to not depend on Variable objects are put in
 # CONSTANT_TYPES.  The most common types can be put in front, as this
 # may slightly improve the execution speed.
+#
+#! In Python 2.6+, numbers.Number could be used instead, here:
 CONSTANT_TYPES = (float, int, complex, long)
 
 ###############################################################################
@@ -447,7 +449,6 @@ def to_affine_scalar(x):
     if isinstance(x, AffineScalarFunc):
         return x
 
-    #! In Python 2.6+, numbers.Number could be used instead, here:
     if isinstance(x, CONSTANT_TYPES):
         # No variable => no derivative:
         return AffineScalarFunc(x, {})
