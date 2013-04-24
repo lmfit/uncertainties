@@ -297,4 +297,6 @@ def test_hypot():
     y = uncertainties.ufloat(0, 2)
     # Derivatives that cannot be calculated simply return NaN, with no
     # exception being raised, normally:
-    umath.hypot(x, y)
+    result = umath.hypot(x, y)
+    assert test_uncertainties.isnan(result.derivatives[x])
+    assert test_uncertainties.isnan(result.derivatives[y])

@@ -1077,8 +1077,8 @@ class AffineScalarFunc(object):
 
     Main attributes and methods:
     
-    - nominal_value, std_dev(): value at the origin / nominal value,
-      and standard deviation.
+    - nominal_value, std_dev: value at the origin / nominal value, and
+      standard deviation.  The standard deviation can be NaN.
 
     - error_components(): error_components()[x] is the error due to
       Variable x.
@@ -1631,7 +1631,8 @@ class Variable(AffineScalarFunc):
     
         # We force the error to be float-like.  Since it is considered
         # as a standard deviation, it must be positive:
-        assert std_dev >= 0, "the error must be a positive number"
+        assert std_dev >= 0 or isnan(std_dev), (
+            "the error must be a positive number, or NaN")
 
         self._std_dev = CallableStdDev(std_dev)
     
