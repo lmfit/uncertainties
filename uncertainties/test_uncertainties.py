@@ -1293,7 +1293,6 @@ def test_power():
     # The outcome of 1**nan and nan**0 was undefined before Python
     # 2.6 (http://docs.python.org/library/math.html#math.pow):
     if sys.version_info >= (2, 6):
-
         assert float('nan')**zero == 1.0
         assert one**float('nan') == 1.0
         
