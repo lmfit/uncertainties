@@ -1267,7 +1267,8 @@ def isnan(x):
     
 def test_power_all_cases():
     '''
-    Checks all cases for x**p.
+    Checks all cases for x**p (not the specific values, except when
+    they are special, like 0, 1 or NaN).
 
     Different cases for the value of x**p and its derivatives are
     tested by dividing the (x, p) plane with:
@@ -1280,6 +1281,7 @@ def test_power_all_cases():
     '''
 
     zero = ufloat(0, 0.1)
+    zero2 = ufloat(0, 0.1)
     one = ufloat(1, 0.1)
     positive = ufloat(0.3, 0.01)
     negative = ufloat(-0.3, 0.01)
@@ -1332,6 +1334,10 @@ def test_power_all_cases():
     assert isnan(result.derivatives[zero])
     assert result.derivatives[positive_smaller_than_one] == 0
 
+    result = zero**zero2
+    assert result.derivatives[zero] == 0
+    assert isnan(result.derivatives[zero2])
+    
     try:
         result = zero**negative
     except ZeroDivisionError:
@@ -1339,7 +1345,7 @@ def test_power_all_cases():
     else:
         raise Exception('Power should be impossible to calculate')
 
-    
+    ## 
 
     
 ###############################################################################
