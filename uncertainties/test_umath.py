@@ -265,26 +265,29 @@ def test_math_module():
 
         try:
             math.log(0)
-        except ValueError, err_math:
-            pass
+        except ValueError as err_math:
+            # Python 3 does not make exceptions local variables: they are
+            # restricted to their except block:
+            err_math_args = err_math.args
         else:
             raise Exception('ValueError exception expected')
+
         try:
             umath.log(0)
-        except ValueError, err_ufloat:
-            assert err_math.args == err_ufloat.args
+        except ValueError as err_ufloat:
+            assert err_math_args == err_ufloat.args
         else:
             raise Exception('ValueError exception expected')
         try:
             umath.log(uncertainties.ufloat(0, 0))
-        except ValueError, err_ufloat:
-            assert err_math.args == err_ufloat.args
+        except ValueError as err_ufloat:
+            assert err_math_args == err_ufloat.args
         else:
             raise Exception('ValueError exception expected')
         try:
             umath.log(uncertainties.ufloat(0, 1))
-        except ValueError, err_ufloat:
-            assert err_math.args == err_ufloat.args
+        except ValueError as err_ufloat:
+            assert err_math_args == err_ufloat.args
         else:
             raise Exception('ValueError exception expected')
 
