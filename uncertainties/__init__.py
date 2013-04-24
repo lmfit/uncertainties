@@ -1231,9 +1231,15 @@ class AffineScalarFunc(object):
     
         # Calculation of the variance:
         error_components = {}
+
         for (variable, derivative) in self.derivatives.iteritems():            
             # Individual standard error due to variable:
-            error_components[variable] = abs(derivative*variable._std_dev)
+            error_components[variable] = (
+                0.
+                # 0 is returned even for a NaN derivative, since an
+                # exact number has a 0 uncertainty:
+                if variable._std_dev == 0
+                else abs(derivative*variable._std_dev))
             
         return error_components
     
@@ -1449,6 +1455,45 @@ def get_ops_with_reflection():
 
         ops_with_reflection["r"+op] = [
             eval("lambda y, x: %s" % expr) for expr in reversed(derivatives)]
+
+    # Some operators can have undefined derivatives but still give
+    # meaningful values when some of their arguments have a zero
+    # uncertainty. Such operators return NaN when their derivative is
+    # not finite. This way, if the uncertainty of the associated
+    # variable is not 0, a NaN uncertainty is produced, which
+    # indicates an error; if the uncertainty is 0, then the total
+    # uncertainty can be returned as 0.
+
+    # Exception catching is used so as to not slow down regular
+    # operation too much:
+    
+    exceptions = (ValueError, ZeroDivisionError)
+    
+    def nan_if_exception(f):
+        # The wrapper is not generalized to more than two arguments
+        # because the unit tests automatically determine the number of
+        # arguments of some functions, and f(*args, **kwargs) would
+        # break this.
+        '''
+        Wrapper around f(x, y) that let f return NaN when f raises one
+        of the exceptions from the exceptions tuple.
+        '''
+
+        def wrapped_f(x, y):
+            try:
+                return f(x, y)
+            except exceptions:
+                return float('NaN')
+
+        return wrapped_f
+    
+
+    for op in ['pow']:
+        ops_with_reflection[op] = map(nan_if_exception,
+                                      ops_with_reflection[op])
+        
+        ops_with_reflection['r'+op] = map(nan_if_exception,
+                                          ops_with_reflection['r'+op])
         
     return ops_with_reflection
 
