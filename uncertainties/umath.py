@@ -202,7 +202,7 @@ for name in dir(math):
     # to a NaN result: it is assumed that a mathematical calculation
     # that cannot be calculated indicates a non-defined derivative
     # (the derivatives in fixed_derivatives must be written this way):
-    
+    derivatives = map(uncertainties.nan_if_exception, derivatives)
     
     func = getattr(math, name)
     
