@@ -1290,8 +1290,13 @@ def test_power():
     else:
         raise Exception('An proper exception should have been raised')
 
-    # Reference: http://docs.python.org/library/math.html#math.pow
+    # The outcome of 1**nan and nan**0 was undefined before Python
+    # 2.6 (http://docs.python.org/library/math.html#math.pow):
+    if sys.version_info >= (2, 6):
 
+        assert float('nan')**zero == 1.0
+        assert one**float('nan') == 1.0
+        
     # …**0 == 1.0:
     assert p**0 == 1.0        
     assert zero**0 == 1.0
@@ -1300,8 +1305,7 @@ def test_power():
     assert (-10.3)**zero == 1.0        
     assert 0**zero == 1.0        
     assert 0.3**zero == 1.0
-    assert float('nan')**zero == 1.0
-    assert (-p)**zero == 1.0        
+        assert (-p)**zero == 1.0        
     assert zero**zero == 1.0
     assert p**zero == 1.0
 
@@ -1311,7 +1315,7 @@ def test_power():
     assert one**0 == 1.0
     assert one**3 == 1.0
     assert one**3.1 == 1.0
-    assert one**float('nan') == 1.0
+
     # … with two numbers with uncertainties:
     assert one**(-p) == 1.0
     assert one**zero == 1.0
