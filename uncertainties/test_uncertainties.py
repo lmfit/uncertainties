@@ -1264,8 +1264,8 @@ def test_power():
     '''
     Checks special cases of x**p.
 
-    The value x = 0 is special, as are positive, null and negative
-    and integral values of p.
+    The value x = 0 is special, as are positive, null, negative and
+    integral values of p.
     '''
 
     zero = ufloat(0, 0)

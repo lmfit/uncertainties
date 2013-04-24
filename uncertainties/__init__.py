@@ -1429,13 +1429,14 @@ def get_ops_with_reflection():
         # but it is calculated numerically, for convenience:
         'mod': ("1.", "partial_derivative(float.__mod__, 1)(x, y)"),
         'mul': ("y", "x"),
-        # The case x**y must yield a zero derivative in x = 0, in x =
-        # 1, and in y = 0 because the function is constant in both of
-        # these cases. If the functions are actually not defined
+        # The case x**y is constant one the line x = 0, x = 1, and in
+        # y = 0; the corresponding derivatives must be zero in these
+        # cases. If the function is actually not defined
         # (e.g. 0**-3), then an exception will be raised when the
         # nominal value is calculated.
-        'pow': ("0. if (x == 0) or (x == 1) or (y == 0) else y*x**(y-1)",
-                "0. if (x == 0) or (y == 0) else log(x)*x**y"),
+        #!!!!!!!!!!!! CHECK THIS more carefully!!!! I think that I should return NaN sometimes: in dx when x**(y-1) cannot be calculated. In fact, it does not make sense to return a zero derivative in this case.
+        'pow': ("0. if y == 0 else y*x**(y-1)",
+                "0. if x == 0 else log(x)*x**y"),
         'sub': ("1.", "-1."),
         'truediv': ("1/y", "-x/y**2")
         }
