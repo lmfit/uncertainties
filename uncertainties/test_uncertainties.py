@@ -1259,13 +1259,97 @@ def test_covariances():
     assert _numbers_close(covs[0][1], -0.02)
 
 ###############################################################################
+def isnan(x):
+    '''
+    Equivalent to the math.isnan() of Python 2.6+.
+    '''
+    return x != x
     
-def test_power():
+def test_power_all_cases():
+    '''
+    Checks all cases for x**p.
+
+    Different cases for the value of x**p and its derivatives are
+    tested by dividing the (x, p) plane with:
+
+    - x < 0, x = 0, x > 0
+    - p integer or not, p < 0, p = 0, p > 0
+
+    (not all combinations are distinct: for instance x > 0 gives
+    identical formulas for all p except p = 0).
+    '''
+
+    zero = ufloat(0, 0.1)
+    one = ufloat(1, 0.1)
+    positive = ufloat(0.3, 0.01)
+    negative = ufloat(-0.3, 0.01)
+    integer = ufloat(-3, 0)
+    larger_than_one = ufloat(3.1, 0.01)
+    positive_smaller_than_one = ufloat(0.3, 0.01)
+    
+    ## negative**integer
+    
+    result = negative**integer
+    assert not isnan(result.derivatives[negative])
+    assert isnan(result.derivatives[integer])
+
+    # Limit cases:
+    result = negative**one
+    assert result.derivatives[negative] == 1
+    assert isnan(result.derivatives[one])
+
+    result = negative**zero
+    assert result.derivatives[negative] == 0
+    assert isnan(result.derivatives[zero])
+    
+    ## negative**non-integer
+    try:
+        negative**positive
+    except ValueError:
+        pass
+    else:
+        raise Exception('Power should be impossible to calculate')
+    
+    try:
+        negative**negative
+    except ValueError:
+        pass
+    else:
+        raise Exception('Power should be impossible to calculate')
+
+    ## zero**...
+
+    result = zero**larger_than_one
+    assert result.derivatives[zero] == 0
+    assert result.derivatives[larger_than_one] == 0
+
+    # Special cases:
+    result = zero**one
+    assert result.derivatives[zero] == 1
+    assert result.derivatives[one] == 0
+
+    result = zero**positive_smaller_than_one
+    assert isnan(result.derivatives[zero])
+    assert result.derivatives[positive_smaller_than_one] == 0
+
+    try:
+        result = zero**negative
+    except ZeroDivisionError:
+        pass
+    else:
+        raise Exception('Power should be impossible to calculate')
+
+    
+
+    
+###############################################################################
+    
+def test_power_special_cases():
     '''
     Checks special cases of x**p.
 
-    The value x = 0 is special, as are positive, null, negative and
-    integral values of p.
+    The values x = 0, x = 1 and x = NaN are special, as are null,
+    integral and NaN values of p.
     '''
 
     zero = ufloat(0, 0)
