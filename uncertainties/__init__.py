@@ -1258,14 +1258,16 @@ class AffineScalarFunc(object):
         # Calculation of the variance:
         error_components = {}
 
-        for (variable, derivative) in self.derivatives.iteritems():            
+        for (variable, derivative) in self.derivatives.iteritems():
+
             # Individual standard error due to variable:
-            error_components[variable] = (
-                0.
-                # 0 is returned even for a NaN derivative, since an
-                # exact number has a 0 uncertainty:
-                if variable._std_dev == 0
-                else abs(derivative*variable._std_dev))
+
+            # 0 is returned even for a NaN derivative, since an
+            # exact number has a 0 uncertainty:
+            if variable._std_dev == 0:
+                error_components[variable] = 0
+            else:
+                error_components[variable] = abs(derivative*variable._std_dev)
             
         return error_components
     
@@ -1498,8 +1500,12 @@ def get_ops_with_reflection():
         # then an exception will be raised when the nominal value is
         # calculated.  These derivatives are transformed to NaN if an
         # error happens during their calculation:
-        'pow': ("0. if y == 0 else y*x**(y-1)",
-                "0. if (x == 0) and (y != 0) else log(x)*x**y"),
+        'pow': (
+            # "0. if y == 0 else y*x**(y-1)":
+            "float(y and y*x**(y-1))",
+            # "0. if (x == 0) and (y != 0) else log(x)*x**y":
+            "float((x or not y) and log(x)*x**y)"
+            ),
         'sub': ("1.", "-1."),
         'truediv': ("1/y", "-x/y**2")
         }
