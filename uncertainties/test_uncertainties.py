@@ -195,11 +195,11 @@ def _compare_derivatives(func, numerical_derivatives,
                     integer_arg_nums = set([0])
                 continue  # We try with different arguments
             # Some arguments might have to be integers, for instance:
-            except TypeError:
+            except TypeError, err:
                 if len(integer_arg_nums) == num_args:
                     raise Exception("Incorrect testing procedure: unable to "
-                                    "find correct argument values for %s."
-                                    % func.__name__)
+                                    "find correct argument values for %s: %s"
+                                    % (func.__name__, err))
 
                 # Another argument might be forced to be an integer:
                 integer_arg_nums.add(random.choice(range(num_args)))
@@ -1304,7 +1304,7 @@ def test_power():
     assert (-10.3)**zero == 1.0        
     assert 0**zero == 1.0        
     assert 0.3**zero == 1.0
-        assert (-p)**zero == 1.0        
+    assert (-p)**zero == 1.0        
     assert zero**zero == 1.0
     assert p**zero == 1.0
 
