@@ -1267,8 +1267,9 @@ def isnan(x):
     
 def test_power_all_cases():
     '''
-    Checks all cases for x**p (not the specific values, except when
-    they are special, like 0, 1 or NaN).
+    Checks all cases for the value and derivatives of x**p.
+
+    Checks only the details of special results like 0, 1 or NaN).
 
     Different cases for the value of x**p and its derivatives are
     tested by dividing the (x, p) plane with:
@@ -1277,7 +1278,7 @@ def test_power_all_cases():
     - p integer or not, p < 0, p = 0, p > 0
 
     (not all combinations are distinct: for instance x > 0 gives
-    identical formulas for all p except p = 0).
+    identical formulas for all p).
     '''
 
     zero = ufloat(0, 0.1)
