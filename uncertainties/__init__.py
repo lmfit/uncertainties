@@ -319,6 +319,14 @@ def deprecation(message):
 
 ###############################################################################
 
+def isnan(x):
+    '''
+    Equivalent to the math.isnan() of Python 2.6+.
+    '''
+    return x != x
+    
+###############################################################################
+
 ## Definitions that depend on the availability of NumPy:
 
 
@@ -1414,8 +1422,8 @@ UFloat = AffineScalarFunc
 
 def nan_if_exception(f):
     '''
-    Wrapper around f(x, y) that let f return NaN when f raises one
-    of the exceptions from the exceptions tuple.
+    Wrapper around f(x, y) that let f return NaN when f raises one of
+    a few numerical exceptions.
     '''
 
     def wrapped_f(*args):
