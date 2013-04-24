@@ -1429,7 +1429,7 @@ def nan_if_exception(f):
     def wrapped_f(*args):
         try:
             return f(*args)
-        except (ValueError, ZeroDivisionError):
+        except (ValueError, ZeroDivisionError, OverflowError):
             return float('NaN')
 
     return wrapped_f

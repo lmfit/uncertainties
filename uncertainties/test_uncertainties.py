@@ -23,7 +23,7 @@ import sys
 # Local modules
 
 import uncertainties
-from uncertainties import ufloat, AffineScalarFunc, ufloat_fromstr
+from uncertainties import ufloat, AffineScalarFunc, ufloat_fromstr, isnan
 from uncertainties import umath
 
 from uncertainties import __author__
@@ -1260,12 +1260,6 @@ def test_covariances():
 
     
 ###############################################################################
-def isnan(x):
-    '''
-    Equivalent to the math.isnan() of Python 2.6+.
-    '''
-    return x != x
-    
 def test_power_all_cases():
     '''
     Checks all cases for the value and derivatives of x**p.
