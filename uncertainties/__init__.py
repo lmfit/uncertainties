@@ -1480,9 +1480,9 @@ def get_ops_with_reflection():
         of the exceptions from the exceptions tuple.
         '''
 
-        def wrapped_f(x, y):
+        def wrapped_f(*args):
             try:
-                return f(x, y)
+                return f(*args)
             except exceptions:
                 return float('NaN')
 

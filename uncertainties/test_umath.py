@@ -287,4 +287,14 @@ def test_math_module():
             assert err_math.args == err_ufloat.args
         else:
             raise Exception('ValueError exception expected')
+
     
+def test_hypot():
+    '''
+    Special cases where derivatives cannot be calculated:
+    '''
+    x = uncertainties.ufloat(0, 1)
+    y = uncertainties.ufloat(0, 2)
+    # Derivatives that cannot be calculated simply return NaN, with no
+    # exception being raised, normally:
+    umath.hypot(x, y)

@@ -1258,6 +1258,7 @@ def test_covariances():
     # Non-diagonal elements:
     assert _numbers_close(covs[0][1], -0.02)
 
+    
 ###############################################################################
 def isnan(x):
     '''
