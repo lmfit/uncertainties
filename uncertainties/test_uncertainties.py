@@ -1284,6 +1284,7 @@ def test_power_all_cases():
     zero2 = ufloat(0, 0.1)
     one = ufloat(1, 0.1)
     positive = ufloat(0.3, 0.01)
+    positive2 = ufloat(0.3, 0.01)
     negative = ufloat(-0.3, 0.01)
     integer = ufloat(-3, 0)
     larger_than_one = ufloat(3.1, 0.01)
@@ -1345,7 +1346,20 @@ def test_power_all_cases():
     else:
         raise Exception('Power should be impossible to calculate')
 
-    ## 
+    ## positive**...: this is a quite regular case where the value and
+    ## the derivatives are all defined.
+
+    result = positive**positive2
+    assert not isnan(result.derivatives[positive])
+    assert not isnan(result.derivatives[positive2])
+
+    result = positive**zero
+    assert result.derivatives[positive] == 0
+    assert not isnan(result.derivatives[zero])
+
+    result = positive**negative
+    assert not isnan(result.derivatives[positive])
+    assert not isnan(result.derivatives[negative])
 
     
 ###############################################################################

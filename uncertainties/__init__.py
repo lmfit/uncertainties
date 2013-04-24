@@ -1456,6 +1456,7 @@ def get_ops_with_reflection():
         ops_with_reflection["r"+op] = [
             eval("lambda y, x: %s" % expr) for expr in reversed(derivatives)]
 
+    
     # Some operators can have undefined derivatives but still give
     # meaningful values when some of their arguments have a zero
     # uncertainty. Such operators return NaN when their derivative is
@@ -1486,7 +1487,6 @@ def get_ops_with_reflection():
                 return float('NaN')
 
         return wrapped_f
-    
 
     for op in ['pow']:
         ops_with_reflection[op] = map(nan_if_exception,
