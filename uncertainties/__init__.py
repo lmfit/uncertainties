@@ -1636,10 +1636,10 @@ def add_operators_to_AffineScalarFunc():
         # different versions of Python (for instance, __trunc__ was
         # introduced with Python 2.6):
         try:
-
-            func_to_wrap = (getattr(float, attribute_name)
-                            if op not in _custom_ops
-                            else _custom_ops[op])
+            if op not in _custom_ops:
+                func_to_wrap = getattr(float, attribute_name)
+            else:
+                func_to_wrap = _custom_ops[op]
 
         except AttributeError:
             pass
