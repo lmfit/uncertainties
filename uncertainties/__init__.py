@@ -227,8 +227,7 @@ author.'''
 # Uncertainties can then be calculated by using this local linear
 # approximation of the original function.
 
-from __future__ import division  # Many analytical derivatives depend on this
-
+import sys
 import re
 import math
 from math import sqrt, log  # Optimization: no attribute look-up
@@ -1549,7 +1548,8 @@ def add_operators_to_AffineScalarFunc():
             _modified_operators.append(op)
             
     ########################################
-
+    # Final definition of the operators for AffineScalarFunc objects:
+            
     # Reversed versions (useful for float*AffineScalarFunc, for instance):
     for (op, derivatives) in _ops_with_reflection.iteritems():
         attribute_name = '__%s__' % op
@@ -1563,6 +1563,13 @@ def add_operators_to_AffineScalarFunc():
             pass
         else:
             _modified_ops_with_reflection.append(op)
+
+    # The power operators (__pow__ and __rpow__) sometimes yield a
+    # complex number, in Python 3: this package does not handle
+    # complex numbers. The user is notified of this, instead of facing
+    # a TypeError because the power operator returns NotImplemented:
+    if sys.version >= (3,):
+        pass
 
     ########################################
     # Conversions to pure numbers are meaningless.  Note that the
