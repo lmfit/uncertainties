@@ -319,6 +319,14 @@ def deprecation(message):
 
 ###############################################################################
 
+def isnan(x):
+    '''
+    Equivalent to the math.isnan() of Python 2.6+.
+    '''
+    return x != x
+    
+###############################################################################
+
 ## Definitions that depend on the availability of NumPy:
 
 
@@ -1077,8 +1085,8 @@ class AffineScalarFunc(object):
 
     Main attributes and methods:
     
-    - nominal_value, std_dev(): value at the origin / nominal value,
-      and standard deviation.
+    - nominal_value, std_dev: value at the origin / nominal value, and
+      standard deviation.  The standard deviation can be NaN.
 
     - error_components(): error_components()[x] is the error due to
       Variable x.
@@ -1231,10 +1239,16 @@ class AffineScalarFunc(object):
     
         # Calculation of the variance:
         error_components = {}
+
         for (variable, derivative) in self.derivatives.iteritems():            
             # Individual standard error due to variable:
-            error_components[variable] = abs(derivative*variable._std_dev)
-
+            error_components[variable] = (
+                0.
+                # 0 is returned even for a NaN derivative, since an
+                # exact number has a 0 uncertainty:
+                if variable._std_dev == 0
+                else abs(derivative*variable._std_dev))
+            
         return error_components
     
     @property
@@ -1393,6 +1407,33 @@ class AffineScalarFunc(object):
 # number with uncertainties from the uncertainties package?".
 UFloat = AffineScalarFunc
 
+###############################################################################
+
+# Some operators can have undefined derivatives but still give
+# meaningful values when some of their arguments have a zero
+# uncertainty. Such operators return NaN when their derivative is
+# not finite. This way, if the uncertainty of the associated
+# variable is not 0, a NaN uncertainty is produced, which
+# indicates an error; if the uncertainty is 0, then the total
+# uncertainty can be returned as 0.
+
+# Exception catching is used so as to not slow down regular
+# operation too much:
+
+def nan_if_exception(f):
+    '''
+    Wrapper around f(x, y) that let f return NaN when f raises one of
+    a few numerical exceptions.
+    '''
+
+    def wrapped_f(*args):
+        try:
+            return f(*args)
+        except (ValueError, ZeroDivisionError, OverflowError):
+            return float('NaN')
+
+    return wrapped_f
+
 def get_ops_with_reflection():
 
     """
@@ -1429,7 +1470,14 @@ def get_ops_with_reflection():
         # but it is calculated numerically, for convenience:
         'mod': ("1.", "partial_derivative(float.__mod__, 1)(x, y)"),
         'mul': ("y", "x"),
-        'pow': ("y*x**(y-1)", "log(x)*x**y"),
+        # The case x**y is constant one the line x = 0 and in y = 0;
+        # the corresponding derivatives must be zero in these
+        # cases. If the function is actually not defined (e.g. 0**-3),
+        # then an exception will be raised when the nominal value is
+        # calculated.  These derivatives are transformed to NaN if an
+        # error happens during their calculation:
+        'pow': ("0. if y == 0 else y*x**(y-1)",
+                "0. if (x == 0) and (y != 0) else log(x)*x**y"),
         'sub': ("1.", "-1."),
         'truediv': ("1/y", "-x/y**2")
         }
@@ -1443,6 +1491,15 @@ def get_ops_with_reflection():
         ops_with_reflection["r"+op] = [
             eval("lambda y, x: %s" % expr) for expr in reversed(derivatives)]
 
+    # Undefined derivatives are converted to NaN when the function
+    # itself can be calculated:
+    for op in ['pow']:
+        ops_with_reflection[op] = map(nan_if_exception,
+                                      ops_with_reflection[op])
+        
+        ops_with_reflection['r'+op] = map(nan_if_exception,
+                                          ops_with_reflection['r'+op])
+        
     return ops_with_reflection
 
 # Operators that have a reflection, along with their derivatives:
@@ -1582,7 +1639,8 @@ class Variable(AffineScalarFunc):
     
         # We force the error to be float-like.  Since it is considered
         # as a standard deviation, it must be positive:
-        assert std_dev >= 0, "the error must be a positive number"
+        assert std_dev >= 0 or isnan(std_dev), (
+            "the error must be a positive number, or NaN")
 
         self._std_dev = CallableStdDev(std_dev)
     
