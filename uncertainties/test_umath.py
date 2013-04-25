@@ -265,7 +265,7 @@ def test_math_module():
 
         try:
             math.log(0)
-        except ValueError as err_math:
+        except ValueError, err_math:  # Python 2.6+: as err_math
             # Python 3 does not make exceptions local variables: they are
             # restricted to their except block:
             err_math_args = err_math.args
@@ -274,19 +274,19 @@ def test_math_module():
 
         try:
             umath.log(0)
-        except ValueError as err_ufloat:
+        except ValueError, err_ufloat:  # Python 2.6+: as err_math
             assert err_math_args == err_ufloat.args
         else:
             raise Exception('ValueError exception expected')
         try:
             umath.log(uncertainties.ufloat(0, 0))
-        except ValueError as err_ufloat:
+        except ValueError, err_ufloat:  # Python 2.6+: as err_math
             assert err_math_args == err_ufloat.args
         else:
             raise Exception('ValueError exception expected')
         try:
             umath.log(uncertainties.ufloat(0, 1))
-        except ValueError as err_ufloat:
+        except ValueError, err_ufloat:  # Python 2.6+: as err_math
             assert err_math_args == err_ufloat.args
         else:
             raise Exception('ValueError exception expected')
