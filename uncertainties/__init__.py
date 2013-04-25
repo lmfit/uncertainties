@@ -1609,7 +1609,7 @@ def add_operators_to_AffineScalarFunc():
             pass
         else:
             setattr(AffineScalarFunc, attribute_name,
-                    wrap(func_to_wrap, [derivative]))
+                    wrap(func_to_wrap, derivatives))
             _modified_ops_with_reflection.append(op)            
 
     ########################################
