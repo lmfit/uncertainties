@@ -229,6 +229,7 @@ author.'''
 
 from __future__ import division  # Many analytical derivatives depend on this
 
+import sys
 import re
 import math
 from math import sqrt, log  # Optimization: no attribute look-up
@@ -1450,12 +1451,12 @@ def nan_if_exception(f):
     a few numerical exceptions.
     '''
 
-    def wrapped_f(*args):
+    def wrapped_f(*args, **kwargs):
         try:
-            return f(*args)
+            return f(*args, **kwargs)
         except (ValueError, ZeroDivisionError, OverflowError):
-            return float('NaN')
-
+            return float('nan')
+        
     return wrapped_f
 
 def get_ops_with_reflection():
@@ -1537,6 +1538,43 @@ _ops_with_reflection = get_ops_with_reflection()
 _modified_operators = []
 _modified_ops_with_reflection = []
 
+# Custom versions of some operators (instead of extending some float
+# __*__ operators to AffineScalarFunc, the operators in _custom_ops
+# are used):
+if sys.version_info < (3,):
+
+    _custom_ops = {}
+
+else:
+
+    def _no_complex_result(func):
+        '''
+        Returns a function that does like func, but that raises a
+        ValueError if the result is complex.
+        '''
+        def no_complex_func(*args, **kwargs):
+            '''
+            Like %s, but raises a ValueError exception if the result
+            is complex.
+            ''' % func.__name__
+            
+            value = func(*args, **kwargs)
+            if isinstance(value, complex):
+                raise ValueError('The uncertainties module does not handle'
+                                 ' complex results')
+            else:
+                return value
+
+        return no_complex_func
+
+    # This module does not handle uncertainties on complex numbers:
+    # complex results for the nominal value of some operations cannot
+    # be calculated with an uncertainty:
+    _custom_ops = {
+        'pow': _no_complex_result(float.__pow__),
+        'rpow': _no_complex_result(float.__rpow__)
+        }
+
 def add_operators_to_AffineScalarFunc():
     """
     Adds many operators (__add__, etc.) to the AffineScalarFunc class.
@@ -1568,9 +1606,10 @@ def add_operators_to_AffineScalarFunc():
         }
 
     for (op, derivative) in (
-          simple_numerical_operators_derivatives.iteritems()):
-        
+        simple_numerical_operators_derivatives.iteritems()):
+
         attribute_name = "__%s__" % op
+        
         # float objects don't exactly have the same attributes between
         # different versions of Python (for instance, __trunc__ was
         # introduced with Python 2.6):
@@ -1583,20 +1622,31 @@ def add_operators_to_AffineScalarFunc():
             _modified_operators.append(op)
             
     ########################################
-
+    # Final definition of the operators for AffineScalarFunc objects:
+            
     # Reversed versions (useful for float*AffineScalarFunc, for instance):
     for (op, derivatives) in _ops_with_reflection.iteritems():
         attribute_name = '__%s__' % op
+
         # float objects don't exactly have the same attributes between
         # different versions of Python (for instance, __div__ and
         # __rdiv__ were removed, in Python 3):
+
+        # float objects don't exactly have the same attributes between
+        # different versions of Python (for instance, __trunc__ was
+        # introduced with Python 2.6):
         try:
-            setattr(AffineScalarFunc, attribute_name,
-                    wrap(getattr(float, attribute_name), derivatives))
+
+            func_to_wrap = (getattr(float, attribute_name)
+                            if op not in _custom_ops
+                            else _custom_ops[op])
+
         except AttributeError:
             pass
         else:
-            _modified_ops_with_reflection.append(op)
+            setattr(AffineScalarFunc, attribute_name,
+                    wrap(func_to_wrap, derivatives))
+            _modified_ops_with_reflection.append(op)            
 
     ########################################
     # Conversions to pure numbers are meaningless.  Note that the
