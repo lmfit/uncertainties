@@ -50,6 +50,7 @@ after the program that did the pickling is finished).  Thus
 which shows that the original variable :data:`x` and the new variable :data:`x2`
 are completely uncorrelated.
 
+.. index:: linear propagation of uncertainties
 .. _linear_method:
 
 Linear propagation of uncertainties
@@ -82,6 +83,8 @@ yields a meaningful standard deviation since the sine is quite linear
 over 0±0.01.  However, ``cos(0+/-0.01)``, yields an approximate
 standard deviation of 0 because it is parabolic around 0 instead of
 linear; this might not be precise enough for all applications.
+
+.. index:: NaN
 
 Not-a-number uncertainties
 ==========================
