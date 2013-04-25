@@ -1529,7 +1529,6 @@ else:
             ''' % func.__name__
             
             value = func(*args, **kwargs)
-            print("WRAPPED")
             if isinstance(value, complex):
                 raise ValueError('The uncertainties module does not handle'
                                  ' complex results')
@@ -1579,16 +1578,11 @@ def add_operators_to_AffineScalarFunc():
         # different versions of Python (for instance, __trunc__ was
         # introduced with Python 2.6):
         try:
-
-            func_to_wrap = (getattr(float, attribute_name)
-                            if op not in _custom_ops
-                            else _custom_ops[op])
-
+            setattr(AffineScalarFunc, attribute_name,
+                    wrap(getattr(float, attribute_name), [derivative]))
         except AttributeError:
             pass
         else:
-            setattr(AffineScalarFunc, attribute_name,
-                    wrap(func_to_wrap, [derivative]))            
             _modified_operators.append(op)
             
     ########################################
@@ -1601,14 +1595,22 @@ def add_operators_to_AffineScalarFunc():
         # float objects don't exactly have the same attributes between
         # different versions of Python (for instance, __div__ and
         # __rdiv__ were removed, in Python 3):
+
+        # float objects don't exactly have the same attributes between
+        # different versions of Python (for instance, __trunc__ was
+        # introduced with Python 2.6):
         try:
-            setattr(AffineScalarFunc, attribute_name,
-                    wrap(getattr(float, attribute_name), derivatives))
+
+            func_to_wrap = (getattr(float, attribute_name)
+                            if op not in _custom_ops
+                            else _custom_ops[op])
+
         except AttributeError:
             pass
         else:
-            _modified_ops_with_reflection.append(op)
-
+            setattr(AffineScalarFunc, attribute_name,
+                    wrap(func_to_wrap, [derivative]))
+            _modified_ops_with_reflection.append(op)            
 
     ########################################
     # Conversions to pure numbers are meaningless.  Note that the
