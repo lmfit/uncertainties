@@ -1434,23 +1434,15 @@ def test_power_special_cases():
     assert ufloat(-1.1, 0)**9 == (-1.1)**9
     
     # Negative numbers cannot be raised to a non-integral power, in
-    # Python 2 (in Python 3, complex numbers are returned; this cannot
+    # Python 2. In Python 3, complex numbers are returned; this cannot
     # (yet) be represented in the uncertainties package, because it
-    # does not handle complex numbers):
-    if sys.version_info < (3,):
-        try:
-            ufloat(-1, 0)**9.1
-        except Exception, err_ufloat:  # "as", for Python 2.6+
-            pass
-        else:
-            raise Exception('An exception should have been raised')
-        try:
-            (-1)**9.1
-        except Exception, err_float:  # "as" for Python 2.6+
-            # UFloat and floats should raise the same error:
-            assert err_ufloat.args == err_float.args
-        else:
-            raise Exception('An exception should have been raised')
+    # does not handle complex numbers:
+    try:
+        ufloat(-1, 0)**9.1
+    except ValueError:
+        pass
+    else:
+        raise Exception('An exception should have been raised')
 
     
 ###############################################################################
