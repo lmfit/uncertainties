@@ -1302,16 +1302,15 @@ def test_power_all_cases():
     assert isnan(result.derivatives[zero])
     
     ## negative**non-integer
+
     try:
         negative**positive
     except ValueError:
-        pass
-    else:
-        raise Exception('Power should be impossible to calculate')
-    
-    try:
-        negative**negative
-    except ValueError:
+        # The reason why it should also fail in Python 3 is that the
+        # result of Python 3 is a complex number, which uncertainties
+        # does not handle (no uncertainties on complex numbers). In
+        # Python 2, this should always fail, since Python 2 does not
+        # know how to calculate it.
         pass
     else:
         raise Exception('Power should be impossible to calculate')

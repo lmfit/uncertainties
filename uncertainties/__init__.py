@@ -1508,6 +1508,44 @@ _ops_with_reflection = get_ops_with_reflection()
 _modified_operators = []
 _modified_ops_with_reflection = []
 
+# Custom versions of some operators (instead of extending some float
+# __*__ operators to AffineScalarFunc, the operators in _custom_ops
+# are used):
+if sys.version_info < (3,):
+
+    _custom_ops = {}
+
+else:
+
+    def _no_complex_result(func):
+        '''
+        Returns a function that does like func, but that raises a
+        ValueError if the result is complex.
+        '''
+        def no_complex_func(*args, **kwargs):
+            '''
+            Like %s, but raises a ValueError exception if the result
+            is complex.
+            ''' % func.__name__
+            
+            value = func(*args, **kwargs)
+            print("WRAPPED")
+            if isinstance(value, complex):
+                raise ValueError('The uncertainties module does not handle'
+                                 ' complex results')
+            else:
+                return value
+
+        return no_complex_func
+
+    # This module does not handle uncertainties on complex numbers:
+    # complex results for the nominal value of some operations cannot
+    # be calculated with an uncertainty:
+    _custom_ops = {
+        'pow': _no_complex_result(float.__pow__),
+        'rpow': _no_complex_result(float.__rpow__)
+        }
+
 def add_operators_to_AffineScalarFunc():
     """
     Adds many operators (__add__, etc.) to the AffineScalarFunc class.
@@ -1533,18 +1571,24 @@ def add_operators_to_AffineScalarFunc():
         }
 
     for (op, derivative) in (
-          simple_numerical_operators_derivatives.iteritems()):
-        
+        simple_numerical_operators_derivatives.iteritems()):
+
         attribute_name = "__%s__" % op
+        
         # float objects don't exactly have the same attributes between
         # different versions of Python (for instance, __trunc__ was
         # introduced with Python 2.6):
         try:
-            setattr(AffineScalarFunc, attribute_name,
-                    wrap(getattr(float, attribute_name), [derivative]))
+
+            func_to_wrap = (getattr(float, attribute_name)
+                            if op not in _custom_ops
+                            else _custom_ops[op])
+
         except AttributeError:
             pass
         else:
+            setattr(AffineScalarFunc, attribute_name,
+                    wrap(func_to_wrap, [derivative]))            
             _modified_operators.append(op)
             
     ########################################
@@ -1553,6 +1597,7 @@ def add_operators_to_AffineScalarFunc():
     # Reversed versions (useful for float*AffineScalarFunc, for instance):
     for (op, derivatives) in _ops_with_reflection.iteritems():
         attribute_name = '__%s__' % op
+
         # float objects don't exactly have the same attributes between
         # different versions of Python (for instance, __div__ and
         # __rdiv__ were removed, in Python 3):
@@ -1564,26 +1609,6 @@ def add_operators_to_AffineScalarFunc():
         else:
             _modified_ops_with_reflection.append(op)
 
-    # The power operators (__pow__ and __rpow__) sometimes yield a
-    # complex number, in Python 3: this package does not handle
-    # complex numbers. The user is notified of this, instead of facing
-    # a TypeError because the power operator returns NotImplemented:
-    if sys.version_info >= (3,):
-        def type_error_to_value_error(func):
-            '''
-            Wrapper around func: if func raises TypeError, then raises
-            a specific ValueError instead.
-            '''
-            def wrapped_func(*args, **kwargs):
-                try:
-                    return func(*args, **kwargs)
-                except TypeError:
-                    raise ValueError('This calculation cannot be performed'
-                                     ' by the uncertainties module')
-
-            return wrapped_func
-                
-                
 
     ########################################
     # Conversions to pure numbers are meaningless.  Note that the
