@@ -1425,9 +1425,9 @@ def nan_if_exception(f):
     a few numerical exceptions.
     '''
 
-    def wrapped_f(*args):
+    def wrapped_f(*args, **kwargs):
         try:
-            return f(*args)
+            return f(*args, **kwargs)
         except (ValueError, ZeroDivisionError, OverflowError):
             return float('nan')
         
@@ -1568,8 +1568,22 @@ def add_operators_to_AffineScalarFunc():
     # complex number, in Python 3: this package does not handle
     # complex numbers. The user is notified of this, instead of facing
     # a TypeError because the power operator returns NotImplemented:
-    if sys.version >= (3,):
-        pass
+    if sys.version_info >= (3,):
+        def type_error_to_value_error(func):
+            '''
+            Wrapper around func: if func raises TypeError, then raises
+            a specific ValueError instead.
+            '''
+            def wrapped_func(*args, **kwargs):
+                try:
+                    return func(*args, **kwargs)
+                except TypeError:
+                    raise ValueError('This calculation cannot be performed'
+                                     ' by the uncertainties module')
+
+            return wrapped_func
+                
+                
 
     ########################################
     # Conversions to pure numbers are meaningless.  Note that the
