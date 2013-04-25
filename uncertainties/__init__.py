@@ -227,6 +227,8 @@ author.'''
 # Uncertainties can then be calculated by using this local linear
 # approximation of the original function.
 
+from __future__ import division  # Many analytical derivatives depend on this
+
 import sys
 import re
 import math
