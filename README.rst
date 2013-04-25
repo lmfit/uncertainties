@@ -6,8 +6,11 @@ uncertainties
 
 This is the uncertainties Python package.
 
-The current version of the branches in this repository are 
-bleeding-edge, but they are *working* versions that passed all the tests
+GitHubg
+-------
+
+The current version of the branches in the Github repository are 
+bleeding-edge, but they are *working* versions that passed all the tests 
 for all the supported versions of Python.
 
 The master branch is for Python 2.5+, while the master_python2.3 branch 
