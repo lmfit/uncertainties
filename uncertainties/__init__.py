@@ -1430,8 +1430,8 @@ def nan_if_exception(f):
         try:
             return f(*args)
         except (ValueError, ZeroDivisionError, OverflowError):
-            return float('NaN')
-
+            return float('nan')
+        
     return wrapped_f
 
 def get_ops_with_reflection():
