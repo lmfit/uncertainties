@@ -209,10 +209,10 @@ available `on GitHub <https://github.com/lebigot/uncertainties/>`_.
 The :mod:`uncertainties` package is written in pure Python and has no
 external dependency (the `NumPy`_ package is optional).  It contains
 about 6000 lines of code.  75 % of those lines are documentation
-strings and comments.  The remaining 25 % are equally split between
-unit tests and the calculation code proper.  :mod:`uncertainties` is
-thus a **lightweight, portable package** with abundant documentation
-and tests.
+strings and comments.  The remaining 25 % are split between unit tests
+(15 % of the total) and the calculation code proper (10 % of the
+total).  :mod:`uncertainties` is thus a **lightweight, portable
+package** with abundant documentation and tests.
 
 
 Migration from version 1 to version 2
