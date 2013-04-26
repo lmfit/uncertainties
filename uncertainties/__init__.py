@@ -229,6 +229,7 @@ author.'''
 
 from __future__ import division  # Many analytical derivatives depend on this
 
+import sys
 import re
 import math
 from math import sqrt, log  # Optimization: no attribute look-up
@@ -239,7 +240,7 @@ import collections
 import inspect
 
 # Numerical version:
-__version_info__ = (2, 3)
+__version_info__ = (2, 3, 5)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
@@ -317,6 +318,14 @@ def deprecation(message):
                   ' python -m uncertainties.1to2 -w ProgramDirectory.'
                   % message, stacklevel=3)
 
+###############################################################################
+
+def isnan(x):
+    '''
+    Equivalent to the math.isnan() of Python 2.6+.
+    '''
+    return x != x
+    
 ###############################################################################
 
 ## Definitions that depend on the availability of NumPy:
@@ -1077,8 +1086,8 @@ class AffineScalarFunc(object):
 
     Main attributes and methods:
     
-    - nominal_value, std_dev(): value at the origin / nominal value,
-      and standard deviation.
+    - nominal_value, std_dev: value at the origin / nominal value, and
+      standard deviation.  The standard deviation can be NaN.
 
     - error_components(): error_components()[x] is the error due to
       Variable x.
@@ -1231,10 +1240,16 @@ class AffineScalarFunc(object):
     
         # Calculation of the variance:
         error_components = {}
+
         for (variable, derivative) in self.derivatives.iteritems():            
             # Individual standard error due to variable:
-            error_components[variable] = abs(derivative*variable._std_dev)
-
+            error_components[variable] = (
+                0.
+                # 0 is returned even for a NaN derivative, since an
+                # exact number has a 0 uncertainty:
+                if variable._std_dev == 0
+                else abs(derivative*variable._std_dev))
+            
         return error_components
     
     @property
@@ -1393,6 +1408,33 @@ class AffineScalarFunc(object):
 # number with uncertainties from the uncertainties package?".
 UFloat = AffineScalarFunc
 
+###############################################################################
+
+# Some operators can have undefined derivatives but still give
+# meaningful values when some of their arguments have a zero
+# uncertainty. Such operators return NaN when their derivative is
+# not finite. This way, if the uncertainty of the associated
+# variable is not 0, a NaN uncertainty is produced, which
+# indicates an error; if the uncertainty is 0, then the total
+# uncertainty can be returned as 0.
+
+# Exception catching is used so as to not slow down regular
+# operation too much:
+
+def nan_if_exception(f):
+    '''
+    Wrapper around f(x, y) that let f return NaN when f raises one of
+    a few numerical exceptions.
+    '''
+
+    def wrapped_f(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except (ValueError, ZeroDivisionError, OverflowError):
+            return float('nan')
+        
+    return wrapped_f
+
 def get_ops_with_reflection():
 
     """
@@ -1429,7 +1471,14 @@ def get_ops_with_reflection():
         # but it is calculated numerically, for convenience:
         'mod': ("1.", "partial_derivative(float.__mod__, 1)(x, y)"),
         'mul': ("y", "x"),
-        'pow': ("y*x**(y-1)", "log(x)*x**y"),
+        # The case x**y is constant one the line x = 0 and in y = 0;
+        # the corresponding derivatives must be zero in these
+        # cases. If the function is actually not defined (e.g. 0**-3),
+        # then an exception will be raised when the nominal value is
+        # calculated.  These derivatives are transformed to NaN if an
+        # error happens during their calculation:
+        'pow': ("0. if y == 0 else y*x**(y-1)",
+                "0. if (x == 0) and (y != 0) else log(x)*x**y"),
         'sub': ("1.", "-1."),
         'truediv': ("1/y", "-x/y**2")
         }
@@ -1443,6 +1492,15 @@ def get_ops_with_reflection():
         ops_with_reflection["r"+op] = [
             eval("lambda y, x: %s" % expr) for expr in reversed(derivatives)]
 
+    # Undefined derivatives are converted to NaN when the function
+    # itself can be calculated:
+    for op in ['pow']:
+        ops_with_reflection[op] = map(nan_if_exception,
+                                      ops_with_reflection[op])
+        
+        ops_with_reflection['r'+op] = map(nan_if_exception,
+                                          ops_with_reflection['r'+op])
+        
     return ops_with_reflection
 
 # Operators that have a reflection, along with their derivatives:
@@ -1451,6 +1509,43 @@ _ops_with_reflection = get_ops_with_reflection()
 # Some effectively modified operators (for the automated tests):
 _modified_operators = []
 _modified_ops_with_reflection = []
+
+# Custom versions of some operators (instead of extending some float
+# __*__ operators to AffineScalarFunc, the operators in _custom_ops
+# are used):
+if sys.version_info < (3,):
+
+    _custom_ops = {}
+
+else:
+
+    def _no_complex_result(func):
+        '''
+        Returns a function that does like func, but that raises a
+        ValueError if the result is complex.
+        '''
+        def no_complex_func(*args, **kwargs):
+            '''
+            Like %s, but raises a ValueError exception if the result
+            is complex.
+            ''' % func.__name__
+            
+            value = func(*args, **kwargs)
+            if isinstance(value, complex):
+                raise ValueError('The uncertainties module does not handle'
+                                 ' complex results')
+            else:
+                return value
+
+        return no_complex_func
+
+    # This module does not handle uncertainties on complex numbers:
+    # complex results for the nominal value of some operations cannot
+    # be calculated with an uncertainty:
+    _custom_ops = {
+        'pow': _no_complex_result(float.__pow__),
+        'rpow': _no_complex_result(float.__rpow__)
+        }
 
 def add_operators_to_AffineScalarFunc():
     """
@@ -1477,9 +1572,10 @@ def add_operators_to_AffineScalarFunc():
         }
 
     for (op, derivative) in (
-          simple_numerical_operators_derivatives.iteritems()):
-        
+        simple_numerical_operators_derivatives.iteritems()):
+
         attribute_name = "__%s__" % op
+        
         # float objects don't exactly have the same attributes between
         # different versions of Python (for instance, __trunc__ was
         # introduced with Python 2.6):
@@ -1492,20 +1588,31 @@ def add_operators_to_AffineScalarFunc():
             _modified_operators.append(op)
             
     ########################################
-
+    # Final definition of the operators for AffineScalarFunc objects:
+            
     # Reversed versions (useful for float*AffineScalarFunc, for instance):
     for (op, derivatives) in _ops_with_reflection.iteritems():
         attribute_name = '__%s__' % op
+
         # float objects don't exactly have the same attributes between
         # different versions of Python (for instance, __div__ and
         # __rdiv__ were removed, in Python 3):
+
+        # float objects don't exactly have the same attributes between
+        # different versions of Python (for instance, __trunc__ was
+        # introduced with Python 2.6):
         try:
-            setattr(AffineScalarFunc, attribute_name,
-                    wrap(getattr(float, attribute_name), derivatives))
+
+            func_to_wrap = (getattr(float, attribute_name)
+                            if op not in _custom_ops
+                            else _custom_ops[op])
+
         except AttributeError:
             pass
         else:
-            _modified_ops_with_reflection.append(op)
+            setattr(AffineScalarFunc, attribute_name,
+                    wrap(func_to_wrap, derivatives))
+            _modified_ops_with_reflection.append(op)            
 
     ########################################
     # Conversions to pure numbers are meaningless.  Note that the
@@ -1582,7 +1689,8 @@ class Variable(AffineScalarFunc):
     
         # We force the error to be float-like.  Since it is considered
         # as a standard deviation, it must be positive:
-        assert std_dev >= 0, "the error must be a positive number"
+        assert std_dev >= 0 or isnan(std_dev), (
+            "the error must be a positive number, or NaN")
 
         self._std_dev = CallableStdDev(std_dev)
     

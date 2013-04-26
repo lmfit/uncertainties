@@ -198,6 +198,12 @@ for name in dir(math):
     else:
         continue  # 'name' not wrapped by this module (__doc__, e, etc.)
 
+    # Errors during the calculation of the derivatives are converted
+    # to a NaN result: it is assumed that a mathematical calculation
+    # that cannot be calculated indicates a non-defined derivative
+    # (the derivatives in fixed_derivatives must be written this way):
+    derivatives = map(uncertainties.nan_if_exception, derivatives)
+    
     func = getattr(math, name)
     
     setattr(this_module, name,

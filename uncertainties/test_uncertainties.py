@@ -23,7 +23,7 @@ import sys
 # Local modules
 
 import uncertainties
-from uncertainties import ufloat, AffineScalarFunc, ufloat_fromstr
+from uncertainties import ufloat, AffineScalarFunc, ufloat_fromstr, isnan
 from uncertainties import umath
 
 from uncertainties import __author__
@@ -195,11 +195,11 @@ def _compare_derivatives(func, numerical_derivatives,
                     integer_arg_nums = set([0])
                 continue  # We try with different arguments
             # Some arguments might have to be integers, for instance:
-            except TypeError:
+            except TypeError, err:
                 if len(integer_arg_nums) == num_args:
                     raise Exception("Incorrect testing procedure: unable to "
-                                    "find correct argument values for %s."
-                                    % func.__name__)
+                                    "find correct argument values for %s: %s"
+                                    % (func.__name__, err))
 
                 # Another argument might be forced to be an integer:
                 integer_arg_nums.add(random.choice(range(num_args)))
@@ -701,7 +701,8 @@ def test_basic_access_to_data():
     except AttributeError:
         pass
     else:
-        raise "std_dev should not be settable for calculated results"
+        raise Exception(
+            "std_dev should not be settable for calculated results")
     
     # Calculation of deviations in units of the standard deviations:
     assert 10/x.std_dev == x.std_score(10 + x.nominal_value)
@@ -1257,22 +1258,121 @@ def test_covariances():
     # Non-diagonal elements:
     assert _numbers_close(covs[0][1], -0.02)
 
+    
+###############################################################################
+def test_power_all_cases():
+    '''
+    Checks all cases for the value and derivatives of x**p.
+
+    Checks only the details of special results like 0, 1 or NaN).
+
+    Different cases for the value of x**p and its derivatives are
+    tested by dividing the (x, p) plane with:
+
+    - x < 0, x = 0, x > 0
+    - p integer or not, p < 0, p = 0, p > 0
+
+    (not all combinations are distinct: for instance x > 0 gives
+    identical formulas for all p).
+    '''
+
+    zero = ufloat(0, 0.1)
+    zero2 = ufloat(0, 0.1)
+    one = ufloat(1, 0.1)
+    positive = ufloat(0.3, 0.01)
+    positive2 = ufloat(0.3, 0.01)
+    negative = ufloat(-0.3, 0.01)
+    integer = ufloat(-3, 0)
+    larger_than_one = ufloat(3.1, 0.01)
+    positive_smaller_than_one = ufloat(0.3, 0.01)
+    
+    ## negative**integer
+    
+    result = negative**integer
+    assert not isnan(result.derivatives[negative])
+    assert isnan(result.derivatives[integer])
+
+    # Limit cases:
+    result = negative**one
+    assert result.derivatives[negative] == 1
+    assert isnan(result.derivatives[one])
+
+    result = negative**zero
+    assert result.derivatives[negative] == 0
+    assert isnan(result.derivatives[zero])
+    
+    ## negative**non-integer
+
+    try:
+        negative**positive
+    except ValueError:
+        # The reason why it should also fail in Python 3 is that the
+        # result of Python 3 is a complex number, which uncertainties
+        # does not handle (no uncertainties on complex numbers). In
+        # Python 2, this should always fail, since Python 2 does not
+        # know how to calculate it.
+        pass
+    else:
+        raise Exception('Power should be impossible to calculate')
+
+    ## zero**...
+
+    result = zero**larger_than_one
+    assert result.derivatives[zero] == 0
+    assert result.derivatives[larger_than_one] == 0
+
+    # Special cases:
+    result = zero**one
+    assert result.derivatives[zero] == 1
+    assert result.derivatives[one] == 0
+
+    result = zero**positive_smaller_than_one
+    assert isnan(result.derivatives[zero])
+    assert result.derivatives[positive_smaller_than_one] == 0
+
+    result = zero**zero2
+    assert result.derivatives[zero] == 0
+    assert isnan(result.derivatives[zero2])
+    
+    try:
+        result = zero**negative
+    except ZeroDivisionError:
+        pass
+    else:
+        raise Exception('Power should be impossible to calculate')
+
+    ## positive**...: this is a quite regular case where the value and
+    ## the derivatives are all defined.
+
+    result = positive**positive2
+    assert not isnan(result.derivatives[positive])
+    assert not isnan(result.derivatives[positive2])
+
+    result = positive**zero
+    assert result.derivatives[positive] == 0
+    assert not isnan(result.derivatives[zero])
+
+    result = positive**negative
+    assert not isnan(result.derivatives[positive])
+    assert not isnan(result.derivatives[negative])
+
+    
 ###############################################################################
     
-def test_power():
+def test_power_special_cases():
     '''
     Checks special cases of x**p.
 
-    The value x = 0 is special, as are positive, null and negative
-    and integral values of p.
+    The values x = 0, x = 1 and x = NaN are special, as are null,
+    integral and NaN values of p.
     '''
 
     zero = ufloat(0, 0)
     one = ufloat(1, 0)
     p = ufloat(0.3, 0.01)
 
-    # assert 0**p == 0  # !!! Should pass
-    # assert zero**p == 0  # !!! Should pass
+    assert 0**p == 0
+    assert zero**p == 0
 
     # Should raise the same errors as float operations:
     try:
@@ -1289,38 +1389,39 @@ def test_power():
     else:
         raise Exception('An proper exception should have been raised')
 
+    # The outcome of 1**nan and nan**0 was undefined before Python
+    # 2.6 (http://docs.python.org/library/math.html#math.pow):
     if sys.version_info >= (2, 6):
+        assert float('nan')**zero == 1.0
+        assert one**float('nan') == 1.0
         
-        # Reference: http://docs.python.org/library/math.html#math.pow
-        
-        # …**0 == 1.0:
-        assert p**0 == 1.0        
-        # assert zero**0 == 1.0  # !!! Should pass
-        assert (-p)**0 == 1.0
-        # …**zero:
-        # assert (-10.3)**zero == 1.0  # !!! Should pass
-        # assert 0**zero == 1.0  # !!! Should pass
-        assert 0.3**zero == 1.0
-        # assert float('nan')**zero == 1.0  # !!! Should pass
-        # assert (-p)**zero == 1.0  # !!! Should pass
-        # assert zero**zero == 1.0  # !!! Should pass
-        assert p**zero == 1.0
+    # …**0 == 1.0:
+    assert p**0 == 1.0        
+    assert zero**0 == 1.0
+    assert (-p)**0 == 1.0
+    # …**zero:
+    assert (-10.3)**zero == 1.0        
+    assert 0**zero == 1.0        
+    assert 0.3**zero == 1.0
+    assert (-p)**zero == 1.0        
+    assert zero**zero == 1.0
+    assert p**zero == 1.0
 
-        # one**… == 1.0
-        assert one**-3 == 1.0
-        assert one**-3.1 == 1.0
-        assert one**0 == 1.0
-        assert one**3 == 1.0
-        assert one**3.1 == 1.0
-        # assert one**float('nan') == 1.0  # !!! Should pass
-        # … with two numbers with uncertainties:
-        assert one**(-p) == 1.0
-        assert one**zero == 1.0
-        assert one**p == 1.0
-        # 1**… == 1.0:
-        assert 1.**(-p) == 1.0
-        assert 1.**zero == 1.0
-        assert 1.**p == 1.0
+    # one**… == 1.0
+    assert one**-3 == 1.0
+    assert one**-3.1 == 1.0
+    assert one**0 == 1.0
+    assert one**3 == 1.0
+    assert one**3.1 == 1.0
+
+    # … with two numbers with uncertainties:
+    assert one**(-p) == 1.0
+    assert one**zero == 1.0
+    assert one**p == 1.0
+    # 1**… == 1.0:
+    assert 1.**(-p) == 1.0
+    assert 1.**zero == 1.0
+    assert 1.**p == 1.0
         
         
     # Negative numbers with unceratinty can be exponentiated to an integral
@@ -1333,23 +1434,15 @@ def test_power():
     assert ufloat(-1.1, 0)**9 == (-1.1)**9
     
     # Negative numbers cannot be raised to a non-integral power, in
-    # Python 2 (in Python 3, complex numbers are returned; this cannot
+    # Python 2. In Python 3, complex numbers are returned; this cannot
     # (yet) be represented in the uncertainties package, because it
-    # does not handle complex numbers):
-    if sys.version_info < (3,):
-        try:
-            ufloat(-1, 0)**9.1
-        except Exception, err_ufloat:  # "as", for Python 2.6+
-            pass
-        else:
-            raise Exception('An exception should have been raised')
-        try:
-            (-1)**9.1
-        except Exception, err_float:  # "as" for Python 2.6+
-            # UFloat and floats should raise the same error:
-            assert err_ufloat.args == err_float.args
-        else:
-            raise Exception('An exception should have been raised')
+    # does not handle complex numbers:
+    try:
+        ufloat(-1, 0)**9.1
+    except ValueError:
+        pass
+    else:
+        raise Exception('An exception should have been raised')
 
     
 ###############################################################################
