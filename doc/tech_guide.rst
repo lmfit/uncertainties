@@ -50,30 +50,67 @@ after the program that did the pickling is finished).  Thus
 which shows that the original variable :data:`x` and the new variable :data:`x2`
 are completely uncorrelated.
 
+.. index:: linear propagation of uncertainties
 .. _linear_method:
 
-Uncertainties must be small
----------------------------
+Linear propagation of uncertainties
+-----------------------------------
+
+Constraints on the uncertainties
+================================
 
 This package calculates the standard deviation of mathematical
 expressions through the linear approximation of `error propagation
 theory`_.
 
 The standard deviations and nominal values calculated by this package
-are thus meaningful approximations as long as the functions involved
-have precise linear expansions in the region where the probability
-distribution of their variables is the largest.  It is therefore
-important that **uncertainties be "small"**.  Mathematically, this
-implies that the linear terms of functions around the nominal values of
-their variables should be much larger than the remaining higher-order
-terms over the region of significant probability.
+are thus meaningful approximations as long as the final calculated
+functions have **precise linear expansions in the region where the
+probability distribution of their variables is the
+largest**. Mathematically, this means that the linear terms of the
+final calculated functions around the nominal values of their
+variables should be much larger than the remaining higher-order terms
+over the region of significant probability.
 
-For instance, ``sin(0+/-0.01)`` yields a meaningful standard deviation
-since it is quite linear over 0±0.01.  However, ``cos(0+/-0.01)``,
-yields an approximate standard deviation of 0 because it is parabolic
-around 0 instead of linear; this might not be precise enough for all
-applications.
+For example, calculating ``x*10`` with :data:`x` = 5±3 gives a
+*perfect result* since the calculated function is linear. So does
+``umath.atan(umath.tan(x))`` for :data:`x` = 0±1, since only the
+*final* function counts (not an intermediate function like
+:func:`tan`).
 
+Another example is ``sin(0+/-0.01)``, for which :mod:`uncertainties`
+yields a meaningful standard deviation since the sine is quite linear
+over 0±0.01.  However, ``cos(0+/-0.01)``, yields an approximate
+standard deviation of 0 because it is parabolic around 0 instead of
+linear; this might not be precise enough for all applications.
+
+.. index:: NaN
+
+Not-a-number uncertainties
+==========================
+
+If linear `error propagation theory`_ cannot be applied,
+:mod:`uncertainties` internally uses a `not-a-number value
+<http://en.wikipedia.org/wiki/Not_a_number>`_ (``nan``) for the
+derivative.
+
+As a consequence, it is possible for uncertainties to be ``nan``:
+
+  >>> umath.sqrt(ufloat(0, 1))
+  0.0+/-nan
+
+This indicates that **the derivative required by linear error
+propagation theory is not defined** (a Monte-Carlo calculation of the
+resulting random variable is more adapted to this specific case).
+
+However, the :mod:`uncertainties` package **correctly handles
+perfectly precise numbers**, in this case:
+
+  >>> umath.sqrt(ufloat(0, 0))
+  0.0
+
+gives the correct result, despite the fact that the derivative of the
+square root is not defined in zero.
 
 Mathematical definition of numbers with uncertainties
 -----------------------------------------------------
