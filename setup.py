@@ -50,7 +50,7 @@ except ImportError:
 
 distutils.core.setup(
     name='uncertainties',
-    version='2.3',
+    version='2.3.5',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://pythonhosted.org/uncertainties/',
@@ -165,6 +165,9 @@ Version history
 
 Main changes:
 
+- 2.3.5: Full support for corner cases of the power operator (``x**y``). \
+       Full support for numbers with a zero uncertainty (``0**y``). \
+       Uncertainties and derivatives can now be NaN (not-a-number).
 - 2.3: Full support for keyword arguments when wrapping a function \
        so that it accepts numbers with uncertainties instead of floats \
        (improved ``wrap()`` function). Incompatible change: \
