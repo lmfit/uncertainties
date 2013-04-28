@@ -1311,8 +1311,9 @@ def power_all_cases(op):
     
     ## negative**non-integer
 
+    
     try:
-        op(negative, positive)
+        result = op(negative, positive)
     except ValueError:
         # The reason why it should also fail in Python 3 is that the
         # result of Python 3 is a complex number, which uncertainties
@@ -1321,7 +1322,11 @@ def power_all_cases(op):
         # know how to calculate it.
         pass
     else:
-        raise Exception('A proper exception should have been raised')
+        if sys.version_info > (2, 5):
+            raise Exception('A proper exception should have been raised')
+        else:
+            assert isnan(result.nominal_value)
+            assert isnan(result.std_dev)
 
     ## zero**...
 
