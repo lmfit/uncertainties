@@ -1371,14 +1371,13 @@ def test_power_special_cases():
     '''
     Checks special cases of x**p.
     '''
-
     power_special_cases(pow)
 
 def power_special_cases(op):
     '''
-    Checks special cases of the power operator op (where op is
-    typically the built-in pow or math.pow).
-    
+    Checks special cases of the uncertainty power operator op (where
+    op is typically the built-in pow or uncertainties.umath.pow).
+        
     The values x = 0, x = 1 and x = NaN are special, as are null,
     integral and NaN values of p.
     '''
@@ -1439,16 +1438,6 @@ def power_special_cases(op):
     assert op(1., zero) == 1.0
     assert op(1., p) == 1.0
         
-        
-    # Negative numbers with unceratinty can be exponentiated to an integral
-    # power:
-    assert op(ufloat(-1.1, 0.1), -9).nominal_value == op(-1.1, -9)
-
-    # Case of numbers with no uncertainty: should give the same result
-    # as numbers with uncertainties:
-    assert op(ufloat(-1, 0), 9) == op(-1, 9)
-    assert op(ufloat(-1.1, 0), 9) == op(-1.1, 9)
-    
     # Negative numbers cannot be raised to a non-integral power, in
     # Python 2. In Python 3, complex numbers are returned; this cannot
     # (yet) be represented in the uncertainties package, because it
@@ -1459,6 +1448,30 @@ def power_special_cases(op):
         pass
     else:
         raise Exception('An exception should have been raised')
+
+def test_power_wrt_ref():
+    '''
+    Checks special cases of the built-in pow() power operator.
+    '''
+    power_wrt_ref(pow, pow)
+    
+def power_wrt_ref(op, ref_op):
+    '''
+    Checks special cases of the uncertainty power operator op (where
+    op is typically the built-in pow or uncertainties.umath.pow), by
+    comparing its results to the reference power operator ref_op
+    (which is typically the built-in pow or math.pow).
+    '''
+    
+    # Negative numbers with uncertainty can be exponentiated to an
+    # integral power:
+    assert op(ufloat(-1.1, 0.1), -9).nominal_value == ref_op(-1.1, -9)
+
+    # Case of numbers with no uncertainty: should give the same result
+    # as numbers with uncertainties:
+    assert op(ufloat(-1, 0), 9) == ref_op(-1, 9)
+    assert op(ufloat(-1.1, 0), 9) == ref_op(-1.1, 9)
+    
 
     
 ###############################################################################

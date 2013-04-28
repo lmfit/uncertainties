@@ -303,3 +303,22 @@ def test_hypot():
     result = umath.hypot(x, y)
     assert test_uncertainties.isnan(result.derivatives[x])
     assert test_uncertainties.isnan(result.derivatives[y])
+
+def test_power_all_cases():
+    '''
+    Test special cases of umath.pow().
+    '''
+    test_uncertainties.power_all_cases(umath.pow)
+
+def test_power_special_cases():
+    '''
+    Checks special cases of umath.pow().
+    '''
+    test_uncertainties.power_special_cases(umath.pow)
+    
+def test_power_wrt_ref():
+    '''
+    Checks special cases of the umath.pow() power operator.
+    '''
+    test_uncertainties.power_wrt_ref(umath.pow, math.pow)
+    
