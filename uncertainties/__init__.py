@@ -1495,18 +1495,6 @@ def get_ops_with_reflection():
         # but it is calculated numerically, for convenience:
         'mod': ("1.", "partial_derivative(float.__mod__, 1)(x, y)"),
         'mul': ("y", "x"),
-        # The case x**y is constant one the line x = 0 and in y = 0;
-        # the corresponding derivatives must be zero in these
-        # cases. If the function is actually not defined (e.g. 0**-3),
-        # then an exception will be raised when the nominal value is
-        # calculated.  These derivatives are transformed to NaN if an
-        # error happens during their calculation:
-        'pow': (
-            # "0. if y == 0 else y*x**(y-1)":
-            "float(y and y*x**(y-1))",
-            # "0. if (x == 0) and (y != 0) else log(x)*x**y":
-            "float((x or not y) and log(x)*x**y)"
-            ),
         'sub': ("1.", "-1."),
         'truediv': ("1/y", "-x/y**2")
         }
@@ -1520,6 +1508,32 @@ def get_ops_with_reflection():
         ops_with_reflection["r"+op] = [
             eval("lambda y, x: %s" % expr) for expr in reversed(derivatives)]
 
+
+    # The derivatives of pow() are more complicated:
+
+    # The case x**y is constant one the line x = 0 and in y = 0;
+    # the corresponding derivatives must be zero in these
+    # cases. If the function is actually not defined (e.g. 0**-3),
+    # then an exception will be raised when the nominal value is
+    # calculated.  These derivatives are transformed to NaN if an
+    # error happens during their calculation:
+    
+    def pow_deriv_0(x, y):
+        if y == 0:
+            return 0.
+        elif x != 0 or y % 1 == 0:
+            return y*x**(y-1)
+        else:
+            return float('nan')
+
+    def pow_deriv_1(x, y):
+        if x == 0 and y > 0:
+            return 0
+        else:
+            return log(x)*x**y
+    ops_with_reflection['pow'] = [pow_deriv_0, pow_deriv_1]
+    ops_with_reflection['rpow'] = [pow_deriv_1, pow_deriv_0]
+            
     # Undefined derivatives are converted to NaN when the function
     # itself can be calculated:
     for op in ['pow']:
