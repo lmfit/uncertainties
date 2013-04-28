@@ -15,9 +15,10 @@ import math
 # Local modules:
 import uncertainties
 import uncertainties.umath as umath
-import test_uncertainties
-
+from uncertainties import ufloat
 from uncertainties import __author__
+
+import test_uncertainties
 
 ###############################################################################
 # Unit tests
@@ -77,7 +78,7 @@ def test_compound_expression():
     Test equality between different formulas.
     """
     
-    x = uncertainties.ufloat(3, 0.1)
+    x = ufloat(3, 0.1)
     
     # Prone to numerical errors (but not much more than floats):
     assert umath.tan(x) == umath.sin(x)/umath.cos(x)
@@ -86,7 +87,7 @@ def test_compound_expression():
 def test_numerical_example():
     "Test specific numerical examples"
 
-    x = uncertainties.ufloat(3.14, 0.01)
+    x = ufloat(3.14, 0.01)
     result = umath.sin(x)
     # In order to prevent big errors such as a wrong, constant value
     # for all analytical and numerical derivatives, which would make
@@ -129,8 +130,8 @@ def test_monte_carlo_comparison():
         # due to y:
         return 10 * x**2 - x * sin_uarray_uncert(y**3)
 
-    x = uncertainties.ufloat(0.2, 0.01)
-    y = uncertainties.ufloat(10, 0.001)
+    x = ufloat(0.2, 0.01)
+    y = ufloat(10, 0.001)
     function_result_this_module = function(x, y)
     nominal_value_this_module = function_result_this_module.nominal_value
 
@@ -194,7 +195,7 @@ def test_monte_carlo_comparison():
 def test_math_module():
     "Operations with the math module"
 
-    x = uncertainties.ufloat(-1.5, 0.1)
+    x = ufloat(-1.5, 0.1)
     
     # The exponent must not be differentiated, when calculating the
     # following (the partial derivative with respect to the exponent
@@ -249,13 +250,13 @@ def test_math_module():
         else:
             raise Exception('OverflowError exception expected')
         try:
-            umath.log(uncertainties.ufloat(0, 0))
+            umath.log(ufloat(0, 0))
         except OverflowError, err_ufloat:  # "as", for Python 2.6+
             assert err_math.args == err_ufloat.args
         else:
             raise Exception('OverflowError exception expected')
         try:
-            umath.log(uncertainties.ufloat(0, 1))
+            umath.log(ufloat(0, 1))
         except OverflowError, err_ufloat:  # "as", for Python 2.6+
             assert err_math.args == err_ufloat.args
         else:
@@ -279,13 +280,13 @@ def test_math_module():
         else:
             raise Exception('ValueError exception expected')
         try:
-            umath.log(uncertainties.ufloat(0, 0))
+            umath.log(ufloat(0, 0))
         except ValueError, err_ufloat:  # Python 2.6+: as err_math
             assert err_math_args == err_ufloat.args
         else:
             raise Exception('ValueError exception expected')
         try:
-            umath.log(uncertainties.ufloat(0, 1))
+            umath.log(ufloat(0, 1))
         except ValueError, err_ufloat:  # Python 2.6+: as err_math
             assert err_math_args == err_ufloat.args
         else:
@@ -296,10 +297,73 @@ def test_hypot():
     '''
     Special cases where derivatives cannot be calculated:
     '''
-    x = uncertainties.ufloat(0, 1)
-    y = uncertainties.ufloat(0, 2)
+    x = ufloat(0, 1)
+    y = ufloat(0, 2)
     # Derivatives that cannot be calculated simply return NaN, with no
     # exception being raised, normally:
     result = umath.hypot(x, y)
     assert test_uncertainties.isnan(result.derivatives[x])
     assert test_uncertainties.isnan(result.derivatives[y])
+
+def test_power_all_cases():
+    '''
+    Test special cases of umath.pow().
+    '''
+    test_uncertainties.power_all_cases(umath.pow)
+
+# test_power_special_cases() is similar to
+# test_uncertainties.py:test_power_special_cases(), but with small
+# differences: the built-in pow() and math.pow() are slightly
+# different:
+def test_power_special_cases():
+    '''
+    Checks special cases of umath.pow().
+    '''
+    
+    test_uncertainties.power_special_cases(umath.pow)
+
+    # We want the same behavior for numbers with uncertainties and for
+    # math.pow() at their nominal values:
+
+    positive = ufloat(0.3, 0.01)
+    negative = ufloat(-0.3, 0.01)
+    
+    # http://stackoverflow.com/questions/10282674/difference-between-the-built-in-pow-and-math-pow-for-floats-in-python
+
+    try:
+        umath.pow(ufloat(0, 0.1), negative)
+    except (ValueError, OverflowError), err:  # Python 2.6+ "as err"
+        err_class = err.__class__  # For Python 3: err is destroyed after except
+    else:
+        err_class = None
+        
+    err_msg = 'A proper exception should have been raised'
+
+    # An exception must have occurred:
+    if sys.version_info >= (2, 6):
+        assert err_class == ValueError, err_msg
+    else:
+        assert err_class == OverflowError, err_msg
+            
+    try:
+        result = umath.pow(negative, positive)
+    except ValueError:
+        # The reason why it should also fail in Python 3 is that the
+        # result of Python 3 is a complex number, which uncertainties
+        # does not handle (no uncertainties on complex numbers). In
+        # Python 2, this should always fail, since Python 2 does not
+        # know how to calculate it.
+        pass
+    else:
+        if sys.version_info >= (2, 6):
+            raise Exception('A proper exception should have been raised')
+        else:
+            assert test_uncertainties.isnan(result.nominal_value)
+            assert test_uncertainties.isnan(result.std_dev)
+    
+def test_power_wrt_ref():
+    '''
+    Checks special cases of the umath.pow() power operator.
+    '''
+    test_uncertainties.power_wrt_ref(umath.pow, math.pow)
+    

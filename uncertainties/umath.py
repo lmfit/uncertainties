@@ -174,6 +174,20 @@ def _deriv_fabs(x):
     else:
         return -1
 
+def _deriv_pow_0(x, y):
+    if y == 0:
+        return  0.
+    elif x != 0 or y % 1 == 0:
+        return y*math.pow(x, y-1)
+    else:
+        return float('nan')
+
+def _deriv_pow_1(x, y):    
+    if x == 0 and y > 0:
+        return 0.
+    else:
+        return math.log(x) * math.pow(x, y)
+    
 _erf_coef = 2/math.sqrt(math.pi)  # Optimization for erf()
 
 fixed_derivatives = {
@@ -204,8 +218,7 @@ fixed_derivatives = {
             lambda x, y: -math.log(x, y)/y/math.log(y)],
     'log10': [lambda x: 1/x/math.log(10)],
     'log1p': [lambda x: 1/(1+x)],
-    'pow': [lambda x, y: y*math.pow(x, y-1),
-            lambda x, y: math.log(x) * math.pow(x, y)],
+    'pow': [_deriv_pow_0, _deriv_pow_1],
     'radians': [lambda x: math.radians(1)],
     'sin': [math.cos],
     'sinh': [math.cosh],
