@@ -180,7 +180,7 @@ def _deriv_pow_0(x, y):
     elif x != 0 or y % 1 == 0:
         return y*math.pow(x, y-1)
     else:
-        return float('nan'),
+        return float('nan')
 
 def _deriv_pow_1(x, y):    
     if x == 0 and y > 0:
