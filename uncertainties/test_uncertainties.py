@@ -1311,23 +1311,6 @@ def power_all_cases(op):
     
     ## negative**non-integer
 
-    
-    try:
-        result = op(negative, positive)
-    except ValueError:
-        # The reason why it should also fail in Python 3 is that the
-        # result of Python 3 is a complex number, which uncertainties
-        # does not handle (no uncertainties on complex numbers). In
-        # Python 2, this should always fail, since Python 2 does not
-        # know how to calculate it.
-        pass
-    else:
-        if sys.version_info > (2, 5):
-            raise Exception('A proper exception should have been raised')
-        else:
-            assert isnan(result.nominal_value)
-            assert isnan(result.std_dev)
-
     ## zero**...
 
     result = op(zero, non_int_larger_than_one)
@@ -1375,19 +1358,36 @@ def test_power_special_cases():
     '''
     power_special_cases(pow)
 
+    # We want the same behavior for numbers with uncertainties and for
+    # math.pow() at their nominal values:
+
+    positive = ufloat(0.3, 0.01)
+    negative = ufloat(-0.3, 0.01)
+    
     # http://stackoverflow.com/questions/10282674/difference-between-the-built-in-pow-and-math-pow-for-floats-in-python
 
     try:
-        pow(ufloat(0, 0), -2.2)
+        pow(ufloat(0, 0), negative)
     except ZeroDivisionError:
         pass
     else:
         raise Exception("A proper exception should have been raised")
 
     try:
-        pow(uncertainties.ufloat(0, 0.1),
-            uncertainties.ufloat(-2.1, 0.1))
+        pow(ufloat(0, 0.1), negative)
     except ZeroDivisionError:
+        pass
+    else:
+        raise Exception('A proper exception should have been raised')
+
+    try:
+        result = pow(negative, positive)
+    except ValueError:
+        # The reason why it should also fail in Python 3 is that the
+        # result of Python 3 is a complex number, which uncertainties
+        # does not handle (no uncertainties on complex numbers). In
+        # Python 2, this should always fail, since Python 2 does not
+        # know how to calculate it.
         pass
     else:
         raise Exception('A proper exception should have been raised')
@@ -1442,16 +1442,6 @@ def power_special_cases(op):
     assert op(1., zero) == 1.0
     assert op(1., p) == 1.0
         
-    # Negative numbers cannot be raised to a non-integral power, in
-    # Python 2. In Python 3, complex numbers are returned; this cannot
-    # (yet) be represented in the uncertainties package, because it
-    # does not handle complex numbers:
-    try:
-        op(ufloat(-1, 0), 9.1)
-    except ValueError:
-        pass
-    else:
-        raise Exception('An exception should have been raised')
 
 def test_power_wrt_ref():
     '''
