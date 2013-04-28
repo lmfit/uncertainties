@@ -358,8 +358,8 @@ def test_power_special_cases():
         if sys.version_info >= (2, 6):
             raise Exception('A proper exception should have been raised')
         else:
-            assert isnan(result.nominal_value)
-            assert isnan(result.std_dev)
+            assert test_uncertainties.isnan(result.nominal_value)
+            assert test_uncertainties.isnan(result.std_dev)
     
 def test_power_wrt_ref():
     '''
