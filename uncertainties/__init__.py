@@ -1533,7 +1533,8 @@ def get_ops_with_reflection():
             return log(x)*x**y
         
     ops_with_reflection['pow'] = [pow_deriv_0, pow_deriv_1]
-    ops_with_reflection['rpow'] = [pow_deriv_1, pow_deriv_0]
+    ops_with_reflection['rpow'] = [lambda y, x: pow_deriv_1(x, y),
+                                   lambda y, x: pow_deriv_0(x, y)]
             
     # Undefined derivatives are converted to NaN when the function
     # itself can be calculated:
