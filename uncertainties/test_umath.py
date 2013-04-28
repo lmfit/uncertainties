@@ -335,7 +335,10 @@ def test_power_special_cases():
     except ValueError:
         pass
     else:
-        raise Exception("A proper exception should have been raised")
+        if sys.version_info >= (2, 6):
+            raise Exception("A proper exception should have been raised")
+        else:
+            
 
     try:
         umath.pow(ufloat(0, 0.1), negative)
@@ -354,7 +357,7 @@ def test_power_special_cases():
         # know how to calculate it.
         pass
     else:
-        if sys.version_info > (2, 5):
+        if sys.version_info >= (2, 6):
             raise Exception('A proper exception should have been raised')
         else:
             assert isnan(result.nominal_value)
