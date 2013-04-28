@@ -240,7 +240,7 @@ import collections
 import inspect
 
 # Numerical version:
-__version_info__ = (2, 3, 5)
+__version_info__ = (2, 3, 6)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
@@ -1477,8 +1477,10 @@ def get_ops_with_reflection():
         # then an exception will be raised when the nominal value is
         # calculated.  These derivatives are transformed to NaN if an
         # error happens during their calculation:
-        'pow': ("0. if y == 0 else y*x**(y-1)",
-                "0. if (x == 0) and (y != 0) else log(x)*x**y"),
+        'pow': ("0. if y == 0"
+                " else y*x**(y-1) if x != 0 or y % 1 == 0"
+                " else float('nan')",
+                "0. if (x == 0) and (y > 0) else log(x)*x**y"),
         'sub': ("1.", "-1."),
         'truediv': ("1/y", "-x/y**2")
         }

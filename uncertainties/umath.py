@@ -171,8 +171,13 @@ fixed_derivatives = {
             lambda x, y: -math.log(x, y)/y/math.log(y)],
     'log10': [lambda x: 1/x/math.log(10)],
     'log1p': [lambda x: 1/(1+x)],
-    'pow': [lambda x, y: y*math.pow(x, y-1),
-            lambda x, y: math.log(x) * math.pow(x, y)],
+    'pow': [lambda x, y:
+                0. if y == 0
+                else y*math.pow(x, y-1)  if x != 0 or y % 1 == 0
+                else float('nan'),
+            lambda x, y:
+                0. if (x == 0) and (y > 0)
+                else math.log(x) * math.pow(x, y)],
     'radians': [lambda x: math.radians(1)],
     'sin': [math.cos],
     'sinh': [math.cosh],
