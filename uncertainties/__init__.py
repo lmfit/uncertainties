@@ -1480,7 +1480,7 @@ def get_ops_with_reflection():
         'pow': ("0. if y == 0"
                 " else y*x**(y-1) if x != 0 or y % 1 == 0"
                 " else float('nan')",
-                "0. if (x == 0) and (y != 0) else log(x)*x**y"),
+                "0. if (x == 0) and (y > 0) else log(x)*x**y"),
         'sub': ("1.", "-1."),
         'truediv': ("1/y", "-x/y**2")
         }
