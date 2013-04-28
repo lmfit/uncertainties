@@ -1531,6 +1531,7 @@ def get_ops_with_reflection():
             return 0
         else:
             return log(x)*x**y
+        
     ops_with_reflection['pow'] = [pow_deriv_0, pow_deriv_1]
     ops_with_reflection['rpow'] = [pow_deriv_1, pow_deriv_0]
             
