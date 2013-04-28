@@ -1528,7 +1528,7 @@ def get_ops_with_reflection():
 
     def pow_deriv_1(x, y):
         if x == 0 and y > 0:
-            return 0
+            return 0.
         else:
             return log(x)*x**y
         
