@@ -331,22 +331,20 @@ def test_power_special_cases():
     # http://stackoverflow.com/questions/10282674/difference-between-the-built-in-pow-and-math-pow-for-floats-in-python
 
     try:
-        umath.pow(ufloat(0, 0), negative)
-    except ValueError:
-        pass
-    else:
-        if sys.version_info >= (2, 6):
-            raise Exception("A proper exception should have been raised")
-        else:
-            
-
-    try:
         umath.pow(ufloat(0, 0.1), negative)
-    except ValueError:
-        pass
+    except (ValueError, OverflowError), err:  # Python 2.6+ "as err"
+        err_type = type(err)  # For Python 3: err is destroyed after except
     else:
-        raise Exception('A proper exception should have been raised')
+        err_type = None
+        
+    err_msg = 'A proper exception should have been raised'
 
+    # An exception must have occurred:
+    if sys.version_info >= (2, 6):
+        assert err_type == ValueError, err_msg
+    else:
+        assert err_type == OverflowError, err_msg
+            
     try:
         result = umath.pow(negative, positive)
     except ValueError:
