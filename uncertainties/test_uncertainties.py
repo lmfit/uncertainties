@@ -1291,7 +1291,7 @@ def power_all_cases(op):
     positive2 = ufloat(0.3, 0.01)
     negative = ufloat(-0.3, 0.01)
     integer = ufloat(-3, 0)
-    larger_than_one = ufloat(3.1, 0.01)
+    non_int_larger_than_one = ufloat(3.1, 0.01)
     positive_smaller_than_one = ufloat(0.3, 0.01)
     
     ## negative**integer
@@ -1325,13 +1325,17 @@ def power_all_cases(op):
 
     ## zero**...
 
-    result = op(zero, larger_than_one)
-    assert result.derivatives[zero] == 0
-    assert result.derivatives[larger_than_one] == 0
+    result = op(zero, non_int_larger_than_one)
+    assert isnan(result.derivatives[zero])
+    assert isnan(result.derivatives[non_int_larger_than_one])
 
     # Special cases:
     result = op(zero, one)
     assert result.derivatives[zero] == 1
+    assert result.derivatives[one] == 0
+
+    result = op(zero, 2*one)
+    assert result.derivatives[zero] == 0
     assert result.derivatives[one] == 0
 
     result = op(zero, positive_smaller_than_one)
