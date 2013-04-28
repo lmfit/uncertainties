@@ -333,17 +333,17 @@ def test_power_special_cases():
     try:
         umath.pow(ufloat(0, 0.1), negative)
     except (ValueError, OverflowError), err:  # Python 2.6+ "as err"
-        err_type = type(err)  # For Python 3: err is destroyed after except
+        err_class = err.__class__  # For Python 3: err is destroyed after except
     else:
-        err_type = None
+        err_class = None
         
     err_msg = 'A proper exception should have been raised'
 
     # An exception must have occurred:
     if sys.version_info >= (2, 6):
-        assert err_type == ValueError, err_msg
+        assert err_class == ValueError, err_msg
     else:
-        assert err_type == OverflowError, err_msg
+        assert err_class == OverflowError, err_msg
             
     try:
         result = umath.pow(negative, positive)
