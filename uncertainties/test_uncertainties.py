@@ -1346,13 +1346,6 @@ def power_all_cases(op):
     assert result.derivatives[zero] == 0
     assert isnan(result.derivatives[zero2])
     
-    try:
-        result = op(zero, negative)
-    except ZeroDivisionError:
-        pass
-    else:
-        raise Exception('Power should be impossible to calculate')
-
     ## positive**...: this is a quite regular case where the value and
     ## the derivatives are all defined.
 
@@ -1380,12 +1373,20 @@ def test_power_special_cases():
     # http://stackoverflow.com/questions/10282674/difference-between-the-built-in-pow-and-math-pow-for-floats-in-python
 
     try:
-        ufloat(0, 0)**(-2.2)
+        pow(ufloat(0, 0), -2.2)
     except ZeroDivisionError:
         pass
     else:
-        raise Exception("An exception should have been raised")
+        raise Exception("A proper exception should have been raised")
 
+    try:
+        pow(uncertainties.ufloat(0, 0.1),
+            uncertainties.ufloat(-2.1, 0.1))
+    except ZeroDivisionError:
+        pass
+    else:
+        raise Exception('A proper exception should have been raised')
+    
 def power_special_cases(op):
     '''
     Checks special cases of the uncertainty power operator op (where

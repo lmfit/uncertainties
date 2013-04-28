@@ -316,6 +316,8 @@ def test_power_special_cases():
     '''
     test_uncertainties.power_special_cases(umath.pow)
 
+    # The following behaviors are those of math.pow():
+    
     # http://stackoverflow.com/questions/10282674/difference-between-the-built-in-pow-and-math-pow-for-floats-in-python
 
     try:
@@ -323,7 +325,15 @@ def test_power_special_cases():
     except ValueError:
         pass
     else:
-        raise Exception("An exception should have been raised")
+        raise Exception("A proper exception should have been raised")
+
+    try:
+        umath.pow(uncertainties.ufloat(0, 0.1),
+                  uncertainties.ufloat(-2.1, 0.1))
+    except ValueError:
+        pass
+    else:
+        raise Exception('A proper exception should have been raised')
     
 def test_power_wrt_ref():
     '''
