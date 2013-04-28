@@ -1327,7 +1327,7 @@ def power_all_cases(op):
 
     result = op(zero, non_int_larger_than_one)
     assert isnan(result.derivatives[zero])
-    assert isnan(result.derivatives[non_int_larger_than_one])
+    assert result.derivatives[non_int_larger_than_one] == 0
 
     # Special cases:
     result = op(zero, one)
