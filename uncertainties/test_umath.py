@@ -334,6 +334,7 @@ def test_power_special_cases():
         pass
     else:
         raise Exception('A proper exception should have been raised')
+
     
 def test_power_wrt_ref():
     '''

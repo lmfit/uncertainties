@@ -1403,21 +1403,6 @@ def power_special_cases(op):
     assert op(0, p) == 0
     assert op(zero, p) == 0
 
-    # Should raise the same errors as float operations:
-    try:
-        op(0, (-p))
-    except ZeroDivisionError:
-        pass
-    else:
-        raise Exception('An proper exception should have been raised')
-
-    try:
-        op(zero, (-p))
-    except ZeroDivisionError:
-        pass
-    else:
-        raise Exception('An proper exception should have been raised')
-
     # The outcome of 1**nan and nan**0 was undefined before Python
     # 2.6 (http://docs.python.org/library/math.html#math.pow):
     if sys.version_info >= (2, 6):
