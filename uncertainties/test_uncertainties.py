@@ -1377,6 +1377,15 @@ def test_power_special_cases():
     '''
     power_special_cases(pow)
 
+    # http://stackoverflow.com/questions/10282674/difference-between-the-built-in-pow-and-math-pow-for-floats-in-python
+
+    try:
+        ufloat(0, 0)**(-2.2)
+    except ZeroDivisionError:
+        pass
+    else:
+        raise Exception("An exception should have been raised")
+
 def power_special_cases(op):
     '''
     Checks special cases of the uncertainty power operator op (where
