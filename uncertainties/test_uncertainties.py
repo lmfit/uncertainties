@@ -1321,7 +1321,7 @@ def power_all_cases(op):
         # know how to calculate it.
         pass
     else:
-        raise Exception('Power should be impossible to calculate')
+        raise Exception('A proper exception should have been raised')
 
     ## zero**...
 
