@@ -1263,7 +1263,15 @@ def test_covariances():
 def test_power_all_cases():
     '''
     Checks all cases for the value and derivatives of x**p.
+    '''
 
+    power_all_cases(pow)
+
+def power_all_cases(op):
+    '''
+    Checks all cases for the value and derivatives of power-like
+    operator op (op is typically the built-in pow(), or math.pow()).
+    
     Checks only the details of special results like 0, 1 or NaN).
 
     Different cases for the value of x**p and its derivatives are
@@ -1283,76 +1291,61 @@ def test_power_all_cases():
     positive2 = ufloat(0.3, 0.01)
     negative = ufloat(-0.3, 0.01)
     integer = ufloat(-3, 0)
-    larger_than_one = ufloat(3.1, 0.01)
+    non_int_larger_than_one = ufloat(3.1, 0.01)
     positive_smaller_than_one = ufloat(0.3, 0.01)
     
     ## negative**integer
     
-    result = negative**integer
+    result = op(negative, integer)
     assert not isnan(result.derivatives[negative])
     assert isnan(result.derivatives[integer])
 
     # Limit cases:
-    result = negative**one
+    result = op(negative, one)
     assert result.derivatives[negative] == 1
     assert isnan(result.derivatives[one])
 
-    result = negative**zero
+    result = op(negative, zero)
     assert result.derivatives[negative] == 0
     assert isnan(result.derivatives[zero])
     
     ## negative**non-integer
 
-    try:
-        negative**positive
-    except ValueError:
-        # The reason why it should also fail in Python 3 is that the
-        # result of Python 3 is a complex number, which uncertainties
-        # does not handle (no uncertainties on complex numbers). In
-        # Python 2, this should always fail, since Python 2 does not
-        # know how to calculate it.
-        pass
-    else:
-        raise Exception('Power should be impossible to calculate')
-
     ## zero**...
 
-    result = zero**larger_than_one
-    assert result.derivatives[zero] == 0
-    assert result.derivatives[larger_than_one] == 0
+    result = op(zero, non_int_larger_than_one)
+    assert isnan(result.derivatives[zero])
+    assert result.derivatives[non_int_larger_than_one] == 0
 
     # Special cases:
-    result = zero**one
+    result = op(zero, one)
     assert result.derivatives[zero] == 1
     assert result.derivatives[one] == 0
 
-    result = zero**positive_smaller_than_one
+    result = op(zero, 2*one)
+    assert result.derivatives[zero] == 0
+    assert result.derivatives[one] == 0
+
+    result = op(zero, positive_smaller_than_one)
     assert isnan(result.derivatives[zero])
     assert result.derivatives[positive_smaller_than_one] == 0
 
-    result = zero**zero2
+    result = op(zero, zero2)
     assert result.derivatives[zero] == 0
     assert isnan(result.derivatives[zero2])
     
-    try:
-        result = zero**negative
-    except ZeroDivisionError:
-        pass
-    else:
-        raise Exception('Power should be impossible to calculate')
-
     ## positive**...: this is a quite regular case where the value and
     ## the derivatives are all defined.
 
-    result = positive**positive2
+    result = op(positive, positive2)
     assert not isnan(result.derivatives[positive])
     assert not isnan(result.derivatives[positive2])
 
-    result = positive**zero
+    result = op(positive, zero)
     assert result.derivatives[positive] == 0
     assert not isnan(result.derivatives[zero])
 
-    result = positive**negative
+    result = op(positive, negative)
     assert not isnan(result.derivatives[positive])
     assert not isnan(result.derivatives[negative])
 
@@ -1362,7 +1355,48 @@ def test_power_all_cases():
 def test_power_special_cases():
     '''
     Checks special cases of x**p.
+    '''
+    power_special_cases(pow)
 
+    # We want the same behavior for numbers with uncertainties and for
+    # math.pow() at their nominal values:
+
+    positive = ufloat(0.3, 0.01)
+    negative = ufloat(-0.3, 0.01)
+    
+    # http://stackoverflow.com/questions/10282674/difference-between-the-built-in-pow-and-math-pow-for-floats-in-python
+
+    try:
+        pow(ufloat(0, 0), negative)
+    except ZeroDivisionError:
+        pass
+    else:
+        raise Exception("A proper exception should have been raised")
+
+    try:
+        pow(ufloat(0, 0.1), negative)
+    except ZeroDivisionError:
+        pass
+    else:
+        raise Exception('A proper exception should have been raised')
+
+    try:
+        result = pow(negative, positive)
+    except ValueError:
+        # The reason why it should also fail in Python 3 is that the
+        # result of Python 3 is a complex number, which uncertainties
+        # does not handle (no uncertainties on complex numbers). In
+        # Python 2, this should always fail, since Python 2 does not
+        # know how to calculate it.
+        pass
+    else:
+        raise Exception('A proper exception should have been raised')
+    
+def power_special_cases(op):
+    '''
+    Checks special cases of the uncertainty power operator op (where
+    op is typically the built-in pow or uncertainties.umath.pow).
+        
     The values x = 0, x = 1 and x = NaN are special, as are null,
     integral and NaN values of p.
     '''
@@ -1371,78 +1405,67 @@ def test_power_special_cases():
     one = ufloat(1, 0)
     p = ufloat(0.3, 0.01)
 
-    assert 0**p == 0
-    assert zero**p == 0
-
-    # Should raise the same errors as float operations:
-    try:
-        0**(-p)
-    except ZeroDivisionError:
-        pass
-    else:
-        raise Exception('An proper exception should have been raised')
-
-    try:
-        zero**(-p)
-    except ZeroDivisionError:
-        pass
-    else:
-        raise Exception('An proper exception should have been raised')
+    assert op(0, p) == 0
+    assert op(zero, p) == 0
 
     # The outcome of 1**nan and nan**0 was undefined before Python
     # 2.6 (http://docs.python.org/library/math.html#math.pow):
     if sys.version_info >= (2, 6):
-        assert float('nan')**zero == 1.0
-        assert one**float('nan') == 1.0
+        assert op(float('nan'), zero) == 1.0
+        assert op(one, float('nan')) == 1.0
         
     # …**0 == 1.0:
-    assert p**0 == 1.0        
-    assert zero**0 == 1.0
-    assert (-p)**0 == 1.0
+    assert op(p, 0) == 1.0        
+    assert op(zero, 0) == 1.0
+    assert op((-p), 0) == 1.0
     # …**zero:
-    assert (-10.3)**zero == 1.0        
-    assert 0**zero == 1.0        
-    assert 0.3**zero == 1.0
-    assert (-p)**zero == 1.0        
-    assert zero**zero == 1.0
-    assert p**zero == 1.0
+    assert op((-10.3), zero) == 1.0        
+    assert op(0, zero) == 1.0        
+    assert op(0.3, zero) == 1.0
+    assert op((-p), zero) == 1.0        
+    assert op(zero, zero) == 1.0
+    assert op(p, zero) == 1.0
 
     # one**… == 1.0
-    assert one**-3 == 1.0
-    assert one**-3.1 == 1.0
-    assert one**0 == 1.0
-    assert one**3 == 1.0
-    assert one**3.1 == 1.0
+    assert op(one, -3) == 1.0
+    assert op(one, -3.1) == 1.0
+    assert op(one, 0) == 1.0
+    assert op(one, 3) == 1.0
+    assert op(one, 3.1) == 1.0
 
     # … with two numbers with uncertainties:
-    assert one**(-p) == 1.0
-    assert one**zero == 1.0
-    assert one**p == 1.0
+    assert op(one, (-p)) == 1.0
+    assert op(one, zero) == 1.0
+    assert op(one, p) == 1.0
     # 1**… == 1.0:
-    assert 1.**(-p) == 1.0
-    assert 1.**zero == 1.0
-    assert 1.**p == 1.0
+    assert op(1., (-p)) == 1.0
+    assert op(1., zero) == 1.0
+    assert op(1., p) == 1.0
         
-        
-    # Negative numbers with unceratinty can be exponentiated to an integral
-    # power:
-    assert (ufloat(-1.1, 0.1)**-9).nominal_value == (-1.1)**-9
+
+def test_power_wrt_ref():
+    '''
+    Checks special cases of the built-in pow() power operator.
+    '''
+    power_wrt_ref(pow, pow)
+    
+def power_wrt_ref(op, ref_op):
+    '''
+    Checks special cases of the uncertainty power operator op (where
+    op is typically the built-in pow or uncertainties.umath.pow), by
+    comparing its results to the reference power operator ref_op
+    (which is typically the built-in pow or math.pow).
+    '''
+    
+    # Negative numbers with uncertainty can be exponentiated to an
+    # integral power:
+    assert op(ufloat(-1.1, 0.1), -9).nominal_value == ref_op(-1.1, -9)
 
     # Case of numbers with no uncertainty: should give the same result
     # as numbers with uncertainties:
-    assert ufloat(-1, 0)**9 == (-1)**9
-    assert ufloat(-1.1, 0)**9 == (-1.1)**9
+    assert op(ufloat(-1, 0), 9) == ref_op(-1, 9)
+    assert op(ufloat(-1.1, 0), 9) == ref_op(-1.1, 9)
     
-    # Negative numbers cannot be raised to a non-integral power, in
-    # Python 2. In Python 3, complex numbers are returned; this cannot
-    # (yet) be represented in the uncertainties package, because it
-    # does not handle complex numbers:
-    try:
-        ufloat(-1, 0)**9.1
-    except ValueError:
-        pass
-    else:
-        raise Exception('An exception should have been raised')
 
     
 ###############################################################################
