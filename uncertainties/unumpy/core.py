@@ -147,10 +147,10 @@ def wrap_array_func(func):
     
     Original documentation:
     %s""" % (func.__name__, func.__doc__))
-    def wrapped_func(arr, *args):
+    def wrapped_func(arr, *args, **kwargs):
         # Nominal value:
         arr_nominal_value = nominal_values(arr)
-        func_nominal_value = func(arr_nominal_value, *args)
+        func_nominal_value = func(arr_nominal_value, *args, **kwargs)
 
         # The algorithm consists in numerically calculating the derivatives
         # of func:
@@ -212,7 +212,7 @@ def wrap_array_func(func):
 
             # Origin value of array arr when var is shifted by shift_var:
             shifted_arr_values = arr_nominal_value + shift_arr
-            func_shifted = func(shifted_arr_values, *args)
+            func_shifted = func(shifted_arr_values, *args, **kwargs)
             numerical_deriv = (func_shifted-func_nominal_value)/shift_var
 
             # Update of the list of variables and associated
@@ -296,11 +296,12 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
     and the derivatives of this function with respect to multiple
     scalar parameters are calculated by func_with_derivatives().
     
-    func_with_derivatives(arr, input_type, derivatives, *args) returns
-    an iterator.  The first element is the value of the function at
-    point 'arr' (with the correct type).  The following elements are
-    arrays that represent the derivative of the function for each
-    derivative array from the iterator 'derivatives'.
+    func_with_derivatives(arr, input_type, derivatives, *args,
+    **kwargs) returns an iterator.  The first element is the value of
+    the function at point 'arr' (with the correct type).  The
+    following elements are arrays that represent the derivative of the
+    function for each derivative array from the iterator
+    'derivatives'.
 
       func_with_derivatives takes the following arguments:
 
@@ -321,7 +322,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
     Examples of func_with_derivatives: inv_with_derivatives().
     """
     
-    def wrapped_func(array_like, *args):
+    def wrapped_func(array_like, *args, **kwargs):
         """
         array_like -- array-like object that contains numbers with
         uncertainties (list, Numpy ndarray or matrix, etc.).
@@ -349,7 +350,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
             array_nominal,
             type(array_like),
             (array_derivative(array_version, var) for var in variables),
-            *args)
+            *args, **kwargs)
 
         func_nominal_value = func_and_derivs.next()
 
