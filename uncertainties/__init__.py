@@ -685,6 +685,12 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
         is immaterial: for example, if f has signature f(a, b=None),
         then derivatives_kwargs should be the empty dictionary, even
         if the wrapped f can be called a wrapped_f(a=123, b=42).
+
+    Numerically calculated derivatives are meaningless when the
+    function is not differentiable (e.g., math.hypot(x, y) in (x, y) =
+    (0, 0), and sqrt(x) in x = 0). The corresponding uncertainties are
+    either meaningless (case of hypot) or raise an exception when
+    calculated (case of sqrt).
         
     Example (for illustration purposes only, as
     uncertainties.umath.sin() runs faster than the examples that
