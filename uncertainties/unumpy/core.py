@@ -220,7 +220,7 @@ def wrap_array_func(func):
                 if derivative_value:
                     derivative_dict[var] = derivative_value
 
-        # numbers with uncertainties are build from the result:
+        # numbers with uncertainties are built from the result:
         return numpy.vectorize(uncertainties.AffineScalarFunc)(
             func_nominal_value, derivatives)
 
