@@ -641,7 +641,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
         take the same arguments as f.
 
         The positional parameters of a function are usually
-        positional-or-keyword parameters like in func(a,
+        positional-or-keyword parameters like in the call func(a,
         b=None). However, they also include var-positional parameters
         given through the func(a, b, *args) *args syntax. In the last
         example, derivatives_args can be an iterable that returns the
@@ -685,7 +685,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
         is immaterial: for example, if f has signature f(a, b=None),
         then derivatives_kwargs should be the empty dictionary, even
         if the wrapped f can be called a wrapped_f(a=123, b=42).
-        
+
     Example (for illustration purposes only, as
     uncertainties.umath.sin() runs faster than the examples that
     follow): wrap(math.sin) is a sine function that can be applied to
@@ -693,7 +693,17 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     numerically.  wrap(math.sin, [None]) would have produced the same
     result.  wrap(math.sin, [math.cos]) is the same function, but with
     an analytically defined derivative.
-
+        
+    Numerically calculated derivatives are meaningless when the
+    function is not differentiable (e.g., math.hypot(x, y) in (x, y) =
+    (0, 0), and sqrt(x) in x = 0). The corresponding uncertainties are
+    either meaningless (case of hypot) or raise an exception when
+    calculated (case of sqrt). In such cases, it is recommended (but
+    not mandatory) to supply instead a derivative function that
+    returns NaN where the function is not differentiable. This
+    function can still numerically calculate the derivative where
+    defined, for instance by using the partial_derivative() function.
+        
     The correctness of the supplied analytical derivatives an be
     tested by setting them to None instead and comparing the
     analytical and the numerical differentiation results.

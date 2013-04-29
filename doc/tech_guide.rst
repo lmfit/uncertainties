@@ -89,8 +89,8 @@ linear; this might not be precise enough for all applications.
 Not-a-number uncertainties
 ==========================
 
-If linear `error propagation theory`_ cannot be applied,
-:mod:`uncertainties` internally uses a `not-a-number value
+If linear `error propagation theory`_ cannot be applied, the functions
+defined by :mod:`uncertainties` internally use a `not-a-number value
 <http://en.wikipedia.org/wiki/Not_a_number>`_ (``nan``) for the
 derivative.
 
