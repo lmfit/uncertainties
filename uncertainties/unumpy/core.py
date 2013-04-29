@@ -129,7 +129,8 @@ def wrap_array_func(func):
     handles an array argument instead of float arguments.
 
     However, the returned function is more restricted: the array
-    argument cannot be given as a keyword argument.
+    argument cannot be given as a keyword argument with the name in
+    the original function (it is not a drop-in replacement).
     
     func -- function whose first argument takes a single NumPy array,
     and which returns a NumPy array.
