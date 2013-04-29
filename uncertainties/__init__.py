@@ -628,7 +628,10 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     functions like +, *, umath.sin(), etc.).
 
     f must return a float-like (i.e. a float, an int, etc., not a
-    list, etc.), unless when called with no number with uncertainty.
+    list, etc.), unless when called with no number with
+    uncertainty. This is because the wrapped function generally
+    returns numbers with uncertainties: they represent a probability
+    distribution of real numbers.
 
     If the wrapped function is called with no argument that has an
     uncertainty, the value of f is returned.
