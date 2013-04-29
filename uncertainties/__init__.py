@@ -690,7 +690,11 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     function is not differentiable (e.g., math.hypot(x, y) in (x, y) =
     (0, 0), and sqrt(x) in x = 0). The corresponding uncertainties are
     either meaningless (case of hypot) or raise an exception when
-    calculated (case of sqrt).
+    calculated (case of sqrt). In such cases, it is recommended (but
+    not mandatory) to supply instead a derivative function that
+    returns NaN where the function is not differentiable. This
+    function can still numerically calculate the derivative where
+    defined, for instance by using the partial_derivative() function.
         
     Example (for illustration purposes only, as
     uncertainties.umath.sin() runs faster than the examples that
