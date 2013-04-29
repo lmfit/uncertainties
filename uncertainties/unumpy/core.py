@@ -125,12 +125,14 @@ def wrap_array_func(func):
     func() is given a NumPy array that contains numbers with
     uncertainties.
 
-    func() is supposed to return a NumPy array.
-
     This wrapper is similar to uncertainties.wrap(), except that it
     handles an array argument instead of float arguments.
+
+    However, the returned function is more restricted: the array
+    argument cannot be given as a keyword argument.
     
-    func -- version that takes and returns a single NumPy array.
+    func -- function whose first argument takes a single NumPy array,
+    and which returns a NumPy array.
     """
 
     @uncertainties.set_doc("""\
