@@ -165,6 +165,8 @@ Version history
 
 Main changes:
 
+- 2.3.6:  Full support for corner cases of the power operator \
+          ``umath.pow()``.
 - 2.3.5: Uncertainties and derivatives can now be NaN (not-a-number). \
          Full support for numbers with a zero uncertainty \
          (``sqrt(ufloat(0, 0))`` now works). \
