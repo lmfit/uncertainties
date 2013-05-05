@@ -52,8 +52,9 @@ def _numbers_close(x, y, tolerance=1e-6):
     if x != 0 and y != 0:
         # Symmetric form of the test:
         return 2*abs(x-y)/(abs(x)+abs(y)) < tolerance
-    else:  # Either x or y is zero
-        return abs(y if x == 0 else x) < tolerance 
+    else:
+        # x or y is zero: selects the non-zero value
+        return abs(x or y) < tolerance 
 
 def _ufloats_close(x, y, tolerance=1e-6):
     '''
