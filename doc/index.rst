@@ -151,7 +151,9 @@ Christoph Gohlke's Base distribution of `scientific Python packages
 
 The :mod:`uncertainties` package is also available through the
 following **Linux** distributions and software platforms: `Ubuntu
-<https://launchpad.net/ubuntu/+source/uncertainties>`_, `openSUSE
+<https://launchpad.net/ubuntu/+source/uncertainties>`_, `Fedora
+<http://pkgs.org/fedora-18/rpm-sphere-i586/python-uncertainties-1.8.dev418-4.1.noarch.rpm.html>`_,
+`openSUSE
 <https://build.opensuse.org/package/show?package=python-uncertainties&project=home%3Aocefpaf>`_,
 `Debian
 <http://packages.debian.org/search?keywords=python-uncertainties>`_
@@ -251,8 +253,9 @@ Backups are automatically created, unless the ``-n`` option is given.
 Some **manual adjustments** might be necessary after running the
 updater (incorrectly modified lines, untouched obsolete syntax).
 
-It is generally useful to **first create a backup** of the modified
-directory, or alternatively to use some `version control
+While the updater creates backup copies by default, it is generally
+useful to **first create a backup** of the modified directory, or
+alternatively to use some `version control
 <http://en.wikipedia.org/wiki/Version_control_system>`_
 system. Reviewing the modifications with a `file comparison tool
 <http://en.wikipedia.org/wiki/File_comparison>`_ might also be useful.
@@ -327,8 +330,8 @@ Contact
 =======
 
 **Feature requests, bug reports, or feedback are much welcome.** They
- can be sent to the creator of :mod:`uncertainties`, `Eric O. LEBIGOT
- (EOL)`_.
+can be sent to the creator of :mod:`uncertainties`, `Eric O. LEBIGOT
+(EOL)`_.
 
 .. figure:: _static/eol.*
    :height: 64
