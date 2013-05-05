@@ -1940,6 +1940,13 @@ NUMBER_WITH_UNCERT_RE_STR = '''
 NUMBER_WITH_UNCERT_RE_SEARCH = re.compile(
     "^%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).search
 
+class NotParenForm(ValueError):
+    '''
+    Raised when a string representing an exact number or a number with
+    an uncertainty indicated between parentheses was expected but not
+    found.
+    '''
+    
 def parse_error_in_parentheses(representation):
     """
     Returns (value, error) from a string representing a number with
@@ -1959,9 +1966,9 @@ def parse_error_in_parentheses(representation):
         (sign, main_int, main_dec, uncert_int, uncert_dec,
          exponent) = match.groups()
     else:
-        raise ValueError("Unparsable number representation: '%s'."
-                         " Was expecting a string of the form 1.23(4)"
-                         " or 1.234" % representation)
+        raise NotParenForm("Unparsable number representation: '%s'."
+                           " Was expecting a string of the form 1.23(4)"
+                           " or 1.234" % representation)
 
     # The value of the number is its nominal value:
     value = float(''.join((sign or '',
@@ -1994,7 +2001,11 @@ def parse_error_in_parentheses(representation):
 
     return (value, uncert)
 
-    
+
+_cannot_parse_ufloat_msg_pat = (
+    'Cannot parse %s: see the documentation of ufloat_fromstr() for a'
+    ' list of accepted formats')
+
 # The following function is not exposed because it can in effect be
 # obtained by doing x = ufloat_fromstr(representation) and reading
 # x.nominal_value and x.std_dev:
@@ -2003,11 +2014,8 @@ def _str_to_number_with_uncert(representation):
     Given a string that represents a number with uncertainty, returns the
     nominal value and the uncertainty.
 
-    The string can be of the form:
-    - 124.5+/-0.15
-    - 124.50(15)
-    - 124.50(123)
-    - 124.5
+    See the documentation of ufloat_fromstr() for a list of accepted
+    formats.
 
     When no numerical error is given, an uncertainty of 1 on the last
     digit is implied.
@@ -2020,14 +2028,16 @@ def _str_to_number_with_uncert(representation):
         (value, uncert) = representation.split('+/-')
     except ValueError:
         # Form with parentheses or no uncertainty:
-        parsed_value = parse_error_in_parentheses(representation)
+        try:
+            parsed_value = parse_error_in_parentheses(representation)
+        except NotParenForm:
+            raise ValueError(_cannot_parse_ufloat_msg_pat % representation)
     else:
         try:
             parsed_value = (float(value), float(uncert))
         except ValueError:
-            raise ValueError('Cannot parse %s: was expecting a number'
-                             ' like 1.23+/-0.1' % representation)
-
+            raise ValueError(_cannot_parse_ufloat_msg_pat % representation)
+        
     return parsed_value
 
 def ufloat_fromstr(representation, tag=None):
@@ -2035,12 +2045,13 @@ def ufloat_fromstr(representation, tag=None):
     Returns a new random variable (Variable object) from a string.
     
     Strings 'representation' of the form '12.345+/-0.015',
-    '12.345(15)', or '12.3' are recognized (see full list below).  In
-    the last case, an uncertainty of +/-1 is assigned to the last
-    digit.
+    '12.345(15)', or '12.3' are recognized (see more complete list
+    below).  In the last case, an uncertainty of +/-1 is assigned to
+    the last digit.
     
     Examples of valid string representations:
 
+        12.3e10+/-5e3
         -1.23(3.4)
         -1.34(5)
         1(6)
