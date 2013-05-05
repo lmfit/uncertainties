@@ -1007,16 +1007,16 @@ def _force_aff_func_args(func):
 # Definition of boolean operators, that assume that self and
 # y_with_uncert are AffineScalarFunc.
 
-# The fact that uncertainties must be smalled is used, here: the
-# comparison functions are supposed to be constant for most values of
+# The fact that uncertainties must be small is used, here: the 
+# comparison functions are supposed to be constant for most values of 
 # the random variables.
 
-# Even though uncertainties are supposed to be small, comparisons
-# between 3+/-0.1 and 3.0 are handled (even though x == 3.0 is not a
-# constant function in the 3+/-0.1 interval).  The comparison between
-# x and x is handled too, when x has an uncertainty.  In fact, as
-# explained in the main documentation, it is possible to give a useful
-# meaning to the comparison operators, in these cases.
+# Even though uncertainties are supposed to be small, comparisons 
+# between 3+/-0.1 and 3.0 are handled correctly (even though x == 3.0 is 
+# not a constant function in the 3+/-0.1 interval).  The comparison 
+# between x and x is handled too, when x has an uncertainty.  In fact, 
+# as explained in the main documentation, it is possible to give a 
+# useful meaning to the comparison operators, in these cases.
 
 def _eq_on_aff_funcs(self, y_with_uncert):
     """
@@ -1217,7 +1217,9 @@ class AffineScalarFunc(object):
     # function with derivatives, as these derivatives are either 0 or
     # don't exist (i.e., the user should probably not rely on
     # derivatives for his code).
-    
+ 
+    # !! In Python 2.7+, it may be possible to use functools.total_ordering.
+   
     # __eq__ is used in "if data in [None, ()]", for instance.  It is
     # therefore important to be able to handle this case too, which is
     # taken care of when _force_aff_func_args(_eq_on_aff_funcs)
