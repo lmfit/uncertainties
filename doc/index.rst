@@ -326,10 +326,9 @@ more through PayPal (no PayPal account necessary).
 Contact
 =======
 
-Please share how this package has helped you by sending an e-mail to the 
-creator of :mod:`uncertainties`, `Eric O. LEBIGOT (EOL)`_, and **have 
-your work be featured on this page**! Feature requests, bug reports, or 
-feedback are much welcome too.
+**Feature requests, bug reports, or feedback are much welcome.** They
+ can be sent to the creator of :mod:`uncertainties`, `Eric O. LEBIGOT
+ (EOL)`_.
 
 .. figure:: _static/eol.*
    :height: 64
@@ -378,7 +377,7 @@ License
 This software is released under a **dual license**; one of the
 following options can be chosen:
 
-1. The `Revised BSD License`_.
+1. The `Revised BSD License`_ (© 2010–2013, Eric O. LEBIGOT [EOL]).
 2. Any other license, as long as it is obtained from the creator of
    this package.
 
