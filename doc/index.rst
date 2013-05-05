@@ -378,7 +378,7 @@ License
 This software is released under a **dual license**; one of the
 following options can be chosen:
 
-1. The `BSD license`_.
+1. The `Revised BSD License`_.
 2. Any other license, as long as it is obtained from the creator of
    this package.
 
@@ -389,7 +389,7 @@ following options can be chosen:
 .. _download: http://pypi.python.org/pypi/uncertainties/#downloads
 .. _donations: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
-.. _BSD license: http://creativecommons.org/licenses/BSD/
+.. _Revised BSD License: http://opensource.org/licenses/BSD-3-Clause
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
 .. _pydoc: http://docs.python.org/library/pydoc.html
 .. _NumPy: http://numpy.scipy.org/

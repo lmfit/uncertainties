@@ -223,7 +223,8 @@ Main changes:
        be done with ``isinstance(..., UFloat)``. \
        ``AffineScalarFunc`` is not imported by ``from uncertainties import *`` \
        anymore, but its new alias ``UFloat`` is.
-- 1.5.5: The first possible license is now BSD instead of GPLv2, which \
+- 1.5.5: The first possible license is now the Revised BSD License \
+         instead of GPLv2, which \
          makes it easier to include this package in other projects.
 - 1.5.4.2: Added ``umath.modf()`` and ``umath.frexp()``.
 - 1.5.4: ``ufloat`` does not accept a single number (nominal value) anymore. \
