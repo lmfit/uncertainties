@@ -344,7 +344,7 @@ If you use this package for a publication (in a journal, on the web,
 etc.), please cite it by including as much information as possible
 from the following: *Uncertainties: a Python package for calculations
 with uncertainties*, Eric O. LEBIGOT,
-`<http://packages.python.org/uncertainties>`_.  Adding the version
+`<http://pythonhosted.org/uncertainties/>`_.  Adding the version
 number is optional.
 
 
