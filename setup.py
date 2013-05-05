@@ -57,7 +57,7 @@ distutils.core.setup(
       
     license='''\
 This software can be used under one of the following two licenses: \
-(1) The BSD license. \
+(1) The Revised BSD License. \
 (2) Any other license, as long as it is obtained from the original \
 author.''',
       
