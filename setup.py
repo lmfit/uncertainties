@@ -171,8 +171,9 @@ Main changes:
          Full support for numbers with a zero uncertainty \
          (``sqrt(ufloat(0, 0))`` now works). \
          Full support for limit cases of the power operator (``x**y``).
-- 2.3: Full support for keyword arguments when wrapping a function \
-       so that it accepts numbers with uncertainties instead of floats \
+- 2.3: Functions wrapped \
+       so that they accept numbers with uncertainties instead of floats \
+       now have full keyword arguments support \
        (improved ``wrap()`` function). Incompatible change: \
        ``wrap(..., None)`` should be replaced by ``wrap(...)`` or \
        ``wrap(..., [])``.
