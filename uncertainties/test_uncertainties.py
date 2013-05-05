@@ -50,18 +50,17 @@ def _numbers_close(x, y, tolerance=1e-6):
     # NaN could appear silently:
 
     if x != 0 and y != 0:
-        return abs(1-y/x) < tolerance
+        # Symmetric form of the test:
+        return 2*abs(x-y)/(abs(x)+abs(y)) < tolerance
     else:
-        if x == 0:
-            return abs(y) < tolerance
-        else:
-            return abs(x) < tolerance
+        # x or y is zero: selects the non-zero value
+        return abs(x or y) < tolerance 
 
 def _ufloats_close(x, y, tolerance=1e-6):
     '''
-    Tests if two numbers with uncertainties (or floats) are close, as
-    random variables: this is stronger than testing whether their
-    nominal value and standard deviation are close.
+    Tests if two numbers with uncertainties are close, as random
+    variables: this is stronger than testing whether their nominal
+    value and standard deviation are close.
 
     The tolerance is applied to both the nominal value and the
     standard deviation of the difference between the numbers.
