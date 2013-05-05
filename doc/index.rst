@@ -151,7 +151,9 @@ Christoph Gohlke's Base distribution of `scientific Python packages
 
 The :mod:`uncertainties` package is also available through the
 following **Linux** distributions and software platforms: `Ubuntu
-<https://launchpad.net/ubuntu/+source/uncertainties>`_, `openSUSE
+<https://launchpad.net/ubuntu/+source/uncertainties>`_, `Fedora
+<http://pkgs.org/fedora-18/rpm-sphere-i586/python-uncertainties-1.8.dev418-4.1.noarch.rpm.html>`_,
+`openSUSE
 <https://build.opensuse.org/package/show?package=python-uncertainties&project=home%3Aocefpaf>`_,
 `Debian
 <http://packages.debian.org/search?keywords=python-uncertainties>`_
@@ -251,8 +253,9 @@ Backups are automatically created, unless the ``-n`` option is given.
 Some **manual adjustments** might be necessary after running the
 updater (incorrectly modified lines, untouched obsolete syntax).
 
-It is generally useful to **first create a backup** of the modified
-directory, or alternatively to use some `version control
+While the updater creates backup copies by default, it is generally
+useful to **first create a backup** of the modified directory, or
+alternatively to use some `version control
 <http://en.wikipedia.org/wiki/Version_control_system>`_
 system. Reviewing the modifications with a `file comparison tool
 <http://en.wikipedia.org/wiki/File_comparison>`_ might also be useful.
@@ -326,10 +329,9 @@ more through PayPal (no PayPal account necessary).
 Contact
 =======
 
-Please share how this package has helped you by sending an e-mail to the 
-creator of :mod:`uncertainties`, `Eric O. LEBIGOT (EOL)`_, and **have 
-your work be featured on this page**! Feature requests, bug reports, or 
-feedback are much welcome too.
+**Feature requests, bug reports, or feedback are much welcome.** They
+can be sent to the creator of :mod:`uncertainties`, `Eric O. LEBIGOT
+(EOL)`_.
 
 .. figure:: _static/eol.*
    :height: 64
@@ -345,7 +347,7 @@ If you use this package for a publication (in a journal, on the web,
 etc.), please cite it by including as much information as possible
 from the following: *Uncertainties: a Python package for calculations
 with uncertainties*, Eric O. LEBIGOT,
-`<http://packages.python.org/uncertainties>`_.  Adding the version
+`<http://pythonhosted.org/uncertainties/>`_.  Adding the version
 number is optional.
 
 
@@ -378,7 +380,7 @@ License
 This software is released under a **dual license**; one of the
 following options can be chosen:
 
-1. The `BSD license`_.
+1. The `Revised BSD License`_ (© 2010–2013, Eric O. LEBIGOT [EOL]).
 2. Any other license, as long as it is obtained from the creator of
    this package.
 
@@ -389,7 +391,7 @@ following options can be chosen:
 .. _download: http://pypi.python.org/pypi/uncertainties/#downloads
 .. _donations: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
-.. _BSD license: http://creativecommons.org/licenses/BSD/
+.. _Revised BSD License: http://opensource.org/licenses/BSD-3-Clause
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
 .. _pydoc: http://docs.python.org/library/pydoc.html
 .. _NumPy: http://numpy.scipy.org/
