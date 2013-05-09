@@ -295,9 +295,6 @@ Future developments
 
 Planned future developments include:
 
-- support for Python `string formatting <http://docs.python.org/library/string.html#formatstrings>`_;
-
-- handling of complex numbers with uncertainties;
 
 - `JSON <http://docs.python.org/library/json.html>`_ support;
 
@@ -311,6 +308,8 @@ Planned future developments include:
 - addition of new functions from the :mod:`math` module;
 
 - fitting routines that conveniently handle data with uncertainties;
+
+- handling of complex numbers with uncertainties;
 
 - a re-correlate function that puts correlations back between data
   that was saved in separate files;
