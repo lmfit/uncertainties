@@ -1317,20 +1317,57 @@ class AffineScalarFunc(object):
 
     def __format__(self, format_spec):
         '''Formats a number with uncertainty.
+
+        Accepts the same format specification as floats do
+        (http://docs.python.org/2.7/library/string.html#formatspec),
+        but using a slightly different semantics, so that the number
+        of digits of the uncertainty can be controlled. The format
+        specification is also more general than that of floats (see
+        the spectroscopic and LaTeX outputs below).
+
+        # !!!!!! Implement
         
-        Returns a string where the number of digits of the uncertainty
-        is controlled by the user, and where the nominal value is
-        truncated accordingly.
+        The nominal value is rounded according to the number of digits
+        of the uncertainty (so as to not show digits that go beyond
+        the last digit of the uncertainty).
+
+        #!!!!!! Implement:
         
-        Can be used as a drop-in replacement for float.__format__():
-        the nominal value is formatted as if it was a float. The only
-        difference is that a precision (".x") is interpreted as
-        indicating the number of digits of the displayed uncertainty
-        (except when more digits would be necessary for the
-        uncertainty digits to reach the decimal point, in which case
-        all digits before the decimal point are displayed, like in
-        ".1f".format(ufloat(1000, 123)), where the uncertainty is
-        displayed as +/-123).
+        The nominal value and the standard deviation are formatted
+        through format_spec almost as if they were floats (with or
+        without exponent, exponent with or without uppercase,
+        etc.). The first difference is that the precision (".p") is
+        generally interpreted as indicating the number p of digits of
+        the displayed uncertainty. The second difference is that any
+        width specification applies to the nominal value and to the
+        standard deviation separately.
+
+        #!!!!!! Implement:
+
+        If no precision is given, then the rounding rules from the
+        Particle Data Group are used
+        (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).
+
+        #!!!!!! Implement:
+        
+        The uncertainty is displayed with more digits than this only
+        when more digits would be necessary for the uncertainty digits
+        to reach the decimal point. In this case all digits before the
+        decimal point are displayed. Example:
+        ".1f".format(ufloat(1000, 123)) shows the uncertainty as
+        +/-123).
+
+        #!!!!!! Implement:
+        
+        In the case of the standard text output, the returned string
+        can be parsed back with ufloat_fromstr().
+
+        #!!!!!! Implement
+        
+        When "S" is present after the usual float format, the
+        spectroscopic notation 1.234(5) is used. When "L" is present,
+        the output is formatted with LaTeX. These options can be
+        combined.        
         '''
 
         return 'lkj'

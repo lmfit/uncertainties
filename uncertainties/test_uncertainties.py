@@ -1470,20 +1470,144 @@ def power_wrt_ref(op, ref_op):
 def test_format():
     '''Test the formatting of numbers with uncertainty.'''
 
+    # Tests of each point of the docstring of
+    # AffineScalarFunc.__format__() in turn, in the same order.
+
     if sys.version_info < (2, 6):  # str.format() added in Python 2.6
         return
-    
-    tests = {
-        (1000, 123): {'.1f': '1000.+/-123.'}
-        }
 
+    #!!!!! put back to regular dictionary
+    import collections #!!!!!!! test
+    tests = collections.OrderedDict({  # (Nominal value, uncertainty): {format: result,...}
+
+        # Precision = number of digits of the uncertainty (most of the
+        # time):
+        (123.456789, 0.00123): {
+            '.1f': '123.457+/-0.001',
+            '.2f': '123.4568+/-0.0012',
+            '.3f': '123.45679+/-0.00123',
+            '.2e': '(1.234567+/-0.000012)e2'
+        },
+        # Sign handling:
+        (-123.456789, 0.00123): {
+            '.1f': '-123.457+/-0.001',
+            '.2f': '-123.4568+/-0.0012',
+            '.3f': '-123.45679+/-0.00123',
+            '.2e': '(-1.234567+/-0.000012)e2'            
+        },
+        
+        # Test of the various float formats: the nominal value should
+        # have a similar representation as if it were directly
+        # represented as a float:
+        (1234567.89, 0.1): {
+            'e': '(1.23456789+/-0.000000010)e+06',
+            'E': '(1.23456789+/-0.000000010)E+06',
+            'f': '1234567.89+/-0.10',
+            'F': '1234567.89+/-0.10',
+            'g': '(1.23456789+/-0.000000010)e+06',
+            'G': '(1.23456789+/-0.000000010)E+06',
+            '%': '123456789+/-10%'
+        },
+        (1234.56789, 0.1): {
+            'e': '(1.23456+/-0.00010)e+03',
+            'E': '(1.23456+/-0.00010)E+03',
+            'f': '1234.57+/-0.10',
+            'F': '1234.57+/-0.10',
+            'f': '1234.57+/-0.10',
+            'F': '1234.57+/-0.10',            
+            '%': '123457+/-10%'
+        },
+        
+        # Particle Data Group automatic convention, including limit cases:
+        (1.2345678, 0.354): {'': '1.23+/-0.35'},
+        (1.2345678, 0.3549): {'': '1.23+/-0.35'},
+        (1.2345678, 0.355): {'': '1.2+/-0.4'},
+        (1.5678, 0.355): {'': '1.6+/-0.4'},
+        (1.2345678, 0.09499): {'': '1.2+/-0.1'},
+        (1.2345678, 0.095): {'': '1.23+/-0.10'},        
+        
+        # Automatic extension of the uncertainty up to the decimal
+        # point:
+        (1000, 123): {'.1f': '1000+/-123'},
+
+        # Spectroscopic notation:
+        (-1.23, 3.4): {
+            'S': '-1.2(3.4)',
+            '.2fS': '-1.2(3.4)',
+            '.3fS': '-1.23(3.40)',
+        },
+        (-123.456, 0.123): {
+            'S': '-123.46(12)',
+            '.1fS': '-123.5(1)',            
+            '.2fS': '-123.46(12)',
+            '.3fS': '-123.456(123)',
+        },
+        (-123.456, 0.567): {
+            'S': '-123.5(6)',
+            '.1fS': '-123.5(6)',            
+            '.2fS': '-123.46(57)',
+            '.3fS': '-123.456(567)',
+        },
+
+        # LaTeX notation:
+        #
+        (1234.56789, 0.1): {
+            'eL': '(1.23456 \pm 0.00010) \times 10^{3}',
+            'EL': '(1.23456 \pm 0.00010) \times 10^{3}',
+            'fL': '1234.57 \pm 0.10',
+            'FL': '1234.57 \pm 0.10',
+            'fL': '1234.57 \pm 0.10',
+            'FL': '1234.57 \pm 0.10',            
+            '%L': '123457 \pm 10 \%'
+        },
+        #
+        # ... combined with the spectroscopic notation:
+        (-1.23, 3.4): {
+            'SL': '-1.2(3.4)',
+            'LS': '-1.2(3.4)',
+            '.2fSL': '-1.2(3.4)',
+            '.2fLS': '-1.2(3.4)'
+        }
+    })
+
+    # ',' format option: introduced in Python 2.7
+    if sys.version_info >= (2, 7):
+        tests[(1234.56789, 0.012)] = {
+            ',.1f': '1,234.57+/-0.01'}
+            
+    
     for (values, representations) in tests.iteritems():
+
         value = ufloat(*values)
+
         for (format_spec, result) in representations.iteritems():
+            
             representation = ('{0:%s}' % format_spec).format(value)
+
             assert representation == result, (
                 'Incorrect representation %s for format %s of %s+/-%s'
                 % (representation, format_spec, values[0], values[1]))
+
+            # Parsing back into a number with uncertainty (unless the
+            # LaTeX notation is used):
+            if 'L' not in format_spec:
+
+                value_back = ufloat_fromstr(representation)
+
+                # The original number and the new one should be consistent
+                # with each other:
+                try:
+
+                    assert _numbers_close(value.nominal_value,
+                                          value_back.nominal_value, 1e-1)
+
+                    assert _numbers_close(value.std_dev,
+                                          value_back.std_dev, 1e-1)
+
+                except AssertionError:
+                    raise AssertionError(
+                        'Values %s and %s are not close enough'
+                        % (value, value_back))
                                                          
 ###############################################################################
 
