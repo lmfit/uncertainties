@@ -1480,8 +1480,6 @@ def test_format():
     for (values, representations) in tests.iteritems():
         value = ufloat(*values)
         for (format_spec, result) in representations.iteritems():
-            print "FORMAT SPEC", format_spec
-            print "VALUE", value
             representation = ('{0:%s}' % format_spec).format(value)
             assert representation == result, (
                 'Incorrect representation %s for format %s of %s+/-%s'
