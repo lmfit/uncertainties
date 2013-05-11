@@ -1465,7 +1465,28 @@ def power_wrt_ref(op, ref_op):
     assert op(ufloat(-1.1, 0), 9) == ref_op(-1.1, 9)
     
 
+###############################################################################
+
+def test_format():
+    '''Test the formatting of numbers with uncertainty.'''
+
+    if sys.version_info < (2, 6):  # str.format() added in Python 2.6
+        return
     
+    tests = {
+        (1000, 123): {'.1f': '1000.+/-123.'}
+        }
+
+    for (values, representations) in tests.iteritems():
+        value = ufloat(*values)
+        for (format_spec, result) in representations.iteritems():
+            print "FORMAT SPEC", format_spec
+            print "VALUE", value
+            representation = ('{0:%s}' % format_spec).format(value)
+            assert representation == result, (
+                'Incorrect representation %s for format %s of %s+/-%s'
+                % (representation, format_spec, values[0], values[1]))
+                                                         
 ###############################################################################
 
 # The tests below require NumPy, which is an optional package:

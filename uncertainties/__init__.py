@@ -1314,6 +1314,27 @@ class AffineScalarFunc(object):
                     
     def __str__(self):
         return self._general_representation(str)
+
+    def __format__(self, format_spec):
+        '''Formats a number with uncertainty.
+        
+        Returns a string where the number of digits of the uncertainty
+        is controlled by the user, and where the nominal value is
+        truncated accordingly.
+        
+        Can be used as a drop-in replacement for float.__format__():
+        the nominal value is formatted as if it was a float. The only
+        difference is that a precision (".x") is interpreted as
+        indicating the number of digits of the displayed uncertainty
+        (except when more digits would be necessary for the
+        uncertainty digits to reach the decimal point, in which case
+        all digits before the decimal point are displayed, like in
+        ".1f".format(ufloat(1000, 123)), where the uncertainty is
+        displayed as +/-123).
+        '''
+
+        return 'lkj'
+        #!!!!!!!!!!!!
     
     def std_score(self, value):
         """
