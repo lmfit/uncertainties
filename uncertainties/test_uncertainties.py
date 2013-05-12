@@ -1596,8 +1596,10 @@ def test_format():
             representation = ('{0:%s}' % format_spec).format(value)
 
             assert representation == result, (
-                'Incorrect representation %s for format %s of %s+/-%s'
-                % (representation, format_spec, values[0], values[1]))
+                'Incorrect representation %s for format %s of %s+/-%s:'
+                ' %s expected.'
+                % (representation, format_spec, values[0], values[1],
+                   result))
 
             # Parsing back into a number with uncertainty (unless the
             # LaTeX notation is used):
