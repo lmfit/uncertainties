@@ -1467,6 +1467,27 @@ def power_wrt_ref(op, ref_op):
 
 ###############################################################################
 
+def test_PDG_precision():
+    '''
+    Test of the calculation of the number of significant digits for
+    the uncertainty.
+    '''
+
+    # The 3 cases of the rounding rules are covered in each case:
+    tests = {
+        # Very big floats:
+        1.7976931348623157e308: (2, 1.7976931348623157e308),
+        0.5e308: (1, 0.5e308),
+        0.9976931348623157e+308: (2, 1e308),
+        # Very small floats:
+        1.3e-323: (2, 1.3e-323),
+        5e-324: (1, 5e-324),
+        9.99e-324: (2, 1e-323)
+        }
+
+    for (std_dev, result) in tests.iteritems():
+        assert uncertainties._PDG_precision(std_dev) == result
+    
 def test_format():
     '''Test the formatting of numbers with uncertainty.'''
 
