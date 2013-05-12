@@ -1476,9 +1476,7 @@ def test_format():
     if sys.version_info < (2, 6):  # str.format() added in Python 2.6
         return
 
-    #!!!!! put back to regular dictionary
-    import collections #!!!!!!! test
-    tests = collections.OrderedDict({  # (Nominal value, uncertainty): {format: result,...}
+    tests = {  # (Nominal value, uncertainty): {format: result,...}
 
         # Full generalization of float formatting:
         (3.1415, 0.0001): {
@@ -1591,7 +1589,7 @@ def test_format():
             'g': '1+/-nan',
             'G': '1+/-NaN'
         }
-    })
+    }
 
     # ',' format option: introduced in Python 2.7
     if sys.version_info >= (2, 7):
