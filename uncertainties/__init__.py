@@ -1344,6 +1344,12 @@ class AffineScalarFunc(object):
         the displayed uncertainty. Another difference is that a "0" in
         the format specification is ignored.
 
+        # !!!!!!!!FQ Is there is a need for *two* width
+        # specifications?  NO: People who aligned their floats with
+        # >10.2f... don\'t get the alignment anymore because the point
+        # becomes floating. NO: Those who aligned with <10 probably
+        # just need to make the width bigger.
+
         #!!!!!! Implement:
 
         If no precision is given, then the rounding rules from the
