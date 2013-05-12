@@ -1070,6 +1070,45 @@ def _le_on_aff_funcs(self, y_with_uncert):
 
 ########################################
 
+def _PDG_precision(std_dev):
+    '''
+    Returns the number of significant digits to be used for the given
+    standard deviation, according to the rounding rules of the
+    Particle Data Group (2010)
+    (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).
+
+    Also returns the effective standard deviation to be used for
+    display.
+    '''
+    
+    # Exponent of the standard deviation (in scientific notation):
+    exponent = math.floor(math.log10(std_dev)) if std_dev else 0
+
+    # The first three digits are what matters: we get them as an
+    # integer number in [100; 999).
+    #
+    # In order to prevent underflow or overflow when calculating
+    # 10**exponent, the exponent is slightly modified first and a
+    # factor to be applied after "removing" the new exponent is
+    # defined.
+    #
+    # Furthermore, 10**(-exponent) is not used because the exponent
+    # range for very small and very big floats is generally different.
+    (exponent, factor) = ((exponent-2, 1) if exponent >= 0
+                          else (exponent+1, 1000))
+    
+    digits = int(std_dev/10**exponent*factor)  # int rounds down
+
+    # Rules:
+    if digits <= 354:
+        return (2, std_dev)
+    elif digits <= 949:
+        return (1, std_dev)
+    else:
+        # The parentheses matter, for very small or very large
+        # std_dev:
+        return (2, 10**exponent*(1000/factor))
+
 class CallableStdDev(float):
     '''
     Class for standard deviation results, which used to be
@@ -1341,8 +1380,9 @@ class AffineScalarFunc(object):
         without exponent, exponent with or without uppercase,
         etc.). The main difference is that the precision (".p") is
         generally interpreted as indicating the number p of digits of
-        the displayed uncertainty. Another difference is that a "0" in
-        the format specification is ignored.
+        the displayed uncertainty (if the given precision is 0, it is
+        converted to 1). Another difference is that a "0" in the
+        format specification is ignored.
 
         # !!!!!!!!FQ Is there is a need for *two* width
         # specifications?  NO: People who aligned their floats with
@@ -1378,14 +1418,44 @@ class AffineScalarFunc(object):
         combined.        
         '''
 
-        # Exponent notation: should it be used?
-        # !!!!!F
-        # eE%: yes
-        # fF: no
-        # gGn/None: depends
+        # Optimization: the standard deviation is generally
+        # calculated: it is calculated only once, here:
+        std_dev = self.std_dev
+        
+        # Exponent notation: should it be used? use_exp is set
+        # accordingly.
+        #
+        # !!!!!F eE%: yes fF: no gGn/None: depends
         #
         # !!!FQ For gGn/None: should 
+
+        match = re.match(
+            '(?P<start>.*?)(?P<prec>\.\d+)?(?P<type>[^LS]|)(?P<ext>[LS])?$',
+            format_spec)
+
+        # Effective format type: f, e, g, etc.:
+        fmt_type = match.group('type') or 'g'  # g is the default
+
+        # Effective precision (is always a number):
+        fmt_prec = match.group('prec')
+        if fmt_prec is None:
+            (fmt_prec, std_dev) = _PDG_precision(std_dev)
+        elif fmt_prec == 0:
+            fmt_prec = 1  # It is meaningless to have no significant digit
         
+        if fmt_type in 'fF%':
+            use_exp = False
+        elif fmt_type in 'eE':
+            use_exp = True
+        else:  # g, G, n
+            # !!!!!!! is this really the precision that I want to use?
+            # write _exp_notation and see...
+            exp_notation = _exp_notation(self.nominal_value, std_dev,
+                                        fmt_prec)
+
+        
+
+            
         return 'lkj'
         #!!!!!!!!!!!!
     
