@@ -1352,7 +1352,10 @@ class AffineScalarFunc(object):
         return self._general_representation(repr)
                     
     def __str__(self):
-        return self._general_representation(str)
+        # An empty format string and str() usually return the same
+        # string:
+        # (http://docs.python.org/2/library/string.html#format-specification-mini-language)
+        return self.__format__('')  # Works with Python < 2.6
 
     def __format__(self, format_spec):
         '''Formats a number with uncertainty.
@@ -1421,14 +1424,8 @@ class AffineScalarFunc(object):
         # Optimization: the standard deviation is generally
         # calculated: it is calculated only once, here:
         std_dev = self.std_dev
-        
-        # Exponent notation: should it be used? use_exp is set
-        # accordingly.
-        #
-        # !!!!!F eE%: yes fF: no gGn/None: depends
-        #
-        # !!!FQ For gGn/None: should 
 
+        # Format specification parsing:
         match = re.match(
             '(?P<start>.*?)(?P<prec>\.\d+)?(?P<type>[^LS]|)(?P<ext>[LS])?$',
             format_spec)
@@ -1442,19 +1439,19 @@ class AffineScalarFunc(object):
             (fmt_prec, std_dev) = _PDG_precision(std_dev)
         elif fmt_prec == 0:
             fmt_prec = 1  # It is meaningless to have no significant digit
-        
+
+        # Exponent notation: should it be used? use_exp is set
+        # accordingly:            
         if fmt_type in 'fF%':
             use_exp = False
         elif fmt_type in 'eE':
             use_exp = True
         else:  # g, G, n
-            # !!!!!!! is this really the precision that I want to use?
-            # write _exp_notation and see...
-            exp_notation = _exp_notation(self.nominal_value, std_dev,
-                                        fmt_prec)
-
-        
-
+            # Should the scientific notation be used? the same rule as
+            # for floats is used ("-4 <= exp < p"), except that the
+            # precision p used is the number of significant digits of
+            # the nominal value.
+            pass  #!!!!!!!!!!!!
             
         return 'lkj'
         #!!!!!!!!!!!!
