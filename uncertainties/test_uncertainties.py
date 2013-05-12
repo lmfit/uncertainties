@@ -1507,8 +1507,7 @@ def test_format():
             '.4e': '(0.123+/-4.568)e+02'
         },
         
-        
-        # Test of the various float formats: the nominal value should
+         # Test of the various float formats: the nominal value should
         # have a similar representation as if it were directly
         # represented as a float:
         (1234567.89, 0.1): {
