@@ -1588,7 +1588,18 @@ def test_format():
         (1, float('nan')): {
             'g': '1+/-nan',
             'G': '1+/-NaN'
+        },
+        (9.9, 0.1): {
+            '.1e': '(9.9+/-0.1)e+00',
+            '.0e': '(9.9+/-0.1)e+00'  # 0 converted to 1: different from float
+        },
+        (9.99, 0.1): {
+             # The precision has an effect on the exponent, like for
+             # floats:
+            '.2e': '(9.99+/-0.10)e+00',  # Same exponent as for 9.99 alone
+            '.1e': '(1.00+/-0.01)e+01'  # Same exponent as for 9.99 alone
         }
+
     }
 
     # ',' format option: introduced in Python 2.7
