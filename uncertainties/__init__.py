@@ -1318,12 +1318,15 @@ class AffineScalarFunc(object):
     def __format__(self, format_spec):
         '''Formats a number with uncertainty.
 
+        #!!!!!! implement
+        
         Accepts the same format specification as floats do
         (http://docs.python.org/2.7/library/string.html#formatspec),
-        but using a slightly different semantics, so that the number
-        of digits of the uncertainty can be controlled. The format
-        specification is also more general than that of floats (see
-        the spectroscopic and LaTeX outputs below).
+        In particular, the usual alignment, sign flag, etc. can be
+        used. However, a slightly different semantics is used, so that
+        the number of digits of the uncertainty can be controlled. The
+        format specification is also more general than that of floats
+        (see the spectroscopic and LaTeX outputs below).
 
         # !!!!!! Implement
         
@@ -1336,11 +1339,9 @@ class AffineScalarFunc(object):
         The nominal value and the standard deviation are formatted
         through format_spec almost as if they were floats (with or
         without exponent, exponent with or without uppercase,
-        etc.). The first difference is that the precision (".p") is
+        etc.). The main difference is that the precision (".p") is
         generally interpreted as indicating the number p of digits of
-        the displayed uncertainty. The second difference is that any
-        width specification applies to the nominal value and to the
-        standard deviation separately.
+        the displayed uncertainty.
 
         #!!!!!! Implement:
 
@@ -1370,6 +1371,14 @@ class AffineScalarFunc(object):
         combined.        
         '''
 
+        # Exponent notation: should it be used?
+        # !!!!!F
+        # eE%: yes
+        # fF: no
+        # gGn/None: depends
+        #
+        # !!!FQ For gGn/None: should 
+        
         return 'lkj'
         #!!!!!!!!!!!!
     
