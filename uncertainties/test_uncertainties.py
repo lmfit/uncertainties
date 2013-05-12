@@ -1471,7 +1471,7 @@ def test_format():
     '''Test the formatting of numbers with uncertainty.'''
 
     # Tests of each point of the docstring of
-    # AffineScalarFunc.__format__() in turn, in the same order.
+    # AffineScalarFunc.__format__() in turn, mostly in the same order.
 
     if sys.version_info < (2, 6):  # str.format() added in Python 2.6
         return
@@ -1479,6 +1479,12 @@ def test_format():
     #!!!!! put back to regular dictionary
     import collections #!!!!!!! test
     tests = collections.OrderedDict({  # (Nominal value, uncertainty): {format: result,...}
+
+        # Full generalization of float formatting:
+        (3.1415, 0.0001): {
+            '*^+022.2f': '**+3.14150+/-0.00010**',  # 0 is ignored
+            '*^+22.2f': '**+3.14150+/-0.00010**'  # 0 is ignored
+        },
 
         # Precision = number of digits of the uncertainty (most of the
         # time):
@@ -1507,7 +1513,7 @@ def test_format():
             '.4e': '(0.123+/-4.568)e+02'
         },
         
-         # Test of the various float formats: the nominal value should
+        # Test of the various float formats: the nominal value should
         # have a similar representation as if it were directly
         # represented as a float:
         (1234567.89, 0.1): {
@@ -1578,6 +1584,12 @@ def test_format():
             'LS': '-1.2(3.4)',
             '.2fSL': '-1.2(3.4)',
             '.2fLS': '-1.2(3.4)'
+        },
+
+        # Some special cases:
+        (1, float('nan')): {
+            'g': '1+/-nan',
+            'G': '1+/-NaN'
         }
     })
 
@@ -1601,6 +1613,11 @@ def test_format():
                 % (representation, format_spec, values[0], values[1],
                    result))
 
+            # An empty format string is like calling str()
+            # (http://docs.python.org/2/library/string.html#formatspec):
+            if not format_spec:
+                assert representation == str(value)
+            
             # Parsing back into a number with uncertainty (unless the
             # LaTeX notation is used):
             if 'L' not in format_spec:
