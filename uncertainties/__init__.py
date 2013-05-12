@@ -1341,7 +1341,8 @@ class AffineScalarFunc(object):
         without exponent, exponent with or without uppercase,
         etc.). The main difference is that the precision (".p") is
         generally interpreted as indicating the number p of digits of
-        the displayed uncertainty.
+        the displayed uncertainty. Another difference is that a "0" in
+        the format specification is ignored.
 
         #!!!!!! Implement:
 
