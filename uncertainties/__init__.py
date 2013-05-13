@@ -1418,13 +1418,22 @@ class AffineScalarFunc(object):
         When "S" is present after the usual float format, the
         spectroscopic notation 1.234(5) is used. When "L" is present,
         the output is formatted with LaTeX. These options can be
-        combined.        
+        combined.
+
+        If the uncertainty is 0, the number is formatted like a float.
         '''
 
         # Optimization: the standard deviation is generally
         # calculated: it is calculated only once, here:
         std_dev = self.std_dev
 
+        # Special case of a 0 uncertainty: formatting like a float:
+        if std_dev == 0:
+            try:
+                return format(self.nominal_value, format_spec)
+            except NameError:  # format() is for Python 2.6+
+                return ('%' + format_spec) % self.nominal_value
+        
         # Format specification parsing:
         match = re.match(
             '(?P<start>.*?)(?P<prec>\.\d+)?(?P<type>[^LS]|)(?P<ext>[LS])?$',
