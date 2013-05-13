@@ -1619,8 +1619,18 @@ def test_format():
              # floats:
             '.2e': '(9.99+/-0.10)e+00',  # Same exponent as for 9.99 alone
             '.1e': '(1.00+/-0.01)e+01'  # Same exponent as for 9.99 alone
-        }
-
+        },
+        # 0 uncertainty: displayed like a float:
+        (1.2345, 0): {
+            '.2e': '1.23e+00',
+            '.2f': '1.23'
+        },
+        (1e5, 0): {
+            'g': '100000'
+        }, 
+        (1e6, 0): {
+            'g': '1e+06'
+        }       
     }
 
     # ',' format option: introduced in Python 2.7
