@@ -1472,7 +1472,7 @@ class AffineScalarFunc(object):
             '(?P<extra1>,?)'  # ","
             '(?:\.(?P<prec>\d+))?'
             '(?P<type>[^LS]|)'
-            '(?P<ext>[LS])?$',
+            '(?P<ext>[LS]*)$',
             format_spec)
 
         # Effective format type: f, e, g, etc.:
@@ -1480,6 +1480,7 @@ class AffineScalarFunc(object):
         # !!!!!!! This rule (for Python 2) seems to be broken for
         # {:20}, where 1e10 is formatted apparently with str() instead
         # of 'g'.
+        print "FMT", format_spec
         fmt_type = match.group('type') or 'g'  # g is the default
 
         # Effective precision (is always a number):
@@ -1505,8 +1506,6 @@ class AffineScalarFunc(object):
             print "FMT SPEC", repr(format_spec)
             1/0   #!!!!!!!!!!!! not implemented yet
 
-        fmt_ext = match.group('ext') or ''
-            
         ########################################
         
         # Position signif_limit of the significant digits limit (0 =
@@ -1568,7 +1567,7 @@ class AffineScalarFunc(object):
                                   fixed_point_fmt_spec_s)
 
                 
-        if 'S' in fmt_ext:  # Spectroscopic notation:
+        if 'S' in match.group('ext'):  # Spectroscopic notation:
 
             # The final found is important because 566.99999999 can be
             # obtained when 567 is wanted:
@@ -1582,7 +1581,7 @@ class AffineScalarFunc(object):
                     
         else:  # Regular +/- notation:
             
-            pm_symbol = ' \pm ' if 'L' in fmt_ext else '+/-'
+            pm_symbol = ' \pm ' if 'L' in match.group('ext') else '+/-'
 
             fixed_point_str = '%s%s%s' % (
                 robust_format(nom_val_mantissa, fixed_point_fmt_spec_m),
