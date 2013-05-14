@@ -2135,9 +2135,12 @@ NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
 # Number with uncertainty of the form (... +/- ...)e10: this is a
 # loose matching, because incorrect contents is handled through
 # exceptions:
-NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = '''
-    
-    '''
+NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile('''
+    \(
+    (?P<simple_num_with_uncert>.*)
+    \)
+    [eE](?P<exp_value>.*)
+    $''', re.VERBOSE).match
 
 class NotParenUncert(ValueError):
     '''
@@ -2219,22 +2222,35 @@ def _str_to_number_with_uncert(representation):
     Raises ValueError if the string cannot be parsed.
     """
 
+    # Do we have the (1.23 +/- 0.01)e10 form?
+    match = NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH(representation)
+    
+    if match:
+        # The representation is simplified, but the global factor is
+        # calculated:
+        try:
+            factor = 10.**int(match.group('exp_value'))
+        except ValueError:
+            raise ValueError(_cannot_parse_ufloat_msg_pat % representation)
+        
+        representation = match.group('simple_num_with_uncert')
+    else:
+        factor = 1  # No global exponential factor
+    
     try:
         # Simple form 1234.45+/-1.2:
-        (value, uncert) = representation.split('+/-')
+        (nom_value, uncert) = representation.split('+/-')
     except ValueError:
 
-        # Do we have the (1.23 +/- 0.01)e10 form?
-        match = #!!!!!!!!!!!
-        
         # Form with parentheses or no uncertainty:
         try:
             parsed_value = parse_error_in_parentheses(representation)
         except NotParenUncert:
             raise ValueError(_cannot_parse_ufloat_msg_pat % representation)
     else:
+        print "VALUE", nom_value, "UNCERT", uncert
         try:
-            parsed_value = (float(value), float(uncert))
+            parsed_value = (float(nom_value)*factor, float(uncert)*factor)
         except ValueError:
             raise ValueError(_cannot_parse_ufloat_msg_pat % representation)
         
