@@ -1411,14 +1411,7 @@ class AffineScalarFunc(object):
         etc.). The main difference is that the precision (".p") is
         generally interpreted as indicating the number p of digits of
         the displayed uncertainty (if the given precision is 0, it is
-        converted to 1). Another difference is that a "0" in the
-        format specification is ignored.
-
-        # !!!!!!!!FQ Is there is a need for *two* width
-        # specifications?  NO: People who aligned their floats with
-        # >10.2f... don\'t get the alignment anymore because the point
-        # becomes floating. NO: Those who aligned with <10 probably
-        # just need to make the width bigger.
+        converted to 1).
 
         #!!!!!! Implement:
 
@@ -1426,20 +1419,15 @@ class AffineScalarFunc(object):
         Particle Data Group are used
         (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).
 
-        #!!!!!! Implement:
-        
-        The uncertainty is displayed with more digits than this only
-        when more digits would be necessary for the uncertainty digits
-        to reach the decimal point. In this case all digits before the
-        decimal point are displayed. Example:
-        ".1f".format(ufloat(1000, 123)) shows the uncertainty as
-        +/-123).
+        The fill, align and width parameters of the format
+        specification are applied globally (not to each of the nominal
+        value and standard deviation).
 
         #!!!!!! Implement:
         
         In the case of the standard text output, the returned string
         can be parsed back with ufloat_fromstr().
-
+        
         #!!!!!! Implement
         
         When "S" is present after the usual float format, the
@@ -1448,6 +1436,15 @@ class AffineScalarFunc(object):
         combined.
 
         If the uncertainty is 0, the number is formatted like a float.
+
+        A "0" in the format specification is ignored.
+
+        # !!!!!!!!FQ Is there is a need for *two* width
+        # specifications?  NO: People who aligned their floats with
+        # >10.2f... don\'t get the alignment anymore because the point
+        # becomes floating. NO: Those who aligned with <10 probably
+        # just need to make the width bigger.
+        
         '''
 
         # Optimization: the standard deviation is generally
