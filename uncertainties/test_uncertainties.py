@@ -270,6 +270,7 @@ def test_str_input():
     # String representation, and numerical values:
     tests = {
         "-1.23(3.4)": (-1.23, 3.4),  # (Nominal value, error)
+        "  -1.23(3.4)  ": (-1.23, 3.4),  # Spaces ignored
         "-1.34(5)": (-1.34, 0.05),
         "1(6)": (1, 6),
         "3(4.2)": (3, 4.2),
