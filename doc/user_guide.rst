@@ -43,6 +43,7 @@ expressed in many convenient ways:
 
   >>> x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
   >>> x = ufloat_fromstr("0.20+/-0.01")
+  >>> x = ufloat_fromstr("(2+/-0.1)e-01")
   >>> x = ufloat_fromstr("0.20(1)")
   >>> x = ufloat_fromstr("20(1)e-2")  # Exponential notation supported
   >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
