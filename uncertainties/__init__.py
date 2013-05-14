@@ -1427,7 +1427,8 @@ class AffineScalarFunc(object):
         #!!!!!! Implement:
         
         In the case of the standard text output, the returned string
-        can be parsed back with ufloat_fromstr().
+        can be generally parsed back with ufloat_fromstr(). This
+        excludes cases where numbers use the "," thousands separator.
         
         #!!!!!! Implement
         
