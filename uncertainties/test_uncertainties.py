@@ -1502,7 +1502,8 @@ def test_format():
         # Full generalization of float formatting:
         (3.1415, 0.0001): {
             '*^+022.2f': '**+3.14150+/-0.00010**',  # 0 is ignored
-            '*^+22.2f': '**+3.14150+/-0.00010**'  # 0 is ignored
+            '*^+22.2f': '**+3.14150+/-0.00010**',  # 0 is ignored
+            '>20f': '   3.14150+/-0.00010'  # Width and align
         },
 
         # Precision = number of digits of the uncertainty (most of the

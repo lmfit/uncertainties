@@ -1452,7 +1452,6 @@ class AffineScalarFunc(object):
         # calculated: it is calculated only once, here:
         std_dev = self.std_dev
 
-
         # Special case of a 0 uncertainty: formatting like a float:
         if std_dev == 0:
             return robust_format(self.nominal_value, format_spec)
@@ -1534,8 +1533,9 @@ class AffineScalarFunc(object):
         ########################################
         # Final formatting:
             
-        fixed_point_fmt_spec = '%s.%df' % (match.group('start'),
-                                           -signif_limit)
+        fixed_point_fmt_spec = '%s%s.%df' % (
+            match.group('extra0') or '', match.group('extra1') or '',
+            -signif_limit)
         
         fixed_point_str = '%s+/-%s' % (
             robust_format(nom_val_mantissa, fixed_point_fmt_spec),
@@ -1545,9 +1545,14 @@ class AffineScalarFunc(object):
         if use_exp:
             1/0
         else:
-            return fixed_point_str
-        
-        #!!!!!!!!!!!!
+            value_str = fixed_point_str  # Nothing to be added
+
+        return robust_format(
+            value_str,
+            # The global options are applied (None -> ''):
+            ((match.group('fill_align') or '') +
+             (match.group('width') or '') +
+             's'))
     
     def std_score(self, value):
         """
