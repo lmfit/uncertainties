@@ -1458,7 +1458,7 @@ class AffineScalarFunc(object):
 
         ########################################            
         # Format specification parsing:
-        match = re.match(
+        match = re.match(  #!!!!!! extract global fill, align, width
             '(?P<start>.*?)(?:\.(?P<prec>\d+))?(?P<type>[^LS]|)'
             '(?P<ext>[LS])?$',
             format_spec)
