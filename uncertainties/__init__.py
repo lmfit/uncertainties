@@ -1466,7 +1466,8 @@ class AffineScalarFunc(object):
         # Format specification parsing:
         match = re.match(  #!!!!!! extract global fill, align, width
             '(?P<fill_align>.?[<>=^])?'
-            '(?P<extra0>[-+ ]?#?0?)'  # sign, #, 0
+            '(?P<sign>[-+ ]?)'
+            '(?P<extra0>#?0?)'  # #, 0
             '(?P<width>\d+)?'
             '(?P<extra1>,?)'  # ","
             '(?:\.(?P<prec>\d+))?'
@@ -1556,10 +1557,17 @@ class AffineScalarFunc(object):
         ########################################
         # Final formatting:
 
-        fixed_point_fmt_spec = '%s%s.%df' % (
+        # Format for the fixed-point part of the standard deviation:
+        fixed_point_fmt_spec_s = '%s%s.%df' % (
             match.group('extra0') or '', match.group('extra1') or '',
             -signif_limit)
-        
+        # Format for the fixed-point part of the nominal value: the
+        # sign is only applied to the mantissa (since the sign of the
+        # standard deviation is always +):
+        fixed_point_fmt_spec_m = ((match.group('sign') or '') +
+                                  fixed_point_fmt_spec_s)
+
+                
         if 'S' in fmt_ext:  # Spectroscopic notation:
 
             # The final found is important because 566.99999999 can be
@@ -1569,7 +1577,7 @@ class AffineScalarFunc(object):
 
             # An integer uncertainty is displayed as an integer:
             fixed_point_str = "%s(%d)" % (
-                robust_format(nom_val_mantissa, fixed_point_fmt_spec),
+                robust_format(nom_val_mantissa, fixed_point_fmt_spec_m),
                 uncert)
                     
         else:  # Regular +/- notation:
@@ -1577,9 +1585,9 @@ class AffineScalarFunc(object):
             pm_symbol = ' \pm ' if 'L' in fmt_ext else '+/-'
 
             fixed_point_str = '%s%s%s' % (
-                robust_format(nom_val_mantissa, fixed_point_fmt_spec),
+                robust_format(nom_val_mantissa, fixed_point_fmt_spec_m),
                 pm_symbol,
-                robust_format(std_dev_mantissa, fixed_point_fmt_spec)
+                robust_format(std_dev_mantissa, fixed_point_fmt_spec_s)
                 )
             
 
