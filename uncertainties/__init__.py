@@ -1379,6 +1379,9 @@ class AffineScalarFunc(object):
         return self._general_representation(repr)
                     
     def __str__(self):
+        # !!!!!!!!!! temporary
+        return self._general_representation(str)
+        
         # An empty format string and str() usually return the same
         # string:
         # (http://docs.python.org/2/library/string.html#format-specification-mini-language)
@@ -1448,7 +1451,9 @@ class AffineScalarFunc(object):
         # just need to make the width bigger.
         
         '''
-
+        
+        print "FMT SPEC", repr(format_spec)  #!!!!!! test
+        
         # Optimization: the standard deviation is generally
         # calculated: it is calculated only once, here:
         std_dev = self.std_dev
@@ -1496,6 +1501,7 @@ class AffineScalarFunc(object):
             # for floats is used ("-4 <= exp < p"), except that the
             # precision p used is the number of significant digits of
             # the nominal value.
+            print "FMT SPEC", repr(format_spec)
             1/0   #!!!!!!!!!!!! not implemented yet
 
         fmt_ext = match.group('ext') or ''

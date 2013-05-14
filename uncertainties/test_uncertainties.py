@@ -1642,7 +1642,7 @@ def test_format():
         (1, 0.994): {
             '.3f': '1.000+/0.994',
             '.2f': '1.00+/0.99',
-            '.1f': '1.+/1.'  # Discontinuity in the number of digits
+            '.1f': '1+/-1'  # Discontinuity in the number of digits
         }
     }
 
@@ -1658,7 +1658,7 @@ def test_format():
 
         for (format_spec, result) in representations.iteritems():
 
-            if 'f' not in format_spec:
+            if ('f' not in format_spec) and ('F' not in format_spec):
                 continue  #!!!!!!!!! temporary
 
             # Call that works with Python < 2.6:
@@ -1689,9 +1689,11 @@ def test_format():
                                           value_back.nominal_value, 1e-1)
 
                     assert _numbers_close(value.std_dev,
-                                          value_back.std_dev, 1e-1)
+                                          value_back.std_dev, 3e-1)
 
                 except AssertionError:
+                    # !! The following string formatting requires
+                    # str() to work (to not raise an exception):
                     raise AssertionError(
                         'Values %s and %s are not close enough'
                         % (value, value_back))
