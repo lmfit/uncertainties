@@ -1643,6 +1643,9 @@ def test_format():
             '.3f': '1.000+/-0.994',
             '.2f': '1.00+/-0.99',
             '.1f': '1+/-1'  # Discontinuity in the number of digits
+        },
+        (12.3, 2.3): {
+            '.2fS': '12.3(23)'  # No decimal point on the uncertainty
         }
     }
 
