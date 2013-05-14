@@ -1389,9 +1389,10 @@ class AffineScalarFunc(object):
 
         #!!!!!! implement
         
-        Accepts the same format specification as floats do
-        (http://docs.python.org/2.7/library/string.html#formatspec),
-        In particular, the usual alignment, sign flag, etc. can be
+        Accepts the same format specification as format() for floats
+        (as defined for Python 2.6+), but restricted to what the %
+        operator accepts (if using an earlier version of Python).  In
+        particular, the usual alignment, sign flag, etc. can be
         used. However, a slightly different semantics is used, so that
         the number of digits of the uncertainty can be controlled. The
         format specification is also more general than that of floats
@@ -1459,7 +1460,12 @@ class AffineScalarFunc(object):
         ########################################            
         # Format specification parsing:
         match = re.match(  #!!!!!! extract global fill, align, width
-            '(?P<start>.*?)(?:\.(?P<prec>\d+))?(?P<type>[^LS]|)'
+            '(?P<fill_align>.?[<>=^])?'
+            '(?P<extra0>[-+ ]?#?0?)'  # sign, #, 0
+            '(?P<width>\d+)?'
+            '(?P<extra1>,?)'  # ","
+            '(?:\.(?P<prec>\d+))?'
+            '(?P<type>[^LS]|)'
             '(?P<ext>[LS])?$',
             format_spec)
 
@@ -1525,6 +1531,9 @@ class AffineScalarFunc(object):
             nom_val_mantissa = self.nominal_value
             std_dev_mantissa = std_dev
 
+        ########################################
+        # Final formatting:
+            
         fixed_point_fmt_spec = '%s.%df' % (match.group('start'),
                                            -signif_limit)
         
