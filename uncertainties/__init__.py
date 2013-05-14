@@ -1497,6 +1497,8 @@ class AffineScalarFunc(object):
             # the nominal value.
             1/0   #!!!!!!!!!!!! not implemented yet
 
+        fmt_ext = match.group('ext') or ''
+            
         ########################################
         # Position signif_limit of the significant digits limit (0 =
         # exactly at the decimal point, -1 = after the first decimal,
@@ -1536,9 +1538,12 @@ class AffineScalarFunc(object):
         fixed_point_fmt_spec = '%s%s.%df' % (
             match.group('extra0') or '', match.group('extra1') or '',
             -signif_limit)
-        
-        fixed_point_str = '%s+/-%s' % (
+
+        pm_symbol = ' \pm ' if 'L' in fmt_ext else '+/-'
+            
+        fixed_point_str = '%s%s%s' % (
             robust_format(nom_val_mantissa, fixed_point_fmt_spec),
+            pm_symbol,
             robust_format(std_dev_mantissa, fixed_point_fmt_spec)
             )
 
