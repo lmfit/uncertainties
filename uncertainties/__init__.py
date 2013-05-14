@@ -2216,6 +2216,10 @@ def _str_to_number_with_uncert(representation):
         # Simple form 1234.45+/-1.2:
         (value, uncert) = representation.split('+/-')
     except ValueError:
+
+        # Do we have the (1.23 +/- 0.01)e10 form?
+        match = #!!!!!!!!!!!
+        
         # Form with parentheses or no uncertainty:
         try:
             parsed_value = parse_error_in_parentheses(representation)
@@ -2260,11 +2264,15 @@ def ufloat_fromstr(representation, tag=None):
         12.3(0.4)e-5        
         169.0(7)
         169.1(15)
+
+    Surrounding spaces are ignored.
     """
 
     #! The special ** syntax is for Python 2.5 and before (Python 2.6+
     # understands tag=tag):
-    (nominal_value, std_dev) = _str_to_number_with_uncert(representation)
+    (nominal_value, std_dev) = _str_to_number_with_uncert(
+        representation.strip())
+    
     return ufloat(nominal_value, std_dev, tag)
 
 def _ufloat_obsolete(representation, tag=None):
