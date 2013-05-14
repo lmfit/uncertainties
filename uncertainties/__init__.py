@@ -1517,7 +1517,7 @@ class AffineScalarFunc(object):
         # the rounded value at that limit is 1.0, i.e. has 2
         # significant digits instead of fmt_prec = 1). We correct for
         # this effect by adjusting std_dev_limit if necessary:
-        std_dev_rounded = round(std_dev, std_dev_limit)
+        std_dev_rounded = round(std_dev, -std_dev_limit)
         # If the rounded version has a first digit shifted to the left:
         if _first_digit(std_dev_rounded) > first_digit_std_dev:
             std_dev_limit += 1
@@ -1555,7 +1555,7 @@ class AffineScalarFunc(object):
             -signif_limit)
         
         if 'S' in fmt_ext:  # Spectroscopic notation:
-
+            
             uncert = (round(std_dev_mantissa, -signif_limit) /
                       10.**signif_limit)
 
