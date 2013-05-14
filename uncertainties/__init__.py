@@ -1072,7 +1072,7 @@ def _le_on_aff_funcs(self, y_with_uncert):
 
 def _first_digit(value):
     '''
-    Returns the first digit position of the given value.
+    Returns the first digit position of the given value, as an integer.
 
     0 is the digit just before the decimal point.
     
@@ -1080,7 +1080,7 @@ def _first_digit(value):
     '''
     # Python 2.5 returns nan for math.log10(-4), but Python 2.7 raises
     # ValueError, so the value is directly tested:
-    return math.floor(math.log10(abs(value))) if value else 0
+    return int(math.floor(math.log10(abs(value)))) if value else 0
     
 def _PDG_precision(std_dev):
     '''
@@ -1108,7 +1108,7 @@ def _PDG_precision(std_dev):
     (exponent, factor) = ((exponent-2, 1) if exponent >= 0
                           else (exponent+1, 1000))
     
-    digits = int(std_dev/10**exponent*factor)  # int rounds towards zero
+    digits = int(std_dev/10.**exponent*factor)  # int rounds towards zero
 
     # Rules:
     if digits <= 354:
@@ -1118,7 +1118,7 @@ def _PDG_precision(std_dev):
     else:
         # The parentheses matter, for very small or very large
         # std_dev:
-        return (2, 10**exponent*(1000/factor))
+        return (2, 10.**exponent*(1000/factor))
 
 # Definition of a formatting function that works whatever the version
 # of Python:
@@ -1410,10 +1410,10 @@ class AffineScalarFunc(object):
         through format_spec almost as if they were floats (with or
         without exponent, exponent with or without uppercase,
         etc.). The main difference is that the precision (".p") is
-        generally interpreted as indicating the number p of digits of
-        the displayed uncertainty (if the given precision is 0, it is
+        interpreted as indicating the number p of digits of the
+        displayed uncertainty (if the given precision is 0, it is
         converted to 1).
-
+        
         #!!!!!! Implement:
 
         If no precision is given, then the rounding rules from the
@@ -1501,14 +1501,29 @@ class AffineScalarFunc(object):
         fmt_ext = match.group('ext') or ''
             
         ########################################
+        
         # Position signif_limit of the significant digits limit (0 =
         # exactly at the decimal point, -1 = after the first decimal,
         # 1 = before the units digit, etc.):
 
         # std_dev_limit uses the same convention as signif_limit, but
         # only applies to the standard deviation:
+        first_digit_std_dev = _first_digit(std_dev)
         std_dev_limit = _first_digit(std_dev)-fmt_prec+1
 
+        # The number of significant digits of the uncertainty, when
+        # rounded at this std_dev_limit level, can be too large by 1
+        # (e.g., with fmt_prec = 1, 0.99 gives std_dev_limit = -1, but
+        # the rounded value at that limit is 1.0, i.e. has 2
+        # significant digits instead of fmt_prec = 1). We correct for
+        # this effect by adjusting std_dev_limit if necessary:
+        std_dev_rounded = round(std_dev, std_dev_limit)
+        # If the rounded version has a first digit shifted to the left:
+        if _first_digit(std_dev_rounded) > first_digit_std_dev:
+            std_dev_limit += 1
+        # Now, std_dev_limit is such that std_dev rounded at
+        # this level has the correct number of digits (fmt_prec).
+            
         # If the nominal value is smaller than the standard deviation,
         # its first digit might be to the right of std_dev_limit, in
         # which case we push the limit just after the first digit of
@@ -1516,13 +1531,12 @@ class AffineScalarFunc(object):
         signif_limit = min(std_dev_limit,
                            _first_digit(self.nominal_value))
 
-        ######################################## Formatting:
-        # signif_limit is updated, and the mantissa nominal value and
-        # standard deviation are calculated
-        
+        #######################################
+
+        # Formatting: signif_limit is updated, and the mantissa
+        # nominal value and standard deviation are calculated
+
         if use_exp:
-            signif_limit = min(signif_limit, 0)
-            nom_val_mantissa = self.nominal_value
             1/0 #!!!!!!
         else:  # Fixed point notation
             # Without an exponent, it is necessary to include the
@@ -1535,27 +1549,43 @@ class AffineScalarFunc(object):
 
         ########################################
         # Final formatting:
-            
+
         fixed_point_fmt_spec = '%s%s.%df' % (
             match.group('extra0') or '', match.group('extra1') or '',
             -signif_limit)
+        
+        if 'S' in fmt_ext:  # Spectroscopic notation:
 
-        pm_symbol = ' \pm ' if 'L' in fmt_ext else '+/-'
+            uncert = (round(std_dev_mantissa, -signif_limit) /
+                      10.**signif_limit)
+
+            # An integer uncertainty is displayed as an integer:
+            fixed_point_str = "%s(%s)" % (
+                robust_format(nom_val_mantissa, fixed_point_fmt_spec),
+                int(uncert) if uncert % 1 == 0
+                else '%.*f' % (uncert, -signif_limit))
+                    
+        else:  # Regular +/- notation:
             
-        fixed_point_str = '%s%s%s' % (
-            robust_format(nom_val_mantissa, fixed_point_fmt_spec),
-            pm_symbol,
-            robust_format(std_dev_mantissa, fixed_point_fmt_spec)
-            )
+            pm_symbol = ' \pm ' if 'L' in fmt_ext else '+/-'
 
+            fixed_point_str = '%s%s%s' % (
+                robust_format(nom_val_mantissa, fixed_point_fmt_spec),
+                pm_symbol,
+                robust_format(std_dev_mantissa, fixed_point_fmt_spec)
+                )
+            
+
+        # Should an exponent be added? The result goes to value_str:
         if use_exp:
             1/0
         else:
             value_str = fixed_point_str  # Nothing to be added
 
+        # The global formatting options are applied:
         return robust_format(
             value_str,
-            # The global options are applied (None -> ''):
+            # None -> '':
             ((match.group('fill_align') or '') +
              (match.group('width') or '') +
              's'))
@@ -2195,7 +2225,7 @@ def parse_error_in_parentheses(representation):
         # 10 than must be applied to the provided uncertainty:
         num_digits_after_period = (0 if main_dec is None
                                    else len(main_dec)-1)
-        uncert = int(uncert_int)/10**num_digits_after_period
+        uncert = int(uncert_int)/10.**num_digits_after_period
 
     # We apply the exponent to the uncertainty as well:
     uncert *= factor
