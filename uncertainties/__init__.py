@@ -1524,11 +1524,14 @@ class AffineScalarFunc(object):
         # significant digits instead of fmt_prec = 1). We correct for
         # this effect by adjusting std_dev_limit if necessary:
         std_dev_rounded = round(std_dev, -std_dev_limit)
+        first_digit_std_dev_rounded = _first_digit(std_dev_rounded)
         # If the rounded version has a first digit shifted to the left:
-        if _first_digit(std_dev_rounded) > first_digit_std_dev:
+        if first_digit_std_dev_rounded > first_digit_std_dev:
             std_dev_limit += 1
-        # Now, std_dev_limit is such that std_dev rounded at
-        # this level has the correct number of digits (fmt_prec).
+        # Now, std_dev_limit is such that std_dev rounded at this
+        # level has the correct number of digits (fmt_prec). The
+        # digits corresponding to the rounded std_dev are
+        # _first_digit_std_dev_rounded to the new std_dev_limit.
             
         # If the nominal value is smaller than the standard deviation,
         # its first digit might be to the right of std_dev_limit, in
@@ -1569,15 +1572,24 @@ class AffineScalarFunc(object):
                 
         if 'S' in match.group('ext'):  # Spectroscopic notation:
 
-            # The final found is important because 566.99999999 can be
-            # obtained when 567 is wanted:
-            uncert = round((round(std_dev_mantissa, -signif_limit) /
-                            10.**signif_limit))
+            uncert = round(std_dev_mantissa, -signif_limit)
+
+            # The uncertainty might straddle the decimal point: we
+            # keep it as it is, in this case (e.g. 1.2(3.4), as this
+            # makes the result easier to read); the spectroscopic
+            # notation then essentially coincides with the +/-
+            # notation:
+            if first_digit_std_dev_rounded >= 0 and signif_limit < 0:
+                uncert_str = '%.*f' % (-signif_limit, uncert)
+            else:
+                # The round is important because 566.99999999 can be
+                # obtained when 567 is wanted:
+                uncert_str = '%d' % round(uncert/10.**signif_limit)
 
             # An integer uncertainty is displayed as an integer:
-            fixed_point_str = "%s(%d)" % (
+            fixed_point_str = "%s(%s)" % (
                 robust_format(nom_val_mantissa, fixed_point_fmt_spec_m),
-                uncert)
+                uncert_str)
                     
         else:  # Regular +/- notation:
             

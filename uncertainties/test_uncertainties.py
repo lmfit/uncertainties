@@ -1645,8 +1645,12 @@ def test_format():
             '.1f': '1+/-1'  # Discontinuity in the number of digits
         },
         (12.3, 2.3): {
-            '.2fS': '12.3(23)'  # No decimal point on the uncertainty
+            '.2fS': '12.3(2.3)'  # Decimal point on the uncertainty
+        },
+        (12.3, 2.3): {
+            '.1fS': '12(2)'  # No decimal point on the uncertainty
         }
+        
     }
 
     # ',' format option: introduced in Python 2.7
