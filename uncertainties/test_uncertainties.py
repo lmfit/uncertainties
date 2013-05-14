@@ -1640,8 +1640,8 @@ def test_format():
         # Rounding of the uncertainty that "changes" the number of
         # significant digits:
         (1, 0.994): {
-            '.3f': '1.000+/0.994',
-            '.2f': '1.00+/0.99',
+            '.3f': '1.000+/-0.994',
+            '.2f': '1.00+/-0.99',
             '.1f': '1+/-1'  # Discontinuity in the number of digits
         }
     }

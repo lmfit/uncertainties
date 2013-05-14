@@ -1561,15 +1561,16 @@ class AffineScalarFunc(object):
             -signif_limit)
         
         if 'S' in fmt_ext:  # Spectroscopic notation:
-            
-            uncert = (round(std_dev_mantissa, -signif_limit) /
-                      10.**signif_limit)
+
+            # The final found is important because 566.99999999 can be
+            # obtained when 567 is wanted:
+            uncert = round((round(std_dev_mantissa, -signif_limit) /
+                            10.**signif_limit))
 
             # An integer uncertainty is displayed as an integer:
-            fixed_point_str = "%s(%s)" % (
+            fixed_point_str = "%s(%d)" % (
                 robust_format(nom_val_mantissa, fixed_point_fmt_spec),
-                int(uncert) if uncert % 1 == 0
-                else '%.*f' % (uncert, -signif_limit))
+                uncert)
                     
         else:  # Regular +/- notation:
             
