@@ -1468,10 +1468,10 @@ class AffineScalarFunc(object):
             '(?P<fill_align>.?[<>=^])?'
             '(?P<sign>[-+ ]?)'
             '(?P<extra0>#?0?)'  # #, 0
-            '(?P<width>\d+)?'
+            '(?P<width>\d*)'
             '(?P<extra1>,?)'  # ","
             '(?:\.(?P<prec>\d+))?'
-            '(?P<type>[^LS]|)'
+            '(?P<type>[^LS]?)'
             '(?P<ext>[LS]*)$',
             format_spec)
 
@@ -1558,12 +1558,12 @@ class AffineScalarFunc(object):
 
         # Format for the fixed-point part of the standard deviation:
         fixed_point_fmt_spec_s = '%s%s.%df' % (
-            match.group('extra0') or '', match.group('extra1') or '',
+            match.group('extra0'), match.group('extra1'),
             -signif_limit)
         # Format for the fixed-point part of the nominal value: the
         # sign is only applied to the mantissa (since the sign of the
         # standard deviation is always +):
-        fixed_point_fmt_spec_m = ((match.group('sign') or '') +
+        fixed_point_fmt_spec_m = ((match.group('sign')) +
                                   fixed_point_fmt_spec_s)
 
                 
@@ -1601,7 +1601,7 @@ class AffineScalarFunc(object):
             value_str,
             # None -> '':
             ((match.group('fill_align') or '') +
-             (match.group('width') or '') +
+             (match.group('width')) +
              's'))
     
     def std_score(self, value):
