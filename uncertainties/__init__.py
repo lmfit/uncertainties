@@ -1070,6 +1070,18 @@ def _le_on_aff_funcs(self, y_with_uncert):
 
 ########################################
 
+def _first_digit(value):
+    '''
+    Returns the first digit position of the given value.
+
+    0 is the digit just before the decimal point.
+    
+    Returns 0 for a null value.
+    '''
+    # Python 2.5 returns nan for math.log10(-4), but Python 2.7 raises
+    # ValueError, so the value is directly tested:
+    return math.floor(math.log10(abs(value))) if value else 0
+    
 def _PDG_precision(std_dev):
     '''
     Returns the number of significant digits to be used for the given
@@ -1081,8 +1093,7 @@ def _PDG_precision(std_dev):
     display.
     '''
     
-    # Exponent of the standard deviation (in scientific notation):
-    exponent = math.floor(math.log10(std_dev)) if std_dev else 0
+    exponent = _first_digit(std_dev)
 
     # The first three digits are what matters: we get them as an
     # integer number in [100; 999).
@@ -1109,6 +1120,22 @@ def _PDG_precision(std_dev):
         # std_dev:
         return (2, 10**exponent*(1000/factor))
 
+# Definition of a formatting function that works whatever the version
+# of Python:
+try:
+
+    robust_format = format
+    
+except NameError:  # format() not defined (Python < 2.6)
+    
+    def robust_format(value, format_spec):
+        '''
+        Formats the given value with the given format specification.
+
+        format_spec: % formatting specification, without the leading %.
+        '''
+        return ('%' + format_spec) % value
+    
 class CallableStdDev(float):
     '''
     Class for standard deviation results, which used to be
@@ -1427,27 +1454,33 @@ class AffineScalarFunc(object):
         # calculated: it is calculated only once, here:
         std_dev = self.std_dev
 
+
         # Special case of a 0 uncertainty: formatting like a float:
         if std_dev == 0:
-            try:
-                return format(self.nominal_value, format_spec)
-            except NameError:  # format() is for Python 2.6+
-                return ('%' + format_spec) % self.nominal_value
-        
+            return robust_format(self.nominal_value, format_spec)
+
+        ########################################            
         # Format specification parsing:
         match = re.match(
-            '(?P<start>.*?)(?P<prec>\.\d+)?(?P<type>[^LS]|)(?P<ext>[LS])?$',
+            '(?P<start>.*?)(?:\.(?P<prec>\d+))?(?P<type>[^LS]|)'
+            '(?P<ext>[LS])?$',
             format_spec)
 
         # Effective format type: f, e, g, etc.:
+        #
+        # !!!!!!! This rule (for Python 2) seems to be broken for
+        # {:20}, where 1e10 is formatted apparently with str() instead
+        # of 'g'.
         fmt_type = match.group('type') or 'g'  # g is the default
 
         # Effective precision (is always a number):
         fmt_prec = match.group('prec')
         if fmt_prec is None:
             (fmt_prec, std_dev) = _PDG_precision(std_dev)
-        elif fmt_prec == 0:
-            fmt_prec = 1  # It is meaningless to have no significant digit
+        else:
+            fmt_prec = int(fmt_prec)
+            if fmt_prec == 0:
+                fmt_prec = 1  # It is meaningless to have no significant digit
 
         # Exponent notation: should it be used? use_exp is set
         # accordingly:            
@@ -1460,9 +1493,54 @@ class AffineScalarFunc(object):
             # for floats is used ("-4 <= exp < p"), except that the
             # precision p used is the number of significant digits of
             # the nominal value.
-            pass  #!!!!!!!!!!!!
-            
-        return 'lkj'
+            1/0   #!!!!!!!!!!!! not implemented yet
+
+        ########################################
+        # Position signif_limit of the significant digits limit (0 =
+        # exactly at the decimal point, -1 = after the first decimal,
+        # 1 = before the units digit, etc.):
+
+        # std_dev_limit uses the same convention as signif_limit, but
+        # only applies to the standard deviation:
+        std_dev_limit = _first_digit(std_dev)-fmt_prec+1
+
+        # If the nominal value is smaller than the standard deviation,
+        # its first digit might be to the right of std_dev_limit, in
+        # which case we push the limit just after the first digit of
+        # the nominal value, so that it is displayed:
+        signif_limit = min(std_dev_limit,
+                           _first_digit(self.nominal_value))
+
+        ######################################## Formatting:
+        # signif_limit is updated, and the mantissa nominal value and
+        # standard deviation are calculated
+        
+        if use_exp:
+            signif_limit = min(signif_limit, 0)
+            nom_val_mantissa = self.nominal_value
+            1/0 #!!!!!!
+        else:  # Fixed point notation
+            # Without an exponent, it is necessary to include the
+            # decimal point location in the printed digit (e.g.,
+            # printing 1234 with only 2 significant digits requires to
+            # print at least 1234 (or maybe 1200)):
+            signif_limit = min(signif_limit, 0)
+            nom_val_mantissa = self.nominal_value
+            std_dev_mantissa = std_dev
+
+        fixed_point_fmt_spec = '%s.%df' % (match.group('start'),
+                                           -signif_limit)
+        
+        fixed_point_str = '%s+/-%s' % (
+            robust_format(nom_val_mantissa, fixed_point_fmt_spec),
+            robust_format(std_dev_mantissa, fixed_point_fmt_spec)
+            )
+
+        if use_exp:
+            1/0
+        else:
+            return fixed_point_str
+        
         #!!!!!!!!!!!!
     
     def std_score(self, value):
