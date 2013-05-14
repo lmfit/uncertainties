@@ -2132,7 +2132,7 @@ NUMBER_WITH_UNCERT_RE_STR = '''
 NUMBER_WITH_UNCERT_RE_SEARCH = re.compile(
     "^%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).search
 
-class NotParenForm(ValueError):
+class NotParenUncert(ValueError):
     '''
     Raised when a string representing an exact number or a number with
     an uncertainty indicated between parentheses was expected but not
@@ -2158,7 +2158,7 @@ def parse_error_in_parentheses(representation):
         (sign, main_int, main_dec, uncert_int, uncert_dec,
          exponent) = match.groups()
     else:
-        raise NotParenForm("Unparsable number representation: '%s'."
+        raise NotParenUncert("Unparsable number representation: '%s'."
                            " Was expecting a string of the form 1.23(4)"
                            " or 1.234" % representation)
 
@@ -2219,7 +2219,7 @@ def _str_to_number_with_uncert(representation):
         # Form with parentheses or no uncertainty:
         try:
             parsed_value = parse_error_in_parentheses(representation)
-        except NotParenForm:
+        except NotParenUncert:
             raise ValueError(_cannot_parse_ufloat_msg_pat % representation)
     else:
         try:
@@ -2239,8 +2239,16 @@ def ufloat_fromstr(representation, tag=None):
     the last digit.
     
     Examples of valid string representations:
-
+    
         12.3e10+/-5e3
+        (-3.1415 +/- 0.0001)e+00
+        
+        0.29
+        31.
+        -31.
+        31
+        -3.1e10
+        
         -1.23(3.4)
         -1.34(5)
         1(6)
@@ -2250,11 +2258,6 @@ def ufloat_fromstr(representation, tag=None):
         12.345(15)
         -12.3456(78)e-6
         12.3(0.4)e-5        
-        0.29
-        31.
-        -31.
-        31
-        -3.1e10
         169.0(7)
         169.1(15)
     """
