@@ -1636,7 +1636,14 @@ def test_format():
         }, 
         (1e6, 0): {
             'g': '1e+06'
-        }       
+        },
+        # Rounding of the uncertainty that "changes" the number of
+        # significant digits:
+        (1, 0.994): {
+            '.3f': '1.000+/0.994',
+            '.2f': '1.00+/0.99',
+            '.1f': '1.+/1.'  # Discontinuity in the number of digits
+        }
     }
 
     # ',' format option: introduced in Python 2.7
@@ -1653,8 +1660,9 @@ def test_format():
 
             if 'f' not in format_spec:
                 continue  #!!!!!!!!! temporary
-            
-            representation = ('{0:%s}' % format_spec).format(value)
+
+            # Call that works with Python < 2.6:
+            representation = value.__format__(format_spec)
 
             assert representation == result, (
                 'Incorrect representation %s for format %s of %s+/-%s:'
@@ -1668,8 +1676,8 @@ def test_format():
                 assert representation == str(value)
             
             # Parsing back into a number with uncertainty (unless the
-            # LaTeX notation is used):
-            if 'L' not in format_spec:
+            # LaTeX or comma notation is used):
+            if not set(format_spec).intersection('L,'):
 
                 value_back = ufloat_fromstr(representation)
 
