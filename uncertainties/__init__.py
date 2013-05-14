@@ -2129,8 +2129,15 @@ NUMBER_WITH_UNCERT_RE_STR = '''
     ([eE][+-]?\d+)?  # Optional exponent
     ''' % (POSITIVE_DECIMAL_UNSIGNED, POSITIVE_DECIMAL_UNSIGNED)
 
-NUMBER_WITH_UNCERT_RE_SEARCH = re.compile(
-    "^%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).search
+NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
+    "%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).match
+
+# Number with uncertainty of the form (... +/- ...)e10: this is a
+# loose matching, because incorrect contents is handled through
+# exceptions:
+NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = '''
+    
+    '''
 
 class NotParenUncert(ValueError):
     '''
@@ -2149,7 +2156,7 @@ def parse_error_in_parentheses(representation):
     Raises ValueError if the string cannot be parsed.    
     """
 
-    match = NUMBER_WITH_UNCERT_RE_SEARCH(representation)
+    match = NUMBER_WITH_UNCERT_RE_MATCH(representation)
 
     if match:
         # The 'main' part is the nominal value, with 'int'eger part, and
