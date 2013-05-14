@@ -2126,7 +2126,7 @@ NUMBER_WITH_UNCERT_RE_STR = '''
     ([+-])?  # Sign
     %s  # Main number
     (?:\(%s\))?  # Optional uncertainty
-    ([eE][+-]?\d+)?  # Optional exponent
+    (?:[eE]([+-]?\d+))?  # Optional exponent
     ''' % (POSITIVE_DECIMAL_UNSIGNED, POSITIVE_DECIMAL_UNSIGNED)
 
 NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
@@ -2172,11 +2172,13 @@ def parse_error_in_parentheses(representation):
                            " Was expecting a string of the form 1.23(4)"
                            " or 1.234" % representation)
 
+    # No exponent digits is equivalent to a 0 exponent:
+    factor = 10.**int(exponent or '0')
+    
     # The value of the number is its nominal value:
     value = float(''.join((sign or '',
                            main_int,
-                           main_dec or '.0',
-                           exponent or '')))
+                           main_dec or '.0')))*factor
                   
     if uncert_int is None:
         # No uncertainty was found: an uncertainty of 1 on the last
@@ -2196,7 +2198,7 @@ def parse_error_in_parentheses(representation):
         uncert = int(uncert_int)/10**num_digits_after_period
 
     # We apply the exponent to the uncertainty as well:
-    uncert *= float("1%s" % (exponent or ''))
+    uncert *= factor
 
     return (value, uncert)
 
@@ -2248,7 +2250,7 @@ def _str_to_number_with_uncert(representation):
         except NotParenUncert:
             raise ValueError(_cannot_parse_ufloat_msg_pat % representation)
     else:
-        print "VALUE", nom_value, "UNCERT", uncert
+        # print "VALUE", nom_value, "UNCERT", uncert
         try:
             parsed_value = (float(nom_value)*factor, float(uncert)*factor)
         except ValueError:

@@ -299,6 +299,8 @@ def test_str_input():
           
     for (representation, values) in tests.iteritems():
 
+        # print "Parsing %s..." % representation
+        
         # Without tag:
         num = ufloat_fromstr(representation)
         assert _numbers_close(num.nominal_value, values[0])
