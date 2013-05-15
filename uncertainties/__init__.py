@@ -1504,6 +1504,8 @@ class AffineScalarFunc(object):
             # precision p used is the number of significant digits of
             # the nominal value.
             print "FMT SPEC", repr(format_spec)
+
+            # !!!!!!! Set fmt_type to fFeE
             1/0   #!!!!!!!!!!!! not implemented yet
 
         ########################################
@@ -1546,7 +1548,19 @@ class AffineScalarFunc(object):
         # nominal value and standard deviation are calculated
 
         if use_exp:
-            1/0 #!!!!!!
+            # The exponent gives the *largest* of the nominal value
+            # and the uncertainty a mantissa between 1 and 9.9999 (in
+            # absolute value) *after rounding*:
+            #!!!!!!!!!!!
+            ref_value = max(abs(self.nominal_value), std_dev)
+            # The reference value will be rounded at signif_limit:
+            # this is what defines its exponent:
+            ref_value = round(ref_value, -signif_limit)
+            exponent = _first_digit(ref_value)
+            factor = 10.**exponent  # Not 10.**(-exponent), for limit cases
+            nom_val_mantissa = self.nominal_value/factor
+            std_dev_mantissa = std_dev/factor
+
         else:  # Fixed point notation
             # Without an exponent, it is necessary to include the
             # decimal point location in the printed digit (e.g.,
@@ -1604,7 +1618,15 @@ class AffineScalarFunc(object):
 
         # Should an exponent be added? The result goes to value_str:
         if use_exp:
-            1/0
+            mantissa_fmt = '%s' if 'S' in match.group('ext') else '(%s)'
+            exp_fmt = (' \times 10^{%d}' if 'L' in match.group('ext')
+                       # Case of e or E. The same convention as Python
+                       # 2.7 to 3.3 is used for the display of the
+                       # exponent:
+                       else fmt_type+'%+02d')
+            value_str = (mantissa_fmt % fixed_point_str +
+                         exp_fmt % exponent)
+            
         else:
             value_str = fixed_point_str  # Nothing to be added
 
