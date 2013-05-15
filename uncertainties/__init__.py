@@ -1560,6 +1560,9 @@ class AffineScalarFunc(object):
             factor = 10.**exponent  # Not 10.**(-exponent), for limit cases
             nom_val_mantissa = self.nominal_value/factor
             std_dev_mantissa = std_dev/factor
+            # The position signif_limit of the significant digit must
+            # be updated accordingly:
+            signif_limit -= exponent
 
         else:  # Fixed point notation
             # Without an exponent, it is necessary to include the
