@@ -1,7 +1,8 @@
 uncertainties
 =============
 
-.. image:: https://travis-ci.org/lebigot/uncertainties.png
+.. Travis's builds with NumPy had problems: commenting out the Travis part
+   image:: https://travis-ci.org/lebigot/uncertainties.png
    :target: https://travis-ci.org/lebigot/uncertainties
 
 This is the uncertainties Python package.
