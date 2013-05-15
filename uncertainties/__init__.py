@@ -1623,7 +1623,7 @@ class AffineScalarFunc(object):
                        # Case of e or E. The same convention as Python
                        # 2.7 to 3.3 is used for the display of the
                        # exponent:
-                       else fmt_type+'%+02d')
+                       else fmt_type+'%+03d')
             value_str = (mantissa_fmt % fixed_point_str +
                          exp_fmt % exponent)
             
