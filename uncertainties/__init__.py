@@ -1622,7 +1622,7 @@ class AffineScalarFunc(object):
         # Should an exponent be added? The result goes to value_str:
         if use_exp:
             mantissa_fmt = '%s' if 'S' in match.group('ext') else '(%s)'
-            exp_fmt = (' \times 10^{%d}' if 'L' in match.group('ext')
+            exp_fmt = (r' \times 10^{%d}' if 'L' in match.group('ext')
                        # Case of e or E. The same convention as Python
                        # 2.7 to 3.3 is used for the display of the
                        # exponent:
