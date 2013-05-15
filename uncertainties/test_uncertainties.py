@@ -1665,7 +1665,7 @@ def test_format():
 
         for (format_spec, result) in representations.iteritems():
 
-            if ('f' not in format_spec) and ('F' not in format_spec):
+            if not set(format_spec).intersection('fFeE'):
                 continue  #!!!!!!!!! temporary
 
             # Call that works with Python < 2.6:
