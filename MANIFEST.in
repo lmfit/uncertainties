@@ -4,5 +4,9 @@ include LICENSE.txt
 include setup.py
 recursive-include uncertainties-py23 *.py
 recursive-include uncertainties-py25 *.py
-graft doc
+recursive-include doc Makefile conf.py *.rst make.bat
+graft doc/_static
+graft doc/_templates
 prune doc/_build
+
+
