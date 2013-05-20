@@ -1,5 +1,6 @@
 include README.rst
-include *.txt
+include INSTALL.txt
+include LICENSE.txt
 include setup.py
 recursive-include uncertainties-py23 *.py
 recursive-include uncertainties-py25 *.py
