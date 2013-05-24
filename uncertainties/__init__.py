@@ -1474,22 +1474,6 @@ class AffineScalarFunc(object):
             if fmt_prec == 0:
                 fmt_prec = 1  # It is meaningless to have no significant digit
 
-        # Exponent notation: should it be used? use_exp is set
-        # accordingly:            
-        if fmt_type in 'fF%':
-            use_exp = False
-        elif fmt_type in 'eE':
-            use_exp = True
-        else:  # g, G, n
-            # Should the scientific notation be used? the same rule as
-            # for floats is used ("-4 <= exp < p"), except that the
-            # precision p used is the number of significant digits of
-            # the nominal value.
-            print "FMT SPEC", repr(format_spec)
-
-            # !!!!!!! Set fmt_type to fFeE
-            1/0   #!!!!!!!!!!!! not implemented yet
-
         ########################################
         
         # Position signif_limit of the significant digits limit (0 =
@@ -1521,6 +1505,22 @@ class AffineScalarFunc(object):
 
         #######################################
 
+        # Exponent notation: should it be used? use_exp is set
+        # accordingly:            
+        if fmt_type in 'fF%':
+            use_exp = False
+        elif fmt_type in 'eE':
+            use_exp = True
+        else:  # g, G, n
+            # Should the scientific notation be used? the same rule as
+            # for floats is used ("-4 <= exp < p"), except that the
+            # precision p used is the number of significant digits of
+            # the nominal value.
+            print "FMT SPEC", repr(format_spec)
+
+            # !!!!!!! Set fmt_type to fFeE
+            1/0   #!!!!!!!!!!!! not implemented yet
+            
         # Formatting: signif_limit is updated, and the mantissa
         # nominal value and standard deviation are calculated
 
