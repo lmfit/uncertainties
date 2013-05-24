@@ -1390,8 +1390,6 @@ class AffineScalarFunc(object):
     def __format__(self, format_spec):
         '''Formats a number with uncertainty.
 
-        #!!!!!! implement
-        
         Accepts the same format specification as format() for floats
         (as defined for Python 2.6+), but restricted to what the %
         operator accepts (if using an earlier version of Python).  In
@@ -1401,13 +1399,9 @@ class AffineScalarFunc(object):
         format specification is also more general than that of floats
         (see the spectroscopic and LaTeX outputs below).
 
-        # !!!!!! Implement
-        
         The nominal value is rounded according to the number of digits
         of the uncertainty (so as to not show digits that go beyond
         the last digit of the uncertainty).
-
-        #!!!!!! Implement:
         
         The nominal value and the standard deviation are formatted
         through format_spec almost as if they were floats (with or
@@ -1417,8 +1411,6 @@ class AffineScalarFunc(object):
         displayed uncertainty (if the given precision is 0, it is
         converted to 1).
         
-        #!!!!!! Implement:
-
         If no precision is given, then the rounding rules from the
         Particle Data Group are used
         (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).
@@ -1427,13 +1419,10 @@ class AffineScalarFunc(object):
         specification are applied globally (not to each of the nominal
         value and standard deviation).
 
-        #!!!!!! Implement:
-        
         In the case of the standard text output, the returned string
         can be generally parsed back with ufloat_fromstr(). This
-        excludes cases where numbers use the "," thousands separator.
-        
-        #!!!!!! Implement
+        excludes cases where numbers use the "," thousands separator,
+        for example.
         
         When "S" is present after the usual float format, the
         spectroscopic notation 1.234(5) is used. When "L" is present,
@@ -1442,14 +1431,7 @@ class AffineScalarFunc(object):
 
         If the uncertainty is 0, the number is formatted like a float.
 
-        A "0" in the format specification is ignored.
-
-        # !!!!!!!!FQ Is there is a need for *two* width
-        # specifications?  NO: People who aligned their floats with
-        # >10.2f... don\'t get the alignment anymore because the point
-        # becomes floating. NO: Those who aligned with <10 probably
-        # just need to make the width bigger.
-        
+        A "0" in the format specification is ignored.        
         '''
         
         print "FMT SPEC", repr(format_spec)  #!!!!!! test
