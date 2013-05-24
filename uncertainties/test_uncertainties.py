@@ -1517,7 +1517,7 @@ def test_format():
             '.1f': '123.457+/-0.001',
             '.2f': '123.4568+/-0.0012',
             '.3f': '123.45679+/-0.00123',
-            '.2e': '(1.234567+/-0.000012)e+02'
+            '.2e': '(1.234568+/-0.000012)e+02'
         },
         # Sign handling:
         (-123.456789, 0.00123): {
@@ -1692,8 +1692,13 @@ def test_format():
                 # with each other:
                 try:
 
-                    assert _numbers_close(value.nominal_value,
-                                          value_back.nominal_value, 1e-1)
+                    # The nominal value can be rounded to 0 when the
+                    # uncertainty is larger (because p digits on the
+                    # uncertainty can still show 0.00... for the
+                    # nominal value). This should not cause an error:
+                    if value_back.nominal_value:
+                        assert _numbers_close(value.nominal_value,
+                                              value_back.nominal_value, 1e-1)
 
                     assert _numbers_close(value.std_dev,
                                           value_back.std_dev, 3e-1)
