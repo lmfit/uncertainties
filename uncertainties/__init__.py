@@ -1535,12 +1535,7 @@ class AffineScalarFunc(object):
         # digits corresponding to the rounded std_dev are
         # _first_digit_std_dev_rounded to the new std_dev_limit.
             
-        # If the nominal value is smaller than the standard deviation,
-        # its first digit might be to the right of std_dev_limit, in
-        # which case we push the limit just after the first digit of
-        # the nominal value, so that it is displayed:
-        signif_limit = min(std_dev_limit,
-                           _first_digit(self.nominal_value))
+        signif_limit = std_dev_limit  #!!!!!! std_dev_limit: can be removed?
 
         #######################################
 
