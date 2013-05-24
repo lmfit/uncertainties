@@ -1415,6 +1415,20 @@ class AffineScalarFunc(object):
         Particle Data Group are used
         (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).
 
+        When the exponent notation is used, the mantissa of the larger
+        value (in absolute value, between the nominal value and the
+        standard deviation) is between 1 and 10, like for floats.
+        
+        If no format type is given, "g" is assumed, like for floats.
+        
+        The g, G and n (and empty) format types work like for floats,
+        except that the equivalent (float) precision is defined as the
+        number of digits required for the larger of the two numbers
+        (nominal value and standard deviation) to be displayed at the
+        level of the displayed uncertainty. This is because when
+        triggering the exponent notation, the larger value is the one
+        formatted like a float, with a mantissa between 1 and 10.
+        
         The fill, align and width parameters of the format
         specification are applied globally (not to each of the nominal
         value and standard deviation).
@@ -1515,10 +1529,22 @@ class AffineScalarFunc(object):
             # Should the scientific notation be used? the same rule as
             # for floats is used ("-4 <= exp < p"), except that the
             # precision p used is the number of significant digits of
-            # the nominal value.
-            print "FMT SPEC", repr(format_spec)
+            # the larger quantity (between nominal value and standard
+            # deviation), based on the required number fmt_prec of
+            # significant digits on the uncertainty.
 
-            # !!!!!!! Set fmt_type to fFeE
+            # Number of significant digits of the larger number:
+            if std_dev >= abs(self.nominal_value):
+                signif_digits = fmt_prec  # !!!! No need for std_dev_limit?
+            else:  # Usual case: larger nominal value:
+                #!!!!! Is there any rounding issue on the nominal
+                #value, here?
+                signif_digits = (_first_digit(self.nominal_value)
+                                 +1-std_dev_limit)
+                
+            # !!!!!!! Set fmt_type to fFeE: by converting the larger
+            # value with '%g' and looking for 'e'? this is robust...
+            
             1/0   #!!!!!!!!!!!! not implemented yet
             
         # Formatting: signif_limit is updated, and the mantissa
@@ -1526,8 +1552,8 @@ class AffineScalarFunc(object):
 
         if use_exp:
             # The exponent gives the *largest* of the nominal value
-            # and the uncertainty a mantissa between 1 and 9.9999 (in
-            # absolute value) *after rounding*:
+            # and the uncertainty a mantissa between 1 and
+            # 9.9999... (in absolute value) *after rounding*:
             #!!!!!!!!!!!
             ref_value = max(abs(self.nominal_value), std_dev)
             # The reference value will be rounded at signif_limit:
