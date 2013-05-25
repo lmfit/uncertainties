@@ -1446,18 +1446,6 @@ class AffineScalarFunc(object):
         the output is formatted with LaTeX. These options can be
         combined.
 
-        #!!!!!!!!! A 0 uncertainty does not handle the LaTeX option,
-        #which is not good (irregular behavior).
-
-        # !!!!!!!!! A NaN uncertainty does not handle the LaTeX
-        # option (\pm). OR the global formatting.
-
-        # !!!!!!! The spectroscopic notation, with a zero uncertainty,
-        # should print (0), so as to be compatible with the fact that
-        # otherwise an uncertainty of 1 is put on the last digit if no
-        # uncertainty is given.
-        
-        
         The nominal value is formatted like a float when the number of
         significant digits of the uncertainty has no meaning: for a
         zero or a NaN uncertainty. In the case of a 0 uncertainty, no
