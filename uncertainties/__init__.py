@@ -1447,6 +1447,10 @@ class AffineScalarFunc(object):
 
         A "0" in the format specification is ignored.        
         '''
+
+        # Convention on limits "between" digits: 0 = exactly at the
+        # decimal point, -1 = after the first decimal, 1 = before the
+        # units digit, etc.).
         
         print "FMT SPEC", repr(format_spec)  #!!!!!! test
         
@@ -1490,12 +1494,8 @@ class AffineScalarFunc(object):
 
         ########################################
         
-        # Position signif_limit of the significant digits limit (0 =
-        # exactly at the decimal point, -1 = after the first decimal,
-        # 1 = before the units digit, etc.):
-
-        # std_dev_limit uses the same convention as signif_limit, but
-        # only applies to the standard deviation:
+        # std_dev_limit: limit on the significant digits of the
+        # standard deviation:
         first_digit_std_dev = _first_digit(std_dev)
         std_dev_limit = _first_digit(std_dev)-fmt_prec+1
 
@@ -1514,16 +1514,23 @@ class AffineScalarFunc(object):
         # level has the correct number of digits (fmt_prec). The
         # digits corresponding to the rounded std_dev are
         # _first_digit_std_dev_rounded to the new std_dev_limit.
-            
-        signif_limit = std_dev_limit  #!!!!!! std_dev_limit: can be removed?
+
 
         #######################################
 
+        # Calculation of signif_limit (position of the significant
+        # digits limit), nom_val_mantissa ("mantissa" for the nominal
+        # value, i.e. value possibly corrected for a factorized
+        # exponent), and std_dev_mantissa (similarly for the standard
+        # deviation).
+        
         # Exponent notation: should it be used? use_exp is set
         # accordingly:            
         if fmt_type in 'fF%':
+            signif_limit = std_dev_limit
             use_exp = False
         elif fmt_type in 'eE':
+            signif_limit = std_dev_limit            
             use_exp = True
         else:  # g, G, n
             # Should the scientific notation be used? the same rule as
@@ -1535,7 +1542,7 @@ class AffineScalarFunc(object):
 
             # Number of significant digits of the larger number:
             if std_dev >= abs(self.nominal_value):
-                signif_digits = fmt_prec  # !!!! No need for std_dev_limit?
+                signif_digits = -fmt_prec
             else:  # Usual case: larger nominal value:
                 #!!!!! Is there any rounding issue on the nominal
                 #value, here?
