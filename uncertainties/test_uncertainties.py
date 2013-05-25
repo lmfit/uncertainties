@@ -1696,13 +1696,19 @@ def test_format():
                     # The nominal value can be rounded to 0 when the
                     # uncertainty is larger (because p digits on the
                     # uncertainty can still show 0.00... for the
-                    # nominal value). This should not cause an error:
+                    # nominal value). The relative error is infinite,
+                    # so this should not cause an error:
                     if value_back.nominal_value:
                         assert _numbers_close(value.nominal_value,
                                               value_back.nominal_value, 1e-1)
 
-                    assert _numbers_close(value.std_dev,
-                                          value_back.std_dev, 3e-1)
+                    # If the uncertainty is zero, then the relative
+                    # change can be large: #!!!!!!!!!! This test may
+                    # have to be put back if +/-0 is "reversible"
+                    # between format() and ufloat_fromstr().
+                    if value.std_dev:
+                        assert _numbers_close(value.std_dev,
+                                              value_back.std_dev, 3e-1)
 
                 except AssertionError:
                     # !! The following string formatting requires

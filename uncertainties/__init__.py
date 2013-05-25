@@ -1451,6 +1451,9 @@ class AffineScalarFunc(object):
         # Convention on limits "between" digits: 0 = exactly at the
         # decimal point, -1 = after the first decimal, 1 = before the
         # units digit, etc.).
+
+        # Convention on digits: 0 is units (10**0), 1 is tens, -1 is
+        # tenths, etc.
         
         print "FMT SPEC", repr(format_spec)  #!!!!!! test
         
@@ -1531,6 +1534,10 @@ class AffineScalarFunc(object):
         elif fmt_type in 'eE':
             use_exp = True
         else:  # g, G, n
+
+            #!!!!!!!!!! There is duplicated code between the g test
+            #and the e implementation. Could this be unified?
+            
             # Should the scientific notation be used? the same rule as
             # for floats is used ("-4 <= exp < p"), except that the
             # precision p used is the number of significant digits of
@@ -1540,17 +1547,27 @@ class AffineScalarFunc(object):
 
             # Number of significant digits of the larger number:
             if std_dev >= abs(self.nominal_value):
-                signif_digits = -fmt_prec
+                ref_value = std_dev_rounded
+                signif_digits = fmt_prec
             else:  # Usual case: larger nominal value:
-                #!!!!! Is there any rounding issue on the nominal
-                #value, here?
-                signif_digits = (_first_digit(self.nominal_value)
-                                 +1-std_dev_limit)
-                
-            # !!!!!!! Set fmt_type to fFeE: by converting the larger
-            # value with '%g' and looking for 'e'? this is robust...
-            
-            1/0   #!!!!!!!!!!!! not implemented yet
+                # The formatting rule for g is "suppose that the
+                # result formatted with presentation type 'e' and
+                # precision p-1 would have exponent exp". This is what
+                # is calculated here (the first digit of the mantissa
+                # uses 1 digit.
+                ref_value = abs(round(self.nominal_value, -std_dev_limit))
+                signif_digits = _first_digit(ref_value)-std_dev_limit+1
+
+            # The choice between using the exponent notation or not
+            # depends on the magnitude of the larger value (the one
+            # with a regular mantissa), in the same way as the g
+            # format (Python 2.7). Its exponent (after rounding, as
+            # defined in the specification of the g format in Python
+            # 2.7) is needed for this:
+            ref_exp = _first_digit(ref_value)
+            exponent = _first_digit(ref_value)
+
+            use_exp = not(-4 <= exponent < signif_digits)
             
         # Formatting: signif_limit is updated, and the mantissa
         # nominal value and standard deviation are calculated
@@ -1558,12 +1575,12 @@ class AffineScalarFunc(object):
         if use_exp:
             # The exponent gives the *largest* of the nominal value
             # and the uncertainty a mantissa between 1 and
-            # 9.9999... (in absolute value) *after rounding*:
-            #!!!!!!!!!!!
-            ref_value = max(abs(self.nominal_value), std_dev)
-            # The reference value will be rounded at std_dev_limit:
-            # this is what defines its exponent:
-            ref_value = round(ref_value, -std_dev_limit)
+            # 9.9999... (in absolute value) *after rounding*.  The
+            # reference value will be rounded at std_dev_limit: this
+            # is what defines its exponent:
+            ref_value = round(max(abs(self.nominal_value), std_dev),
+                              -std_dev_limit)
+
             exponent = _first_digit(ref_value)
             factor = 10.**exponent  # Not 10.**(-exponent), for limit cases
             nom_val_mantissa = self.nominal_value/factor
