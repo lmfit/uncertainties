@@ -1446,7 +1446,24 @@ class AffineScalarFunc(object):
         the output is formatted with LaTeX. These options can be
         combined.
 
-        If the uncertainty is 0, the number is formatted like a float.
+        #!!!!!!!!! A 0 uncertainty does not handle the LaTeX option,
+        #which is not good (irregular behavior).
+
+        # !!!!!!!!! A NaN uncertainty does not handle the LaTeX
+        # option (\pm).
+
+        # !!!!!!! The spectroscopic notation, with a zero uncertainty,
+        # should print (0), so as to be compatible with the fact that
+        # otherwise an uncertainty of 1 is put on the last digit if no
+        # uncertainty is given.
+        
+        
+        The nominal value is formatted like a float when the number of
+        significant digits of the uncertainty has no meaning: for a
+        zero or a NaN uncertainty. In the case of a 0 uncertainty, no
+        uncertainty is present in the result and the result looks like
+        a float.  In the case of NaN, the uncertainty is formatted
+        like a float too (giving either nan or NaN).
 
         A "0" in the format specification is ignored.        
         '''
@@ -1495,9 +1512,13 @@ class AffineScalarFunc(object):
 
         # Special case of an uncertainty where the number of
         # significant digits has no meaning: formatting like a float:
-        if std_dev == 0 or isnan(std_dev):
+        if std_dev == 0:
             return robust_format(nom_val, format_spec)
 
+        if isnan(std_dev):
+            return ('%s+/-%s' % (robust_format(nom_val, format_spec),
+                                 robust_format(std_dev, format_spec)))
+     
         if fmt_type == '%':
             std_dev *= 100
             nom_val *= 100

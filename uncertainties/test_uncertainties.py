@@ -1720,7 +1720,7 @@ def test_format():
                     # change can be large: #!!!!!!!!!! This test may
                     # have to be put back if +/-0 is "reversible"
                     # between format() and ufloat_fromstr().
-                    if value.std_dev:
+                    if value.std_dev and not isnan(value.std_dev):
                         assert _numbers_close(value.std_dev,
                                               value_back.std_dev, 3e-1)
 
