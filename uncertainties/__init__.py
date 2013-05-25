@@ -1679,6 +1679,10 @@ class AffineScalarFunc(object):
 
         # Possible % sign:
         if fmt_type == '%':
+            if 'L' in match.group('ext'):
+                # Using '\\' instead of r'\' so as not to confuse
+                # emacs's syntax highlighting:
+                value_str += ' \\'  # % is a special character, in LaTeX
             value_str += '%'
         
         # The global formatting options are applied:
