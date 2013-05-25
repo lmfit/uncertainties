@@ -1527,10 +1527,8 @@ class AffineScalarFunc(object):
         # Exponent notation: should it be used? use_exp is set
         # accordingly:            
         if fmt_type in 'fF%':
-            signif_limit = std_dev_limit
             use_exp = False
         elif fmt_type in 'eE':
-            signif_limit = std_dev_limit            
             use_exp = True
         else:  # g, G, n
             # Should the scientific notation be used? the same rule as
@@ -1563,23 +1561,23 @@ class AffineScalarFunc(object):
             # 9.9999... (in absolute value) *after rounding*:
             #!!!!!!!!!!!
             ref_value = max(abs(self.nominal_value), std_dev)
-            # The reference value will be rounded at signif_limit:
+            # The reference value will be rounded at std_dev_limit:
             # this is what defines its exponent:
-            ref_value = round(ref_value, -signif_limit)
+            ref_value = round(ref_value, -std_dev_limit)
             exponent = _first_digit(ref_value)
             factor = 10.**exponent  # Not 10.**(-exponent), for limit cases
             nom_val_mantissa = self.nominal_value/factor
             std_dev_mantissa = std_dev/factor
-            # The position signif_limit of the significant digit must
+            # The position std_dev_limit of the significant digit must
             # be updated accordingly:
-            signif_limit -= exponent
+            signif_limit = std_dev_limit - exponent
 
         else:  # Fixed point notation
             # Without an exponent, it is necessary to include the
             # decimal point location in the printed digit (e.g.,
             # printing 1234 with only 2 significant digits requires to
             # print at least 1234 (or maybe 1200)):
-            signif_limit = min(signif_limit, 0)
+            signif_limit = min(std_dev_limit, 0)
             nom_val_mantissa = self.nominal_value
             std_dev_mantissa = std_dev
 
