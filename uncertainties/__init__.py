@@ -1382,13 +1382,10 @@ class AffineScalarFunc(object):
         return self._general_representation(repr)
                     
     def __str__(self):
-        # !!!!!!!!!! temporary
-        return self._general_representation(str)
-        
         # An empty format string and str() usually return the same
         # string:
         # (http://docs.python.org/2/library/string.html#format-specification-mini-language)
-        return self.__format__('')  # Works with Python < 2.6
+        return self.__format__('')  # Works with Python < 2.6, not format()
 
     def __format__(self, format_spec):
         '''Formats a number with uncertainty.
@@ -1460,6 +1457,10 @@ class AffineScalarFunc(object):
         
         print "FMT SPEC", repr(format_spec)  #!!!!!! test
 
+        # !!!!!!! I may want the empty format to not be 'g', like for
+        # floats, where str() is different
+
+        
         ########################################            
         # Format specification parsing:
         match = re.match(  #!!!!!! extract global fill, align, width
