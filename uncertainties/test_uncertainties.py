@@ -1649,6 +1649,10 @@ def test_format():
         },
         (12.3, 2.3): {
             '.1fS': '12(2)'  # No decimal point on the uncertainty
+        },
+        (0, 0): {  # Make defining the first significant digit problematic
+            '.1f': '0+/-0',
+            'g': '0+/-0'
         }
         
     }
