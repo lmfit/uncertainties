@@ -1459,14 +1459,6 @@ class AffineScalarFunc(object):
         # tenths, etc.
         
         print "FMT SPEC", repr(format_spec)  #!!!!!! test
-        
-        # Optimization: the standard deviation is generally
-        # calculated: it is calculated only once, here:
-        std_dev = self.std_dev
-
-        # Special case of a 0 uncertainty: formatting like a float:
-        if std_dev == 0:
-            return robust_format(self.nominal_value, format_spec)
 
         ########################################            
         # Format specification parsing:
@@ -1489,6 +1481,26 @@ class AffineScalarFunc(object):
         print "FMT", format_spec
         fmt_type = match.group('type') or 'g'  # g is the default
 
+        ########################################
+                
+        # Since the '%' format can change the value to be displayed,
+        # this value must first be calculated. Calculating the
+        # standard deviation is also an optimization: the standard
+        # deviation is generally calculated: it is calculated only
+        # once, here:
+        std_dev = self.std_dev
+        nom_val = self.nominal_value
+
+        # Special case of a 0 uncertainty: formatting like a float:
+        if std_dev == 0:
+            return robust_format(nom_val, format_spec)
+        
+        if fmt_type == '%':
+            std_dev *= 100
+            nom_val *= 100
+        
+        ########################################
+ 
         # Effective precision (is always a number):
         fmt_prec = match.group('prec')
         if fmt_prec is None:
@@ -1497,7 +1509,7 @@ class AffineScalarFunc(object):
             fmt_prec = int(fmt_prec)
             if fmt_prec == 0:
                 fmt_prec = 1  # It is meaningless to have no significant digit
-
+       
         ########################################
         
         # std_dev_limit: limit on the significant digits of the
@@ -1536,7 +1548,7 @@ class AffineScalarFunc(object):
             use_exp = False
         elif fmt_type in 'eE':
             use_exp = True
-        else:  # g, G, n   #!!!!!!!! what about %?
+        else:  # g, G, n
 
             #!!!!!!!!!! There is duplicated code between the g test
             #and the e implementation. Could this be unified?
@@ -1549,7 +1561,7 @@ class AffineScalarFunc(object):
             # significant digits on the uncertainty.
 
             # Number of significant digits of the larger number:
-            if std_dev >= abs(self.nominal_value):
+            if std_dev >= abs(nom_val):
                 ref_value = std_dev_rounded
                 signif_digits = fmt_prec
             else:  # Usual case: larger nominal value:
@@ -1558,7 +1570,7 @@ class AffineScalarFunc(object):
                 # precision p-1 would have exponent exp". This is what
                 # is calculated here (the first digit of the mantissa
                 # uses 1 digit.
-                ref_value = abs(round(self.nominal_value, -std_dev_limit))
+                ref_value = abs(round(nom_val, -std_dev_limit))
                 signif_digits = _first_digit(ref_value)-std_dev_limit+1
 
             # The choice between using the exponent notation or not
@@ -1586,12 +1598,12 @@ class AffineScalarFunc(object):
             # 9.9999... (in absolute value) *after rounding*.  The
             # reference value will be rounded at std_dev_limit: this
             # is what defines its exponent:
-            ref_value = round(max(abs(self.nominal_value), std_dev),
+            ref_value = round(max(abs(nom_val), std_dev),
                               -std_dev_limit)
 
             exponent = _first_digit(ref_value)
             factor = 10.**exponent  # Not 10.**(-exponent), for limit cases
-            nom_val_mantissa = self.nominal_value/factor
+            nom_val_mantissa = nom_val/factor
             std_dev_mantissa = std_dev/factor
             # The position std_dev_limit of the significant digit must
             # be updated accordingly:
@@ -1603,7 +1615,7 @@ class AffineScalarFunc(object):
             # printing 1234 with only 2 significant digits requires to
             # print at least 1234 (or maybe 1200)):
             signif_limit = min(std_dev_limit, 0)
-            nom_val_mantissa = self.nominal_value
+            nom_val_mantissa = nom_val
             std_dev_mantissa = std_dev
 
         ########################################
@@ -1665,6 +1677,10 @@ class AffineScalarFunc(object):
         else:
             value_str = fixed_point_str  # Nothing to be added
 
+        # Possible % sign:
+        if fmt_type == '%':
+            value_str += '%'
+        
         # The global formatting options are applied:
         return robust_format(
             value_str,
