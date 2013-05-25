@@ -1622,7 +1622,7 @@ def test_format():
         # Some special cases:
         (1, float('nan')): {
             'g': '1+/-nan',
-            'G': '1+/-NaN'
+            'G': '1+/-NAN'
         },
         (9.9, 0.1): {
             '.1e': '(9.9+/-0.1)e+00',
@@ -1674,7 +1674,7 @@ def test_format():
     for (values, representations) in tests.iteritems():
 
         value = ufloat(*values)
-        print "VALUE", value  #!!!!!!!!!!!
+        print "VALUE", value.nominal_value, value.std_dev  #!!!!!!!!!!!
         
         for (format_spec, result) in representations.iteritems():
 
