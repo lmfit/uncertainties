@@ -1147,7 +1147,10 @@ class CallableStdDev(float):
         deprecation('the std_dev attribute should not be called'
                     ' anymore: use .std_dev instead of .std_dev().')
         return self
-        
+
+# Exponent letter for all AffineScalarFunc format types:
+_exp_letter = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
+    
 class AffineScalarFunc(object):
     """
     Affine functions that support basic mathematical operations
@@ -1533,7 +1536,7 @@ class AffineScalarFunc(object):
             use_exp = False
         elif fmt_type in 'eE':
             use_exp = True
-        else:  # g, G, n
+        else:  # g, G, n   #!!!!!!!! what about %?
 
             #!!!!!!!!!! There is duplicated code between the g test
             #and the e implementation. Could this be unified?
@@ -1567,7 +1570,12 @@ class AffineScalarFunc(object):
             ref_exp = _first_digit(ref_value)
             exponent = _first_digit(ref_value)
 
-            use_exp = not(-4 <= exponent < signif_digits)
+            if -4 <= exponent < signif_digits:
+                use_exp = False
+            else:
+                use_exp = True
+                # The letter for the format should be specified:
+                
             
         # Formatting: signif_limit is updated, and the mantissa
         # nominal value and standard deviation are calculated
@@ -1642,7 +1650,6 @@ class AffineScalarFunc(object):
                 pm_symbol,
                 robust_format(std_dev_mantissa, fixed_point_fmt_spec_s)
                 )
-            
 
         # Should an exponent be added? The result goes to value_str:
         if use_exp:
@@ -1651,7 +1658,7 @@ class AffineScalarFunc(object):
                        # Case of e or E. The same convention as Python
                        # 2.7 to 3.3 is used for the display of the
                        # exponent:
-                       else fmt_type+'%+03d')
+                       else _exp_letter[fmt_type]+'%+03d')
             value_str = (mantissa_fmt % fixed_point_str +
                          exp_fmt % exponent)
             
