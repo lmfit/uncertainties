@@ -320,14 +320,14 @@ def deprecation(message):
 
 ###############################################################################
 
-if sys.version_info < (2.6):
+try:
+    isnan = math.isnan
+except AttributeError:  # Python < 2.6
     def isnan(x):
         '''
         Equivalent to the math.isnan() of Python 2.6+.
         '''
         return x != x
-else:
-    isnan = math.isnan
     
 ###############################################################################
 
