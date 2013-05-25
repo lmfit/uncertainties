@@ -1689,7 +1689,10 @@ def test_format():
             # An empty format string is like calling str()
             # (http://docs.python.org/2/library/string.html#formatspec):
             if not format_spec:
-                assert representation == str(value)
+                assert representation == str(value), (
+                    'Empty format should give the same thing as str():'
+                    ' %s obtained instead of %s'
+                    % (representation, str(value)))
             
             # Parsing back into a number with uncertainty (unless the
             # LaTeX or comma notation is used):
