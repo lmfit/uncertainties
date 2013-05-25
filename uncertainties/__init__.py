@@ -1455,8 +1455,6 @@ class AffineScalarFunc(object):
         # Convention on digits: 0 is units (10**0), 1 is tens, -1 is
         # tenths, etc.
         
-        print "FMT SPEC", repr(format_spec)  #!!!!!! test
-
         # !!!!!!! I may want the empty format to not be 'g', like for
         # floats, where str() is different
 

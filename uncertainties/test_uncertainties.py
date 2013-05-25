@@ -1674,8 +1674,11 @@ def test_format():
     for (values, representations) in tests.iteritems():
 
         value = ufloat(*values)
-
+        print "VALUE", value  #!!!!!!!!!!!
+        
         for (format_spec, result) in representations.iteritems():
+
+            print "FMT SPEC", repr(format_spec)  #!!!!!! test
 
             # Call that works with Python < 2.6:
             representation = value.__format__(format_spec)
