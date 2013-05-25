@@ -1450,7 +1450,7 @@ class AffineScalarFunc(object):
         #which is not good (irregular behavior).
 
         # !!!!!!!!! A NaN uncertainty does not handle the LaTeX
-        # option (\pm).
+        # option (\pm). OR the global formatting.
 
         # !!!!!!! The spectroscopic notation, with a zero uncertainty,
         # should print (0), so as to be compatible with the fact that
