@@ -320,11 +320,14 @@ def deprecation(message):
 
 ###############################################################################
 
-def isnan(x):
-    '''
-    Equivalent to the math.isnan() of Python 2.6+.
-    '''
-    return x != x
+if sys.version_info < (2.6):
+    def isnan(x):
+        '''
+        Equivalent to the math.isnan() of Python 2.6+.
+        '''
+        return x != x
+else:
+    isnan = math.isnan
     
 ###############################################################################
 
@@ -1477,7 +1480,7 @@ class AffineScalarFunc(object):
         # !!!!!!! This rule (for Python 2) seems to be broken for
         # {:20}, where 1e10 is formatted apparently with str() instead
         # of 'g'.
-        print "FMT", format_spec
+
         fmt_type = match.group('type') or 'g'  # g is the default
 
         ########################################
@@ -1490,10 +1493,11 @@ class AffineScalarFunc(object):
         std_dev = self.std_dev
         nom_val = self.nominal_value
 
-        # Special case of a 0 uncertainty: formatting like a float:
-        if std_dev == 0:
+        # Special case of an uncertainty where the number of
+        # significant digits has no meaning: formatting like a float:
+        if std_dev == 0 or isnan(std_dev):
             return robust_format(nom_val, format_spec)
-        
+
         if fmt_type == '%':
             std_dev *= 100
             nom_val *= 100
