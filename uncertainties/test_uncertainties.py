@@ -1619,6 +1619,20 @@ def test_format():
             '.2fLS': '-1.2(3.4)'
         },
 
+        # Special cases for the uncertainty (0, nan) and format
+        # strings (extension S, L, U,..., global width, etc.):
+        (-1.4e-12, 0): {
+            'L': r'-1.4 \times 10^{12}',
+            '10': '  -1.4e-12',
+            '13S': '  -1.4(0)e-12'
+        },
+        (-1.4e-12, float('nan')): {
+            'L': r'-1.4 \pm nan',
+            '16': '  -1.4e-12+/-nan',
+            '15S': '  -1.4(nan)e-12',
+            '15GS': '  -1.4(NAN)E-12'
+        },
+        
         # Some special cases:
         (1, float('nan')): {
             'g': '1+/-nan',

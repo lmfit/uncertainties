@@ -1501,9 +1501,11 @@ class AffineScalarFunc(object):
         # Special case of an uncertainty where the number of
         # significant digits has no meaning: formatting like a float:
         if std_dev == 0:
+            #!!!!!!!! Go through options (LaTeX: 10^..., etc.)
             return robust_format(nom_val, format_spec)
 
         if isnan(std_dev):
+            #!!!!!!!! Go through options (LaTeX: 10^..., etc.)            
             return ('%s+/-%s' % (robust_format(nom_val, format_spec),
                                  robust_format(std_dev, format_spec)))
      
@@ -1633,6 +1635,11 @@ class AffineScalarFunc(object):
         ########################################
         # Final formatting:
 
+        #!!!!!! Define the main inputs, put the following in a
+        # routine: fixed_point_fmt_spec_s/m, options
+        # (match.group('ext')), std_dev_mantissa, signif_limit,
+        # first_digit_std_dev_rounded #!!!!!!!!!!
+        
         # Format for the fixed-point part of the standard deviation:
         fixed_point_fmt_spec_s = '%s%s.%df' % (
             match.group('extra0'), match.group('extra1'),
