@@ -1743,7 +1743,7 @@ class AffineScalarFunc(object):
         This can be used for formatting numbers with uncertainties in
         Python < 2.6, with '... %s ...' % num.format('.2e').
         """
-        self.__format__(format_spec)
+        return self.__format__(format_spec)
     
     def std_score(self, value):
         """
