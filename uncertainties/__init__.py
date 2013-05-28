@@ -1735,10 +1735,10 @@ class AffineScalarFunc(object):
              (match.group('width')) +
              's'))
 
-    def format(self, format_spec):  #!!!!!! or format(), since it can return unicode?
+    def format(self, format_spec):
         """
-        Returns the same result as format(self, format_spec) in Python
-        2.6+.
+        Returns the same result as the format(self, format_spec) of
+        Python 2.6+.
 
         This can be used for formatting numbers with uncertainties in
         Python < 2.6, with '... %s ...' % num.format('.2e').
