@@ -1578,7 +1578,10 @@ def test_format():
         
         # Automatic extension of the uncertainty up to the decimal
         # point:
-        (1000, 123): {'.1f': '1000+/-123'},
+        (1000, 123): {
+            '.1f': '1000+/-123',
+            '.1e': '(10+/-1)e+02'  # No extension, in this case
+        },
 
         # Spectroscopic notation:
         (-1.23, 3.4): {
