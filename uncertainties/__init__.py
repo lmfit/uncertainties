@@ -1123,8 +1123,8 @@ def _PDG_precision(std_dev):
         # std_dev:
         return (2, 10.**exponent*(1000/factor))
 
-# Definition of a formatting function that works whatever the version
-# of Python:
+# Definition of a basic formatting function that works whatever the
+# version of Python:
 try:
 
     robust_format = format
@@ -1135,7 +1135,8 @@ except NameError:  # format() not defined (Python < 2.6)
         '''
         Formats the given value with the given format specification.
 
-        format_spec: % formatting specification, without the leading %.
+        format_spec: a simple % formatting specification, without the
+        leading % (e.g., 3.2f).
         '''
         return ('%' + format_spec) % value
     
@@ -1155,12 +1156,14 @@ class CallableStdDev(float):
 _exp_letter = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
 def __format_num(nom_val_mantissa, fp_fmt_n,
-                 std_dev_mantissa, fp_fmt_s
+                 std_dev_mantissa, fp_fmt_s,
+                 exponent,  # !!!! None if no exponent
+                 options  # !!!!!! supports "in"
                  ):
     '''
     Returns a valid __format__() output for a number with uncertainty.
 
-    
+    #!!!!!!!!!
     '''
     #!!!!!!!!!!
 
@@ -1661,7 +1664,7 @@ class AffineScalarFunc(object):
         fixed_point_fmt_spec_n = ((match.group('sign')) +
                                   fixed_point_fmt_spec_s)
 
-                
+        
         if 'S' in match.group('ext'):  # Spectroscopic notation:
 
             uncert = round(std_dev_mantissa, -signif_limit)
@@ -1717,7 +1720,7 @@ class AffineScalarFunc(object):
         
         # The global formatting options are applied:
         return robust_format(
-            value_str,
+            __format_num(),
             # None -> '':
             ((match.group('fill_align') or '') +
              (match.group('width')) +
