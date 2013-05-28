@@ -1153,6 +1153,17 @@ class CallableStdDev(float):
 
 # Exponent letter for all AffineScalarFunc format types:
 _exp_letter = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
+
+def __format_num(nom_val_mantissa, fp_fmt_n,
+                 std_dev_mantissa, fp_fmt_s
+                 ):
+    '''
+    Returns a valid __format__() output for a number with uncertainty.
+
+    
+    '''
+    #!!!!!!!!!!
+
     
 class AffineScalarFunc(object):
     """
@@ -1647,7 +1658,7 @@ class AffineScalarFunc(object):
         # Format for the fixed-point part of the nominal value: the
         # sign is only applied to the mantissa (since the sign of the
         # standard deviation is always +):
-        fixed_point_fmt_spec_m = ((match.group('sign')) +
+        fixed_point_fmt_spec_n = ((match.group('sign')) +
                                   fixed_point_fmt_spec_s)
 
                 
@@ -1669,7 +1680,7 @@ class AffineScalarFunc(object):
 
             # An integer uncertainty is displayed as an integer:
             fixed_point_str = "%s(%s)" % (
-                robust_format(nom_val_mantissa, fixed_point_fmt_spec_m),
+                robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
                 uncert_str)
                     
         else:  # Regular +/- notation:
@@ -1677,7 +1688,7 @@ class AffineScalarFunc(object):
             pm_symbol = ' \pm ' if 'L' in match.group('ext') else '+/-'
 
             fixed_point_str = '%s%s%s' % (
-                robust_format(nom_val_mantissa, fixed_point_fmt_spec_m),
+                robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
                 pm_symbol,
                 robust_format(std_dev_mantissa, fixed_point_fmt_spec_s)
                 )
