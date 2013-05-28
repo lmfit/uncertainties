@@ -87,7 +87,7 @@ Basic examples
 
     >>> from uncertainties import ufloat
     
-    >>> x = ufloat((2, 0.25))
+    >>> x = ufloat(2, 0.25)
     >>> x
     2.0+/-0.25
     
@@ -110,7 +110,7 @@ Basic examples
     2.0
     
     >>> from uncertainties import unumpy  # Array manipulation
-    >>> random_vars = unumpy.uarray(([1, 2], [0.1, 0.2]))
+    >>> random_vars = unumpy.uarray([1, 2], [0.1, 0.2])
     >>> print random_vars
     [1.0+/-0.1 2.0+/-0.2]
     >>> random_vars.mean()
