@@ -1166,6 +1166,10 @@ def __format_num(nom_val_mantissa, fp_fmt_n,
     #!!!!!!!!!
     '''
     #!!!!!!!!!!
+
+    # The string fixed_point_str for the fixed-point part is
+    # calculated (part with no exponent):
+    
     if 'S' in options:  # Spectroscopic notation:
 
         uncert = round(std_dev_mantissa, -signif_limit)
@@ -1730,6 +1734,16 @@ class AffineScalarFunc(object):
             ((match.group('fill_align') or '') +
              (match.group('width')) +
              's'))
+
+    def format(self, format_spec):  #!!!!!! or format(), since it can return unicode?
+        """
+        Returns the same result as format(self, format_spec) in Python
+        2.6+.
+
+        This can be used for formatting numbers with uncertainties in
+        Python < 2.6, with '... %s ...' % num.format('.2e').
+        """
+        self.__format__(format_spec)
     
     def std_score(self, value):
         """
