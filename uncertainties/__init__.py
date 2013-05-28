@@ -1166,6 +1166,60 @@ def __format_num(nom_val_mantissa, fp_fmt_n,
     #!!!!!!!!!
     '''
     #!!!!!!!!!!
+    if 'S' in options:  # Spectroscopic notation:
+
+        uncert = round(std_dev_mantissa, -signif_limit)
+
+        # The uncertainty might straddle the decimal point: we
+        # keep it as it is, in this case (e.g. 1.2(3.4), as this
+        # makes the result easier to read); the spectroscopic
+        # notation then essentially coincides with the +/-
+        # notation:
+        if first_digit_std_dev_rounded >= 0 and signif_limit < 0:
+            uncert_str = '%.*f' % (-signif_limit, uncert)
+        else:
+            # The round is important because 566.99999999 can be
+            # obtained when 567 is wanted (%d prints the integer
+            # part):
+            uncert_str = '%d' % round(uncert/10.**signif_limit)
+
+        # An integer uncertainty is displayed as an integer:
+        fixed_point_str = "%s(%s)" % (
+            robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
+            uncert_str)
+
+    else:  # Regular +/- notation:
+
+        pm_symbol = ' \pm ' if 'L' in match.group('ext') else '+/-'
+
+        fixed_point_str = '%s%s%s' % (
+            robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
+            pm_symbol,
+            robust_format(std_dev_mantissa, fixed_point_fmt_spec_s)
+            )
+
+    # Should an exponent be added? The result goes to value_str:
+    if use_exp:
+        mantissa_fmt = '%s' if 'S' in match.group('ext') else '(%s)'
+        exp_fmt = (r' \times 10^{%d}' if 'L' in match.group('ext')
+                   # Case of e or E. The same convention as Python
+                   # 2.7 to 3.3 is used for the display of the
+                   # exponent:
+                   else _exp_letter[fmt_type]+'%+03d')
+        value_str = (mantissa_fmt % fixed_point_str +
+                     exp_fmt % exponent)
+
+    else:
+        value_str = fixed_point_str  # Nothing to be added
+
+    # Possible % sign:
+    if fmt_type == '%':
+        if 'L' in match.group('ext'):
+            # Using '\\' instead of r'\' so as not to confuse
+            # emacs's syntax highlighting:
+            value_str += ' \\'  # % is a special character, in LaTeX
+        value_str += '%'
+
 
     
 class AffineScalarFunc(object):
@@ -1642,6 +1696,7 @@ class AffineScalarFunc(object):
             # decimal point location in the printed digit (e.g.,
             # printing 1234 with only 2 significant digits requires to
             # print at least 1234 (or maybe 1200)):
+            exponent = None
             signif_limit = min(std_dev_limit, 0)
             nom_val_mantissa = nom_val
             std_dev_mantissa = std_dev
@@ -1665,62 +1720,12 @@ class AffineScalarFunc(object):
                                   fixed_point_fmt_spec_s)
 
         
-        if 'S' in match.group('ext'):  # Spectroscopic notation:
-
-            uncert = round(std_dev_mantissa, -signif_limit)
-
-            # The uncertainty might straddle the decimal point: we
-            # keep it as it is, in this case (e.g. 1.2(3.4), as this
-            # makes the result easier to read); the spectroscopic
-            # notation then essentially coincides with the +/-
-            # notation:
-            if first_digit_std_dev_rounded >= 0 and signif_limit < 0:
-                uncert_str = '%.*f' % (-signif_limit, uncert)
-            else:
-                # The round is important because 566.99999999 can be
-                # obtained when 567 is wanted:
-                uncert_str = '%d' % round(uncert/10.**signif_limit)
-
-            # An integer uncertainty is displayed as an integer:
-            fixed_point_str = "%s(%s)" % (
-                robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
-                uncert_str)
-                    
-        else:  # Regular +/- notation:
-            
-            pm_symbol = ' \pm ' if 'L' in match.group('ext') else '+/-'
-
-            fixed_point_str = '%s%s%s' % (
-                robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
-                pm_symbol,
-                robust_format(std_dev_mantissa, fixed_point_fmt_spec_s)
-                )
-
-        # Should an exponent be added? The result goes to value_str:
-        if use_exp:
-            mantissa_fmt = '%s' if 'S' in match.group('ext') else '(%s)'
-            exp_fmt = (r' \times 10^{%d}' if 'L' in match.group('ext')
-                       # Case of e or E. The same convention as Python
-                       # 2.7 to 3.3 is used for the display of the
-                       # exponent:
-                       else _exp_letter[fmt_type]+'%+03d')
-            value_str = (mantissa_fmt % fixed_point_str +
-                         exp_fmt % exponent)
-            
-        else:
-            value_str = fixed_point_str  # Nothing to be added
-
-        # Possible % sign:
-        if fmt_type == '%':
-            if 'L' in match.group('ext'):
-                # Using '\\' instead of r'\' so as not to confuse
-                # emacs's syntax highlighting:
-                value_str += ' \\'  # % is a special character, in LaTeX
-            value_str += '%'
-        
         # The global formatting options are applied:
         return robust_format(
-            __format_num(),
+            __format_num(nom_val_mantissa, fixed_point_fmt_spec_n,
+                         std_dev_mantissa, fixed_point_fmt_spec_s,
+                         exponent,
+                         set(match.group('ext'))),
             # None -> '':
             ((match.group('fill_align') or '') +
              (match.group('width')) +
