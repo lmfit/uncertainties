@@ -1555,8 +1555,8 @@ class AffineScalarFunc(object):
             '(?P<width>\d*)'
             '(?P<extra1>,?)'  # ","
             '(?:\.(?P<prec>\d+))?'
-            '(?P<type>[^LS]?)'
-            '(?P<options>[LS]*)$',
+            '(?P<type>[^LSC]?)'  # Special options excluded
+            '(?P<options>*)$',
             format_spec)
 
         # Effective format type: f, e, g, etc.:
@@ -1579,30 +1579,36 @@ class AffineScalarFunc(object):
 
         # Special case of an uncertainty where the number of
         # significant digits has no meaning: formatting like a float:
-        if std_dev == 0:
-            #!!!!!!!! Go through options (LaTeX: 10^..., etc.)
-            return _format_num(
-                nom_val,
-                '%s%s.%df' % (
-            match.group('extra0'), match.group('extra1'),
 
+        if std_dev == 0 or isnan(std_dev):
 
-                format_spec,  #!!!!! Wrong! needs to extract the global format
-                # No decimal point = exact, not truncated float (0.00
-                # might be truncated):
-                0, 'd',
-                match.group('options')
-                )
+            # Formatting for a single part (nominal value, but also
+            # standard deviation, for floats):
+            fmt_spec_n = '%s%s%s' % (
+                match.group('sign'), match.group('extra1'),
+                '.%s' % fmt_prec if fmt_prec else '',
+                match.group('type'))
+        
+            if std_dev == 0:
 
-        if isnan(std_dev):
-            #!!!!!!!! Go through options (LaTeX: 10^..., etc.)            
-            return ('%s+/-%s' % (robust_format(nom_val, format_spec),
-                                 robust_format(std_dev, format_spec)))
+                return _format_num(
+                    nom_val, fmt_spec_n,
+                    # No decimal point = exact, not truncated float (0.00
+                    # might be truncated):
+                    std_dev_mantissa=0, 'd',
+                    match.group('options')
+                    )
+
+            else:  # NaN case
+
+                return _format_num(
+                    nom_val, fmt_spec_n,
+                    std_dev, fmt_spec_n,
+                    match.group('options'))
      
         if fmt_type == '%':
             std_dev *= 100
             nom_val *= 100
-        
         ########################################
  
         # Effective precision (is always a number):
@@ -1613,7 +1619,7 @@ class AffineScalarFunc(object):
             fmt_prec = int(fmt_prec)
             if fmt_prec == 0:
                 fmt_prec = 1  # It is meaningless to have no significant digit
-       
+               
         ########################################
         
         # std_dev_limit: limit on the significant digits of the
@@ -1727,8 +1733,8 @@ class AffineScalarFunc(object):
         # Final formatting:
         
         # Format for the fixed-point part of the standard deviation:
-        fixed_point_fmt_spec_s = '%s%s.%df' % (
-            match.group('extra0'), match.group('extra1'),
+        fixed_point_fmt_spec_s = '%s.%df' % (
+            match.group('extra1'),
             -signif_limit)
         # Format for the fixed-point part of the nominal value: the
         # sign is only applied to the mantissa (since the sign of the
