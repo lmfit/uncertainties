@@ -1155,11 +1155,11 @@ class CallableStdDev(float):
 # Exponent letter for all AffineScalarFunc format types:
 _exp_letter = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
-def __format_num(nom_val_mantissa, fp_fmt_n,
-                 std_dev_mantissa, fp_fmt_s,
-                 exponent,  # !!!! None if no exponent
-                 options  # !!!!!! supports "in"
-                 ):
+def _format_num(nom_val_mantissa, fp_fmt_n,
+                std_dev_mantissa, fp_fmt_s,
+                exponent,  # !!!! None if no exponent
+                options  # !!!!!! supports "in"
+                ):
     '''
     Returns a valid __format__() output for a number with uncertainty.
 
@@ -1726,10 +1726,10 @@ class AffineScalarFunc(object):
         
         # The global formatting options are applied:
         return robust_format(
-            __format_num(nom_val_mantissa, fixed_point_fmt_spec_n,
-                         std_dev_mantissa, fixed_point_fmt_spec_s,
-                         exponent,
-                         set(match.group('ext'))),
+            _format_num(nom_val_mantissa, fixed_point_fmt_spec_n,
+                        std_dev_mantissa, fixed_point_fmt_spec_s,
+                        exponent,
+                        set(match.group('ext'))),
             # None -> '':
             '%s%ss' % (match.group('fill_align') or '', match.group('width')))
 
