@@ -1,3 +1,5 @@
+# coding=utf-8
+
 #!! Whenever the documentation below is updated, setup.py should be
 # checked for consistency.
 
@@ -1158,7 +1160,7 @@ _exp_letter = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 def _format_num(nom_val_mantissa, fp_fmt_n,
                 std_dev_mantissa, fp_fmt_s,
                 exponent,  # !!!! None if no exponent
-                options  # !!!!!! supports "in"
+                options  # !!!!!! supports "in", SLC
                 ):
     '''
     Returns a valid __format__() output for a number with uncertainty.
@@ -1192,9 +1194,14 @@ def _format_num(nom_val_mantissa, fp_fmt_n,
             robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
             uncert_str)
 
-    else:  # Regular +/- notation:
+    else:  # +/- notation:
 
-        pm_symbol = ' \pm ' if 'L' in match.group('ext') else '+/-'
+        pm_symbol = (
+            # Unicode has priority over LaTeX, so that users with a
+            # Unicode-compatible LaTeX source can use ±:
+            u'±' if 'C' in options else
+            ' \pm ' if 'L' in options else
+            '+/-')
 
         fixed_point_str = '%s%s%s' % (
             robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
