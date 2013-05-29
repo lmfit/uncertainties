@@ -1731,9 +1731,7 @@ class AffineScalarFunc(object):
                          exponent,
                          set(match.group('ext'))),
             # None -> '':
-            ((match.group('fill_align') or '') +
-             (match.group('width')) +
-             's'))
+            '%s%ss' % (match.group('fill_align') or '', match.group('width')))
 
     # Alternate name for __format__, for use with Python < 2.6:    
     format = set_doc("""
