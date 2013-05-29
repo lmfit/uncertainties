@@ -1735,15 +1735,15 @@ class AffineScalarFunc(object):
              (match.group('width')) +
              's'))
 
-    def format(self, format_spec):
-        """
+    # Alternate name for __format__, for use with Python < 2.6:    
+    format = set_doc("""
         Returns the same result as the format(self, format_spec) of
         Python 2.6+, or equivalently as self.__format__(format_spec).
 
-        This can be used for formatting numbers with uncertainties in
-        Python < 2.6, with '... %s ...' % num.format('.2e').
-        """
-        return self.__format__(format_spec)
+        This method can be used for formatting numbers with
+        uncertainties in Python < 2.6, with '... %s ...' %
+        num.format('.2e').
+        """)(__format__)
     
     def std_score(self, value):
         """
