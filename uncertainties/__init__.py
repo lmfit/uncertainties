@@ -1551,7 +1551,7 @@ class AffineScalarFunc(object):
         match = re.match(  #!!!!!! extract global fill, align, width
             '(?P<fill_align>.?[<>=^])?'
             '(?P<sign>[-+ ]?)'
-            '(?P<extra0>#?0?)'  # #, 0
+            '(?P<extra0>0?)'  # 0
             '(?P<width>\d*)'
             '(?P<extra1>,?)'  # ","
             '(?:\.(?P<prec>\d+))?'
@@ -1581,13 +1581,18 @@ class AffineScalarFunc(object):
         # significant digits has no meaning: formatting like a float:
         if std_dev == 0:
             #!!!!!!!! Go through options (LaTeX: 10^..., etc.)
-            return _format_num(nom_val, format_spec,
-                               # No decimal point = exact, not
-                               # truncated float (0.00 might be
-                               # truncated):
-                               0, 'd',
-                               match.group('options')
-                               )
+            return _format_num(
+                nom_val,
+                '%s%s.%df' % (
+            match.group('extra0'), match.group('extra1'),
+
+
+                format_spec,  #!!!!! Wrong! needs to extract the global format
+                # No decimal point = exact, not truncated float (0.00
+                # might be truncated):
+                0, 'd',
+                match.group('options')
+                )
 
         if isnan(std_dev):
             #!!!!!!!! Go through options (LaTeX: 10^..., etc.)            
@@ -1720,11 +1725,6 @@ class AffineScalarFunc(object):
 
         ########################################
         # Final formatting:
-
-        #!!!!!! Define the main inputs, put the following in a
-        # routine: fixed_point_fmt_spec_s/m, options
-        # (match.group('options')), std_dev_mantissa, signif_limit,
-        # first_digit_std_dev_rounded #!!!!!!!!!!
         
         # Format for the fixed-point part of the standard deviation:
         fixed_point_fmt_spec_s = '%s%s.%df' % (
