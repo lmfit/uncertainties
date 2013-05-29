@@ -1167,8 +1167,8 @@ def _format_num(nom_val_mantissa, fp_fmt_n,
     '''
     #!!!!!!!!!!
 
-    # The string fixed_point_str for the fixed-point part is
-    # calculated (part with no exponent):
+    # The string fixed_point_str for the whole fixed-point part
+    # (nominal value and standard deviation) is calculated:
     
     if 'S' in options:  # Spectroscopic notation:
 
