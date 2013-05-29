@@ -1556,7 +1556,7 @@ class AffineScalarFunc(object):
             '(?P<extra1>,?)'  # ","
             '(?:\.(?P<prec>\d+))?'
             '(?P<type>[^LS]?)'
-            '(?P<ext>[LS]*)$',
+            '(?P<options>[LS]*)$',
             format_spec)
 
         # Effective format type: f, e, g, etc.:
@@ -1581,7 +1581,13 @@ class AffineScalarFunc(object):
         # significant digits has no meaning: formatting like a float:
         if std_dev == 0:
             #!!!!!!!! Go through options (LaTeX: 10^..., etc.)
-            return robust_format(nom_val, format_spec)
+            return _format_num(nom_val, format_spec,
+                               # No decimal point = exact, not
+                               # truncated float (0.00 might be
+                               # truncated):
+                               0, 'd',
+                               match.group('options')
+                               )
 
         if isnan(std_dev):
             #!!!!!!!! Go through options (LaTeX: 10^..., etc.)            
@@ -1717,7 +1723,7 @@ class AffineScalarFunc(object):
 
         #!!!!!! Define the main inputs, put the following in a
         # routine: fixed_point_fmt_spec_s/m, options
-        # (match.group('ext')), std_dev_mantissa, signif_limit,
+        # (match.group('options')), std_dev_mantissa, signif_limit,
         # first_digit_std_dev_rounded #!!!!!!!!!!
         
         # Format for the fixed-point part of the standard deviation:
@@ -1736,7 +1742,7 @@ class AffineScalarFunc(object):
             _format_num(nom_val_mantissa, fixed_point_fmt_spec_n,
                         std_dev_mantissa, fixed_point_fmt_spec_s,
                         exponent,
-                        set(match.group('ext'))),
+                        set(match.group('options'))),
             # None -> '':
             '%s%ss' % (match.group('fill_align') or '', match.group('width')))
 
