@@ -1503,36 +1503,36 @@ def test_format():
 
         # Full generalization of float formatting:
         (3.1415, 0.0001): {
-            '*^+022.2f': '**+3.14150+/-0.00010**',  # 0 is ignored
-            '*^+22.2f': '**+3.14150+/-0.00010**',  # 0 is ignored
+            '*^+022.2uf': '**+3.14150+/-0.00010**',  # 0 is ignored
+            '*^+22.2uf': '**+3.14150+/-0.00010**',  # 0 is ignored
             '>20f': '   3.14150+/-0.00010'  # Width and align
         },
 
         # Precision = number of digits of the uncertainty (most of the
         # time):
         (123.456789, 0.00123): {
-            '.1f': '123.457+/-0.001',
-            '.2f': '123.4568+/-0.0012',
-            '.3f': '123.45679+/-0.00123',
-            '.2e': '(1.234568+/-0.000012)e+02'
+            '.1uf': '123.457+/-0.001',
+            '.2uf': '123.4568+/-0.0012',
+            '.3uf': '123.45679+/-0.00123',
+            '.2ue': '(1.234568+/-0.000012)e+02'
         },
         # Sign handling:
         (-123.456789, 0.00123): {
-            '.1f': '-123.457+/-0.001',
-            '.2f': '-123.4568+/-0.0012',
-            '.3f': '-123.45679+/-0.00123',
-            '.2e': '(-1.234568+/-0.000012)e+02'
+            '.1uf': '-123.457+/-0.001',
+            '.2uf': '-123.4568+/-0.0012',
+            '.3uf': '-123.45679+/-0.00123',
+            '.2ue': '(-1.234568+/-0.000012)e+02'
         },
         # Uncertainty larger than the nominal value:
         (12.3, 456.78): {
             '': '12+/-457',
-            '.1f': '12+/-457',
-            '.4f': '12.3+/-456.8'
+            '.1uf': '12+/-457',
+            '.4uf': '12.3+/-456.8'
         },
         # ... Same thing, but with an exponent:
         (12.3, 456.78): {
-            '.1e': '(0+/-5)e+02',
-            '.4e': '(0.123+/-4.568)e+02'
+            '.1ue': '(0+/-5)e+02',
+            '.4ue': '(0.123+/-4.568)e+02'
         },
         
         # Test of the various float formats: the nominal value should
@@ -1576,27 +1576,27 @@ def test_format():
         # Automatic extension of the uncertainty up to the decimal
         # point:
         (1000, 123): {
-            '.1f': '1000+/-123',
-            '.1e': '(10+/-1)e+02'  # No extension, in this case
+            '.1uf': '1000+/-123',
+            '.1ue': '(10+/-1)e+02'  # No extension, in this case
         },
 
         # Spectroscopic notation:
         (-1.23, 3.4): {
             'S': '-1.2(3.4)',
-            '.2fS': '-1.2(3.4)',
-            '.3fS': '-1.23(3.40)',
+            '.2ufS': '-1.2(3.4)',
+            '.3ufS': '-1.23(3.40)',
         },
         (-123.456, 0.123): {
             'S': '-123.46(12)',
-            '.1fS': '-123.5(1)',            
-            '.2fS': '-123.46(12)',
-            '.3fS': '-123.456(123)',
+            '.1ufS': '-123.5(1)',            
+            '.2ufS': '-123.46(12)',
+            '.3ufS': '-123.456(123)',
         },
         (-123.456, 0.567): {
             'S': '-123.5(6)',
-            '.1fS': '-123.5(6)',            
-            '.2fS': '-123.46(57)',
-            '.3fS': '-123.456(567)',
+            '.1ufS': '-123.5(6)',            
+            '.2ufS': '-123.46(57)',
+            '.3ufS': '-123.456(567)',
         },
 
         # LaTeX notation:
@@ -1615,8 +1615,8 @@ def test_format():
         (-1.23, 3.4): {
             'SL': '-1.2(3.4)',
             'LS': '-1.2(3.4)',
-            '.2fSL': '-1.2(3.4)',
-            '.2fLS': '-1.2(3.4)'
+            '.2ufSL': '-1.2(3.4)',
+            '.2ufLS': '-1.2(3.4)'
         },
 
         # Special cases for the uncertainty (0, nan) and format
@@ -1644,19 +1644,19 @@ def test_format():
             'G': '1+/-NAN'
         },
         (9.9, 0.1): {
-            '.1e': '(9.9+/-0.1)e+00',
-            '.0e': '(9.9+/-0.1)e+00'  # 0 converted to 1: different from float
+            '.1ue': '(9.9+/-0.1)e+00',
+            '.0ue': '(9.9+/-0.1)e+00'  # 0 converted to 1: different from float
         },
         (9.99, 0.1): {
              # The precision has an effect on the exponent, like for
              # floats:
-            '.2e': '(9.99+/-0.10)e+00',  # Same exponent as for 9.99 alone
-            '.1e': '(1.00+/-0.01)e+01'  # Same exponent as for 9.99 alone
+            '.2ue': '(9.99+/-0.10)e+00',  # Same exponent as for 9.99 alone
+            '.1ue': '(1.00+/-0.01)e+01'  # Same exponent as for 9.99 alone
         },
         # 0 uncertainty: displayed like a float:
         (1.2345, 0): {
-            '.2e': '1.23e+00',
-            '.2f': '1.23'
+            '.2ue': '1.23e+00',
+            '.2uf': '1.23'
         },
         (1e5, 0): {
             'g': '100000'
@@ -1667,18 +1667,18 @@ def test_format():
         # Rounding of the uncertainty that "changes" the number of
         # significant digits:
         (1, 0.994): {
-            '.3f': '1.000+/-0.994',
-            '.2f': '1.00+/-0.99',
-            '.1f': '1+/-1'  # Discontinuity in the number of digits
+            '.3uf': '1.000+/-0.994',
+            '.2uf': '1.00+/-0.99',
+            '.1uf': '1+/-1'  # Discontinuity in the number of digits
         },
         (12.3, 2.3): {
-            '.2fS': '12.3(2.3)'  # Decimal point on the uncertainty
+            '.2ufS': '12.3(2.3)'  # Decimal point on the uncertainty
         },
         (12.3, 2.3): {
-            '.1fS': '12(2)'  # No decimal point on the uncertainty
+            '.1ufS': '12(2)'  # No decimal point on the uncertainty
         },
         (0, 0): {  # Make defining the first significant digit problematic
-            '.1f': '0.0',  # Simple float formatting
+            '.1uf': '0.0',  # Simple float formatting
             'g': '0'
         }
         
@@ -1687,7 +1687,7 @@ def test_format():
     # ',' format option: introduced in Python 2.7
     if sys.version_info >= (2, 7):
         tests[(1234.56789, 0.012)] = {
-            ',.1f': '1,234.57+/-0.01'}
+            ',.1uf': '1,234.57+/-0.01'}
             
     
     for (values, representations) in tests.iteritems():
