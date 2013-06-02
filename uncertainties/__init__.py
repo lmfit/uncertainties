@@ -1522,6 +1522,10 @@ class AffineScalarFunc(object):
         specification are applied individually to each of the nominal
         value and standard deviation.
 
+        The sign parameter of the format specification is only applied
+        to the nominal value (since the standard deviation is
+        positive).
+
         In the case of the standard text output, the returned string
         can be generally parsed back with ufloat_fromstr(). This
         excludes cases where numbers use the "," thousands separator,
