@@ -1699,8 +1699,8 @@ def test_format():
 
             print "FMT SPEC", repr(format_spec)  #!!!!!! test
 
-            # Call that works with Python < 2.6:
-            representation = value.__format__(format_spec)
+            # Call that works with Python < 2.6 too:
+            representation = value.format(format_spec)
 
             assert representation == result, (
                 'Incorrect representation %s for format %r of %s+/-%s:'
