@@ -1503,16 +1503,16 @@ def test_format():
 
         # Usual float formatting, and individual widths, etc.:
         (3.1415, 0.0001): {
-            ' ^+7.2f': ' +3.14 +/- 0.00  ',
+            '*^+7.2f': '*+3.14*+/-*0.00**',
             '+07.2f': '+003.14+/-0000.00',  # 0 fill
             '>10f': '  3.141500+/-  0.000100'  # Width and align
         },
         
         # Full generalization of float formatting:
         (3.1415, 0.0001): {
-            '*^+022.2uf': '**+3.14150+/-0.00010**',  # 0 is ignored
-            '*^+22.2uf': '**+3.14150+/-0.00010**',  # 0 is ignored
-            '>20f': '   3.14150+/-0.00010'  # Width and align
+            '+09.2uf': '+003.14150+/-000.00010',
+            '*^+9.2uf': '*+3.14150*+/-*0.00010*',
+            '>9f': '  3.14150+/-  0.00010'  # Width and align
         },
 
         # Precision = number of digits of the uncertainty (most of the
