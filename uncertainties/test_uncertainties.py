@@ -1499,9 +1499,6 @@ def test_format():
     # Tests of each point of the docstring of
     # AffineScalarFunc.__format__() in turn, mostly in the same order.
 
-    if sys.version_info < (2, 6):  # str.format() added in Python 2.6
-        return
-
     tests = {  # (Nominal value, uncertainty): {format: result,...}
 
         # Full generalization of float formatting:
@@ -1634,6 +1631,11 @@ def test_format():
             '16': '  -1.4e-12+/-nan',
             '15S': '  -1.4(nan)e-12',
             '15GS': '  -1.4(NAN)E-12'
+        },
+
+        # Character (Unicode) strings:
+        (3.14, 0.01): {
+            u'U': u'3.14±0.01'
         },
         
         # Some special cases:
