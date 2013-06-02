@@ -1491,10 +1491,10 @@ class AffineScalarFunc(object):
         given number of digits after the decimal point, etc.).
 
         The main difference is that the precision (".p"), when
-        followed by the extension "u", is interpreted as indicating
-        the number p of digits of the displayed uncertainty. Example:
-        .1uf will return the uncertainty with a single significant
-        digit.
+        followed by the "u" precision extension, is interpreted as
+        indicating the number p of significant digits of the displayed
+        uncertainty. Example: .1uf will return the uncertainty with a
+        single significant digit.
         
         Another difference is that if no precision is given, then the
         rounding rules from the Particle Data Group are used
