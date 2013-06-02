@@ -1472,48 +1472,55 @@ class AffineScalarFunc(object):
     def __format__(self, format_spec):
         '''Formats a number with uncertainty.
 
-        Accepts the same format specification as format() for floats
-        (as defined for Python 2.6+), but restricted to what the %
-        operator accepts (if using an earlier version of Python).  In
+        Accepts the same format specification as format() for floats,
+        as defined for Python 2.6+--restricted to what the % operator
+        accepts, if using an earlier version of Python.  In
         particular, the usual alignment, sign flag, etc. can be
-        used. However, a slightly different semantics is used, so that
-        the number of digits of the uncertainty can be controlled. The
-        format specification is also more general than that of floats
-        (see the spectroscopic and LaTeX outputs below).
+        used. However, the format is extended: the number of digits of
+        the uncertainty can be controlled, as is the way the
+        uncertainty is indicated (with +/- or with the short-hand
+        notation 3.14(1), in LaTeX or with a simple text string,...).
 
-        The nominal value is rounded according to the number of digits
-        of the uncertainty (so as to not show digits that go beyond
-        the last digit of the uncertainty).
+        The nominal value is rounded at the digit where the displayed
+        uncertainty stops (e.g. 1.23+/-0.01)--where this makes sense,
+        i.e. not for the exact value 1.23+/-0, and 1.23+/-NaN).
         
         The nominal value and the standard deviation are formatted
         through format_spec almost as if they were floats (with or
-        without exponent, exponent with or without uppercase,
-        etc.). The main difference is that the precision (".p") is
-        interpreted as indicating the number p of digits of the
-        displayed uncertainty (if the given precision is 0, it is
-        converted to 1).
+        without exponent, exponent with or without uppercase, with a
+        given number of digits after the decimal point, etc.).
+
+        The main difference is that the precision (".p"), when
+        followed by the extension "u", is interpreted as indicating
+        the number p of digits of the displayed uncertainty. Example:
+        .1uf will return the uncertainty with a single significant
+        digit.
         
-        If no precision is given, then the rounding rules from the
-        Particle Data Group are used
-        (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).
+        Another difference is that if no precision is given, then the
+        rounding rules from the Particle Data Group are used
+        (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf)--instead
+        of having, for example, the f format use the default 6 digits
+        after the decimal point.
 
         When the exponent notation is used, the mantissa of the larger
         value (in absolute value, between the nominal value and the
         standard deviation) is between 1 and 10, like for floats.
         
         If no format type is given, "g" is assumed, like for floats.
-        
-        The g, G and n (and empty) format types work like for floats,
-        except that the equivalent (float) precision is defined as the
+
+        When prefixed with "u", the g, G and n (and empty) format
+        types trigger the exponent notation based on the following
+        equivalent (float) precision: the precision defined as the
         number of digits required for the larger of the two numbers
         (nominal value and standard deviation) to be displayed at the
-        level of the displayed uncertainty. This is because when
-        triggering the exponent notation, the larger value is the one
-        formatted like a float, with a mantissa between 1 and 10.
-        
-        The fill, align and width parameters of the format
-        specification are applied globally (not to each of the nominal
-        value and standard deviation).
+        level of the displayed uncertainty. This is because when the
+        exponent notation is triggered, the larger value is the one
+        formatted like a float, with a mantissa between 1 and 10, so
+        it is the one that obeys the same exponent rule.
+
+        The fill, align, zero and width parameters of the format
+        specification are applied individually to each of the nominal
+        value and standard deviation.
 
         In the case of the standard text output, the returned string
         can be generally parsed back with ufloat_fromstr(). This
@@ -1521,18 +1528,16 @@ class AffineScalarFunc(object):
         for example.
         
         When "S" is present after the usual float format, the
-        spectroscopic notation 1.234(5) is used. When "L" is present,
-        the output is formatted with LaTeX. These options can be
-        combined.
+        short-hand notation 1.234(5) is used. When "L" is present, the
+        output is formatted with LaTeX. These options can be combined.
 
         The nominal value is formatted like a float when the number of
-        significant digits of the uncertainty has no meaning: for a
-        zero or a NaN uncertainty. In the case of a 0 uncertainty, no
-        uncertainty is present in the result and the result looks like
-        a float.  In the case of NaN, the uncertainty is formatted
-        like a float too (giving either nan or NaN).
-
-        A "0" in the format specification is ignored.        
+        significant digits of the uncertainty has no meaning (any "u"
+        precision modifier is ignored), i.e. for a zero or a NaN
+        uncertainty. A 0 uncertainty, is represented by the integer 0.
+        In the case of NaN, the uncertainty is formatted like a float
+        too (giving either nan or NAN, depending on the format
+        string).
         '''
 
         # Convention on limits "between" digits: 0 = exactly at the
