@@ -1505,7 +1505,8 @@ def test_format():
         (3.1415, 0.0001): {
             '*^+7.2f': '*+3.14*+/-*0.00**',
             '+07.2f': '+003.14+/-0000.00',  # 0 fill
-            '>10f': '  3.141500+/-  0.000100'  # Width and align
+            '>10f': '  3.141500+/-  0.000100',  # Width and align
+            '11.3e': '  3.142e+00+/-  0.000e+00'  # Duplicated exponent
         },
         
         # Full generalization of float formatting:
@@ -1515,8 +1516,7 @@ def test_format():
             '>9f': '  3.14150+/-  0.00010'  # Width and align
         },
 
-        # Precision = number of digits of the uncertainty (most of the
-        # time):
+        # Number of digits of the uncertainty fixed:
         (123.456789, 0.00123): {
             '.1uf': '123.457+/-0.001',
             '.2uf': '123.4568+/-0.0012',
