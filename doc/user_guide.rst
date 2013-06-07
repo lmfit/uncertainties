@@ -46,6 +46,7 @@ expressed in many convenient ways:
   >>> x = ufloat_fromstr("0.20(1)")
   >>> x = ufloat_fromstr("20(1)e-2")  # Exponential notation supported
   >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
+  >>> x = ufloat_parse("0.20")  # No automatic uncertainty is added
 
 The available representations can be listed with ``pydoc
 uncertainties.ufloat_fromstr``.  Representations that are invalid raise a
