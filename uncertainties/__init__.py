@@ -1577,11 +1577,10 @@ class AffineScalarFunc(object):
 
         # Effective format type: f, e, g, etc.:
         #
-        # !!!!!!! This rule (for Python 2) seems to be broken for
-        # {:20}, where 1e10 is formatted apparently with str() instead
-        # of 'g'.
-
-        fmt_type = match.group('type') or 'g'  # g is the default
+        # g is the default
+        # (http://docs.python.org/2/library/string.html#format-specification-mini-language,
+        # see effect of a None format type on floats)
+        fmt_type = match.group('type') or 'g'
 
         ########################################
                 
