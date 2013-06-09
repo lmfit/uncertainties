@@ -1584,11 +1584,11 @@ class AffineScalarFunc(object):
 
         ########################################
                 
-        # Since the '%' format can change the value to be displayed,
-        # this value must first be calculated. Calculating the
-        # standard deviation is also an optimization: the standard
-        # deviation is generally calculated: it is calculated only
-        # once, here:
+        # Since the '%' format specification can change the value to
+        # be displayed, this value must first be
+        # calculated. Calculating the standard deviation is also an
+        # optimization: the standard deviation is generally
+        # calculated: it is calculated only once, here:
         std_dev = self.std_dev
         nom_val = self.nominal_value
 
