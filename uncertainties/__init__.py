@@ -1457,8 +1457,7 @@ class AffineScalarFunc(object):
         # mistaken for another element of the array).
 
         return ("%s+/-%s" % (to_string(nominal_value), to_string(std_dev))
-                if std_dev
-                else to_string(nominal_value))
+                if std_dev else '0')
 
     def __repr__(self):
         return self._general_representation(repr)
@@ -1592,6 +1591,8 @@ class AffineScalarFunc(object):
         std_dev = self.std_dev
         nom_val = self.nominal_value
 
+        #!!!!!!!!!!
+        
         # Special case of an uncertainty where the number of
         # significant digits has no meaning: formatting like a float:
 
