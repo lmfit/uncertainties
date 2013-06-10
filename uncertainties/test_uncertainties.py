@@ -1507,6 +1507,7 @@ def test_format():
             '+07.2f': '+003.14+/-0000.00',  # 0 fill
             '>10f': '  3.141500+/-  0.000100',  # Width and align
             '11.3e': '  3.142e+00+/-  0.000e+00'  # Duplicated exponent
+            '0.4e': '3.1415e+00+/-0.0000e+00'  # Forced double exponent
         },
         
         # Full generalization of float formatting:
@@ -1662,14 +1663,16 @@ def test_format():
         },
         # 0 uncertainty: displayed like a float:
         (1.2345, 0): {
-            '.2ue': '1.23e+00',
-            '.2uf': '1.23'
+            '.2ue': '(1.23e+/-0)e+00',
+            '.2uf': '1.23+/-0',
+            '.2ufS': '1.23(0)',
+            '.2fS': '1.23(0)'
         },
         (1e5, 0): {
-            'g': '100000'
+            'g': '100000+/-0'
         }, 
         (1e6, 0): {
-            'g': '1e+06'
+            'g': '(1+/-0)e+06'
         },
         # Rounding of the uncertainty that "changes" the number of
         # significant digits:
