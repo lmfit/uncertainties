@@ -1492,6 +1492,17 @@ def test_PDG_precision():
 
     for (std_dev, result) in tests.iteritems():
         assert uncertainties._PDG_precision(std_dev) == result
+
+def test_repr():
+    '''Test the representation of numbers with uncertainty.'''
+
+    # The uncertainty is a power of 2, so that it can be exactly
+    # represented:
+    x = ufloat(3.14159265358979, 0.25)
+    assert repr(x) == '3.14+/-0.25'
+
+    x = ufloat(3.14159265358979, 0)
+    assert repr(x) == '3.14+/-0'
     
 def test_format():
     '''Test the formatting of numbers with uncertainty.'''
