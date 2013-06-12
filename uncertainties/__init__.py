@@ -1566,10 +1566,10 @@ class AffineScalarFunc(object):
             format_spec)
 
         if not match:
-            raise ValueError('Format specification %r cannot be used with'
-                             ' object of type %r' % (format_spec,
-                                                     # Sub-classes handled:
-                                                     self.__class__.__name__))
+            raise ValueError(
+                'Format specification %r cannot be used with object of type %r'
+                # Sub-classes handled:
+                % (format_spec, self.__class__.__name__))
             
         # Effective format type: f, e, g, etc.:
         #
