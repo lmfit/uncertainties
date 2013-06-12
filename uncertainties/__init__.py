@@ -1468,7 +1468,7 @@ class AffineScalarFunc(object):
 
         The nominal value is rounded at the digit where the displayed
         uncertainty stops (e.g. 1.23+/-0.01)--where this makes sense,
-        i.e. not for the exact value 1.23+/-0, and 1.23+/-NaN).
+        i.e. not for the exact value 1.23+/-0, and for 1.23+/-NaN).
         
         The nominal value and the standard deviation are formatted
         through format_spec almost as if they were floats (with or
