@@ -1501,16 +1501,6 @@ class AffineScalarFunc(object):
         
         If no format type is given, "g" is assumed, like for floats.
 
-        When prefixed with "u", the g, G and n (and empty) format
-        types trigger the exponent notation based on the following
-        equivalent (float) precision: the precision defined as the
-        number of digits required for the larger of the two numbers
-        (nominal value and standard deviation) to be displayed at the
-        level of the displayed uncertainty. This is because when the
-        exponent notation is triggered, the larger value is the one
-        formatted like a float, with a mantissa between 1 and 10, so
-        it is the one that obeys the usual "g" exponent rule.
-
         The fill, align, zero and width parameters of the format
         specification are applied individually to each of the nominal
         value and standard deviation.
@@ -1536,10 +1526,20 @@ class AffineScalarFunc(object):
         The nominal value is formatted like a float when the number of
         significant digits of the uncertainty has no meaning (any "u"
         precision modifier is ignored), i.e. for a zero or a NaN
-        uncertainty. A 0 uncertainty, is represented by the integer 0.
-        In the case of NaN, the uncertainty is formatted like a float
-        too (giving either nan or NAN, depending on the format
+        uncertainty. A zero uncertainty, is represented by the integer
+        0.  In the case of NaN, the uncertainty is formatted like a
+        float too (giving either nan or NAN, depending on the format
         string).
+
+        When prefixed with "u", the g, G and n (and empty) format
+        types trigger the exponent notation based on the following
+        equivalent (float) precision: the precision defined as the
+        number of digits required for the larger of the two numbers
+        (nominal value and standard deviation) to be displayed at the
+        level of the displayed uncertainty. This is because when the
+        exponent notation is triggered, the larger value is the one
+        formatted like a float, with a mantissa between 1 and 10, so
+        it is the one that obeys the usual "g" exponent rule.        
         '''
 
         # Convention on limits "between" digits: 0 = exactly at the
