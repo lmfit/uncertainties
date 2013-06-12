@@ -1438,29 +1438,15 @@ class AffineScalarFunc(object):
         return CallableStdDev(sqrt(sum(
             delta**2 for delta in self.error_components().itervalues())))
 
-    def _general_representation(self, to_string):
-        """
-        Uses the to_string() conversion function on both the nominal
-        value and the standard deviation, and returns a string that
-        describes them.
-
-        to_string() is typically repr() or str().
-        """
-
-        (nominal_value, std_dev) = (self._nominal_value, self.std_dev)
-
-        # String representation:
-
+    def __repr__(self):
         # Not putting spaces around "+/-" helps with arrays of
         # Variable, as each value with an uncertainty is a
         # block of signs (otherwise, the standard deviation can be
         # mistaken for another element of the array).
-
-        return ("%s+/-%s" % (to_string(nominal_value), to_string(std_dev))
-                if std_dev else '0')
-
-    def __repr__(self):
-        return self._general_representation(repr)
+        
+        std_dev = self.std_dev  # Optimization, since std_dev is calculated
+        
+        return "%r+/-%s" % (nominal_value, repr(std_dev) if std_dev else '0')
                     
     def __str__(self):
         # An empty format string and str() usually return the same
