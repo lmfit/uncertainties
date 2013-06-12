@@ -1523,10 +1523,15 @@ class AffineScalarFunc(object):
         can be normally be parsed back with ufloat_fromstr(). This
         excludes cases where numbers use the "," thousands separator,
         for example.
+
+        Options can be added, at the end of the format
+        specification. Multiple options can be specified.
         
-        When "S" is present after the usual float format, the
-        short-hand notation 1.234(5) is used. When "L" is present, the
-        output is formatted with LaTeX. These options can be combined.
+        When option "S" is present (like in .1uS), the short-hand
+        notation 1.234(5) is used. When "C" is present, the single
+        character "±" separates the nominal value from the standard
+        deviation. When "L" is present, the output is formatted with
+        LaTeX.
 
         The nominal value is formatted like a float when the number of
         significant digits of the uncertainty has no meaning (any "u"
