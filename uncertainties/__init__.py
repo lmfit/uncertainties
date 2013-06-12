@@ -1545,7 +1545,7 @@ class AffineScalarFunc(object):
 
         # Convention on limits "between" digits: 0 = exactly at the
         # decimal point, -1 = after the first decimal, 1 = before the
-        # units digit, etc.).
+        # units digit, etc.
 
         # Convention on digits: 0 is units (10**0), 1 is tens, -1 is
         # tenths, etc.
