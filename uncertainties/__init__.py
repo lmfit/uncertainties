@@ -1560,11 +1560,17 @@ class AffineScalarFunc(object):
             '(?P<width>\d*)'
             '(?P<extra1>,?)'  # ","
             '(?:\.(?P<prec>\d+))?'
-            # The type can be omitted. Options must not go here::            
+            # The type can be omitted. Options must not go here:
             '(?P<type>.??)'
             '(?P<options>[LSC]*)$',
             format_spec)
 
+        if not match:
+            raise ValueError('Format specification %r cannot be used with'
+                             ' object of type %r' % (format_spec,
+                                                     # Sub-classes handled:
+                                                     self.__class__.__name__))
+            
         # Effective format type: f, e, g, etc.:
         #
         # g is the default
