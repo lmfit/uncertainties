@@ -1458,8 +1458,8 @@ class AffineScalarFunc(object):
         '''Formats a number with uncertainty.
 
         Accepts the same format specification as format() for floats,
-        as defined for Python 2.6+--restricted to what the % operator
-        accepts, if using an earlier version of Python.  In
+        as defined for Python 2.6+ (restricted to what the % operator
+        accepts, if using an earlier version of Python).  In
         particular, the usual alignment, sign flag, etc. can be
         used. However, the format is extended: the number of digits of
         the uncertainty can be controlled, as is the way the
