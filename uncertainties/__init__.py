@@ -1550,21 +1550,19 @@ class AffineScalarFunc(object):
         # Convention on digits: 0 is units (10**0), 1 is tens, -1 is
         # tenths, etc.
         
-        # !!!!!!! I may want the empty format to not be 'g', like for
-        # floats, where str() is different
-
-        
         ########################################            
         # Format specification parsing:
-        match = re.match(  #!!!!!! extract global fill, align, width
+
+        match = re.match(
             '(?P<fill_align>.?[<>=^])?'
             '(?P<sign>[-+ ]?)'
             '(?P<extra0>0?)'  # 0
             '(?P<width>\d*)'
             '(?P<extra1>,?)'  # ","
             '(?:\.(?P<prec>\d+))?'
-            '(?P<type>[^LSC]?)'  # Special options excluded
-            '(?P<options>*)$',
+            # The type can be omitted. Options must not go here::            
+            '(?P<type>.??)'
+            '(?P<options>[LSC]*)$',
             format_spec)
 
         # Effective format type: f, e, g, etc.:
