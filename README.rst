@@ -15,9 +15,13 @@ This is the uncertainties Python package.
 GitHub
 ------
 
-The current version of the branches in the Github repository are 
-bleeding-edge, but they are *working* versions that passed the tests 
+The current version of the `master*` branches in the Github repository 
+are bleeding-edge, but they are *working* versions that passed the tests 
 for all version of Python starting at 2.4.
 
-The master branch is for Python 2.5+, while the master_python2.3 branch 
+The `master` branch is for Python 2.5+, while the `master_python2.3` branch 
 is for Python 2.3 and 2.4.
+
+Other branches might be present in the GitHub repository, but they are 
+temporary and represent work in progress that do not necessarily run 
+properly yet.
