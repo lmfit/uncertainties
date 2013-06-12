@@ -1520,7 +1520,7 @@ class AffineScalarFunc(object):
         positive).
 
         In the case of the standard text output, the returned string
-        can be generally parsed back with ufloat_fromstr(). This
+        can be normally be parsed back with ufloat_fromstr(). This
         excludes cases where numbers use the "," thousands separator,
         for example.
         
