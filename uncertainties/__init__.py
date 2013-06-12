@@ -1475,11 +1475,11 @@ class AffineScalarFunc(object):
         without exponent, exponent with or without uppercase, with a
         given number of digits after the decimal point, etc.).
 
-        The main difference is that the precision (".p"), when
-        followed by the "u" precision extension, is interpreted as
-        indicating the number p of significant digits of the displayed
-        uncertainty. Example: .1uf will return the uncertainty with a
-        single significant digit.
+        The main difference is that the precision (".p", where p is a
+        number), when followed by the "u" precision extension, is
+        interpreted as indicating the number p of significant digits
+        of the displayed uncertainty. Example: .1uf will return the
+        uncertainty with a single significant digit.
         
         Another difference is that if no precision is given, then the
         rounding rules from the Particle Data Group are used
