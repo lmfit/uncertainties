@@ -1509,7 +1509,7 @@ class AffineScalarFunc(object):
         level of the displayed uncertainty. This is because when the
         exponent notation is triggered, the larger value is the one
         formatted like a float, with a mantissa between 1 and 10, so
-        it is the one that obeys the same exponent rule.
+        it is the one that obeys the usual "g" exponent rule.
 
         The fill, align, zero and width parameters of the format
         specification are applied individually to each of the nominal
