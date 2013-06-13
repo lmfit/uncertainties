@@ -1653,8 +1653,9 @@ def test_format():
         },
 
         # Character (Unicode) strings:
-        (3.14, 0.01): {
-            u'U': u'3.14±0.01'
+        (3.14e-10, 0.01e-10): {
+            u'C': u'(3.14±0.01)e-10',
+            u'CL': ur'(3.14±0.01) \times 10^{-10}'
         },
         
         # Some special cases:
