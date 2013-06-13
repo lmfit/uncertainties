@@ -1580,8 +1580,8 @@ class AffineScalarFunc(object):
 
         ########################################
                 
-        # Since the '%' format specification can change the value to
-        # be displayed, this value must first be
+        # Since the '%' (percentage) format specification can change
+        # the value to be displayed, this value must first be
         # calculated. Calculating the standard deviation is also an
         # optimization: the standard deviation is generally
         # calculated: it is calculated only once, here:
