@@ -1790,7 +1790,7 @@ class AffineScalarFunc(object):
         Returns the same result as the format(self, format_spec) of
         Python 2.6+, or equivalently as self.__format__(format_spec).
 
-        This method can be used for formatting numbers with
+        This method is meant to be used for formatting numbers with
         uncertainties in Python < 2.6, with '... %s ...' %
         num.format('.2e').
         """)(__format__)
