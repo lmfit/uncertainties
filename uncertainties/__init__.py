@@ -2019,39 +2019,6 @@ def ufloat_fromstr(representation, tag=None):
     (nominal_value, std_dev) = _str_to_number_with_uncert(representation)
     return ufloat(nominal_value, std_dev, tag)
 
-def ufloat_parse(representation, float_=None):
-    """
-    Returns a new random variable (Variable object) from a string.
-
-    Recognized representations are the same as for ufloat_fromstr.
-    The behaviour deviates from ufloat_fromstr only in the case where
-    no uncertainty is given. In this case an error of zero will be
-    assumed.
-
-    This behaviour better complies with the expectation that parsing
-    should be the inverse operation to formatting, which is currently
-    not fulfilled by ufloat_fromstr:
-
-    >>> ufloat_fromstr(str(ufloat(1, 0)))
-    1.0+/-0.1
-    >>> ufloat_parse(str(ufloat(1, 0)))
-    1.0
-
-    The float_ parameter is used as a factory for the case where no
-    uncertainty is given. If float_ is None a ufloat with std_dev=0
-    will be created.
-
-    """
-    try:
-        value = float(representation)
-    except ValueError:
-        return ufloat_fromstr(representation)
-
-    if float_ is None:
-        return ufloat(value, 0)
-    else:
-        return float_(value)
-
 def _ufloat_obsolete(representation, tag=None):
     '''
     Legacy version of ufloat(). Will eventually be removed.
