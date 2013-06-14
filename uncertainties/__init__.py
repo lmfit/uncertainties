@@ -1159,8 +1159,8 @@ _exp_letter = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
 def _format_num(nom_val_mantissa, fp_fmt_n,
                 std_dev_mantissa, fp_fmt_s,
-                exponent,  # !!!! None if no exponent
-                options  # !!!!!! supports "in", SLC
+                options='',  # !!!!!! supports options in "SLC"                
+                exponent=None  # !!!! None if no common exponent
                 ):
     '''
     Returns a valid __format__() output for a number with uncertainty.
@@ -1501,9 +1501,10 @@ class AffineScalarFunc(object):
         
         If no format type is given, "g" is assumed, like for floats.
 
-        The fill, align, zero and width parameters of the format
-        specification are applied individually to each of the nominal
-        value and standard deviation.
+        In the standard form, the fill, align, zero and width
+        parameters of the format specification are applied
+        individually to each of the nominal value and standard
+        deviation.
 
         The sign parameter of the format specification is only applied
         to the nominal value (since the standard deviation is
@@ -1556,10 +1557,9 @@ class AffineScalarFunc(object):
         match = re.match(
             '(?P<fill_align>.?[<>=^])?'
             '(?P<sign>[-+ ]?)'
-            '(?P<extra0>0?)'  # 0
-            '(?P<width>\d*)'
-            '(?P<extra1>,?)'  # ","
+            '(?P<extra0>0?\d*,?)'  # Optional 0, width and comma
             '(?:\.(?P<prec>\d+))?'
+            '(?P<uncert_prec>u?)'  # Precision for the uncertainty?
             # The type can be omitted. Options must not go here:
             '(?P<type>.??)'
             '(?P<options>[LSC]*)$',
@@ -1588,50 +1588,62 @@ class AffineScalarFunc(object):
         std_dev = self.std_dev
         nom_val = self.nominal_value
 
-        #!!!!!!!!!!
+        if fmt_type == '%':
+            std_dev *= 100
+            nom_val *= 100
         
         # Special case of an uncertainty where the number of
         # significant digits has no meaning: formatting like a float:
 
         if std_dev == 0 or isnan(std_dev):
 
-            # Formatting for a single part (nominal value, but also
-            # standard deviation, for floats):
-            fmt_spec_n = '%s%s%s' % (
-                match.group('sign'), match.group('extra1'),
-                '.%s' % fmt_prec if fmt_prec else '',
-                match.group('type'))
-        
-            if std_dev == 0:
+            fmt_prec = match.group('prec')
+
+            # Float formatting for each part, without the uncertainty
+            # flag (u) and without the type:
+            fmt_spec_part_start = ''.join([
+                match.group('fill_align'), match.group('sign'),
+                match.group('extra0'), '.%s' % fmt_prec if fmt_prec else ''])
+
+            fmt_spec_part_end = match.group('type')
+
+            # Full format specification (for the nominal value):
+            fmt_spec_part = fmt_spec_part_start+fmt_spec_part_end
+            
+            if std_dev:  # NaN
 
                 return _format_num(
-                    nom_val, fmt_spec_n,
-                    # No decimal point = exact, not truncated float (0.00
-                    # might be truncated):
-                    std_dev_mantissa=0, 'd',
+                    nom_val, fmt_spec_part,
+                    std_dev, fmt_spec_part,
+                    match.group('options'))
+
+            else:  # 0
+
+                return _format_num(
+                    nom_val, fmt_spec_part,
+                    std_dev_mantissa=0,
+                    # No decimal point means exact (this is different
+                    # from a truncated float (0.00 might be
+                    # truncated)).
+                    #
+                    # The total width, etc. are taken into account:
+                    fmt_spec_part_start+'d',
                     match.group('options')
                     )
-
-            else:  # NaN case
-
-                return _format_num(
-                    nom_val, fmt_spec_n,
-                    std_dev, fmt_spec_n,
-                    match.group('options'))
      
-        if fmt_type == '%':
-            std_dev *= 100
-            nom_val *= 100
         ########################################
- 
+
+        #!!!!!!!!!!!!!
+            
         # Effective precision (is always a number):
         fmt_prec = match.group('prec')
-        if fmt_prec is None:
-            (fmt_prec, std_dev) = _PDG_precision(std_dev)
-        else:
+        if fmt_prec:
             fmt_prec = int(fmt_prec)
             if fmt_prec == 0:
+                #!!!!!! Adapt for u and or g? OR REMOVE?
                 fmt_prec = 1  # It is meaningless to have no significant digit
+        else:
+            (fmt_prec, std_dev) = _PDG_precision(std_dev)
                
         ########################################
         
