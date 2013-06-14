@@ -1159,18 +1159,26 @@ _exp_letter = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
 def _format_num(nom_val_mantissa, fp_fmt_n,
                 std_dev_mantissa, fp_fmt_s,
-                options='',  # !!!!!! supports options in "SLC"                
+                options='',
                 exponent=None  # !!!! None if no common exponent
                 ):
     '''
     Returns a valid __format__() output for a number with uncertainty.
 
-    #!!!!!!!!!
+    #!!!!!!!!! options in LSC, can generally be cumulated
+
+    #!!!!!!!! exponent: = *common* exponent; None = no common exponent used
     '''
     #!!!!!!!!!!
 
     # The string fixed_point_str for the whole fixed-point part
     # (nominal value and standard deviation) is calculated:
+
+    #!!!!!!!! What should the spectroscopic notation with a fixed
+    #number of digits after the decimal point give? the risk is to
+    #have something like 3.14(00) printed, which looks as if the
+    #uncertainty is exactly zero. I could forbid this, or count on
+    #users to know what they are doing.
     
     if 'S' in options:  # Spectroscopic notation:
 
