@@ -1893,13 +1893,13 @@ class NotParenForm(ValueError):
     an uncertainty indicated between parentheses was expected but not
     found.
     '''
-    
-def parse_error_in_parentheses(representation):
+
+def parse_error_in_parentheses(representation, exact_float):
     """
     Returns (value, error) from a string representing a number with
     uncertainty like 12.34(5), 12.34(142), 12.5(3.4) or 12.3(4.2)e3.
     If no parenthesis is given, an uncertainty of one on the last
-    digit is assumed.
+    digit is assumed iff exact_float==False.
 
     Raises ValueError if the string cannot be parsed.    
     """
@@ -1925,8 +1925,8 @@ def parse_error_in_parentheses(representation):
                   
     if uncert_int is None:
         # No uncertainty was found: an uncertainty of 1 on the last
-        # digit is assumed:
-        uncert_int = '1'
+        # digit is assumed iff exact_float==False:
+        uncert_int = str(int(not exact_float))
 
     # Do we have a fully explicit uncertainty?
     if uncert_dec is not None:
@@ -1953,7 +1953,7 @@ _cannot_parse_ufloat_msg_pat = (
 # The following function is not exposed because it can in effect be
 # obtained by doing x = ufloat_fromstr(representation) and reading
 # x.nominal_value and x.std_dev:
-def _str_to_number_with_uncert(representation):
+def _str_to_number_with_uncert(representation, exact_float=False):
     """
     Given a string that represents a number with uncertainty, returns the
     nominal value and the uncertainty.
@@ -1973,7 +1973,7 @@ def _str_to_number_with_uncert(representation):
     except ValueError:
         # Form with parentheses or no uncertainty:
         try:
-            parsed_value = parse_error_in_parentheses(representation)
+            parsed_value = parse_error_in_parentheses(representation, exact_float)
         except NotParenForm:
             raise ValueError(_cannot_parse_ufloat_msg_pat % representation)
     else:
@@ -1984,15 +1984,15 @@ def _str_to_number_with_uncert(representation):
         
     return parsed_value
 
-def ufloat_fromstr(representation, tag=None):
+def ufloat_fromstr(representation, tag=None, exact_float=False):
     """
     Returns a new random variable (Variable object) from a string.
     
     Strings 'representation' of the form '12.345+/-0.015',
     '12.345(15)', or '12.3' are recognized (see more complete list
     below).  In the last case, an uncertainty of +/-1 is assigned to
-    the last digit.
-    
+    the last digit iff exact_float==False; +/-0 otherwise.
+
     Examples of valid string representations:
 
         12.3e10+/-5e3
@@ -2016,7 +2016,7 @@ def ufloat_fromstr(representation, tag=None):
 
     #! The special ** syntax is for Python 2.5 and before (Python 2.6+
     # understands tag=tag):
-    (nominal_value, std_dev) = _str_to_number_with_uncert(representation)
+    (nominal_value, std_dev) = _str_to_number_with_uncert(representation, exact_float)
     return ufloat(nominal_value, std_dev, tag)
 
 def _ufloat_obsolete(representation, tag=None):
