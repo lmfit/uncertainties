@@ -1174,19 +1174,19 @@ def _format_num(nom_val_mantissa, fp_fmt_n,
     # The string fixed_point_str for the whole fixed-point part
     # (nominal value and standard deviation) is calculated:
 
-    #!!!!!!!! What should the spectroscopic notation with a fixed
+    #!!!!!!!! What should the shorthand notation with a fixed
     #number of digits after the decimal point give? the risk is to
     #have something like 3.14(00) printed, which looks as if the
     #uncertainty is exactly zero. I could forbid this, or count on
     #users to know what they are doing.
     
-    if 'S' in options:  # Spectroscopic notation:
+    if 'S' in options:  # Shorthand notation:
 
         uncert = round(std_dev_mantissa, -signif_limit)
 
         # The uncertainty might straddle the decimal point: we
         # keep it as it is, in this case (e.g. 1.2(3.4), as this
-        # makes the result easier to read); the spectroscopic
+        # makes the result easier to read); the shorthand
         # notation then essentially coincides with the +/-
         # notation:
         if first_digit_std_dev_rounded >= 0 and signif_limit < 0:
