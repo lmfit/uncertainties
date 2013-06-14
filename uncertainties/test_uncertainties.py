@@ -1641,13 +1641,13 @@ def test_format():
         # Special cases for the uncertainty (0, nan) and format
         # strings (extension S, L, U,..., global width, etc.):
         (-1.4e-12, 0): {
-            'L': r'-1.4 \times 10^{12}',
-            '10': '  -1.4e-12',
+            'L': r'-1.4 \times 10^{12} \pm 0 \times 10^{12}',
+            '10C': u'  -1.4e-12±         0',
             '13S': '  -1.4(0)e-12'
         },
         (-1.4e-12, float('nan')): {
             'L': r'-1.4 \pm nan',
-            '16': '  -1.4e-12+/-nan',
+            '10': '  -1.4e-12+/-       nan',
             '15S': '  -1.4(nan)e-12',
             '15GS': '  -1.4(NAN)E-12'
         },
@@ -1661,7 +1661,8 @@ def test_format():
         # Some special cases:
         (1, float('nan')): {
             'g': '1+/-nan',
-            'G': '1+/-NAN'
+            'G': '1+/-NAN',
+            '%': '100+/-nan'
         },
         (9.9, 0.1): {
             '.1ue': '(9.9+/-0.1)e+00',
