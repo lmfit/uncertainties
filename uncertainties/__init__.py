@@ -1240,7 +1240,34 @@ def _format_num(nom_val_mantissa, fp_fmt_n,
         value_str += '%'
 
 
-    
+def signif_d_to_limit(value, num_signif_d):
+    '''
+    Returns the precision limit necessary to display value with
+    num_signif_d significant digits.
+
+    The precision limit is given as -1 for 1 digit after the decimal
+    point, 0 for integer rounding, etc. It can be positive.
+    '''
+
+    first_digit = _first_digit(value)
+
+    limit_no_rounding = first_digit-num_signif_d+1
+
+    # The number of significant digits of the uncertainty, when
+    # rounded at this limit_no_rounding level, can be too large by 1
+    # (e.g., with num_signif_d = 1, 0.99 gives limit_no_rounding = -1, but
+    # the rounded value at that limit is 1.0, i.e. has 2
+    # significant digits instead of num_signif_d = 1). We correct for
+    # this effect by adjusting limit if necessary:
+    rounded = round(value, -limit_no_rounding)
+    first_digit_rounded = _first_digit(rounded)
+
+    return (limit_no_rounding if first_digit_rounded <= first_digit
+            # The rounded limit is first_digit_rounded-num_signif_d+1;
+            # but this can only be 1 above the non-rounded limit:
+            else limit_no_rounding+1)
+
+
 class AffineScalarFunc(object):
     """
     Affine functions that support basic mathematical operations
@@ -1648,47 +1675,22 @@ class AffineScalarFunc(object):
 
         if match.group('uncert_prec'):  # u option
 
-            #!!!!!!!!!!!!
-            
-            # Effective precision (is always a number):
-
+            # Number of significant digits to use:
             if fmt_prec:
-                fmt_prec = int(fmt_prec)
+                num_signif_d = int(fmt_prec)
             else:
-                (fmt_prec, std_dev) = _PDG_precision(std_dev)
+                (num_signif_d, std_dev) = _PDG_precision(std_dev)
 
-            ########################################
+            std_dev_limit = signif_d_to_limit(std_dev, num_signif_d)
 
-            # std_dev_limit: limit on the significant digits of the
-            # standard deviation:
-            first_digit_std_dev = _first_digit(std_dev)
-            std_dev_limit = _first_digit(std_dev)-fmt_prec+1
-
-            # The number of significant digits of the uncertainty, when
-            # rounded at this std_dev_limit level, can be too large by 1
-            # (e.g., with fmt_prec = 1, 0.99 gives std_dev_limit = -1, but
-            # the rounded value at that limit is 1.0, i.e. has 2
-            # significant digits instead of fmt_prec = 1). We correct for
-            # this effect by adjusting std_dev_limit if necessary:
-            std_dev_rounded = round(std_dev, -std_dev_limit)
-            first_digit_std_dev_rounded = _first_digit(std_dev_rounded)
-            # If the rounded version has a first digit shifted to the left:
-            if first_digit_std_dev_rounded > first_digit_std_dev:
-                std_dev_limit += 1
-            # Now, std_dev_limit is such that std_dev rounded at this
-            # level has the correct number of digits (fmt_prec). The
-            # digits corresponding to the rounded std_dev are
-            # _first_digit_std_dev_rounded to the new std_dev_limit.
-
-            #!!!!!!!! move code below here, if needed
-
-        else:
+        else:  # The precision has the same meaning as for floats
 
             # Regular meaning of the precision (applied to the nominal
             # value, which is for instance relevant with the g format
             # specification [where precision = number of significant
             # digits]):
-               
+
+            std_dev_limit =  #!!!!!!! meaningless
             #!!!!!!
             
         #######################################
@@ -1717,13 +1719,13 @@ class AffineScalarFunc(object):
             # for floats is used ("-4 <= exp < p"), except that the
             # precision p used is the number of significant digits of
             # the larger quantity (between nominal value and standard
-            # deviation), based on the required number fmt_prec of
+            # deviation), based on the required number num_signif_d of
             # significant digits on the uncertainty.
 
             # Number of significant digits of the larger number:
             if std_dev >= abs(nom_val):
                 ref_value = std_dev_rounded
-                signif_digits = fmt_prec
+                signif_digits = num_signif_d
             else:  # Usual case: larger nominal value:
                 # The formatting rule for g is "suppose that the
                 # result formatted with presentation type 'e' and
