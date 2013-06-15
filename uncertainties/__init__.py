@@ -1528,11 +1528,11 @@ class AffineScalarFunc(object):
         contains an explicit width (" 1.2e-5+/- 0.1e-5"); this allows
         numbers to be in a single column, when printing numbers over
         many lines (specifying a width of 0 is a way of forcing the
-        exponent to not be factored out). The exponent is always the
-        same for the nominal value and for the uncertainty. The
-        mantissa of the larger value (in absolute value, between the
-        nominal value and the standard deviation) is between 1 and 10,
-        like for floats.
+        exponent to not be factored out). The exponent is the same for
+        the nominal value and for the uncertainty (except for a 0 or
+        NaN uncertainty). The mantissa of the larger value (in
+        absolute value, between the nominal value and the standard
+        deviation) is between 1 and 10, like for floats.
         
         If no format type is given, "g" is assumed, like for floats.
 
@@ -1703,7 +1703,7 @@ class AffineScalarFunc(object):
                 # The precision is interpreted like for floats: as the
                 # number of significant digits. However, this number
                 # of significant digits applies to the nominal value
-                # (not the standard deviation):
+                # (not to the standard deviation):
                 digits_limit = signif_d_to_limit(nom_val, prec)
             
         #######################################
