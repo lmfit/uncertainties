@@ -1669,10 +1669,6 @@ class AffineScalarFunc(object):
      
         ########################################
 
-        #!!!!!!!!!!!!! WHAT am I doing in what follows? i.e. what
-        #quantity is the key one? the position of the last significant
-        #digit to use (for both the nominal value and the std dev)?
-
         if match.group('uncert_prec'):  # u option
 
             # Number of significant digits to use:
@@ -1700,6 +1696,9 @@ class AffineScalarFunc(object):
         # value, i.e. value possibly corrected for a factorized
         # exponent), and std_dev_mantissa (similarly for the standard
         # deviation).
+
+        #!!!!!!!! Shouldn't use_exp now be factor_exp? this is what
+        #matters, no?… no: the exponent is *always* factored.
         
         # Exponent notation: should it be used? use_exp is set
         # accordingly:            
