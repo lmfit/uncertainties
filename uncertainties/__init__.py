@@ -1669,9 +1669,13 @@ class AffineScalarFunc(object):
      
         ########################################
 
-        # The limit digits_limit on the digits to be displayed is
-        # calculated. This limit applies to both the nominal value and
-        # the uncertainty.
+        # The limit digits_limit on the digits of nom_val and std_dev
+        # to be displayed is calculated. If the exponent notation is
+        # used, this limit is generally different from the finally
+        # displayed limit (e.g. 314.15+/-0.01 has digits_limit=-2, but
+        # will be displayed with an exponent as (3.1415+/-0.0001)e+02,
+        # which corresponds to 4 decimals after the decimal point, not
+        # 2).
             
         # Should the precision be interpreted like for a float, or
         # should the number of significant digits on the uncertainty
