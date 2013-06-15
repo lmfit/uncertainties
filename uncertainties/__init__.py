@@ -1586,6 +1586,9 @@ class AffineScalarFunc(object):
         # see effect of a None format type on floats)
         fmt_type = match.group('type') or 'g'
 
+        # Shortcut:
+        fmt_prec = match.group('prec')
+
         ########################################
                 
         # Since the '%' (percentage) format specification can change
@@ -1604,8 +1607,6 @@ class AffineScalarFunc(object):
         # significant digits has no meaning: formatting like a float:
 
         if std_dev == 0 or isnan(std_dev):
-
-            fmt_prec = match.group('prec')
 
             # Float formatting for each part, without the uncertainty
             # flag (u) and without the type:
@@ -1641,42 +1642,55 @@ class AffineScalarFunc(object):
      
         ########################################
 
-        #!!!!!!!!!!!!!
+        #!!!!!!!!!!!!! WHAT am I doing in what follows? i.e. what
+        #quantity is the key one? the position of the last significant
+        #digit to use (for both the nominal value and the std dev)?
+
+        if match.group('uncert_prec'):  # u option
+
+            #!!!!!!!!!!!!
             
-        # Effective precision (is always a number):
-        fmt_prec = match.group('prec')
-        if fmt_prec:
-            fmt_prec = int(fmt_prec)
-            if fmt_prec == 0:
-                #!!!!!! Adapt for u and or g? OR REMOVE?
-                fmt_prec = 1  # It is meaningless to have no significant digit
+            # Effective precision (is always a number):
+
+            if fmt_prec:
+                fmt_prec = int(fmt_prec)
+            else:
+                (fmt_prec, std_dev) = _PDG_precision(std_dev)
+
+            ########################################
+
+            # std_dev_limit: limit on the significant digits of the
+            # standard deviation:
+            first_digit_std_dev = _first_digit(std_dev)
+            std_dev_limit = _first_digit(std_dev)-fmt_prec+1
+
+            # The number of significant digits of the uncertainty, when
+            # rounded at this std_dev_limit level, can be too large by 1
+            # (e.g., with fmt_prec = 1, 0.99 gives std_dev_limit = -1, but
+            # the rounded value at that limit is 1.0, i.e. has 2
+            # significant digits instead of fmt_prec = 1). We correct for
+            # this effect by adjusting std_dev_limit if necessary:
+            std_dev_rounded = round(std_dev, -std_dev_limit)
+            first_digit_std_dev_rounded = _first_digit(std_dev_rounded)
+            # If the rounded version has a first digit shifted to the left:
+            if first_digit_std_dev_rounded > first_digit_std_dev:
+                std_dev_limit += 1
+            # Now, std_dev_limit is such that std_dev rounded at this
+            # level has the correct number of digits (fmt_prec). The
+            # digits corresponding to the rounded std_dev are
+            # _first_digit_std_dev_rounded to the new std_dev_limit.
+
+            #!!!!!!!! move code below here, if needed
+
         else:
-            (fmt_prec, std_dev) = _PDG_precision(std_dev)
+
+            # Regular meaning of the precision (applied to the nominal
+            # value, which is for instance relevant with the g format
+            # specification [where precision = number of significant
+            # digits]):
                
-        ########################################
-        
-        # std_dev_limit: limit on the significant digits of the
-        # standard deviation:
-        first_digit_std_dev = _first_digit(std_dev)
-        std_dev_limit = _first_digit(std_dev)-fmt_prec+1
-
-        # The number of significant digits of the uncertainty, when
-        # rounded at this std_dev_limit level, can be too large by 1
-        # (e.g., with fmt_prec = 1, 0.99 gives std_dev_limit = -1, but
-        # the rounded value at that limit is 1.0, i.e. has 2
-        # significant digits instead of fmt_prec = 1). We correct for
-        # this effect by adjusting std_dev_limit if necessary:
-        std_dev_rounded = round(std_dev, -std_dev_limit)
-        first_digit_std_dev_rounded = _first_digit(std_dev_rounded)
-        # If the rounded version has a first digit shifted to the left:
-        if first_digit_std_dev_rounded > first_digit_std_dev:
-            std_dev_limit += 1
-        # Now, std_dev_limit is such that std_dev rounded at this
-        # level has the correct number of digits (fmt_prec). The
-        # digits corresponding to the rounded std_dev are
-        # _first_digit_std_dev_rounded to the new std_dev_limit.
-
-
+            #!!!!!!
+            
         #######################################
 
         # Calculation of signif_limit (position of the significant
@@ -1695,6 +1709,9 @@ class AffineScalarFunc(object):
 
             #!!!!!!!!!! There is duplicated code between the g test
             #and the e implementation. Could this be unified?
+
+            #!!!!!! Make sure that the following is always calculated,
+            #whether the u is given or not
             
             # Should the scientific notation be used? the same rule as
             # for floats is used ("-4 <= exp < p"), except that the
