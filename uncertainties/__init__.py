@@ -1681,10 +1681,6 @@ class AffineScalarFunc(object):
         # should the number of significant digits on the uncertainty
         # be controlled?
 
-        # !!!!!!!!!! What is relevant depends on the use or not of the
-        # exponent notation: if no exponent notation is used, the
-        # number of digits after the decimal point matters.
-        
         if match.group('uncert_prec') or not fmt_prec:
             # The number of significant digits on the uncertainty is
             # controlled.
