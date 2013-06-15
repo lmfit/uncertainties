@@ -1519,7 +1519,7 @@ class AffineScalarFunc(object):
         
         Another difference is that if no precision is given, then the
         rounding rules from the Particle Data Group are used
-        (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf)--instead
+        (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).--instead
         of having, for example, the f format use the default 6 digits
         after the decimal point.
 
@@ -1669,7 +1669,16 @@ class AffineScalarFunc(object):
      
         ########################################
 
-        if match.group('uncert_prec'):  # u option
+        # The limit digits_limit on the digits to be displayed is
+        # calculated. This limit applies to both the nominal value and
+        # the uncertainty.
+            
+        # Should the precision be interpreted like for a float, or
+        # should the number of significant digits on the uncertainty
+        # be controlled?
+        
+        if match.group('uncert_prec') or not fmt_prec:
+            # The number of significant digits is controlled.
 
             # Number of significant digits to use:
             if fmt_prec:
@@ -1677,28 +1686,37 @@ class AffineScalarFunc(object):
             else:
                 (num_signif_d, std_dev) = _PDG_precision(std_dev)
 
-            std_dev_limit = signif_d_to_limit(std_dev, num_signif_d)
+            digits_limit = signif_d_to_limit(std_dev, num_signif_d)
 
-        else:  # The precision has the same meaning as for floats
+        else:
+            # The precision has the same meaning as for floats and is
+            # explicit.
 
-            # Regular meaning of the precision (applied to the nominal
-            # value, which is for instance relevant with the g format
-            # specification [where precision = number of significant
-            # digits]):
+            prec = int(fmt_prec)
 
-            std_dev_limit =  #!!!!!!! meaningless
-            #!!!!!!
+            if fmt_type in 'feEFE':
+                
+                digits_limit = -prec
+                
+            else:  # Format type = gGn% (or no format type specified)
+                
+                # The precision is interpreted like for floats: as the
+                # number of significant digits. However, this number
+                # of significant digits applies to the nominal value
+                # (not the standard deviation):
+                digits_limit = signif_d_to_limit(nom_val, prec)
             
         #######################################
 
+        #!!!!!!!! I'm not sure whether signif_limit is still
+        #relevant. I would guess that it should be calculated or
+        #adjusted above, and be stored in digits_limit.
+        
         # Calculation of signif_limit (position of the significant
         # digits limit), nom_val_mantissa ("mantissa" for the nominal
         # value, i.e. value possibly corrected for a factorized
         # exponent), and std_dev_mantissa (similarly for the standard
         # deviation).
-
-        #!!!!!!!! Shouldn't use_exp now be factor_exp? this is what
-        #matters, no?… no: the exponent is *always* factored.
         
         # Exponent notation: should it be used? use_exp is set
         # accordingly:            
@@ -1711,8 +1729,8 @@ class AffineScalarFunc(object):
             #!!!!!!!!!! There is duplicated code between the g test
             #and the e implementation. Could this be unified?
 
-            #!!!!!! Make sure that the following is always calculated,
-            #whether the u is given or not
+            #!!!!!! Make sure that the following can always be
+            #calculated, whether the u is given or not
             
             # Should the scientific notation be used? the same rule as
             # for floats is used ("-4 <= exp < p"), except that the
@@ -1731,8 +1749,8 @@ class AffineScalarFunc(object):
                 # precision p-1 would have exponent exp". This is what
                 # is calculated here (the first digit of the mantissa
                 # uses 1 digit.
-                ref_value = abs(round(nom_val, -std_dev_limit))
-                signif_digits = _first_digit(ref_value)-std_dev_limit+1
+                ref_value = abs(round(nom_val, -digits_limit))
+                signif_digits = _first_digit(ref_value)-digits_limit+1
 
             # The choice between using the exponent notation or not
             # depends on the magnitude of the larger value (the one
@@ -1757,18 +1775,18 @@ class AffineScalarFunc(object):
             # The exponent gives the *largest* of the nominal value
             # and the uncertainty a mantissa between 1 and
             # 9.9999... (in absolute value) *after rounding*.  The
-            # reference value will be rounded at std_dev_limit: this
+            # reference value will be rounded at digits_limit: this
             # is what defines its exponent:
             ref_value = round(max(abs(nom_val), std_dev),
-                              -std_dev_limit)
+                              -digits_limit)
 
             exponent = _first_digit(ref_value)
             factor = 10.**exponent  # Not 10.**(-exponent), for limit cases
             nom_val_mantissa = nom_val/factor
             std_dev_mantissa = std_dev/factor
-            # The position std_dev_limit of the significant digit must
+            # The position digits_limit of the significant digit must
             # be updated accordingly:
-            signif_limit = std_dev_limit - exponent
+            signif_limit = digits_limit - exponent
 
         else:  # Fixed point notation
             # Without an exponent, it is necessary to include the
@@ -1776,7 +1794,7 @@ class AffineScalarFunc(object):
             # printing 1234 with only 2 significant digits requires to
             # print at least 1234 (or maybe 1200)):
             exponent = None
-            signif_limit = min(std_dev_limit, 0)
+            signif_limit = min(digits_limit, 0)
             nom_val_mantissa = nom_val
             std_dev_mantissa = std_dev
 
