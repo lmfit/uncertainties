@@ -1517,7 +1517,7 @@ def test_format():
             '*^+7.2f': '*+3.14*+/-*0.00**',
             '+07.2f': '+003.14+/-0000.00',  # 0 fill
             '>10f': '  3.141500+/-  0.000100',  # Width and align
-            '11.3e': '  3.142e+00+/-  0.000e+00'  # Duplicated exponent
+            '11.3e': '  3.142e+00+/-  0.000e+00',  # Duplicated exponent
             '0.4e': '3.1415e+00+/-0.0000e+00'  # Forced double exponent
         },
         
