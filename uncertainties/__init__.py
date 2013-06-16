@@ -1719,22 +1719,16 @@ class AffineScalarFunc(object):
             
         #######################################
 
-        #!!!!!!!! I'm not sure whether signif_limit is still
-        #relevant. I would guess that it should be calculated or
-        #adjusted above, and be stored in digits_limit.
-        
-        # Calculation of signif_limit (position of the significant
-        # digits limit), nom_val_mantissa ("mantissa" for the nominal
-        # value, i.e. value possibly corrected for a factorized
-        # exponent), and std_dev_mantissa (similarly for the standard
-        # deviation).
-        
         # Exponent notation: should it be used? use_exp is set
-        # accordingly:            
+        # accordingly. If an exponent should be used (use_exp is
+        # True), 'exponent' is set to the exponent that should be
+        # used.
+
         if fmt_type in 'fF%':
             use_exp = False
         elif fmt_type in 'eE':
             use_exp = True
+            exponent = _first_digit(round(nom_val, -digits_limit))
         else:  # g, G, n
 
             # The rules from
@@ -1781,38 +1775,39 @@ class AffineScalarFunc(object):
 
         ########################################
 
-        # The common exponent is calculated, if an exponent is needed:
+        # Calculation of signif_limit (position of the significant
+        # digits limit in the final fixed point representations), of
+        # nom_val_mantissa ("mantissa" for the nominal value,
+        # i.e. value possibly corrected for a factorized exponent),
+        # and std_dev_mantissa (similarly for the standard
+        # deviation). Exponent is also set to None if no exponent
+        # should be used.
         
         if use_exp:
 
-            # digits_limit is updated, and the mantissa of the nominal
-            # value and of the standard deviation are calculated.
-
-            #!!!!!!!!!!!!
-            
-            ref_value = round(max(abs(nom_val), std_dev),
-                              -digits_limit)
-
-            exponent = _first_digit(ref_value)
             factor = 10.**exponent  # Not 10.**(-exponent), for limit cases
+            
             nom_val_mantissa = nom_val/factor
             std_dev_mantissa = std_dev/factor
-            # The position digits_limit of the significant digit must
-            # be updated accordingly:
+            # Limit for the last digit of the mantissas:
             signif_limit = digits_limit - exponent
 
-        else:  # Fixed point notation
-            # Without an exponent, it is necessary to include the
-            # decimal point location in the printed digit (e.g.,
-            # printing 1234 with only 2 significant digits requires to
-            # print at least 1234 (or maybe 1200)):
+        else:  # Full fixed-point notation
+            
             exponent = None
-            signif_limit = min(digits_limit, 0)
+
             nom_val_mantissa = nom_val
             std_dev_mantissa = std_dev
+            # Without an exponent, it is necessary to include the
+            # decimal point location in the printed digit (e.g.,
+            # printing 3456 with only 2 significant digits requires to
+            # print at least four digits, like in 3456 or 3500):
+            signif_limit = min(digits_limit, 0)
 
         ########################################
         # Final formatting:
+
+        #!!!!!!!!!!
         
         # Format for the fixed-point part of the standard deviation:
         fixed_point_fmt_spec_s = '%s.%df' % (
