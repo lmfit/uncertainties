@@ -1217,7 +1217,7 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
                 uncert_str = '0.'
 
         fixed_point_str = "%s(%s)" % (
-            _robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
+            _robust_format(nom_val_mantissa, fixed_point_fmt_n),
             uncert_str)
 
     else:  # +/- notation:
@@ -1230,9 +1230,9 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
             '+/-')
 
         fixed_point_str = '%s%s%s' % (
-            _robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
+            _robust_format(nom_val_mantissa, fixed_point_fmt_n),
             pm_symbol,
-            _robust_format(error_mantissa, fixed_point_fmt_spec_s)
+            _robust_format(error_mantissa, fixed_point_fmt_s)
             )
 
     # Should an exponent be added? The result goes to value_str:
