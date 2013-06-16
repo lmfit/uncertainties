@@ -1644,13 +1644,6 @@ class AffineScalarFunc(object):
 
         # Shortcut:
         fmt_prec = match.group('prec')  # Can be None
-
-        # Effective format specification precision: the rule of
-        # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
-        # is used:
-        if fmt_type in 'gGn' and not prec:
-            prec = 1
-        #!!!!!!! move in correct place
             
         # Options:
         fmt_options = match.group('options')
@@ -1724,7 +1717,7 @@ class AffineScalarFunc(object):
 
             # Number of significant digits to use:
             if fmt_prec:
-                num_signif_d = prec
+                num_signif_d = int(fmt_prec)
             else:
                 (num_signif_d, std_dev) = PDG_precision(std_dev)
 
@@ -1732,14 +1725,23 @@ class AffineScalarFunc(object):
 
         else:
             # The precision has the same meaning as for floats and is
-            # explicit.
+            # explicit (fmt_prec is not empty):
 
+            prec = int(fmt_prec)
+                
             if fmt_type in 'feEFE%':  # More common cases first (optimization)
                 
                 digits_limit = -prec
                 
             else:  # Format type = gGn (or no format type specified)
 
+                # Effective format specification precision: the rule
+                # of
+                # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
+                # is used:
+                if fmt_type in 'gGn' and not prec:
+                    prec = 1
+                
                 # The precision is interpreted like for floats: as the
                 # number of significant digits. However, this number
                 # of significant digits applies to the nominal value
