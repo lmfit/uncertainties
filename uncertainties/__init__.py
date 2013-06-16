@@ -1616,6 +1616,13 @@ class AffineScalarFunc(object):
         # Shortcut:
         fmt_prec = match.group('prec')
 
+        # Effective format specification precision: the rule of
+        # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
+        # is used:
+        prec = int(fmt_prec)
+        if fmt_type in 'gGn' and not prec:
+            prec = 1
+
         ########################################
                 
         # Since the '%' (percentage) format specification can change
@@ -1687,7 +1694,7 @@ class AffineScalarFunc(object):
 
             # Number of significant digits to use:
             if fmt_prec:
-                num_signif_d = int(fmt_prec)
+                num_signif_d = prec
             else:
                 (num_signif_d, std_dev) = _PDG_precision(std_dev)
 
@@ -1697,14 +1704,12 @@ class AffineScalarFunc(object):
             # The precision has the same meaning as for floats and is
             # explicit.
 
-            prec = int(fmt_prec)
-
-            if fmt_type in 'feEFE':
+            if fmt_type in 'feEFE%':  # More common cases first (optimization)
                 
                 digits_limit = -prec
                 
-            else:  # Format type = gGn% (or no format type specified)
-                
+            else:  # Format type = gGn (or no format type specified)
+
                 # The precision is interpreted like for floats: as the
                 # number of significant digits. However, this number
                 # of significant digits applies to the nominal value
@@ -1731,6 +1736,21 @@ class AffineScalarFunc(object):
             use_exp = True
         else:  # g, G, n
 
+            # The rules from
+            # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
+            # are applied.
+
+            # Python's native formatting is not used because there is
+            # shared information between the nominal value and the
+            # standard error (same last digit, common exponent) and
+            # extracting this information from Python would entail
+            # parsing its formatted string, which is in principle
+            # inefficient (internally, Python performs calculations
+            # that yield a string, and the string would be parsed back
+            # into separate parts and numbers, which is in principle
+            # unnecessary).
+
+            
             #!!!!!!!!!! There is duplicated code between the g test
             #and the e implementation. Could this be unified?
 
