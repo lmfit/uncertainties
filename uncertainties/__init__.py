@@ -1236,7 +1236,9 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
             )
 
     # Should an exponent be added? The result goes to value_str:
-    if use_exp:
+    if exponent is None:
+        value_str = fixed_point_str  # Nothing to be added
+    else:
         mantissa_fmt = '%s' if 'S' in options else '(%s)'
         exp_fmt = (r' \times 10^{%d}' if 'L' in options
                    # Case of e or E. The same convention as Python 2.7
@@ -1244,9 +1246,7 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
                    else _exp_letter[fmt_type]+'%+03d')
         value_str = (mantissa_fmt % fixed_point_str +
                      exp_fmt % exponent)
-    else:
-        value_str = fixed_point_str  # Nothing to be added
-
+        
     # Possible % sign:
     if '%' in options:
         if 'S' not in options:
