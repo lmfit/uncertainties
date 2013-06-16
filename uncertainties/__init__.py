@@ -1158,15 +1158,26 @@ class CallableStdDev(float):
 # an exponent):
 _exp_letter = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
-def _format_num(nom_val_mantissa, fp_fmt_n,
-                std_dev_mantissa, fp_fmt_s,
+def _format_num(nom_val_mantissa, fixed_point_fmt_n,
+                std_dev_mantissa, fixed_point_fmt_s,
                 options='', exponent=None):
     '''
     Returns a valid __format__() output for a number with uncertainty.
 
-    #!!!!!!!!! options in LSC, can generally be cumulated, support "in"
+    nom_val_mantissa, std_dev_mantissa -- mantissas of the nominal
+    value and of the standard deviation (numbers).
 
-    #!!!!!!!! exponent: = *common* exponent; None = no exponent used
+    fixed_point_fmt_n, fixed_point_fmt_s -- format strings for the
+    fixed-point part of the nominal value and standard deviation
+    (respectively).
+
+    options -- options (as an object that support membership testing,
+    like for instance a string). "S" is for the short-hand notation
+    1.23(1). "C" is for using the character "±" between the nominal
+    value and the standard deviation. "L" is for a LaTeX
+    output. Options can be combined.
+
+    exponent -- common exponent to use. If None, no exponent is used.
     '''
     #!!!!!!!!!!
 
@@ -1808,17 +1819,17 @@ class AffineScalarFunc(object):
         # Final formatting:
 
         # Format for the fixed-point part of the standard deviation:
-        fixed_point_fmt_spec_s = '%s%s.%df' % (
+        fixed_point_fmt_s = '%s%s.%df' % (
             match.group('fill_align'), match.group('extra'), -signif_limit)
         
         # Format for the fixed-point part of the nominal value: the
         # sign is only applied to the mantissa (since the sign of the
         # standard deviation is always +):
-        fixed_point_fmt_spec_n = '%s.%df' % (
+        fixed_point_fmt_n = '%s.%df' % (
             ''.join(match.groups()[:3]), -signif_limit)
 
-        return _format_num(nom_val_mantissa, fixed_point_fmt_spec_n,
-                           std_dev_mantissa, fixed_point_fmt_spec_s,
+        return _format_num(nom_val_mantissa, fixed_point_fmt_n,
+                           std_dev_mantissa, fixed_point_fmt_s,
                            match.group('options'), exponent)
 
     # Alternate name for __format__, for use with Python < 2.6:    
