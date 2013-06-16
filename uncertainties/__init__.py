@@ -1587,6 +1587,7 @@ class AffineScalarFunc(object):
         # tenths, etc.
         
         ########################################            
+
         # Format specification parsing:
 
         match = re.match(
@@ -1636,7 +1637,9 @@ class AffineScalarFunc(object):
         if fmt_type == '%':
             std_dev *= 100
             nom_val *= 100
-        
+
+        ########################################
+            
         # Special case of an uncertainty where the number of
         # significant digits has no meaning: formatting like a float:
 
@@ -1805,6 +1808,7 @@ class AffineScalarFunc(object):
             signif_limit = min(digits_limit, 0)
 
         ########################################
+
         # Final formatting:
 
         #!!!!!!!!!!
