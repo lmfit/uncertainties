@@ -1164,7 +1164,7 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
     '''
     Returns a valid __format__() output for a number with uncertainty.
 
-    When the shorthand notation is required, an error truncated to
+    When the shorthand notation is required, an error rounded to
     zero is always displayed with a decimal point, so as to indicate
     that the error is not exactly zero.
     
@@ -1185,7 +1185,6 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
 
     exponent -- common exponent to use. If None, no exponent is used.
     '''
-    #!!!!!!!!!!
 
     # Calculation of the final no-exponent part, fixed_point_str:
     
@@ -1193,22 +1192,29 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
 
         uncert = round(error_mantissa, fixed_point_fmt_s)
 
-        # A zero rounded uncertainty is indicated by 
-        
+        # The representation uncert_str of the uncertainty (which will
+        # be put inside parentheses) is calculated:
+
         # The uncertainty might straddle the decimal point: we
         # keep it as it is, in this case (e.g. 1.2(3.4), as this
         # makes the result easier to read); the shorthand
         # notation then essentially coincides with the +/-
         # notation:
-        if first_digit_error_rounded >= 0 and signif_limit < 0:
-            uncert_str = '%.*f' % (-signif_limit, uncert)
+        if _first_digit(error_rounded) >= 0 and fixed_point_fmt_s > 0:
+            # This case includes a zero rounded error with digits
+            # after the decimal point:
+            uncert_str = '%.*f' % (fixed_point_fmt_s, uncert)
+            
         else:
-            # The round is important because 566.99999999 can be
-            # obtained when 567 is wanted (%d prints the integer
-            # part):
-            uncert_str = '%d' % round(uncert/10.**signif_limit)
+            if uncert:
+                # The round is important because 566.99999999 can
+                # first be obtained when 567 is wanted (%d prints the
+                # integer part, not the rounded value):
+                uncert_str = '%d' % round(uncert*10.**fixed_point_fmt_s)
+            else:
+                # The decimal point indicates a truncated float:
+                uncert_str = '0.'
 
-        # An integer uncertainty is displayed as an integer:
         fixed_point_str = "%s(%s)" % (
             _robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
             uncert_str)
@@ -1677,8 +1683,7 @@ class AffineScalarFunc(object):
                     nom_val, fmt_spec_part,
                     std_dev_mantissa=0,
                     # No decimal point means exact (this is different
-                    # from a truncated float (0.00 might be
-                    # truncated)).
+                    # from a rounded float (0.00 might be truncated)).
                     #
                     # The total width, etc. are taken into account:
                     fmt_spec_part_start+'d',
