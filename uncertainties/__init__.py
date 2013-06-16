@@ -1159,48 +1159,48 @@ class CallableStdDev(float):
 _exp_letter = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
 def _format_num(nom_val_mantissa, fixed_point_fmt_n,
-                std_dev_mantissa, fixed_point_fmt_s,
+                error_mantissa, fixed_point_fmt_s,
                 options='', exponent=None):
     '''
     Returns a valid __format__() output for a number with uncertainty.
 
-    nom_val_mantissa, std_dev_mantissa -- mantissas of the nominal
-    value and of the standard deviation (numbers).
+    When the shorthand notation is required, an error truncated to
+    zero is always displayed with a decimal point, so as to indicate
+    that the error is not exactly zero.
+    
+    nom_val_mantissa, error_mantissa -- mantissas of the nominal
+    value and of the error (numbers).
 
-    fixed_point_fmt_n, fixed_point_fmt_s -- format strings for the
-    fixed-point part of the nominal value and standard deviation
-    (respectively). fixed_point_fmt_s is ignored if the "S" option is
-    used.
-
+    fixed_point_fmt_n, fixed_point_fmt_s -- format specification (for
+    _robust_format) for the fixed-point part of the nominal value and
+    error (respectively). If the "S" option is used,
+    fixed_point_fmt_s must instead be the number of digits after the
+    decimal point where the error should end.
+    
     options -- options (as an object that support membership testing,
     like for instance a string). "S" is for the short-hand notation
     1.23(1). "C" is for using the character "±" between the nominal
-    value and the standard deviation. "L" is for a LaTeX
-    output. Options can be combined.
+    value and the error. "L" is for a LaTeX output. Options can be
+    combined.
 
     exponent -- common exponent to use. If None, no exponent is used.
     '''
     #!!!!!!!!!!
 
-    # The string fixed_point_str for the whole fixed-point part
-    # (nominal value and standard deviation) is calculated:
-
-    #!!!!!!!! What should the shorthand notation with a fixed
-    #number of digits after the decimal point give? the risk is to
-    #have something like 3.14(00) printed, which looks as if the
-    #uncertainty is exactly zero. I could forbid this, or count on
-    #users to know what they are doing.
+    # Calculation of the final no-exponent part, fixed_point_str:
     
     if 'S' in options:  # Shorthand notation:
 
-        uncert = round(std_dev_mantissa, -signif_limit)
+        uncert = round(error_mantissa, fixed_point_fmt_s)
 
+        # A zero rounded uncertainty is indicated by 
+        
         # The uncertainty might straddle the decimal point: we
         # keep it as it is, in this case (e.g. 1.2(3.4), as this
         # makes the result easier to read); the shorthand
         # notation then essentially coincides with the +/-
         # notation:
-        if first_digit_std_dev_rounded >= 0 and signif_limit < 0:
+        if first_digit_error_rounded >= 0 and signif_limit < 0:
             uncert_str = '%.*f' % (-signif_limit, uncert)
         else:
             # The round is important because 566.99999999 can be
@@ -1225,7 +1225,7 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
         fixed_point_str = '%s%s%s' % (
             _robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
             pm_symbol,
-            _robust_format(std_dev_mantissa, fixed_point_fmt_spec_s)
+            _robust_format(error_mantissa, fixed_point_fmt_spec_s)
             )
 
     # Should an exponent be added? The result goes to value_str:
@@ -1787,12 +1787,12 @@ class AffineScalarFunc(object):
         ########################################
 
         # Calculation of signif_limit (position of the significant
-        # digits limit in the final fixed point representations), of
-        # nom_val_mantissa ("mantissa" for the nominal value,
-        # i.e. value possibly corrected for a factorized exponent),
-        # and std_dev_mantissa (similarly for the standard
-        # deviation). Exponent is also set to None if no exponent
-        # should be used.
+        # digits limit in the final fixed point representations; this
+        # number is non-positive), of nom_val_mantissa ("mantissa" for
+        # the nominal value, i.e. value possibly corrected for a
+        # factorized exponent), and std_dev_mantissa (similarly for
+        # the standard deviation). Exponent is also set to None if no
+        # exponent should be used.
         
         if use_exp:
 
@@ -1800,7 +1800,9 @@ class AffineScalarFunc(object):
             
             nom_val_mantissa = nom_val/factor
             std_dev_mantissa = std_dev/factor
-            # Limit for the last digit of the mantissas:
+            # Limit for the last digit of the mantissas (it should be
+            # non-positive, as digits before the final decimal points
+            # are always returned in full):
             signif_limit = digits_limit - exponent
 
         else:  # No exponent
@@ -1819,14 +1821,15 @@ class AffineScalarFunc(object):
 
         # Final formatting:
 
-        # Format for the fixed-point part of the standard deviation:
+        # Format for the fixed-point part of the standard deviation,
+        # for _format_num():
         fixed_point_fmt_s = (
             '%s%s.%df' % (
             match.group('fill_align'), match.group('extra'), -signif_limit)
             if 'S' not in match.group('options')
-            # The format of the standard deviation is handled directly
-            # by _format_num():
-            else None)
+            # The semantics of this parameter is special, for the
+            # shorthand notation:
+            else -signif_limit)
         
         # Format for the fixed-point part of the nominal value: the
         # sign is only applied to the mantissa (since the sign of the
