@@ -86,7 +86,7 @@ def test_matrix():
     3*m
     m*3
 
-def _derivatives_close(x, y):
+def derivatives_close(x, y):
     """
     Returns True iff the AffineScalarFunc objects x and y have
     derivatives that are close to each other (they must depend
@@ -152,8 +152,8 @@ def test_inverse():
     assert arrays_close(m_double_inverse, m)
 
     # Partial test:
-    assert _derivatives_close(m_double_inverse[0, 0], m[0, 0])
-    assert _derivatives_close(m_double_inverse[1, 1], m[1, 1])
+    assert derivatives_close(m_double_inverse[0, 0], m[0, 0])
+    assert derivatives_close(m_double_inverse[1, 1], m[1, 1])
 
     ####################
 

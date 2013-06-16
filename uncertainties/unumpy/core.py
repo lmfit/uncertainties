@@ -422,8 +422,8 @@ def inv_with_derivatives(arr, input_type, derivatives):
         derivative_mat = numpy.asmatrix(derivative)
         yield -inverse_mat * derivative_mat * inverse_mat
 
-_inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
-_inv.__doc__ = """\
+inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
+inv.__doc__ = """\
     Version of numpy.linalg.inv that works with array-like objects
     that contain numbers with uncertainties.
 
@@ -506,7 +506,7 @@ _pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
     Original documentation:
     %s
     """ % numpy.linalg.pinv.__doc__)
-def _pinv(array_like, rcond=_pinv_default):
+def pinv(array_like, rcond=_pinv_default):
     return _pinv_with_uncert(array_like, rcond)
 
 ########## Matrix class
@@ -540,9 +540,9 @@ class matrix(numpy.matrix):
 
         M, N = self.shape
         if M == N:
-            func = _inv
+            func = inv
         else:
-            func = _pinv
+            func = pinv
         return func(self)
         
 
