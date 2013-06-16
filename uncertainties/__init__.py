@@ -1687,8 +1687,9 @@ class AffineScalarFunc(object):
         # Should the precision be interpreted like for a float, or
         # should the number of significant digits on the uncertainty
         # be controlled?
-
-        if match.group('uncert_prec') or not fmt_prec:
+        uncert_controlled = not fmt_prec or match.group('uncert_prec')
+        
+        if uncert_controlled:
             # The number of significant digits on the uncertainty is
             # controlled.
 
@@ -1740,44 +1741,60 @@ class AffineScalarFunc(object):
             # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
             # are applied.
 
-            # Python's native formatting is not used because there is
-            # shared information between the nominal value and the
-            # standard error (same last digit, common exponent) and
-            # extracting this information from Python would entail
-            # parsing its formatted string, which is in principle
-            # inefficient (internally, Python performs calculations
-            # that yield a string, and the string would be parsed back
-            # into separate parts and numbers, which is in principle
+            # Python's native formatting (whose result could be parsed
+            # in order to determine whether an exponent should be
+            # used) is not used because there is shared information
+            # between the nominal value and the standard error (same
+            # last digit, common exponent) and extracting this
+            # information from Python would entail parsing its
+            # formatted string, which is in principle inefficient
+            # (internally, Python performs calculations that yield a
+            # string, and the string would be parsed back into
+            # separate parts and numbers, which is in principle
             # unnecessary).
 
+            # Should the scientific notation be used? The same rule as
+            # for floats is used ("-4 <= exponent of value < p"). It
+            # is applied, however, to either the nominal value or the
+            # standard deviation. When the user wants to control the
+            # number of significant digits of the uncertainty, the
+            # larger value (in absolute value) is used, and the
+            # precision p is defined as its desired number of
+            # significant digits; otherwise, the nominal value is used
+            # (which gives the same nominal value format as if the
+            # number had no uncertainty and were a float) and the
+            # precision p is the one specified by the user.
+
+            # except that the precision p used is the
+            # number of significant digits of the larger value
+            # 
+
             
-            #!!!!!!!!!! There is duplicated code between the g test
-            #and the e implementation. Could this be unified?
+            if uncert_controlled:
+                #!!!!!!!!!! There is duplicated code between the g test
+                #and the e implementation. Could this be unified?
 
-            #!!!!!! Make sure that the following can always be
-            #calculated, whether the u is given or not
+
+                # Number of significant digits of the larger number:
+                if std_dev >= abs(nom_val):
+                    ref_value = std_dev_rounded
+                    signif_digits = num_signif_d
+                else:  # Usual case: larger nominal value:
+                    # The formatting rule for g is "suppose that the
+                    # result formatted with presentation type 'e' and
+                    # precision p-1 would have exponent exp". This is what
+                    # is calculated here (the first digit of the mantissa
+                    # uses 1 digit.
+                    ref_value = abs(round(nom_val, -digits_limit))
+                    signif_digits = _first_digit(ref_value)-digits_limit+1
+
+            else:
+                # prec is the desired number of significant digits on
+                # the nominal value:
+
+                ref_value = nom_val
+            #!!!!!!!!!!!
             
-            # Should the scientific notation be used? the same rule as
-            # for floats is used ("-4 <= exponent of value < p"),
-            # except that the precision p used is the number of
-            # significant digits of the larger quantity (between
-            # nominal value and standard deviation), based on the
-            # required number num_signif_d of significant digits on
-            # the uncertainty.
-
-            # Number of significant digits of the larger number:
-            if std_dev >= abs(nom_val):
-                ref_value = std_dev_rounded
-                signif_digits = num_signif_d
-            else:  # Usual case: larger nominal value:
-                # The formatting rule for g is "suppose that the
-                # result formatted with presentation type 'e' and
-                # precision p-1 would have exponent exp". This is what
-                # is calculated here (the first digit of the mantissa
-                # uses 1 digit.
-                ref_value = abs(round(nom_val, -digits_limit))
-                signif_digits = _first_digit(ref_value)-digits_limit+1
-
             # The choice between using the exponent notation or not
             # depends on the magnitude of the larger value (the one
             # with a regular mantissa), in the same way as the g
