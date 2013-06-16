@@ -977,7 +977,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
     return f_with_affine_output
 
-def _force_aff_func_args(func):
+def force_aff_func_args(func):
     """
     Takes an operator op(x, y) and wraps it.
 
@@ -1024,7 +1024,7 @@ def _force_aff_func_args(func):
 # as explained in the main documentation, it is possible to give a 
 # useful meaning to the comparison operators, in these cases.
 
-def _eq_on_aff_funcs(self, y_with_uncert):
+def eq_on_aff_funcs(self, y_with_uncert):
     """
     __eq__ operator, assuming that both self and y_with_uncert are
     AffineScalarFunc objects.
@@ -1034,49 +1034,49 @@ def _eq_on_aff_funcs(self, y_with_uncert):
     # equal numerically:
     return not(difference._nominal_value or difference.std_dev)
 
-def _ne_on_aff_funcs(self, y_with_uncert):
+def ne_on_aff_funcs(self, y_with_uncert):
     """
     __ne__ operator, assuming that both self and y_with_uncert are
     AffineScalarFunc objects.
     """
 
-    return not _eq_on_aff_funcs(self, y_with_uncert)
+    return not eq_on_aff_funcs(self, y_with_uncert)
 
-def _gt_on_aff_funcs(self, y_with_uncert):
+def gt_on_aff_funcs(self, y_with_uncert):
     """
     __gt__ operator, assuming that both self and y_with_uncert are
     AffineScalarFunc objects.
     """
     return self._nominal_value > y_with_uncert._nominal_value
 
-def _ge_on_aff_funcs(self, y_with_uncert):
+def ge_on_aff_funcs(self, y_with_uncert):
     """
     __ge__ operator, assuming that both self and y_with_uncert are
     AffineScalarFunc objects.
     """
 
-    return (_gt_on_aff_funcs(self, y_with_uncert)
-            or _eq_on_aff_funcs(self, y_with_uncert))
+    return (gt_on_aff_funcs(self, y_with_uncert)
+            or eq_on_aff_funcs(self, y_with_uncert))
 
-def _lt_on_aff_funcs(self, y_with_uncert):
+def lt_on_aff_funcs(self, y_with_uncert):
     """
     __lt__ operator, assuming that both self and y_with_uncert are
     AffineScalarFunc objects.
     """
     return self._nominal_value < y_with_uncert._nominal_value
 
-def _le_on_aff_funcs(self, y_with_uncert):
+def le_on_aff_funcs(self, y_with_uncert):
     """
     __le__ operator, assuming that both self and y_with_uncert are
     AffineScalarFunc objects.
     """
 
-    return (_lt_on_aff_funcs(self, y_with_uncert)
-            or _eq_on_aff_funcs(self, y_with_uncert))
+    return (lt_on_aff_funcs(self, y_with_uncert)
+            or eq_on_aff_funcs(self, y_with_uncert))
 
 ########################################
 
-def _first_digit(value):
+def first_digit(value):
     '''
     Returns the first digit position of the given value, as an integer.
 
@@ -1088,7 +1088,7 @@ def _first_digit(value):
     # ValueError, so the value is directly tested:
     return int(math.floor(math.log10(abs(value)))) if value else 0
     
-def _PDG_precision(std_dev):
+def PDG_precision(std_dev):
     '''
     Returns the number of significant digits to be used for the given
     standard deviation, according to the rounding rules of the
@@ -1099,7 +1099,7 @@ def _PDG_precision(std_dev):
     display.
     '''
     
-    exponent = _first_digit(std_dev)
+    exponent = first_digit(std_dev)
 
     # The first three digits are what matters: we get them as an
     # integer number in [100; 999).
@@ -1130,11 +1130,11 @@ def _PDG_precision(std_dev):
 # function that works whatever the version of Python:
 try:
 
-    _robust_format = format
+    robust_format = format
     
 except NameError:  # !! format() is not defined (Python < 2.6)
     
-    def _robust_format(value, format_spec):
+    def robust_format(value, format_spec):
         '''
         Formats the given value with the given format specification.
 
@@ -1157,9 +1157,9 @@ class CallableStdDev(float):
 
 # Exponent letter for all AffineScalarFunc format types (that can use
 # an exponent):
-_EXP_LETTERS = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
+EXP_LETTERS = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
-def _format_num(nom_val_mantissa, fixed_point_fmt_n,
+def format_num(nom_val_mantissa, fixed_point_fmt_n,
                 error_mantissa, fixed_point_fmt_s,
                 options='',
                 exponent=None, exp_fmt='e+03d'):
@@ -1174,7 +1174,7 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
     value and of the error (numbers).
 
     fixed_point_fmt_n, fixed_point_fmt_s -- format specification (for
-    _robust_format) for the fixed-point part of the nominal value and
+    robust_format) for the fixed-point part of the nominal value and
     error (respectively). If the "S" option is used,
     fixed_point_fmt_s must instead be the number of digits after the
     decimal point where the error should end.
@@ -1206,7 +1206,7 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
         # makes the result easier to read); the shorthand
         # notation then essentially coincides with the +/-
         # notation:
-        if _first_digit(error_rounded) >= 0 and fixed_point_fmt_s > 0:
+        if first_digit(error_rounded) >= 0 and fixed_point_fmt_s > 0:
             # This case includes a zero rounded error with digits
             # after the decimal point:
             uncert_str = '%.*f' % (fixed_point_fmt_s, uncert)
@@ -1222,7 +1222,7 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
                 uncert_str = '0.'
 
         fixed_point_str = "%s(%s)" % (
-            _robust_format(nom_val_mantissa, fixed_point_fmt_n),
+            robust_format(nom_val_mantissa, fixed_point_fmt_n),
             uncert_str)
 
     else:  # +/- notation:
@@ -1235,9 +1235,9 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
             '+/-')
 
         fixed_point_str = '%s%s%s' % (
-            _robust_format(nom_val_mantissa, fixed_point_fmt_n),
+            robust_format(nom_val_mantissa, fixed_point_fmt_n),
             pm_symbol,
-            _robust_format(error_mantissa, fixed_point_fmt_s)
+            robust_format(error_mantissa, fixed_point_fmt_s)
             )
 
     # Should an exponent be added? The result goes to value_str:
@@ -1277,9 +1277,9 @@ def signif_d_to_limit(value, num_signif_d):
     point, 0 for integer rounding, etc. It can be positive.
     '''
 
-    first_digit = _first_digit(value)
+    fst_digit = first_digit(value)
 
-    limit_no_rounding = first_digit-num_signif_d+1
+    limit_no_rounding = fst_digit-num_signif_d+1
 
     # The number of significant digits of the uncertainty, when
     # rounded at this limit_no_rounding level, can be too large by 1
@@ -1288,10 +1288,10 @@ def signif_d_to_limit(value, num_signif_d):
     # significant digits instead of num_signif_d = 1). We correct for
     # this effect by adjusting limit if necessary:
     rounded = round(value, -limit_no_rounding)
-    first_digit_rounded = _first_digit(rounded)
+    fst_digit_rounded = first_digit(rounded)
 
-    return (limit_no_rounding if first_digit_rounded <= first_digit
-            # The rounded limit is first_digit_rounded-num_signif_d+1;
+    return (limit_no_rounding if fst_digit_rounded <= fst_digit
+            # The rounded limit is fst_digit_rounded-num_signif_d+1;
             # but this can only be 1 above the non-rounded limit:
             else limit_no_rounding+1)
 
@@ -1436,20 +1436,20 @@ class AffineScalarFunc(object):
    
     # __eq__ is used in "if data in [None, ()]", for instance.  It is
     # therefore important to be able to handle this case too, which is
-    # taken care of when _force_aff_func_args(_eq_on_aff_funcs)
+    # taken care of when force_aff_func_args(eq_on_aff_funcs)
     # returns NotImplemented.
-    __eq__ = _force_aff_func_args(_eq_on_aff_funcs)
+    __eq__ = force_aff_func_args(eq_on_aff_funcs)
     
-    __ne__ = _force_aff_func_args(_ne_on_aff_funcs)
-    __gt__ = _force_aff_func_args(_gt_on_aff_funcs)
+    __ne__ = force_aff_func_args(ne_on_aff_funcs)
+    __gt__ = force_aff_func_args(gt_on_aff_funcs)
 
     # __ge__ is not the opposite of __lt__ because these operators do
     # not always yield a boolean (for instance, 0 <= numpy.arange(10)
     # yields an array).
-    __ge__ = _force_aff_func_args(_ge_on_aff_funcs)
+    __ge__ = force_aff_func_args(ge_on_aff_funcs)
 
-    __lt__ = _force_aff_func_args(_lt_on_aff_funcs)
-    __le__ = _force_aff_func_args(_le_on_aff_funcs)
+    __lt__ = force_aff_func_args(lt_on_aff_funcs)
+    __le__ = force_aff_func_args(le_on_aff_funcs)
 
     ########################################
 
@@ -1686,14 +1686,14 @@ class AffineScalarFunc(object):
             
             if std_dev:  # NaN
 
-                return _format_num(
+                return format_num(
                     nom_val, fmt_spec_part,
                     std_dev, fmt_spec_part,
                     fmt_options)
 
             else:  # 0
 
-                return _format_num(
+                return format_num(
                     nom_val, fmt_spec_part,
                     # No decimal point means exact (this is different
                     # from a rounded float (0.00 might be truncated)).
@@ -1726,7 +1726,7 @@ class AffineScalarFunc(object):
             if fmt_prec:
                 num_signif_d = prec
             else:
-                (num_signif_d, std_dev) = _PDG_precision(std_dev)
+                (num_signif_d, std_dev) = PDG_precision(std_dev)
 
             digits_limit = signif_d_to_limit(std_dev, num_signif_d)
 
@@ -1757,7 +1757,7 @@ class AffineScalarFunc(object):
             use_exp = False
         elif fmt_type in 'eE':
             use_exp = True
-            exponent = _first_digit(round(nom_val, -digits_limit))
+            exponent = first_digit(round(nom_val, -digits_limit))
         else:  # g, G, n
 
             # The rules from
@@ -1793,7 +1793,7 @@ class AffineScalarFunc(object):
                          if uncert_controlled and abs(nom_val) < std_dev
                          else nom_val)
 
-            exponent = _first_digit(round(ref_value, -digits_limit))
+            exponent = first_digit(round(ref_value, -digits_limit))
 
             # The number of significant digits of the reference value
             # rounded at digits_limit is exponent-digits_limit+1:
@@ -1840,7 +1840,7 @@ class AffineScalarFunc(object):
         # Final formatting:
 
         # Format for the fixed-point part of the standard deviation,
-        # for _format_num():
+        # for format_num():
         fixed_point_fmt_s = (
             '%s%s.%df' % (
             match.group('fill_align'), match.group('extra'), -signif_limit)
@@ -1856,14 +1856,14 @@ class AffineScalarFunc(object):
             '%s.%df' % (''.join(match.groups()[:3]), -signif_limit))
 
         # Format for the exponent:
-        if fmt_type in _EXP_LETTERS and 'L' not in fmt_options:
+        if fmt_type in EXP_LETTERS and 'L' not in fmt_options:
             # Case of e or E. The same convention as Python 2.7
             # to 3.3 is used for the display of the exponent:
-            exp_fmt = _EXP_LETTERS[fmt_type]+'%+03d'
+            exp_fmt = EXP_LETTERS[fmt_type]+'%+03d'
         else:
             exp_fmt = None
         
-        return _format_num(nom_val_mantissa, fixed_point_fmt_n,
+        return format_num(nom_val_mantissa, fixed_point_fmt_n,
                            std_dev_mantissa, fixed_point_fmt_s,
                            fmt_options if fmt_type != '%' else fmt_options+'%',
                            exponent, exp_fmt)
@@ -2099,7 +2099,7 @@ if sys.version_info < (3,):
 
 else:
 
-    def _no_complex_result(func):
+    def no_complex_result(func):
         '''
         Returns a function that does like func, but that raises a
         ValueError if the result is complex.
@@ -2123,8 +2123,8 @@ else:
     # complex results for the nominal value of some operations cannot
     # be calculated with an uncertainty:
     _custom_ops = {
-        'pow': _no_complex_result(float.__pow__),
-        'rpow': _no_complex_result(float.__rpow__)
+        'pow': no_complex_result(float.__pow__),
+        'rpow': no_complex_result(float.__rpow__)
         }
 
 def add_operators_to_AffineScalarFunc():
@@ -2528,7 +2528,7 @@ _cannot_parse_ufloat_msg_pat = (
 # The following function is not exposed because it can in effect be
 # obtained by doing x = ufloat_fromstr(representation) and reading
 # x.nominal_value and x.std_dev:
-def _str_to_number_with_uncert(representation):
+def str_to_number_with_uncert(representation):
     """
     Given a string that represents a number with uncertainty, returns the
     nominal value and the uncertainty.
@@ -2613,12 +2613,12 @@ def ufloat_fromstr(representation, tag=None):
 
     #! The special ** syntax is for Python 2.5 and before (Python 2.6+
     # understands tag=tag):
-    (nominal_value, std_dev) = _str_to_number_with_uncert(
+    (nominal_value, std_dev) = str_to_number_with_uncert(
         representation.strip())
     
     return ufloat(nominal_value, std_dev, tag)
 
-def _ufloat_obsolete(representation, tag=None):
+def ufloat_obsolete(representation, tag=None):
     '''
     Legacy version of ufloat(). Will eventually be removed.
 
@@ -2676,9 +2676,9 @@ def ufloat(nominal_value, std_dev=None, tag=None):
         deprecation('either use ufloat(nominal_value, std_dev),'
                     ' ufloat(nominal_value, std_dev, tag), or the'
                     ' ufloat_fromstr() function, for string representations.')
-        return _ufloat_obsolete(nominal_value,  # Tuple or string
-                                # tag keyword used:
-                                tag if tag is not None
-                                # 2 positional arguments form:
-                                else std_dev)
+        return ufloat_obsolete(nominal_value,  # Tuple or string
+                               # tag keyword used:
+                               tag if tag is not None
+                               # 2 positional arguments form:
+                               else std_dev)
 
