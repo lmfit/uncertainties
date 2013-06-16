@@ -1164,9 +1164,9 @@ def _format_num(nom_val_mantissa, fp_fmt_n,
     '''
     Returns a valid __format__() output for a number with uncertainty.
 
-    #!!!!!!!!! options in LSC, can generally be cumulated
+    #!!!!!!!!! options in LSC, can generally be cumulated, support "in"
 
-    #!!!!!!!! exponent: = *common* exponent; None = no common exponent used
+    #!!!!!!!! exponent: = *common* exponent; None = no exponent used
     '''
     #!!!!!!!!!!
 
@@ -1646,11 +1646,9 @@ class AffineScalarFunc(object):
 
             # Part of the float format specification common to the
             # nominal value and to the standard deviation::
-            fmt_spec_part_start = ''.join([
-                match.group('fill_align'), match.group('sign'),
-                match.group('extra'), '.%s' % fmt_prec if fmt_prec else ''])
+            fmt_spec_part_start = (''.join(match.groups()[:3])
+                                   + '.%s' % fmt_prec if fmt_prec else '')
 
-            
             # Full format specification (for the nominal value):
             fmt_spec_part = fmt_spec_part_start+match.group('type')
             
@@ -1809,35 +1807,19 @@ class AffineScalarFunc(object):
 
         # Final formatting:
 
-        #!!!!!!!!!!
-        
-        # Part of the float format specification common to the
-        # nominal value and to the standard deviation::
-
-        fmt_spec_part_start = ''.join([
-            match.group('fill_align'), match.group('sign'),
-            match.group('extra'), '.%s' % fmt_prec if fmt_prec else ''])
-        
         # Format for the fixed-point part of the standard deviation:
-        fixed_point_fmt_spec_s = '%s.%df' % (
-            match.group('extra1'),
-            -signif_limit)
+        fixed_point_fmt_spec_s = '%s%s.%df' % (
+            match.group('fill_align'), match.group('extra'), -signif_limit)
         
         # Format for the fixed-point part of the nominal value: the
         # sign is only applied to the mantissa (since the sign of the
         # standard deviation is always +):
-        fixed_point_fmt_spec_n = ((match.group('sign')) +
-                                  fixed_point_fmt_spec_s)
+        fixed_point_fmt_spec_n = '%s.%df' % (
+            ''.join(match.groups()[:3]), -signif_limit)
 
-        
-        # The global formatting options are applied:
-        return _robust_format(
-            _format_num(nom_val_mantissa, fixed_point_fmt_spec_n,
-                        std_dev_mantissa, fixed_point_fmt_spec_s,
-                        exponent,
-                        set(match.group('options'))),
-            # None -> '':
-            '%s%ss' % (match.group('fill_align') or '', match.group('width')))
+        return _format_num(nom_val_mantissa, fixed_point_fmt_spec_n,
+                           std_dev_mantissa, fixed_point_fmt_spec_s,
+                           match.group('options'), exponent)
 
     # Alternate name for __format__, for use with Python < 2.6:    
     format = set_doc("""
