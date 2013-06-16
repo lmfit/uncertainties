@@ -1125,15 +1125,15 @@ def _PDG_precision(std_dev):
         # std_dev:
         return (2, 10.**exponent*(1000/factor))
 
-# Definition of a basic formatting function that works whatever the
-# version of Python:
+# Definition of a basic (format specification only) formatting
+# function that works whatever the version of Python:
 try:
 
-    robust_format = format
+    _robust_format = format
     
-except NameError:  # format() not defined (Python < 2.6)
+except NameError:  # !! format() is not defined (Python < 2.6)
     
-    def robust_format(value, format_spec):
+    def _robust_format(value, format_spec):
         '''
         Formats the given value with the given format specification.
 
@@ -1154,14 +1154,13 @@ class CallableStdDev(float):
                     ' anymore: use .std_dev instead of .std_dev().')
         return self
 
-# Exponent letter for all AffineScalarFunc format types:
+# Exponent letter for all AffineScalarFunc format types (that can use
+# an exponent):
 _exp_letter = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
 def _format_num(nom_val_mantissa, fp_fmt_n,
                 std_dev_mantissa, fp_fmt_s,
-                options='',
-                exponent=None  # !!!! None if no common exponent
-                ):
+                options='', exponent=None):
     '''
     Returns a valid __format__() output for a number with uncertainty.
 
@@ -1199,7 +1198,7 @@ def _format_num(nom_val_mantissa, fp_fmt_n,
 
         # An integer uncertainty is displayed as an integer:
         fixed_point_str = "%s(%s)" % (
-            robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
+            _robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
             uncert_str)
 
     else:  # +/- notation:
@@ -1212,9 +1211,9 @@ def _format_num(nom_val_mantissa, fp_fmt_n,
             '+/-')
 
         fixed_point_str = '%s%s%s' % (
-            robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
+            _robust_format(nom_val_mantissa, fixed_point_fmt_spec_n),
             pm_symbol,
-            robust_format(std_dev_mantissa, fixed_point_fmt_spec_s)
+            _robust_format(std_dev_mantissa, fixed_point_fmt_spec_s)
             )
 
     # Should an exponent be added? The result goes to value_str:
@@ -1593,7 +1592,7 @@ class AffineScalarFunc(object):
         match = re.match(
             '(?P<fill_align>.?[<>=^])?'
             '(?P<sign>[-+ ]?)'
-            '(?P<extra0>0?\d*,?)'  # Optional 0, width and comma
+            '(?P<extra>0?\d*,?)'  # Optional 0, width and comma
             '(?:\.(?P<prec>\d+))?'
             '(?P<uncert_prec>u?)'  # Precision for the uncertainty?
             # The type can be omitted. Options must not go here:
@@ -1645,16 +1644,15 @@ class AffineScalarFunc(object):
 
         if std_dev == 0 or isnan(std_dev):
 
-            # Float formatting for each part, without the uncertainty
-            # flag (u) and without the type:
+            # Part of the float format specification common to the
+            # nominal value and to the standard deviation::
             fmt_spec_part_start = ''.join([
                 match.group('fill_align'), match.group('sign'),
-                match.group('extra0'), '.%s' % fmt_prec if fmt_prec else ''])
+                match.group('extra'), '.%s' % fmt_prec if fmt_prec else ''])
 
-            fmt_spec_part_end = match.group('type')
-
+            
             # Full format specification (for the nominal value):
-            fmt_spec_part = fmt_spec_part_start+fmt_spec_part_end
+            fmt_spec_part = fmt_spec_part_start+match.group('type')
             
             if std_dev:  # NaN
 
@@ -1795,7 +1793,7 @@ class AffineScalarFunc(object):
             # Limit for the last digit of the mantissas:
             signif_limit = digits_limit - exponent
 
-        else:  # Full fixed-point notation
+        else:  # No exponent
             
             exponent = None
 
@@ -1813,10 +1811,18 @@ class AffineScalarFunc(object):
 
         #!!!!!!!!!!
         
+        # Part of the float format specification common to the
+        # nominal value and to the standard deviation::
+
+        fmt_spec_part_start = ''.join([
+            match.group('fill_align'), match.group('sign'),
+            match.group('extra'), '.%s' % fmt_prec if fmt_prec else ''])
+        
         # Format for the fixed-point part of the standard deviation:
         fixed_point_fmt_spec_s = '%s.%df' % (
             match.group('extra1'),
             -signif_limit)
+        
         # Format for the fixed-point part of the nominal value: the
         # sign is only applied to the mantissa (since the sign of the
         # standard deviation is always +):
@@ -1825,7 +1831,7 @@ class AffineScalarFunc(object):
 
         
         # The global formatting options are applied:
-        return robust_format(
+        return _robust_format(
             _format_num(nom_val_mantissa, fixed_point_fmt_spec_n,
                         std_dev_mantissa, fixed_point_fmt_spec_s,
                         exponent,
