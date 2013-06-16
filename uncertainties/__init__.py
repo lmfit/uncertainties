@@ -1738,11 +1738,12 @@ class AffineScalarFunc(object):
             #calculated, whether the u is given or not
             
             # Should the scientific notation be used? the same rule as
-            # for floats is used ("-4 <= exp < p"), except that the
-            # precision p used is the number of significant digits of
-            # the larger quantity (between nominal value and standard
-            # deviation), based on the required number num_signif_d of
-            # significant digits on the uncertainty.
+            # for floats is used ("-4 <= exponent of value < p"),
+            # except that the precision p used is the number of
+            # significant digits of the larger quantity (between
+            # nominal value and standard deviation), based on the
+            # required number num_signif_d of significant digits on
+            # the uncertainty.
 
             # Number of significant digits of the larger number:
             if std_dev >= abs(nom_val):
