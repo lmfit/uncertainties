@@ -1646,6 +1646,9 @@ class AffineScalarFunc(object):
         if fmt_type in 'gGn' and not prec:
             prec = 1
 
+        # Options:
+        fmt_options = match.group('options')
+        
         ########################################
                 
         # Since the '%' (percentage) format specification can change
@@ -1680,19 +1683,18 @@ class AffineScalarFunc(object):
                 return _format_num(
                     nom_val, fmt_spec_part,
                     std_dev, fmt_spec_part,
-                    match.group('options'))
+                    fmt_options)
 
             else:  # 0
 
                 return _format_num(
                     nom_val, fmt_spec_part,
-                    std_dev_mantissa=0,
                     # No decimal point means exact (this is different
                     # from a rounded float (0.00 might be truncated)).
                     #
                     # The total width, etc. are taken into account:
-                    fmt_spec_part_start+'d',
-                    match.group('options')
+                    0, fmt_spec_part_start+'d',
+                    fmt_options
                     )
      
         ########################################
@@ -1836,7 +1838,7 @@ class AffineScalarFunc(object):
         fixed_point_fmt_s = (
             '%s%s.%df' % (
             match.group('fill_align'), match.group('extra'), -signif_limit)
-            if 'S' not in match.group('options')
+            if 'S' not in fmt_options
             # The semantics of this parameter is special, for the
             # shorthand notation:
             else -signif_limit)
@@ -1846,15 +1848,11 @@ class AffineScalarFunc(object):
         # standard deviation is always +):
         fixed_point_fmt_n = (
             '%s.%df' % (''.join(match.groups()[:3]), -signif_limit))
-
-
-        options = match.group('options')
-        if fmt_type == '%':
-            options += '%'
             
         return _format_num(nom_val_mantissa, fixed_point_fmt_n,
                            std_dev_mantissa, fixed_point_fmt_s,
-                           options, exponent)
+                           fmt_options if fmt_type != '%' else fmt_options+'%',
+                           exponent)
 
     # Alternate name for __format__, for use with Python < 2.6:    
     format = set_doc("""
