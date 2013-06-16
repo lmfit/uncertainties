@@ -1643,15 +1643,15 @@ class AffineScalarFunc(object):
         fmt_type = match.group('type') or 'g'
 
         # Shortcut:
-        fmt_prec = match.group('prec')
+        fmt_prec = match.group('prec')  # Can be None
 
         # Effective format specification precision: the rule of
         # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
         # is used:
-        prec = int(fmt_prec)
         if fmt_type in 'gGn' and not prec:
             prec = 1
-
+        #!!!!!!! move in correct place
+            
         # Options:
         fmt_options = match.group('options')
         
