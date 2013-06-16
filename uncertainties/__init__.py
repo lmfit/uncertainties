@@ -1169,7 +1169,8 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
 
     fixed_point_fmt_n, fixed_point_fmt_s -- format strings for the
     fixed-point part of the nominal value and standard deviation
-    (respectively).
+    (respectively). fixed_point_fmt_s is ignored if the "S" option is
+    used.
 
     options -- options (as an object that support membership testing,
     like for instance a string). "S" is for the short-hand notation
@@ -1819,14 +1820,19 @@ class AffineScalarFunc(object):
         # Final formatting:
 
         # Format for the fixed-point part of the standard deviation:
-        fixed_point_fmt_s = '%s%s.%df' % (
+        fixed_point_fmt_s = (
+            '%s%s.%df' % (
             match.group('fill_align'), match.group('extra'), -signif_limit)
+            if 'S' not in match.group('options')
+            # The format of the standard deviation is handled directly
+            # by _format_num():
+            else None)
         
         # Format for the fixed-point part of the nominal value: the
         # sign is only applied to the mantissa (since the sign of the
         # standard deviation is always +):
-        fixed_point_fmt_n = '%s.%df' % (
-            ''.join(match.groups()[:3]), -signif_limit)
+        fixed_point_fmt_n = (
+            '%s.%df' % (''.join(match.groups()[:3]), -signif_limit))
 
         return _format_num(nom_val_mantissa, fixed_point_fmt_n,
                            std_dev_mantissa, fixed_point_fmt_s,
