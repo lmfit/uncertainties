@@ -26,7 +26,8 @@ Examples:
   x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
   x = ufloat_fromstr("0.20+/-0.01")  # Other representation
   x = ufloat_fromstr("0.20(1)")  # Other representation
-  x = ufloat_fromstr("0.20")  # Implicit uncertainty of +/-1 on the last digit
+  # Implicit uncertainty of +/-1 on the last digit:  
+  x = ufloat_fromstr("0.20")
   print x**2  # Square: prints "0.04+/-0.004"
   print sin(x**2)  # Prints "0.0399...+/-0.00399..."
 
@@ -1156,11 +1157,12 @@ class CallableStdDev(float):
 
 # Exponent letter for all AffineScalarFunc format types (that can use
 # an exponent):
-_exp_letter = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
+_EXP_LETTERS = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
 def _format_num(nom_val_mantissa, fixed_point_fmt_n,
                 error_mantissa, fixed_point_fmt_s,
-                options='', exponent=None):
+                options='',
+                exponent=None, exp_fmt='e+03d'):
     '''
     Returns a valid __format__() output for a number with uncertainty.
 
@@ -1185,6 +1187,9 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
     shorthand notation is not used.
 
     exponent -- common exponent to use. If None, no exponent is used.
+    
+    exp_fmt -- % format string for the exponent part. Ignored if no
+    exponent is given, and for the LaTeX output.
     '''
 
     # Calculation of the final no-exponent part, fixed_point_str:
@@ -1240,10 +1245,11 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
         value_str = fixed_point_str  # Nothing to be added
     else:
         mantissa_fmt = '%s' if 'S' in options else '(%s)'
-        exp_fmt = (r' \times 10^{%d}' if 'L' in options
-                   # Case of e or E. The same convention as Python 2.7
-                   # to 3.3 is used for the display of the exponent:
-                   else _exp_letter[fmt_type]+'%+03d')
+        
+        if 'L' in options:
+            # The provided exp_fmt is ignored:
+            exp_fmt = r' \times 10^{%d}'
+                   
         value_str = (mantissa_fmt % fixed_point_str +
                      exp_fmt % exponent)
         
@@ -1848,11 +1854,19 @@ class AffineScalarFunc(object):
         # standard deviation is always +):
         fixed_point_fmt_n = (
             '%s.%df' % (''.join(match.groups()[:3]), -signif_limit))
-            
+
+        # Format for the exponent:
+        if fmt_type in _EXP_LETTERS and 'L' not in fmt_options:
+            # Case of e or E. The same convention as Python 2.7
+            # to 3.3 is used for the display of the exponent:
+            exp_fmt = _EXP_LETTERS[fmt_type]+'%+03d'
+        else:
+            exp_fmt = None
+        
         return _format_num(nom_val_mantissa, fixed_point_fmt_n,
                            std_dev_mantissa, fixed_point_fmt_s,
                            fmt_options if fmt_type != '%' else fmt_options+'%',
-                           exponent)
+                           exponent, exp_fmt)
 
     # Alternate name for __format__, for use with Python < 2.6:    
     format = set_doc("""
