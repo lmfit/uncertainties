@@ -1589,7 +1589,7 @@ def test_format():
             '.1u%': '(42+/-1)%',
             '.1u%S': '42(1)%',
             'C%': u'(42±1)%'
-        }
+        },
         
         # Particle Data Group automatic convention, including limit cases:
         (1.2345678, 0.354): {'': '1.23+/-0.35'},
