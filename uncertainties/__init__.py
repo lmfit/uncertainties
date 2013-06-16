@@ -1613,7 +1613,7 @@ class AffineScalarFunc(object):
         # Format specification parsing:
 
         match = re.match(
-            '(?P<fill_align>.?[<>=^])?'
+            '(?P<fill_align>(?:.?[<>=^]|))'  # Can be the empty string
             '(?P<sign>[-+ ]?)'
             '(?P<extra>0?\d*,?)'  # Optional 0, width and comma
             '(?:\.(?P<prec>\d+))?'
@@ -1847,7 +1847,7 @@ class AffineScalarFunc(object):
         # sign is only applied to the mantissa (since the sign of the
         # standard deviation is always +):
         fixed_point_fmt_n = (
-            '%s.%df' % (''.join(match.groups('')[:3]), -signif_limit))
+            '%s.%df' % (''.join(match.groups()[:3]), -signif_limit))
             
         return _format_num(nom_val_mantissa, fixed_point_fmt_n,
                            std_dev_mantissa, fixed_point_fmt_s,
