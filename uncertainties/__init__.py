@@ -1181,7 +1181,8 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
     like for instance a string). "S" is for the short-hand notation
     1.23(1). "C" is for using the character "±" between the nominal
     value and the error. "L" is for a LaTeX output. Options can be
-    combined.
+    combined. "%" adds a final percent sign, and parentheses if the
+    shorthand notation is not used.
 
     exponent -- common exponent to use. If None, no exponent is used.
     '''
@@ -1236,26 +1237,30 @@ def _format_num(nom_val_mantissa, fixed_point_fmt_n,
 
     # Should an exponent be added? The result goes to value_str:
     if use_exp:
-        mantissa_fmt = '%s' if 'S' in match.group('ext') else '(%s)'
-        exp_fmt = (r' \times 10^{%d}' if 'L' in match.group('ext')
-                   # Case of e or E. The same convention as Python
-                   # 2.7 to 3.3 is used for the display of the
-                   # exponent:
+        mantissa_fmt = '%s' if 'S' in options else '(%s)'
+        exp_fmt = (r' \times 10^{%d}' if 'L' in options
+                   # Case of e or E. The same convention as Python 2.7
+                   # to 3.3 is used for the display of the exponent:
                    else _exp_letter[fmt_type]+'%+03d')
         value_str = (mantissa_fmt % fixed_point_str +
                      exp_fmt % exponent)
-
     else:
         value_str = fixed_point_str  # Nothing to be added
 
     # Possible % sign:
-    if fmt_type == '%':
-        if 'L' in match.group('ext'):
-            # Using '\\' instead of r'\' so as not to confuse
-            # emacs's syntax highlighting:
-            value_str += ' \\'  # % is a special character, in LaTeX
+    if '%' in options:
+        if 'S' not in options:
+            # The output will look like (42+/-1)%:
+            value_str = '(%s)' % value_str
+        if 'L' in options:
+            # % is a special character, in LaTeX: it must be escaped.
+            #
+            # Using '\\' in the code instead of r'\' so as not to
+            # confuse emacs's syntax highlighting:
+            value_str += ' \\'
         value_str += '%'
 
+    return value_str
 
 def signif_d_to_limit(value, num_signif_d):
     '''
@@ -1842,9 +1847,14 @@ class AffineScalarFunc(object):
         fixed_point_fmt_n = (
             '%s.%df' % (''.join(match.groups()[:3]), -signif_limit))
 
+
+        options = match.group('options')
+        if fmt_type == '%':
+            options += '%'
+            
         return _format_num(nom_val_mantissa, fixed_point_fmt_n,
                            std_dev_mantissa, fixed_point_fmt_s,
-                           match.group('options'), exponent)
+                           options, exponent)
 
     # Alternate name for __format__, for use with Python < 2.6:    
     format = set_doc("""

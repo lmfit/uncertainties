@@ -1583,6 +1583,13 @@ def test_format():
             'F': '1234.57+/-0.10',            
             '%': '123457+/-10%'
         },
+
+        # Percent notation:
+        (0.42, 0.55): {
+            '.1u%': '(42+/-1)%',
+            '.1u%S': '42(1)%',
+            'C%': u'(42±1)%'
+        }
         
         # Particle Data Group automatic convention, including limit cases:
         (1.2345678, 0.354): {'': '1.23+/-0.35'},
@@ -1652,20 +1659,24 @@ def test_format():
             '15GS': '  -1.4(NAN)E-12'
         },
 
-        # Character (Unicode) strings:
         (3.14e-10, 0.01e-10): {
+            # Character (Unicode) strings:
             u'C': u'(3.14±0.01)e-10',
-            u'CL': ur'(3.14±0.01) \times 10^{-10}'
+            u'CL': ur'(3.14±0.01) \times 10^{-10}',
+            # Truncated non-zero uncertainty:
+            '.1e': '(3+/-0.)e-10',
+            '.1eS': '3(0.)e-10'
         },
         
         # Some special cases:
         (1, float('nan')): {
             'g': '1+/-nan',
             'G': '1+/-NAN',
-            '%': '100+/-nan'
+            '%': '100+/-nan',
         },
         (9.9, 0.1): {
             '.1ue': '(9.9+/-0.1)e+00',
+            '.0fS': '10(0)',
             '.0ue': '(9.9+/-0.1)e+00'  # 0 converted to 1: different from float
         },
         (9.99, 0.1): {
@@ -1702,8 +1713,8 @@ def test_format():
             '.1ufS': '12(2)'  # No decimal point on the uncertainty
         },
         (0, 0): {  # Make defining the first significant digit problematic
-            '.1uf': '0.0',  # Simple float formatting
-            'g': '0'
+            '.1f': '0.0+/-0',  # Simple float formatting
+            'g': '0+/-0'
         }
         
     }
