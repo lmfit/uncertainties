@@ -1754,72 +1754,42 @@ class AffineScalarFunc(object):
             # unnecessary).
 
             # Should the scientific notation be used? The same rule as
-            # for floats is used ("-4 <= exponent of value < p"). It
-            # is applied, however, to either the nominal value or the
-            # standard deviation. When the user wants to control the
-            # number of significant digits of the uncertainty, the
-            # larger value (in absolute value) is used, and the
-            # precision p is defined as its desired number of
-            # significant digits; otherwise, the nominal value is used
-            # (which gives the same nominal value format as if the
-            # number had no uncertainty and were a float) and the
-            # precision p is the one specified by the user.
-
-            # except that the precision p used is the
-            # number of significant digits of the larger value
-            # 
-
+            # for floats is used ("-4 <= exponent of rounded value <
+            # p"). It is applied, however, to a reference value which
+            # is either the nominal value or the standard
+            # deviation. When the user wants to control the number of
+            # significant digits of the uncertainty, the larger value
+            # (in absolute value) is used; otherwise, the nominal
+            # value is used (which gives the same nominal value format
+            # as if the number had no uncertainty and were a
+            # float). In both cases, the precision p is the number of
+            # significant digits of the reference value when rounded
+            # at the previously calculated digits_limit.
             
-            if uncert_controlled:
-                #!!!!!!!!!! There is duplicated code between the g test
-                #and the e implementation. Could this be unified?
+            ref_value = (std_dev
+                         if uncert_controlled and abs(nom_val) < std_dev
+                         else nom_val)
 
+            exponent = _first_digit(round(ref_value, -digits_limit))
 
-                # Number of significant digits of the larger number:
-                if std_dev >= abs(nom_val):
-                    ref_value = std_dev_rounded
-                    signif_digits = num_signif_d
-                else:  # Usual case: larger nominal value:
-                    # The formatting rule for g is "suppose that the
-                    # result formatted with presentation type 'e' and
-                    # precision p-1 would have exponent exp". This is what
-                    # is calculated here (the first digit of the mantissa
-                    # uses 1 digit.
-                    ref_value = abs(round(nom_val, -digits_limit))
-                    signif_digits = _first_digit(ref_value)-digits_limit+1
-
-            else:
-                # prec is the desired number of significant digits on
-                # the nominal value:
-
-                ref_value = nom_val
-            #!!!!!!!!!!!
-            
-            # The choice between using the exponent notation or not
-            # depends on the magnitude of the larger value (the one
-            # with a regular mantissa), in the same way as the g
-            # format (Python 2.7). Its exponent (after rounding, as
-            # defined in the specification of the g format in Python
-            # 2.7) is needed for this:
-            ref_exp = _first_digit(ref_value)
-            exponent = _first_digit(ref_value)
-
-            if -4 <= exponent < signif_digits:
+            # The number of significant digits of the reference value
+            # rounded at digits_limit is exponent-digits_limit+1:
+            if -4 <= exponent < exponent-digits_limit+1:
                 use_exp = False
             else:
                 use_exp = True
-                # The letter for the format should be specified:
-                
-            
-        # Formatting: signif_limit is updated, and the mantissa
-        # nominal value and standard deviation are calculated
 
+        ########################################
+
+        # The common exponent is calculated, if an exponent is needed:
+        
         if use_exp:
-            # The exponent gives the *largest* of the nominal value
-            # and the uncertainty a mantissa between 1 and
-            # 9.9999... (in absolute value) *after rounding*.  The
-            # reference value will be rounded at digits_limit: this
-            # is what defines its exponent:
+
+            # digits_limit is updated, and the mantissa of the nominal
+            # value and of the standard deviation are calculated.
+
+            #!!!!!!!!!!!!
+            
             ref_value = round(max(abs(nom_val), std_dev),
                               -digits_limit)
 
