@@ -1553,11 +1553,12 @@ def test_format():
             '.1ue': '(0+/-5)e+02',
             '.4ue': '(0.123+/-4.568)e+02'
         },
-        
+
         # Test of the various float formats: the nominal value should
         # have a similar representation as if it were directly
         # represented as a float:
         (1234567.89, 0.1): {
+            '.0e': '(1+/-0.)e+06',  # Approximate error indicated with "."
             'e': '(1.23456789+/-0.00000010)e+06',
             'E': '(1.23456789+/-0.00000010)E+06',
             'f': '1234567.89+/-0.10',
@@ -1575,6 +1576,7 @@ def test_format():
         },        
         
         (1234.56789, 0.1): {
+            '.0f': '(1234+/-0.)',  # Approximate error indicated with "."
             'e': '(1.23456+/-0.00010)e+03',
             'E': '(1.23456+/-0.00010)E+03',
             'f': '1234.57+/-0.10',
