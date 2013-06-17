@@ -1161,22 +1161,22 @@ class CallableStdDev(float):
 # an exponent):
 EXP_LETTERS = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
-def format_num(nom_val_mantissa, error_mantissa,
-               fmt_prefix_n='', fmt_prefix_s='',
+def format_num(mantissa_n, mantissa_e, exponent=None,
+               fmt_prefix_n='', fmt_prefix_e='', fmt_exp='e+03d',
                prec=6, fixed_point_type='f',
-               options='', exponent=None, exp_fmt='e+03d'):
+               options=''):
     '''
     Returns a formatted number with uncertainty.
 
-    Null errors (error_mantissa) are displayed as the integer 0, with
+    Null errors (mantissa_e) are displayed as the integer 0, with
     no decimal point.
     
-    nom_val_mantissa, error_mantissa -- mantissas of the nominal
+    mantissa_n, mantissa_e -- mantissas of the nominal
     value and of the error (numbers).
 
-    fmt_prefix_n, fmt_prefix_s -- prefixes for the format given to
+    fmt_prefix_n, fmt_prefix_e -- prefixes for the format given to
     robust_format() for the nominal value and the error. They can be
-    used for instance to set the width of each value. fmt_prefix_s is
+    used for instance to set the width of each value. fmt_prefix_e is
     ignored if the shorthand notation is used.
 
     prec -- number of digits to display after the decimal
@@ -1193,7 +1193,7 @@ def format_num(nom_val_mantissa, error_mantissa,
 
     exponent -- common exponent to use. If None, no exponent is used.
     
-    exp_fmt -- % format string for the exponent part. Ignored if no
+    fmt_exp -- % format string for the exponent part. Ignored if no
     exponent is given, and for the LaTeX output.
     '''
 
@@ -1212,11 +1212,17 @@ def format_num(nom_val_mantissa, error_mantissa,
     # That said, it is good to indicate null errors explicitly when
     # possible: printing 3.1±0 with the default format prints 3.1+/-0,
     # which shows that the uncertainty is exactly zero.
+
+
+    #!!!!!!!!! There is a problem with the shorthand formatting: in
+    #the format spec, the alignment, width, etc. (but not 0n,) should
+    #be global.
     
-    print ("CALLING format_num with", nom_val_mantissa, error_mantissa,
-               fmt_prefix_n, fmt_prefix_s,
+    print ("CALLING format_num with", mantissa_n, mantissa_e,
+               fmt_prefix_n, fmt_prefix_e,
+           #!!!!!!!!!!! The exponent and the format could be grouped
                prec, fixed_point_type,
-               options, exponent, exp_fmt) #!!!!! test
+               options, exponent, fmt_exp) #!!!!! test
     
     # Calculation of the final no-exponent part, fixed_point_str:
 
@@ -1225,7 +1231,7 @@ def format_num(nom_val_mantissa, error_mantissa,
     
     # Nominal value formatting:
     nom_val_str = robust_format(
-        nom_val_mantissa,
+        mantissa_n,
         '%s.%d%s' % (fmt_prefix_n, prec, fixed_point_type))    
 
     # Error formatting:
@@ -1234,14 +1240,14 @@ def format_num(nom_val_mantissa, error_mantissa,
 
         # Calculation of the uncertainty part, uncert_str:
 
-        if error_mantissa == 0:
+        if mantissa_e == 0:
             # The error is exactly zero
             uncert_str = '0'
-        elif isnan(error_mantissa):
-            uncert_str = fixed_point_type % error_mantissa
+        elif isnan(mantissa_e):
+            uncert_str = fixed_point_type % mantissa_e
         else:  #  Error with a meaningful first digit (not 0, not NaN)
 
-            uncert = round(error_mantissa, prec)
+            uncert = round(mantissa_e, prec)
 
             # The representation uncert_str of the uncertainty (which will
             # be put inside parentheses) is calculated:
@@ -1265,16 +1271,16 @@ def format_num(nom_val_mantissa, error_mantissa,
                 else:
                     # The decimal point indicates a truncated float
                     # (this is easy to do, in this case, since
-                    # fmt_prefix_s is ignored):
+                    # fmt_prefix_e is ignored):
                     uncert_str = '0.'
 
         fixed_point_str = "%s(%s)" % (nom_val_str, uncert_str)
             
     else:  # +/- notation:
 
-        if not error_mantissa:  # Exactly zero error
+        if not mantissa_e:  # Exactly zero error
             fmt_suffix_s = 'd'  # No decimal point for zero
-            error_mantissa = 0  # Integer ('{:d}'.format(0.) fails)
+            mantissa_e = 0  # Integer ('{:d}'.format(0.) fails)
             # Note: .0f applied to a float can give the same result,
             # but this does not appear to be documented
             # (http://docs.python.org/2/library/string.html#format-specification-mini-language).
@@ -1291,7 +1297,7 @@ def format_num(nom_val_mantissa, error_mantissa,
         fixed_point_str = '%s%s%s' % (
             nom_val_str, 
             pm_symbol,
-            robust_format(error_mantissa, fmt_prefix_s+fmt_suffix_s)
+            robust_format(mantissa_e, fmt_prefix_e+fmt_suffix_s)
             )
 
     # Should an exponent be added? The result goes to value_str:
@@ -1301,11 +1307,11 @@ def format_num(nom_val_mantissa, error_mantissa,
         mantissa_fmt = '%s' if 'S' in options else '(%s)'
         
         if 'L' in options:
-            # The provided exp_fmt is ignored:
-            exp_fmt = r' \times 10^{%d}'
+            # The provided fmt_exp is ignored:
+            fmt_exp = r' \times 10^{%d}'
                    
         value_str = (mantissa_fmt % fixed_point_str +
-                     exp_fmt % exponent)
+                     fmt_exp % exponent)
         
     # Possible % sign:
     if '%' in options:
@@ -1865,7 +1871,7 @@ class AffineScalarFunc(object):
 
         # Calculation of signif_limit (position of the significant
         # digits limit in the final fixed point representations; this
-        # number is non-positive), of nom_val_mantissa ("mantissa" for
+        # number is non-positive), of mantissa_n ("mantissa" for
         # the nominal value, i.e. value possibly corrected for a
         # factorized exponent), and std_dev_mantissa (similarly for
         # the standard deviation). Exponent is also set to None if no
@@ -1875,7 +1881,7 @@ class AffineScalarFunc(object):
 
             factor = 10.**exponent  # Not 10.**(-exponent), for limit cases
             
-            nom_val_mantissa = nom_val/factor
+            mantissa_n = nom_val/factor
             std_dev_mantissa = std_dev/factor
             # Limit for the last digit of the mantissas (it should be
             # non-positive, as digits before the final decimal points
@@ -1886,7 +1892,7 @@ class AffineScalarFunc(object):
             
             exponent = None
 
-            nom_val_mantissa = nom_val
+            mantissa_n = nom_val
             std_dev_mantissa = std_dev
             # Without an exponent, it is necessary to include the
             # decimal point location in the printed digit (e.g.,
@@ -1916,16 +1922,15 @@ class AffineScalarFunc(object):
         if fmt_type in EXP_LETTERS and 'L' not in fmt_options:
             # Case of e or E. The same convention as Python 2.7
             # to 3.3 is used for the display of the exponent:
-            exp_fmt = EXP_LETTERS[fmt_type]+'%+03d'
+            fmt_exp = EXP_LETTERS[fmt_type]+'%+03d'
         else:
-            exp_fmt = None
+            fmt_exp = None
 
-        return format_num(nom_val_mantissa, std_dev_mantissa,
-                          prefix_n, prefix_s,
+        return format_num(mantissa_n, std_dev_mantissa, exponent, 
+                          prefix_n, prefix_s, fmt_exp,
                           prec=-signif_limit,
                           fixed_point_type = 'fF'[fmt_type.isupper()],
-                          options=options,
-                          exponent=exponent, exp_fmt=exp_fmt)
+                          options=options)
 
     # Alternate name for __format__, for use with Python < 2.6:    
     format = set_doc("""

@@ -1669,7 +1669,7 @@ def test_format():
             u'C': u'(3.140±0.010)e-10',  # PDG rules: 2 digits
             u'CL': ur'(3.140±0.010) \times 10^{-10}',
             # Truncated non-zero uncertainty:
-            '.1e': '(3+/-0.)e-10',
+            '.1e': '(3.1+/-0.0)e-10',
             '.1eS': '3.1(0.0)e-10'
         },
         
