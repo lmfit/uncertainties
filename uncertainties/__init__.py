@@ -1218,7 +1218,7 @@ def format_num(nom_val_mantissa, fixed_point_fmt_n,
             # makes the result easier to read); the shorthand
             # notation then essentially coincides with the +/-
             # notation:
-            if first_digit(error_rounded) >= 0 and fixed_point_fmt_s > 0:
+            if first_digit(uncert) >= 0 and fixed_point_fmt_s > 0:
                 # This case includes a zero rounded error with digits
                 # after the decimal point:
                 uncert_str = '%.*f' % (fixed_point_fmt_s, uncert)
