@@ -1162,8 +1162,8 @@ class CallableStdDev(float):
 EXP_LETTERS = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
 def format_num(mantissa_n, mantissa_e, exponent=None,
-               fmt_prefix_n='', fmt_prefix_e='', fmt_exp='e+03d',
-               prec=6, fixed_point_type='f',
+               fmt_prefix_n='', fmt_prefix_e='',
+               prec=6, fmt_type='g',
                options=''):
     '''
     Returns a formatted number with uncertainty.
@@ -1174,6 +1174,8 @@ def format_num(mantissa_n, mantissa_e, exponent=None,
     mantissa_n, mantissa_e -- mantissas of the nominal
     value and of the error (numbers).
 
+    exponent -- common exponent to use. If None, no exponent is used.
+    
     fmt_prefix_n, fmt_prefix_e -- prefixes for the format given to
     robust_format() for the nominal value and the error. They can be
     used for instance to set the width of each value. fmt_prefix_e is
@@ -1182,7 +1184,9 @@ def format_num(mantissa_n, mantissa_e, exponent=None,
     prec -- number of digits to display after the decimal
     point. Ignored if a value is exactly zero.
 
-    fixed_point_type -- "f" or "F". This has an impact on NaN values.
+    fmt_type -- format specification type, in "eEfFgGn" that defines
+    how exponents and NaN values are represented (in the same way as
+    for float).
 
     options -- options (as an object that support membership testing,
     like for instance a string). "S" is for the short-hand notation
@@ -1190,11 +1194,6 @@ def format_num(mantissa_n, mantissa_e, exponent=None,
     value and the error. "L" is for a LaTeX output. Options can be
     combined. "%" adds a final percent sign, and parentheses if the
     shorthand notation is not used.
-
-    exponent -- common exponent to use. If None, no exponent is used.
-    
-    fmt_exp -- % format string for the exponent part. Ignored if no
-    exponent is given, and for the LaTeX output.
     '''
 
     # If a decimal point were always present in zero rounded errors
@@ -1213,16 +1212,23 @@ def format_num(mantissa_n, mantissa_e, exponent=None,
     # possible: printing 3.1±0 with the default format prints 3.1+/-0,
     # which shows that the uncertainty is exactly zero.
 
-
     #!!!!!!!!! There is a problem with the shorthand formatting: in
     #the format spec, the alignment, width, etc. (but not 0n,) should
     #be global.
     
     print ("CALLING format_num with", mantissa_n, mantissa_e,
                fmt_prefix_n, fmt_prefix_e,
-           #!!!!!!!!!!! The exponent and the format could be grouped
-               prec, fixed_point_type,
-               options, exponent, fmt_exp) #!!!!! test
+               prec, fmt_type,
+               options, exponent) #!!!!! test
+
+    # Fixed point format for each part:
+    fixed_point_type = 'fF'[fmt_type.isupper()]
+
+    # Format for the exponent:
+    if exponent is not None and fmt_type in EXP_LETTERS and 'L' not in options:
+        # Case of e or E. The same convention as Python 2.7
+        # to 3.3 is used for the display of the exponent:
+        fmt_exp = EXP_LETTERS[fmt_type]+'%+03d'
     
     # Calculation of the final no-exponent part, fixed_point_str:
 
@@ -1918,18 +1924,10 @@ class AffineScalarFunc(object):
             # shorthand notation
             if 'S' not in fmt_options else '')
 
-        # Format for the exponent:
-        if fmt_type in EXP_LETTERS and 'L' not in fmt_options:
-            # Case of e or E. The same convention as Python 2.7
-            # to 3.3 is used for the display of the exponent:
-            fmt_exp = EXP_LETTERS[fmt_type]+'%+03d'
-        else:
-            fmt_exp = None
-
         return format_num(mantissa_n, std_dev_mantissa, exponent, 
-                          prefix_n, prefix_s, fmt_exp,
+                          prefix_n, prefix_s,
                           prec=-signif_limit,
-                          fixed_point_type = 'fF'[fmt_type.isupper()],
+                          fmt_type=fmt_type,
                           options=options)
 
     # Alternate name for __format__, for use with Python < 2.6:    
