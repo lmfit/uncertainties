@@ -1213,9 +1213,10 @@ def format_num(nom_val_mantissa, error_mantissa,
     # possible: printing 3.1±0 with the default format prints 3.1+/-0,
     # which shows that the uncertainty is exactly zero.
     
-    print ("CALLING format_num with", nom_val_mantissa, fixed_point_fmt_n,
-           error_mantissa, fixed_point_fmt_s,
-           options, exponent, exp_fmt) #!!!!!!!!!!! test
+    print ("CALLING format_num with", nom_val_mantissa, error_mantissa,
+               fmt_prefix_n, fmt_prefix_s,
+               prec, fixed_point_type,
+               options, exponent, exp_fmt) #!!!!! test
     
     # Calculation of the final no-exponent part, fixed_point_str:
 
@@ -1274,6 +1275,9 @@ def format_num(nom_val_mantissa, error_mantissa,
         if not error_mantissa:  # Exactly zero error
             fixed_point_type = 'd'  # No decimal point for zero
             error_mantissa = 0  # Integer ('{:d}'.format(0.) fails)
+            # Note: .0f applied to a float can give the same result,
+            # but this does not appear to be documented
+            # (http://docs.python.org/2/library/string.html#format-specification-mini-language).
         
         pm_symbol = (
             # Unicode has priority over LaTeX, so that users with a
