@@ -1687,7 +1687,7 @@ def test_format():
             '.2ue': '(9.99+/-0.10)e+00',  # Same exponent as for 9.99 alone
             '.1ue': '(1.00+/-0.01)e+01'  # Same exponent as for 9.99 alone
         },
-        # 0 uncertainty: displayed like a float:
+        # 0 uncertainty: nominal value displayed like a float:
         (1.2345, 0): {
             '.2ue': '(1.23+/-0)e+00',
             '0.2ue': '1.23e+00+/-0e+00',
