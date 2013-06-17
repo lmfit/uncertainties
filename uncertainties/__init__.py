@@ -1540,16 +1540,17 @@ class AffineScalarFunc(object):
 
         The main difference is that the precision (".p", where p is a
         number), when followed by the "u" precision extension, is
-        interpreted as indicating the number p of significant digits
-        of the displayed uncertainty. Example: .1uf will return a
-        string with one significant digit in the uncertainty (and no
-        exponent).
+        interpreted (if meaningful) as indicating the number p of
+        significant digits of the displayed uncertainty. Example: .1uf
+        will return a string with one significant digit in the
+        uncertainty (and no exponent).
         
         Another difference is that if no precision is given, then the
-        rounding rules from the Particle Data Group are used
+        rounding rules from the Particle Data Group are used, if
+        possible
         (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).--for
-        example, the f format does not use the default 6 digits after
-        the decimal point.
+        example, the f format generally does not use the default 6
+        digits after the decimal point.
 
         When the exponent notation is used, a single exponent is
         printed ("(1.2+/-0.1)e-5"). unless the format specification
@@ -1708,12 +1709,15 @@ class AffineScalarFunc(object):
             digits_limit = signif_d_to_limit(std_dev, num_signif_d)
 
         else:
-            # The precision has the same meaning as for floats and is
-            # explicit (fmt_prec is not empty):
+            # The precision has the same meaning as for floats:
 
-            prec = int(fmt_prec)
+            # The usual default precision is used (this is useful for
+            # 3.141592±NaN with an "f" format specification, for
+            # example):
+
+            prec = int(fmt_prec) if fmt_prec else 6
                 
-            if fmt_type in 'feEFE%':  # More common cases first (optimization)
+            if fmt_type in 'feEF':  # More common cases first (optimization)
                 
                 digits_limit = -prec
                 
@@ -1739,7 +1743,7 @@ class AffineScalarFunc(object):
         # True), 'exponent' is set to the exponent that should be
         # used.
 
-        if fmt_type in 'fF%':
+        if fmt_type in 'fF':
             use_exp = False
         elif fmt_type in 'eE':
             use_exp = True
