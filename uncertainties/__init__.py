@@ -1160,9 +1160,9 @@ class CallableStdDev(float):
 EXP_LETTERS = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
 def format_num(nom_val_mantissa, fixed_point_fmt_n,
-                error_mantissa, fixed_point_fmt_s,
-                options='',
-                exponent=None, exp_fmt='e+03d'):
+               error_mantissa, fixed_point_fmt_s,
+               options='',
+               exponent=None, exp_fmt='e+03d'):
     '''
     Returns a valid __format__() output for a number with uncertainty.
 
@@ -1192,6 +1192,10 @@ def format_num(nom_val_mantissa, fixed_point_fmt_n,
     exponent is given, and for the LaTeX output.
     '''
 
+    print ("CALLING format_num with", nom_val_mantissa, fixed_point_fmt_n,
+           error_mantissa, fixed_point_fmt_s,
+           options, exponent, exp_fmt) #!!!!!!!!!!!
+    
     # Calculation of the final no-exponent part, fixed_point_str:
     
     if 'S' in options:  # Shorthand notation:
