@@ -1658,7 +1658,7 @@ def test_format():
             'L': r'-1.4 \pm nan',
             # Multiplied by 100, no parentheses before %:
             '%': '(-1.4+/-nan)e-10%',
-            '.2uG': '(-1.4+/-NAN)E-12'  # u ignored, format used
+            '.2uG': '(-1.4+/-NAN)E-12',  # u ignored, format used
             '10': '  -1.4e-12+/-       nan',
             '15S': '  -1.4(nan)e-12',
             '15GS': '  -1.4(NAN)E-12'
