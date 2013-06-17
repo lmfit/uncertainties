@@ -1670,7 +1670,7 @@ def test_format():
             u'CL': ur'(3.14±0.01) \times 10^{-10}',
             # Truncated non-zero uncertainty:
             '.1e': '(3+/-0.)e-10',
-            '.1eS': '3(0.)e-10'
+            '.1eS': '3.1(0.0)e-10'
         },
         
         # Some special cases:
@@ -1777,7 +1777,7 @@ def test_format():
                     # so this should not cause an error:
                     if value_back.nominal_value:
                         assert numbers_close(value.nominal_value,
-                                              value_back.nominal_value, 1e-1)
+                                              value_back.nominal_value, 2.4e-1)
 
                     # If the uncertainty is zero, then the relative
                     # change can be large: #!!!!!!!!!! This test may
