@@ -1587,10 +1587,16 @@ class AffineScalarFunc(object):
         deviation. When "L" is present, the output is formatted with
         LaTeX.
 
+        The "%" format type always forces the percent sign to be at
+        the end of the returned string (and not attached to each of
+        the nominal value and the standard deviation).
+        
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point). An uncertainty whose
         truncated value is zero always has a decimal point (e.g. 0.00,
-        or 0.).
+        or 0.). When the uncertainty is zero, any "u" precision
+        modifier is ignored (since the number of digits of the
+        uncertainty is undefined).
         
         If the uncertainty is NaN, any "u" precision modifier is
         ignored (since the number of significant digits of the
@@ -1661,48 +1667,40 @@ class AffineScalarFunc(object):
         std_dev = self.std_dev
         nom_val = self.nominal_value
 
+        # The '%' format is treated internally as a display option,
+        # while the main part is treated 
+        
+
         if fmt_type == '%':
             std_dev *= 100
             nom_val *= 100
 
         ########################################
             
-        # Special case of an uncertainty where the number of
-        # significant digits has no meaning: formatting like a float:
+        # Special case of a NaN uncertainty: both members are
+        # formatted like a float (the u format specification modifier
+        # is ignored):
 
-        if std_dev == 0 or isnan(std_dev):
+        #!!!!! Interaction with %??
+        
+        if isnan(std_dev):
 
             # Part of the float format specification common to the
             # nominal value and to the standard deviation::
-            fmt_spec_part_start = (''.join(match.groups()[:3])
-                                   + '.%s' % fmt_prec if fmt_prec else '')
-
-            # Full format specification (for the nominal value):
-            fmt_spec_part = fmt_spec_part_start+match.group('type')
+            fmt_spec_part = '%s%s%s' % (
+                ''.join(match.groups()[:3])
+                '.%s' % fmt_prec if fmt_prec else '',
+                match.group('type'))
             
-            if std_dev:  # NaN
+            return format_num(
+                nom_val, fmt_spec_part,
+                std_dev, fmt_spec_part,
+                fmt_options)
 
-                return format_num(
-                    nom_val, fmt_spec_part,
-                    std_dev, fmt_spec_part,
-                    fmt_options)
 
-            else:  # 0
-
-                #!!!!!!!! (1+/-0)e+06 is much easier to read than
-                #1e+06+/-0. I want to factor the 0. How can this be
-                #achieved with some elegant code?
-                
-                return format_num(
-                    nom_val, fmt_spec_part,
-                    # No decimal point means exact (this is different
-                    # from a rounded float (0.00 might be truncated)).
-                    #
-                    # The total width, etc. are taken into account:
-                    0, fmt_spec_part_start+'d',
-                    fmt_options
-                    )
-     
+        #!!!!!!!! Handle std_dev == 0, in what follows (almost normal
+        #display of the uncertainty, but must appear as an integer)
+        
         ########################################
 
         # The limit digits_limit on the digits of nom_val and std_dev
