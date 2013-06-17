@@ -1127,7 +1127,9 @@ def PDG_precision(std_dev):
         return (2, 10.**exponent*(1000/factor))
 
 # Definition of a basic (format specification only) formatting
-# function that works whatever the version of Python:
+# function that works whatever the version of Python. This function
+# exists just to save the addition of the leading '%' that would have
+# to be added if the % formatting operator were used:
 try:
 
     robust_format = format
