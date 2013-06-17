@@ -1739,28 +1739,35 @@ class AffineScalarFunc(object):
             # 3.141592±NaN with an "f" format specification, for
             # example):
 
+            print "FMT_PREC = {!r}".format(fmt_prec) #!!!!!! test
+            
             prec = int(fmt_prec) if fmt_prec else 6
                 
-            if fmt_type in 'feEF':  # More common cases first (optimization)
-                
+            if fmt_type in 'fF':
+
                 digits_limit = -prec
                 
-            else:  # Format type = gGn (or no format type specified)
+            else:  # Format type = eEgGn (or no format type specified)
 
-                # Effective format specification precision: the rule
-                # of
-                # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
-                # is used:
-                if not prec:
-                    prec = 1
+                if fmt_type in 'eE':
+                    # The precision is the number of significant
+                    # digits required - 1 (because there is a single
+                    # digit before the decimal point):
+                    num_signif_digits = prec+1
+                else:
+                    
+                    # Effective format specification precision: the rule
+                    # of
+                    # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
+                    # is used:
+
+                    num_signif_digits = prec or 1  # 0 is interpreted like 1
                 
-                # The precision is interpreted like for floats: as the
-                # number of significant digits. However, this number
-                # of significant digits applies to the nominal value
-                # (not to the standard deviation):
-                digits_limit = signif_d_to_limit(nom_val, prec)
+                # The number of significant digits applies to the
+                # nominal value (not to the standard deviation):
+                digits_limit = signif_d_to_limit(nom_val, num_signif_digits)
 
-                print "DIGITS LIMIT, gGn format, uncert not controlled", digits_limit  #!!!!!!!!! test
+            print "DIGITS LIMIT, uncert not controlled", digits_limit  #!!!!!!!!! test
             
         #######################################
 
