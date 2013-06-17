@@ -1724,6 +1724,9 @@ class AffineScalarFunc(object):
             # Number of significant digits to use:
             if fmt_prec:
                 num_signif_d = int(fmt_prec)
+                if not num_signif_d:
+                    raise ValueError("The number of significant digits"
+                                     " on the uncertainty should be positive")
             else:
                 (num_signif_d, std_dev) = PDG_precision(std_dev)
 
