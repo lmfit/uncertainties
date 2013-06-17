@@ -1649,10 +1649,10 @@ class AffineScalarFunc(object):
 
         # Shortcut:
         fmt_prec = match.group('prec')  # Can be None
-            
+
         # Options:
         fmt_options = match.group('options')
-        
+
         ########################################
                 
         # Since the '%' (percentage) format specification can change
@@ -1674,32 +1674,6 @@ class AffineScalarFunc(object):
             options += '%'
         else:
             options = fmt_options
-
-        ########################################
-            
-        # Special case of a NaN uncertainty: both members are
-        # formatted like a float (the u format specification modifier
-        # is ignored):
-
-        #!!!!! Interaction with %??
-        
-        if isnan(std_dev):
-
-            # Part of the float format specification common to the
-            # nominal value and to the standard deviation::
-            fmt_spec_part = '%s%s%s' % (
-                ''.join(match.groups()[:3])
-                '.%s' % fmt_prec if fmt_prec else '',
-                fmt_type)
-            
-            return format_num(
-                nom_val, fmt_spec_part,
-                std_dev, fmt_spec_part,
-                options)
-
-
-        #!!!!!!!! Handle std_dev == 0, in what follows (almost normal
-        #display of the uncertainty, but must appear as an integer)
         
         ########################################
 
@@ -1714,7 +1688,12 @@ class AffineScalarFunc(object):
         # Should the precision be interpreted like for a float, or
         # should the number of significant digits on the uncertainty
         # be controlled?
-        uncert_controlled = not fmt_prec or match.group('uncert_prec')
+        uncert_controlled = (
+            (not fmt_prec  # Default behavior: uncertainty controlled
+             or match.group('uncert_prec')  # Explicit control
+             # The number of significant digits of
+             # the uncertainty must be meaningful:
+             and std_dev and not isnan(std_dev)))
         
         if uncert_controlled:
             # The number of significant digits on the uncertainty is
