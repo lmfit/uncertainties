@@ -1161,16 +1161,16 @@ class CallableStdDev(float):
 # an exponent):
 EXP_LETTERS = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
-def format_num(nom_val_mantissa, fixed_point_fmt_n,
-               error_mantissa, fixed_point_fmt_s,
-               options='',
-               exponent=None, exp_fmt='e+03d'):
+def format_num(nom_val_mantissa, error_mantissa,
+               fmt_prefix_n='', fmt_prefix_s='',
+               prec=6, fixed_point_type='f',
+               options='', exponent=None, exp_fmt='e+03d'):
     '''
-    Returns a valid __format__() output for a number with uncertainty.
+    Returns a formatted number with uncertainty.
 
-    When the shorthand notation is required, an error rounded to
-    zero is always displayed with a decimal point, so as to indicate
-    that the error is not exactly zero.
+    Non-zero values that are rounded to 0 are always displayed with a
+    decimal point (this differs from "%.0f" % 0.1). Exact zero values
+    are displayed as the integer 0, with no decimal point.
     
     nom_val_mantissa, error_mantissa -- mantissas of the nominal
     value and of the error (numbers).
@@ -1613,9 +1613,10 @@ class AffineScalarFunc(object):
         the nominal value and the standard deviation).
         
         An uncertainty which is exactly zero is represented as the
-        integer 0 (i.e. with no decimal point). An uncertainty whose
-        truncated value is zero always has a decimal point (e.g. 0.00,
-        or 0.).
+        integer 0 (i.e. with no decimal point).
+
+        A value whose rounded value is zero always has a decimal point
+        (e.g. 0.00, or 0.).
 
         When the magnitude of the uncertainty is meaningless (zero or
         NaN uncertainty), any "u" precision modifier is ignored.
@@ -1780,6 +1781,9 @@ class AffineScalarFunc(object):
             use_exp = False
         elif fmt_type in 'eE':
             use_exp = True
+            # !! This calculation might have been already done, for
+            # instance when using the .0e format: signif_d_to_limit()
+            # was called before, which prompted a similar calculation:
             exponent = first_digit(round(nom_val, -digits_limit))
         else:  # g, G, n
 
@@ -1862,6 +1866,8 @@ class AffineScalarFunc(object):
 
         # Final formatting:
 
+        #!!!!!!!!!! implement new form: prefix, precision, fixed_point_type f/F
+        
         # Format for the fixed-point part of the standard deviation,
         # for format_num():
         fixed_point_fmt_s = (
