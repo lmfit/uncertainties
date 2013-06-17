@@ -1219,14 +1219,6 @@ def format_num(nom_val_mantissa, error_mantissa,
     
     # Calculation of the final no-exponent part, fixed_point_str:
 
-    # !!!!!!!!! Difficulty: adding a . for 0. when w width is given is
-    # a little bit of a pain: "0.  +/- 12 " PLUS I don't see why one
-    # should write 0. but 12 even when truncated. Users are supposed
-    # to *know* what they want, when they use .0f, for instance: there
-    # is no trace of disappeared digits. I should only have 0. for the
-    # uncertainty. BUT even this is a little bit of a bother when a
-    # width is used, no? I MUST DO IT ANYWAY.
-    
     #!!!!!!!! do we really need robust_format, now that the format
     #string is calculated anyway?
     
