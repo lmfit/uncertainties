@@ -1547,9 +1547,9 @@ class AffineScalarFunc(object):
         
         Another difference is that if no precision is given, then the
         rounding rules from the Particle Data Group are used
-        (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).--instead
-        of having, for example, the f format use the default 6 digits
-        after the decimal point.
+        (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).--for
+        example, the f format does not use the default 6 digits after
+        the decimal point.
 
         When the exponent notation is used, a single exponent is
         printed ("(1.2+/-0.1)e-5"), unless the format specification
@@ -1591,9 +1591,9 @@ class AffineScalarFunc(object):
         significant digits of the uncertainty has no meaning (any "u"
         precision modifier is ignored), i.e. for a zero or a NaN
         uncertainty. A zero uncertainty, is represented by the integer
-        0.  In the case of NaN, the uncertainty is formatted like a
-        float too (giving either nan or NAN, depending on the format
-        string).
+        0.  In the case of NaN, any "u" precision modifier is ignored
+        too and the uncertainty is formatted like a float too (giving
+        either nan or NAN, depending on the format string).
 
         When prefixed with "u", the g, G and n (and empty) format
         types trigger the exponent notation based on the rules for
@@ -1686,6 +1686,10 @@ class AffineScalarFunc(object):
 
             else:  # 0
 
+                #!!!!!!!! (1+/-0)e+06 is much easier to read than
+                #1e+06+/-0. I want to factor the 0. How can this be
+                #achieved with some elegant code?
+                
                 return format_num(
                     nom_val, fmt_spec_part,
                     # No decimal point means exact (this is different
