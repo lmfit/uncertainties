@@ -1691,7 +1691,7 @@ class AffineScalarFunc(object):
             std_dev *= 100
             nom_val *= 100
             fmt_type = 'f'
-            options += '%'
+            options = fmt_options+'%'
         else:
             options = fmt_options
         
