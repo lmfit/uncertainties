@@ -1615,8 +1615,9 @@ class AffineScalarFunc(object):
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
 
-        A value whose rounded value is zero always has a decimal point
-        (e.g. 0.00, or 0.).
+        A value whose rounded value is zero is always indicated with a
+        decimal point (e.g. 0.00, or 0.). This behavior differs from
+        "%.0f" % 0.1, for example.
 
         When the magnitude of the uncertainty is meaningless (zero or
         NaN uncertainty), any "u" precision modifier is ignored.
