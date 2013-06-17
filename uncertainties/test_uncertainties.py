@@ -1666,8 +1666,8 @@ def test_format():
 
         (3.14e-10, 0.01e-10): {
             # Character (Unicode) strings:
-            u'C': u'(3.14±0.01)e-10',
-            u'CL': ur'(3.14±0.01) \times 10^{-10}',
+            u'C': u'(3.140±0.010)e-10',  # PDG rules: 2 digits
+            u'CL': ur'(3.140±0.010) \times 10^{-10}',
             # Truncated non-zero uncertainty:
             '.1e': '(3+/-0.)e-10',
             '.1eS': '3.1(0.0)e-10'
