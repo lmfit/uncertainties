@@ -1175,9 +1175,11 @@ def format_num(nom_val_mantissa, fixed_point_fmt_n,
 
     fixed_point_fmt_n, fixed_point_fmt_s -- format specification (for
     robust_format) for the fixed-point part of the nominal value and
-    error (respectively). If the "S" option is used,
-    fixed_point_fmt_s must instead be the number of digits after the
-    decimal point where the error should end.
+    error (respectively). If the "S" option is used, fixed_point_fmt_s
+    must instead be the number of digits after the decimal point where
+    the numbers should end. fixed_point_fmt_s is ignored if the
+    uncertainty is exactly zero: in this case, it is always displayed
+    as the integer 0, without any decimal point.
     
     options -- options (as an object that support membership testing,
     like for instance a string). "S" is for the short-hand notation
@@ -1200,37 +1202,48 @@ def format_num(nom_val_mantissa, fixed_point_fmt_n,
     
     if 'S' in options:  # Shorthand notation:
 
-        uncert = round(error_mantissa, fixed_point_fmt_s)
+        # Calculation of the uncertainty part, uncert_str:
+        
+        if error_mantissa:  # Non-zero error
+             
+            uncert = round(error_mantissa, fixed_point_fmt_s)
 
-        # The representation uncert_str of the uncertainty (which will
-        # be put inside parentheses) is calculated:
+            # The representation uncert_str of the uncertainty (which will
+            # be put inside parentheses) is calculated:
 
-        # The uncertainty might straddle the decimal point: we
-        # keep it as it is, in this case (e.g. 1.2(3.4), as this
-        # makes the result easier to read); the shorthand
-        # notation then essentially coincides with the +/-
-        # notation:
-        if first_digit(error_rounded) >= 0 and fixed_point_fmt_s > 0:
-            # This case includes a zero rounded error with digits
-            # after the decimal point:
-            uncert_str = '%.*f' % (fixed_point_fmt_s, uncert)
-            
-        else:
-            if uncert:
-                # The round is important because 566.99999999 can
-                # first be obtained when 567 is wanted (%d prints the
-                # integer part, not the rounded value):
-                uncert_str = '%d' % round(uncert*10.**fixed_point_fmt_s)
+            # The uncertainty might straddle the decimal point: we
+            # keep it as it is, in this case (e.g. 1.2(3.4), as this
+            # makes the result easier to read); the shorthand
+            # notation then essentially coincides with the +/-
+            # notation:
+            if first_digit(error_rounded) >= 0 and fixed_point_fmt_s > 0:
+                # This case includes a zero rounded error with digits
+                # after the decimal point:
+                uncert_str = '%.*f' % (fixed_point_fmt_s, uncert)
+
             else:
-                # The decimal point indicates a truncated float:
-                uncert_str = '0.'
+                if uncert:
+                    # The round is important because 566.99999999 can
+                    # first be obtained when 567 is wanted (%d prints the
+                    # integer part, not the rounded value):
+                    uncert_str = '%d' % round(uncert*10.**fixed_point_fmt_s)
+                else:
+                    # The decimal point indicates a truncated float:
+                    uncert_str = '0.'
 
+        else:  # The error is exactly zero
+            uncert_str = '0'
+                    
         fixed_point_str = "%s(%s)" % (
             robust_format(nom_val_mantissa, fixed_point_fmt_n),
             uncert_str)
-
+            
     else:  # +/- notation:
 
+        if not error_mantissa:  # Exactly zero error
+            fixed_point_fmt_s = 'd'  # No decimal point for zero
+            error_mantissa = 0  # Integer ('{:d}'.format(0.) fails)
+        
         pm_symbol = (
             # Unicode has priority over LaTeX, so that users with a
             # Unicode-compatible LaTeX source can use ±:
@@ -1524,6 +1537,11 @@ class AffineScalarFunc(object):
     def __format__(self, format_spec):
         '''Formats a number with uncertainty.
 
+        The nominal value is returned with a precision that matches
+        that of the standard error, like in 1.23+/-0.01--when this
+        makes sense, i.e. not for the exact value 1.23+/-0, or for
+        1.23+/-NaN).
+        
         Accepts the same format specification as format() for floats,
         as defined for Python 2.6+ (restricted to what the % operator
         accepts, if using an earlier version of Python).  In
@@ -1533,10 +1551,6 @@ class AffineScalarFunc(object):
         uncertainty is indicated (with +/- or with the short-hand
         notation 3.14(1), in LaTeX or with a simple text string,...).
 
-        The nominal value is rounded at the digit where the displayed
-        uncertainty stops (e.g. 1.23+/-0.01)--where this makes sense,
-        i.e. not for the exact value 1.23+/-0, and for 1.23+/-NaN).
-        
         The nominal value and the standard deviation are formatted
         through format_spec almost as if they were floats (with or
         without exponent, exponent with or without uppercase, with a
@@ -1601,9 +1615,8 @@ class AffineScalarFunc(object):
         truncated value is zero always has a decimal point (e.g. 0.00,
         or 0.).
 
-        When the number of significant digits of the uncertainty is
-        meaningless (zero or NaN uncertainty), any "u" precision
-        modifier is ignored.
+        When the magnitude of the uncertainty is meaningless (zero or
+        NaN uncertainty), any "u" precision modifier is ignored.
         
         When prefixed with "u", the g, G and n (and empty) format
         types trigger the exponent notation based on the rules for
