@@ -1194,7 +1194,7 @@ def format_num(nom_val_mantissa, fixed_point_fmt_n,
 
     print ("CALLING format_num with", nom_val_mantissa, fixed_point_fmt_n,
            error_mantissa, fixed_point_fmt_s,
-           options, exponent, exp_fmt) #!!!!!!!!!!!
+           options, exponent, exp_fmt) #!!!!!!!!!!! test
     
     # Calculation of the final no-exponent part, fixed_point_str:
     
@@ -1699,7 +1699,7 @@ class AffineScalarFunc(object):
              # The number of significant digits of
              # the uncertainty must be meaningful:
              and std_dev and not isnan(std_dev)))
-        
+
         if uncert_controlled:
             # The number of significant digits on the uncertainty is
             # controlled.
@@ -1731,7 +1731,7 @@ class AffineScalarFunc(object):
                 # of
                 # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
                 # is used:
-                if fmt_type in 'gGn' and not prec:
+                if not prec:
                     prec = 1
                 
                 # The precision is interpreted like for floats: as the
@@ -1739,6 +1739,8 @@ class AffineScalarFunc(object):
                 # of significant digits applies to the nominal value
                 # (not to the standard deviation):
                 digits_limit = signif_d_to_limit(nom_val, prec)
+
+                print "DIGITS LIMIT, gGn format, uncert not controlled", digits_limit  #!!!!!!!!! test
             
         #######################################
 
