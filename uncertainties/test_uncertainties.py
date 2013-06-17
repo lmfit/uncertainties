@@ -1791,9 +1791,10 @@ def test_format():
                     # !! The following string formatting requires
                     # str() to work (to not raise an exception):
                     raise AssertionError(
-                        'Original value %s and value %s parsed from %r are not'
-                        ' close enough'
-                        % (value, value_back, representation))
+                        'Original value %s and value %s parsed from %r'
+                        ' (obtained through format specification %r)'
+                        ' are not close enough'
+                        % (value, value_back, representation, format_spec))
                                                          
 ###############################################################################
 
