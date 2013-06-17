@@ -1175,14 +1175,15 @@ def format_num(nom_val_mantissa, error_mantissa,
     nom_val_mantissa, error_mantissa -- mantissas of the nominal
     value and of the error (numbers).
 
-    fixed_point_fmt_n, fixed_point_fmt_s -- format specification (for
-    robust_format) for the fixed-point part of the nominal value and
-    error (respectively). If the "S" option is used, fixed_point_fmt_s
-    must instead be the number of digits after the decimal point where
-    the numbers should end. fixed_point_fmt_s is ignored if the
-    uncertainty is exactly zero: in this case, it is always displayed
-    as the integer 0, without any decimal point.
-    
+    fmt_prefix_n, fmt_prefix_s -- prefixes for the format given to
+    robust_format() for the nominal value and the error. They can be
+    used for instance to set the width of each value.
+
+    prec -- number of digits to display after the decimal
+    point. Ignored if a value is exactly zero.
+
+    fixed_point_type -- "f" or "F". This has an impact on NaN values.
+
     options -- options (as an object that support membership testing,
     like for instance a string). "S" is for the short-hand notation
     1.23(1). "C" is for using the character "±" between the nominal
