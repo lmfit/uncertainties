@@ -1923,7 +1923,7 @@ class AffineScalarFunc(object):
             return (value - self._nominal_value) / self.std_dev
         except ZeroDivisionError:
             raise ValueError("The standard deviation is zero:"
-                             " undefined result.")
+                             " undefined result")
 
     def __deepcopy__(self, memo):
         """
