@@ -1594,16 +1594,12 @@ class AffineScalarFunc(object):
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point). An uncertainty whose
         truncated value is zero always has a decimal point (e.g. 0.00,
-        or 0.). When the uncertainty is zero, any "u" precision
-        modifier is ignored (since the number of digits of the
-        uncertainty is undefined).
-        
-        If the uncertainty is NaN, any "u" precision modifier is
-        ignored (since the number of significant digits of the
-        uncertainty is undefined). Both the nominal value and the NaN
-        uncertainty are formatted with the resulting format (the
-        uncertainty will therefore appear as nan or NAN).
+        or 0.).
 
+        When the number of significant digits of the uncertainty is
+        meaningless (zero or NaN uncertainty), any "u" precision
+        modifier is ignored.
+        
         When prefixed with "u", the g, G and n (and empty) format
         types trigger the exponent notation based on the rules for
         Python 2.7 applied to the following equivalent (float)
@@ -1644,7 +1640,7 @@ class AffineScalarFunc(object):
                 # Sub-classes handled:
                 % (format_spec, self.__class__.__name__))
             
-        # Effective format type: f, e, g, etc.:
+        # Effective format type: f, e, g, etc. (never None or empty):
         #
         # g is the default
         # (http://docs.python.org/2/library/string.html#format-specification-mini-language,
@@ -1667,13 +1663,17 @@ class AffineScalarFunc(object):
         std_dev = self.std_dev
         nom_val = self.nominal_value
 
-        # The '%' format is treated internally as a display option,
-        # while the main part is treated 
-        
-
+        # The '%' format is treated internally as a display option: it
+        # should not be applied individually to each part:
+        #
+        # 'options' is the options that must be given to format_num():
         if fmt_type == '%':
             std_dev *= 100
             nom_val *= 100
+            fmt_type = 'f'
+            options += '%'
+        else:
+            options = fmt_options
 
         ########################################
             
@@ -1690,12 +1690,12 @@ class AffineScalarFunc(object):
             fmt_spec_part = '%s%s%s' % (
                 ''.join(match.groups()[:3])
                 '.%s' % fmt_prec if fmt_prec else '',
-                match.group('type'))
+                fmt_type)
             
             return format_num(
                 nom_val, fmt_spec_part,
                 std_dev, fmt_spec_part,
-                fmt_options)
+                options)
 
 
         #!!!!!!!! Handle std_dev == 0, in what follows (almost normal
@@ -1872,7 +1872,7 @@ class AffineScalarFunc(object):
         
         return format_num(nom_val_mantissa, fixed_point_fmt_n,
                            std_dev_mantissa, fixed_point_fmt_s,
-                           fmt_options if fmt_type != '%' else fmt_options+'%',
+                           options,
                            exponent, exp_fmt)
 
     # Alternate name for __format__, for use with Python < 2.6:    
