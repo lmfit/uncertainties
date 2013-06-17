@@ -1747,8 +1747,8 @@ def test_format():
             representation = value.format(format_spec)
 
             assert representation == result, (
-                'Incorrect representation %s for format %r of %s+/-%s:'
-                ' %s expected.'
+                'Incorrect representation %r for format %r of %s+/-%s:'
+                ' %r expected.'
                 % (representation, format_spec, values[0], values[1],
                    result))
 
