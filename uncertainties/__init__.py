@@ -1552,15 +1552,15 @@ class AffineScalarFunc(object):
         the decimal point.
 
         When the exponent notation is used, a single exponent is
-        printed ("(1.2+/-0.1)e-5"), unless the format specification
-        contains an explicit width (" 1.2e-5+/- 0.1e-5"); this allows
+        printed ("(1.2+/-0.1)e-5"). unless the format specification
+        contains an explicit width (" 1.2e-5+/- 0.1e-5") (this allows
         numbers to be in a single column, when printing numbers over
-        many lines (specifying a width of 0 is a way of forcing the
-        exponent to not be factored out). The exponent is the same for
-        the nominal value and for the uncertainty (except for a 0 or
-        NaN uncertainty). The mantissa of the larger value (in
-        absolute value, between the nominal value and the standard
-        deviation) is between 1 and 10, like for floats.
+        many lines). The exponent is the same for the nominal value
+        and for the uncertainty (except for a NaN uncertainty). The
+        mantissa of the larger value (in absolute value, between the
+        nominal value and the standard deviation) is between 1 and 10,
+        like for floats. Specifying a minimum width of 0 is a way of
+        forcing the exponent to not be factored out.
         
         If no format type is given, "g" is assumed, like for floats.
 
@@ -1587,13 +1587,16 @@ class AffineScalarFunc(object):
         deviation. When "L" is present, the output is formatted with
         LaTeX.
 
-        The nominal value is formatted like a float when the number of
-        significant digits of the uncertainty has no meaning (any "u"
-        precision modifier is ignored), i.e. for a zero or a NaN
-        uncertainty. A zero uncertainty, is represented by the integer
-        0.  In the case of NaN, any "u" precision modifier is ignored
-        too and the uncertainty is formatted like a float too (giving
-        either nan or NAN, depending on the format string).
+        An uncertainty which is exactly zero is represented as the
+        integer 0 (i.e. with no decimal point). An uncertainty whose
+        truncated value is zero always has a decimal point (e.g. 0.00,
+        or 0.).
+        
+        If the uncertainty is NaN, any "u" precision modifier is
+        ignored (since the number of significant digits of the
+        uncertainty is undefined). Both the nominal value and the NaN
+        uncertainty are formatted with the resulting format (the
+        uncertainty will therefore appear as nan or NAN).
 
         When prefixed with "u", the g, G and n (and empty) format
         types trigger the exponent notation based on the rules for
