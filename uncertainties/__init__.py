@@ -1168,9 +1168,8 @@ def format_num(nom_val_mantissa, error_mantissa,
     '''
     Returns a formatted number with uncertainty.
 
-    Non-zero values that are rounded to 0 are always displayed with a
-    decimal point (this differs from "%.0f" % 0.1). Exact zero values
-    are displayed as the integer 0, with no decimal point.
+    Null errors (error_mantissa) are displayed as the integer 0, with
+    no decimal point.
     
     nom_val_mantissa, error_mantissa -- mantissas of the nominal
     value and of the error (numbers).
@@ -1198,21 +1197,58 @@ def format_num(nom_val_mantissa, error_mantissa,
     exponent is given, and for the LaTeX output.
     '''
 
+    # If a decimal point were always present in zero rounded errors
+    # that are not zero, the formatting would be difficult, in general
+    # (because the formatting options are very general): an example
+    # is'{:04.0f}'.format(0.1), which gives "0000" and would have to
+    # give "000.". Another example is '{:<4.0f}'.format(0.1), which
+    # gives "0 " but should give "0.  ". This is cumbersome to
+    # implement in the general case, because no format prints "0."
+    # for 0. Furthermore, using the .0f format already brings the same
+    # kind of difficulty: non-zero numbers can appear as the exact
+    # integer zero, after rounding. The problem is not larger, for
+    # numbers with an error.
+    #
+    # That said, it is good to indicate null errors explicitly when
+    # possible: printing 3.1±0 with the default format prints 3.1+/-0,
+    # which shows that the uncertainty is exactly zero.
+    
     print ("CALLING format_num with", nom_val_mantissa, fixed_point_fmt_n,
            error_mantissa, fixed_point_fmt_s,
            options, exponent, exp_fmt) #!!!!!!!!!!! test
     
     # Calculation of the final no-exponent part, fixed_point_str:
 
-    #!!!!!!! handle the new (prefix, prec, fixed_point_type)
+    # !!!!!!!!! Difficulty: adding a . for 0. when w width is given is
+    # a little bit of a pain: "0.  +/- 12 " PLUS I don't see why one
+    # should write 0. but 12 even when truncated. Users are supposed
+    # to *know* what they want, when they use .0f, for instance: there
+    # is no trace of disappeared digits. I should only have 0. for the
+    # uncertainty. BUT even this is a little bit of a bother when a
+    # width is used, no? I MUST DO IT ANYWAY.
+    
+    #!!!!!!!! do we really need robust_format, now that the format
+    #string is calculated anyway?
+    
+    # Nominal value formatting:
+    nom_val_str = robust_format(
+        nom_val_mantissa,
+        '%s.%d%s' % (fmt_prefix_n, prec, fixed_point_type))    
+
+    # Error formatting:
     
     if 'S' in options:  # Shorthand notation:
 
         # Calculation of the uncertainty part, uncert_str:
-        
-        if error_mantissa:  # Non-zero error
-             
-            uncert = round(error_mantissa, fixed_point_fmt_s)
+
+        if error_mantissa == 0:
+            # The error is exactly zero
+            uncert_str = '0'
+        elif isnan(error_mantissa):
+            uncert_str = fixed_point_type % error_mantissa
+        else:  #  Error with a meaningful first digit (not 0, not NaN)
+
+            uncert = round(error_mantissa, prec)
 
             # The representation uncert_str of the uncertainty (which will
             # be put inside parentheses) is calculated:
@@ -1222,32 +1258,27 @@ def format_num(nom_val_mantissa, error_mantissa,
             # makes the result easier to read); the shorthand
             # notation then essentially coincides with the +/-
             # notation:
-            if first_digit(uncert) >= 0 and fixed_point_fmt_s > 0:
+            if first_digit(uncert) >= 0 and prec > 0:
                 # This case includes a zero rounded error with digits
                 # after the decimal point:
-                uncert_str = '%.*f' % (fixed_point_fmt_s, uncert)
+                uncert_str = '%.*f' % (prec, uncert)
 
             else:
                 if uncert:
                     # The round is important because 566.99999999 can
                     # first be obtained when 567 is wanted (%d prints the
                     # integer part, not the rounded value):
-                    uncert_str = '%d' % round(uncert*10.**fixed_point_fmt_s)
+                    uncert_str = '%d' % round(uncert*10.**prec)
                 else:
                     # The decimal point indicates a truncated float:
                     uncert_str = '0.'
 
-        else:  # The error is exactly zero
-            uncert_str = '0'
-                    
-        fixed_point_str = "%s(%s)" % (
-            robust_format(nom_val_mantissa, fixed_point_fmt_n),
-            uncert_str)
+        fixed_point_str = "%s(%s)" % (nom_val_str, uncert_str)
             
     else:  # +/- notation:
 
         if not error_mantissa:  # Exactly zero error
-            fixed_point_fmt_s = 'd'  # No decimal point for zero
+            fixed_point_type = 'd'  # No decimal point for zero
             error_mantissa = 0  # Integer ('{:d}'.format(0.) fails)
         
         pm_symbol = (
@@ -1258,9 +1289,10 @@ def format_num(nom_val_mantissa, error_mantissa,
             '+/-')
 
         fixed_point_str = '%s%s%s' % (
-            robust_format(nom_val_mantissa, fixed_point_fmt_n),
+            nom_val_str, 
             pm_symbol,
-            robust_format(error_mantissa, fixed_point_fmt_s)
+            robust_format(error_mantissa,
+                          '%s.%d%s' % (fmt_prefix_s, prec, fixed_point_type))
             )
 
     # Should an exponent be added? The result goes to value_str:
@@ -1618,10 +1650,6 @@ class AffineScalarFunc(object):
         
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
-
-        A value whose rounded value is zero is always indicated with a
-        decimal point (e.g. 0.00, or 0.). This behavior differs from
-        "%.0f" % 0.1, for example.
 
         When the magnitude of the uncertainty is meaningless (zero or
         NaN uncertainty), any "u" precision modifier is ignored.
