@@ -1681,7 +1681,7 @@ def test_format():
         },
         (9.9, 0.1): {
             '.1ue': '(9.9+/-0.1)e+00',
-            '.0fS': '10(0)'
+            '.0fS': '10(0.)'
         },
         (9.99, 0.1): {
              # The precision has an effect on the exponent, like for
