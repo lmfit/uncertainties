@@ -1695,11 +1695,13 @@ class AffineScalarFunc(object):
         # be controlled?
         uncert_controlled = (
             (not fmt_prec  # Default behavior: uncertainty controlled
-             or match.group('uncert_prec')  # Explicit control
+             or match.group('uncert_prec'))  # Explicit control
              # The number of significant digits of
              # the uncertainty must be meaningful:
-             and std_dev and not isnan(std_dev)))
+             and std_dev and not isnan(std_dev))
 
+        print "UNCERT CONTROLLED =", uncert_controlled  # !!!!!!!!! test
+        
         if uncert_controlled:
             # The number of significant digits on the uncertainty is
             # controlled.
