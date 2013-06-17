@@ -1273,11 +1273,13 @@ def format_num(nom_val_mantissa, error_mantissa,
     else:  # +/- notation:
 
         if not error_mantissa:  # Exactly zero error
-            fixed_point_type = 'd'  # No decimal point for zero
+            fmt_suffix_s = 'd'  # No decimal point for zero
             error_mantissa = 0  # Integer ('{:d}'.format(0.) fails)
             # Note: .0f applied to a float can give the same result,
             # but this does not appear to be documented
             # (http://docs.python.org/2/library/string.html#format-specification-mini-language).
+        else:
+            fmt_suffix_s = '.%d%s' % (prec, fixed_point_type)
         
         pm_symbol = (
             # Unicode has priority over LaTeX, so that users with a
@@ -1289,8 +1291,7 @@ def format_num(nom_val_mantissa, error_mantissa,
         fixed_point_str = '%s%s%s' % (
             nom_val_str, 
             pm_symbol,
-            robust_format(error_mantissa,
-                          '%s.%d%s' % (fmt_prefix_s, prec, fixed_point_type))
+            robust_format(error_mantissa, fmt_prefix_s+fmt_suffix_s)
             )
 
     # Should an exponent be added? The result goes to value_str:
