@@ -1177,7 +1177,8 @@ def format_num(nom_val_mantissa, error_mantissa,
 
     fmt_prefix_n, fmt_prefix_s -- prefixes for the format given to
     robust_format() for the nominal value and the error. They can be
-    used for instance to set the width of each value.
+    used for instance to set the width of each value. fmt_prefix_s is
+    ignored if the shorthand notation is used.
 
     prec -- number of digits to display after the decimal
     point. Ignored if a value is exactly zero.
@@ -1202,6 +1203,8 @@ def format_num(nom_val_mantissa, error_mantissa,
            options, exponent, exp_fmt) #!!!!!!!!!!! test
     
     # Calculation of the final no-exponent part, fixed_point_str:
+
+    #!!!!!!! handle the new (prefix, prec, fixed_point_type)
     
     if 'S' in options:  # Shorthand notation:
 
