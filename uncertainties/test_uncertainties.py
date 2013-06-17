@@ -1558,7 +1558,7 @@ def test_format():
         # have a similar representation as if it were directly
         # represented as a float:
         (1234567.89, 0.1): {
-            '.0e': '(1+/-0.)e+06',  # Approximate error indicated with "."
+            '.0e': '(1+/-0)e+06',
             'e': '(1.23456789+/-0.00000010)e+06',
             'E': '(1.23456789+/-0.00000010)E+06',
             'f': '1234567.89+/-0.10',
