@@ -1869,22 +1869,18 @@ class AffineScalarFunc(object):
         # Final formatting:
 
         #!!!!!!!!!! implement new form: prefix, precision, fixed_point_type f/F
-        
-        # Format for the fixed-point part of the standard deviation,
-        # for format_num():
-        fixed_point_fmt_s = (
-            '%s%s.%df' % (
-            match.group('fill_align'), match.group('extra'), -signif_limit)
-            if 'S' not in fmt_options
-            # The semantics of this parameter is special, for the
-            # shorthand notation:
-            else -signif_limit)
-        
-        # Format for the fixed-point part of the nominal value: the
-        # sign is only applied to the mantissa (since the sign of the
+
+        # Prefix for the nominal value format specification: the sign
+        # is only applied to the mantissa (since the sign of the
         # standard deviation is always +):
-        fixed_point_fmt_n = (
-            '%s.%df' % (''.join(match.groups()[:3]), -signif_limit))
+        prefix_n = ''.join(match.groups()[:3])
+        
+        # Prefix for the standard deviation:
+        prefix_s = (
+            match.group('fill_align')+match.group('extra')
+            # Optimization: the format is ignored anyway, with the
+            # shorthand notation
+            if 'S' not in fmt_options else '')
 
         # Format for the exponent:
         if fmt_type in EXP_LETTERS and 'L' not in fmt_options:
@@ -1893,11 +1889,13 @@ class AffineScalarFunc(object):
             exp_fmt = EXP_LETTERS[fmt_type]+'%+03d'
         else:
             exp_fmt = None
-        
-        return format_num(nom_val_mantissa, fixed_point_fmt_n,
-                           std_dev_mantissa, fixed_point_fmt_s,
-                           options,
-                           exponent, exp_fmt)
+
+        return format_num(nom_val_mantissa, std_dev_mantissa,
+                          prefix_n, prefix_s,
+                          prec=-signif_limit,
+                          fixed_point_type = 'fF'[fmt_type.isupper()],
+                          options=options,
+                          exponent=exponent, exp_fmt=exp_fmt)
 
     # Alternate name for __format__, for use with Python < 2.6:    
     format = set_doc("""
