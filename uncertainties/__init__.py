@@ -1262,7 +1262,9 @@ def format_num(nom_val_mantissa, error_mantissa,
                     # integer part, not the rounded value):
                     uncert_str = '%d' % round(uncert*10.**prec)
                 else:
-                    # The decimal point indicates a truncated float:
+                    # The decimal point indicates a truncated float
+                    # (this is easy to do, in this case, since
+                    # fmt_prefix_s is ignored):
                     uncert_str = '0.'
 
         fixed_point_str = "%s(%s)" % (nom_val_str, uncert_str)
