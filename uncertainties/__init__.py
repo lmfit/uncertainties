@@ -1899,7 +1899,7 @@ class AffineScalarFunc(object):
 
                     # The number of significant digits to be displayed
                     # is not necessarily obvious: trailing zeros are
-                    # removed (with a gGn format type).
+                    # removed (with the gGn format type).
                     
                     num_signif_digits = prec or 1  # 0 is interpreted like 1
 
@@ -1972,7 +1972,7 @@ class AffineScalarFunc(object):
 
         # Calculation of signif_limit (position of the significant
         # digits limit in the final fixed point representations; this
-        # number is non-positive), of mantissa_n ("mantissa" for
+        # number is non-positive), of nom_val_mantissa ("mantissa" for
         # the nominal value, i.e. value possibly corrected for a
         # factorized exponent), and std_dev_mantissa (similarly for
         # the standard deviation). Exponent is also set to None if no
@@ -1982,7 +1982,7 @@ class AffineScalarFunc(object):
 
             factor = 10.**exponent  # Not 10.**(-exponent), for limit cases
             
-            mantissa_n = nom_val/factor
+            nom_val_mantissa = nom_val/factor
             std_dev_mantissa = std_dev/factor
             # Limit for the last digit of the mantissas (it should be
             # non-positive, as digits before the final decimal points
@@ -1993,7 +1993,7 @@ class AffineScalarFunc(object):
             
             exponent = None
 
-            mantissa_n = nom_val
+            nom_val_mantissa = nom_val
             std_dev_mantissa = std_dev
             # Without an exponent, it is necessary to include the
             # decimal point location in the printed digit (e.g.,
@@ -2005,7 +2005,7 @@ class AffineScalarFunc(object):
 
         # Final formatting:
             
-        return format_num(mantissa_n, std_dev_mantissa, exponent, 
+        return format_num(nom_val_mantissa, std_dev_mantissa, exponent, 
                           match.groupdict(),
                           prec=-signif_limit,
                           fmt_type=fmt_type,
