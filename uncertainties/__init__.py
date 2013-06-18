@@ -1161,16 +1161,17 @@ class CallableStdDev(float):
 # an exponent):
 EXP_LETTERS = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
-def format_num(mantissa_n, mantissa_e, exponent,
+def format_num(nom_val_main, error_main, exponent,
                fmt_parts, prec, fmt_type, options):
     '''
     Returns a formatted number with uncertainty.
 
-    Null errors (mantissa_e) are displayed as the integer 0, with
+    Null errors (error_main) are displayed as the integer 0, with
     no decimal point.
     
-    mantissa_n, mantissa_e -- mantissas of the nominal
-    value and of the error (numbers).
+    nom_val_main, error_main -- nominal value and error, before using
+    the exponent (e.g., "1.23e2" would have a main value of 1.23;
+    similarly, "12.3+/-0.01" would have a main value of 12.3).
 
     exponent -- common exponent to use. If None, no exponent is used.
 
@@ -1217,7 +1218,7 @@ def format_num(mantissa_n, mantissa_e, exponent,
     # possible: printing 3.1±0 with the default format prints 3.1+/-0,
     # which shows that the uncertainty is exactly zero.
 
-    print ("CALLING format_num with", mantissa_n, mantissa_e,
+    print ("CALLING format_num with", nom_val_main, error_main,
                prec, fmt_type,
                options, exponent) #!!!!! test
 
@@ -1270,14 +1271,14 @@ def format_num(mantissa_n, mantissa_e, exponent,
 
         # Calculation of the uncertainty part, uncert_str:
 
-        if mantissa_e == 0:
+        if error_main == 0:
             # The error is exactly zero
             uncert_str = '0'
-        elif isnan(mantissa_e):
-            uncert_str = fixed_point_type % mantissa_e
+        elif isnan(error_main):
+            uncert_str = fixed_point_type % error_main
         else:  #  Error with a meaningful first digit (not 0, not NaN)
 
-            uncert = round(mantissa_e, prec)
+            uncert = round(error_main, prec)
 
             # The representation uncert_str of the uncertainty (which will
             # be put inside parentheses) is calculated:
@@ -1334,7 +1335,7 @@ def format_num(mantissa_n, mantissa_e, exponent,
         # uncertainty)
         nom_val_fmt += '.%d%s' % (prec, fixed_point_type)
 
-        nom_val_str = robust_format(mantissa_n, nom_val_fmt)
+        nom_val_str = robust_format(nom_val_main, nom_val_fmt)
 
         value_str = nom_val_str+value_end
                                 
@@ -1347,7 +1348,7 @@ def format_num(mantissa_n, mantissa_e, exponent,
         ####################
         # Nominal value formatting:
         nom_val_str = robust_format(
-            mantissa_n,
+            nom_val_main,
             '%s.%d%s' % (
             ''.join(fmt_parts[part] for part
                     in ('fill_align', 'sign', 'zero', 'width', 'comma')),
@@ -1360,7 +1361,7 @@ def format_num(mantissa_n, mantissa_e, exponent,
         fmt_prefix_e = ''.join(fmt_parts[part] for part in
                                ('fill_align', 'zero', 'width', 'comma'))
 
-        if mantissa_e:
+        if error_main:
             fmt_suffix_e = '.%d%s' % (prec, fixed_point_type)
         else:  # Exactly zero error
             fmt_suffix_e = '.0f'  # No decimal point for zero
@@ -1371,7 +1372,7 @@ def format_num(mantissa_n, mantissa_e, exponent,
             # comma format parameter to be handled more conveniently
             # than if the 'd' format was used.
 
-        error_str = robust_format(mantissa_e, fmt_prefix_e+fmt_suffix_e)
+        error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
         
         ####################            
         pm_symbol = (
@@ -1897,11 +1898,16 @@ class AffineScalarFunc(object):
                     #which can land here and require the g format for
                     #the nominal value.
 
-                    # The number of significant digits to be displayed
-                    # is not necessarily obvious: trailing zeros are
-                    # removed (with the gGn format type).
-                    
-                    num_signif_digits = prec or 1  # 0 is interpreted like 1
+                    # The final number of significant digits to be
+                    # displayed is not necessarily obvious: trailing
+                    # zeros are removed (with the gGn format type), so
+                    # num_signif_digits is the number of significant
+                    # digits, given the fact that trailing zeros will
+                    # be removed.
+
+                    # 0 is interpreted like 1 (as with floats with
+                    # a gGn format type):
+                    num_signif_digits = prec or 1
 
                 # The number of significant digits applies to the
                 # nominal value (not to the standard deviation):
@@ -2004,7 +2010,6 @@ class AffineScalarFunc(object):
         ########################################
 
         # Final formatting:
-            
         return format_num(nom_val_mantissa, std_dev_mantissa, exponent, 
                           match.groupdict(),
                           prec=-signif_limit,
