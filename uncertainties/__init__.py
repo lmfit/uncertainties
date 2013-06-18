@@ -1224,6 +1224,10 @@ def format_num(nom_val_main, error_main, exponent,
 
     # Fixed point format for each part:
     fixed_point_type = ('fF'[fmt_type.isupper()] if fmt_type not in 'gGn'
+                        
+                        #!!!!!!!!! The following can break the precision
+                        #matching
+                        
                         # The following case is useful for 1.4±0 with
                         # the g format, for instance: otherwise, the
                         # nominal value would be formatted with
@@ -1641,7 +1645,8 @@ class AffineScalarFunc(object):
         
         std_dev = self.std_dev  # Optimization, since std_dev is calculated
         
-        return "%r+/-%s" % (nominal_value, repr(std_dev) if std_dev else '0')
+        return "%r+/-%s" % (self.nominal_value,
+                            repr(std_dev) if std_dev else '0')
                     
     def __str__(self):
         # An empty format string and str() usually return the same
