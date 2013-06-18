@@ -1174,10 +1174,11 @@ def format_num(mantissa_n, mantissa_e, exponent,
 
     exponent -- common exponent to use. If None, no exponent is used.
 
-    groupdict -- mapping that contains at least the following parts of the
-    format specification: fill_align, sign, zero, width, comma. These
-    format specification parts are handled. The width is applied to
-    each value, or, if the shorthand notation is used, globally.
+    groupdict -- mapping that contains at least the following parts of
+    the format specification: fill_align, sign, zero, width, comma;
+    the value are strings. These format specification parts are
+    handled. The width is applied to each value, or, if the shorthand
+    notation is used, globally.
     
     fmt_prefix_n, fmt_prefix_e -- prefixes for the format given to
     robust_format() for the nominal value and the error. They can be
@@ -1223,12 +1224,19 @@ def format_num(mantissa_n, mantissa_e, exponent,
     # Fixed point format for each part:
     fixed_point_type = 'fF'[fmt_type.isupper()]
 
-    # Format for the exponent:
-    if exponent is not None and fmt_type in EXP_LETTERS and 'L' not in options:
-        # Case of e or E. The same convention as Python 2.7
-        # to 3.3 is used for the display of the exponent:
-        fmt_exp = EXP_LETTERS[fmt_type]+'%+03d'
-    
+    # Format for the exponent (calculated early because the formatting
+    # of the shorthand notation with a fixed width uses its length):
+    if exponent is None:
+        exp_str = ''
+    else:
+        if 'L' in options:
+            fmt_exp = r' \times 10^{%d}'            
+        elif fmt_type in EXP_LETTERS:
+            # Case of e or E. The same convention as Python 2.7
+            # to 3.3 is used for the display of the exponent:
+            fmt_exp = EXP_LETTERS[fmt_type]+'%+03d'
+        exp_str = fmt_exp % exponent
+            
     #!!!!!!!! do we really need robust_format, now that the format
     #string is calculated anyway?
 
@@ -1238,18 +1246,6 @@ def format_num(mantissa_n, mantissa_e, exponent,
     
     if 'S' in options:  # Shorthand notation:
 
-        #!!!!!!!!!!! better handle fmt options
-
-        #!!!!!!!! handle global width
-        
-        # Nominal value formatting:
-        nom_val_str = robust_format(
-            mantissa_n,
-            '%s.%d%s' % (
-            ''.join(groupdict[part] for part
-                    in ('fill_align', 'sign', 'zero', 'width', 'comma')),
-            prec, fixed_point_type))
-        
         # Calculation of the uncertainty part, uncert_str:
 
         if mantissa_e == 0:
@@ -1286,11 +1282,14 @@ def format_num(mantissa_n, mantissa_e, exponent,
                     # fmt_prefix_e is ignored):
                     uncert_str = '0.'
 
-        fixed_point_str = "%s(%s)" % (nom_val_str, uncert_str)
-            
-    else:  # +/- notation:
+        #!!!!!!!!!!! better handle fmt options
 
         # Nominal value formatting:
+
+        #!!!!!!!! handle global width: presence or not of an exponent, etc.
+        if groupdict['width']:
+            effective_width = groupdict['width']  #!!!!!!
+            
         nom_val_str = robust_format(
             mantissa_n,
             '%s.%d%s' % (
@@ -1298,7 +1297,24 @@ def format_num(mantissa_n, mantissa_e, exponent,
                     in ('fill_align', 'sign', 'zero', 'width', 'comma')),
             prec, fixed_point_type))
         
-        # Prefix for the standard deviation format specification:
+                    
+        fixed_point_str = "%s(%s)" % (nom_val_str, uncert_str)
+            
+    else:  # +/- notation:
+
+        ####################
+        # Nominal value formatting:
+        nom_val_str = robust_format(
+            mantissa_n,
+            '%s.%d%s' % (
+            ''.join(groupdict[part] for part
+                    in ('fill_align', 'sign', 'zero', 'width', 'comma')),
+            prec, fixed_point_type))
+
+        ####################
+        # Error formatting:
+        
+        # Prefix for the error format specification:
         fmt_prefix_e = ''.join(groupdict[part] for part in
                                ('fill_align', 'zero', 'width', 'comma'))
 
@@ -1312,7 +1328,10 @@ def format_num(mantissa_n, mantissa_e, exponent,
             # feature is used anyway, because it allows a possible
             # comma format parameter to be handled more conveniently
             # than if the 'd' format was used.
+
+        error_str = robust_format(mantissa_e, fmt_prefix_e+fmt_suffix_e)
         
+        ####################            
         pm_symbol = (
             # Unicode has priority over LaTeX, so that users with a
             # Unicode-compatible LaTeX source can use ±:
@@ -1320,30 +1339,26 @@ def format_num(mantissa_n, mantissa_e, exponent,
             ' \pm ' if 'L' in options else
             '+/-')
 
+        ####################
+        # Final fixed-point part
         fixed_point_str = '%s%s%s' % (
             nom_val_str, 
             pm_symbol,
-            robust_format(mantissa_e, fmt_prefix_e+fmt_suffix_e)
+            error_str
             )
 
-    # Should an exponent be added? The result goes to value_str:
-    if exponent is None:
-        value_str = fixed_point_str  # Nothing to be added
-    else:
-        mantissa_fmt = '%s' if 'S' in options else '(%s)'
-        
-        if 'L' in options:
-            # The provided fmt_exp is ignored:
-            fmt_exp = r' \times 10^{%d}'
-                   
-        value_str = (mantissa_fmt % fixed_point_str +
-                     fmt_exp % exponent)
-        
+        # The nominal value and the error might have to be explicitly
+        # grouped together, so as to prevent an ambiguous notation:
+        if exponent is not None or '%' in options:
+            fixed_point_str = '(%s)' % fixed_point_str
+            
+    #!!!!!!!! handle parens if non-S and (exp or %)
+
+    # Final form:
+    value_str = '%s%s' % (fixed_point_str, exp_str)
+    
     # Possible % sign:
     if '%' in options:
-        if 'S' not in options:
-            # The output will look like (42+/-1)%:
-            value_str = '(%s)' % value_str
         if 'L' in options:
             # % is a special character, in LaTeX: it must be escaped.
             #
