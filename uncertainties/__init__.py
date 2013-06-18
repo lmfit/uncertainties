@@ -1352,8 +1352,6 @@ def format_num(mantissa_n, mantissa_e, exponent,
         if exponent is not None or '%' in options:
             fixed_point_str = '(%s)' % fixed_point_str
             
-    #!!!!!!!! handle parens if non-S and (exp or %)
-
     # Final form:
     value_str = '%s%s' % (fixed_point_str, exp_str)
     
