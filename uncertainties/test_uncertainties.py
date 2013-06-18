@@ -1828,7 +1828,15 @@ def test_format():
                         ' (obtained through format specification %r)'
                         ' are not close enough'
                         % (value, value_back, representation, format_spec))
-                                                         
+
+def test_unicode_format():
+    '''Test of the unicode formatting of numbers with uncertainties'''
+
+    x = ufloat(3.14159265358979, 0.25)
+
+    assert isinstance(u'Résultat = {}'.format(x), unicode)
+    assert isinstance(u'Résultat = {:C}'.format(x), unicode)
+    
 ###############################################################################
 
 # The tests below require NumPy, which is an optional package:
