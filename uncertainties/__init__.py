@@ -1623,12 +1623,12 @@ class AffineScalarFunc(object):
         printed ("(1.2+/-0.1)e-5"). unless the format specification
         contains an explicit width (" 1.2e-5+/- 0.1e-5") (this allows
         numbers to be in a single column, when printing numbers over
-        many lines). The exponent is the same for the nominal value
-        and for the uncertainty (except for a NaN uncertainty). The
-        mantissa of the larger value (in absolute value, between the
-        nominal value and the standard deviation) is between 1 and 10,
-        like for floats. Specifying a minimum width of 0 is a way of
-        forcing the exponent to not be factored out.
+        many lines), in which case the exponent is the same for the
+        nominal value and for the uncertainty. The mantissa of the
+        larger value (in absolute value, between the nominal value and
+        the standard deviation) is between 1 and 10, like for
+        floats. Specifying a minimum width of 0 is a way of forcing
+        the exponent to not be factored out.
         
         If no format type is given, "g" is assumed, like for floats.
 
