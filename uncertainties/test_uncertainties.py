@@ -10,6 +10,7 @@ These tests can be run through the Nose testing framework.
 
 from __future__ import division
 
+
 # Standard modules
 import copy
 import weakref
@@ -17,6 +18,18 @@ import math
 import random
 import sys
 
+# For some tests (test_format() and the "n" format specification):
+import locale
+locale_set = True
+try:
+    locale.setlocale(locale.LC_ALL, 'en_US')  # POSIX
+except Error:
+    try:
+        locale.setlocale(locale.LC_ALL, 'american_usa')  
+    except Error:
+        locale_set = False  # Some tests won't be run
+
+        
 # 3rd-party modules
 # import nose.tools
 
@@ -1601,12 +1614,6 @@ def test_format():
         (1.2345678, 0.09499): {'': '1.23+/-0.09'},
         (1.2345678, 0.095): {'': '1.23+/-0.10'},        
 
-        # Comma option:
-        (123456.789123, 1234.5678): {
-            ',': '123,456+/-1,234',
-            ',.4f': '123,456.7891+/-1,234.5678'
-        },
-        
         # Automatic extension of the uncertainty up to the decimal
         # point:
         (1000, 123): {
@@ -1738,10 +1745,28 @@ def test_format():
 
     # ',' format option: introduced in Python 2.7
     if sys.version_info >= (2, 7):
-        tests[(1234.56789, 0.012)] = {
-            ',.1uf': '1,234.57+/-0.01'}
+        
+        tests.update({
+            (1234.56789, 0.012): {
+                ',.1uf': '1,234.57+/-0.01'
+                },
+
+            (123456.789123, 1234.5678): {
+                ',f': '123,456.789123+/-1,234.567800',
+                ',.4f': '123,456.7891+/-1,234.5678'
+                }
+        })
+        
+       
+    # If the locale was set to American (USA), the "n" format type can
+    # be tested:
+    if locale_set:
+        tests[(123456.789123, 1234.56789123)] = {
+            '.0n': '123,456+/-1,234',
+            '.4n': '123,456.7891+/-1,234.5678'
+            }
             
-    
+        
     for (values, representations) in tests.iteritems():
 
         value = ufloat(*values)
