@@ -1222,7 +1222,12 @@ def format_num(mantissa_n, mantissa_e, exponent,
                options, exponent) #!!!!! test
 
     # Fixed point format for each part:
-    fixed_point_type = 'fF'[fmt_type.isupper()]
+    fixed_point_type = ('fF'[fmt_type.isupper()] if fmt_type not in 'gGn'
+                        # The following case is useful for 1.4±0 with
+                        # the g format, for instance: otherwise, the
+                        # nominal value would be formatted with
+                        # something like .6f:
+                        else fmt_type)
 
     # The suffix of the result is calculated first because it is
     # useful for the width handling of the shorthand notation.
@@ -1323,7 +1328,10 @@ def format_num(mantissa_n, mantissa_e, exponent,
             # Any 'zero' part should not do anything: it is not
             # included
             nom_val_fmt = fmt_parts['sign']+fmt_parts['comma']
-            
+
+        # !!!!!!!!! prec should be None when no precision can be
+        # defined (example: g format for a number with a zero
+        # uncertainty)
         nom_val_fmt += '.%d%s' % (prec, fixed_point_type)
 
         nom_val_str = robust_format(mantissa_n, nom_val_fmt)
@@ -1803,7 +1811,9 @@ class AffineScalarFunc(object):
             nom_val *= 100
             fmt_type = 'f'
             options.add('%')
-        
+
+        # At this point, fmt_type is in eEfFgGn (not None, not %).
+            
         ########################################
 
         # The limit digits_limit on the digits of nom_val and std_dev
@@ -1857,14 +1867,17 @@ class AffineScalarFunc(object):
 
                 digits_limit = -prec
                 
-            else:  # Format type = eEgGn (or no format type specified)
+            else:  # Format type in eEgGn
 
+                # We calculate first the number of significant digits
+                # to be displayed (if possible):
+                
                 if fmt_type in 'eE':
                     # The precision is the number of significant
                     # digits required - 1 (because there is a single
                     # digit before the decimal point):
                     num_signif_digits = prec+1
-                else:
+                else:  # Format type in gGn
                     
                     # Effective format specification precision: the rule
                     # of
@@ -1873,9 +1886,21 @@ class AffineScalarFunc(object):
 
                     #!!!!!!!! The following is actually incorrect:
                     #'{:.6g}'.format(3.14) is actually "3.14", not
-                    #3.14000.
-                    
+                    #3.14000.  The number smallest number of digits <=
+                    #prec should be determined… The mantissa is
+                    #needed. *OR* a special mode is used, whereby the
+                    #final formatting uses the Python formatting
+                    #directly. TO DO: think about the meaning for
+                    #nominal_value + uncertainty, though: 1.2±0.01
+                    #with the g format… NO, this does not exist: I
+                    #should only care about the zero uncertainty case,
+                    #which can land here and require the g format for
+                    #the nominal value.
 
+                    # The number of significant digits to be displayed
+                    # is not necessarily obvious: trailing zeros are
+                    # removed (with a gGn format type).
+                    
                     num_signif_digits = prec or 1  # 0 is interpreted like 1
 
                 # The number of significant digits applies to the
