@@ -1734,6 +1734,9 @@ class AffineScalarFunc(object):
         one that obeys the usual "g" exponent rule.
         '''
 
+        #!!!!!!!!!!!! {:.6g}'.format(1.4) gives 1.4. My program gives
+        #1.40000 (default precision 6). Understand.
+        
         # Convention on limits "between" digits: 0 = exactly at the
         # decimal point, -1 = after the first decimal, 1 = before the
         # units digit, etc.
@@ -1839,7 +1842,8 @@ class AffineScalarFunc(object):
             digits_limit = signif_d_to_limit(std_dev, num_signif_d)
 
         else:
-            # The precision has the same meaning as for floats:
+            # The precision has the same meaning as for floats (it is
+            # not the uncertainty that defines the number of digits).
 
             # The usual default precision is used (this is useful for
             # 3.141592±NaN with an "f" format specification, for
@@ -1867,8 +1871,13 @@ class AffineScalarFunc(object):
                     # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
                     # is used:
 
+                    #!!!!!!!! The following is actually incorrect:
+                    #'{:.6g}'.format(3.14) is actually "3.14", not
+                    #3.14000.
+                    
+
                     num_signif_digits = prec or 1  # 0 is interpreted like 1
-                
+
                 # The number of significant digits applies to the
                 # nominal value (not to the standard deviation):
                 digits_limit = signif_d_to_limit(nom_val, num_signif_digits)
