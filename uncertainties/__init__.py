@@ -1161,10 +1161,8 @@ class CallableStdDev(float):
 # an exponent):
 EXP_LETTERS = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
-def format_num(mantissa_n, mantissa_e, exponent=None,
-               fmt_prefix_n='', fmt_prefix_e='',
-               prec=6, fmt_type='g',
-               options=''):
+def format_num(mantissa_n, mantissa_e, exponent,
+               groupdict, prec, fmt_type, options):
     '''
     Returns a formatted number with uncertainty.
 
@@ -1175,6 +1173,11 @@ def format_num(mantissa_n, mantissa_e, exponent=None,
     value and of the error (numbers).
 
     exponent -- common exponent to use. If None, no exponent is used.
+
+    groupdict -- mapping that contains at least the following parts of the
+    format specification: fill_align, sign, zero, width, comma. These
+    format specification parts are handled. The width is applied to
+    each value, or, if the shorthand notation is used, globally.
     
     fmt_prefix_n, fmt_prefix_e -- prefixes for the format given to
     robust_format() for the nominal value and the error. They can be
@@ -1186,7 +1189,8 @@ def format_num(mantissa_n, mantissa_e, exponent=None,
 
     fmt_type -- format specification type, in "eEfFgGn" that defines
     how exponents and NaN values are represented (in the same way as
-    for float).
+    for float). Note that None, the empty string, or "%" are not
+    accepted.
 
     options -- options (as an object that support membership testing,
     like for instance a string). "S" is for the short-hand notation
@@ -1212,12 +1216,7 @@ def format_num(mantissa_n, mantissa_e, exponent=None,
     # possible: printing 3.1±0 with the default format prints 3.1+/-0,
     # which shows that the uncertainty is exactly zero.
 
-    #!!!!!!!!! There is a problem with the shorthand formatting: in
-    #the format spec, the alignment, width, etc. (but not 0n,) should
-    #be global.
-    
     print ("CALLING format_num with", mantissa_n, mantissa_e,
-               fmt_prefix_n, fmt_prefix_e,
                prec, fmt_type,
                options, exponent) #!!!!! test
 
@@ -1230,20 +1229,27 @@ def format_num(mantissa_n, mantissa_e, exponent=None,
         # to 3.3 is used for the display of the exponent:
         fmt_exp = EXP_LETTERS[fmt_type]+'%+03d'
     
-    # Calculation of the final no-exponent part, fixed_point_str:
-
     #!!!!!!!! do we really need robust_format, now that the format
     #string is calculated anyway?
-    
-    # Nominal value formatting:
-    nom_val_str = robust_format(
-        mantissa_n,
-        '%s.%d%s' % (fmt_prefix_n, prec, fixed_point_type))    
 
+    # Calculation of the final no-exponent part, fixed_point_str:
+    
     # Error formatting:
     
     if 'S' in options:  # Shorthand notation:
 
+        #!!!!!!!!!!! better handle fmt options
+
+        #!!!!!!!! handle global width
+        
+        # Nominal value formatting:
+        nom_val_str = robust_format(
+            mantissa_n,
+            '%s.%d%s' % (
+            ''.join(groupdict[part] for part
+                    in ('fill_align', 'sign', 'zero', 'width', 'comma')),
+            prec, fixed_point_type))
+        
         # Calculation of the uncertainty part, uncert_str:
 
         if mantissa_e == 0:
@@ -1284,14 +1290,28 @@ def format_num(mantissa_n, mantissa_e, exponent=None,
             
     else:  # +/- notation:
 
-        if not mantissa_e:  # Exactly zero error
-            fmt_suffix_s = 'd'  # No decimal point for zero
-            mantissa_e = 0  # Integer ('{:d}'.format(0.) fails)
-            # Note: .0f applied to a float can give the same result,
-            # but this does not appear to be documented
-            # (http://docs.python.org/2/library/string.html#format-specification-mini-language).
-        else:
-            fmt_suffix_s = '.%d%s' % (prec, fixed_point_type)
+        # Nominal value formatting:
+        nom_val_str = robust_format(
+            mantissa_n,
+            '%s.%d%s' % (
+            ''.join(groupdict[part] for part
+                    in ('fill_align', 'sign', 'zero', 'width', 'comma')),
+            prec, fixed_point_type))
+        
+        # Prefix for the standard deviation format specification:
+        fmt_prefix_e = ''.join(groupdict[part] for part in
+                               ('fill_align', 'zero', 'width', 'comma'))
+
+        if mantissa_e:
+            fmt_suffix_e = '.%d%s' % (prec, fixed_point_type)
+        else:  # Exactly zero error
+            fmt_suffix_e = '.0f'  # No decimal point for zero
+            # Note: .0f applied to a float has no decimal point, but
+            # this does not appear to be documented
+            # (http://docs.python.org/2/library/string.html#format-specification-mini-language). This
+            # feature is used anyway, because it allows a possible
+            # comma format parameter to be handled more conveniently
+            # than if the 'd' format was used.
         
         pm_symbol = (
             # Unicode has priority over LaTeX, so that users with a
@@ -1303,7 +1323,7 @@ def format_num(mantissa_n, mantissa_e, exponent=None,
         fixed_point_str = '%s%s%s' % (
             nom_val_str, 
             pm_symbol,
-            robust_format(mantissa_e, fmt_prefix_e+fmt_suffix_s)
+            robust_format(mantissa_e, fmt_prefix_e+fmt_suffix_e)
             )
 
     # Should an exponent be added? The result goes to value_str:
@@ -1683,21 +1703,29 @@ class AffineScalarFunc(object):
 
         # Convention on digits: 0 is units (10**0), 1 is tens, -1 is
         # tenths, etc.
+
+        # This method does the format specification parsing, and
+        # calculates the various parts of the displayed value
+        # (mantissas, exponent, position of the last digit). The
+        # formatting itself is delegated to format_num().
         
         ########################################            
 
         # Format specification parsing:
 
-        match = re.match(
-            '(?P<fill_align>(?:.?[<>=^]|))'  # Can be the empty string
-            '(?P<sign>[-+ ]?)'
-            '(?P<extra>0?\d*,?)'  # Optional 0, width and comma
-            '(?:\.(?P<prec>\d+))?'
-            '(?P<uncert_prec>u?)'  # Precision for the uncertainty?
+        match = re.match('''
+            (?P<fill_align>(?:.?[<>=^]|))  # Can be the empty string
+            (?P<sign>[-+ ]?)
+            (?P<zero>0?)
+            (?P<width>\d*)
+            (?P<comma>,?)
+            (?:\.(?P<prec>\d+))?
+            (?P<uncert_prec>u?)  # Precision for the uncertainty?
             # The type can be omitted. Options must not go here:
-            '(?P<type>.??)'
-            '(?P<options>[LSC]*)$',
-            format_spec)
+            (?P<type>.??)
+            (?P<options>[LSC]*)$''',
+            format_spec,
+            re.VERBOSE)
 
         if not match:
             raise ValueError(
@@ -1909,21 +1937,9 @@ class AffineScalarFunc(object):
         ########################################
 
         # Final formatting:
-
-        # Prefix for the nominal value format specification: the sign
-        # is only applied to the mantissa (since the sign of the
-        # standard deviation is always +):
-        prefix_n = ''.join(match.groups()[:3])
-        
-        # Prefix for the standard deviation:
-        prefix_s = (
-            match.group('fill_align')+match.group('extra')
-            # Optimization: the format is ignored anyway, with the
-            # shorthand notation
-            if 'S' not in fmt_options else '')
-
+            
         return format_num(mantissa_n, std_dev_mantissa, exponent, 
-                          prefix_n, prefix_s,
+                          match.groupdict(),
                           prec=-signif_limit,
                           fmt_type=fmt_type,
                           options=options)
