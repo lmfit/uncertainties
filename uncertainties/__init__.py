@@ -1162,7 +1162,7 @@ class CallableStdDev(float):
 EXP_LETTERS = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
 def format_num(mantissa_n, mantissa_e, exponent,
-               groupdict, prec, fmt_type, options):
+               fmt_parts, prec, fmt_type, options):
     '''
     Returns a formatted number with uncertainty.
 
@@ -1174,7 +1174,7 @@ def format_num(mantissa_n, mantissa_e, exponent,
 
     exponent -- common exponent to use. If None, no exponent is used.
 
-    groupdict -- mapping that contains at least the following parts of
+    fmt_parts -- mapping that contains at least the following parts of
     the format specification: fill_align, sign, zero, width, comma;
     the value are strings. These format specification parts are
     handled. The width is applied to each value, or, if the shorthand
@@ -1224,23 +1224,40 @@ def format_num(mantissa_n, mantissa_e, exponent,
     # Fixed point format for each part:
     fixed_point_type = 'fF'[fmt_type.isupper()]
 
-    # Format for the exponent (calculated early because the formatting
-    # of the shorthand notation with a fixed width uses its length):
+    # The suffix of the result is calculated first because it is
+    # useful for the width handling of the shorthand notation.
+    
+    # Exponent part:
     if exponent is None:
         exp_str = ''
     else:
         if 'L' in options:
-            fmt_exp = r' \times 10^{%d}'            
+            exp_str = r' \times 10^{%d}' % exponent
         elif fmt_type in EXP_LETTERS:
             # Case of e or E. The same convention as Python 2.7
             # to 3.3 is used for the display of the exponent:
-            fmt_exp = EXP_LETTERS[fmt_type]+'%+03d'
-        exp_str = fmt_exp % exponent
-            
-    #!!!!!!!! do we really need robust_format, now that the format
-    #string is calculated anyway?
+            exp_str = EXP_LETTERS[fmt_type]+'%+03d' % exponent
+        else:
+            exp_str = ''  # No exponent format
 
-    # Calculation of the final no-exponent part, fixed_point_str:
+    # Possible % sign:
+    percent_str = ''
+    if '%' in options:
+        if 'L' in options:
+            # % is a special character, in LaTeX: it must be escaped.
+            #
+            # Using '\\' in the code instead of r'\' so as not to
+            # confuse emacs's syntax highlighting:
+            percent_str += ' \\'
+        percent_str += '%'
+            
+    # !!!!!!!! do we really need robust_format, now that the format
+    # string is calculated anyway?
+
+    ####################
+    
+    # Calculation of the mostly final numerical part value_str (no %
+    # sign, no global width applied).
     
     # Error formatting:
     
@@ -1282,24 +1299,41 @@ def format_num(mantissa_n, mantissa_e, exponent,
                     # fmt_prefix_e is ignored):
                     uncert_str = '0.'
 
-        #!!!!!!!!!!! better handle fmt options
+        # End of the final number representation (width and alignment
+        # not included). This string is important for the handling of
+        # the width:
+        value_end = '(%s)%s%s' % (uncert_str, exp_str, percent_str)
 
+        ##########
         # Nominal value formatting:
 
-        #!!!!!!!! handle global width: presence or not of an exponent, etc.
-        if groupdict['width']:
-            effective_width = groupdict['width']  #!!!!!!
-            
-        nom_val_str = robust_format(
-            mantissa_n,
-            '%s.%d%s' % (
-            ''.join(groupdict[part] for part
-                    in ('fill_align', 'sign', 'zero', 'width', 'comma')),
-            prec, fixed_point_type))
+        # Calculation of the format nom_val_fmt:
         
-                    
-        fixed_point_str = "%s(%s)" % (nom_val_str, uncert_str)
+        if fmt_parts['zero'] and fmt_parts['width']:
             
+            # Padding with zeros must be done on the nominal value alone:
+            
+            # Remaining width (for the nominal value):
+            nom_val_width = max(int(fmt_parts['width']) - len(value_end), 0)
+            nom_val_fmt = '%s%s%d%s' % (
+                fmt_parts['sign'], fmt_parts['zero'], nom_val_width,
+                fmt_parts['comma'])
+            
+        else:
+            # Any 'zero' part should not do anything: it is not
+            # included
+            nom_val_fmt = fmt_parts['sign']+fmt_parts['comma']
+            
+        nom_val_fmt += '.%d%s' % (prec, fixed_point_type)
+
+        nom_val_str = robust_format(mantissa_n, nom_val_fmt)
+
+        value_str = nom_val_str+value_end
+                                
+        # Global width, if any:
+        if fmt_parts['width']:
+            value_str = ('%%%ss' % fmt_parts['width']) % value_str
+                                
     else:  # +/- notation:
 
         ####################
@@ -1307,7 +1341,7 @@ def format_num(mantissa_n, mantissa_e, exponent,
         nom_val_str = robust_format(
             mantissa_n,
             '%s.%d%s' % (
-            ''.join(groupdict[part] for part
+            ''.join(fmt_parts[part] for part
                     in ('fill_align', 'sign', 'zero', 'width', 'comma')),
             prec, fixed_point_type))
 
@@ -1315,7 +1349,7 @@ def format_num(mantissa_n, mantissa_e, exponent,
         # Error formatting:
         
         # Prefix for the error format specification:
-        fmt_prefix_e = ''.join(groupdict[part] for part in
+        fmt_prefix_e = ''.join(fmt_parts[part] for part in
                                ('fill_align', 'zero', 'width', 'comma'))
 
         if mantissa_e:
@@ -1352,19 +1386,9 @@ def format_num(mantissa_n, mantissa_e, exponent,
         if exponent is not None or '%' in options:
             fixed_point_str = '(%s)' % fixed_point_str
             
-    # Final form:
-    value_str = '%s%s' % (fixed_point_str, exp_str)
+        # Final form:
+        value_str = '%s%s%s' % (fixed_point_str, exp_str, percent_str)
     
-    # Possible % sign:
-    if '%' in options:
-        if 'L' in options:
-            # % is a special character, in LaTeX: it must be escaped.
-            #
-            # Using '\\' in the code instead of r'\' so as not to
-            # confuse emacs's syntax highlighting:
-            value_str += ' \\'
-        value_str += '%'
-
     return value_str
 
 def signif_d_to_limit(value, num_signif_d):
@@ -1756,9 +1780,6 @@ class AffineScalarFunc(object):
         # Shortcut:
         fmt_prec = match.group('prec')  # Can be None
 
-        # Options:
-        fmt_options = match.group('options')
-
         ########################################
                 
         # Since the '%' (percentage) format specification can change
@@ -1769,17 +1790,16 @@ class AffineScalarFunc(object):
         std_dev = self.std_dev
         nom_val = self.nominal_value
 
+        # 'options' is the options that must be given to format_num():
+        options = set(match.group('options'))  # Faster lookup
+
         # The '%' format is treated internally as a display option: it
         # should not be applied individually to each part:
-        #
-        # 'options' is the options that must be given to format_num():
         if fmt_type == '%':
             std_dev *= 100
             nom_val *= 100
             fmt_type = 'f'
-            options = fmt_options+'%'
-        else:
-            options = fmt_options
+            options.add('%')
         
         ########################################
 
