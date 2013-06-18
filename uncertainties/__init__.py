@@ -1635,7 +1635,7 @@ class AffineScalarFunc(object):
         In the standard form, the fill, align, zero and width
         parameters of the format specification are applied
         individually to each of the nominal value and standard
-        deviation.
+        deviation or, if the shorthand notation is used, globally.
 
         The sign parameter of the format specification is only applied
         to the nominal value (since the standard deviation is
@@ -1909,8 +1909,6 @@ class AffineScalarFunc(object):
         ########################################
 
         # Final formatting:
-
-        #!!!!!!!!!! implement new form: prefix, precision, fixed_point_type f/F
 
         # Prefix for the nominal value format specification: the sign
         # is only applied to the mantissa (since the sign of the
