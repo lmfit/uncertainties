@@ -2744,7 +2744,7 @@ def ufloat_fromstr(representation, tag=None):
         12.3e10+/-5e3
         12.3e10±5e3  # Only as a unicode string (Python 2)
         (-3.1415 +/- 0.0001)e+00
-        (-3.1415 +/- 1e-4)e+02
+        (-3.1415 +/- 1e-4)e+200
         
         0.29
         31.
