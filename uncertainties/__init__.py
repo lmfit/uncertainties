@@ -2713,9 +2713,8 @@ def str_to_number_with_uncert(representation):
         # Simple form 1234.45+/-1.2:
         (nom_value, uncert) = representation.split('+/-')
     except ValueError:
-        print "REPR", representation
         try:
-            # Simple form 1234.45±1.2:
+            # Simple form 1234.45±1.2 (implies a Unicode string, in Python 2):
             (nom_value, uncert) = representation.split(u'±')
         except ValueError:
             # Form with parentheses or no uncertainty:
@@ -2723,6 +2722,13 @@ def str_to_number_with_uncert(representation):
                 parsed_value = parse_error_in_parentheses(representation)
             except NotParenUncert:
                 raise ValueError(cannot_parse_ufloat_msg_pat % representation)
+        else: # !! There is code duplication, here: can the logic be improved?
+            # print "VALUE", nom_value, "UNCERT", uncert
+            try:
+                parsed_value = (float(nom_value)*factor, float(uncert)*factor)
+            except ValueError:
+                raise ValueError(cannot_parse_ufloat_msg_pat % representation)
+            
     else:
         # print "VALUE", nom_value, "UNCERT", uncert
         try:
