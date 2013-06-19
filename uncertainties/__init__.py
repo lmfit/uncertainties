@@ -2589,11 +2589,11 @@ else:
 ###############################################################################
 # Parsing of values with uncertainties:
 
-POSITIVE_DECIMAL_UNSIGNED = r'(\d+)(\.\d*)?'
+POSITIVE_DECIMAL_UNSIGNED = ur'(\d+)(\.\d*)?'
 
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where the
 # uncertainty is optional (in which case the uncertainty is implicit):
-NUMBER_WITH_UNCERT_RE_STR = '''
+NUMBER_WITH_UNCERT_RE_STR = u'''
     ([+-])?  # Sign
     %s  # Main number
     (?:\(%s\))?  # Optional uncertainty
@@ -2601,12 +2601,12 @@ NUMBER_WITH_UNCERT_RE_STR = '''
     ''' % (POSITIVE_DECIMAL_UNSIGNED, POSITIVE_DECIMAL_UNSIGNED)
 
 NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
-    "%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).match
+    u"%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).match
 
 # Number with uncertainty of the form (... +/- ...)e10: this is a
 # loose matching, because incorrect contents is handled through
 # exceptions:
-NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile('''
+NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(u'''
     \(
     (?P<simple_num_with_uncert>.*)
     \)
@@ -2695,10 +2695,9 @@ def str_to_number_with_uncert(representation):
     Raises ValueError if the string cannot be parsed.
     """
 
-    # Do we have the (1.23 +/- 0.01)e10 form?
     match = NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH(representation)
     
-    if match:
+    if match:  # We have a (1.23 +/- 0.01)e10 form
         # The representation is simplified, but the global factor is
         # calculated:
         try:
@@ -2714,12 +2713,16 @@ def str_to_number_with_uncert(representation):
         # Simple form 1234.45+/-1.2:
         (nom_value, uncert) = representation.split('+/-')
     except ValueError:
-
-        # Form with parentheses or no uncertainty:
+        print "REPR", representation
         try:
-            parsed_value = parse_error_in_parentheses(representation)
-        except NotParenUncert:
-            raise ValueError(cannot_parse_ufloat_msg_pat % representation)
+            # Simple form 1234.45±1.2:
+            (nom_value, uncert) = representation.split(u'±')
+        except ValueError:
+            # Form with parentheses or no uncertainty:
+            try:
+                parsed_value = parse_error_in_parentheses(representation)
+            except NotParenUncert:
+                raise ValueError(cannot_parse_ufloat_msg_pat % representation)
     else:
         # print "VALUE", nom_value, "UNCERT", uncert
         try:
@@ -2734,13 +2737,14 @@ def ufloat_fromstr(representation, tag=None):
     Returns a new random variable (Variable object) from a string.
     
     Strings 'representation' of the form '12.345+/-0.015',
-    '12.345(15)', or '12.3' are recognized (see more complete list
-    below).  In the last case, an uncertainty of +/-1 is assigned to
-    the last digit.
+    '12.345(15)', '12.3' or u'1.2±0.1' (Unicode string) are recognized
+    (see more complete list below).  In the last case, an uncertainty
+    of +/-1 is assigned to the last digit.
     
     Examples of valid string representations:
     
         12.3e10+/-5e3
+        12.3e10±5e3
         (-3.1415 +/- 0.0001)e+00
         
         0.29
