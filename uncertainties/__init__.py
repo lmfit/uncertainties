@@ -2674,7 +2674,7 @@ def parse_error_in_parentheses(representation):
     return (value, uncert)
 
 
-_cannot_parse_ufloat_msg_pat = (
+cannot_parse_ufloat_msg_pat = (
     'Cannot parse %s: see the documentation of ufloat_fromstr() for a'
     ' list of accepted formats')
 
@@ -2704,7 +2704,7 @@ def str_to_number_with_uncert(representation):
         try:
             factor = 10.**int(match.group('exp_value'))
         except ValueError:
-            raise ValueError(_cannot_parse_ufloat_msg_pat % representation)
+            raise ValueError(cannot_parse_ufloat_msg_pat % representation)
         
         representation = match.group('simple_num_with_uncert')
     else:
@@ -2719,13 +2719,13 @@ def str_to_number_with_uncert(representation):
         try:
             parsed_value = parse_error_in_parentheses(representation)
         except NotParenUncert:
-            raise ValueError(_cannot_parse_ufloat_msg_pat % representation)
+            raise ValueError(cannot_parse_ufloat_msg_pat % representation)
     else:
         # print "VALUE", nom_value, "UNCERT", uncert
         try:
             parsed_value = (float(nom_value)*factor, float(uncert)*factor)
         except ValueError:
-            raise ValueError(_cannot_parse_ufloat_msg_pat % representation)
+            raise ValueError(cannot_parse_ufloat_msg_pat % representation)
         
     return parsed_value
 
