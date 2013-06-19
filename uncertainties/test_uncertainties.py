@@ -1795,7 +1795,7 @@ def test_format():
             
             # Parsing back into a number with uncertainty (unless the
             # LaTeX or comma notation is used):
-            if not set(format_spec).intersection('L,*%C'):  # * = fill with *
+            if not set(format_spec).intersection('L,*%'):  # * = fill with *
 
                 value_back = ufloat_fromstr(representation)
 
