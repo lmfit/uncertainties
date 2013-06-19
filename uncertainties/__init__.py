@@ -2708,32 +2708,24 @@ def str_to_number_with_uncert(representation):
         representation = match.group('simple_num_with_uncert')
     else:
         factor = 1  # No global exponential factor
-    
-    try:
-        # Simple form 1234.45+/-1.2:
-        (nom_value, uncert) = representation.split('+/-')
-    except ValueError:
-        try:
-            # Simple form 1234.45±1.2 (implies a Unicode string, in Python 2):
-            (nom_value, uncert) = representation.split(u'±')
-        except ValueError:
-            # Form with parentheses or no uncertainty:
-            try:
-                parsed_value = parse_error_in_parentheses(representation)
-            except NotParenUncert:
-                raise ValueError(cannot_parse_ufloat_msg_pat % representation)
-        else: # !! There is code duplication, here: can the logic be improved?
-            # print "VALUE", nom_value, "UNCERT", uncert
-            try:
-                parsed_value = (float(nom_value)*factor, float(uncert)*factor)
-            except ValueError:
-                raise ValueError(cannot_parse_ufloat_msg_pat % representation)
-            
-    else:
+
+    match = re.match(u'(.*)(?:\+/-|±)(.*)', representation)
+    if match:
+
+        # Simple form 1234.45+/-1.2 or 1234.45±1.2:
+        (nom_value, uncert) = match.groups()
+
         # print "VALUE", nom_value, "UNCERT", uncert
         try:
             parsed_value = (float(nom_value)*factor, float(uncert)*factor)
         except ValueError:
+            raise ValueError(cannot_parse_ufloat_msg_pat % representation)
+        
+    else:
+        # Form with parentheses or no uncertainty:
+        try:
+            parsed_value = parse_error_in_parentheses(representation)
+        except NotParenUncert:
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
         
     return parsed_value
@@ -2750,8 +2742,9 @@ def ufloat_fromstr(representation, tag=None):
     Examples of valid string representations:
     
         12.3e10+/-5e3
-        12.3e10±5e3
+        12.3e10±5e3  # Only as a unicode string (Python 2)
         (-3.1415 +/- 0.0001)e+00
+        (-3.1415 +/- 1e-4)e+02
         
         0.29
         31.
