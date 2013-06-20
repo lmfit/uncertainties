@@ -1850,14 +1850,6 @@ class AffineScalarFunc(object):
             
         ########################################
 
-        # The limit digits_limit on the digits of nom_val and std_dev
-        # to be displayed is calculated. If the exponent notation is
-        # used, this limit is generally different from the finally
-        # displayed limit (e.g. 314.15+/-0.01 has digits_limit=-2, but
-        # will be displayed with an exponent as (3.1415+/-0.0001)e+02,
-        # which corresponds to 4 decimals after the decimal point, not
-        # 2).
-
         # The number of significant digits of the uncertainty must be
         # meaningful, otherwise the position of the significant digits
         # of the uncertainty do not have a clear meaning. This gives
@@ -1871,9 +1863,17 @@ class AffineScalarFunc(object):
             # The number of significant digits on the uncertainty is
             # controlled.
 
+            # The limit digits_limit on the digits of nom_val and std_dev
+            # to be displayed is calculated. If the exponent notation is
+            # used, this limit is generally different from the finally
+            # displayed limit (e.g. 314.15+/-0.01 has digits_limit=-2, but
+            # will be displayed with an exponent as (3.1415+/-0.0001)e+02,
+            # which corresponds to 4 decimals after the decimal point, not
+            # 2).
+
             # Number of significant digits to use:
             if fmt_prec:
-                num_signif_d = int(fmt_prec)
+                num_signif_d = int(fmt_prec)  # Can only be non-negative
                 if not num_signif_d:
                     raise ValueError("The number of significant digits"
                                      " on the uncertainty should be positive")
