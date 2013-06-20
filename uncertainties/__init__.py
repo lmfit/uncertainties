@@ -1947,7 +1947,7 @@ class AffineScalarFunc(object):
             # for floats is used ("-4 <= exponent of rounded value <
             # p"), on the nominal value.
             
-            exponent = first_digit(round(ref_value, -digits_limit))
+            exponent = first_digit(round(nom_val, -digits_limit))
 
             # The number of significant digits of the reference value
             # rounded at digits_limit is exponent-digits_limit+1:
