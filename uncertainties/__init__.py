@@ -1185,7 +1185,7 @@ def format_num(nom_val_main, error_main, exponent,
     point. Ignored if a value is exactly zero.
 
     fmt_type -- format specification type, in "eEfFgGn". This defines
-    the type that in particular how exponents and NaN values are represented (in the
+    in particular how exponents and NaN values are represented (in the
     same way as for float). Note that None, the empty string, or "%"
     are not accepted.
 
@@ -1925,9 +1925,6 @@ class AffineScalarFunc(object):
                 digits_limit = signif_d_to_limit(nom_val, num_signif_digits)
 
             print "DIGITS LIMIT, uncert not controlled", digits_limit  #!!!!!!!!! test
-            
-        #!!!!!!!!!! one choice above yield digits_limit, the other one
-        #yields prec. Different meaning.
             
         #######################################
 
