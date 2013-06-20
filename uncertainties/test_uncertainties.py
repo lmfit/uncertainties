@@ -1802,7 +1802,8 @@ def test_format():
             
             # Parsing back into a number with uncertainty (unless the
             # LaTeX or comma notation is used):
-            if not set(format_spec).intersection('L,*%'):  # * = fill with *
+            if (not set(format_spec).intersection('L,*%')  # * = fill with *
+                and '0nan' not in representation.lower()):  # "00nan"
 
                 value_back = ufloat_fromstr(representation)
 
