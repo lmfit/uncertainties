@@ -1618,7 +1618,9 @@ def test_format():
         # point:
         (1000, 123): {
             '.1uf': '1000+/-123',
-            '.1ue': '(10+/-1)e+02'  # No extension, in this case
+            # The nominal value has 1 <= mantissa < 10. The precision
+            # is the number of significant digits of the uncertainty:
+            '.1ue': '(1.0+/-0.1)e+03'
         },
 
         # Spectroscopic notation:
