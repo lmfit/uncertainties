@@ -1762,7 +1762,7 @@ class AffineScalarFunc(object):
             (?P<uncert_prec>u?)  # Precision for the uncertainty?
             # The type can be omitted. Options must not go here:
             (?P<type>[eEfFgGn%]??)
-            (?P<options>[LAC]*)$''',
+            (?P<options>[LSC]*)$''',
             format_spec,
             re.VERBOSE)
 
