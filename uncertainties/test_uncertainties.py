@@ -1663,7 +1663,7 @@ def test_format():
         # Special cases for the uncertainty (0, nan) and format
         # strings (extension S, L, U,..., global width, etc.):
         (-1.4e-12, 0): {
-            'L': r'-1.4 \times 10^{12} \pm 0 \times 10^{12}',
+            'L': r'(-1.4 \pm 0) \times 10^{-12}',
             '10C': u'  -1.4e-12±         0',
             '13S': '  -1.4(0)e-12'
         },
