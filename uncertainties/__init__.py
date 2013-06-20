@@ -1217,6 +1217,7 @@ def format_num(nom_val_main, error_main, exponent,
                prec, fixed_point_type,
                options, exponent) #!!!!! test
 
+    
     # The suffix of the result is calculated first because it is
     # useful for the width handling of the shorthand notation.
     
@@ -1341,6 +1342,11 @@ def format_num(nom_val_main, error_main, exponent,
                     in ('fill_align', 'sign', 'zero', 'width', 'comma')),
             prec, fixed_point_type))
 
+        print "FORMAT FOR NOMINAL VALUE: ", ('%s.%d%s' % (
+            ''.join(fmt_parts[part] for part
+                    in ('fill_align', 'sign', 'zero', 'width', 'comma')),
+            prec, fixed_point_type))
+        
         ####################
         # Error formatting:
         
@@ -1865,7 +1871,6 @@ class AffineScalarFunc(object):
             print "FMT_PREC = {!r}".format(fmt_prec) #!!!!!! test
             prec = int(fmt_prec) if fmt_prec else 6
 
-
             if fmt_type in 'fF':
 
                 digits_limit = -prec
@@ -1991,20 +1996,24 @@ class AffineScalarFunc(object):
 
         ########################################
 
+        # prec is the precision for the mantissa/field final format.
+        
         # Formatting of individual fields:
         if uncert_controlled or fmt_type in 'eEfF':
             fixed_point_type = 'fF'[fmt_type.isupper()]
+            prec = -signif_limit
         else:
             # The original format type and precision are used (case of
             # ".6g", ".3n", and of a zero or NaN uncertainty):
             fixed_point_type = fmt_type
+            # prec was already calculated
         
         ########################################
 
         # Final formatting:
         return format_num(nom_val_mantissa, std_dev_mantissa, exponent, 
                           match.groupdict(),
-                          prec=-signif_limit,
+                          prec=prec,
                           fixed_point_type=fixed_point_type,
                           options=options)
 
