@@ -1657,33 +1657,45 @@ class AffineScalarFunc(object):
     def __format__(self, format_spec):
         '''Formats a number with uncertainty.
 
-        In the "uncertainty control" mode, the nominal value is
-        returned with a precision that matches that of the standard
-        error, like in 1.23+/-0.01--when this makes sense, i.e. not
-        for the exact value 1.23+/-0, or for 1.23+/-NaN.
-        
         The format specification are the same as for format() for
         floats, as defined for Python 2.6+ (restricted to what the %
         operator accepts, if using an earlier version of Python). In
-        particular, the usual alignment, sign flag, etc. can be
-        used. However, the format is extended: the number of digits of
-        the uncertainty can be controlled, as is the way the
-        uncertainty is indicated (with +/- or with the short-hand
+        particular, the usual precision, alignment, sign flag,
+        etc. can be used. However, the format is extended: the number
+        of digits of the uncertainty can be controlled, as is the way
+        the uncertainty is indicated (with +/- or with the short-hand
         notation 3.14(1), in LaTeX or with a simple text string,...).
 
-        The main difference is that the precision (".p", where p is a
-        number), when followed by the "u" precision extension, is
+        Beyond the use of options at the end of the format
+        specification, the only difference with floats is that a "u"
+        just before the format type (f, e, g, None, etc;) activates
+        the "uncertainty control" mode (e.g.: "u", or "ug"). This mode
+        is automatically activated when not using any explicit
+        precision (e.g.: "g", "10f", "+010,e" format specifications).
+
+        In the uncertainty control mode, the nominal value is returned
+        with a precision that matches that of the standard deviation,
+        like in 1.23+/-0.01 (when this makes sense, i.e. not for the
+        exact value 1.23+/-0, or for 1.23+/-NaN).
+        
+        In this mode, the precision (".p", where p is a number) is
         interpreted (if meaningful) as indicating the number p of
         significant digits of the displayed uncertainty. Example: .1uf
         will return a string with one significant digit in the
         uncertainty (and no exponent).
-        
-        Another difference is that if no precision is given, then the
-        rounding rules from the Particle Data Group are used, if
-        possible
+
+        In this mode, if no precision is given, then the rounding
+        rules from the Particle Data Group are used, if possible
         (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).--for
-        example, the f format generally does not use the default 6
-        digits after the decimal point.
+        example, the "f" format generally does not use the default 6
+        digits after the decimal point, but applies the PDG rules.
+
+        The "n" format type cannot be used in the uncertainty control
+        mode (because trailing zeros are removed by this format, for
+        floats, which would prevent precision matching between the
+        nominal value and the uncertainty).
+        
+        #!!!!!!!!!!!!!
 
         When the exponent notation is used, a single exponent is
         printed ("(1.2+/-0.1)e-5"). unless the format specification
