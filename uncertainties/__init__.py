@@ -1788,7 +1788,7 @@ class AffineScalarFunc(object):
         # be controlled?        
         uncert_controlled = (
             not fmt_prec  # Default behavior: uncertainty controlled
-            or match.group('uncert_prec'))  # Explicit control
+            or bool(match.group('uncert_prec')))  # Explicit control
 
         # The n format type is not available when the uncertainty is
         # normally controlled:        
