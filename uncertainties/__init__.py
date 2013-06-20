@@ -1826,7 +1826,7 @@ class AffineScalarFunc(object):
         # meaningful, otherwise the position of the significant digits
         # of the uncertainty do not have a clear meaning. This gives
         # us the *effective* uncertainty control mode:
-        uncert_controlled &= std_dev and not isnan(std_dev)
+        uncert_controlled &= bool(std_dev) and not isnan(std_dev)
 
         print "UNCERT CONTROLLED =", uncert_controlled  # !!!!!!!!! test
         
