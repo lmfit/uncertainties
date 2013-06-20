@@ -1245,9 +1245,6 @@ def format_num(nom_val_main, error_main, exponent,
             percent_str += ' \\'
         percent_str += '%'
             
-    # !!!!!!!! do we really need robust_format, now that the format
-    # string is calculated anyway?
-
     ####################
     
     # Calculation of the mostly final numerical part value_str (no %
