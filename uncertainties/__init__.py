@@ -1887,6 +1887,51 @@ class AffineScalarFunc(object):
             print "FMT_PREC = {!r}".format(fmt_prec) #!!!!!! test
             prec = int(fmt_prec) if fmt_prec else 6
 
+
+            if fmt_type in 'fF':
+
+                digits_limit = -prec
+                
+            else:  # Format type in eEgGn
+
+                # We calculate first the number of significant digits
+                # to be displayed (if possible):
+                
+                if fmt_type in 'eE':
+                    # The precision is the number of significant
+                    # digits required - 1 (because there is a single
+                    # digit before the decimal point, which is not
+                    # included in the definition of the precision with
+                    # the e/E format type):
+                    num_signif_digits = prec+1
+
+                else:  # Format type in gGn
+                    
+                    # Effective format specification precision: the rule
+                    # of
+                    # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
+                    # is used:
+
+                    # The final number of significant digits to be
+                    # displayed is not necessarily obvious: trailing
+                    # zeros are removed (with the gGn format type), so
+                    # num_signif_digits is the number of significant
+                    # digits if trailing zeros were not removed. This
+                    # quantity is relevant for the rounding implied by
+                    # the exponent test of the g/G/n format:
+
+                    # 0 is interpreted like 1 (as with floats with
+                    # a gGn format type):
+                    num_signif_digits = prec or 1
+
+                # The number of significant digits applies to the
+                # nominal value (not to the standard deviation). This
+                # quantity is important for example for determining
+                # the exponent:
+                digits_limit = signif_d_to_limit(nom_val, num_signif_digits)
+
+            print "DIGITS LIMIT, uncert not controlled", digits_limit  #!!!!!!!!! test
+            
         #!!!!!!!!!! one choice above yield digits_limit, the other one
         #yields prec. Different meaning.
             
@@ -1901,10 +1946,6 @@ class AffineScalarFunc(object):
             use_exp = False
         elif fmt_type in 'eE':
             use_exp = True
-
-            #!!!!!!! Nominal value, or larger value??? Nom value eschews the problem with a 0 and NaN uncertainty PLUS keeps the same notation for the nominal value if the uncertainty goes to zero
-
-            
             # !! This calculation might have been already done, for
             # instance when using the .0e format: signif_d_to_limit()
             # was called before, which prompted a similar calculation:
@@ -1929,21 +1970,8 @@ class AffineScalarFunc(object):
 
             # Should the scientific notation be used? The same rule as
             # for floats is used ("-4 <= exponent of rounded value <
-            # p"). It is applied, however, to a reference value which
-            # is either the nominal value or the standard
-            # deviation. When the user wants to control the number of
-            # significant digits of the uncertainty, the larger value
-            # (in absolute value) is used; otherwise, the nominal
-            # value is used (which gives the same nominal value format
-            # as if the number had no uncertainty and were a
-            # float). In both cases, the precision p is the number of
-            # significant digits of the reference value when rounded
-            # at the previously calculated digits_limit.
+            # p"), on the nominal value.
             
-            ref_value = (std_dev
-                         if uncert_controlled and abs(nom_val) < std_dev
-                         else nom_val)
-
             exponent = first_digit(round(ref_value, -digits_limit))
 
             # The number of significant digits of the reference value
