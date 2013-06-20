@@ -1294,6 +1294,7 @@ def format_num(nom_val_main, error_main, exponent,
         # not included). This string is important for the handling of
         # the width:
         value_end = '(%s)%s%s' % (uncert_str, exp_str, percent_str)
+        exponent_factored = True  # Single exponent in the output
 
         ##########
         # Nominal value formatting:
@@ -1327,27 +1328,42 @@ def format_num(nom_val_main, error_main, exponent,
                                 
     else:  # +/- notation:
 
+        # Prefix for the parts:
+        if fmt_parts['width']:
+
+            # The exponent is not factored, so as to have nice columns
+            # for the nominal values and the errors (no shift due to a
+            # varying exponent):
+            exponent_factored = False
+            
+            # Remaining width (for the nominal value):
+            remaining_width = max(int(fmt_parts['width']) - len(exp_str), 0)
+            
+            fmt_prefix_n = '%s%s%s%d%s' % (
+                fmt_parts['fill_align'],
+                fmt_parts['sign'], fmt_parts['zero'], remaining_width,
+                fmt_parts['comma'])
+            
+            fmt_prefix_e = '%s%s%d%s' % (
+                fmt_parts['fill_align'],
+                fmt_parts['zero'], remaining_width,
+                fmt_parts['comma'])
+
+        else:
+            exponent_factored = True            
+            fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
+            fmt_prefix_e = fmt_parts['comma']
+        
         ####################
         # Nominal value formatting:
+        
         nom_val_str = robust_format(
             nom_val_main,
-            '%s.%d%s' % (
-            ''.join(fmt_parts[part] for part
-                    in ('fill_align', 'sign', 'zero', 'width', 'comma')),
-            prec, fixed_point_type))
+            fmt_prefix_n+'.%d%s' % (prec, fixed_point_type))
 
-        print "FORMAT FOR NOMINAL VALUE: ", ('%s.%d%s' % (
-            ''.join(fmt_parts[part] for part
-                    in ('fill_align', 'sign', 'zero', 'width', 'comma')),
-            prec, fixed_point_type))
-        
         ####################
         # Error formatting:
         
-        # Prefix for the error format specification:
-        fmt_prefix_e = ''.join(fmt_parts[part] for part in
-                               ('fill_align', 'zero', 'width', 'comma'))
-
         if error_main:
             fmt_suffix_e = '.%d%s' % (prec, fixed_point_type)
         else:  # Exactly zero error
@@ -1370,20 +1386,28 @@ def format_num(nom_val_main, error_main, exponent,
             '+/-')
 
         ####################
-        # Final fixed-point part
-        fixed_point_str = '%s%s%s' % (
-            nom_val_str, 
-            pm_symbol,
-            error_str
-            )
 
+        # Construction of the final value, value_str:
+        
         # The nominal value and the error might have to be explicitly
         # grouped together, so as to prevent an ambiguous notation:
-        if exponent is not None or '%' in options:
-            fixed_point_str = '(%s)' % fixed_point_str
+        if exponent_factored:
+            if exp_str:
+                value_str = '(%s%s%s)%s' % (
+                    nom_val_str, pm_symbol, error_str, exp_str)
+            else:
+                value_str = '%s%s%s' % (nom_val_str, pm_symbol, error_str)
+        else:
+            value_str = '%s%s%s%s%s' % (
+                nom_val_str, exp_str, pm_symbol, error_str, exp_str)
+            
             
         # Final form:
-        value_str = '%s%s%s' % (fixed_point_str, exp_str, percent_str)
+        if percent_str:
+            if exponent_factored:
+                value_str += percent_str
+            else:
+                value_str = '(%s)%s' % (value_str, percent_str)
     
     return value_str
 
