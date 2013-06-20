@@ -1660,7 +1660,7 @@ class AffineScalarFunc(object):
         The nominal value is returned with a precision that matches
         that of the standard error, like in 1.23+/-0.01--when this
         makes sense, i.e. not for the exact value 1.23+/-0, or for
-        1.23+/-NaN).
+        1.23+/-NaN.
         
         Accepts the same format specification as format() for floats,
         as defined for Python 2.6+ (restricted to what the % operator
