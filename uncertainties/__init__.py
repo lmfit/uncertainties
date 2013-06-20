@@ -1696,21 +1696,21 @@ class AffineScalarFunc(object):
         example, the "f" format generally does not use the default 6
         digits after the decimal point, but applies the PDG rules.
 
-        The "n" format type cannot be used in the uncertainty control
-        mode (because trailing zeros are removed by this format type,
+        In the uncertainty control mode, the "n" format type cannot be
+        used (because trailing zeros are removed by this format type,
         for floats, which would prevent precision matching between the
         nominal value and the uncertainty).
 
         When the uncertainty control mode is not activated (e.g.,
-        ".3f", ".3", ".3n", or a zero uncertainty), the format
-        (without "u") is applied separately to the nominal value and
-        the standard deviation (or their mantissa, if an exponent is
-        used, or only the nominal value, if the shorthand notation is
-        used). Thus, a compact notation for numbers with uncertainty
-        can thus be obtained with the ".6g" format, and gives results
-        similar to those obtained for floats with the "g" format
-        (which has a default precision of 6); this can lead to
-        representations like "(1±1e-4)e123".
+        ".3f", ".3e", ".3g", ".3", ".3n", or a zero or NaN
+        uncertainty), the format (without "u") is applied separately
+        to the nominal value and the standard deviation (or their
+        mantissa, if an exponent is used, or only the nominal value,
+        if the shorthand notation is used). Thus, a compact notation
+        for numbers with uncertainty can thus be obtained with the
+        ".6g" format, and gives results similar to those obtained for
+        floats with the "g" format (which has a default precision of
+        6); this can lead to representations like "(1±1e-4)e123".
         
         When the exponent notation is used, a single common exponent
         is used. It is factored (as in "(1.2+/-0.1)e-5"). unless the
@@ -1860,8 +1860,10 @@ class AffineScalarFunc(object):
 
         # The number of significant digits of the uncertainty must be
         # meaningful, otherwise the position of the significant digits
-        # of the uncertainty do not have a clear meaning:
-        uncert_controlled &= std_dev and not isnan(std_dev)
+        # of the uncertainty do not have a clear meaning. This gives
+        # us the *effective* uncertainty control mode:
+        eff_uncert_controlled = (uncert_controlled
+                                 and std_dev and not isnan(std_dev))
 
         print "UNCERT CONTROLLED =", uncert_controlled  # !!!!!!!!! test
         
