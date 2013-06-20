@@ -1185,9 +1185,9 @@ def format_num(nom_val_main, error_main, exponent,
     point. Ignored if a value is exactly zero.
 
     fmt_type -- format specification type, in "eEfFgGn". This defines
-    how in particular how exponents and NaN values are represented (in
-    the same way as for float). Note that None, the empty string, or
-    "%" are not accepted.
+    the type that in particular how exponents and NaN values are represented (in the
+    same way as for float). Note that None, the empty string, or "%"
+    are not accepted.
 
     options -- options (as an object that support membership testing,
     like for instance a string). "S" is for the short-hand notation
@@ -1842,8 +1842,7 @@ class AffineScalarFunc(object):
         # meaningful, otherwise the position of the significant digits
         # of the uncertainty do not have a clear meaning. This gives
         # us the *effective* uncertainty control mode:
-        eff_uncert_controlled = (uncert_controlled
-                                 and std_dev and not isnan(std_dev))
+        uncert_controlled &= std_dev and not isnan(std_dev)
 
         print "UNCERT CONTROLLED =", uncert_controlled  # !!!!!!!!! test
         
