@@ -1704,23 +1704,22 @@ class AffineScalarFunc(object):
         When the uncertainty control mode is not activated (e.g.,
         ".3f", ".3e", ".3g", ".3", ".3n", or a zero or NaN
         uncertainty), the format (without "u") is applied separately
-        to the nominal value and the standard deviation (or their
+        to the nominal value and to the standard deviation (or their
         mantissa, if an exponent is used, or only the nominal value,
-        if the shorthand notation is used). Thus, a compact notation
-        for numbers with uncertainty can thus be obtained with the
-        ".6g" format, and gives results similar to those obtained for
-        floats with the "g" format (which has a default precision of
-        6); this can lead to representations like "(1±1e-4)e123".
+        if the shorthand notation is used). A compact notation for
+        numbers with uncertainty can thus be obtained with the ".6g"
+        format, and gives results similar to those obtained for floats
+        with the "g" format (which has a default precision of 6); this
+        can lead to representations like "(1±1e-4)e123".
         
         When the exponent notation is used, a single common exponent
-        is used. It is factored (as in "(1.2+/-0.1)e-5"). unless the
-        format specification contains an explicit width (" 1.2e-5+/-
-        0.1e-5") (this allows numbers to be in a single column, when
-        printing numbers over many lines). The mantissa of the larger
-        value (in absolute value, between the nominal value and the
-        standard deviation) is between 1 and 10, like for
-        floats. Specifying a minimum width of 0 is a way of forcing
-        the exponent to not be factored out.
+        is used. The mantissa of the nominal value is between 1 and
+        10. The exponent is factored (as in "(1.2+/-0.1)e-5"). unless
+        the format specification contains an explicit width ("
+        1.2e-5+/- 0.1e-5") (this allows numbers to be in a single
+        column, when printing numbers over many lines). Specifying a
+        minimum width of 0 is a way of forcing the exponent to not be
+        factored out.
         
         The fill, align, zero and width parameters of the format
         specification are applied individually to each of the nominal
@@ -1884,17 +1883,6 @@ class AffineScalarFunc(object):
 
         else:
 
-            #!!!!!!!!!!! digits_limit does not have to be used, maybe:
-            #I may replace it with the precision string (if any) and
-            #the type? think about the new interface of
-            #format_num(). I just need the input precision and the
-            #format type, and some instruction to not use
-            #digits_limit: I MUST be able to differentiate between .3g
-            #and g and .3ug, in format_num(). ON THE OTHER HAND,
-            #__format__ does know about the uncert_controlled mode,
-            #and this should not be "recalculated". I should probably
-            #pass it.
-            
             # The precision has the same meaning as for floats (it is
             # not the uncertainty that defines the number of digits).
 
@@ -1903,59 +1891,10 @@ class AffineScalarFunc(object):
             # example):
 
             print "FMT_PREC = {!r}".format(fmt_prec) #!!!!!! test
-            
             prec = int(fmt_prec) if fmt_prec else 6
-                
-            if fmt_type in 'fF':
 
-                digits_limit = -prec
-                
-            else:  # Format type in eEgGn
-
-                # We calculate first the number of significant digits
-                # to be displayed (if possible):
-                
-                if fmt_type in 'eE':
-                    # The precision is the number of significant
-                    # digits required - 1 (because there is a single
-                    # digit before the decimal point):
-                    num_signif_digits = prec+1
-                else:  # Format type in gGn
-                    
-                    # Effective format specification precision: the rule
-                    # of
-                    # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
-                    # is used:
-
-                    #!!!!!!!! The following is actually incorrect:
-                    #'{:.6g}'.format(3.14) is actually "3.14", not
-                    #3.14000.  The number smallest number of digits <=
-                    #prec should be determined… The mantissa is
-                    #needed. *OR* a special mode is used, whereby the
-                    #final formatting uses the Python formatting
-                    #directly. TO DO: think about the meaning for
-                    #nominal_value + uncertainty, though: 1.2±0.01
-                    #with the g format… NO, this does not exist: I
-                    #should only care about the zero uncertainty case,
-                    #which can land here and require the g format for
-                    #the nominal value.
-
-                    # The final number of significant digits to be
-                    # displayed is not necessarily obvious: trailing
-                    # zeros are removed (with the gGn format type), so
-                    # num_signif_digits is the number of significant
-                    # digits, given the fact that trailing zeros will
-                    # be removed.
-
-                    # 0 is interpreted like 1 (as with floats with
-                    # a gGn format type):
-                    num_signif_digits = prec or 1
-
-                # The number of significant digits applies to the
-                # nominal value (not to the standard deviation):
-                digits_limit = signif_d_to_limit(nom_val, num_signif_digits)
-
-            print "DIGITS LIMIT, uncert not controlled", digits_limit  #!!!!!!!!! test
+        #!!!!!!!!!! one choice above yield digits_limit, the other one
+        #yields prec. Different meaning.
             
         #######################################
 
@@ -1968,6 +1907,10 @@ class AffineScalarFunc(object):
             use_exp = False
         elif fmt_type in 'eE':
             use_exp = True
+
+            #!!!!!!! Nominal value, or larger value??? Nom value eschews the problem with a 0 and NaN uncertainty PLUS keeps the same notation for the nominal value if the uncertainty goes to zero
+
+            
             # !! This calculation might have been already done, for
             # instance when using the .0e format: signif_d_to_limit()
             # was called before, which prompted a similar calculation:
