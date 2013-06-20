@@ -1689,8 +1689,9 @@ class AffineScalarFunc(object):
         will return a string with one significant digit in the
         uncertainty (and no exponent).
 
-        If no precision is given, then the rounding rules from the
-        Particle Data Group are used, if possible
+        In the uncertainty control mode, if no precision is given,
+        then the rounding rules from the Particle Data Group are used,
+        if possible
         (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).--for
         example, the "f" format generally does not use the default 6
         digits after the decimal point, but applies the PDG rules.
@@ -1701,13 +1702,15 @@ class AffineScalarFunc(object):
         nominal value and the uncertainty).
 
         When the uncertainty control mode is not activated (e.g.,
-        ".3f", ".3", ".3n"), the format is applied separately to the
-        nominal value and the standard deviation (or their mantissa,
-        if an exponent is used). Thus, a compact notation for numbers
-        with uncertainty can thus be obtained with the ".6g" format,
-        and gives results similar to those obtained for floats with
-        the "g" format (which has a default precision of 6); this can
-        lead to representations like "(1±1e-4)e123".
+        ".3f", ".3", ".3n", or a zero uncertainty), the format
+        (without "u") is applied separately to the nominal value and
+        the standard deviation (or their mantissa, if an exponent is
+        used, or only the nominal value, if the shorthand notation is
+        used). Thus, a compact notation for numbers with uncertainty
+        can thus be obtained with the ".6g" format, and gives results
+        similar to those obtained for floats with the "g" format
+        (which has a default precision of 6); this can lead to
+        representations like "(1±1e-4)e123".
         
         When the exponent notation is used, a single common exponent
         is used. It is factored (as in "(1.2+/-0.1)e-5"). unless the
@@ -1749,9 +1752,6 @@ class AffineScalarFunc(object):
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
 
-        When the magnitude of the uncertainty is meaningless (zero or
-        NaN uncertainty), any "u" precision modifier is ignored.
-        
         In the uncertainty control mode, the g, G and empty format
         types trigger the exponent notation based on the rules for
         Python 2.7 applied to the following equivalent (float)
