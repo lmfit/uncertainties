@@ -1657,24 +1657,19 @@ class AffineScalarFunc(object):
     def __format__(self, format_spec):
         '''Formats a number with uncertainty.
 
-        The nominal value is returned with a precision that matches
-        that of the standard error, like in 1.23+/-0.01--when this
-        makes sense, i.e. not for the exact value 1.23+/-0, or for
-        1.23+/-NaN.
+        In the "uncertainty control" mode, the nominal value is
+        returned with a precision that matches that of the standard
+        error, like in 1.23+/-0.01--when this makes sense, i.e. not
+        for the exact value 1.23+/-0, or for 1.23+/-NaN.
         
-        Accepts the same format specification as format() for floats,
-        as defined for Python 2.6+ (restricted to what the % operator
-        accepts, if using an earlier version of Python).  In
+        The format specification are the same as for format() for
+        floats, as defined for Python 2.6+ (restricted to what the %
+        operator accepts, if using an earlier version of Python). In
         particular, the usual alignment, sign flag, etc. can be
         used. However, the format is extended: the number of digits of
         the uncertainty can be controlled, as is the way the
         uncertainty is indicated (with +/- or with the short-hand
         notation 3.14(1), in LaTeX or with a simple text string,...).
-
-        The nominal value and the standard deviation are formatted
-        through format_spec almost as if they were floats (with or
-        without exponent, exponent with or without uppercase, with a
-        given number of digits after the decimal point, etc.).
 
         The main difference is that the precision (".p", where p is a
         number), when followed by the "u" precision extension, is
