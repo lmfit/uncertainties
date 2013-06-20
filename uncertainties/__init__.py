@@ -1181,8 +1181,8 @@ def format_num(nom_val_main, error_main, exponent,
     handled. The width is applied to each value, or, if the shorthand
     notation is used, globally.
     
-    prec -- number of digits to display after the decimal
-    point. Ignored if a value is exactly zero.
+    prec -- precision to use with the fixed_point_type format type
+    (see below).
 
     fixed_point_type -- format specification type, in "eEfFgGn". This
     defines how the mantissas, exponents and NaN values are
