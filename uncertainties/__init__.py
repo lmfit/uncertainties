@@ -1218,7 +1218,7 @@ def format_num(nom_val_main, error_main, exponent,
                options, exponent) #!!!!! test
 
     # Fixed point format for each part:
-    fixed_point_type = ('fF'[fmt_type.isupper()] if fmt_type not in 'gGn'
+    #!!!!!!!!!!!!!!
                         
                         #!!!!!!!!! The following can break the precision
                         #matching
@@ -1696,16 +1696,12 @@ class AffineScalarFunc(object):
         for floats, which would prevent precision matching between the
         nominal value and the uncertainty).
 
-        When the uncertainty control mode is not activated (e.g.,
-        ".3f", ".3e", ".3g", ".3", ".3n", or a zero or NaN
-        uncertainty), the format (without "u") is applied separately
-        to the nominal value and to the standard deviation (or their
-        mantissa, if an exponent is used, or only the nominal value,
-        if the shorthand notation is used). A compact notation for
-        numbers with uncertainty can thus be obtained with the ".6g"
-        format, and gives results similar to those obtained for floats
-        with the "g" format (which has a default precision of 6); this
-        can lead to representations like "(1±1e-4)e123".
+        When the uncertainty control mode is not activated, the
+        formatting is similar to that of floats (any "u" in the format
+        is discarded). A compact notation for numbers with uncertainty
+        can thus be obtained with the ".6g" format (since "g" has a
+        default precision of 6); this can lead to representations like
+        "(1±1e-4)e123".
         
         When the exponent notation is used, a single common exponent
         is used. The mantissa of the nominal value is between 1 and
@@ -2005,6 +2001,15 @@ class AffineScalarFunc(object):
             # print at least four digits, like in 3456 or 3500):
             signif_limit = min(digits_limit, 0)
 
+        ########################################
+
+        # Formatting of individual fields:
+        if uncert_controlled:
+            fixed_point_type = 'fF'[fmt_type.isupper()]
+        else:
+            # The original format type and precision are used:
+            #!!!!!!!!!!!!!
+        
         ########################################
 
         # Final formatting:
