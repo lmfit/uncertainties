@@ -1691,7 +1691,9 @@ def test_format():
             '%': '(100.000000+/-nan)%',  # The % format type is like f
             # This is ugly, but consistent with '{:+05}'.format(float('nan'))
             '+05': '+00001+/-00nan',
-            '+05': '(+00100+/-00nan)%',
+            # 5 is the *minimal* width, 6 is the default number of
+            # digits after the decimal point:
+            '+05%': '(+100.000000+/-00nan)%'
         },
         (9.9, 0.1): {
             '.1ue': '(9.9+/-0.1)e+00',
