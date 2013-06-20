@@ -1128,8 +1128,8 @@ def PDG_precision(std_dev):
 
 # Definition of a basic (format specification only) formatting
 # function that works whatever the version of Python. This function
-# exists just to save the addition of the leading '%' that would have
-# to be added if the % formatting operator were used:
+# exists so that the more capable format() is used instead of the %
+# formatting operator, if available.
 try:
 
     robust_format = format
@@ -1661,14 +1661,16 @@ class AffineScalarFunc(object):
         floats, as defined for Python 2.6+ (restricted to what the %
         operator accepts, if using an earlier version of Python). In
         particular, the usual precision, alignment, sign flag,
-        etc. can be used. However, the format is extended: the number
-        of digits of the uncertainty can be controlled, as is the way
-        the uncertainty is indicated (with +/- or with the short-hand
-        notation 3.14(1), in LaTeX or with a simple text string,...).
+        etc. can be used. The behavior of the various format types (f,
+        g, None, etc.) is similar. However, the format is extended:
+        the number of digits of the uncertainty can be controlled, as
+        is the way the uncertainty is indicated (with +/- or with the
+        short-hand notation 3.14(1), in LaTeX or with a simple text
+        string,...).
 
         Beyond the use of options at the end of the format
-        specification, the only difference with floats is that a "u"
-        just before the format type (f, e, g, None, etc;) activates
+        specification, the main difference with floats is that a "u"
+        just before the format type (f, e, g, None, etc.) activates
         the "uncertainty control" mode (e.g.: "u", or "ug"). This mode
         is automatically activated when not using any explicit
         precision (e.g.: "g", "10f", "+010,e" format specifications).
@@ -1676,7 +1678,8 @@ class AffineScalarFunc(object):
         In the uncertainty control mode, the nominal value is returned
         with a precision that matches that of the standard deviation,
         like in 1.23+/-0.01 (when this makes sense, i.e. not for the
-        exact value 1.23+/-0, or for 1.23+/-NaN).
+        exact value 1.23+/-0, or for 1.23+/-NaN). This generally
+        implies trailing zeros, even for the g format type.
         
         In this mode, the precision (".p", where p is a number) is
         interpreted (if meaningful) as indicating the number p of
@@ -1684,45 +1687,49 @@ class AffineScalarFunc(object):
         will return a string with one significant digit in the
         uncertainty (and no exponent).
 
-        In this mode, if no precision is given, then the rounding
-        rules from the Particle Data Group are used, if possible
+        If no precision is given, then the rounding rules from the
+        Particle Data Group are used, if possible
         (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).--for
         example, the "f" format generally does not use the default 6
         digits after the decimal point, but applies the PDG rules.
 
         The "n" format type cannot be used in the uncertainty control
-        mode (because trailing zeros are removed by this format, for
-        floats, which would prevent precision matching between the
+        mode (because trailing zeros are removed by this format type,
+        for floats, which would prevent precision matching between the
         nominal value and the uncertainty).
-        
-        #!!!!!!!!!!!!!
 
-        When the exponent notation is used, a single exponent is
-        printed ("(1.2+/-0.1)e-5"). unless the format specification
-        contains an explicit width (" 1.2e-5+/- 0.1e-5") (this allows
-        numbers to be in a single column, when printing numbers over
-        many lines), in which case the exponent is the same for the
-        nominal value and for the uncertainty. The mantissa of the
-        larger value (in absolute value, between the nominal value and
-        the standard deviation) is between 1 and 10, like for
+        When the uncertainty control mode is not activated (e.g.,
+        ".3f", ".3", ".3n"), the format is applied separately to the
+        nominal value and the standard deviation (or their mantissa,
+        if an exponent is used). Thus, a compact notation for numbers
+        with uncertainty can thus be obtained with the ".6g" format,
+        and gives results similar to those obtained for floats with
+        the "g" format (which has a default precision of 6); this can
+        lead to representations like "(1±1e-4)e123".
+        
+        When the exponent notation is used, a single common exponent
+        is used. It is factored (as in "(1.2+/-0.1)e-5"). unless the
+        format specification contains an explicit width (" 1.2e-5+/-
+        0.1e-5") (this allows numbers to be in a single column, when
+        printing numbers over many lines). The mantissa of the larger
+        value (in absolute value, between the nominal value and the
+        standard deviation) is between 1 and 10, like for
         floats. Specifying a minimum width of 0 is a way of forcing
         the exponent to not be factored out.
         
-        If no format type is given, "g" is assumed, like for floats.
-
-        In the standard form, the fill, align, zero and width
-        parameters of the format specification are applied
-        individually to each of the nominal value and standard
-        deviation or, if the shorthand notation is used, globally.
+        The fill, align, zero and width parameters of the format
+        specification are applied individually to each of the nominal
+        value and standard deviation or, if the shorthand notation is
+        used, globally.
 
         The sign parameter of the format specification is only applied
         to the nominal value (since the standard deviation is
         positive).
 
         In the case of the standard text output, the returned string
-        can be normally be parsed back with ufloat_fromstr(). This
-        excludes cases where numbers use the "," thousands separator,
-        for example.
+        can normally be parsed back with ufloat_fromstr(). This
+        however excludes cases where numbers use the "," thousands
+        separator, for example.
 
         Options can be added, at the end of the format
         specification. Multiple options can be specified.
@@ -1743,7 +1750,7 @@ class AffineScalarFunc(object):
         When the magnitude of the uncertainty is meaningless (zero or
         NaN uncertainty), any "u" precision modifier is ignored.
         
-        When prefixed with "u", the g, G and n (and empty) format
+        In the uncertainty control mode, the g, G and empty format
         types trigger the exponent notation based on the rules for
         Python 2.7 applied to the following equivalent (float)
         precision: this precision is defined as the number of digits
