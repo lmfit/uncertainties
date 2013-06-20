@@ -1700,8 +1700,8 @@ class AffineScalarFunc(object):
         When the exponent notation is used, a single common exponent
         is used. The mantissa of the nominal value is between 1 and
         10. The exponent is factored (as in "(1.2+/-0.1)e-5"). unless
-        the format specification contains an explicit width ("
-        1.2e-5+/- 0.1e-5") (this allows numbers to be in a single
+        the format specification contains an explicit width
+        ("  1.2e-5+/-  0.1e-5") (this allows numbers to be in a single
         column, when printing numbers over many lines). Specifying a
         minimum width of 0 is a way of forcing the exponent to not be
         factored out.
