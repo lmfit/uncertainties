@@ -1315,9 +1315,6 @@ def format_num(nom_val_main, error_main, exponent,
             # included
             nom_val_fmt = fmt_parts['sign']+fmt_parts['comma']
 
-        # !!!!!!!!! prec should be None when no precision can be
-        # defined (example: g format for a number with a zero
-        # uncertainty)
         nom_val_fmt += '.%d%s' % (prec, fixed_point_type)
 
         nom_val_str = robust_format(nom_val_main, nom_val_fmt)
