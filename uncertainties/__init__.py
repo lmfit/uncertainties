@@ -2005,7 +2005,7 @@ class AffineScalarFunc(object):
         return format_num(nom_val_mantissa, std_dev_mantissa, exponent, 
                           match.groupdict(),
                           prec=-signif_limit,
-                          fmt_type=fmt_type,
+                          fixed_point_type=fixed_point_type,
                           options=options)
 
     # Alternate name for __format__, for use with Python < 2.6:    
