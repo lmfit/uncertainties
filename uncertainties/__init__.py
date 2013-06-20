@@ -1673,13 +1673,15 @@ class AffineScalarFunc(object):
         just before the format type (f, e, g, None, etc.) activates
         the "uncertainty control" mode (e.g.: "u", or "ug"). This mode
         is automatically activated when not using any explicit
-        precision (e.g.: "g", "10f", "+010,e" format specifications).
+        precision (e.g.: "g", "10f", "+010,e" format
+        specifications). This mode is automatically deactivated if the
+        uncertainty does not have a meaningful number of significant
+        digits (0 and NaN uncertainties).
 
         In the uncertainty control mode, the nominal value is returned
         with a precision that matches that of the standard deviation,
-        like in 1.23+/-0.01 (when this makes sense, i.e. not for the
-        exact value 1.23+/-0, or for 1.23+/-NaN). This generally
-        implies trailing zeros, even for the g format type.
+        like in 1.23+/-0.01. This generally implies trailing zeros,
+        even for the g format type.
         
         In this mode, the precision (".p", where p is a number) is
         interpreted (if meaningful) as indicating the number p of
@@ -1762,9 +1764,6 @@ class AffineScalarFunc(object):
         one that obeys the usual "g" exponent rule.
         '''
 
-        #!!!!!!!!!!!! {:.6g}'.format(1.4) gives 1.4. My program gives
-        #1.40000 (default precision 6). Understand.
-        
         # Convention on limits "between" digits: 0 = exactly at the
         # decimal point, -1 = after the first decimal, 1 = before the
         # units digit, etc.
@@ -1800,7 +1799,7 @@ class AffineScalarFunc(object):
                 'Format specification %r cannot be used with object of type %r'
                 # Sub-classes handled:
                 % (format_spec, self.__class__.__name__))
-            
+
         # Effective format type: f, e, g, etc. (never None or empty):
         #
         # g is the default
