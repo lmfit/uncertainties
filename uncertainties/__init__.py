@@ -1753,14 +1753,8 @@ class AffineScalarFunc(object):
 
         In the uncertainty control mode, the g, G and empty format
         types trigger the exponent notation based on the rules for
-        Python 2.7 applied to the following equivalent (float)
-        precision: this precision is defined as the number of digits
-        required for the larger of the two numbers (nominal value and
-        standard deviation) to be displayed at the level of the
-        displayed uncertainty. This is because when the exponent
-        notation is triggered, the larger value is the one formatted
-        like a float, with a mantissa between 1 and 10, so it is the
-        one that obeys the usual "g" exponent rule.
+        Python 2.7 applied to the nominal value (not to the standard
+        deviation).
         '''
 
         # Convention on limits "between" digits: 0 = exactly at the
