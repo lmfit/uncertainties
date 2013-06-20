@@ -1189,10 +1189,10 @@ def format_num(nom_val_main, error_main, exponent,
     prec -- number of digits to display after the decimal
     point. Ignored if a value is exactly zero.
 
-    fmt_type -- format specification type, in "eEfFgGn" that defines
-    how exponents and NaN values are represented (in the same way as
-    for float). Note that None, the empty string, or "%" are not
-    accepted.
+    fmt_type -- format specification type, in "eEfFgGn". This defines
+    how in particular how exponents and NaN values are represented (in
+    the same way as for float). Note that None, the empty string, or
+    "%" are not accepted.
 
     options -- options (as an object that support membership testing,
     like for instance a string). "S" is for the short-hand notation
@@ -1789,27 +1789,42 @@ class AffineScalarFunc(object):
             (?:\.(?P<prec>\d+))?
             (?P<uncert_prec>u?)  # Precision for the uncertainty?
             # The type can be omitted. Options must not go here:
-            (?P<type>.??)
-            (?P<options>[LSC]*)$''',
+            (?P<type>[eEfFgGn%]??)
+            (?P<options>[LAC]*)$''',
             format_spec,
             re.VERBOSE)
 
+        # Does the format specification look correct?
         if not match:
             raise ValueError(
                 'Format specification %r cannot be used with object of type %r'
                 # Sub-classes handled:
                 % (format_spec, self.__class__.__name__))
-
+       
+        
         # Effective format type: f, e, g, etc. (never None or empty):
         #
-        # g is the default
-        # (http://docs.python.org/2/library/string.html#format-specification-mini-language,
-        # see effect of a None format type on floats)
+        # g is the default, like for floats
+        # (http://docs.python.org/2/library/string.html#format-specification-mini-language):
         fmt_type = match.group('type') or 'g'
 
         # Shortcut:
         fmt_prec = match.group('prec')  # Can be None
 
+        # Should the precision be interpreted like for a float, or
+        # should the number of significant digits on the uncertainty
+        # be controlled?        
+        uncert_controlled = (
+            not fmt_prec  # Default behavior: uncertainty controlled
+            or match.group('uncert_prec'))  # Explicit control
+
+        # The n format type is not available when the uncertainty is
+        # normally controlled:        
+        if uncert_controlled and fmt_type == 'n':
+            raise ValueError(
+                'Format type %r cannot be used with the uncertainty control'
+                ' mode' % (fmt_type, match.group('uncert_prec')))
+        
         ########################################
                 
         # Since the '%' (percentage) format specification can change
@@ -1842,16 +1857,11 @@ class AffineScalarFunc(object):
         # will be displayed with an exponent as (3.1415+/-0.0001)e+02,
         # which corresponds to 4 decimals after the decimal point, not
         # 2).
-            
-        # Should the precision be interpreted like for a float, or
-        # should the number of significant digits on the uncertainty
-        # be controlled?
-        uncert_controlled = (
-            (not fmt_prec  # Default behavior: uncertainty controlled
-             or match.group('uncert_prec'))  # Explicit control
-             # The number of significant digits of
-             # the uncertainty must be meaningful:
-             and std_dev and not isnan(std_dev))
+
+        # The number of significant digits of the uncertainty must be
+        # meaningful, otherwise the position of the significant digits
+        # of the uncertainty do not have a clear meaning:
+        uncert_controlled &= std_dev and not isnan(std_dev)
 
         print "UNCERT CONTROLLED =", uncert_controlled  # !!!!!!!!! test
         
@@ -1871,6 +1881,18 @@ class AffineScalarFunc(object):
             digits_limit = signif_d_to_limit(std_dev, num_signif_d)
 
         else:
+
+            #!!!!!!!!!!! digits_limit does not have to be used, maybe:
+            #I may replace it with the precision string (if any) and
+            #the type? think about the new interface of
+            #format_num(). I just need the input precision and the
+            #format type, and some instruction to not use
+            #digits_limit: I MUST be able to differentiate between .3g
+            #and g and .3ug, in format_num(). ON THE OTHER HAND,
+            #__format__ does know about the uncert_controlled mode,
+            #and this should not be "recalculated". I should probably
+            #pass it.
+            
             # The precision has the same meaning as for floats (it is
             # not the uncertainty that defines the number of digits).
 
