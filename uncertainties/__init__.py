@@ -1260,7 +1260,7 @@ def format_num(nom_val_main, error_main, exponent,
             # The error is exactly zero
             uncert_str = '0'
         elif isnan(error_main):
-            uncert_str = fixed_point_type % error_main
+            uncert_str = robust_format(error_main, fixed_point_type)
         else:  #  Error with a meaningful first digit (not 0, not NaN)
 
             uncert = round(error_main, prec)
