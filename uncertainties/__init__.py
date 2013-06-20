@@ -1162,7 +1162,7 @@ class CallableStdDev(float):
 EXP_LETTERS = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
 def format_num(nom_val_main, error_main, exponent,
-               fmt_parts, prec, fmt_type, options):
+               fmt_parts, prec, fixed_point_type, options):
     '''
     Returns a formatted number with uncertainty.
 
@@ -1184,10 +1184,10 @@ def format_num(nom_val_main, error_main, exponent,
     prec -- number of digits to display after the decimal
     point. Ignored if a value is exactly zero.
 
-    fmt_type -- format specification type, in "eEfFgGn". This defines
-    in particular how exponents and NaN values are represented (in the
-    same way as for float). Note that None, the empty string, or "%"
-    are not accepted.
+    fixed_point_type -- format specification type, in "eEfFgGn". This
+    defines how the mantissas, exponents and NaN values are
+    represented (in the same way as for float). Note that None, the
+    empty string, or "%" are not accepted.
 
     options -- options (as an object that support membership testing,
     like for instance a string). "S" is for the short-hand notation
@@ -1214,20 +1214,8 @@ def format_num(nom_val_main, error_main, exponent,
     # which shows that the uncertainty is exactly zero.
 
     print ("CALLING format_num with", nom_val_main, error_main,
-               prec, fmt_type,
+               prec, fixed_point_type,
                options, exponent) #!!!!! test
-
-    # Fixed point format for each part:
-    #!!!!!!!!!!!!!!
-                        
-                        #!!!!!!!!! The following can break the precision
-                        #matching
-                        
-                        # The following case is useful for 1.4±0 with
-                        # the g format, for instance: otherwise, the
-                        # nominal value would be formatted with
-                        # something like .6f:
-                        else fmt_type)
 
     # The suffix of the result is calculated first because it is
     # useful for the width handling of the shorthand notation.
@@ -1238,10 +1226,10 @@ def format_num(nom_val_main, error_main, exponent,
     else:
         if 'L' in options:
             exp_str = r' \times 10^{%d}' % exponent
-        elif fmt_type in EXP_LETTERS:
+        elif fixed_point_type in EXP_LETTERS:
             # Case of e or E. The same convention as Python 2.7
             # to 3.3 is used for the display of the exponent:
-            exp_str = EXP_LETTERS[fmt_type]+'%+03d' % exponent
+            exp_str = EXP_LETTERS[fixed_point_type]+'%+03d' % exponent
         else:
             exp_str = ''  # No exponent format
 
@@ -2004,11 +1992,12 @@ class AffineScalarFunc(object):
         ########################################
 
         # Formatting of individual fields:
-        if uncert_controlled:
+        if uncert_controlled or fmt_type in 'eEfF':
             fixed_point_type = 'fF'[fmt_type.isupper()]
         else:
-            # The original format type and precision are used:
-            #!!!!!!!!!!!!!
+            # The original format type and precision are used (case of
+            # ".6g", ".3n", and of a zero or NaN uncertainty):
+            fixed_point_type = fmt_type
         
         ########################################
 
