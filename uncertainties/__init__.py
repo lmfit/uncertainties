@@ -1181,11 +1181,6 @@ def format_num(nom_val_main, error_main, exponent,
     handled. The width is applied to each value, or, if the shorthand
     notation is used, globally.
     
-    fmt_prefix_n, fmt_prefix_e -- prefixes for the format given to
-    robust_format() for the nominal value and the error. They can be
-    used for instance to set the width of each value. fmt_prefix_e is
-    ignored if the shorthand notation is used.
-
     prec -- number of digits to display after the decimal
     point. Ignored if a value is exactly zero.
 
