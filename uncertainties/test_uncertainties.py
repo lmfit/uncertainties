@@ -1721,7 +1721,13 @@ def test_format():
             # A default precision of 6 is used because the uncertainty
             # cannot be used for defining a default precision (it does
             # not have a magnitude):
-            'g': '(1.00000+/-0)e+06'
+            'g': '(1+/-0)e+06'
+        },
+        (1e6+10, 0): {
+            # A default precision of 6 is used because the uncertainty
+            # cannot be used for defining a default precision (it does
+            # not have a magnitude):
+            'g': '(1.00001+/-0)e+06'
         },
         # Rounding of the uncertainty that "changes" the number of
         # significant digits:
