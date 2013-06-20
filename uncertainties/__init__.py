@@ -2613,12 +2613,13 @@ else:
 
 POSITIVE_DECIMAL_UNSIGNED = ur'(\d+)(\.\d*)?'
 
-# Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where the
-# uncertainty is optional (in which case the uncertainty is implicit):
+# Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where
+# the uncertainty is optional (in which case the uncertainty is
+# implicit). The uncertainty can also be nan or NAN:
 NUMBER_WITH_UNCERT_RE_STR = u'''
     ([+-])?  # Sign
     %s  # Main number
-    (?:\(%s\))?  # Optional uncertainty
+    (?:\(%s|nan|NAN\))?  # Optional uncertainty
     (?:[eE]([+-]?\d+))?  # Optional exponent
     ''' % (POSITIVE_DECIMAL_UNSIGNED, POSITIVE_DECIMAL_UNSIGNED)
 
@@ -2645,9 +2646,9 @@ class NotParenUncert(ValueError):
 def parse_error_in_parentheses(representation):
     """
     Returns (value, error) from a string representing a number with
-    uncertainty like 12.34(5), 12.34(142), 12.5(3.4) or 12.3(4.2)e3.
-    If no parenthesis is given, an uncertainty of one on the last
-    digit is assumed.
+    uncertainty like 12.34(5), 12.34(142), 12.5(3.4), 12.3(4.2)e3, or
+    13.4(nan)e10.  If no parenthesis is given, an uncertainty of one
+    on the last digit is assumed.
 
     Raises ValueError if the string cannot be parsed.    
     """
