@@ -2663,8 +2663,8 @@ def parse_error_in_parentheses(representation):
          exponent) = match.groups()
     else:
         raise NotParenUncert("Unparsable number representation: '%s'."
-                           " Was expecting a string of the form 1.23(4)"
-                           " or 1.234" % representation)
+                             " Was expecting a string of the form 1.23(4)"
+                             " or 1.234" % representation)
 
     # No exponent digits is equivalent to a 0 exponent:
     factor = 10.**int(exponent or '0')
