@@ -1328,6 +1328,12 @@ def format_num(nom_val_main, error_main, exponent,
                                 
     else:  # +/- notation:
 
+        # True when the error part has an exponent directly attached
+        # (case of an individual exponent for both the nominal value
+        # and the error, when the error is a non-0, non-NaN number):
+        error_has_exp = (fmt_parts['width'] and error_main
+                         and not isnan(error_main))
+        
         # Prefix for the parts:
         if fmt_parts['width']:
 
@@ -1335,9 +1341,10 @@ def format_num(nom_val_main, error_main, exponent,
             # for the nominal values and the errors (no shift due to a
             # varying exponent):
             exponent_factored = False
-            
+
+            width = int(fmt_parts['width'])
             # Remaining width (for the nominal value):
-            remaining_width = max(int(fmt_parts['width']) - len(exp_str), 0)
+            remaining_width = max(width - len(exp_str), 0)
             
             fmt_prefix_n = '%s%s%s%d%s' % (
                 fmt_parts['fill_align'],
@@ -1346,7 +1353,7 @@ def format_num(nom_val_main, error_main, exponent,
             
             fmt_prefix_e = '%s%s%d%s' % (
                 fmt_parts['fill_align'],
-                fmt_parts['zero'], remaining_width,
+                fmt_parts['zero'], remaining_width if error_has_exp else width,
                 fmt_parts['comma'])
 
         else:
@@ -1361,6 +1368,9 @@ def format_num(nom_val_main, error_main, exponent,
             nom_val_main,
             fmt_prefix_n+'.%d%s' % (prec, fixed_point_type))
 
+        if not exponent_factored:
+            nom_val_str += exp_str
+            
         ####################
         # Error formatting:
         
@@ -1376,6 +1386,9 @@ def format_num(nom_val_main, error_main, exponent,
             # than if the 'd' format was used.
 
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
+
+        if error_has_exp:
+            error_str += exp_str
         
         ####################            
         pm_symbol = (
@@ -1391,20 +1404,15 @@ def format_num(nom_val_main, error_main, exponent,
         
         # The nominal value and the error might have to be explicitly
         # grouped together, so as to prevent an ambiguous notation:
-        if exponent_factored:
-            if exp_str:
-                value_str = '(%s%s%s)%s' % (
-                    nom_val_str, pm_symbol, error_str, exp_str)
-            else:
-                value_str = '%s%s%s' % (nom_val_str, pm_symbol, error_str)
+        if exponent_factored and exponent is not None:
+            value_str = '(%s%s%s)%s' % (
+                nom_val_str, pm_symbol, error_str, exp_str)
         else:
-            value_str = '%s%s%s%s%s' % (
-                nom_val_str, exp_str, pm_symbol, error_str, exp_str)
-            
+            value_str = ''.join([nom_val_str, pm_symbol, error_str])
             
         # Final form:
         if percent_str:
-            if exponent_factored:
+            if exponent is not None and exponent_factored:
                 value_str += percent_str
             else:
                 value_str = '(%s)%s' % (value_str, percent_str)
