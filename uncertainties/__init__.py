@@ -1158,8 +1158,8 @@ class CallableStdDev(float):
         return self
 
 # Exponent letter for all AffineScalarFunc format types (that can use
-# an exponent):
-EXP_LETTERS = {'e': 'e', 'E': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
+# an exponent): the keys are the possible mantissa formats:
+EXP_LETTERS = {'f': 'e', 'F': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
 def format_num(nom_val_main, error_main, exponent,
                fmt_parts, prec, fixed_point_type, options):
