@@ -2738,7 +2738,6 @@ def str_to_number_with_uncert(representation):
         # Simple form 1234.45+/-1.2 or 1234.45±1.2:
         (nom_value, uncert) = match.groups()
 
-        # print "VALUE", nom_value, "UNCERT", uncert
         try:
             parsed_value = (float(nom_value)*factor, float(uncert)*factor)
         except ValueError:
@@ -2768,7 +2767,7 @@ def ufloat_fromstr(representation, tag=None):
         12.3e10±5e3  # Only as a unicode string (Python 2)
         (-3.1415 +/- 0.0001)e+02
         (-3.1415 +/- 1e-4)e+200
-        
+
         0.29
         31.
         -31.
@@ -2786,6 +2785,10 @@ def ufloat_fromstr(representation, tag=None):
         12.3(0.4)e-5        
         169.0(7)
         169.1(15)
+
+        12.3(nan)
+        12.3(NAN)
+        3±nan
 
     Surrounding spaces are ignored.
     """
