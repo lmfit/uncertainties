@@ -1689,7 +1689,8 @@ def test_format():
             'g': '1+/-nan',
             'G': '1+/-NAN',
             '%': '100+/-nan',
-            '+011': '+00001(nan)',
+            # This is ugly, but consistent with '{:+05}'.format(float('nan'))
+            '+05': '+00001+/-00nan',
             '+011%': '+0100(nan)%'
         },
         (9.9, 0.1): {
