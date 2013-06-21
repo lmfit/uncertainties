@@ -2762,6 +2762,8 @@ def ufloat_fromstr(representation, tag=None):
     '12.345(15)', '12.3' or u'1.2±0.1' (Unicode string) are recognized
     (see more complete list below).  In the last case, an uncertainty
     of +/-1 is assigned to the last digit.
+
+    Invalid representations raise a ValueError.
     
     Examples of valid string representations:
     
