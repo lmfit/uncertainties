@@ -475,11 +475,11 @@ to study its impact on a final result.  With this package, the
 
 >>> sum_value = u+2*v
 >>> sum_value
-21.0+/-0.22360679774997899
+21.0+/-0.223606797749979
 >>> prev_uncert = u.std_dev
 >>> u.std_dev = 10
 >>> sum_value
-21.0+/-10.001999800039989
+21.0+/-10.00199980003999
 >>> u.std_dev = prev_uncert
 
 The relevant concept is that :data:`sum_value` does depend on the
