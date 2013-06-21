@@ -195,8 +195,36 @@ for the **shorthand notation**, ``C`` for using a **single character
 
 Options can be combined.
 
-More information can be obtained with ``pydoc
+**More information** on formatting can be obtained with ``pydoc
 uncertainties.UFloat.__format__``.
+
+Global formatting
+-----------------
+
+It is sometimes useful to have a **consistent formatting** across
+multiple parts of a program. Python's `Formatter class
+<http://docs.python.org/2/library/string.html#string-formatting>`_
+allows one to do just that. Here is how it can be used to consistently
+use the shorthand notation for numbers with uncertainties:
+
+.. code-block:: python
+
+   class ShorthandFormatter(Formatter):
+
+       def format_field(self, value, format_spec):
+           if isinstance(value, uncertainties.UFloat):
+               return value.format(format_spec+'S')  # Shorthand option added
+           # Special formatting for other types can be added here (floats, etc.)
+           else:
+               return super(ShorthandFormatter, self).format_field(
+                   value, format_spec)
+
+   fmter = ShorthandFormatter()
+
+   print fmter.format("Result = {}", ufloat(3.14, 0.01))
+
+prints ``Result = 3.14(1)``.
+
 
 .. index::
    pair: nominal value; of scalar
