@@ -1654,7 +1654,10 @@ class AffineScalarFunc(object):
         # mistaken for another element of the array).
         
         std_dev = self.std_dev  # Optimization, since std_dev is calculated
-        
+
+        # A zero standard deviation is printed because otherwise,
+        # ufloat_fromstr() does not correctly parse back the value
+        # ("1.23" is interpreted as "1.23(1)"):
         return "%r+/-%s" % (self.nominal_value,
                             repr(std_dev) if std_dev else '0')
                     
