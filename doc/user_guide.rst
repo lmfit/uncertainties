@@ -239,7 +239,7 @@ The nominal value and the uncertainty (standard deviation) can also be
 accessed independently:
 
 >>> print square
-0.04+/-0.004
+0.040+/-0.004
 >>> print square.nominal_value
 0.04
 >>> print square.std_dev
@@ -262,12 +262,12 @@ when the variables are **tagged**:
 >>> v = ufloat(10, 0.1, "v variable")
 >>> sum_value = u+2*v
 >>> sum_value
-21.0+/-0.22360679774997899
+21.0+/-0.223606797749979
 >>> for (var, error) in sum_value.error_components().items():
-...     print "%s: %f" % (var.tag, error)
+...     print "{}: {}".format(var.tag, error)
 ...
-u variable: 0.100000
-v variable: 0.200000
+u variable: 0.1
+v variable: 0.2
 
 The variance (i.e. squared uncertainty) of the result
 (:data:`sum_value`) is the quadratic sum of these independent
@@ -298,7 +298,7 @@ Comparison operators
 Comparison operators behave in a natural way:
 
 >>> print x
-0.2+/-0.01
+0.200+/-0.010
 >>> y = x + 0.0001
 >>> y
 0.2001+/-0.01
@@ -314,9 +314,9 @@ standard deviation are generally different:
 >>> y = ufloat(1, 0.1)
 >>> z = ufloat(1, 0.1)
 >>> print y
-1.0+/-0.1
+1.00+/-0.10
 >>> print z
-1.0+/-0.1
+1.00+/-0.10
 >>> y == y
 True
 >>> y == z
@@ -350,8 +350,8 @@ has value
 ::
 
 [[0.01, 0.0,  0.01],
-[0.0,  0.01, 0.02],
-[0.01, 0.02, 0.05]]
+ [0.0,  0.01, 0.02],
+ [0.01, 0.02, 0.05]]
 
 In this matrix, the zero covariances indicate that :data:`u` and :data:`v` are
 independent from each other; the last column shows that :data:`sum_value`
@@ -360,7 +360,7 @@ keeps track at all times of all correlations between quantities
 (variables and functions):
 
 >>> sum_value - (u+2*v)
->>> 0.0
+0.0+/-0
 
 Correlation matrix
 ------------------
@@ -393,11 +393,11 @@ creates three new variables with the listed nominal values, and the given
 covariance matrix:
 
 >>> sum_value
-21.0+/-0.22360679774997899
+21.0+/-0.223606797749979
 >>> sum2
-21.0+/-0.22360679774997899
+21.0+/-0.223606797749979
 >>> sum2 - (u2+2*v2)
-0.0+/-3.8337185686225597e-09
+0.0+/-3.83371856862256e-09
 
 The theoretical value of the last expression is exactly zero, like for
 ``sum - (u+2*v)``, but numerical errors yield a small uncertainty
@@ -422,7 +422,7 @@ diagonal), along with a list of nominal values and standard deviations:
 >>> (u3, v3, sum3) = uncertainties.correlated_values_norm(
 ...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)], corr_matrix)
 >>> print u3
-1.0+/-0.1
+1.00+/-0.10
 
 The three returned numbers with uncertainties have the correct
 uncertainties and correlations (:data:`corr_matrix` can be recovered
