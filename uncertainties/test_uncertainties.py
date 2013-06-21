@@ -307,7 +307,12 @@ def test_str_input():
         '-100.0(15)': (-100, 1.5),
         '14.(15)': (14, 15),
         # Global exponent:
-        '(3.141+/-0.001)E+02': (314.1, 0.1)
+        '(3.141+/-0.001)E+02': (314.1, 0.1),
+        # ± sign:
+        u'(3.141±0.001)E+02': (314.1, 0.1),
+        # NaN uncertainty:
+        u'(3.141±nan)E+02': (314.1, float('nan')),
+        '3.4(nan)e10': (3.4e10, float('nan'))
         }
           
     for (representation, values) in tests.iteritems():
