@@ -2333,11 +2333,11 @@ modified_operators = []
 modified_ops_with_reflection = []
 
 # Custom versions of some operators (instead of extending some float
-# __*__ operators to AffineScalarFunc, the operators in _custom_ops
+# __*__ operators to AffineScalarFunc, the operators in custom_ops
 # are used):
 if sys.version_info < (3,):
 
-    _custom_ops = {}
+    custom_ops = {}
 
 else:
 
@@ -2364,7 +2364,7 @@ else:
     # This module does not handle uncertainties on complex numbers:
     # complex results for the nominal value of some operations cannot
     # be calculated with an uncertainty:
-    _custom_ops = {
+    custom_ops = {
         'pow': no_complex_result(float.__pow__),
         'rpow': no_complex_result(float.__rpow__)
         }
@@ -2430,11 +2430,10 @@ def add_operators_to_AffineScalarFunc():
         # different versions of Python (for instance, __trunc__ was
         # introduced with Python 2.6):
         try:
-            if op not in _custom_ops:
+            if op not in custom_ops:
                 func_to_wrap = getattr(float, attribute_name)
             else:
-                func_to_wrap = _custom_ops[op]
-
+                func_to_wrap = custom_ops[op]
         except AttributeError:
             pass
         else:
