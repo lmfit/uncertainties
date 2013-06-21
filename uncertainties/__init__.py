@@ -1725,13 +1725,16 @@ class AffineScalarFunc(object):
         "(1±1e-4)e123".
         
         When the exponent notation is used, a single common exponent
-        is used. The mantissa of the nominal value is between 1 and
-        10. The exponent is factored (as in "(1.2+/-0.1)e-5"). unless
-        the format specification contains an explicit width
-        ("  1.2e-5+/-  0.1e-5") (this allows numbers to be in a single
-        column, when printing numbers over many lines). Specifying a
-        minimum width of 1 is a way of forcing the exponent to not be
-        factored out.
+        is used. The exponent is defined through the larger of the
+        nominal value (in absolute value) and the standard deviation;
+        this way, the quantity that best describes the associated
+        probability distribution has a mantissa in the usual 1-10
+        range. The exponent is factored (as in
+        "(1.2+/-0.1)e-5"). unless the format specification contains an
+        explicit width (" 1.2e-5+/- 0.1e-5") (this allows numbers to
+        be in a single column, when printing numbers over many
+        lines). Specifying a minimum width of 1 is a way of forcing
+        the exponent to not be factored out.
         
         The fill, align, zero and width parameters of the format
         specification are applied individually to each of the nominal
@@ -1762,11 +1765,6 @@ class AffineScalarFunc(object):
         
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
-
-        In the uncertainty control mode, the g, G and empty format
-        types trigger the exponent notation based on the rules for
-        Python 2.7 applied to the nominal value (not to the standard
-        deviation).
         '''
 
         # Convention on limits "between" digits: 0 = exactly at the
