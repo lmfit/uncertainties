@@ -48,9 +48,9 @@ formulas):
   >>> from uncertainties.umath import *  # sin(), etc.
   >>> x = ufloat(1, 0.1)  # x = 1+/-0.1
   >>> print 2*x
-  2.0+/-0.2
+  2.00+/-0.20
   >>> sin(2*x)  # In a Python shell, "print" is optional
-  0.90929742682568171+/-0.083229367309428481
+  0.9092974268256817+/-0.08322936730942848
 
 Thus, existing calculation code designed for regular numbers can run 
 with numbers with uncertainties with :ref:`no or little modification 
@@ -63,7 +63,7 @@ Another strength of this package is its correct handling of
 zero even though :data:`x` has an uncertainty:
 
   >>> x-x
-  0.0
+  0.0+/-0
 
 Many other error propagation codes return the incorrect value 0±0.1414… 
 because they wrongly assume that the two subtracted quantities are 
@@ -210,7 +210,7 @@ and `documentation source
 available `on GitHub <https://github.com/lebigot/uncertainties/>`_.
 The :mod:`uncertainties` package is written in pure Python and has no
 external dependency (the `NumPy`_ package is optional).  It contains
-about 6000 lines of code.  75 % of those lines are documentation
+about 7000 lines of code.  75 % of these lines are documentation
 strings and comments.  The remaining 25 % are split between unit tests
 (15 % of the total) and the calculation code proper (10 % of the
 total).  :mod:`uncertainties` is thus a **lightweight, portable
