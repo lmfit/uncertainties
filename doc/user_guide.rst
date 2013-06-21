@@ -213,7 +213,7 @@ Global formatting
 -----------------
 
 It is sometimes useful to have a **consistent formatting** across
-multiple parts of a program. Python's ```string.Formatter`` class
+multiple parts of a program. Python's `string.Formatter class
 <http://docs.python.org/2/library/string.html#string-formatting>`_
 allows one to do just that. Here is how it can be used to consistently
 use the shorthand notation for numbers with uncertainties:
