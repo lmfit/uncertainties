@@ -1558,13 +1558,6 @@ def test_format():
             '0.4e': '3.1415e+00+/-0.0000e+00'  # Forced double exponent
         },
         
-        # Full generalization of float formatting:
-        (3.1415, 0.0001): {
-            '+09.2uf': '+03.14150+/-000.00010',
-            '*^+9.2uf': '+3.14150*+/-*0.00010*',
-            '>9f': '  3.14150+/-  0.00010'  # Width and align
-        },
-
         # Number of digits of the uncertainty fixed:
         (123.456789, 0.00123): {
             '.1uf': '123.457+/-0.001',
@@ -1611,6 +1604,11 @@ def test_format():
             'g': '(1.23457+/-0.00004)e+06',
             'G': '(1.23457+/-0.00004)E+06'
         },        
+
+
+        (3.1415, 0.0001): {
+            '+09.2uf': '+03.14150+/-000.00010'
+            },
         
         (1234.56789, 0.1): {
             '.0f': '(1234+/-0.)',  # Approximate error indicated with "."
@@ -1794,7 +1792,16 @@ def test_format():
                 }
         })
         
-       
+    if sys.version_info >= (2, 5):
+
+        # Alignment is not available with the % formatting
+        # operator of Python < 2.5:
+        test[(3.1415, 0.0001)].udpate({
+            '*^+9.2uf': '+3.14150*+/-*0.00010*',
+            '>9f': '  3.14150+/-  0.00010'  # Width and align
+        })
+
+        
     # If the locale was set to American (USA), the "n" format type can
     # be tested:
     if locale_set and sys.version_info >= (2, 6):
