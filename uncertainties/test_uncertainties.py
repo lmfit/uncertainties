@@ -52,18 +52,23 @@ print "Testing with Python", sys.version
 
 def numbers_close(x, y, tolerance=1e-6):
     """
-    Returns True if the given (real) numbers are close enough.
+    Returns True if the given floats are close enough.
 
     The given tolerance is the relative difference allowed, or the absolute
     difference, if one of the numbers is 0.
+
+    NaN is allowed: it is considered close to itself.
     """
 
     # Instead of using a try and ZeroDivisionError, we do a test,
     # NaN could appear silently:
 
     if x != 0 and y != 0:
-        # Symmetric form of the test:
-        return 2*abs(x-y)/(abs(x)+abs(y)) < tolerance
+        if not uncertainties.isnan(x):
+            # Symmetric form of the test:
+            return 2*abs(x-y)/(abs(x)+abs(y)) < tolerance
+        else:
+            return uncertainties.isnan(y)
     else:  # Either x or y is zero
         return abs(x or y) < tolerance 
 
@@ -321,7 +326,7 @@ def test_str_input():
           
     for (representation, values) in tests.iteritems():
 
-        # print "Parsing %s..." % representation
+        print "Parsing %s..." % representation #!!!!!!!!! test
         
         # Without tag:
         num = ufloat_fromstr(representation)

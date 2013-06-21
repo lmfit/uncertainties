@@ -2611,7 +2611,10 @@ else:
 ###############################################################################
 # Parsing of values with uncertainties:
 
-POSITIVE_DECIMAL_UNSIGNED = ur'(\d+)(\.\d*)?'
+POSITIVE_DECIMAL_UNSIGNED_OR_NAN = ur'((\d+)(\.\d*)?|nan|NAN)'
+
+#!!!!!!!! make sure that nan can be captured!?!!!
+#!!!!!! Solve the problem with 10(0.) not matched
 
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where
 # the uncertainty is optional (in which case the uncertainty is
@@ -2619,16 +2622,15 @@ POSITIVE_DECIMAL_UNSIGNED = ur'(\d+)(\.\d*)?'
 NUMBER_WITH_UNCERT_RE_STR = u'''
     ([+-])?  # Sign
     %s  # Main number
-    (?:\(%s|nan|NAN\))?  # Optional uncertainty
+    (?:\(%s\))?  # Optional uncertainty
     (?:[eE]([+-]?\d+))?  # Optional exponent
-    ''' % (POSITIVE_DECIMAL_UNSIGNED, POSITIVE_DECIMAL_UNSIGNED)
+    ''' % (POSITIVE_DECIMAL_UNSIGNED_OR_NAN, POSITIVE_DECIMAL_UNSIGNED_OR_NAN)
 
 NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
     u"%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).match
 
 # Number with uncertainty of the form (... +/- ...)e10: this is a
-# loose matching, because incorrect contents is handled through
-# exceptions:
+# loose matching, so as to accommodate for multiple formats:
 NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(u'''
     \(
     (?P<simple_num_with_uncert>.*)
@@ -2659,29 +2661,27 @@ def parse_error_in_parentheses(representation):
         # The 'main' part is the nominal value, with 'int'eger part, and
         # 'dec'imal part.  The 'uncert'ainty is similarly broken into its
         # integer and decimal parts.
-        (sign, main_int, main_dec, uncert_int, uncert_dec,
+        (sign, main, main_int, main_dec, uncert, uncert_int, uncert_dec,
          exponent) = match.groups()
     else:
         raise NotParenUncert("Unparsable number representation: '%s'."
-                             " Was expecting a string of the form 1.23(4)"
-                             " or 1.234" % representation)
+                             " See the documentation of ufloat_fromstr()."
+                             % representation)
 
-    # No exponent digits is equivalent to a 0 exponent:
-    factor = 10.**int(exponent or '0')
+    # Global exponent:
+    factor = 10.**int(exponent) if exponent else 1
     
-    # The value of the number is its nominal value:
-    value = float(''.join((sign or '',
-                           main_int,
-                           main_dec or '.0')))*factor
+    # Nominal value:
+    value = float((sign or '')+main)*factor
                   
-    if uncert_int is None:
+    if uncert is None:
         # No uncertainty was found: an uncertainty of 1 on the last
         # digit is assumed:
-        uncert_int = '1'
+        uncert_int = '1'  # The other parts of the uncertainty are None
 
     # Do we have a fully explicit uncertainty?
-    if uncert_dec is not None:
-        uncert = float("%s%s" % (uncert_int, uncert_dec or ''))
+    if uncert_dec is not None or uncert in ('nan', 'NAN'):
+        uncert_value = float(uncert)
     else:
         # uncert_int represents an uncertainty on the last digits:
 
@@ -2689,12 +2689,12 @@ def parse_error_in_parentheses(representation):
         # 10 than must be applied to the provided uncertainty:
         num_digits_after_period = (0 if main_dec is None
                                    else len(main_dec)-1)
-        uncert = int(uncert_int)/10.**num_digits_after_period
+        uncert_value = int(uncert_int)/10.**num_digits_after_period
 
     # We apply the exponent to the uncertainty as well:
-    uncert *= factor
+    uncert_value *= factor
 
-    return (value, uncert)
+    return (value, uncert_value)
 
 
 cannot_parse_ufloat_msg_pat = (
@@ -2766,7 +2766,7 @@ def ufloat_fromstr(representation, tag=None):
         12.3e10+/-5e3
         12.3e10±5e3  # Only as a unicode string (Python 2)
         (-3.1415 +/- 0.0001)e+02
-        (-3.1415 +/- 1e-4)e+200
+        (-3.1415 +/- 1e-4)e+200  # Double-float uncertainty
 
         0.29
         31.
@@ -2786,6 +2786,7 @@ def ufloat_fromstr(representation, tag=None):
         169.0(7)
         169.1(15)
 
+        # NaN uncertainties:
         12.3(nan)
         12.3(NAN)
         3±nan
