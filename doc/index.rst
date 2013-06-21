@@ -19,7 +19,7 @@ anymore!
 Calculations of results with uncertainties, or of derivatives, can be 
 performed either in an **interactive session** (as with a calculator), 
 or in **programs** written in the Python_ programming language.  
-Existing calculation code can **run with no or little change**.
+Existing calculation code can **run with little or no change**.
 
 Whatever the complexity of a calculation, this package returns its
 result with an uncertainty as predicted by linear `error propagation 
