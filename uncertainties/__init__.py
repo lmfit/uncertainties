@@ -1846,6 +1846,13 @@ class AffineScalarFunc(object):
         # The '%' format is treated internally as a display option: it
         # should not be applied individually to each part:
         if fmt_type == '%':
+            # Because '%' does 0.0055*100, the value
+            # 0.5499999999999999 is obtained, which rounds to 0.5. The
+            # original rounded value is 0.006. The same behavior is
+            # found in Python 2.7: '{:.1%}'.format(0.0055) is '0.5%'.
+            # If a different behavior is needed, a solution to this
+            # problem would be to do the rounding before the
+            # multiplication.
             std_dev *= 100
             nom_val *= 100
             fmt_type = 'f'

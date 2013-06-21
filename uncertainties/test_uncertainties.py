@@ -1615,9 +1615,13 @@ def test_format():
 
         # Percent notation:
         (0.42, 0.0055): {
-            '.1u%': '(42.0+/-0.6)%',
-            '.1u%S': '42.0(6)%',
-            'C%': u'(42.0±0.6)%'
+            # Because '%' does 0.0055*100, the value
+            # 0.5499999999999999 is obtained, which rounds to 0.5. The
+            # original rounded value is 0.006. The same behavior is
+            # found in Python 2.7: '{:.1%}'.format(0.0055) is '0.5%'.
+            '.1u%': '(42.0+/-0.5)%',
+            '.1u%S': '42.0(5)%',
+            'C%': u'(42.0±0.5)%'
         },
         
         # Particle Data Group automatic convention, including limit cases:
