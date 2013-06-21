@@ -19,7 +19,7 @@ except ImportError:
 import uncertainties
 from uncertainties import ufloat, unumpy, test_uncertainties
 from uncertainties.unumpy import core
-from uncertainties.test_uncertainties import _numbers_close, arrays_close
+from uncertainties.test_uncertainties import numbers_close, arrays_close
 from uncertainties import __author__
 
 def test_numpy():
@@ -97,7 +97,7 @@ def derivatives_close(x, y):
     if set(x.derivatives) != set(y.derivatives):
         return False  # Not the same variables
 
-    return all(_numbers_close(x.derivatives[var], y.derivatives[var])
+    return all(numbers_close(x.derivatives[var], y.derivatives[var])
                for var in x.derivatives)
 
 def test_inverse():
@@ -124,10 +124,10 @@ def test_inverse():
     # Checks of the numerical values: the diagonal elements of the
     # inverse should be the inverses of the diagonal elements of
     # m (because we started with a triangular matrix):
-    assert _numbers_close(1/m_nominal_values[0, 0],
+    assert numbers_close(1/m_nominal_values[0, 0],
                           m_inv_uncert[0, 0].nominal_value), "Wrong value"
     
-    assert _numbers_close(1/m_nominal_values[1, 1],
+    assert numbers_close(1/m_nominal_values[1, 1],
                           m_inv_uncert[1, 1].nominal_value), "Wrong value"
 
 
@@ -144,9 +144,9 @@ def test_inverse():
     m_double_inverse = m_inverse.I
     # The initial matrix should be recovered, including its
     # derivatives, which define covariances:
-    assert _numbers_close(m_double_inverse[0, 0].nominal_value,
+    assert numbers_close(m_double_inverse[0, 0].nominal_value,
                           m[0, 0].nominal_value)
-    assert _numbers_close(m_double_inverse[0, 0].std_dev,
+    assert numbers_close(m_double_inverse[0, 0].std_dev,
                           m[0, 0].std_dev)
 
     assert arrays_close(m_double_inverse, m)
