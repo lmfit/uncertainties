@@ -1615,9 +1615,9 @@ def test_format():
 
         # Percent notation:
         (0.42, 0.0055): {
-            '.1u%': '(42+/-1)%',
-            '.1u%S': '42(1)%',
-            'C%': u'(42±1)%'
+            '.1u%': '(42.0+/-0.6)%',
+            '.1u%S': '42.0(6)%',
+            'C%': u'(42.0±0.6)%'
         },
         
         # Particle Data Group automatic convention, including limit cases:
