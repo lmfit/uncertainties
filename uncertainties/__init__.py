@@ -1214,6 +1214,7 @@ def format_num(nom_val_main, error_main, exponent,
     # which shows that the uncertainty is exactly zero.
 
     print ("CALLING format_num with", nom_val_main, error_main,
+           fmt_parts,
                prec, fixed_point_type,
                options, exponent) #!!!!! test
 
@@ -1729,7 +1730,7 @@ class AffineScalarFunc(object):
         the format specification contains an explicit width
         ("  1.2e-5+/-  0.1e-5") (this allows numbers to be in a single
         column, when printing numbers over many lines). Specifying a
-        minimum width of 0 is a way of forcing the exponent to not be
+        minimum width of 1 is a way of forcing the exponent to not be
         factored out.
         
         The fill, align, zero and width parameters of the format
@@ -2032,7 +2033,7 @@ class AffineScalarFunc(object):
             # The original format type and precision are used (case of
             # ".6g", ".3n", and of a zero or NaN uncertainty):
             fixed_point_type = fmt_type
-            # prec was already calculated
+            # prec was calculated above, for this case
         
         ########################################
 
