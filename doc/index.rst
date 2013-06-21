@@ -8,7 +8,7 @@ Welcome to the uncertainties package
 ====================================
 
 The `uncertainties package`_ is a free, cross-platform program that 
-transparently handles calculations with **numbers with uncertainties** 
+**transparently** handles calculations with **numbers with uncertainties** 
 (like 3.14±0.01).  It can also yield the **derivatives** of any 
 expression.
 
