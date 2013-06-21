@@ -1839,7 +1839,7 @@ class AffineScalarFunc(object):
         nom_val = self.nominal_value
 
         # 'options' is the options that must be given to format_num():
-        options = set(match.group('options'))  # Faster lookup
+        options = set(match.group('options'))
 
         # The '%' format is treated internally as a display option: it
         # should not be applied individually to each part:
@@ -1867,6 +1867,13 @@ class AffineScalarFunc(object):
         uncert_controlled &= bool(std_dev) and not isnan(std_dev)
 
         print "UNCERT CONTROLLED =", uncert_controlled  # !!!!!!!!! test
+
+        # Reference value for the calculation of a possible exponent,
+        # if needed:
+        if fmt_type in set('eEgGn'):
+            # Reference value for the exponent
+            exp_ref_value = max(abs(nom_val), std_dev)
+
         
         if uncert_controlled:
             # The number of significant digits on the uncertainty is
@@ -1939,11 +1946,11 @@ class AffineScalarFunc(object):
                     # a gGn format type):
                     num_signif_digits = prec or 1
 
-                # The number of significant digits applies to the
-                # nominal value (not to the standard deviation). This
-                # quantity is important for example for determining
-                # the exponent:
-                digits_limit = signif_d_to_limit(nom_val, num_signif_digits)
+                
+                # The number of significant digits is important for
+                # example for determining the exponent:
+                digits_limit = signif_d_to_limit(exp_ref_value,
+                                                 num_signif_digits)
 
             print "DIGITS LIMIT, uncert not controlled", digits_limit  #!!!!!!!!! test
             
@@ -1961,7 +1968,7 @@ class AffineScalarFunc(object):
             # !! This calculation might have been already done, for
             # instance when using the .0e format: signif_d_to_limit()
             # was called before, which prompted a similar calculation:
-            exponent = first_digit(round(nom_val, -digits_limit))
+            exponent = first_digit(round(exp_ref_value, -digits_limit))
         else:  # g, G, n
 
             # The rules from
@@ -1984,7 +1991,7 @@ class AffineScalarFunc(object):
             # for floats is used ("-4 <= exponent of rounded value <
             # p"), on the nominal value.
             
-            exponent = first_digit(round(nom_val, -digits_limit))
+            exponent = first_digit(round(exp_ref_value, -digits_limit))
 
             # The number of significant digits of the reference value
             # rounded at digits_limit is exponent-digits_limit+1:
