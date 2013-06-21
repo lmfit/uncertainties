@@ -175,7 +175,7 @@ x.format('10.2f')`` instead.)
 
 **All the float format specifications** are accepted.
 
-An uncertainty which is exactly equal to **zero** is always represented as
+An uncertainty which is *exactly* equal to **zero** is always represented as
 an integer:
 
 >>> print ufloat(3.1415, 0)
