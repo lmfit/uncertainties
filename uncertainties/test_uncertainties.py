@@ -318,8 +318,9 @@ def test_ufloat_fromstr():
         # NaN uncertainty:
         u'(3.141±nan)E+02': (314.1, float('nan')),
         '3.4(nan)e10': (3.4e10, float('nan')),
-        # "Double-float" uncertainty:
+        # "Double-floats"
         '(-3.1415 +/- 1e-4)e+200': (-3.1415e200, 1e196),
+        '(-3.1415e-10 +/- 1e-4)e+200': (-3.1415e190, 1e196),
         # Special float representation:
         '-3(0.)': (-3, 0)
         }
