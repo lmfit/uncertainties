@@ -316,7 +316,7 @@ def test_str_input():
         # "Double-float" uncertainty:
         '(-3.1415 +/- 1e-4)e+200': (-3.1415e200, 1e196),
         # Special float representation:
-        '-3(0.)': (-3, 1)
+        '-3(0.)': (-3, 0)
         }
           
     for (representation, values) in tests.iteritems():
