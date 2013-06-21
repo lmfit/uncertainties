@@ -1549,9 +1549,7 @@ def test_format():
         
         # Full generalization of float formatting:
         (3.1415, 0.0001): {
-            '+09.2uf': '+03.14150+/-000.00010',
-            '*^+9.2uf': '+3.14150*+/-*0.00010*',
-            '>9f': '  3.14150+/-  0.00010'  # Width and align
+            '+09.2uf': '+03.14150+/-000.00010'
         },
 
         # Number of digits of the uncertainty fixed:
@@ -1783,15 +1781,22 @@ def test_format():
                 }
         })
         
-       
+    if sys.version_info >= (2, 6):
+
+        # Alignment is not available with the % formatting
+        # operator of Python < 2.6:
+        test[(3.1415, 0.0001)].udpate({
+            '*^+9.2uf': '+3.14150*+/-*0.00010*',
+            '>9f': '  3.14150+/-  0.00010'  # Width and align
+        })
+        
     # If the locale was set to American (USA), the "n" format type can
     # be tested:
     if locale_set and sys.version_info >= (2, 6):
         tests[(23456.789123, 1234.56789123)] = {
             '.0n': '(2+/-0.1)e+04',
             '.6n': '23,456.8+/-1,234.57'
-            }
-            
+            }            
         
     for (values, representations) in tests.iteritems():
 
