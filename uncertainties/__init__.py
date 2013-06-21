@@ -2742,7 +2742,10 @@ def parse_error_in_parentheses(representation):
                              % representation)
 
     # Global exponent:
-    factor = 10.**int(exponent) if exponent else 1
+    if exponent:
+        factor = 10.**int(exponent)
+    else:
+        factor = 1
     
     # Nominal value:
     value = float((sign or '')+main)*factor
