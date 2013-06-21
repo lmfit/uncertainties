@@ -165,7 +165,7 @@ def test_monte_carlo_comparison():
     # We rely on the fact that covariances_samples very rarely has
     # null elements:
     
-    assert numpy.vectorize(test_uncertainties._numbers_close)(
+    assert numpy.vectorize(test_uncertainties.numbers_close)(
         covariances_this_module,
         covariances_samples,
         0.05).all(), (
@@ -176,7 +176,7 @@ def test_monte_carlo_comparison():
         )
     
     # The nominal values must be close:
-    assert test_uncertainties._numbers_close(
+    assert test_uncertainties.numbers_close(
         nominal_value_this_module,
         nominal_value_samples,
         # The scale of the comparison depends on the standard
