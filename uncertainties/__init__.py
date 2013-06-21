@@ -2266,11 +2266,11 @@ def get_ops_with_reflection():
     return ops_with_reflection
 
 # Operators that have a reflection, along with their derivatives:
-_ops_with_reflection = get_ops_with_reflection()
+ops_with_reflection = get_ops_with_reflection()
 
 # Some effectively modified operators (for the automated tests):
-_modified_operators = []
-_modified_ops_with_reflection = []
+modified_operators = []
+modified_ops_with_reflection = []
 
 # Custom versions of some operators (instead of extending some float
 # __*__ operators to AffineScalarFunc, the operators in _custom_ops
@@ -2347,13 +2347,13 @@ def add_operators_to_AffineScalarFunc():
         except AttributeError:
             pass
         else:
-            _modified_operators.append(op)
+            modified_operators.append(op)
             
     ########################################
     # Final definition of the operators for AffineScalarFunc objects:
             
     # Reversed versions (useful for float*AffineScalarFunc, for instance):
-    for (op, derivatives) in _ops_with_reflection.iteritems():
+    for (op, derivatives) in ops_with_reflection.iteritems():
         attribute_name = '__%s__' % op
 
         # float objects don't exactly have the same attributes between
@@ -2374,7 +2374,7 @@ def add_operators_to_AffineScalarFunc():
         else:
             setattr(AffineScalarFunc, attribute_name,
                     wrap(func_to_wrap, derivatives))
-            _modified_ops_with_reflection.append(op)            
+            modified_ops_with_reflection.append(op)            
 
     ########################################
     # Conversions to pure numbers are meaningless.  Note that the
