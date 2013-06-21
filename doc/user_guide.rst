@@ -39,10 +39,11 @@ Creating and handling numbers with uncertainties
 Numbers with uncertainties can be input either numerically, or through
 one of many string representations, so that files containing numbers
 with uncertainties can easily be parsed.  Thus, x = 0.20±0.01 can be
-expressed in many convenient ways:
+expressed in many convenient ways, including:
 
   >>> x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
   >>> x = ufloat_fromstr("0.20+/-0.01")
+  >>> x = ufloat_fromstr(u"0.20±0.01")
   >>> x = ufloat_fromstr("(2+/-0.1)e-01")
   >>> x = ufloat_fromstr("0.20(1)")
   >>> x = ufloat_fromstr("20(1)e-2")  # Exponential notation supported
