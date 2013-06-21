@@ -1855,8 +1855,8 @@ def test_unicode_format():
 
     x = ufloat(3.14159265358979, 0.25)
 
-    assert isinstance(u'Résultat = {}'.format(x), unicode)
-    assert isinstance(u'Résultat = {:C}'.format(x), unicode)
+    assert isinstance(u'Résultat = %s' % x.format(''), unicode)
+    assert isinstance(u'Résultat = %s' % x.format('C'), unicode)
     
 ###############################################################################
 
