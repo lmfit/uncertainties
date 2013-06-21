@@ -1519,7 +1519,7 @@ def test_PDG_precision():
         }
 
     for (std_dev, result) in tests.iteritems():
-        assert uncertainties._PDG_precision(std_dev) == result
+        assert uncertainties.PDG_precision(std_dev) == result
 
 def test_repr():
     '''Test the representation of numbers with uncertainty.'''
