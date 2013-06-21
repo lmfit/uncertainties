@@ -492,7 +492,7 @@ try:
 except AttributeError:
     _pinv_default = 1e-15
 
-_pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
+pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
 @uncertainties.set_doc("""
     Version of numpy.linalg.pinv that works with array-like objects
@@ -507,7 +507,7 @@ _pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
     %s
     """ % numpy.linalg.pinv.__doc__)
 def pinv(array_like, rcond=_pinv_default):
-    return _pinv_with_uncert(array_like, rcond)
+    return pinv_with_uncert(array_like, rcond)
 
 ########## Matrix class
 

@@ -2468,22 +2468,11 @@ class Variable(AffineScalarFunc):
         self.std_dev = value
         
     # The following method is overridden so that we can represent the tag:
-    def _general_representation(self, to_string):
-        """
-        Uses the to_string() conversion function on both the nominal
-        value and standard deviation and returns a string that
-        describes the number.
+    def __repr__(self):
 
-        to_string() is typically repr() or str().
-        """
-        num_repr  = super(Variable, self)._general_representation(to_string)
+        num_repr  = super(Variable, self).__repr__()
         
-        # Optional tag: only full representations (to_string == repr)
-        # contain the tag, as the tag is required in order to recreate
-        # the variable.  Outputting the tag for regular string ("print
-        # x") would be too heavy and produce an unusual representation
-        # of a number with uncertainty.
-        return (num_repr if ((self.tag is None) or (to_string != repr))
+        return (num_repr if self.tag is None
                 else "< %s = %s >" % (self.tag, num_repr))
 
     def __hash__(self):
