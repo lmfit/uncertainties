@@ -1414,13 +1414,15 @@ def format_num(nom_val_main, error_main, exponent,
         if error_has_exp:
             error_str += exp_str
         
-        ####################            
-        pm_symbol = (
+        ####################
+        if 'C' in options:
             # Unicode has priority over LaTeX, so that users with a
             # Unicode-compatible LaTeX source can use ±:
-            u'±' if 'C' in options else
-            ' \pm ' if 'L' in options else
-            '+/-')
+            pm_symbol = u'±'
+        elif 'L' in options:
+            pm_symbol = ' \pm '
+        else:
+            pm_symbol = '+/-'
 
         ####################
 
