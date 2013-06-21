@@ -1467,11 +1467,12 @@ def signif_d_to_limit(value, num_signif_d):
     rounded = round(value, -limit_no_rounding)
     fst_digit_rounded = first_digit(rounded)
 
-    return (limit_no_rounding if fst_digit_rounded <= fst_digit
-            # The rounded limit is fst_digit_rounded-num_signif_d+1;
-            # but this can only be 1 above the non-rounded limit:
-            else limit_no_rounding+1)
-
+    if fst_digit_rounded > fst_digit:
+        # The rounded limit is fst_digit_rounded-num_signif_d+1;
+        # but this can only be 1 above the non-rounded limit:        
+        limit_no_rounding += 1
+        
+    return limit_no_rounding
 
 class AffineScalarFunc(object):
     """
