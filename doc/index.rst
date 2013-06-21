@@ -44,13 +44,13 @@ calculations with **automatic error propagation** can be performed
 **transparently** (i.e., through the usual syntax for mathematical 
 formulas):
 
-  >>> from uncertainties import ufloat
-  >>> from uncertainties.umath import *  # sin(), etc.
-  >>> x = ufloat(1, 0.1)  # x = 1+/-0.1
-  >>> print 2*x
-  2.00+/-0.20
-  >>> sin(2*x)  # In a Python shell, "print" is optional
-  0.9092974268256817+/-0.08322936730942848
+>>> from uncertainties import ufloat
+>>> from uncertainties.umath import *  # sin(), etc.
+>>> x = ufloat(1, 0.1)  # x = 1+/-0.1
+>>> print 2*x
+2.00+/-0.20
+>>> sin(2*x)  # In a Python shell, "print" is optional
+0.9092974268256817+/-0.08322936730942848
 
 Thus, existing calculation code designed for regular numbers can run 
 with numbers with uncertainties with :ref:`no or little modification 
@@ -62,8 +62,8 @@ Another strength of this package is its correct handling of
 **correlations**.  For instance, the following quantity is exactly
 zero even though :data:`x` has an uncertainty:
 
-  >>> x-x
-  0.0+/-0
+>>> x-x
+0.0+/-0
 
 Many other error propagation codes return the incorrect value 0±0.1414… 
 because they wrongly assume that the two subtracted quantities are 
@@ -75,8 +75,8 @@ handled <simple_array_use>` too.
 
 **Derivatives** are similarly very :ref:`easy to obtain <derivatives>`:
 
-  >>> (2*x+1000).derivatives[x]
-  2.0
+>>> (2*x+1000).derivatives[x]
+2.0
 
 They are calculated with a :ref:`fast method <differentiation method>`.
 
