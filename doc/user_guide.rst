@@ -175,6 +175,14 @@ x.format('10.2f')`` instead.)
 
 **All the float format specifications** are accepted.
 
+An uncertainty which is exactly equal to **zero** is always represented as
+an integer:
+
+>>> print ufloat(3.1415, 0)
+3.1415+/-0
+>>> print '{:.2f}'.format(ufloat(3.14, 0.001))
+3.14+/-0.00
+
 It is possible to control the **number of significant digits of the
 uncertainty** by adding the modifier ``u`` before the format type:
 

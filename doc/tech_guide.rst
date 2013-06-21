@@ -34,7 +34,7 @@ If multiple variables are pickled together (including when pickling
 >>> p = pickle.dumps([x, y])  # Pickling to a string
 >>> (x2, y2) = pickle.loads(p)  # Unpickling into new variables
 >>> y2 - 2*x2
-0.0
+0.0+/-0
 
 The final result is exactly zero because the unpickled variables :data:`x2`
 and :data:`y2` are completely correlated.
@@ -107,7 +107,7 @@ However, the :mod:`uncertainties` package **correctly handles
 perfectly precise numbers**, in this case:
 
 >>> umath.sqrt(ufloat(0, 0))
-0.0
+0.0+/-0
 
 gives the correct result, despite the fact that the derivative of the
 square root is not defined in zero.
@@ -297,7 +297,7 @@ yield correct uncertainties.  For example:
 >>> poly
 46.0+/-0.4
 >>> poly - x*x
-42.0
+42+/-0
 
 Even though ``x*x`` has a non-zero uncertainty, the result has a zero
 uncertainty, because it is equal to :data:`a`.
@@ -315,7 +315,7 @@ updated on the fly, because quantities with uncertainties (like
 
 >>> x.std_dev = 0
 >>> print poly
-46.0  # Zero uncertainty, now
+46+/-0  # Zero uncertainty, now
 
 As usual, Python keeps track of objects as long as they are used.
 Thus, redefining the value of :data:`x` does not change the fact that
@@ -324,7 +324,7 @@ in :data:`x`:
 
 >>> x = 10000
 >>> print poly
-46.0  # Unchanged
+46+/-0  # Unchanged
 
 These mechanisms make quantities with uncertainties behave mostly like
 regular numbers, while providing a fully transparent way of handling
