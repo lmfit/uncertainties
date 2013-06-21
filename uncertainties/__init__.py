@@ -1688,9 +1688,14 @@ class AffineScalarFunc(object):
         # mistaken for another element of the array).
         
         std_dev = self.std_dev  # Optimization, since std_dev is calculated
-        
-        return "%r+/-%s" % (self.nominal_value,
-                            repr(std_dev) if std_dev else '0')
+
+
+        if std_dev:
+            std_dev_str = repr(std_dev)
+        else:
+            std_dev_str = '0'
+            
+        return "%r+/-%s" % (self.nominal_value, std_dev_str)
                     
     def __str__(self):
         # An empty format string and str() usually return the same
