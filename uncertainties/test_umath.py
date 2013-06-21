@@ -37,7 +37,7 @@ def test_fixed_derivatives_math_funcs():
         # is used as the underlying function:
         numerical_derivatives = uncertainties.NumericalDerivatives(
             lambda *args: func(*args))
-        test_uncertainties._compare_derivatives(func, numerical_derivatives)
+        test_uncertainties.compare_derivatives(func, numerical_derivatives)
 
     # Functions that are not in umath.many_scalars_to_scalar_funcs:
 
@@ -48,11 +48,11 @@ def test_fixed_derivatives_math_funcs():
     def int_part_modf(x):
         return umath.modf(x)[1]
     
-    test_uncertainties._compare_derivatives(
+    test_uncertainties.compare_derivatives(
         frac_part_modf,
         uncertainties.NumericalDerivatives(
             lambda x: frac_part_modf(x)))
-    test_uncertainties._compare_derivatives(
+    test_uncertainties.compare_derivatives(
         int_part_modf,
         uncertainties.NumericalDerivatives(
             lambda x: int_part_modf(x)))
@@ -64,11 +64,11 @@ def test_fixed_derivatives_math_funcs():
     def exponent_frexp(x):
         return umath.frexp(x)[1]
     
-    test_uncertainties._compare_derivatives(
+    test_uncertainties.compare_derivatives(
         mantissa_frexp,
         uncertainties.NumericalDerivatives(
             lambda x: mantissa_frexp(x)))
-    test_uncertainties._compare_derivatives(
+    test_uncertainties.compare_derivatives(
         exponent_frexp,
         uncertainties.NumericalDerivatives(
             lambda x: exponent_frexp(x)))
