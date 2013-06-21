@@ -510,7 +510,7 @@ except AttributeError:
 pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
 def pinv(array_like, rcond=_pinv_default):
-    return _pinv_with_uncert(array_like, rcond)
+    return pinv_with_uncert(array_like, rcond)
 
 pinv = uncertainties.set_doc("""
     Version of numpy.linalg.pinv that works with array-like objects
