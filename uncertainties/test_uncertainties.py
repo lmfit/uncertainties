@@ -1621,7 +1621,7 @@ def test_format():
             # found in Python 2.7: '{:.1%}'.format(0.0055) is '0.5%'.
             '.1u%': '(42.0+/-0.5)%',
             '.1u%S': '42.0(5)%',
-            'C%': u'(42.0±0.5)%'
+            '%C': u'(42.0±0.5)%'
         },
         
         # Particle Data Group automatic convention, including limit cases:
