@@ -213,14 +213,14 @@ Global formatting
 -----------------
 
 It is sometimes useful to have a **consistent formatting** across
-multiple parts of a program. Python's `Formatter class
+multiple parts of a program. Python's ```string.Formatter`` class
 <http://docs.python.org/2/library/string.html#string-formatting>`_
 allows one to do just that. Here is how it can be used to consistently
 use the shorthand notation for numbers with uncertainties:
 
 .. code-block:: python
 
-   class ShorthandFormatter(Formatter):
+   class ShorthandFormatter(string.Formatter):
 
        def format_field(self, value, format_spec):
            if isinstance(value, uncertainties.UFloat):
@@ -359,9 +359,9 @@ has value
 
 ::
 
-[[0.01, 0.0,  0.01],
- [0.0,  0.01, 0.02],
- [0.01, 0.02, 0.05]]
+  [[0.01, 0.0,  0.01],
+   [0.0,  0.01, 0.02],
+   [0.01, 0.02, 0.05]]
 
 In this matrix, the zero covariances indicate that :data:`u` and :data:`v` are
 independent from each other; the last column shows that :data:`sum_value`
