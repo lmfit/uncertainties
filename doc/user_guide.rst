@@ -216,6 +216,7 @@ use the shorthand notation for numbers with uncertainties:
                return value.format(format_spec+'S')  # Shorthand option added
            # Special formatting for other types can be added here (floats, etc.)
            else:
+               # Usual formatting:
                return super(ShorthandFormatter, self).format_field(
                    value, format_spec)
 
