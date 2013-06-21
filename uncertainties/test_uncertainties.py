@@ -312,7 +312,9 @@ def test_str_input():
         u'(3.141±0.001)E+02': (314.1, 0.1),
         # NaN uncertainty:
         u'(3.141±nan)E+02': (314.1, float('nan')),
-        '3.4(nan)e10': (3.4e10, float('nan'))
+        '3.4(nan)e10': (3.4e10, float('nan')),
+        # "Double-float" uncertainty:
+        '(-3.1415 +/- 1e-4)e+200': (-3.1415e200, 1e196)
         }
           
     for (representation, values) in tests.iteritems():
