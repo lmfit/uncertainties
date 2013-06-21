@@ -523,7 +523,7 @@ pinv = uncertainties.set_doc("""
 
     Original documentation:
     %s
-    """ % numpy.linalg.pinv.__doc__)(_pinv)
+    """ % numpy.linalg.pinv.__doc__)(pinv)
 
 ########## Matrix class
 
