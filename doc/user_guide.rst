@@ -158,7 +158,7 @@ automatically applied (they essentially keep the number of digits
 small, while preventing the uncertainty from being displayed with a
 large relative error).
 
-**Exponents** are automatically **factored** for an increased legibility:
+**Exponents** are automatically **factored** for increased legibility:
 
   >>> print x*1e7
   (2.00+/-0.10)e+06
@@ -184,20 +184,19 @@ uncertainty** by adding the modifier ``u`` before the format type:
 
 Formatting options can be added at the end of the format string: ``S``
 for the **shorthand notation**, ``C`` for using a **single character
-(±)**, ``L`` for a LaTeχ output:
+(±)**, ``L`` for a **LaTeχ** output:
 
-  >>> print '{:S}'.format(x)
-  0.200(10)
-  >>> print u'{:C}'.format(x)
-  0.200±0.010
-  >>> print '{:L}'.format(x)
-  0.200 \pm 0.010
+  >>> print '{:.1uS}'.format(x)  # 1 digit for the uncertainty
+  0.20(1)
+  >>> print u'{:.2eC}'.format(x)  # 2 digits after the decimal point
+  (2.00±0.10)e-01
+  >>> print '{:L}'.format(x*1e7)  # Automatic exponent
+  (2.00 \pm 0.10) \times 10^{6}
 
 Options can be combined.
 
-More information can be obtained with ``pydoc uncertainties.``.
-
-.. !!!!!!!!!!!!!!
+More information can be obtained with ``pydoc
+uncertainties.UFloat.__format__``.
 
 .. index::
    pair: nominal value; of scalar
