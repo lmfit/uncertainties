@@ -6,12 +6,9 @@ of the functions from numpy.linalg.
 """
 
 from uncertainties import __author__
-from uncertainties.unumpy import core
+from uncertainties.unumpy.core import inv, pinv
 
 # This module cannot import unumpy because unumpy imports this module.
 
 __all__ = ['inv', 'pinv']
-
-inv = core._inv
-pinv = core._pinv
 
