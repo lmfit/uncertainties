@@ -180,6 +180,8 @@ an integer:
 
 >>> print ufloat(3.1415, 0)
 3.1415+/-0
+>>> print ufloat(3.1415, 0.0005)
+3.1415+/-0.0005
 >>> print '{:.2f}'.format(ufloat(3.14, 0.001))
 3.14+/-0.00
 
