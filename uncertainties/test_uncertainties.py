@@ -228,7 +228,7 @@ def compare_derivatives(func, numerical_derivatives,
 def test_value_construction():
     '''
     Tests the various means of constructing a constant number with
-    uncertainty *without a string* (see test_str_input(), for this).
+    uncertainty *without a string* (see test_ufloat_fromstr(), for this).
     '''
 
     ## Simple construction:
@@ -282,7 +282,7 @@ def test_value_construction():
     assert x.tag == 'pi'
     assert x2.tag == 'pi'
     
-def test_str_input():
+def test_ufloat_fromstr():
     "Input of numbers with uncertainties as a string"
 
     # String representation, and numerical values:
