@@ -2022,11 +2022,7 @@ class AffineScalarFunc(object):
 
             nom_val_mantissa = nom_val
             std_dev_mantissa = std_dev
-            # Without an exponent, it is necessary to include the
-            # decimal point location in the printed digit (e.g.,
-            # printing 3456 with only 2 significant digits requires to
-            # print at least four digits, like in 3456 or 3500):
-            signif_limit = min(digits_limit, 0)
+            signif_limit = digits_limit
 
         ########################################
 
@@ -2035,7 +2031,11 @@ class AffineScalarFunc(object):
         # Formatting of individual fields:
         if uncert_controlled or fmt_type in 'eEfF':
             fixed_point_type = 'fF'[fmt_type.isupper()]
-            prec = -signif_limit
+            # The decimal point location is always included in the
+            # printed digits (e.g., printing 3456 with only 2
+            # significant digits requires to print at least four
+            # digits, like in 3456 or 3500):
+            prec = max(-signif_limit, 0)
         else:
             # The original format type and precision are used (case of
             # ".6g", ".3n", and of a zero or NaN uncertainty):
