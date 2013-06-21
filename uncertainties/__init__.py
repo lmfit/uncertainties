@@ -2048,15 +2048,17 @@ class AffineScalarFunc(object):
                           fixed_point_type=fixed_point_type,
                           options=options)
 
-    # Alternate name for __format__, for use with Python < 2.6:    
-    format = set_doc("""
-        Returns the same result as the format(self, format_spec) of
-        Python 2.6+, or equivalently as self.__format__(format_spec).
+    # Alternate name for __format__, for use with Python < 2.6:
+    @set_doc("""
+        Returns the same result as self.__format__(format_spec), or
+        equivalently as the format(self, format_spec) of Python 2.6+.
 
         This method is meant to be used for formatting numbers with
         uncertainties in Python < 2.6, with '... %s ...' %
         num.format('.2e').
-        """)(__format__)
+        """)
+    def format(*args, **kwargs):
+        return args[0].__format__(*args[1:], **kwargs)
     
     def std_score(self, value):
         """

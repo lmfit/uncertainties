@@ -145,8 +145,8 @@ All of this is done completely transparently.
 Printing
 ========
 
-Numbers with uncertainties can be printed conveniently. The precision
-of the nominal value and of the uncertainty match by default:
+Numbers with uncertainties can be printed conveniently. The **precisions**
+of the nominal value and of the uncertainty **match** by default:
 
   >>> print x
   0.200+/-0.010
@@ -158,11 +158,44 @@ automatically applied (they essentially keep the number of digits
 small, while preventing the uncertainty from being displayed with a
 large relative error).
 
-More control over the format can be obtained (in Python 2.6+) through
-the usual :func:`format` method of strings:
+**Exponents** are automatically **factored** for an increased legibility:
 
-  >>> print 'Result = {:>10.2f}'.format(x)
+  >>> print x*1e7
+  (2.00+/-0.10)e+06
+
+More **control over the format** can be obtained (in Python 2.6+)
+through the usual :func:`format` method of strings:
+
+  >>> print 'Result = {:10.2f}'.format(x)
   Result =       0.20+/-      0.01
+
+(For Python before version 2.6, one can do ``'Result = %s' %
+x.format('10.2f')`` instead.)
+
+**All the float format specifications** are accepted.
+
+It is possible to control the **number of significant digits of the
+uncertainty** by adding the modifier ``u`` before the format type:
+
+  >>> print '1 significant digit on the uncertainty: {:.1u}'.format(x)
+  1 significant digit on the uncertainty: 0.20+/-0.01
+  >>> print '3 significant digits on the uncertainty: {:.3u}'.format(x)
+  3 significant digits on the uncertainty: 0.2000+/-0.0100
+
+Formatting options can be added at the end of the format string: ``S``
+for the **shorthand notation**, ``C`` for using a **single character
+(±)**, ``L`` for a LaTeχ output:
+
+  >>> print '{:S}'.format(x)
+  0.200(10)
+  >>> print u'{:C}'.format(x)
+  0.200±0.010
+  >>> print '{:L}'.format(x)
+  0.200 \pm 0.010
+
+Options can be combined.
+
+More information can be obtained with ``pydoc uncertainties.``.
 
 .. !!!!!!!!!!!!!!
 
