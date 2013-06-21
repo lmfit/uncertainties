@@ -1578,7 +1578,7 @@ def test_format():
         # ... Same thing, but with an exponent:
         (12.3, 456.78): {
             '.1ue': '(0+/-5)e+02',
-            '.4ue': '(1.23+/-45.68)e+02'
+            '.4ue': '(1.23+/-45.68)e+01'
         },
 
         # Test of the various float formats: the nominal value should
