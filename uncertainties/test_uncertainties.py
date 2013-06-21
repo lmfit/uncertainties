@@ -1525,10 +1525,10 @@ def test_repr():
     # The uncertainty is a power of 2, so that it can be exactly
     # represented:
     x = ufloat(3.14159265358979, 0.25)
-    assert repr(x) == '3.14+/-0.25'
+    assert repr(x) == '3.14159265358979+/-0.25'
 
     x = ufloat(3.14159265358979, 0)
-    assert repr(x) == '3.14+/-0'
+    assert repr(x) == '3.14159265358979+/-0'
     
 def test_format():
     '''Test the formatting of numbers with uncertainty.'''
