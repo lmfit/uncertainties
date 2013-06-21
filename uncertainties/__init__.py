@@ -1368,10 +1368,16 @@ def format_num(nom_val_main, error_main, exponent,
                 fmt_parts['fill_align'],
                 fmt_parts['sign'], fmt_parts['zero'], remaining_width,
                 fmt_parts['comma'])
-            
+
+
+            if error_has_exp:
+                remaining_width_e = remaining_width
+            else:
+                remaining_width_e = width
+                
             fmt_prefix_e = '%s%s%d%s' % (
                 fmt_parts['fill_align'],
-                fmt_parts['zero'], remaining_width if error_has_exp else width,
+                fmt_parts['zero'], remaining_width_e,
                 fmt_parts['comma'])
 
         else:
