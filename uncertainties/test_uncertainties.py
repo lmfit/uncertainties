@@ -1785,7 +1785,7 @@ def test_format():
 
         # Alignment is not available with the % formatting
         # operator of Python < 2.6:
-        tests[(3.1415, 0.0001)].udpate({
+        tests[(3.1415, 0.0001)].update({
             '*^+9.2uf': '+3.14150*+/-*0.00010*',
             '>9f': '  3.14150+/-  0.00010'  # Width and align
         })
