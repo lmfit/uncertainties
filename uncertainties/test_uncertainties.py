@@ -1532,7 +1532,7 @@ def test_repr():
 
     # Tagging:
     x = ufloat(3, 1, "length")
-    assert repr(x) == '< length = 3+/-1 >'
+    assert repr(x) == '< length = 3.0+/-1.0 >'
     
 def test_format():
     '''Test the formatting of numbers with uncertainty.'''
