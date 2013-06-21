@@ -33,8 +33,8 @@ The :mod:`uncertainties` package also contains sub-modules for
 .. index::
    pair: number with uncertainty; creation
 
-Creating and handling numbers with uncertainties
-================================================
+Creating numbers with uncertainties
+===================================
 
 Numbers with uncertainties can be input either numerically, or through
 one of many string representations, so that files containing numbers
@@ -49,9 +49,9 @@ expressed in many convenient ways, including:
   >>> x = ufloat_fromstr("20(1)e-2")  # Exponential notation supported
   >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
 
-The available representations can be listed with ``pydoc
-uncertainties.ufloat_fromstr``.  Representations that are invalid raise a
-:class:`ValueError` exception.
+More information can be obtained with ``pydoc
+uncertainties.ufloat_fromstr``.
+
 
 Basic math
 ==========
@@ -60,7 +60,7 @@ Calculations can be performed directly, as with regular real numbers:
 
   >>> square = x**2
   >>> print square
-  0.04+/-0.004
+  0.040+/-0.004
 
 
 .. index:: mathematical operation; on a scalar, umath
@@ -77,7 +77,7 @@ functions are found in the :mod:`uncertainties.umath` module::
 
   >>> from uncertainties.umath import *  # Imports sin(), etc.
   >>> sin(x**2)
-  0.039989334186634168+/-0.003996800426643912
+  0.03998933418663417+/-0.003996800426643912
 
 The list of available mathematical functions can be obtained with the
 ``pydoc uncertainties.umath`` command.
@@ -96,7 +96,7 @@ matrices:
   >>> 2*arr
   [2.0+/-0.02 4.0+/-0.2]
   >>> print arr.sum()
-  3.0+/-0.100498756211
+  3.00+/-0.10
 
 Thus, usual operations on NumPy arrays can be performed transparently
 even when these arrays contain numbers with uncertainties.
@@ -119,12 +119,12 @@ with uncertainty defined above,
 
   >>> square = x**2
   >>> print square
-  0.04+/-0.004
+  0.040+/-0.004
   >>> square - x*x
-  0.0
+  0.0+/-0
   >>> y = x*x + 1
   >>> y - square
-  1.0
+  1.0+/-0
 
 The last two printed results above have a zero uncertainty despite the
 fact that :data:`x`, :data:`y` and :data:`square` have a non-zero uncertainty: the
@@ -137,6 +137,34 @@ exactly as with simple floats.  When various quantities are combined
 through mathematical operations, the result is calculated by taking
 into account all the correlations between the quantities involved.
 All of this is done completely transparently.
+
+.. index::
+   printing
+   formatting
+
+Printing
+========
+
+Numbers with uncertainties can be printed conveniently. The precision
+of the nominal value and of the uncertainty match by default:
+
+  >>> print x
+  0.200+/-0.010
+
+When no explicit precision is given, like here, the `rounding rules of
+the Particle Data Group
+<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ are
+automatically applied (they essentially keep the number of digits
+small, while preventing the uncertainty from being displayed with a
+large relative error).
+
+More control over the format can be obtained (in Python 2.6+) through
+the usual :func:`format` method of strings:
+
+  >>> print 'Result = {:>10.2f}'.format(x)
+  Result =       0.20+/-      0.01
+
+.. !!!!!!!!!!!!!!
 
 .. index::
    pair: nominal value; of scalar
