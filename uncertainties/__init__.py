@@ -1213,12 +1213,6 @@ def format_num(nom_val_main, error_main, exponent,
     # possible: printing 3.1±0 with the default format prints 3.1+/-0,
     # which shows that the uncertainty is exactly zero.
 
-    print ("CALLING format_num with", nom_val_main, error_main,
-           fmt_parts,
-               prec, fixed_point_type,
-               options, exponent) #!!!!! test
-
-    
     # The suffix of the result is calculated first because it is
     # useful for the width handling of the shorthand notation.
     
@@ -1866,8 +1860,6 @@ class AffineScalarFunc(object):
         # us the *effective* uncertainty control mode:
         uncert_controlled &= bool(std_dev) and not isnan(std_dev)
 
-        print "UNCERT CONTROLLED =", uncert_controlled  # !!!!!!!!! test
-
         # Reference value for the calculation of a possible exponent,
         # if needed:
         if fmt_type in set('eEgGn'):
@@ -1907,7 +1899,6 @@ class AffineScalarFunc(object):
             # 3.141592±NaN with an "f" format specification, for
             # example):
 
-            print "FMT_PREC = {!r}".format(fmt_prec) #!!!!!! test
             prec = int(fmt_prec) if fmt_prec else 6
 
             if fmt_type in 'fF':
@@ -1952,8 +1943,6 @@ class AffineScalarFunc(object):
                 digits_limit = signif_d_to_limit(exp_ref_value,
                                                  num_signif_digits)
 
-            print "DIGITS LIMIT, uncert not controlled", digits_limit  #!!!!!!!!! test
-            
         #######################################
 
         # Exponent notation: should it be used? use_exp is set
@@ -2625,9 +2614,6 @@ else:
 # Parsing of values with uncertainties:
 
 POSITIVE_DECIMAL_UNSIGNED_OR_NAN = ur'((\d+)(\.\d*)?|nan|NAN)'
-
-#!!!!!!!! make sure that nan can be captured!?!!!
-#!!!!!! Solve the problem with 10(0.) not matched
 
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where
 # the uncertainty is optional (in which case the uncertainty is

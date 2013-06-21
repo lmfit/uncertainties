@@ -327,8 +327,6 @@ def test_ufloat_fromstr():
           
     for (representation, values) in tests.iteritems():
 
-        print "Parsing %s..." % representation #!!!!!!!!! test
-        
         # Without tag:
         num = ufloat_fromstr(representation)
         assert numbers_close(num.nominal_value, values[0])
@@ -1798,11 +1796,8 @@ def test_format():
     for (values, representations) in tests.iteritems():
 
         value = ufloat(*values)
-        print "VALUE", value.nominal_value, value.std_dev  #!!!!!!!!!!!
         
         for (format_spec, result) in representations.iteritems():
-
-            print "FMT SPEC", repr(format_spec)  #!!!!!! test
 
             # Call that works with Python < 2.6 too:
             representation = value.format(format_spec)
@@ -1842,12 +1837,9 @@ def test_format():
                                               value_back.nominal_value, 2.4e-1)
 
                     # If the uncertainty is zero, then the relative
-                    # change can be large: #!!!!!!!!!! This test may
-                    # have to be put back if +/-0 is "reversible"
-                    # between format() and ufloat_fromstr().
-                    if value.std_dev and not isnan(value.std_dev):
-                        assert numbers_close(value.std_dev,
-                                              value_back.std_dev, 3e-1)
+                    # change can be large:
+                    assert numbers_close(value.std_dev,
+                                         value_back.std_dev, 3e-1)
 
                 except AssertionError:
                     # !! The following string formatting requires
