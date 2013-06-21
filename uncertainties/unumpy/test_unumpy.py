@@ -220,7 +220,7 @@ def test_pseudo_inverse():
     # the same:
     rcond = 1e-8  # Test of the second argument to pinv()
     m_pinv_num = pinv_num(m, rcond)
-    m_pinv_package = core._pinv(m, rcond)
+    m_pinv_package = core.pinv(m, rcond)
     assert arrays_close(m_pinv_num, m_pinv_package)
 
     ##########
