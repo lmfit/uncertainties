@@ -1132,8 +1132,10 @@ def PDG_precision(std_dev):
     #
     # Furthermore, 10**(-exponent) is not used because the exponent
     # range for very small and very big floats is generally different.
-    (exponent, factor) = ((exponent-2, 1) if exponent >= 0
-                          else (exponent+1, 1000))
+    if exponent >= 0:
+        (exponent, factor) = (exponent-2, 1)
+    else:
+        (exponent, factor) = (exponent+1, 1000)
     
     digits = int(std_dev/10.**exponent*factor)  # int rounds towards zero
 
