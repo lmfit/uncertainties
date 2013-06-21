@@ -1788,9 +1788,9 @@ def test_format():
     # If the locale was set to American (USA), the "n" format type can
     # be tested:
     if locale_set:
-        tests[(123456.789123, 1234.56789123)] = {
-            '.0n': '123,456+/-1,234',
-            '.4n': '123,456.7891+/-1,234.5678'
+        tests[(23456.789123, 1234.56789123)] = {
+            '.0n': '(2+/-0.1)e+04',
+            '.6n': '23,456.8+/-1,234.57'
             }
             
         
