@@ -1684,7 +1684,7 @@ def test_format():
             '13S': '  -1.4(0)e-12'
         },
         (-1.4e-12, float('nan')): {
-            'L': r'-1.4 \pm nan',
+            'L': r'(-1.4 \pm nan) \times 10^{-12}',
             '.2uG': '(-1.4+/-NAN)E-12',  # u ignored, format used
             '10': '  -1.4e-12+/-       nan',
             '15S': '  -1.4(nan)e-12',
