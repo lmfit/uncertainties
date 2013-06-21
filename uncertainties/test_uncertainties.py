@@ -1550,8 +1550,8 @@ def test_format():
         
         # Full generalization of float formatting:
         (3.1415, 0.0001): {
-            '+09.2uf': '+003.14150+/-000.00010',
-            '*^+9.2uf': '*+3.14150*+/-*0.00010*',
+            '+09.2uf': '+03.14150+/-000.00010',
+            '*^+9.2uf': '+3.14150*+/-*0.00010*',
             '>9f': '  3.14150+/-  0.00010'  # Width and align
         },
 
@@ -1578,7 +1578,7 @@ def test_format():
         # ... Same thing, but with an exponent:
         (12.3, 456.78): {
             '.1ue': '(0+/-5)e+02',
-            '.4ue': '(0.123+/-4.568)e+02'
+            '.4ue': '(1.23+/-45.68)e+02'
         },
 
         # Test of the various float formats: the nominal value should
