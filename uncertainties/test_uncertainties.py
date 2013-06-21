@@ -399,11 +399,11 @@ def test_fixed_derivatives_basic_funcs():
         compare_derivatives(func, numerical_derivatives, [num_args])
 
     # Operators that take 1 value:
-    for op in uncertainties._modified_operators:
+    for op in uncertainties.modified_operators:
         check_op(op, 1)
 
     # Operators that take 2 values:
-    for op in uncertainties._modified_ops_with_reflection:
+    for op in uncertainties.modified_ops_with_reflection:
         check_op(op, 2)
 
 # Additional, more complex checks, for use with the nose unit testing
@@ -1540,6 +1540,10 @@ def test_repr():
 
     x = ufloat(3.14159265358979, 0)
     assert repr(x) == '3.14159265358979+/-0'
+
+    # Tagging:
+    x = ufloat(3, 1, "length")
+    assert repr(x) == '< length = 3.0+/-1.0 >'
     
 def test_format():
     '''Test the formatting of numbers with uncertainty.'''
@@ -1558,6 +1562,11 @@ def test_format():
             '0.4e': '3.1415e+00+/-0.0000e+00'  # Forced double exponent
         },
         
+        # Full generalization of float formatting:
+        (3.1415, 0.0001): {
+            '+09.2uf': '+03.14150+/-000.00010'
+        },
+
         # Number of digits of the uncertainty fixed:
         (123.456789, 0.00123): {
             '.1uf': '123.457+/-0.001',
@@ -1792,15 +1801,14 @@ def test_format():
                 }
         })
         
-    if sys.version_info >= (2, 5):
+    if sys.version_info >= (2, 6):
 
         # Alignment is not available with the % formatting
-        # operator of Python < 2.5:
-        test[(3.1415, 0.0001)].udpate({
+        # operator of Python < 2.6:
+        tests[(3.1415, 0.0001)].update({
             '*^+9.2uf': '+3.14150*+/-*0.00010*',
             '>9f': '  3.14150+/-  0.00010'  # Width and align
         })
-
         
     # If the locale was set to American (USA), the "n" format type can
     # be tested:
@@ -1808,8 +1816,7 @@ def test_format():
         tests[(23456.789123, 1234.56789123)] = {
             '.0n': '(2+/-0.1)e+04',
             '.6n': '23,456.8+/-1,234.57'
-            }
-            
+            }            
         
     for (values, representations) in tests.iteritems():
 

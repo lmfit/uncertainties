@@ -28,14 +28,14 @@ Examples:
   x = ufloat_fromstr("0.20(1)")  # Other representation
   # Implicit uncertainty of +/-1 on the last digit:  
   x = ufloat_fromstr("0.20")
-  print x**2  # Square: prints "0.04+/-0.004"
+  print x**2  # Square: prints "0.040+/-0.004"
   print sin(x**2)  # Prints "0.0399...+/-0.00399..."
 
   print x.std_score(0.17)  # Prints "-3.0": deviation of -3 sigmas
 
   # Access to the nominal value, and to the uncertainty:
   square = x**2  # Square
-  print square  # Prints "0.04+/-0.004"  
+  print square  # Prints "0.040+/-0.004"  
   print square.nominal_value  # Prints "0.04"
   print square.std_dev  # Prints "0.004..."
 
@@ -47,10 +47,10 @@ Examples:
   sum_value = u+v
   
   u.std_dev = 0.1  # Standard deviations can be updated on the fly
-  print sum_value - u - v  # Prints "0.0" (exact result)
+  print sum_value - u - v  # Prints "0+/-0" (exact result)
 
   # List of all sources of error:
-  print sum_value  # Prints "11+/-0.1414..."
+  print sum_value  # Prints "11.00+/-0.14"
   for (var, error) in sum_value.error_components().iteritems():
       print "%s: %f" % (var.tag, error)  # Individual error components
 
@@ -62,7 +62,7 @@ Examples:
   # NumPy is available:
   (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 11],
                                                    cov_matrix)
-  print u2  # Value and uncertainty of u: correctly recovered (1+/-0.1)
+  print u2  # Value and uncertainty of u: correctly recovered (1.00+/-0.10)
   print uncertainties.covariance_matrix([u2, v2, sum2])  # == cov_matrix
 
 - The main function provided by this module is ufloat, which creates
@@ -79,7 +79,7 @@ on numbers with uncertainties by using their generalization from the
 uncertainties.umath module:
 
   from uncertainties.umath import sin
-  print sin(ufloat_fromstr("1+/-0.01"))  # 0.841...+/-0.005...
+  print sin(ufloat_fromstr("1+/-0.01"))  # 0.841+/-0.005
   print sin(1)  # umath.sin() also works on floats, exactly like math.sin()
 
 Logical operations (>, ==, etc.) are also supported.
@@ -208,7 +208,7 @@ still holds.
 The boolean value (bool(x), "if x...") of a number with uncertainty x
 is the result of x != 0.
 
-- The uncertainties package is for Python 2.5 and above.
+- The uncertainties package is for Python 2.3 and above.
 
 - This package contains tests.  They can be run either manually or
 automatically with the nose unit testing framework (nosetests).
@@ -216,7 +216,7 @@ automatically with the nose unit testing framework (nosetests).
 (c) 2009-2013 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 Please send feature requests, bug reports, or feedback to this address.
 
-Please support future development by donating $5 or more through PayPal!
+Please support future development by donating $10 or more through PayPal!
 
 This software is released under a dual license.  (1) The BSD license.
 (2) Any other license, as long as it is obtained from the original
@@ -245,7 +245,7 @@ import inspect
 from backport import *
 
 # Numerical version:
-__version_info__ = (2, 3, 6)
+__version_info__ = (2, 4)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
@@ -1689,6 +1689,9 @@ class AffineScalarFunc(object):
         
         std_dev = self.std_dev  # Optimization, since std_dev is calculated
 
+        # A zero standard deviation is printed because otherwise,
+        # ufloat_fromstr() does not correctly parse back the value
+        # ("1.23" is interpreted as "1.23(1)"):
 
         if std_dev:
             std_dev_str = repr(std_dev)
@@ -2087,15 +2090,17 @@ class AffineScalarFunc(object):
                           fixed_point_type=fixed_point_type,
                           options=options)
 
-    # Alternate name for __format__, for use with Python < 2.6:    
-    format = set_doc("""
-        Returns the same result as the format(self, format_spec) of
-        Python 2.6+, or equivalently as self.__format__(format_spec).
+    # Alternate name for __format__, for use with Python < 2.6:
+    @set_doc("""
+        Returns the same result as self.__format__(format_spec), or
+        equivalently as the format(self, format_spec) of Python 2.6+.
 
         This method is meant to be used for formatting numbers with
         uncertainties in Python < 2.6, with '... %s ...' %
         num.format('.2e').
-        """)(__format__)
+        """)
+    def format(*args, **kwargs):
+        return args[0].__format__(*args[1:], **kwargs)
     
     def std_score(self, value):
         """
@@ -2321,11 +2326,11 @@ def get_ops_with_reflection():
     return ops_with_reflection
 
 # Operators that have a reflection, along with their derivatives:
-_ops_with_reflection = get_ops_with_reflection()
+ops_with_reflection = get_ops_with_reflection()
 
 # Some effectively modified operators (for the automated tests):
-_modified_operators = []
-_modified_ops_with_reflection = []
+modified_operators = []
+modified_ops_with_reflection = []
 
 # Custom versions of some operators (instead of extending some float
 # __*__ operators to AffineScalarFunc, the operators in _custom_ops
@@ -2408,13 +2413,13 @@ def add_operators_to_AffineScalarFunc():
         except AttributeError:
             pass
         else:
-            _modified_operators.append(op)
+            modified_operators.append(op)
             
     ########################################
     # Final definition of the operators for AffineScalarFunc objects:
             
     # Reversed versions (useful for float*AffineScalarFunc, for instance):
-    for (op, derivatives) in _ops_with_reflection.iteritems():
+    for (op, derivatives) in ops_with_reflection.iteritems():
         attribute_name = '__%s__' % op
 
         # float objects don't exactly have the same attributes between
@@ -2435,7 +2440,7 @@ def add_operators_to_AffineScalarFunc():
         else:
             setattr(AffineScalarFunc, attribute_name,
                     wrap(func_to_wrap, derivatives))
-            _modified_ops_with_reflection.append(op)            
+            modified_ops_with_reflection.append(op)            
 
     ########################################
     # Conversions to pure numbers are meaningless.  Note that the
@@ -2529,25 +2534,14 @@ class Variable(AffineScalarFunc):
         self.std_dev = value
         
     # The following method is overridden so that we can represent the tag:
-    def _general_representation(self, to_string):
-        """
-        Uses the to_string() conversion function on both the nominal
-        value and standard deviation and returns a string that
-        describes the number.
+    def __repr__(self):
 
-        to_string() is typically repr() or str().
-        """
-        num_repr  = super(Variable, self)._general_representation(to_string)
+        num_repr  = super(Variable, self).__repr__()
         
-        # Optional tag: only full representations (to_string == repr)
-        # contain the tag, as the tag is required in order to recreate
-        # the variable.  Outputting the tag for regular string ("print
-        # x") would be too heavy and produce an unusual representation
-        # of a number with uncertainty.
-        if (self.tag is None) or (to_string != repr):
+        if self.tag is None:
             return num_repr
         else:
-            "< %s = %s >" % (self.tag, num_repr)
+            return "< %s = %s >" % (self.tag, num_repr)
 
     def __hash__(self):
         # All Variable objects are by definition independent
@@ -2839,6 +2833,8 @@ def ufloat_fromstr(representation, tag=None):
     '12.345(15)', '12.3' or u'1.2±0.1' (Unicode string) are recognized
     (see more complete list below).  In the last case, an uncertainty
     of +/-1 is assigned to the last digit.
+
+    Invalid representations raise a ValueError.
     
     Examples of valid string representations:
     

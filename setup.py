@@ -50,7 +50,7 @@ except ImportError:
 
 distutils.core.setup(
     name='uncertainties',
-    version='2.3.6',
+    version='2.4',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://pythonhosted.org/uncertainties/',
@@ -165,6 +165,9 @@ Version history
 
 Main changes:
 
+- 2.4: Extensive support for the formatting_ of numbers with uncertainties. \
+       A zero uncertainty is now explicitly displayed as the integer 0. \
+       Additional representations are understood by ``ufloat_fromstr()``.
 - 2.3.6:  Full support for limit cases of the power operator \
           ``umath.pow()``.
 - 2.3.5: Uncertainties and derivatives can now be NaN (not-a-number). \
@@ -281,6 +284,7 @@ _of_uncertainty
 .. _PayPal: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _main website: http://pythonhosted.org/uncertainties/
 .. _code updater: http://pythonhosted.org/uncertainties/#migration-from-version-1-to-version-2
+.. _formatting: http://pythonhosted.org/uncertainties/user_guide.html#printing
 ''',
       
     keywords=['error propagation', 'uncertainties',
