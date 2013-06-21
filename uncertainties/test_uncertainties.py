@@ -1669,7 +1669,7 @@ def test_format():
             'FL': '1234.57 \pm 0.10',
             'fL': '1234.57 \pm 0.10',
             'FL': '1234.57 \pm 0.10',            
-            '%L': '123457 \pm 10 \%'
+            '%L': '(123457 \pm 10) \%'
         },
         #
         # ... combined with the spectroscopic notation:
@@ -1822,7 +1822,7 @@ def test_format():
             
             # Parsing back into a number with uncertainty (unless the
             # LaTeX or comma notation is used):
-            if (not set(format_spec).intersection('L,*%')  # * = fill with *
+            if (not set(format_spec).intersection('L,*%n')  # * = fill with *
                 and '0nan' not in representation.lower()):  # "00nan"
 
                 value_back = ufloat_fromstr(representation)
