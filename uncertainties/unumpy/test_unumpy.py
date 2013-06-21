@@ -228,14 +228,14 @@ def test_pseudo_inverse():
     vector = [ufloat(10, 1), -3.1, 11]
     m = unumpy.matrix([vector, vector])
     m_pinv_num = pinv_num(m, rcond)
-    m_pinv_package = core._pinv(m, rcond)
+    m_pinv_package = core.pinv(m, rcond)
     assert arrays_close(m_pinv_num, m_pinv_package)
     
     ##########
     # Example with a non-full-rank square matrix:
     m = unumpy.matrix([[ufloat(10, 1), 0], [3, 0]])
     m_pinv_num = pinv_num(m, rcond)
-    m_pinv_package = core._pinv(m, rcond)
+    m_pinv_package = core.pinv(m, rcond)
     assert arrays_close(m_pinv_num, m_pinv_package)
     
 def test_broadcast_funcs():
