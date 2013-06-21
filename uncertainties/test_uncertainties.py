@@ -391,11 +391,11 @@ def test_fixed_derivatives_basic_funcs():
         compare_derivatives(func, numerical_derivatives, [num_args])
 
     # Operators that take 1 value:
-    for op in uncertainties._modified_operators:
+    for op in uncertainties.modified_operators:
         check_op(op, 1)
 
     # Operators that take 2 values:
-    for op in uncertainties._modified_ops_with_reflection:
+    for op in uncertainties.modified_ops_with_reflection:
         check_op(op, 2)
 
 # Additional, more complex checks, for use with the nose unit testing
