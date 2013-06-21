@@ -28,14 +28,14 @@ Examples:
   x = ufloat_fromstr("0.20(1)")  # Other representation
   # Implicit uncertainty of +/-1 on the last digit:  
   x = ufloat_fromstr("0.20")
-  print x**2  # Square: prints "0.04+/-0.004"
+  print x**2  # Square: prints "0.040+/-0.004"
   print sin(x**2)  # Prints "0.0399...+/-0.00399..."
 
   print x.std_score(0.17)  # Prints "-3.0": deviation of -3 sigmas
 
   # Access to the nominal value, and to the uncertainty:
   square = x**2  # Square
-  print square  # Prints "0.04+/-0.004"  
+  print square  # Prints "0.040+/-0.004"  
   print square.nominal_value  # Prints "0.04"
   print square.std_dev  # Prints "0.004..."
 
@@ -47,10 +47,10 @@ Examples:
   sum_value = u+v
   
   u.std_dev = 0.1  # Standard deviations can be updated on the fly
-  print sum_value - u - v  # Prints "0.0" (exact result)
+  print sum_value - u - v  # Prints "0+/-0" (exact result)
 
   # List of all sources of error:
-  print sum_value  # Prints "11+/-0.1414..."
+  print sum_value  # Prints "11.00+/-0.14"
   for (var, error) in sum_value.error_components().iteritems():
       print "%s: %f" % (var.tag, error)  # Individual error components
 
@@ -62,7 +62,7 @@ Examples:
   # NumPy is available:
   (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 11],
                                                    cov_matrix)
-  print u2  # Value and uncertainty of u: correctly recovered (1+/-0.1)
+  print u2  # Value and uncertainty of u: correctly recovered (1.00+/-0.10)
   print uncertainties.covariance_matrix([u2, v2, sum2])  # == cov_matrix
 
 - The main function provided by this module is ufloat, which creates
@@ -79,7 +79,7 @@ on numbers with uncertainties by using their generalization from the
 uncertainties.umath module:
 
   from uncertainties.umath import sin
-  print sin(ufloat_fromstr("1+/-0.01"))  # 0.841...+/-0.005...
+  print sin(ufloat_fromstr("1+/-0.01"))  # 0.841+/-0.005
   print sin(1)  # umath.sin() also works on floats, exactly like math.sin()
 
 Logical operations (>, ==, etc.) are also supported.
@@ -208,7 +208,7 @@ still holds.
 The boolean value (bool(x), "if x...") of a number with uncertainty x
 is the result of x != 0.
 
-- The uncertainties package is for Python 2.5 and above.
+- The uncertainties package is for Python 2.3 and above.
 
 - This package contains tests.  They can be run either manually or
 automatically with the nose unit testing framework (nosetests).
@@ -216,7 +216,7 @@ automatically with the nose unit testing framework (nosetests).
 (c) 2009-2013 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 Please send feature requests, bug reports, or feedback to this address.
 
-Please support future development by donating $5 or more through PayPal!
+Please support future development by donating $10 or more through PayPal!
 
 This software is released under a dual license.  (1) The BSD license.
 (2) Any other license, as long as it is obtained from the original
