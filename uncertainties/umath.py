@@ -161,7 +161,6 @@ def log_der0(*args):
     #except TypeError:
     #    return 1/args[0]/math.log(args[1])  # 2-argument form
 
-
 def _deriv_copysign(x,y):
     if x >= 0:
         return math.copysign(1, y)
@@ -188,7 +187,7 @@ def _deriv_pow_1(x, y):
     else:
         return math.log(x) * math.pow(x, y)
     
-_erf_coef = 2/math.sqrt(math.pi)  # Optimization for erf()
+erf_coef = 2/math.sqrt(math.pi)  # Optimization for erf()
 
 fixed_derivatives = {
     # In alphabetical order, here:
@@ -206,8 +205,8 @@ fixed_derivatives = {
     'cos': [lambda x: -math.sin(x)],
     'cosh': [math.sinh],
     'degrees': [lambda x: math.degrees(1)],
-    'erf': [lambda x: exp(-x**2)*_erf_coef],
-    'erfc': [lambda x: -exp(-x**2)*_erf_coef],
+    'erf': [lambda x: exp(-x**2)*erf_coef],
+    'erfc': [lambda x: -exp(-x**2)*erf_coef],
     'exp': [math.exp],
     'expm1': [math.exp],
     'fabs': [_deriv_fabs],

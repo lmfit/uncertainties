@@ -8,7 +8,7 @@ Welcome to the uncertainties package
 ====================================
 
 The `uncertainties package`_ is a free, cross-platform program that 
-transparently handles calculations with **numbers with uncertainties** 
+**transparently** handles calculations with **numbers with uncertainties** 
 (like 3.14±0.01).  It can also yield the **derivatives** of any 
 expression.
 
@@ -19,7 +19,7 @@ anymore!
 Calculations of results with uncertainties, or of derivatives, can be 
 performed either in an **interactive session** (as with a calculator), 
 or in **programs** written in the Python_ programming language.  
-Existing calculation code can **run with no or little change**.
+Existing calculation code can **run with little or no change**.
 
 Whatever the complexity of a calculation, this package returns its
 result with an uncertainty as predicted by linear `error propagation 
@@ -44,13 +44,13 @@ calculations with **automatic error propagation** can be performed
 **transparently** (i.e., through the usual syntax for mathematical 
 formulas):
 
-  >>> from uncertainties import ufloat
-  >>> from uncertainties.umath import *  # sin(), etc.
-  >>> x = ufloat(1, 0.1)  # x = 1+/-0.1
-  >>> print 2*x
-  2.0+/-0.2
-  >>> sin(2*x)  # In a Python shell, "print" is optional
-  0.90929742682568171+/-0.083229367309428481
+>>> from uncertainties import ufloat
+>>> from uncertainties.umath import *  # sin(), etc.
+>>> x = ufloat(1, 0.1)  # x = 1+/-0.1
+>>> print 2*x
+2.00+/-0.20
+>>> sin(2*x)  # In a Python shell, "print" is optional
+0.9092974268256817+/-0.08322936730942848
 
 Thus, existing calculation code designed for regular numbers can run 
 with numbers with uncertainties with :ref:`no or little modification 
@@ -62,8 +62,8 @@ Another strength of this package is its correct handling of
 **correlations**.  For instance, the following quantity is exactly
 zero even though :data:`x` has an uncertainty:
 
-  >>> x-x
-  0.0
+>>> x-x
+0.0+/-0
 
 Many other error propagation codes return the incorrect value 0±0.1414… 
 because they wrongly assume that the two subtracted quantities are 
@@ -75,8 +75,8 @@ handled <simple_array_use>` too.
 
 **Derivatives** are similarly very :ref:`easy to obtain <derivatives>`:
 
-  >>> (2*x+1000).derivatives[x]
-  2.0
+>>> (2*x+1000).derivatives[x]
+2.0
 
 They are calculated with a :ref:`fast method <differentiation method>`.
 
@@ -210,7 +210,7 @@ and `documentation source
 available `on GitHub <https://github.com/lebigot/uncertainties/>`_.
 The :mod:`uncertainties` package is written in pure Python and has no
 external dependency (the `NumPy`_ package is optional).  It contains
-about 6000 lines of code.  75 % of those lines are documentation
+about 7000 lines of code.  75 % of these lines are documentation
 strings and comments.  The remaining 25 % are split between unit tests
 (15 % of the total) and the calculation code proper (10 % of the
 total).  :mod:`uncertainties` is thus a **lightweight, portable
@@ -295,9 +295,6 @@ Future developments
 
 Planned future developments include:
 
-- support for Python `string formatting <http://docs.python.org/library/string.html#formatstrings>`_;
-
-- handling of complex numbers with uncertainties;
 
 - `JSON <http://docs.python.org/library/json.html>`_ support;
 
@@ -311,6 +308,8 @@ Planned future developments include:
 - addition of new functions from the :mod:`math` module;
 
 - fitting routines that conveniently handle data with uncertainties;
+
+- handling of complex numbers with uncertainties;
 
 - a re-correlate function that puts correlations back between data
   that was saved in separate files;
