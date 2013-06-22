@@ -252,7 +252,11 @@ accessed independently:
 0.040+/-0.004
 >>> print square.nominal_value
 0.04
+>>> print square.n  # Abbreviation
+0.04
 >>> print square.std_dev
+0.004
+>>> print square.s  # Abbreviation
 0.004
 
 Access to the individual sources of uncertainty
