@@ -199,11 +199,11 @@ Formatting options can be added at the end of the format string: ``S``
 for the **shorthand notation**, ``C`` for using a **single character
 (±)**, ``L`` for a **LaTeχ** output:
 
->>> print '{:.1uS}'.format(x)  # 1 digit for the uncertainty
+>>> print '{:.1uS}'.format(x)  # 1 digit for the uncertainty, shorthand
 0.20(1)
->>> print u'{:.2eC}'.format(x)  # 2 digits after the decimal point
+>>> print u'{:.2eC}'.format(x)  # 2 digits after the decimal point, ± character
 (2.00±0.10)e-01
->>> print '{:L}'.format(x*1e7)  # Automatic exponent form
+>>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeχ
 (2.00 \pm 0.10) \times 10^{6}
 
 Options can be combined.
