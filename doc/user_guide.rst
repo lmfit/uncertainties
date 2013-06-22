@@ -177,7 +177,7 @@ Result =       0.20+/-      0.01
 
 (For Python before version 2.6, one can do ``'Result = %s' %
 x.format('10.2f')`` instead.) When a width is used, exponents are not
-factored, so that each part (nominal value and standard deviation) are
+factored, so that parts (nominal value and standard deviation) can be
 well aligned; using a (minimal) width of 1 is thus a way of forcing
 exponents to not be factored.
 
