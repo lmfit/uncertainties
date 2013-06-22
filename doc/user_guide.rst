@@ -146,23 +146,28 @@ All of this is done completely transparently.
 Printing
 ========
 
+.. Basic examples:
+
 Numbers with uncertainties can be printed conveniently. The nominal
 value and the uncertainty have the **same precision** by default:
 
 >>> print x
 0.200+/-0.010
 
-When no explicit precision is given, like here, the `rounding rules of
-the Particle Data Group
-<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ are
-automatically applied (they essentially keep the number of digits
-small, while preventing the uncertainty from being displayed with a
-large relative error).
-
-**Exponents** are automatically **factored** for increased legibility:
+**Exponents** are generally automatically **factored**, for increased
+legibility:
 
 >>> print x*1e7
 (2.00+/-0.10)e+06
+
+.. Usage:
+
+When no explicit precision is given, the **rounding rules** of the
+`Particle Data Group
+<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ are
+**automatically applied** (they essentially keep the number of digits
+small, while preventing the uncertainty from being displayed with a
+large relative error).
 
 More **control over the format** can be obtained (in Python 2.6+)
 through the usual :func:`format` method of strings:
@@ -173,16 +178,32 @@ Result =       0.20+/-      0.01
 (For Python before version 2.6, one can do ``'Result = %s' %
 x.format('10.2f')`` instead.)
 
-**All the float format specifications** are accepted (except for the
-`n` format type without precision).
+**Almost all the float format specifications** are accepted.
 
 It is possible to control the **number of significant digits of the
-uncertainty** by adding the modifier ``u`` before the format type:
+uncertainty** by adding the modifier ``u`` after the precision:
 
 >>> print '1 significant digit on the uncertainty: {:.1u}'.format(x)
 1 significant digit on the uncertainty: 0.20+/-0.01
 >>> print '3 significant digits on the uncertainty: {:.3u}'.format(x)
 3 significant digits on the uncertainty: 0.2000+/-0.0100
+
+.. Options
+
+Formatting options can be added at the end of the format string: ``S``
+for the **shorthand notation**, ``C`` for using a **single character
+(±)**, ``L`` for a **LaTeχ** output:
+
+>>> print '{:.1uS}'.format(x)  # 1 digit for the uncertainty
+0.20(1)
+>>> print u'{:.2eC}'.format(x)  # 2 digits after the decimal point
+(2.00±0.10)e-01
+>>> print '{:L}'.format(x*1e7)  # Automatic exponent form
+(2.00 \pm 0.10) \times 10^{6}
+
+Options can be combined.
+
+.. Output:
 
 An uncertainty which is *exactly* equal to **zero** is always
 formatted as an integer:
@@ -204,19 +225,6 @@ representation:
 1.23456789012345+/-0.123456789
 >>> y
 1.23456789012345+/-0.123456789
-
-Formatting options can be added at the end of the format string: ``S``
-for the **shorthand notation**, ``C`` for using a **single character
-(±)**, ``L`` for a **LaTeχ** output:
-
->>> print '{:.1uS}'.format(x)  # 1 digit for the uncertainty
-0.20(1)
->>> print u'{:.2eC}'.format(x)  # 2 digits after the decimal point
-(2.00±0.10)e-01
->>> print '{:L}'.format(x*1e7)  # Automatic exponent
-(2.00 \pm 0.10) \times 10^{6}
-
-Options can be combined.
 
 **More information** on formatting can be obtained with ``pydoc
 uncertainties.UFloat.__format__``.
