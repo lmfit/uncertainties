@@ -260,7 +260,7 @@ use the shorthand notation for numbers with uncertainties:
 
    print frmtr.format("Result = {0:.1u}", x)  # 1-digit uncertainty
 
-prints ``Result = 0.20(1)``.
+prints with the shorthand notation: ``Result = 0.20(1)``.
 
 
 .. index::
