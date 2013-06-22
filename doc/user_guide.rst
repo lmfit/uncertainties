@@ -72,7 +72,7 @@ Mathematical operations
 
 Besides being able to apply basic mathematical operations to numbers
 with uncertainty, this package provides generalizations of **most of
-the functions from the standard :mod:`math` module**.  These
+the functions from the standard** :mod:`math` **module**.  These
 mathematical functions are found in the :mod:`uncertainties.umath`
 module:
 
@@ -109,14 +109,13 @@ performed through the dedicated :mod:`uncertainties.unumpy` module.
 .. index:: correlations; detailed example
 
 
-Correlations
-============
+Correlated variables
+====================
 
-Correlations between variables are automatically handled whatever the
-number of variables involved, and whatever the complexity of the
-calculation.  Thus, each calculation result keeps track of how it is
-correlated to random variables.  For example, when :data:`x` is the number
-with uncertainty defined above,
+Correlations between variables are **automatically handled** whatever
+the number of variables involved, and whatever the complexity of the
+calculation. For example, when :data:`x` is the number with
+uncertainty defined above,
 
 >>> square = x**2
 >>> print square
@@ -132,12 +131,12 @@ fact that :data:`x`, :data:`y` and :data:`square` have a non-zero uncertainty: t
 calculated functions give the same value for all samples of the random
 variable :data:`x`.
 
-Thanks to the tracking of dependencies on random variables,
-calculations can therefore be performed in as many steps as necessary,
-exactly as with simple floats.  When various quantities are combined
-through mathematical operations, the result is calculated by taking
-into account all the correlations between the quantities involved.
-All of this is done completely transparently.
+Thanks to the automatic correlation handling, calculations can be
+performed in as many steps as necessary, exactly as with simple
+floats.  When various quantities are combined through mathematical
+operations, the result is calculated by taking into account all the
+correlations between the quantities involved.  All of this is done
+completely **transparently**.
 
 .. index::
    printing
@@ -256,11 +255,11 @@ use the shorthand notation for numbers with uncertainties:
                return super(ShorthandFormatter, self).format_field(
                    value, format_spec)
 
-   fmtr = ShorthandFormatter()
+   frmtr = ShorthandFormatter()
 
-   print fmtr.format("Result = {0}", ufloat(3.14, 0.01))
+   print frmtr.format("Result = {0:.1u}", x)  # 1-digit uncertainty
 
-prints ``Result = 3.140(10)``.
+prints with the shorthand notation: ``Result = 0.20(1)``.
 
 
 .. index::
