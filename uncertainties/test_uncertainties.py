@@ -10,6 +10,7 @@ These tests can be run through the Nose testing framework.
 
 from __future__ import division
 
+
 # Standard modules
 import copy
 import weakref
@@ -17,6 +18,18 @@ import math
 import random
 import sys
 
+# For some tests (test_format() and the "n" format specification):
+import locale
+locale_set = True
+try:
+    locale.setlocale(locale.LC_ALL, 'en_US')  # POSIX
+except Error:
+    try:
+        locale.setlocale(locale.LC_ALL, 'american_usa')  
+    except Error:
+        locale_set = False  # Some tests won't be run
+
+        
 # 3rd-party modules
 # import nose.tools
 
@@ -37,24 +50,29 @@ print "Testing with Python", sys.version
 
 # Utilities for unit testing
 
-def _numbers_close(x, y, tolerance=1e-6):
+def numbers_close(x, y, tolerance=1e-6):
     """
-    Returns True if the given (real) numbers are close enough.
+    Returns True if the given floats are close enough.
 
     The given tolerance is the relative difference allowed, or the absolute
     difference, if one of the numbers is 0.
+
+    NaN is allowed: it is considered close to itself.
     """
 
     # Instead of using a try and ZeroDivisionError, we do a test,
     # NaN could appear silently:
 
     if x != 0 and y != 0:
-        # Symmetric form of the test:
-        return 2*abs(x-y)/(abs(x)+abs(y)) < tolerance
+        if not uncertainties.isnan(x):
+            # Symmetric form of the test:
+            return 2*abs(x-y)/(abs(x)+abs(y)) < tolerance
+        else:
+            return uncertainties.isnan(y)
     else:  # Either x or y is zero
         return abs(x or y) < tolerance 
 
-def _ufloats_close(x, y, tolerance=1e-6):
+def ufloats_close(x, y, tolerance=1e-6):
     '''
     Tests if two numbers with uncertainties are close, as random
     variables: this is stronger than testing whether their nominal
@@ -65,14 +83,14 @@ def _ufloats_close(x, y, tolerance=1e-6):
     '''
 
     diff = x-y
-    return (_numbers_close(diff.nominal_value, 0, tolerance)
-            and _numbers_close(diff.std_dev, 0, tolerance))
+    return (numbers_close(diff.nominal_value, 0, tolerance)
+            and numbers_close(diff.std_dev, 0, tolerance))
     
 class DerivativesDiffer(Exception):
     pass
 
     
-def _compare_derivatives(func, numerical_derivatives,
+def compare_derivatives(func, numerical_derivatives,
                          num_args_list=None):
     """
     Checks the derivatives of a function 'func' (as returned by the
@@ -171,7 +189,7 @@ def _compare_derivatives(func, numerical_derivatives,
                         print "Testing %s at %s, arg #%d" % (
                             func.__name__, args, arg_num)
                         
-                        if not _numbers_close(fixed_deriv_value,
+                        if not numbers_close(fixed_deriv_value,
                                               num_deriv_value, 1e-4):
 
                             # It is possible that the result is NaN:
@@ -210,7 +228,7 @@ def _compare_derivatives(func, numerical_derivatives,
 def test_value_construction():
     '''
     Tests the various means of constructing a constant number with
-    uncertainty *without a string* (see test_str_input(), for this).
+    uncertainty *without a string* (see test_ufloat_fromstr(), for this).
     '''
 
     ## Simple construction:
@@ -264,12 +282,13 @@ def test_value_construction():
     assert x.tag == 'pi'
     assert x2.tag == 'pi'
     
-def test_str_input():
+def test_ufloat_fromstr():
     "Input of numbers with uncertainties as a string"
 
     # String representation, and numerical values:
     tests = {
         "-1.23(3.4)": (-1.23, 3.4),  # (Nominal value, error)
+        "  -1.23(3.4)  ": (-1.23, 3.4),  # Spaces ignored
         "-1.34(5)": (-1.34, 0.05),
         "1(6)": (1, 6),
         "3(4.2)": (3, 4.2),
@@ -291,46 +310,58 @@ def test_str_input():
         "-13e-2+/-1e2": (-13e-2, 1e2),
         '-14.(15)': (-14, 15),
         '-100.0(15)': (-100, 1.5),
-        '14.(15)': (14, 15)
+        '14.(15)': (14, 15),
+        # Global exponent:
+        '(3.141+/-0.001)E+02': (314.1, 0.1),
+        # ± sign:
+        u'(3.141±0.001)E+02': (314.1, 0.1),
+        # NaN uncertainty:
+        u'(3.141±nan)E+02': (314.1, float('nan')),
+        '3.4(nan)e10': (3.4e10, float('nan')),
+        # "Double-floats"
+        '(-3.1415 +/- 1e-4)e+200': (-3.1415e200, 1e196),
+        '(-3.1415e-10 +/- 1e-4)e+200': (-3.1415e190, 1e196),
+        # Special float representation:
+        '-3(0.)': (-3, 0)
         }
           
     for (representation, values) in tests.iteritems():
 
         # Without tag:
         num = ufloat_fromstr(representation)
-        assert _numbers_close(num.nominal_value, values[0])
-        assert _numbers_close(num.std_dev, values[1])
+        assert numbers_close(num.nominal_value, values[0])
+        assert numbers_close(num.std_dev, values[1])
         assert num.tag is None
         
         # With a tag as positional argument:
         num = ufloat_fromstr(representation, 'test variable')
-        assert _numbers_close(num.nominal_value, values[0])
-        assert _numbers_close(num.std_dev, values[1])
+        assert numbers_close(num.nominal_value, values[0])
+        assert numbers_close(num.std_dev, values[1])
         assert num.tag == 'test variable'
 
         # With a tag as keyword argument:
         num = ufloat_fromstr(representation, tag='test variable')
-        assert _numbers_close(num.nominal_value, values[0])
-        assert _numbers_close(num.std_dev, values[1])
+        assert numbers_close(num.nominal_value, values[0])
+        assert numbers_close(num.std_dev, values[1])
         assert num.tag == 'test variable'
         
         ## Obsolete forms
 
         num = ufloat(representation)  # Obsolete
-        assert _numbers_close(num.nominal_value, values[0])
-        assert _numbers_close(num.std_dev, values[1])
+        assert numbers_close(num.nominal_value, values[0])
+        assert numbers_close(num.std_dev, values[1])
         assert num.tag is None
         
         # Call with a tag list argument:
         num = ufloat(representation, 'test variable')  # Obsolete
-        assert _numbers_close(num.nominal_value, values[0])
-        assert _numbers_close(num.std_dev, values[1])
+        assert numbers_close(num.nominal_value, values[0])
+        assert numbers_close(num.std_dev, values[1])
         assert num.tag == 'test variable'
         
         # Call with a tag keyword argument:
         num = ufloat(representation, tag='test variable')  # Obsolete
-        assert _numbers_close(num.nominal_value, values[0])
-        assert _numbers_close(num.std_dev, values[1])
+        assert numbers_close(num.nominal_value, values[0])
+        assert numbers_close(num.std_dev, values[1])
         assert num.tag == 'test variable'
 
 ###############################################################################
@@ -357,14 +388,14 @@ def test_fixed_derivatives_basic_funcs():
             # possible scalar arguments (used for calculating
             # derivatives) to AffineScalarFunc objects:
             lambda *args: func(*map(uncertainties.to_affine_scalar, args)))
-        _compare_derivatives(func, numerical_derivatives, [num_args])
+        compare_derivatives(func, numerical_derivatives, [num_args])
 
     # Operators that take 1 value:
-    for op in uncertainties._modified_operators:
+    for op in uncertainties.modified_operators:
         check_op(op, 1)
 
     # Operators that take 2 values:
-    for op in uncertainties._modified_ops_with_reflection:
+    for op in uncertainties.modified_ops_with_reflection:
         check_op(op, 2)
 
 # Additional, more complex checks, for use with the nose unit testing
@@ -761,17 +792,17 @@ def test_wrapped_func_no_args_no_kwargs():
     
     ## Fully automatic numerical derivatives:
     f_wrapped = uncertainties.wrap(f)
-    assert _ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
     ## Automatic additional derivatives for non-defined derivatives:
     f_wrapped = uncertainties.wrap(f, [None])  # No derivative for y
-    assert _ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
     ### Explicit derivatives:
 
@@ -779,17 +810,17 @@ def test_wrapped_func_no_args_no_kwargs():
     f_wrapped = uncertainties.wrap(f, [lambda x, y: 2,
                                        lambda x, y: math.cos(y)])
     
-    assert _ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
     ## Automatic additional derivatives for non-defined derivatives:
     f_wrapped = uncertainties.wrap(f, [lambda x, y: 2])  # No derivative for y
-    assert _ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
 def test_wrapped_func_no_args_no_kwargs():
     '''
@@ -812,18 +843,18 @@ def test_wrapped_func_no_args_no_kwargs():
     
     ## Fully automatic numerical derivatives:
     f_wrapped = uncertainties.wrap(f)
-    assert _ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
     ## Automatic additional derivatives for non-defined derivatives,
     ## and explicit None derivative:
     f_wrapped = uncertainties.wrap(f, [None])  # No derivative for y
-    assert _ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
     ### Explicit derivatives:
 
@@ -831,17 +862,17 @@ def test_wrapped_func_no_args_no_kwargs():
     f_wrapped = uncertainties.wrap(f, [lambda x, y: 2,
                                        lambda x, y: math.cos(y)])
     
-    assert _ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
     ## Automatic additional derivatives for non-defined derivatives:
     f_wrapped = uncertainties.wrap(f, [lambda x, y: 2])  # No derivative for y
-    assert _ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
 def test_wrapped_func_args_no_kwargs():
     '''
@@ -869,12 +900,12 @@ def test_wrapped_func_args_no_kwargs():
     
     ## Fully automatic numerical derivatives:
     f_wrapped = uncertainties.wrap(f)
-    assert _ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
+    assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
     ## Automatic additional derivatives for non-defined derivatives,
     ## and explicit None derivative:
     f_wrapped = uncertainties.wrap(f, [None])  # No derivative for y
-    assert _ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
+    assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
     ### Explicit derivatives:
 
@@ -884,13 +915,13 @@ def test_wrapped_func_args_no_kwargs():
                                        None,
                                        lambda x, y, *args: 3])
     
-    assert _ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
+    assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
     ## Automatic additional derivatives for non-defined derivatives:
     
     # No derivative for y:    
     f_wrapped = uncertainties.wrap(f, [lambda x, y, *args: 2])
-    assert _ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
+    assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
 def test_wrapped_func_no_args_kwargs():
     '''
@@ -918,11 +949,11 @@ def test_wrapped_func_no_args_kwargs():
     
     ## Fully automatic numerical derivatives:
     f_wrapped = uncertainties.wrap(f)
-    assert _ufloats_close(f_auto_unc(x, y, **kwargs),
+    assert ufloats_close(f_auto_unc(x, y, **kwargs),
                           f_wrapped(x, y, **kwargs))
 
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
+    assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                           f_wrapped(y=y, x=x, **kwargs))
     
     ## Automatic additional derivatives for non-defined derivatives,
@@ -931,32 +962,32 @@ def test_wrapped_func_no_args_kwargs():
     # No derivative for positional-or-keyword parameter y, no
     # derivative for optional-keyword parameter z:
     f_wrapped = uncertainties.wrap(f, [None])
-    assert _ufloats_close(f_auto_unc(x, y, **kwargs),
+    assert ufloats_close(f_auto_unc(x, y, **kwargs),
                           f_wrapped(x, y, **kwargs))
 
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
+    assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                           f_wrapped(y=y, x=x, **kwargs))
 
     # No derivative for positional-or-keyword parameter y, no
     # derivative for optional-keyword parameter z:
     f_wrapped = uncertainties.wrap(f, [None], {'z': None})
-    assert _ufloats_close(f_auto_unc(x, y, **kwargs),
+    assert ufloats_close(f_auto_unc(x, y, **kwargs),
                           f_wrapped(x, y, **kwargs))
 
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
+    assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                           f_wrapped(y=y, x=x, **kwargs))
     
     # No derivative for positional-or-keyword parameter y, derivative
     # for optional-keyword parameter z:
     f_wrapped = uncertainties.wrap(f, [None],
                                    {'z': lambda x, y, **kwargs: 3})
-    assert _ufloats_close(f_auto_unc(x, y, **kwargs),
+    assert ufloats_close(f_auto_unc(x, y, **kwargs),
                           f_wrapped(x, y, **kwargs))
 
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
+    assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                           f_wrapped(y=y, x=x, **kwargs))
     
     ### Explicit derivatives:
@@ -967,21 +998,21 @@ def test_wrapped_func_no_args_kwargs():
         [lambda x, y, **kwargs: 2, lambda x, y, **kwargs: math.cos(y)],
         {'z:': lambda x, y, **kwargs: 3})
     
-    assert _ufloats_close(f_auto_unc(x, y, **kwargs),
+    assert ufloats_close(f_auto_unc(x, y, **kwargs),
                           f_wrapped(x, y, **kwargs))
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
+    assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                           f_wrapped(y=y, x=x, **kwargs))
     
     ## Automatic additional derivatives for non-defined derivatives:
     
     # No derivative for y or z:    
     f_wrapped = uncertainties.wrap(f, [lambda x, y, **kwargs: 2])
-    assert _ufloats_close(f_auto_unc(x, y, **kwargs),
+    assert ufloats_close(f_auto_unc(x, y, **kwargs),
                           f_wrapped(x, y, **kwargs))
 
     # Call with keyword arguments:
-    assert _ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
+    assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                           f_wrapped(y=y, x=x, **kwargs))
 
 def test_wrapped_func_args_kwargs():
@@ -1013,7 +1044,7 @@ def test_wrapped_func_args_kwargs():
     ## Fully automatic numerical derivatives:
     f_wrapped = uncertainties.wrap(f)
     
-    assert _ufloats_close(f_auto_unc(x, y, *args, **kwargs),
+    assert ufloats_close(f_auto_unc(x, y, *args, **kwargs),
                           f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
 
     ## Automatic additional derivatives for non-defined derivatives,
@@ -1023,20 +1054,20 @@ def test_wrapped_func_args_kwargs():
     # derivative for optional-keyword parameter z:
     f_wrapped = uncertainties.wrap(f, [None, None, None,
                                        lambda x, y, *args, **kwargs: 4])
-    assert _ufloats_close(f_auto_unc(x, y, *args, **kwargs),
+    assert ufloats_close(f_auto_unc(x, y, *args, **kwargs),
                           f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
 
     # No derivative for positional-or-keyword parameter y, no
     # derivative for optional-keyword parameter z:
     f_wrapped = uncertainties.wrap(f, [None], {'z': None})
-    assert _ufloats_close(f_auto_unc(x, y, *args, **kwargs),
+    assert ufloats_close(f_auto_unc(x, y, *args, **kwargs),
                           f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
     
     # No derivative for positional-or-keyword parameter y, derivative
     # for optional-keyword parameter z:
     f_wrapped = uncertainties.wrap(f, [None],
                                    {'z': lambda x, y, *args, **kwargs: 3})
-    assert _ufloats_close(f_auto_unc(x, y, *args, **kwargs),
+    assert ufloats_close(f_auto_unc(x, y, *args, **kwargs),
                           f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
     
     ### Explicit derivatives:
@@ -1048,14 +1079,14 @@ def test_wrapped_func_args_kwargs():
          lambda x, y, *args, **kwargs: math.cos(y)],
         {'z:': lambda x, y, *args, **kwargs: 3})
     
-    assert _ufloats_close(f_auto_unc(x, y, *args, **kwargs),
+    assert ufloats_close(f_auto_unc(x, y, *args, **kwargs),
                           f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
     
     ## Automatic additional derivatives for non-defined derivatives:
     
     # No derivative for y or z:    
     f_wrapped = uncertainties.wrap(f, [lambda x, y, *args, **kwargs: 2])
-    assert _ufloats_close(f_auto_unc(x, y, *args, **kwargs),
+    assert ufloats_close(f_auto_unc(x, y, *args, **kwargs),
                           f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
 
     
@@ -1099,10 +1130,10 @@ def test_wrapped_func():
 
     # The random variables must be the same (full correlation):
 
-    assert _ufloats_close(f_wrapped(angle, *[1, angle]),
+    assert ufloats_close(f_wrapped(angle, *[1, angle]),
                           f_auto_unc(angle, *[1, angle]))
     
-    assert _ufloats_close(f_wrapped(angle, *[list_value, angle]),
+    assert ufloats_close(f_wrapped(angle, *[list_value, angle]),
                           f_auto_unc(angle, *[list_value, angle]))
     
     ########################################
@@ -1117,7 +1148,7 @@ def test_wrapped_func():
 
     x = uncertainties.ufloat(10, 1)
 
-    assert _numbers_close(f_wrapped(x, 'string argument', x, x, x).std_dev,
+    assert numbers_close(f_wrapped(x, 'string argument', x, x, x).std_dev,
                           (1+2+3+4)*x.std_dev)
 
 def test_wrap_with_kwargs():
@@ -1152,7 +1183,7 @@ def test_wrap_with_kwargs():
     z = ufloat(100, 0.111)
     t = ufloat(0.1, 0.1111)
         
-    assert _ufloats_close(f_wrapped(x, y, z, t=t),
+    assert ufloats_close(f_wrapped(x, y, z, t=t),
                           f_auto_unc(x, y, z, t=t), tolerance=1e-5)
 
     ########################################
@@ -1250,11 +1281,11 @@ def test_covariances():
     z = -3*x
     covs = uncertainties.covariance_matrix([x, y, z])
     # Diagonal elements are simple:
-    assert _numbers_close(covs[0][0], 0.01)
-    assert _numbers_close(covs[1][1], 0.04)
-    assert _numbers_close(covs[2][2], 0.09)
+    assert numbers_close(covs[0][0], 0.01)
+    assert numbers_close(covs[1][1], 0.04)
+    assert numbers_close(covs[2][2], 0.09)
     # Non-diagonal elements:
-    assert _numbers_close(covs[0][1], -0.02)
+    assert numbers_close(covs[0][1], -0.02)
 
     
 ###############################################################################
@@ -1465,6 +1496,376 @@ def power_wrt_ref(op, ref_op):
     assert op(ufloat(-1.1, 0), 9) == ref_op(-1.1, 9)
     
 
+###############################################################################
+
+def test_PDG_precision():
+    '''
+    Test of the calculation of the number of significant digits for
+    the uncertainty.
+    '''
+
+    # The 3 cases of the rounding rules are covered in each case:
+    tests = {
+        # Very big floats:
+        1.7976931348623157e308: (2, 1.7976931348623157e308),
+        0.5e308: (1, 0.5e308),
+        0.9976931348623157e+308: (2, 1e308),
+        # Very small floats:
+        1.3e-323: (2, 1.3e-323),
+        5e-324: (1, 5e-324),
+        9.99e-324: (2, 1e-323)
+        }
+
+    for (std_dev, result) in tests.iteritems():
+        assert uncertainties.PDG_precision(std_dev) == result
+
+def test_repr():
+    '''Test the representation of numbers with uncertainty.'''
+
+    # The uncertainty is a power of 2, so that it can be exactly
+    # represented:
+    x = ufloat(3.14159265358979, 0.25)
+    assert repr(x) == '3.14159265358979+/-0.25'
+
+    x = ufloat(3.14159265358979, 0)
+    assert repr(x) == '3.14159265358979+/-0'
+
+    # Tagging:
+    x = ufloat(3, 1, "length")
+    assert repr(x) == '< length = 3.0+/-1.0 >'
+    
+def test_format():
+    '''Test the formatting of numbers with uncertainty.'''
+
+    # Tests of each point of the docstring of
+    # AffineScalarFunc.__format__() in turn, mostly in the same order.
+
+    tests = {  # (Nominal value, uncertainty): {format: result,...}
+
+        # Usual float formatting, and individual widths, etc.:
+        (3.1415, 0.0001): {
+            '*^+7.2f': '*+3.14*+/-*0.00**',
+            '+07.2f': '+003.14+/-0000.00',  # 0 fill
+            '>10f': '  3.141500+/-  0.000100',  # Width and align
+            '11.3e': '  3.142e+00+/-  0.000e+00',  # Duplicated exponent
+            '0.4e': '3.1415e+00+/-0.0000e+00'  # Forced double exponent
+        },
+        
+        # Full generalization of float formatting:
+        (3.1415, 0.0001): {
+            '+09.2uf': '+03.14150+/-000.00010'
+        },
+
+        # Number of digits of the uncertainty fixed:
+        (123.456789, 0.00123): {
+            '.1uf': '123.457+/-0.001',
+            '.2uf': '123.4568+/-0.0012',
+            '.3uf': '123.45679+/-0.00123',
+            '.2ue': '(1.234568+/-0.000012)e+02'
+        },
+        # Sign handling:
+        (-123.456789, 0.00123): {
+            '.1uf': '-123.457+/-0.001',
+            '.2uf': '-123.4568+/-0.0012',
+            '.3uf': '-123.45679+/-0.00123',
+            '.2ue': '(-1.234568+/-0.000012)e+02'
+        },
+        # Uncertainty larger than the nominal value:
+        (12.3, 456.78): {
+            '': '12+/-457',
+            '.1uf': '12+/-457',
+            '.4uf': '12.3+/-456.8'
+        },
+        # ... Same thing, but with an exponent:
+        (12.3, 456.78): {
+            '.1ue': '(0+/-5)e+02',
+            '.4ue': '(0.123+/-4.568)e+02'
+        },
+
+        # Test of the various float formats: the nominal value should
+        # have a similar representation as if it were directly
+        # represented as a float:
+        (1234567.89, 0.1): {
+            '.0e': '(1+/-0)e+06',
+            'e': '(1.23456789+/-0.00000010)e+06',
+            'E': '(1.23456789+/-0.00000010)E+06',
+            'f': '1234567.89+/-0.10',
+            'F': '1234567.89+/-0.10',
+            'g': '1234567.89+/-0.10',
+            'G': '1234567.89+/-0.10',
+            '%': '(123456789+/-10)%'
+        },
+        (1234567.89, 4.3): {
+            'g': '1234568+/-4'
+        },
+        (1234567.89, 43): {  # Case where g triggers the exponent notation
+            'g': '(1.23457+/-0.00004)e+06',
+            'G': '(1.23457+/-0.00004)E+06'
+        },        
+        
+        (1234.56789, 0.1): {
+            '.0f': '(1234+/-0.)',  # Approximate error indicated with "."
+            'e': '(1.23456+/-0.00010)e+03',
+            'E': '(1.23456+/-0.00010)E+03',
+            'f': '1234.57+/-0.10',
+            'F': '1234.57+/-0.10',
+            'f': '1234.57+/-0.10',
+            'F': '1234.57+/-0.10',            
+            '%': '123457+/-10%'
+        },
+
+        # Percent notation:
+        (0.42, 0.0055): {
+            # Because '%' does 0.0055*100, the value
+            # 0.5499999999999999 is obtained, which rounds to 0.5. The
+            # original rounded value is 0.006. The same behavior is
+            # found in Python 2.7: '{:.1%}'.format(0.0055) is '0.5%'.
+            '.1u%': '(42.0+/-0.5)%',
+            '.1u%S': '42.0(5)%',
+            '%C': u'(42.0±0.5)%'
+        },
+        
+        # Particle Data Group automatic convention, including limit cases:
+        (1.2345678, 0.354): {'': '1.23+/-0.35'},
+        (1.2345678, 0.3549): {'': '1.23+/-0.35'},
+        (1.2345678, 0.355): {'': '1.2+/-0.4'},
+        (1.5678, 0.355): {'': '1.6+/-0.4'},
+        (1.2345678, 0.09499): {'': '1.23+/-0.09'},
+        (1.2345678, 0.095): {'': '1.23+/-0.10'},        
+
+        # Automatic extension of the uncertainty up to the decimal
+        # point:
+        (1000, 123): {
+            '.1uf': '1000+/-123',
+            # The nominal value has 1 <= mantissa < 10. The precision
+            # is the number of significant digits of the uncertainty:
+            '.1ue': '(1.0+/-0.1)e+03'
+        },
+
+        # Spectroscopic notation:
+        (-1.23, 3.4): {
+            'S': '-1.2(3.4)',
+            '.2ufS': '-1.2(3.4)',
+            '.3ufS': '-1.23(3.40)',
+        },
+        (-123.456, 0.123): {
+            'S': '-123.46(12)',
+            '.1ufS': '-123.5(1)',            
+            '.2ufS': '-123.46(12)',
+            '.3ufS': '-123.456(123)',
+        },
+        (-123.456, 0.567): {
+            'S': '-123.5(6)',
+            '.1ufS': '-123.5(6)',            
+            '.2ufS': '-123.46(57)',
+            '.3ufS': '-123.456(567)',
+        },
+
+        # LaTeX notation:
+        #
+        (1234.56789, 0.1): {
+            'eL': r'(1.23457 \pm 0.00010) \times 10^{3}',
+            'EL': r'(1.23457 \pm 0.00010) \times 10^{3}',
+            'fL': '1234.57 \pm 0.10',
+            'FL': '1234.57 \pm 0.10',
+            'fL': '1234.57 \pm 0.10',
+            'FL': '1234.57 \pm 0.10',            
+            '%L': '(123457 \pm 10) \%'
+        },
+        #
+        # ... combined with the spectroscopic notation:
+        (-1.23, 3.4): {
+            'SL': '-1.2(3.4)',
+            'LS': '-1.2(3.4)',
+            '.2ufSL': '-1.2(3.4)',
+            '.2ufLS': '-1.2(3.4)'
+        },
+
+        # Special cases for the uncertainty (0, nan) and format
+        # strings (extension S, L, U,..., global width, etc.):
+        (-1.4e-12, 0): {
+            'L': r'(-1.4 \pm 0) \times 10^{-12}',
+            '10C': u'  -1.4e-12±         0',
+            '13S': '  -1.4(0)e-12'
+        },
+        (-1.4e-12, float('nan')): {
+            'L': r'(-1.4 \pm nan) \times 10^{-12}',
+            '.2uG': '(-1.4+/-NAN)E-12',  # u ignored, format used
+            '10': '  -1.4e-12+/-       nan',
+            '15S': '  -1.4(nan)e-12',
+            '15GS': '  -1.4(NAN)E-12'
+        },
+
+        (3.14e-10, 0.01e-10): {
+            # Character (Unicode) strings:
+            u'C': u'(3.140±0.010)e-10',  # PDG rules: 2 digits
+            u'CL': ur'(3.140±0.010) \times 10^{-10}',
+            # Truncated non-zero uncertainty:
+            '.1e': '(3.1+/-0.0)e-10',
+            '.1eS': '3.1(0.0)e-10'
+        },
+        
+        # Some special cases:
+        (1, float('nan')): {
+            'g': '1+/-nan',
+            'G': '1+/-NAN',
+            '%': '(100.000000+/-nan)%',  # The % format type is like f
+            # This is ugly, but consistent with '{:+05}'.format(float('nan'))
+            '+05': '+0001+/-00nan',
+            # 5 is the *minimal* width, 6 is the default number of
+            # digits after the decimal point:
+            '+05%': '(+100.000000+/-00nan)%'
+        },
+        (9.9, 0.1): {
+            '.1ue': '(9.9+/-0.1)e+00',
+            '.0fS': '10(0.)'
+        },
+        (9.99, 0.1): {
+             # The precision has an effect on the exponent, like for
+             # floats:
+            '.2ue': '(9.99+/-0.10)e+00',  # Same exponent as for 9.99 alone
+            '.1ue': '(1.00+/-0.01)e+01'  # Same exponent as for 9.99 alone
+        },
+        # 0 uncertainty: nominal value displayed like a float:
+        (1.2345, 0): {
+            '.2ue': '(1.23+/-0)e+00',
+            '1.2ue': '1.23e+00+/-0',
+            '.2uf': '1.23+/-0',
+            '.2ufS': '1.23(0)',
+            '.2fS': '1.23(0)',
+            '': '1.2345+/-0',
+            'g': '1.2345+/-0'
+        },
+        (1e5, 0): {
+            'g': '100000+/-0'
+        }, 
+        (1e6, 0): {
+            # A default precision of 6 is used because the uncertainty
+            # cannot be used for defining a default precision (it does
+            # not have a magnitude):
+            'g': '(1+/-0)e+06'
+        },
+        (1e6+10, 0): {
+            # A default precision of 6 is used because the uncertainty
+            # cannot be used for defining a default precision (it does
+            # not have a magnitude):
+            'g': '(1.00001+/-0)e+06'
+        },
+        # Rounding of the uncertainty that "changes" the number of
+        # significant digits:
+        (1, 0.994): {
+            '.3uf': '1.000+/-0.994',
+            '.2uf': '1.00+/-0.99',
+            '.1uf': '1+/-1'  # Discontinuity in the number of digits
+        },
+        (12.3, 2.3): {
+            '.2ufS': '12.3(2.3)'  # Decimal point on the uncertainty
+        },
+        (12.3, 2.3): {
+            '.1ufS': '12(2)'  # No decimal point on the uncertainty
+        },
+        (0, 0): {  # Make defining the first significant digit problematic
+            '.1f': '0.0+/-0',  # Simple float formatting
+            'g': '0+/-0'
+        }
+        
+    }
+
+    # ',' format option: introduced in Python 2.7
+    if sys.version_info >= (2, 7):
+        
+        tests.update({
+            (1234.56789, 0.012): {
+                ',.1uf': '1,234.57+/-0.01'
+                },
+
+            (123456.789123, 1234.5678): {
+                ',f': '123,457+/-1,235',  # Particle Data Group convention
+                ',.4f': '123,456.7891+/-1,234.5678'
+                }
+        })
+        
+    if sys.version_info >= (2, 6):
+
+        # Alignment is not available with the % formatting
+        # operator of Python < 2.6:
+        tests[(3.1415, 0.0001)].update({
+            '*^+9.2uf': '+3.14150*+/-*0.00010*',
+            '>9f': '  3.14150+/-  0.00010'  # Width and align
+        })
+        
+    # If the locale was set to American (USA), the "n" format type can
+    # be tested:
+    if locale_set and sys.version_info >= (2, 6):
+        tests[(23456.789123, 1234.56789123)] = {
+            '.0n': '(2+/-0.1)e+04',
+            '.6n': '23,456.8+/-1,234.57'
+            }            
+        
+    for (values, representations) in tests.iteritems():
+
+        value = ufloat(*values)
+        
+        for (format_spec, result) in representations.iteritems():
+
+            # Call that works with Python < 2.6 too:
+            representation = value.format(format_spec)
+
+            assert representation == result, (
+                'Incorrect representation %r for format %r of %s+/-%s:'
+                ' %r expected.'
+                % (representation, format_spec, values[0], values[1],
+                   result))
+
+            # An empty format string is like calling str()
+            # (http://docs.python.org/2/library/string.html#formatspec):
+            if not format_spec:
+                assert representation == str(value), (
+                    'Empty format should give the same thing as str():'
+                    ' %s obtained instead of %s'
+                    % (representation, str(value)))
+            
+            # Parsing back into a number with uncertainty (unless the
+            # LaTeX or comma notation is used):
+            if (not set(format_spec).intersection('L,*%n')  # * = fill with *
+                and '0nan' not in representation.lower()):  # "00nan"
+
+                value_back = ufloat_fromstr(representation)
+
+                # The original number and the new one should be consistent
+                # with each other:
+                try:
+
+                    # The nominal value can be rounded to 0 when the
+                    # uncertainty is larger (because p digits on the
+                    # uncertainty can still show 0.00... for the
+                    # nominal value). The relative error is infinite,
+                    # so this should not cause an error:
+                    if value_back.nominal_value:
+                        assert numbers_close(value.nominal_value,
+                                              value_back.nominal_value, 2.4e-1)
+
+                    # If the uncertainty is zero, then the relative
+                    # change can be large:
+                    assert numbers_close(value.std_dev,
+                                         value_back.std_dev, 3e-1)
+
+                except AssertionError:
+                    # !! The following string formatting requires
+                    # str() to work (to not raise an exception):
+                    raise AssertionError(
+                        'Original value %s and value %s parsed from %r'
+                        ' (obtained through format specification %r)'
+                        ' are not close enough'
+                        % (value, value_back, representation, format_spec))
+
+def test_unicode_format():
+    '''Test of the unicode formatting of numbers with uncertainties'''
+
+    x = ufloat(3.14159265358979, 0.25)
+
+    assert isinstance(u'Résultat = %s' % x.format(''), unicode)
+    assert isinstance(u'Résultat = %s' % x.format('C'), unicode)
     
 ###############################################################################
 
@@ -1486,7 +1887,7 @@ else:
         
         m1, m2 -- NumPy matrices.
         precision -- precision passed through to
-        uncertainties.test_uncertainties._numbers_close().
+        uncertainties.test_uncertainties.numbers_close().
         """
 
         # ! numpy.allclose() is similar to this function, but does not
@@ -1500,11 +1901,11 @@ else:
             elmt1 = uncertainties.to_affine_scalar(elmt1)
             elmt2 = uncertainties.to_affine_scalar(elmt2)
 
-            if not _numbers_close(elmt1.nominal_value,
+            if not numbers_close(elmt1.nominal_value,
                                   elmt2.nominal_value, precision):
                 return False
 
-            if not _numbers_close(elmt1.std_dev,
+            if not numbers_close(elmt1.std_dev,
                                   elmt2.std_dev, precision):
                 return False
         return True
@@ -1615,7 +2016,7 @@ else:
             [x.nominal_value for x in [u, v, sum_value]],
             cov_matrix)
 
-        # arrays_close() is used instead of _numbers_close() because
+        # arrays_close() is used instead of numbers_close() because
         # it compares uncertainties too:
         assert arrays_close(numpy.array([u]), numpy.array([u2]))
         assert arrays_close(numpy.array([v]), numpy.array([v2]))
@@ -1655,7 +2056,7 @@ else:
         x2, y2, z2 = uncertainties.correlated_values_norm(
             zip(nominal_values, std_devs), corr_mat)
         
-        # arrays_close() is used instead of _numbers_close() because
+        # arrays_close() is used instead of numbers_close() because
         # it compares uncertainties too:
 
         # Test of individual variables:
