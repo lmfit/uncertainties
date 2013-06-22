@@ -258,7 +258,7 @@ use the shorthand notation for numbers with uncertainties:
 
    frmtr = ShorthandFormatter()
 
-   print frmtr.format("Result = {0:.1u}", x)
+   print frmtr.format("Result = {0:.1u}", x)  # 1-digit uncertainty
 
 prints ``Result = 0.20(1)``.
 
