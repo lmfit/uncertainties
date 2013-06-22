@@ -146,8 +146,8 @@ All of this is done completely transparently.
 Printing
 ========
 
-Numbers with uncertainties can be printed conveniently. The **precisions**
-of the nominal value and of the uncertainty **match** by default:
+Numbers with uncertainties can be printed conveniently. The nominal
+value and the uncertainty have the **same precision** by default:
 
 >>> print x
 0.200+/-0.010
