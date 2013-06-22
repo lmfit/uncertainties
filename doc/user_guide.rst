@@ -114,9 +114,8 @@ Correlated variables
 
 Correlations between variables are automatically handled whatever the
 number of variables involved, and whatever the complexity of the
-calculation.  Thus, each calculation result keeps track of how it is
-correlated to random variables.  For example, when :data:`x` is the number
-with uncertainty defined above,
+calculation. For example, when :data:`x` is the number with uncertainty
+defined above,
 
 >>> square = x**2
 >>> print square
