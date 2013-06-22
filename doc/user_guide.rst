@@ -181,7 +181,9 @@ factored, so that parts (nominal value and standard deviation) can be
 well aligned; using a (minimal) width of 1 is thus a way of forcing
 exponents to not be factored.
 
-**Almost all the float format specifications** are accepted.
+**Almost all the float format specifications** are accepted (including
+those containing a fill character, an alignment option, a sign or zero
+option, and a width).
 
 It is possible to control the **number of significant digits of the
 uncertainty** by adding the modifier ``u`` after the precision:
