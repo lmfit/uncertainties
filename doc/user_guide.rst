@@ -112,10 +112,10 @@ performed through the dedicated :mod:`uncertainties.unumpy` module.
 Correlated variables
 ====================
 
-Correlations between variables are automatically handled whatever the
-number of variables involved, and whatever the complexity of the
-calculation. For example, when :data:`x` is the number with uncertainty
-defined above,
+Correlations between variables are **automatically handled** whatever
+the number of variables involved, and whatever the complexity of the
+calculation. For example, when :data:`x` is the number with
+uncertainty defined above,
 
 >>> square = x**2
 >>> print square
@@ -131,12 +131,12 @@ fact that :data:`x`, :data:`y` and :data:`square` have a non-zero uncertainty: t
 calculated functions give the same value for all samples of the random
 variable :data:`x`.
 
-Thanks to the tracking of dependencies on random variables,
-calculations can therefore be performed in as many steps as necessary,
-exactly as with simple floats.  When various quantities are combined
-through mathematical operations, the result is calculated by taking
-into account all the correlations between the quantities involved.
-All of this is done completely transparently.
+Thanks to the automatic correlation handling, calculations can be
+performed in as many steps as necessary, exactly as with simple
+floats.  When various quantities are combined through mathematical
+operations, the result is calculated by taking into account all the
+correlations between the quantities involved.  All of this is done
+completely **transparently**.
 
 .. index::
    printing
