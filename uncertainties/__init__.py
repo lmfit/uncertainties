@@ -1522,6 +1522,9 @@ class AffineScalarFunc(object):
         "Nominal value of the random number."
         return self._nominal_value
     
+    # Abbreviation (for formulas, etc.):
+    n = nominal_value
+    
     ############################################################
 
         
@@ -1647,6 +1650,9 @@ class AffineScalarFunc(object):
         return CallableStdDev(sqrt(sum(
             delta**2 for delta in self.error_components().itervalues())))
 
+    # Abbreviation (for formulas, etc.):
+    s = std_dev
+    
     def __repr__(self):
         # Not putting spaces around "+/-" helps with arrays of
         # Variable, as each value with an uncertainty is a
