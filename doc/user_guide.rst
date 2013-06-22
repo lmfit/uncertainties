@@ -231,9 +231,9 @@ use the shorthand notation for numbers with uncertainties:
                return super(ShorthandFormatter, self).format_field(
                    value, format_spec)
 
-   fmter = ShorthandFormatter()
+   fmtr = ShorthandFormatter()
 
-   print fmter.format("Result = {0}", ufloat(3.14, 0.01))
+   print fmtr.format("Result = {0}", ufloat(3.14, 0.01))
 
 prints ``Result = 3.140(10)``.
 
