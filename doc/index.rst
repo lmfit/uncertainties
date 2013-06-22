@@ -363,9 +363,8 @@ Jason Moore, Martin Lutz, Víctor Terrón, Matt Newville, Matthew Peel,
 Don Peterson and many others.
 
 I greatly appreciated getting key technical input from Arnaud
-Delobelle, Pierre Cladé, and Sebastian Walter.  Patches by Pierre
-Cladé, Tim Head, José Sabater Montes and Martijn Pieters are
-gratefully acknowledged.
+Delobelle, Pierre Cladé, and Sebastian Walter.  Patches by Tim Head,
+José Sabater Montes and Martijn Pieters are gratefully acknowledged.
 
 I am also grateful to the Linux distribution maintainers of this
 package, and to Christoph Gohlke for including it in his Base
