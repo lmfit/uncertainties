@@ -176,7 +176,9 @@ through the usual :func:`format` method of strings:
 Result =       0.20+/-      0.01
 
 (For Python before version 2.6, one can do ``'Result = %s' %
-x.format('10.2f')`` instead.)
+x.format('10.2f')`` instead.) When a width is used, exponents are not
+factored, so that each part (nominal value and standard deviation) are
+well aligned.
 
 **Almost all the float format specifications** are accepted.
 
