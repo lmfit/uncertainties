@@ -210,8 +210,8 @@ Options can be combined.
 
 .. Output:
 
-An uncertainty which is *exactly* equal to **zero** is always
-formatted as an integer:
+An uncertainty which is *exactly* **zero** is always formatted as an
+integer:
 
 >>> print ufloat(3.1415, 0)
 3.1415+/-0
