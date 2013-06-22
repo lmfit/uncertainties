@@ -258,9 +258,9 @@ use the shorthand notation for numbers with uncertainties:
 
    frmtr = ShorthandFormatter()
 
-   print frmtr.format("Result = {0}", ufloat(3.14, 0.01))
+   print frmtr.format("Result = {0}", x)
 
-prints ``Result = 3.140(10)``.
+prints ``Result = 0.20(1)``.
 
 
 .. index::
