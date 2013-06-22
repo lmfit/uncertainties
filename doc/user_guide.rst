@@ -173,17 +173,8 @@ Result =       0.20+/-      0.01
 (For Python before version 2.6, one can do ``'Result = %s' %
 x.format('10.2f')`` instead.)
 
-**All the float format specifications** are accepted.
-
-An uncertainty which is *exactly* equal to **zero** is always represented as
-an integer:
-
->>> print ufloat(3.1415, 0)
-3.1415+/-0
->>> print ufloat(3.1415, 0.0005)
-3.1415+/-0.0005
->>> print '{:.2f}'.format(ufloat(3.14, 0.001))
-3.14+/-0.00
+**All the float format specifications** are accepted (except for the
+`n` format type without precision).
 
 It is possible to control the **number of significant digits of the
 uncertainty** by adding the modifier ``u`` before the format type:
@@ -192,6 +183,27 @@ uncertainty** by adding the modifier ``u`` before the format type:
 1 significant digit on the uncertainty: 0.20+/-0.01
 >>> print '3 significant digits on the uncertainty: {:.3u}'.format(x)
 3 significant digits on the uncertainty: 0.2000+/-0.0100
+
+An uncertainty which is *exactly* equal to **zero** is always
+formatted as an integer:
+
+>>> print ufloat(3.1415, 0)
+3.1415+/-0
+>>> print ufloat(3.1415, 0.0005)
+3.1415+/-0.0005
+>>> print '{:.2f}'.format(ufloat(3.14, 0.001))
+3.14+/-0.00
+
+**All the digits** of a number with uncertainty are given in its
+representation:
+
+>>> y = ufloat(1.23456789012345, 0.123456789)
+>>> print y
+1.23+/-0.12
+>>> print repr(y)
+1.23456789012345+/-0.123456789
+>>> y
+1.23456789012345+/-0.123456789
 
 Formatting options can be added at the end of the format string: ``S``
 for the **shorthand notation**, ``C`` for using a **single character
