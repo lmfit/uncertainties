@@ -258,6 +258,7 @@ __all__ = [
     # in particular because NumPy might be unavailable.
 
     'ufloat',  # Main function: returns a number with uncertainty
+    'ufloat_fromstr',  # Important function: returns a number with uncertainty
 
     # Uniform access to nominal values and standard deviations:
     'nominal_value',

@@ -146,23 +146,28 @@ All of this is done completely transparently.
 Printing
 ========
 
+.. Basic examples:
+
 Numbers with uncertainties can be printed conveniently. The nominal
 value and the uncertainty have the **same precision** by default:
 
 >>> print x
 0.200+/-0.010
 
-When no explicit precision is given, like here, the `rounding rules of
-the Particle Data Group
-<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ are
-automatically applied (they essentially keep the number of digits
-small, while preventing the uncertainty from being displayed with a
-large relative error).
-
-**Exponents** are automatically **factored** for increased legibility:
+**Exponents** are generally automatically **factored**, for increased
+legibility:
 
 >>> print x*1e7
 (2.00+/-0.10)e+06
+
+.. Usage:
+
+When no explicit precision is given, the **rounding rules** of the
+`Particle Data Group
+<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ are
+**automatically applied** (they essentially keep the number of digits
+small, while preventing the uncertainty from being displayed with a
+large relative error).
 
 More **control over the format** can be obtained (in Python 2.6+)
 through the usual :func:`format` method of strings:
@@ -171,12 +176,42 @@ through the usual :func:`format` method of strings:
 Result =       0.20+/-      0.01
 
 (For Python before version 2.6, one can do ``'Result = %s' %
-x.format('10.2f')`` instead.)
+x.format('10.2f')`` instead.) When a width is used, exponents are not
+factored, so that parts (nominal value and standard deviation) can be
+well aligned; using a (minimal) width of 1 is thus a way of forcing
+exponents to not be factored.
 
-**All the float format specifications** are accepted.
+**Almost all the float format specifications** are accepted (including
+those containing a fill character, an alignment option, a sign or zero
+option, and a width).
 
-An uncertainty which is *exactly* equal to **zero** is always represented as
-an integer:
+It is possible to control the **number of significant digits of the
+uncertainty** by adding the modifier ``u`` after the precision:
+
+>>> print '1 significant digit on the uncertainty: {:.1u}'.format(x)
+1 significant digit on the uncertainty: 0.20+/-0.01
+>>> print '3 significant digits on the uncertainty: {:.3u}'.format(x)
+3 significant digits on the uncertainty: 0.2000+/-0.0100
+
+.. Options
+
+Formatting options can be added at the end of the format string: ``S``
+for the **shorthand notation**, ``C`` for using a **single character
+(±)**, ``L`` for a **LaTeχ** output:
+
+>>> print '{:+.1uS}'.format(x)  # Sign, 1 digit for the uncertainty, shorthand
++0.20(1)
+>>> print u'{:.2eC}'.format(x)  # 2 digits after the decimal point, ± character
+(2.00±0.10)e-01
+>>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeχ
+(2.00 \pm 0.10) \times 10^{6}
+
+Options can be combined.
+
+.. Output:
+
+An uncertainty which is *exactly* **zero** is always formatted as an
+integer:
 
 >>> print ufloat(3.1415, 0)
 3.1415+/-0
@@ -185,26 +220,16 @@ an integer:
 >>> print '{:.2f}'.format(ufloat(3.14, 0.001))
 3.14+/-0.00
 
-It is possible to control the **number of significant digits of the
-uncertainty** by adding the modifier ``u`` before the format type:
+**All the digits** of a number with uncertainty are given in its
+representation:
 
->>> print '1 significant digit on the uncertainty: {:.1u}'.format(x)
-1 significant digit on the uncertainty: 0.20+/-0.01
->>> print '3 significant digits on the uncertainty: {:.3u}'.format(x)
-3 significant digits on the uncertainty: 0.2000+/-0.0100
-
-Formatting options can be added at the end of the format string: ``S``
-for the **shorthand notation**, ``C`` for using a **single character
-(±)**, ``L`` for a **LaTeχ** output:
-
->>> print '{:.1uS}'.format(x)  # 1 digit for the uncertainty
-0.20(1)
->>> print u'{:.2eC}'.format(x)  # 2 digits after the decimal point
-(2.00±0.10)e-01
->>> print '{:L}'.format(x*1e7)  # Automatic exponent
-(2.00 \pm 0.10) \times 10^{6}
-
-Options can be combined.
+>>> y = ufloat(1.23456789012345, 0.123456789)
+>>> print y
+1.23+/-0.12
+>>> print repr(y)
+1.23456789012345+/-0.123456789
+>>> y
+1.23456789012345+/-0.123456789
 
 **More information** on formatting can be obtained with ``pydoc
 uncertainties.UFloat.__format__``.
