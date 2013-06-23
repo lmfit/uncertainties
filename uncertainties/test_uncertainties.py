@@ -1770,8 +1770,14 @@ def test_format():
         (0, 0): {  # Make defining the first significant digit problematic
             '.1f': '0.0+/-0',  # Simple float formatting
             'g': '0+/-0'
+        },
+        (1.2e-34, 5e-67): {
+            '.6g': '(1.2+/-5e-33)e-34',
+            # The following form is unusual, but has the advantage of
+            # clearly showing the relative magnitude of the
+            # uncertainty:
+            '10.6g': '   1.2e-34+/- 5e-33e-34'
         }
-        
     }
 
     # ',' format option: introduced in Python 2.7
