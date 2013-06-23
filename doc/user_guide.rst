@@ -211,7 +211,7 @@ precision**.  The *only exception* is that if a format specification
 does not define the number of significant digits on the uncertainty,
 it is applied to each part *independently*, which may not yield the
 same precision (this happens with formats like ``".3g"`` or ``".6n"``,
-which give a *maximum* of 3 significant digits):
+which only define a *maximum* of significant digits):
 
 >>> print "{:.6g}".format(ufloat(1.2e3, 4.56e-10))
 1200+/-4.56e-10
