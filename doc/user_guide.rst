@@ -216,7 +216,8 @@ which only define a *maximum* of significant digits):
 >>> print "{:.6g}".format(ufloat(1.2e3, 4.56e-10))
 1200+/-4.56e-10
 
-Even in this case, the exponent is still common and can be factored:
+(The larger value defines whether a common exponent should be used.)
+Even in this case, a common exponent can still be factored:
 
 >>> print "{:.6g}".format(ufloat(1.2345e-10, 0.06e-10))
 (1.2345+/-0.06)e-10
