@@ -42,6 +42,8 @@ with uncertainties can easily be parsed.  Thus, x = 0.20±0.01 can be
 expressed in many convenient ways, including:
 
 >>> x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
+
+>>> from uncertainties import ufloat_fromstr
 >>> x = ufloat_fromstr("0.20+/-0.01")
 >>> x = ufloat_fromstr(u"0.20±0.01")
 >>> x = ufloat_fromstr("(2+/-0.1)e-01")
@@ -196,7 +198,11 @@ The nominal value and the uncertainty generally have the **same
 precision**.  The only exception is that if a format specification
 does not define the number of significant digits on the uncertainty,
 it is applied to each part independently (e.g., the "float" format
-specifications ``".2f"``, ``".3g"``, ``".6n"``, etc.).
+specifications ``".2f"``, ``".3g"``, ``".6n"``, etc.):
+
+>>> y = ufloat(1.2e3, 4.56e-10)
+>>> print "{:.6g}".format(y)
+1200+/-4.56e-10
 
 .. Options
 
