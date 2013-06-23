@@ -182,8 +182,7 @@ not be factored.) Thanks to this feature, each part (nominal value and
 standard deviation) can be well aligned across multiple lines, and the
 relative magnitude of the error can be readily estimated.
 
-.. Usage:
-
+.. Legacy code and simple control:
 
 **Almost all the float format specifications** are accepted (including
 those containing a fill character, an alignment option, a sign or zero
