@@ -1817,9 +1817,9 @@ def test_format():
         
         for (format_spec, result) in representations.iteritems():
 
-            # Jython 2.5.2 does not always represent NaN as nan or
-            # NAN: for example, '%.2g' % float('nan') is '\ufffd'. The
-            # test is skipped, in this case:
+            # Jython 2.5.2 does not always represent NaN as nan or NAN
+            # in the CPython way: for example, '%.2g' % float('nan')
+            # is '\ufffd'. The test is skipped, in this case:
             if jython_detected and isnan(value.std_dev):
                 continue
             
