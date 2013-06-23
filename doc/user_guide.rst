@@ -205,7 +205,7 @@ rules (the rules keep the number of digits small, while preventing the
 uncertainty from being displayed with a large relative error).
 
 The nominal value and the uncertainty generally have the **same
-precision**.  The only *exception* is that if a format specification
+precision**.  The *only exception* is that if a format specification
 does not define the number of significant digits on the uncertainty,
 it is applied to each part *independently* (e.g., the "float" format
 specifications ``".2f"``, ``".3g"``, ``".6n"``, etc.):
