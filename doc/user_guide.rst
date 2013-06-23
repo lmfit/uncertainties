@@ -188,7 +188,7 @@ uncertainty** by adding the modifier ``u`` after the precision:
 >>> print '3 significant digits on the uncertainty: {:.3u}'.format(x)
 3 significant digits on the uncertainty: 0.2000+/-0.0100
 
-When no explicit precision is given, the number of significant digits
+When no *explicit* precision is given, the number of significant digits
 on the uncertainty is defined with the `Particle Data Group
 <http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
 rules (the rules keep the number of digits small, while preventing the
