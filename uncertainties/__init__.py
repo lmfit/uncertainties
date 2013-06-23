@@ -2741,16 +2741,16 @@ def str_to_number_with_uncert(representation):
     match = re.match(u'(.*)(?:\+/-|±)(.*)', representation)
     if match:
 
-        # Simple form 1234.45+/-1.2 or 1234.45±1.2:
         (nom_value, uncert) = match.groups()
-
+        
         try:
+            # Simple form 1234.45+/-1.2 or 1234.45±1.2, or 1.23e-10+/-1e-23
             parsed_value = (float(nom_value)*factor, float(uncert)*factor)
         except ValueError:
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
         
     else:
-        # Form with parentheses or no uncertainty:
+        # Form with error parentheses or no uncertainty:
         try:
             parsed_value = parse_error_in_parentheses(representation)
         except NotParenUncert:
