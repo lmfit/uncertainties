@@ -165,14 +165,15 @@ x.format('10.2f')`` instead.)
 
 .. Details on the facilities offered: exponents:
 
-**Exponents** are generally automatically **factored**, for increased
+A **common exponent** is automatically calculated if an exponent is
+needed for the larger of the nominal value (in absolute value) and the
+uncertainty. The exponent is generally **factored**, for increased
 legibility:
 
 >>> print x*1e7
 (2.00+/-0.10)e+06
 
-When a format width is used, the exponent is still **common** but is
-not factored:
+When a *format width* is used, the common exponent is not factored:
 
 >>> print 'Result = {:10.1e}'.format(x*1e-10)
 Result =    2.0e-11+/-   0.1e-11
