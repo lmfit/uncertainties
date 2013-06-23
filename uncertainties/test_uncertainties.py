@@ -619,7 +619,10 @@ def test_comparison_ops():
         for op in ("__%s__" % name
                    for name in('ne', 'eq', 'lt', 'le', 'gt', 'ge')):
 
-            float_func = getattr(float, op)
+            try:
+                float_func = getattr(float, op)
+            except AttributeError:  # Jython 2.5 does not have float.__ne__
+                continue
             
             # Determination of the correct truth value of func(x, y):
 
