@@ -22,11 +22,11 @@ import sys
 import locale
 locale_set = True
 try:
-    locale.setlocale(locale.LC_ALL, 'en_US')  # POSIX
-except Error:
+    locale.setlocale(locale.LC_ALL, 'en_USX')  # POSIX
+except locale.Error:
     try:
         locale.setlocale(locale.LC_ALL, 'american_usa')  
-    except Error:
+    except locale.Error:
         locale_set = False  # Some tests won't be run
 
         
