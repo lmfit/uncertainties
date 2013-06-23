@@ -1962,9 +1962,9 @@ class AffineScalarFunc(object):
 
         #######################################
 
-        # Exponent notation: should it be used? use_exp is set
-        # accordingly. If an exponent should be used (use_exp is
-        # True), 'exponent' is set to the exponent that should be
+        # Common exponent notation: should it be used? use_exp is set
+        # accordingly. If a common exponent should be used (use_exp is
+        # True), 'common_exp' is set to the exponent that should be
         # used.
 
         if fmt_type in 'fF':
@@ -1974,7 +1974,7 @@ class AffineScalarFunc(object):
             # !! This calculation might have been already done, for
             # instance when using the .0e format: signif_d_to_limit()
             # was called before, which prompted a similar calculation:
-            exponent = first_digit(round(exp_ref_value, -digits_limit))
+            common_exp = first_digit(round(exp_ref_value, -digits_limit))
         else:  # g, G, n
 
             # The rules from
@@ -1982,8 +1982,8 @@ class AffineScalarFunc(object):
             # are applied.
 
             # Python's native formatting (whose result could be parsed
-            # in order to determine whether an exponent should be
-            # used) is not used because there is shared information
+            # in order to determine whether a common exponent should
+            # be used) is not used because there is shared information
             # between the nominal value and the standard error (same
             # last digit, common exponent) and extracting this
             # information from Python would entail parsing its
@@ -1997,11 +1997,11 @@ class AffineScalarFunc(object):
             # for floats is used ("-4 <= exponent of rounded value <
             # p"), on the nominal value.
             
-            exponent = first_digit(round(exp_ref_value, -digits_limit))
+            common_exp = first_digit(round(exp_ref_value, -digits_limit))
 
             # The number of significant digits of the reference value
             # rounded at digits_limit is exponent-digits_limit+1:
-            if -4 <= exponent < exponent-digits_limit+1:
+            if -4 <= common_exp < common_exp-digits_limit+1:
                 use_exp = False
             else:
                 use_exp = True
@@ -2013,23 +2013,23 @@ class AffineScalarFunc(object):
         # number is non-positive), of nom_val_mantissa ("mantissa" for
         # the nominal value, i.e. value possibly corrected for a
         # factorized exponent), and std_dev_mantissa (similarly for
-        # the standard deviation). Exponent is also set to None if no
-        # exponent should be used.
+        # the standard deviation). common_exp is also set to None if no
+        # common exponent should be used.
         
         if use_exp:
 
-            factor = 10.**exponent  # Not 10.**(-exponent), for limit cases
+            factor = 10.**common_exp  # Not 10.**(-common_exp), for limit cases
             
             nom_val_mantissa = nom_val/factor
             std_dev_mantissa = std_dev/factor
             # Limit for the last digit of the mantissas (it should be
             # non-positive, as digits before the final decimal points
             # are always returned in full):
-            signif_limit = digits_limit - exponent
+            signif_limit = digits_limit - common_exp
 
-        else:  # No exponent
+        else:  # No common exponent
             
-            exponent = None
+            common_exp = None
 
             nom_val_mantissa = nom_val
             std_dev_mantissa = std_dev
@@ -2056,7 +2056,7 @@ class AffineScalarFunc(object):
         ########################################
 
         # Final formatting:
-        return format_num(nom_val_mantissa, std_dev_mantissa, exponent, 
+        return format_num(nom_val_mantissa, std_dev_mantissa, common_exp, 
                           match.groupdict(),
                           prec=prec,
                           fixed_point_type=fixed_point_type,
