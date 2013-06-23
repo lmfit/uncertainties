@@ -22,7 +22,7 @@ import sys
 import locale
 locale_set = True
 try:
-    locale.setlocale(locale.LC_ALL, 'en_USX')  # POSIX
+    locale.setlocale(locale.LC_ALL, 'en_US')  # POSIX
 except locale.Error:
     try:
         locale.setlocale(locale.LC_ALL, 'american_usa')  
