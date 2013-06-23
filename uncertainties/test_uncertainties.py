@@ -1776,7 +1776,8 @@ def test_format():
             # The following form is unusual, but has the advantage of
             # clearly showing the relative magnitude of the
             # uncertainty:
-            '10.6g': '   1.2e-34+/- 5e-33e-34'
+            '10.6g': '   1.2e-34+/- 5e-33e-34',
+            '10.6G': '   1.2E-34+/- 5E-33e-34'
         }
     }
 
