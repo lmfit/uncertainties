@@ -2778,8 +2778,6 @@ def ufloat_fromstr(representation, tag=None):
         # of formats like .6g, 10.6g or 10.6n):
         (-3.1415 +/- 1e-4)e+200
         (1e-20 +/- 3)e100
-        1.2e-3e-10 +/- 1e-10
-        1.2e-10 +/- 4e-3e-10
 
         0.29
         31.
