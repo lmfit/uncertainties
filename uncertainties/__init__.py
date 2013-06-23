@@ -478,6 +478,14 @@ def to_affine_scalar(x):
     raise NotUpcast("%s cannot be converted to a number with"
                     " uncertainty" % type(x))
 
+# Step constant for numerical derivatives in
+# partial_derivative(). Value chosen to as to get better numerical
+# result:
+try:
+    STEP_SIZE = sqrt(sys.float_info.epsilon)
+except AttributeError:
+    STEP_SIZE = 1e-8
+
 # !! It would be possible to split the partial derivative calculation
 # into two functions: one for positional arguments (case of integer
 # arg_ref) and one for keyword arguments (case of string
@@ -518,12 +526,10 @@ def partial_derivative(f, arg_ref):
        
         # The step is relative to the parameter being varied, so that
         # shifting it does not suffer from finite precision limitations:
-        step = 1e-8*abs(args_with_var[arg_ref])
+        step = STEP_SIZE*abs(args_with_var[arg_ref])
         if not step:
-            # Arbitrary, but "small" with respect to 1, and of the
-            # order of the square root of the precision of double
-            # precision floats:
-            step = 1e-8
+            # Arbitrary, but "small" with respect to 1:
+            step = STEP_SIZE
 
         args_with_var[arg_ref] += step
 

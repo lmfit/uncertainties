@@ -23,10 +23,10 @@ import locale
 locale_set = True
 try:
     locale.setlocale(locale.LC_ALL, 'en_US')  # POSIX
-except Error:
+except locale.Error:
     try:
         locale.setlocale(locale.LC_ALL, 'american_usa')  
-    except Error:
+    except locale.Error:
         locale_set = False  # Some tests won't be run
 
         
@@ -1817,13 +1817,25 @@ def test_format():
             '.0n': '(2+/-0.1)e+04',
             '.6n': '23,456.8+/-1,234.57'
             }            
-        
+
+    # True if we can detect that the Jython interpreter is running this code:
+    try:
+        jython_detected = sys.subversion[0] == 'Jython'
+    except AttributeError:
+        jython_detected = False
+    
     for (values, representations) in tests.iteritems():
 
         value = ufloat(*values)
         
         for (format_spec, result) in representations.iteritems():
 
+            # Jython 2.5.2 does not always represent NaN as nan or NAN
+            # in the CPython way: for example, '%.2g' % float('nan')
+            # is '\ufffd'. The test is skipped, in this case:
+            if jython_detected and isnan(value.std_dev):
+                continue
+            
             # Call that works with Python < 2.6 too:
             representation = value.format(format_spec)
 
