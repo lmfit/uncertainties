@@ -182,7 +182,9 @@ exponents to not be factored.
 
 **Almost all the float format specifications** are accepted (including
 those containing a fill character, an alignment option, a sign or zero
-option, and a width).
+option, and a width). With float format specifications, if an explicit
+precision is given, the format is applied to each part independently
+(this is the only case with no precision matching).
 
 It is possible to control the **number of significant digits of the
 uncertainty** by adding the modifier ``u`` after the precision:
