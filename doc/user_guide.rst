@@ -178,9 +178,11 @@ not factored:
 Result =    2.0e-11+/-   0.1e-11
 
 (Using a (minimal) width of 1 is thus a way of forcing exponents to
-not be factored.) Thanks to this feature, each part (nominal value and
-standard deviation) can be well aligned across multiple lines, and the
-relative magnitude of the error can be readily estimated.
+not be factored.)
+
+Thanks to this feature, each part (nominal value and standard
+deviation) can be well aligned across multiple lines, and the relative
+magnitude of the error can be readily estimated.
 
 .. Legacy code and simple control:
 
@@ -207,12 +209,23 @@ uncertainty from being displayed with a large relative error).
 The nominal value and the uncertainty generally have the **same
 precision**.  The *only exception* is that if a format specification
 does not define the number of significant digits on the uncertainty,
-it is applied to each part *independently* (e.g., the "float" format
-specifications ``".2f"``, ``".3g"``, ``".6n"``, etc.):
+it is applied to each part *independently*, which may not yield the
+same precision (this happens with formats like ``".3g"`` or ``".6n"``,
+which give a *maximum* of 3 significant digits):
 
->>> y = 
->>> print "{:.6g}".format(ufloat(1.2e3, 4.56e-10)y)
+>>> print "{:.6g}".format(ufloat(1.2e3, 4.56e-10))
 1200+/-4.56e-10
+
+Even in this case, the exponent is still common and can be factored:
+
+>>> print "{:.6g}".format(ufloat(1.2345e-10, 0.06e-10))
+(1.2345+/-0.06)e-10
+
+This feature gives a relatively compact notation that contains many
+significant digits for both the nominal value and the standard
+deviation (the common precision of a format with one significant
+digits on the uncertainty—like ``".1ug"``—would truncate the nominal
+value to `1.23`, here).
 
 .. Options
 
