@@ -188,24 +188,22 @@ uncertainty from being displayed with a large relative error).
 The nominal value and the uncertainty generally have the **same
 precision**.  The *only exception* is that if a format specification
 does not define the number of significant digits on the uncertainty,
-it is applied to each part *independently*, which may not yield the
-same precision (this happens with formats like ``".3g"`` or ``".6n"``,
-which only define a *maximum* of significant digits):
+it is applied to each part *independently* (after applying any common
+exponent factor), which may not yield the same precision (this happens
+with formats like ``".3g"`` or ``".6n"``, which only define a
+*maximum* of significant digits):
 
 >>> print "{:.6g}".format(ufloat(1.2e3, 4.56e-10))
 1200+/-4.56e-10
-
-(The larger value defines whether a common exponent should be used.)
-Even in this case, a common exponent can still be factored:
-
 >>> print "{:.6g}".format(ufloat(1.2345e-10, 0.06e-10))
 (1.2345+/-0.06)e-10
 
-This feature gives a relatively compact notation that contains many
-significant digits for both the nominal value and the standard
-deviation (the common precision of a format with one significant
-digits on the uncertainty—like ``".1ug"``—would truncate the nominal
-value to ``1.23``, here).
+(1200 does not need the exponent notation, so no common exponent is
+used in the first example.) This feature gives a relatively compact
+notation that contains many significant digits for both the nominal
+value and the standard deviation (the common precision of a format
+with one significant digits on the uncertainty—like ``".1ug"``—would
+truncate the nominal value to ``1.23``, here).
 
 .. Common exponent:
 
