@@ -1735,18 +1735,16 @@ class AffineScalarFunc(object):
         default precision of 6); this can lead to representations like
         "(1±1e-4)e123".
         
-        When the exponent notation is used, a single common exponent
-        is used. The common exponent (and the presence of such an
-        exponent, in the case of the g, n and None format types) is
-        defined through the larger of the nominal value (in absolute
-        value) and the standard deviation; this way, the quantity that
-        best describes the associated probability distribution has a
-        mantissa in the usual 1-10 range. The exponent is factored (as
-        in "(1.2+/-0.1)e-5"). unless the format specification contains
-        an explicit width (" 1.2e-5+/- 0.1e-5") (this allows numbers
-        to be in a single column, when printing numbers over many
-        lines). Specifying a minimum width of 1 is a way of forcing
-        any common exponent to not be factored out.
+        A common exponent is used if an exponent is needed for the
+        larger of the nominal value (in absolute value) and the
+        standard deviation. Thanks to this, the quantity that best
+        describes the associated probability distribution has a
+        mantissa in the usual 1-10 range. The common exponent is
+        factored (as in "(1.2+/-0.1)e-5"). unless the format
+        specification contains an explicit width (" 1.2e-5+/- 0.1e-5")
+        (this allows numbers to be in a single column, when printing
+        numbers over many lines). Specifying a minimum width of 1 is a
+        way of forcing any common exponent to not be factored out.
         
         The fill, align, zero and width parameters of the format
         specification are applied individually to each of the nominal
