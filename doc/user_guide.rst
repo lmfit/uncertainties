@@ -187,11 +187,10 @@ uncertainty** by adding the modifier ``u`` after the precision:
 3 significant digits on the uncertainty: 0.2000+/-0.0100
 
 When no explicit precision is given, the number of significant digits
-of the uncertainty from the `Particle Data Group
+on the uncertainty is defined with the `Particle Data Group
 <http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
-rules is **automatically calculated** and used (the rules keep the
-number of digits small, while preventing the uncertainty from being
-displayed with a large relative error).
+rules (the rules keep the number of digits small, while preventing the
+uncertainty from being displayed with a large relative error).
 
 The nominal value and the uncertainty generally have the **same
 precision**.  The only exception is that a format specification that
