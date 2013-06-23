@@ -147,8 +147,7 @@ Printing
 
 .. Basic examples:
 
-Numbers with uncertainties can be printed conveniently. The nominal
-value and the uncertainty have the **same precision** by default:
+Numbers with uncertainties can be printed conveniently:
 
 >>> print x
 0.200+/-0.010
@@ -161,13 +160,6 @@ legibility:
 
 .. Usage:
 
-When no explicit precision is given, the **rounding rules** of the
-`Particle Data Group
-<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ are
-**automatically applied** (they essentially keep the number of digits
-small, while preventing the uncertainty from being displayed with a
-large relative error).
-
 More **control over the format** can be obtained (in Python 2.6+)
 through the usual :func:`format` method of strings:
 
@@ -176,15 +168,15 @@ Result =       0.20+/-      0.01
 
 (For Python before version 2.6, one can do ``'Result = %s' %
 x.format('10.2f')`` instead.) When a width is used, exponents are not
-factored, so that parts (nominal value and standard deviation) can be
-well aligned; using a (minimal) width of 1 is thus a way of forcing
+factored, so that each part (nominal value and standard deviation) can
+be well aligned; using a (minimal) width of 1 is thus a way of forcing
 exponents to not be factored.
 
 **Almost all the float format specifications** are accepted (including
 those containing a fill character, an alignment option, a sign or zero
-option, and a width). With float format specifications, if an explicit
-precision is given, the format is applied to each part independently
-(this is the only case with no precision matching).
+option, a width, or the ``%`` format type).
+
+.. Precision control:
 
 It is possible to control the **number of significant digits of the
 uncertainty** by adding the modifier ``u`` after the precision:
@@ -193,6 +185,19 @@ uncertainty** by adding the modifier ``u`` after the precision:
 1 significant digit on the uncertainty: 0.20+/-0.01
 >>> print '3 significant digits on the uncertainty: {:.3u}'.format(x)
 3 significant digits on the uncertainty: 0.2000+/-0.0100
+
+When no explicit precision is given, the number of significant digits
+of the uncertainty from the `Particle Data Group
+<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
+rules is **automatically calculated** and used (the rules keep the
+number of digits small, while preventing the uncertainty from being
+displayed with a large relative error).
+
+The nominal value and the uncertainty generally have the **same
+precision**.  The only exception is that a format specification that
+does not define the number of significant digits of the uncertainty is
+applied to each part independently (e.g., the "float" format
+specifications ``".2f"``, ``".3g"``, ``".6n"``, etc.).
 
 .. Options
 
