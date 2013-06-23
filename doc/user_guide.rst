@@ -225,7 +225,7 @@ This feature gives a relatively compact notation that contains many
 significant digits for both the nominal value and the standard
 deviation (the common precision of a format with one significant
 digits on the uncertainty—like ``".1ug"``—would truncate the nominal
-value to `1.23`, here).
+value to ``1.23``, here).
 
 .. Options
 
