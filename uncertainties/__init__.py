@@ -1168,7 +1168,7 @@ class CallableStdDev(float):
 # an exponent): the keys are the possible mantissa formats:
 EXP_LETTERS = {'f': 'e', 'F': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
-def format_num(nom_val_main, error_main, exponent,
+def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, fixed_point_type, options):
     '''
     Returns a formatted number with uncertainty.
@@ -1177,10 +1177,11 @@ def format_num(nom_val_main, error_main, exponent,
     no decimal point.
     
     nom_val_main, error_main -- nominal value and error, before using
-    the exponent (e.g., "1.23e2" would have a main value of 1.23;
+    common_exp (e.g., "1.23e2" would have a main value of 1.23;
     similarly, "12.3+/-0.01" would have a main value of 12.3).
 
-    exponent -- common exponent to use. If None, no exponent is used.
+    common_exp -- common exponent to use. If None, no common exponent
+    is used.
 
     fmt_parts -- mapping that contains at least the following parts of
     the format specification: fill_align, sign, zero, width, comma;
@@ -1224,15 +1225,15 @@ def format_num(nom_val_main, error_main, exponent,
     # useful for the width handling of the shorthand notation.
     
     # Exponent part:
-    if exponent is None:
+    if common_exp is None:
         exp_str = ''
     else:
         if 'L' in options:
-            exp_str = r' \times 10^{%d}' % exponent
+            exp_str = r' \times 10^{%d}' % common_exp
         elif fixed_point_type in EXP_LETTERS:
             # Case of e or E. The same convention as Python 2.7
             # to 3.3 is used for the display of the exponent:
-            exp_str = EXP_LETTERS[fixed_point_type]+'%+03d' % exponent
+            exp_str = EXP_LETTERS[fixed_point_type]+'%+03d' % common_exp
         else:
             exp_str = ''  # No exponent format
 
@@ -1406,7 +1407,7 @@ def format_num(nom_val_main, error_main, exponent,
         
         # The nominal value and the error might have to be explicitly
         # grouped together, so as to prevent an ambiguous notation:
-        if exponent_factored and exponent is not None:
+        if exponent_factored and common_exp is not None:
             value_str = '(%s%s%s)%s' % (
                 nom_val_str, pm_symbol, error_str, exp_str)
         else:
@@ -1414,7 +1415,7 @@ def format_num(nom_val_main, error_main, exponent,
             
         # Final form:
         if percent_str:
-            if exponent is not None and exponent_factored:
+            if common_exp is not None and exponent_factored:
                 value_str += percent_str
             else:
                 value_str = '(%s)%s' % (value_str, percent_str)
