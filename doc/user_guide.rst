@@ -147,20 +147,12 @@ completely **transparently**.
 Printing
 ========
 
-.. Basic examples:
+.. Overview:
 
 Numbers with uncertainties can be printed conveniently:
 
 >>> print x
 0.200+/-0.010
-
-**Exponents** are generally automatically **factored**, for increased
-legibility:
-
->>> print x*1e7
-(2.00+/-0.10)e+06
-
-.. Usage:
 
 More **control over the format** can be obtained (in Python 2.6+)
 through the usual :func:`format` method of strings:
@@ -169,10 +161,29 @@ through the usual :func:`format` method of strings:
 Result =       0.20+/-      0.01
 
 (For Python before version 2.6, one can do ``'Result = %s' %
-x.format('10.2f')`` instead.) When a width is used, exponents are not
-factored, so that each part (nominal value and standard deviation) can
-be well aligned; using a (minimal) width of 1 is thus a way of forcing
-exponents to not be factored.
+x.format('10.2f')`` instead.) 
+
+.. Details on the facilities offered: exponents:
+
+**Exponents** are generally automatically **factored**, for increased
+legibility:
+
+>>> print x*1e7
+(2.00+/-0.10)e+06
+
+When a format width is used, the exponent is still **common** but is
+not factored:
+
+>>> print 'Result = {:10.1e}'.format(x*1e-10)
+Result =    2.0e-11+/-   0.1e-11
+
+(Using a (minimal) width of 1 is thus a way of forcing exponents to
+not be factored.) Thanks to this feature, each part (nominal value and
+standard deviation) can be well aligned across multiple lines, and the
+relative magnitude of the error can be readily estimated.
+
+.. Usage:
+
 
 **Almost all the float format specifications** are accepted (including
 those containing a fill character, an alignment option, a sign or zero
@@ -195,13 +206,13 @@ rules (the rules keep the number of digits small, while preventing the
 uncertainty from being displayed with a large relative error).
 
 The nominal value and the uncertainty generally have the **same
-precision**.  The only exception is that if a format specification
+precision**.  The only *exception* is that if a format specification
 does not define the number of significant digits on the uncertainty,
-it is applied to each part independently (e.g., the "float" format
+it is applied to each part *independently* (e.g., the "float" format
 specifications ``".2f"``, ``".3g"``, ``".6n"``, etc.):
 
->>> y = ufloat(1.2e3, 4.56e-10)
->>> print "{:.6g}".format(y)
+>>> y = 
+>>> print "{:.6g}".format(ufloat(1.2e3, 4.56e-10)y)
 1200+/-4.56e-10
 
 .. Options
