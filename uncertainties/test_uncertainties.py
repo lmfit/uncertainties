@@ -1809,7 +1809,8 @@ def test_format():
     if locale_set and sys.version_info >= (2, 6):
         tests[(23456.789123, 1234.56789123)] = {
             '.0n': '(2+/-0.1)e+04',
-            '.6n': '23,456.8+/-1,234.57'
+            '.6n': '23,456.8+/-1,234.57',
+            '.6nS': '23,456.8(1,234.6)'
             }            
 
     # True if we can detect that the Jython interpreter is running this code:
