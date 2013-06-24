@@ -1585,6 +1585,10 @@ def test_format():
             '.4ue': '(0.123+/-4.568)e+02'
         },
 
+        (23456.789123, 1234.56789123): {
+            '.6gS': '23456.8(1234.6)'
+        },
+        
         # Test of the various float formats: the nominal value should
         # have a similar representation as if it were directly
         # represented as a float:
@@ -1807,11 +1811,11 @@ def test_format():
     # If the locale was set to American (USA), the "n" format type can
     # be tested:
     if locale_set and sys.version_info >= (2, 6):
-        tests[(23456.789123, 1234.56789123)] = {
+        tests[(23456.789123, 1234.56789123)].update({
             '.0n': '(2+/-0.1)e+04',
             '.6n': '23,456.8+/-1,234.57',
             '.6nS': '23,456.8(1,234.6)'
-            }            
+            })
 
     # True if we can detect that the Jython interpreter is running this code:
     try:
