@@ -1529,6 +1529,10 @@ def test_repr():
 def test_format():
     '''Test the formatting of numbers with uncertainty.'''
 
+    # The way NaN is formatted with F and E depends on the version of
+    # Python (NAN for Python 2.7+):
+    NaN_EF = '%F' % float('nan')
+    
     # Tests of each point of the docstring of
     # AffineScalarFunc.__format__() in turn, mostly in the same order.
 
@@ -1694,10 +1698,10 @@ def test_format():
         },
         (-1.4e-12, float('nan')): {
             'L': r'(-1.4 \pm nan) \times 10^{-12}',
-            '.2uG': '(-1.4+/-NAN)E-12',  # u ignored, format used
+            '.2uG': '(-1.4+/-%s)E-12' % NaN_EF,  # u ignored, format used
             '10': '  -1.4e-12+/-       nan',
             '15S': '  -1.4(nan)e-12',
-            '15GS': '  -1.4(NAN)E-12'
+            '15GS': '  -1.4(%s)E-12' % NaN_EF
         },
 
         (3.14e-10, 0.01e-10): {
@@ -1712,7 +1716,7 @@ def test_format():
         # Some special cases:
         (1, float('nan')): {
             'g': '1+/-nan',
-            'G': '1+/-NAN',
+            'G': '1+/-%s' % NaN_EF,
             '%': '(100.000000+/-nan)%',  # The % format type is like f
             # This is ugly, but consistent with
             # '{:+05}'.format(float('nan')) and format(1.) [which
@@ -1854,7 +1858,7 @@ def test_format():
             
             # Parsing back into a number with uncertainty (unless the
             # LaTeX or comma notation is used):
-            if (not set(format_spec).intersection('L,*%n')  # * = fill with *
+            if (not set(format_spec).intersection('L,*%')  # * = fill with *
                 and '0nan' not in representation.lower()):  # "00nan"
 
                 value_back = ufloat_fromstr(representation)
