@@ -1345,7 +1345,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # avoid the 0e10 notation for an exactly zero uncertainty,
         # because .0e can give this for a non-zero value (the goal is
         # to have zero uncertainty be very explicit):
-        error_has_exp = fmt_parts['width'] and special_error
+        error_has_exp = fmt_parts['width'] and not special_error
         
         # Prefix for the parts:
         if fmt_parts['width']:
