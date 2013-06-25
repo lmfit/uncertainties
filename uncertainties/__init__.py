@@ -1209,8 +1209,8 @@ def format_num(nom_val_main, error_main, common_exp,
     '''
 
 
-    print (nom_val_main, error_main, common_exp,
-           fmt_parts, prec, main_fmt_type, options)  #!!!!!!!!!!!
+    # print (nom_val_main, error_main, common_exp,
+    #        fmt_parts, prec, main_fmt_type, options)
     
     # If a decimal point were always present in zero rounded errors
     # that are not zero, the formatting would be difficult, in general
@@ -1348,8 +1348,8 @@ def format_num(nom_val_main, error_main, common_exp,
             # included
             fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
 
-        print "FMT_PREFIX_N", fmt_prefix_n  #!!!!!!!!!!
-        print "FMT_SUFFIX_N", fmt_suffix_n
+        # print "FMT_PREFIX_N", fmt_prefix_n
+        # print "FMT_SUFFIX_N", fmt_suffix_n
 
         # !! The following fails with Python < 2.6 when the format is
         # not accepted by the % operator. This can happen when
@@ -1410,12 +1410,13 @@ def format_num(nom_val_main, error_main, common_exp,
         # special_error is true, as the format used for the nominal
         # value is essentially the format provided by the user, which
         # may be empty:
+
+        # print "FMT_PREFIX_N", fmt_prefix_n
+        # print "FMT_SUFFIX_N", fmt_suffix_n
         
         nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
 
-        print "FMT_PREFIX_N", fmt_prefix_n  #!!!!!!!!!!
-        print "FMT_SUFFIX_N", fmt_suffix_n
-        print "NOM_VAL_STR", nom_val_str
+        # print "NOM_VAL_STR", nom_val_str
         
         if not any_exp_factored:
             nom_val_str += exp_str
