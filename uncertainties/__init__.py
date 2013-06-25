@@ -1429,16 +1429,6 @@ def format_num(nom_val_main, error_main, common_exp,
         if not any_exp_factored:
             nom_val_str += exp_str
 
-        if fmt_parts['width']:  # An individual alignment is needed:
-            print "ALIGNING", repr(nom_val_str), "WITH", repr(
-                fmt_parts['fill_align']+fmt_parts['width'])
-            
-            nom_val_str = robust_format(
-                nom_val_str,
-                # Default alignment, for numbers: to the right:
-                (fmt_parts['fill_align'] or '>')
-                +fmt_parts['width'])
-            
         ####################
         # Error formatting:
 
@@ -1458,11 +1448,21 @@ def format_num(nom_val_main, error_main, common_exp,
         if error_has_exp:
             error_str += exp_str
 
+        ####################
+        # Final alignment of each field, if needed:
+        
         if fmt_parts['width']:  # An individual alignment is needed:
-            nom_val_str = robust_format(
-                nom_val_str,
-                fmt_parts['fill_align']+fmt_parts['width'])
             
+            print "ALIGNING", repr(nom_val_str), "WITH", repr(
+                fmt_parts['fill_align']+fmt_parts['width'])
+
+            # Default alignment, for numbers: to the right (if no
+            # alignment is specified, a string is aligned to the left):
+            str_format = (fmt_parts['fill_align'] or '>')+fmt_parts['width']
+            
+            nom_val_str = robust_format(nom_val_str, str_format)
+            error_str = robust_format(error_str, str_format)
+
         ####################            
         pm_symbol = (
             # Unicode has priority over LaTeX, so that users with a
