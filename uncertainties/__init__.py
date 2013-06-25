@@ -1411,14 +1411,9 @@ def format_num(nom_val_main, error_main, common_exp,
         #
         # The following uses a special integer representation of a
         # zero uncertainty:
-        fmt_suffix_e = '.%d%s' % (0 if special_error else prec, main_fmt_type)
-
-        print "FMT_SUFFIX_E", fmt_suffix_e #!!!!!!
-        print "FMT PREFIX_E", fmt_prefix_e
+        fmt_suffix_e = '.%d%s' % (prec if error_main else 0, main_fmt_type)
         
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
-
-        print "ERROR_STR", error_str #!!!!
         
         if error_has_exp:
             error_str += exp_str
