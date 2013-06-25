@@ -1379,8 +1379,10 @@ def format_num(nom_val_main, error_main, common_exp,
 
         nom_val_fmt = fmt_prefix_n
         
-        if special_error:
-            nom_val_fmt += main_fmt_type
+        # Nicer representation of the main part, with no trailing
+        # zeros:
+        if special_error and fmt_parts['type'] in 'gG':
+            nom_val_fmt += (fmt_parts['prec'] or '')+fmt_parts['type']
         else:
             nom_val_fmt += '.%d%s' % (prec, main_fmt_type)
             
@@ -1751,8 +1753,10 @@ class AffineScalarFunc(object):
         
         A common exponent is used if an exponent is needed for the
         larger of the nominal value (in absolute value) and the
-        standard deviation. Thanks to this, the quantity that best
-        describes the associated probability distribution has a
+        standard deviation, unless this would result in a zero
+        uncertainty being represented as 0e... or a NaN uncertainty as
+        NaNe.... Thanks to this common exponent, the quantity that
+        best describes the associated probability distribution has a
         mantissa in the usual 1-10 range. The common exponent is
         factored (as in "(1.2+/-0.1)e-5"). unless the format
         specification contains an explicit width (" 1.2e-5+/- 0.1e-5")
@@ -2059,10 +2063,10 @@ class AffineScalarFunc(object):
 
         ########################################
 
-        # prec is the precision for the mantissa/field final format.
-        
+        # Format of the main (i.e. with no exponent) parts:
         main_fmt_type = 'fF'[fmt_type.isupper()]
-        
+
+        # prec is the precision for the main parts of the final format:
         if std_dev and not isnan(std_dev):
             # The decimal point location is always included in the
             # printed digits (e.g., printing 3456 with only 2
