@@ -1793,7 +1793,7 @@ class AffineScalarFunc(object):
             (?:\.(?P<prec>\d+))?
             (?P<uncert_prec>u?)  # Precision for the uncertainty?
             # The type can be omitted. Options must not go here:
-            (?P<type>[eEfFgGn%]??)
+            (?P<type>[eEfFgG%]??)  # n not supported
             (?P<options>[LSC]*)$''',
             format_spec,
             re.VERBOSE)
@@ -1804,7 +1804,6 @@ class AffineScalarFunc(object):
                 'Format specification %r cannot be used with object of type %r'
                 # Sub-classes handled:
                 % (format_spec, self.__class__.__name__))
-       
         
         # Effective format type: f, e, g, etc. (never None or empty):
         #
@@ -1820,14 +1819,13 @@ class AffineScalarFunc(object):
         # be controlled?        
         uncert_controlled = (
             not fmt_prec  # Default behavior: uncertainty controlled
-            or bool(match.group('uncert_prec')))  # Explicit control
-
-        # The n format type is not available when the uncertainty is
-        # normally controlled:        
-        if uncert_controlled and fmt_type == 'n':
-            raise ValueError(
-                'Format type %r cannot be used with the uncertainty control'
-                ' mode' % (fmt_type, match.group('uncert_prec')))
+            or match.group('uncert_prec')  # Explicit control
+            # The number of significant digits of the uncertainty must
+            # be meaningful, otherwise the position of the significant
+            # digits of the uncertainty do not have a clear
+            # meaning. This gives us the *effective* uncertainty
+            # control mode:
+            and std_dev and not isnan(std_dev))
         
         ########################################
                 
@@ -1857,22 +1855,18 @@ class AffineScalarFunc(object):
             fmt_type = 'f'
             options.add('%')
 
-        # At this point, fmt_type is in eEfFgGn (not None, not %).
+        # At this point, fmt_type is in eEfFgG (not None, not %).
             
         ########################################
 
-        # The number of significant digits of the uncertainty must be
-        # meaningful, otherwise the position of the significant digits
-        # of the uncertainty do not have a clear meaning. This gives
-        # us the *effective* uncertainty control mode:
-        uncert_controlled &= bool(std_dev) and not isnan(std_dev)
-
+        # Calculation of digits_limit, which defines the precision of
+        # the nominal value and of the standard deviation:
+        
         # Reference value for the calculation of a possible exponent,
         # if needed:
-        if fmt_type in set('eEgGn'):
+        if fmt_type in set('eEgG'):
             # Reference value for the exponent
             exp_ref_value = max(abs(nom_val), std_dev)
-
         
         if uncert_controlled:
             # The number of significant digits on the uncertainty is
@@ -1912,7 +1906,7 @@ class AffineScalarFunc(object):
 
                 digits_limit = -prec
                 
-            else:  # Format type in eEgGn
+            else:  # Format type in eEgG
 
                 # We calculate first the number of significant digits
                 # to be displayed (if possible):
@@ -1934,14 +1928,14 @@ class AffineScalarFunc(object):
 
                     # The final number of significant digits to be
                     # displayed is not necessarily obvious: trailing
-                    # zeros are removed (with the gGn format type), so
+                    # zeros are removed (with the gG format type), so
                     # num_signif_digits is the number of significant
                     # digits if trailing zeros were not removed. This
                     # quantity is relevant for the rounding implied by
                     # the exponent test of the g/G/n format:
 
-                    # 0 is interpreted like 1 (as with floats with
-                    # a gGn format type):
+                    # 0 is interpreted like 1 (as with floats with a
+                    # gG format type):
                     num_signif_digits = prec or 1
 
                 
@@ -1965,7 +1959,7 @@ class AffineScalarFunc(object):
             # instance when using the .0e format: signif_d_to_limit()
             # was called before, which prompted a similar calculation:
             common_exp = first_digit(round(exp_ref_value, -digits_limit))
-        else:  # g, G, n
+        else:  # g, G
 
             # The rules from
             # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
@@ -2030,18 +2024,12 @@ class AffineScalarFunc(object):
         # prec is the precision for the mantissa/field final format.
         
         # Formatting of individual fields:
-        if uncert_controlled or fmt_type in 'eEfF':
-            fixed_point_type = 'fF'[fmt_type.isupper()]
-            # The decimal point location is always included in the
-            # printed digits (e.g., printing 3456 with only 2
-            # significant digits requires to print at least four
-            # digits, like in 3456 or 3500):
-            prec = max(-signif_limit, 0)
-        else:
-            # The original format type and precision are used (case of
-            # ".6g", ".3n", and of a zero or NaN uncertainty):
-            fixed_point_type = fmt_type
-            # prec was calculated above, for this case
+        fixed_point_type = 'fF'[fmt_type.isupper()]
+        # The decimal point location is always included in the
+        # printed digits (e.g., printing 3456 with only 2
+        # significant digits requires to print at least four
+        # digits, like in 3456 or 3500):
+        prec = max(-signif_limit, 0)
         
         ########################################
 
