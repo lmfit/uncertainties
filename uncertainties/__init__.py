@@ -1361,8 +1361,15 @@ def format_num(nom_val_main, error_main, common_exp,
         value_str = nom_val_str+value_end
                                 
         # Global width, if any:
-        if fmt_parts['width']:
-            value_str = ('%%%ss' % fmt_parts['width']) % value_str
+
+        if fmt_parts['width']:  # An individual alignment is needed:
+            
+            # Default alignment, for numbers: to the right (if no
+            # alignment is specified, a string is aligned to the left):
+            str_format = ((fmt_parts['fill_align'] or '>')
+                          +fmt_parts['width']+'s')
+            
+            value_str = robust_format(value_str, str_format)
                                 
     else:  # +/- notation:
         
@@ -1453,13 +1460,13 @@ def format_num(nom_val_main, error_main, common_exp,
         
         if fmt_parts['width']:  # An individual alignment is needed:
             
-            print "ALIGNING", repr(nom_val_str), "WITH", repr(
-                fmt_parts['fill_align']+fmt_parts['width'])
-
             # Default alignment, for numbers: to the right (if no
             # alignment is specified, a string is aligned to the left):
-            str_format = (fmt_parts['fill_align'] or '>')+fmt_parts['width']
-            
+            str_format = ((fmt_parts['fill_align'] or '>')
+                          +fmt_parts['width']+'s')
+
+            # robust_format() is used because it may handle alignment
+            # options, where the % operator does not:
             nom_val_str = robust_format(nom_val_str, str_format)
             error_str = robust_format(error_str, str_format)
 
