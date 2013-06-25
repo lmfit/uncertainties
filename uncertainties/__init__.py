@@ -1168,6 +1168,34 @@ class CallableStdDev(float):
 # an exponent): the keys are the possible mantissa formats:
 EXP_LETTERS = {'f': 'e', 'F': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
+if sys.version_info >= (2, 6):
+    
+    def robust_align(orig_str, fill_char, align_option, width):
+        '''
+        Aligns the given string with the given fill character.
+
+        align_option -- as accepted by format()
+
+        wdith -- string that contains the width
+        '''
+        print "ALIGNING", repr(orig_str), "WITH", fill_char+align_option,
+        print "WIDTH", width  #!!!!!!
+        
+        return format(orig_str, fill_char+align_option+width)
+
+else:
+    def robust_align(orig_str, fill_char, align_option, width):
+        '''
+        Aligns the given string with the given fill character.
+
+        align_option -- > < or ^
+
+        wdith -- string that contains the width
+        '''
+
+        return {'>': str.rjust, '<': str.ljust, '^': str.center}[align_option](
+            orig_str, int(width), fill_char)
+
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_fmt_type, options):
     '''
@@ -1184,7 +1212,7 @@ def format_num(nom_val_main, error_main, common_exp,
     is used.
 
     fmt_parts -- mapping that contains at least the following parts of
-    the format specification: fill_align, sign, zero, width, comma,
+    the format specification: fill, align, sign, zero, width, comma,
     type; the value are strings. These format specification parts are
     handled. The width is applied to each value, or, if the shorthand
     notation is used, globally. If the error is special (zero or NaN),
@@ -1365,12 +1393,12 @@ def format_num(nom_val_main, error_main, common_exp,
         if fmt_parts['width']:  # An individual alignment is needed:
             
             # Default alignment, for numbers: to the right (if no
-            # alignment is specified, a string is aligned to the left):
-            str_format = ((fmt_parts['fill_align'] or '>')
-                          +fmt_parts['width']+'s')
+            # alignment is specified, a string is aligned to the
+            # left):
+            value_str = robust_align(
+                value_str, fmt_parts['fill'], fmt_parts['align'] or '>',
+                fmt_parts['width'])
             
-            value_str = robust_format(value_str, str_format)
-                                
     else:  # +/- notation:
         
         # True when the error part has an exponent directly attached
@@ -1461,14 +1489,19 @@ def format_num(nom_val_main, error_main, common_exp,
         if fmt_parts['width']:  # An individual alignment is needed:
             
             # Default alignment, for numbers: to the right (if no
-            # alignment is specified, a string is aligned to the left):
-            str_format = ((fmt_parts['fill_align'] or '>')
-                          +fmt_parts['width']+'s')
-
+            # alignment is specified, a string is aligned to the
+            # left):
+            effective_align = fmt_parts['align'] or '>'
+            
             # robust_format() is used because it may handle alignment
             # options, where the % operator does not:
-            nom_val_str = robust_format(nom_val_str, str_format)
-            error_str = robust_format(error_str, str_format)
+            nom_val_str = robust_align(
+                nom_val_str, fmt_parts['fill'], effective_align,
+                fmt_parts['width'])
+            
+            error_str = robust_align(
+                error_str, fmt_parts['fill'], effective_align,
+                fmt_parts['width'])
 
         ####################            
         pm_symbol = (
@@ -1869,7 +1902,7 @@ class AffineScalarFunc(object):
         # Format specification parsing:
 
         match = re.match('''
-            (?P<fill_align>(?:.?[<>=^]|))  # Can be the empty string
+            (?P<fill>[^{}]??)(?P<align>[<>=^]?)  # fill cannot be { or }
             (?P<sign>[-+ ]?)
             (?P<zero>0?)
             (?P<width>\d*)
