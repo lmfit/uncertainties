@@ -1192,7 +1192,7 @@ def format_num(nom_val_main, error_main, common_exp,
     prec -- precision to use with the fixed_point_type format type
     (see below).
 
-    fixed_point_type -- format specification type, in "eEfFgGn". This
+    fixed_point_type -- format specification type, in "eEfFgG". This
     defines how the mantissas, exponents and NaN values are
     represented (in the same way as for float). Note that None, the
     empty string, or "%" are not accepted.
@@ -1953,7 +1953,7 @@ class AffineScalarFunc(object):
                                                  num_signif_digits)
 
                 #!!!! test
-                print "EXP_REF_VAL", exp_ref_val
+                print "EXP_REF_VAL", exp_ref_value
                 print "NUM_SIGNIF_DIGITS", num_signif_digits
                 
         #######################################
@@ -2040,7 +2040,7 @@ class AffineScalarFunc(object):
 
         # prec is the precision for the mantissa/field final format.
 
-        if uncert_controlled:
+        if std_dev and not isnan(std_dev):
 
             fixed_point_type = 'fF'[fmt_type.isupper()]
             # The decimal point location is always included in the
