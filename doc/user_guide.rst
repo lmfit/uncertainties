@@ -154,6 +154,13 @@ Numbers with uncertainties can be printed conveniently:
 >>> print x
 0.200+/-0.010
 
+.. Precision matching:
+
+The nominal value and the uncertainty always have the **same
+precision**.
+
+.. Formatting method:
+
 More **control over the format** can be obtained (in Python 2.6+)
 through the usual :func:`format` method of strings:
 
@@ -163,11 +170,12 @@ Result =       0.20+/-      0.01
 (For Python before version 2.6, one can do ``'Result = %s' %
 x.format('10.2f')`` instead.) 
 
-.. Legacy code and simple control:
+.. Legacy formats and base syntax of the format specification:
 
-**Almost all the float format specifications** are accepted (including
-those containing a fill character, an alignment option, a sign or zero
-option, a width, or the ``%`` format type).
+**All the float format specifications** are accepted, except those
+with the ``n`` format type. In particular, a fill character, an
+alignment option, a sign or zero option, a width, or the ``%`` format
+type are all supported.
 
 .. Precision control:
 
@@ -185,26 +193,6 @@ on the uncertainty is defined with the `Particle Data Group
 rules (the rules keep the number of digits small, while preventing the
 uncertainty from being displayed with a large relative error).
 
-The nominal value and the uncertainty generally have the **same
-precision**.  The *only exception* is that if a format specification
-does not define the number of significant digits on the uncertainty,
-it is applied to each part *independently* (after applying any common
-exponent factor), which may not yield the same precision (this happens
-with formats like ``".3g"`` or ``".6n"``, which only define a
-*maximum* of significant digits):
-
->>> print "{:.6g}".format(ufloat(1.2e3, 4.56e-10))
-1200+/-4.56e-10
->>> print "{:10.6g}".format(ufloat(1.2e-34,5e-67))  # Warning: unusual form!
-   1.2e-34+/- 5e-33e-34
->>> print "{:.6g}".format(ufloat(1.2345e-10, 0.06e-10))
-(1.2345+/-0.06)e-10
-
-This feature gives a relatively compact notation that contains many
-significant digits for both the nominal value and the standard
-deviation (the common precision of a format with one significant
-digits on the uncertainty—like ``".1ug"``—would truncate the nominal
-value to ``1.23``, here).
 
 .. Common exponent:
 
@@ -243,7 +231,7 @@ for the **shorthand notation**, ``C`` for using a **single character
 
 Options can be combined.
 
-.. Output:
+.. Special cases:
 
 An uncertainty which is *exactly* **zero** is always formatted as an
 integer:
