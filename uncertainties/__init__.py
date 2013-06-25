@@ -1180,8 +1180,9 @@ if sys.version_info >= (2, 6):
 
         wdith -- string that contains the width.
         '''
-        print "ALIGNING", repr(orig_str), "WITH", fill_char+align_option,
-        print "WIDTH", width  #!!!!!!
+        
+        # print "ALIGNING", repr(orig_str), "WITH", fill_char+align_option,
+        # print "WIDTH", width
         
         return format(orig_str, fill_char+align_option+width)
 
