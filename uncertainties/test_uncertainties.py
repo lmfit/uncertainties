@@ -1702,26 +1702,33 @@ def test_format():
         },
 
         # Special cases for the uncertainty (0, nan) and format
-        # strings (extension S, L, U,..., global width, etc.):
-        (-1.4e-12, 0): python26_add({
-            '12.2gCL': ur'-1.4 \times 10^{-12}±           0'
+        # strings (extension S, L, U,..., global width, etc.).
+        #
+        # Python 3.2 and 3.3 give 1.4e-12*1e+12 = 1.4000000000000001
+        # instead of 1.4 for Python 3.1. The problem does not appear
+        # with 1.2, so 1.2 is used.
+        (-1.2e-12, 0): python26_add({
+            '12.2gCL': ur'-1.2 \times 10^{-12}±           0'
         }, {
             # Pure "width" formats are not accepted by the % operator,
             # and only %-compatible formats are accepted, for Python <
             # 2.6:
-            '13S': '  -1.4(0)e-12',
-            '10C': u'  -1.4e-12±         0',
-            'L': r'(-1.4 \pm 0) \times 10^{-12}',
-            'SL': r'-1.4(0) \times 10^{-12}'            
+            '13S': '  -1.2(0)e-12',
+            '10C': u'  -1.2e-12±         0',
+            'L': r'(-1.2 \pm 0) \times 10^{-12}',
+            'SL': r'-1.2(0) \times 10^{-12}'            
         }),
-        
-        (-1.4e-12, float('nan')): python26_add({
-            '.2uG': '(-1.4+/-%s)E-12' % NaN_EF,  # u ignored, format used
-            '15GS': '  -1.4(%s)E-12' % NaN_EF
+
+        # Python 3.2 and 3.3 give 1.4e-12*1e+12 = 1.4000000000000001
+        # instead of 1.4 for Python 3.1. The problem does not appear
+        # with 1.2, so 1.2 is used.        
+        (-1.2e-12, float('nan')): python26_add({
+            '.2uG': '(-1.2+/-%s)E-12' % NaN_EF,  # u ignored, format used
+            '15GS': '  -1.2(%s)E-12' % NaN_EF
         }, {
-            'L': r'(-1.4 \pm nan) \times 10^{-12}',        
-            '10': '  -1.4e-12+/-       nan',
-            '15S': '  -1.4(nan)e-12'            
+            'L': r'(-1.2 \pm nan) \times 10^{-12}',        
+            '10': '  -1.2e-12+/-       nan',
+            '15S': '  -1.2(nan)e-12'            
         }),
 
         (3.14e-10, 0.01e-10): {
