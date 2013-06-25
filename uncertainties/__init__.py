@@ -1336,7 +1336,7 @@ def format_num(nom_val_main, error_main, common_exp,
     else:  # +/- notation:
 
         # Only true if the error should not have an exponent
-        special_error = error_main and not isnan(error_main)
+        special_error = not error_main or isnan(error_main)
         
         # True when the error part has an exponent directly attached
         # (case of an individual exponent for both the nominal value
@@ -2067,9 +2067,6 @@ class AffineScalarFunc(object):
             # digits, like in 3456 or 3500):
             prec = max(-signif_limit, 0)
         else:
-            #!!!!! not a fixed point type: update (= either fixed
-            #point type or type of *mantisssa* of
-            #nominal value  only) => mantissa type
             main_fmt_type = fmt_type
             # 'prec' was defined above, for the other case
 
