@@ -1174,9 +1174,11 @@ if sys.version_info >= (2, 6):
         '''
         Aligns the given string with the given fill character.
 
-        align_option -- as accepted by format()
+        fill_char -- if empty, space is used.
+        
+        align_option -- as accepted by format().
 
-        wdith -- string that contains the width
+        wdith -- string that contains the width.
         '''
         print "ALIGNING", repr(orig_str), "WITH", fill_char+align_option,
         print "WIDTH", width  #!!!!!!
@@ -1194,7 +1196,7 @@ else:
         '''
 
         return {'>': str.rjust, '<': str.ljust, '^': str.center}[align_option](
-            orig_str, int(width), fill_char)
+            orig_str, int(width), fill_char or ' ')
 
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_fmt_type, options):
