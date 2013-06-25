@@ -1715,7 +1715,14 @@ def test_format():
         
         # Some special cases:
         (1, float('nan')): {
-            '': '1+/-nan',  # The default (g) should be handled correctly
+            # There is a difference between '{}'.format(1.) and
+            # '{:g}'.format(1.), which is not fully obvious in the
+            # documentation, which indicates that a None format type
+            # is like g. The reason is that the empty format string is
+            # actually interpreted as str(), and that str() does not
+            # have to behave like g ('{}'.format(1.234567890123456789)
+            # and '{:g}'.format(1.234567890123456789) are different).
+            '': '1.0+/-nan',
             'g': '1+/-nan',
             'G': '1+/-%s' % NaN_EF,
             '%': '(100.000000+/-nan)%',  # The % format type is like f

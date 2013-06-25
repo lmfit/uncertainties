@@ -1206,8 +1206,8 @@ def format_num(nom_val_main, error_main, common_exp,
     '''
 
 
-    # print (nom_val_main, error_main, common_exp,
-    #        fmt_parts, prec, main_fmt_type, options)
+    print (nom_val_main, error_main, common_exp,
+           fmt_parts, prec, main_fmt_type, options)  #!!!!!!!!!!!
     
     # If a decimal point were always present in zero rounded errors
     # that are not zero, the formatting would be difficult, in general
@@ -1266,6 +1266,10 @@ def format_num(nom_val_main, error_main, common_exp,
         # exponent is taken care of by common_exp, so it is
         # formatted without an exponent (otherwise, the exponent
         # would have to be handled for the LaTeX option):
+        #
+        # A non-empty format is useful when robust_format() uses the %
+        # operator, which does not accept an empty format (contrary to
+        # '{}'.format()).
         fmt_suffix_n = (fmt_parts['prec'] or '')+fmt_parts['type']
     else:
         fmt_suffix_n = '.%d%s' % (prec, main_fmt_type)
@@ -1345,6 +1349,9 @@ def format_num(nom_val_main, error_main, common_exp,
             # included
             fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
 
+        print "FMT_PREFIX_N", fmt_prefix_n  #!!!!!!!!!!
+        print "FMT_SUFFIX_N", fmt_suffix_n
+        
         nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
 
         value_str = nom_val_str+value_end
@@ -1396,6 +1403,10 @@ def format_num(nom_val_main, error_main, common_exp,
 
         nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
 
+        print "FMT_PREFIX_N", fmt_prefix_n  #!!!!!!!!!!
+        print "FMT_SUFFIX_N", fmt_suffix_n
+        print "NOM_VAL_STR", nom_val_str
+        
         if not any_exp_factored:
             nom_val_str += exp_str
             
@@ -1412,6 +1423,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # The following uses a special integer representation of a
         # zero uncertainty:
         fmt_suffix_e = '.%d%s' % (prec if error_main else 0, main_fmt_type)
+
         
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
         
