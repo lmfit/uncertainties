@@ -2040,22 +2040,15 @@ class AffineScalarFunc(object):
 
         # prec is the precision for the mantissa/field final format.
 
-        if std_dev and not isnan(std_dev):
+        fixed_point_type = 'fF'[fmt_type.isupper()]
 
-            fixed_point_type = 'fF'[fmt_type.isupper()]
+        if std_dev and not isnan(std_dev):
             # The decimal point location is always included in the
             # printed digits (e.g., printing 3456 with only 2
             # significant digits requires to print at least four
             # digits, like in 3456 or 3500):
             prec = max(-signif_limit, 0)
-
-        else:
-
-            # The original format type and precision are used (case of
-            # a zero or NaN uncertainty):
-            fixed_point_type = fmt_type
-            
-            # 'prec' was defined above, for this case
+        # 'prec' was defined above, for the other case
         
         ########################################
 
