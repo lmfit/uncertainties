@@ -1322,7 +1322,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # not included). This string is important for the handling of
         # the width:
         value_end = '(%s)%s%s' % (uncert_str, exp_str, percent_str)
-        exponent_factored = True  # Single exponent in the output
+        any_exp_factored = True  # Single exponent in the output
 
         ##########
         # Nominal value formatting:
@@ -1370,7 +1370,7 @@ def format_num(nom_val_main, error_main, common_exp,
             # The exponent is not factored, so as to have nice columns
             # for the nominal values and the errors (no shift due to a
             # varying exponent):
-            exponent_factored = False
+            any_exp_factored = False
 
             width = int(fmt_parts['width'])
             # Remaining width (for the nominal value):
@@ -1387,7 +1387,7 @@ def format_num(nom_val_main, error_main, common_exp,
                 fmt_parts['comma'])
 
         else:
-            exponent_factored = True            
+            any_exp_factored = True            
             fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
             fmt_prefix_e = fmt_parts['comma']
         
@@ -1396,7 +1396,7 @@ def format_num(nom_val_main, error_main, common_exp,
 
         nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
 
-        if not exponent_factored:
+        if not any_exp_factored:
             nom_val_str += exp_str
             
         ####################
@@ -1437,7 +1437,7 @@ def format_num(nom_val_main, error_main, common_exp,
         #factored, then it should imply that there is a common
         #exponent, the test should not be performed. UNLESS this is
         #related to a zero or NaN uncertainty.
-        if exponent_factored and common_exp is not None:
+        if any_exp_factored and common_exp is not None:
             value_str = '(%s%s%s)%s' % (
                 nom_val_str, pm_symbol, error_str, exp_str)
         else:
@@ -1445,7 +1445,7 @@ def format_num(nom_val_main, error_main, common_exp,
             
         # Final form:
         if percent_str:
-            if common_exp is not None and exponent_factored:
+            if common_exp is not None and any_exp_factored:
                 value_str += percent_str
             else:
                 value_str = '(%s)%s' % (value_str, percent_str)
