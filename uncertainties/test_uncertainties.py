@@ -1801,6 +1801,16 @@ def test_format():
             '': '1.2345+/-0'
         }),
 
+        # Alignment and filling characters:
+        (3.1415e10, 0): python26_add(
+        {}, {
+            '<15': '3.1415e+10     +/-0              ',
+            '<20S': '3.1415(0)e+10       ',
+            # Trying to trip the format parsing with a fill character
+            # which is an alignment character:
+            '=>15': '=====3.1415e+10+/-==============0'
+        }),
+        
         (1234.56789, 0): {
             '1.2ue': '1.23e+03+/-0',  # u ignored
             '1.2e': '1.23e+03+/-0',
@@ -1877,7 +1887,8 @@ def test_format():
 
         for (format_spec, result) in representations.iteritems():
 
-            # print "FORMATTING", repr(value), "WITH", format_spec
+            #!!!!!!!!!!!!!
+            print "FORMATTING", repr(value), "WITH", format_spec
             
             # Jython 2.5.2 does not always represent NaN as nan or NAN
             # in the CPython way: for example, '%.2g' % float('nan')
@@ -1905,7 +1916,11 @@ def test_format():
             # Parsing back into a number with uncertainty (unless the
             # LaTeX or comma notation is used):
             if (not set(format_spec).intersection('L,*%')  # * = fill with *
-                and '0nan' not in representation.lower()):  # "00nan"
+                # "00nan"
+                and '0nan' not in representation.lower()
+                # Specific case:
+                and '=====' not in representation):
+                
 
                 value_back = ufloat_fromstr(representation)
 

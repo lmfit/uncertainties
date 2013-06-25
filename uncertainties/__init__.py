@@ -1191,6 +1191,36 @@ class CallableStdDev(float):
 # an exponent): the keys are the possible mantissa formats:
 EXP_LETTERS = {'f': 'e', 'F': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
+if sys.version_info >= (2, 6):
+    
+    def robust_align(orig_str, fill_char, align_option, width):
+        '''
+        Aligns the given string with the given fill character.
+
+        fill_char -- if empty, space is used.
+        
+        align_option -- as accepted by format().
+
+        wdith -- string that contains the width.
+        '''
+        print "ALIGNING", repr(orig_str), "WITH", fill_char+align_option,
+        print "WIDTH", width  #!!!!!!
+        
+        return format(orig_str, fill_char+align_option+width)
+
+else:
+    def robust_align(orig_str, fill_char, align_option, width):
+        '''
+        Aligns the given string with the given fill character.
+
+        align_option -- > < or ^
+
+        width -- string that contains the width
+        '''
+
+        return {'>': str.rjust, '<': str.ljust, '^': str.center}[align_option](
+            orig_str, int(width), fill_char or ' ')
+
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_fmt_type, options):
     '''
@@ -1207,7 +1237,7 @@ def format_num(nom_val_main, error_main, common_exp,
     is used.
 
     fmt_parts -- mapping that contains at least the following parts of
-    the format specification: fill_align, sign, zero, width, comma,
+    the format specification: fill, align, sign, zero, width, comma,
     type; the value are strings. These format specification parts are
     handled. The width is applied to each value, or, if the shorthand
     notation is used, globally. If the error is special (zero or NaN),
@@ -1384,9 +1414,16 @@ def format_num(nom_val_main, error_main, common_exp,
         value_str = nom_val_str+value_end
                                 
         # Global width, if any:
-        if fmt_parts['width']:
-            value_str = ('%%%ss' % fmt_parts['width']) % value_str
-                                
+
+        if fmt_parts['width']:  # An individual alignment is needed:
+            
+            # Default alignment, for numbers: to the right (if no
+            # alignment is specified, a string is aligned to the
+            # left):
+            value_str = robust_align(
+                value_str, fmt_parts['fill'], fmt_parts['align'] or '>',
+                fmt_parts['width'])
+            
     else:  # +/- notation:
         
         # True when the error part has an exponent directly attached
@@ -1399,34 +1436,41 @@ def format_num(nom_val_main, error_main, common_exp,
         error_has_exp = fmt_parts['width'] and not special_error
         
         # Prefix for the parts:
-        if fmt_parts['width']:
+        if fmt_parts['width']:  # Individual widths
 
             # The exponent is not factored, so as to have nice columns
             # for the nominal values and the errors (no shift due to a
             # varying exponent):
             any_exp_factored = False
 
-            width = int(fmt_parts['width'])
-            # Remaining width (for the nominal value):
-            remaining_width = max(width - len(exp_str), 0)
-            
-            fmt_prefix_n = '%s%s%s%d%s' % (
-                fmt_parts['fill_align'],
-                fmt_parts['sign'], fmt_parts['zero'], remaining_width,
-                fmt_parts['comma'])
-
-
-            if error_has_exp:
-                remaining_width_e = remaining_width
-            else:
-                remaining_width_e = width
+            # If zeros are needed, then the width is taken into
+            # account now (before the exponent is added):
+            if fmt_parts['zero']:
                 
-            fmt_prefix_e = '%s%s%d%s' % (
-                fmt_parts['fill_align'],
-                fmt_parts['zero'], remaining_width_e,
-                fmt_parts['comma'])
+                width = int(fmt_parts['width'])
 
-        else:
+                # Remaining (minimum) width:
+                remaining_width = max(width - len(exp_str), 0)
+                
+                fmt_prefix_n = '%s%s%d%s' % (
+                    fmt_parts['sign'], fmt_parts['zero'],
+                    remaining_width, fmt_parts['comma'])
+
+                if error_has_exp:
+                    remaining_width_e = remaining_width
+                else:
+                    remaining_width_e = width
+                    
+                fmt_prefix_e = '%s%d%s' % (
+                    fmt_parts['zero'],
+                    remaining_width_e,
+                    fmt_parts['comma'])
+                
+            else:
+                fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
+                fmt_prefix_e = fmt_parts['comma']
+
+        else:  # Global width
             any_exp_factored = True            
             fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
             fmt_prefix_e = fmt_parts['comma']
@@ -1449,7 +1493,7 @@ def format_num(nom_val_main, error_main, common_exp,
         
         if not any_exp_factored:
             nom_val_str += exp_str
-            
+
         ####################
         # Error formatting:
 
@@ -1466,14 +1510,34 @@ def format_num(nom_val_main, error_main, common_exp,
             fmt_suffix_e = '.%d%s' % (prec, main_fmt_type)
         else:
             fmt_suffix_e = '.0%s' % main_fmt_type
-                    
+        
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
         
         if error_has_exp:
             error_str += exp_str
-        
+
         ####################
-        if 'C' in options:
+        # Final alignment of each field, if needed:
+        
+        if fmt_parts['width']:  # An individual alignment is needed:
+            
+            # Default alignment, for numbers: to the right (if no
+            # alignment is specified, a string is aligned to the
+            # left):
+            effective_align = fmt_parts['align'] or '>'
+            
+            # robust_format() is used because it may handle alignment
+            # options, where the % operator does not:
+            nom_val_str = robust_align(
+                nom_val_str, fmt_parts['fill'], effective_align,
+                fmt_parts['width'])
+            
+            error_str = robust_align(
+                error_str, fmt_parts['fill'], effective_align,
+                fmt_parts['width'])
+
+        ####################
+        if 'C' in options:        
             # Unicode has priority over LaTeX, so that users with a
             # Unicode-compatible LaTeX source can use ±:
             pm_symbol = u'±'
@@ -1881,7 +1945,7 @@ class AffineScalarFunc(object):
         # Format specification parsing:
 
         match = re.match('''
-            (?P<fill_align>(?:.?[<>=^]|))  # Can be the empty string
+            (?P<fill>[^{}]??)(?P<align>[<>=^]?)  # fill cannot be { or }
             (?P<sign>[-+ ]?)
             (?P<zero>0?)
             (?P<width>\d*)
