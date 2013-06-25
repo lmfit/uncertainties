@@ -1401,17 +1401,17 @@ def format_num(nom_val_main, error_main, common_exp,
             
         ####################
         # Error formatting:
-        
-        if error_main:
-            fmt_suffix_e = '.%d%s' % (prec, main_fmt_type)
-        else:  # Exactly zero error
-            fmt_suffix_e = '.0f'  # No decimal point for zero
-            # Note: .0f applied to a float has no decimal point, but
-            # this does not appear to be documented
-            # (http://docs.python.org/2/library/string.html#format-specification-mini-language). This
-            # feature is used anyway, because it allows a possible
-            # comma format parameter to be handled more conveniently
-            # than if the 'd' format was used.
+
+        # Note: .0f applied to a float has no decimal point, but
+        # this does not appear to be documented
+        # (http://docs.python.org/2/library/string.html#format-specification-mini-language). This
+        # feature is used anyway, because it allows a possible
+        # comma format parameter to be handled more conveniently
+        # than if the 'd' format was used.
+        #
+        # The following uses a special integer representation of a
+        # zero uncertainty:
+        fmt_suffix_e = '.%d%s' % (0 if special_error else prec, main_fmt_type)
 
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
 
