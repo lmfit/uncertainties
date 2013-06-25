@@ -1715,6 +1715,7 @@ def test_format():
         
         # Some special cases:
         (1, float('nan')): {
+            '': '1+/-nan',  # The default (g) should be handled correctly
             'g': '1+/-nan',
             'G': '1+/-%s' % NaN_EF,
             '%': '(100.000000+/-nan)%',  # The % format type is like f
