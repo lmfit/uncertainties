@@ -1814,6 +1814,16 @@ class AffineScalarFunc(object):
         # Shortcut:
         fmt_prec = match.group('prec')  # Can be None
 
+        ########################################
+                
+        # Since the '%' (percentage) format specification can change
+        # the value to be displayed, this value must first be
+        # calculated. Calculating the standard deviation is also an
+        # optimization: the standard deviation is generally
+        # calculated: it is calculated only once, here:
+        std_dev = self.std_dev
+        nom_val = self.nominal_value
+
         # Should the precision be interpreted like for a float, or
         # should the number of significant digits on the uncertainty
         # be controlled?        
@@ -1827,19 +1837,11 @@ class AffineScalarFunc(object):
             # control mode:
             and std_dev and not isnan(std_dev))
         
-        ########################################
-                
-        # Since the '%' (percentage) format specification can change
-        # the value to be displayed, this value must first be
-        # calculated. Calculating the standard deviation is also an
-        # optimization: the standard deviation is generally
-        # calculated: it is calculated only once, here:
-        std_dev = self.std_dev
-        nom_val = self.nominal_value
-
         # 'options' is the options that must be given to format_num():
         options = set(match.group('options'))
 
+        ########################################
+        
         # The '%' format is treated internally as a display option: it
         # should not be applied individually to each part:
         if fmt_type == '%':
@@ -2022,14 +2024,23 @@ class AffineScalarFunc(object):
         ########################################
 
         # prec is the precision for the mantissa/field final format.
-        
-        # Formatting of individual fields:
-        fixed_point_type = 'fF'[fmt_type.isupper()]
-        # The decimal point location is always included in the
-        # printed digits (e.g., printing 3456 with only 2
-        # significant digits requires to print at least four
-        # digits, like in 3456 or 3500):
-        prec = max(-signif_limit, 0)
+
+        if std_dev and not isnan(std_dev):
+
+            fixed_point_type = 'fF'[fmt_type.isupper()]
+            # The decimal point location is always included in the
+            # printed digits (e.g., printing 3456 with only 2
+            # significant digits requires to print at least four
+            # digits, like in 3456 or 3500):
+            prec = max(-signif_limit, 0)
+
+        else:
+
+            # The original format type and precision are used (case of
+            # a zero or NaN uncertainty):
+            fixed_point_type = fmt_type
+            
+            # 'prec' was defined above, for this case
         
         ########################################
 
