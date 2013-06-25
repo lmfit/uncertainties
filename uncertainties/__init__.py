@@ -1266,10 +1266,6 @@ def format_num(nom_val_main, error_main, common_exp,
         # exponent is taken care of by common_exp, so it is
         # formatted without an exponent (otherwise, the exponent
         # would have to be handled for the LaTeX option):
-        #
-        # A non-empty format is useful when robust_format() uses the %
-        # operator, which does not accept an empty format (contrary to
-        # '{}'.format()).
         fmt_suffix_n = (fmt_parts['prec'] or '')+fmt_parts['type']
     else:
         fmt_suffix_n = '.%d%s' % (prec, main_fmt_type)
