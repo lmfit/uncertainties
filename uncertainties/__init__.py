@@ -1190,7 +1190,7 @@ else:
 
         align_option -- > < or ^
 
-        wdith -- string that contains the width
+        width -- string that contains the width
         '''
 
         return {'>': str.rjust, '<': str.ljust, '^': str.center}[align_option](
