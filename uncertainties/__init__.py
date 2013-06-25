@@ -1169,7 +1169,7 @@ class CallableStdDev(float):
 EXP_LETTERS = {'f': 'e', 'F': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
 def format_num(nom_val_main, error_main, common_exp,
-               fmt_parts, prec, fixed_point_type, options):
+               fmt_parts, prec, main_fmt_type, options):
     '''
     Returns a formatted number with uncertainty.
 
@@ -1189,10 +1189,10 @@ def format_num(nom_val_main, error_main, common_exp,
     handled. The width is applied to each value, or, if the shorthand
     notation is used, globally.
     
-    prec -- precision to use with the fixed_point_type format type
+    prec -- precision to use with the main_fmt_type format type
     (see below).
 
-    fixed_point_type -- format specification type, in "eEfFgG". This
+    main_fmt_type -- format specification type, in "eEfFgG". This
     defines how the mantissas, exponents and NaN values are
     represented (in the same way as for float). Note that None, the
     empty string, or "%" are not accepted.
@@ -1207,7 +1207,7 @@ def format_num(nom_val_main, error_main, common_exp,
 
 
     print (nom_val_main, error_main, common_exp,
-           fmt_parts, prec, fixed_point_type, options)  #!!!!!!! test
+           fmt_parts, prec, main_fmt_type, options)  #!!!!!!! test
     
     # If a decimal point were always present in zero rounded errors
     # that are not zero, the formatting would be difficult, in general
@@ -1234,10 +1234,10 @@ def format_num(nom_val_main, error_main, common_exp,
     else:
         if 'L' in options:
             exp_str = r' \times 10^{%d}' % common_exp
-        elif fixed_point_type in EXP_LETTERS:
+        elif main_fmt_type in EXP_LETTERS:
             # Case of e or E. The same convention as Python 2.7
             # to 3.3 is used for the display of the exponent:
-            exp_str = EXP_LETTERS[fixed_point_type]+'%+03d' % common_exp
+            exp_str = EXP_LETTERS[main_fmt_type]+'%+03d' % common_exp
         else:
             exp_str = ''  # No exponent format
 
@@ -1267,7 +1267,7 @@ def format_num(nom_val_main, error_main, common_exp,
             # The error is exactly zero
             uncert_str = '0'
         elif isnan(error_main):
-            uncert_str = robust_format(error_main, fixed_point_type)
+            uncert_str = robust_format(error_main, main_fmt_type)
         else:  #  Error with a meaningful first digit (not 0, not NaN)
 
             uncert = round(error_main, prec)
@@ -1323,7 +1323,7 @@ def format_num(nom_val_main, error_main, common_exp,
             # included
             nom_val_fmt = fmt_parts['sign']+fmt_parts['comma']
 
-        nom_val_fmt += '.%d%s' % (prec, fixed_point_type)
+        nom_val_fmt += '.%d%s' % (prec, main_fmt_type)
 
         nom_val_str = robust_format(nom_val_main, nom_val_fmt)
 
@@ -1335,11 +1335,17 @@ def format_num(nom_val_main, error_main, common_exp,
                                 
     else:  # +/- notation:
 
+        # Only true if the error should not have an exponent
+        special_error = error_main and not isnan(error_main)
+        
         # True when the error part has an exponent directly attached
         # (case of an individual exponent for both the nominal value
-        # and the error, when the error is a non-0, non-NaN number):
-        error_has_exp = (fmt_parts['width'] and error_main
-                         and not isnan(error_main))
+        # and the error, when the error is a non-0, non-NaN number).
+        # The goal is to avoid the strange notation NaNe-10, and to
+        # avoid the 0e10 notation for an exactly zero uncertainty,
+        # because .0e can give this for a non-zero value (the goal is
+        # to have zero uncertainty be very explicit):
+        error_has_exp = fmt_parts['width'] and special_error
         
         # Prefix for the parts:
         if fmt_parts['width']:
@@ -1370,10 +1376,15 @@ def format_num(nom_val_main, error_main, common_exp,
         
         ####################
         # Nominal value formatting:
+
+        nom_val_fmt = fmt_prefix_n
         
-        nom_val_str = robust_format(
-            nom_val_main,
-            fmt_prefix_n+'.%d%s' % (prec, fixed_point_type))
+        if special_error:
+            nom_val_fmt += main_fmt_type
+        else:
+            nom_val_fmt += '.%d%s' % (prec, main_fmt_type)
+            
+        nom_val_str = robust_format(nom_val_main, nom_val_fmt)
 
         if not exponent_factored:
             nom_val_str += exp_str
@@ -1382,7 +1393,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # Error formatting:
         
         if error_main:
-            fmt_suffix_e = '.%d%s' % (prec, fixed_point_type)
+            fmt_suffix_e = '.%d%s' % (prec, main_fmt_type)
         else:  # Exactly zero error
             fmt_suffix_e = '.0f'  # No decimal point for zero
             # Note: .0f applied to a float has no decimal point, but
@@ -1411,6 +1422,11 @@ def format_num(nom_val_main, error_main, common_exp,
         
         # The nominal value and the error might have to be explicitly
         # grouped together, so as to prevent an ambiguous notation:
+
+        #!!!!!!!! this test is strange: if the exponent factored is
+        #factored, then it should imply that there is a common
+        #exponent, the test should not be performed. UNLESS this is
+        #related to a zero or NaN uncertainty.
         if exponent_factored and common_exp is not None:
             value_str = '(%s%s%s)%s' % (
                 nom_val_str, pm_symbol, error_str, exp_str)
@@ -2044,7 +2060,7 @@ class AffineScalarFunc(object):
         # prec is the precision for the mantissa/field final format.
 
         if std_dev and not isnan(std_dev):
-            fixed_point_type = 'fF'[fmt_type.isupper()]
+            main_fmt_type = 'fF'[fmt_type.isupper()]
             # The decimal point location is always included in the
             # printed digits (e.g., printing 3456 with only 2
             # significant digits requires to print at least four
@@ -2052,8 +2068,9 @@ class AffineScalarFunc(object):
             prec = max(-signif_limit, 0)
         else:
             #!!!!! not a fixed point type: update (= either fixed
-            #point type or type of nominal value only)
-            fixed_point_type = fmt_type
+            #point type or type of *mantisssa* of
+            #nominal value  only) => mantissa type
+            main_fmt_type = fmt_type
             # 'prec' was defined above, for the other case
 
         ########################################
@@ -2062,7 +2079,7 @@ class AffineScalarFunc(object):
         return format_num(nom_val_mantissa, std_dev_mantissa, common_exp, 
                           match.groupdict(),
                           prec=prec,
-                          fixed_point_type=fixed_point_type,
+                          main_fmt_type=main_fmt_type,
                           options=options)
 
     # Alternate name for __format__, for use with Python < 2.6:
