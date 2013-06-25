@@ -1827,9 +1827,11 @@ def test_format():
     for (values, representations) in tests.iteritems():
 
         value = ufloat(*values)
-        
+
         for (format_spec, result) in representations.iteritems():
 
+            print "FORMATTING", value, "WITH", format_spec
+            
             # Jython 2.5.2 does not always represent NaN as nan or NAN
             # in the CPython way: for example, '%.2g' % float('nan')
             # is '\ufffd'. The test is skipped, in this case:

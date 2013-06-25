@@ -1866,7 +1866,7 @@ class AffineScalarFunc(object):
         
         # Reference value for the calculation of a possible exponent,
         # if needed:
-        if fmt_type in set('eEgG'):
+        if fmt_type in 'eEgG':
             # Reference value for the exponent
             exp_ref_value = max(abs(nom_val), std_dev)
         
@@ -2025,7 +2025,7 @@ class AffineScalarFunc(object):
 
         # prec is the precision for the mantissa/field final format.
 
-        if std_dev and not isnan(std_dev):
+        if uncert_controlled:
 
             fixed_point_type = 'fF'[fmt_type.isupper()]
             # The decimal point location is always included in the
