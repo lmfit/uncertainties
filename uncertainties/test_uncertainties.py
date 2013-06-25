@@ -1694,7 +1694,8 @@ def test_format():
         (-1.4e-12, 0): {
             'L': r'(-1.4 \pm 0) \times 10^{-12}',
             '10C': u'  -1.4e-12±         0',
-            '13S': '  -1.4(0)e-12'
+            '13S': '  -1.4(0)e-12',
+            'SL': '-1.4(0) \times 10^{-12}'
         },
         (-1.4e-12, float('nan')): {
             'L': r'(-1.4 \pm nan) \times 10^{-12}',
@@ -1778,11 +1779,9 @@ def test_format():
         },
         (1.2e-34, 5e-67): {
             '.6g': '(1.20000+/-0.00000)e-34',
-            # The following form is unusual, but has the advantage of
-            # clearly showing the relative magnitude of the
-            # uncertainty:
-            '10.6g': '   1.2e-34+/- 5e-33e-34',
-            '10.6G': '   1.2E-34+/- 5E-33e-34'
+            '11.6g': ' 1.20000e-34+/- 0.00000e-34',
+            '11.6G': ' 1.20000E-34+/- 0.00000E-34',
+            '11.6GL': r'1.20000 \time 10^{-34} \pm 0.00000 \times 10^{-34}'
         }
     }
 
