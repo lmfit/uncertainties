@@ -1184,8 +1184,8 @@ def format_num(nom_val_main, error_main, common_exp,
     is used.
 
     fmt_parts -- mapping that contains at least the following parts of
-    the format specification: fill_align, sign, zero, width, comma;
-    the value are strings. These format specification parts are
+    the format specification: fill_align, sign, zero, width, comma,
+    type; the value are strings. These format specification parts are
     handled. The width is applied to each value, or, if the shorthand
     notation is used, globally.
     
@@ -1251,7 +1251,28 @@ def format_num(nom_val_main, error_main, common_exp,
             # confuse emacs's syntax highlighting:
             percent_str += ' \\'
         percent_str += '%'
-            
+
+    ####################
+        
+    # Only true if the error should not have an exponent (has priority
+    # over common_exp):
+    special_error = not error_main or isnan(error_main)
+
+    # Nicer representation of the main part, with no trailing
+    # zeros, when the error does not have a defined number of
+    # significant digits:
+    if special_error and (fmt_parts['type'] in 'gG' or not fmt_parts['type']):
+        # The main part is between 1 and 10 because any possible
+        # exponent is taken care of by common_exp, so it is
+        # formatted without an exponent (otherwise, the exponent
+        # would have to be handled for the LaTeX option):
+        fmt_suffix_n = (fmt_parts['prec'] or '')+fmt_parts['type']
+    else:
+        fmt_suffix_n = '.%d%s' % (prec, main_fmt_type)
+
+
+    print "FMT_SUFFIX_N", fmt_suffix_n  #!!!!!!!!
+    
     ####################
     
     # Calculation of the mostly final numerical part value_str (no %
@@ -1306,7 +1327,8 @@ def format_num(nom_val_main, error_main, common_exp,
         ##########
         # Nominal value formatting:
 
-        # Calculation of the format nom_val_fmt:
+        # Calculation of fmt_prefix_n (prefix for the format of the
+        # main part of the nominal value):
         
         if fmt_parts['zero'] and fmt_parts['width']:
             
@@ -1314,18 +1336,16 @@ def format_num(nom_val_main, error_main, common_exp,
             
             # Remaining width (for the nominal value):
             nom_val_width = max(int(fmt_parts['width']) - len(value_end), 0)
-            nom_val_fmt = '%s%s%d%s' % (
+            fmt_prefix_n = '%s%s%d%s' % (
                 fmt_parts['sign'], fmt_parts['zero'], nom_val_width,
                 fmt_parts['comma'])
             
         else:
             # Any 'zero' part should not do anything: it is not
             # included
-            nom_val_fmt = fmt_parts['sign']+fmt_parts['comma']
+            fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
 
-        nom_val_fmt += '.%d%s' % (prec, main_fmt_type)
-
-        nom_val_str = robust_format(nom_val_main, nom_val_fmt)
+        nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
 
         value_str = nom_val_str+value_end
                                 
@@ -1334,9 +1354,6 @@ def format_num(nom_val_main, error_main, common_exp,
             value_str = ('%%%ss' % fmt_parts['width']) % value_str
                                 
     else:  # +/- notation:
-
-        # Only true if the error should not have an exponent
-        special_error = not error_main or isnan(error_main)
         
         # True when the error part has an exponent directly attached
         # (case of an individual exponent for both the nominal value
@@ -1377,23 +1394,7 @@ def format_num(nom_val_main, error_main, common_exp,
         ####################
         # Nominal value formatting:
 
-        nom_val_fmt = fmt_prefix_n
-        
-        # Nicer representation of the main part, with no trailing
-        # zeros, when the error does not have a defined number of
-        # significant digits:
-        if special_error and fmt_parts['type'] in 'gG':
-            # The main part is between 1 and 10 because any possible
-            # exponent is taken care of by common_exp, so it is
-            # formatted without an exponent (otherwise, the exponent
-            # would have to be handled for the LaTeX option):
-            nom_val_fmt += (fmt_parts['prec'] or '')+fmt_parts['type']
-        else:
-            nom_val_fmt += '.%d%s' % (prec, main_fmt_type)
-
-        print "NOM_VAL_FMT", nom_val_fmt  #!!!!!! test
-        
-        nom_val_str = robust_format(nom_val_main, nom_val_fmt)
+        nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
 
         if not exponent_factored:
             nom_val_str += exp_str
