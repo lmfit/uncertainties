@@ -1206,8 +1206,8 @@ def format_num(nom_val_main, error_main, common_exp,
     '''
 
 
-    print (nom_val_main, error_main, common_exp,
-           fmt_parts, prec, main_fmt_type, options)  #!!!!!!! test
+    # print (nom_val_main, error_main, common_exp,
+    #        fmt_parts, prec, main_fmt_type, options)
     
     # If a decimal point were always present in zero rounded errors
     # that are not zero, the formatting would be difficult, in general
@@ -1271,7 +1271,7 @@ def format_num(nom_val_main, error_main, common_exp,
         fmt_suffix_n = '.%d%s' % (prec, main_fmt_type)
 
 
-    print "FMT_SUFFIX_N", fmt_suffix_n  #!!!!!!!!
+    # print "FMT_SUFFIX_N", fmt_suffix_n
     
     ####################
     
@@ -1432,11 +1432,6 @@ def format_num(nom_val_main, error_main, common_exp,
         
         # The nominal value and the error might have to be explicitly
         # grouped together, so as to prevent an ambiguous notation:
-
-        #!!!!!!!! this test is strange: if the exponent factored is
-        #factored, then it should imply that there is a common
-        #exponent, the test should not be performed. UNLESS this is
-        #related to a zero or NaN uncertainty.
         if any_exp_factored and common_exp is not None:
             value_str = '(%s%s%s)%s' % (
                 nom_val_str, pm_symbol, error_str, exp_str)
@@ -1874,7 +1869,7 @@ class AffineScalarFunc(object):
             # control mode:
             and std_dev and not isnan(std_dev))
 
-        print "UNCERT CONTROLLED", uncert_controlled  #!!!!!! test
+        # print "UNCERT CONTROLLED", uncert_controlled
         
         # 'options' is the options that must be given to format_num():
         options = set(match.group('options'))
@@ -1985,9 +1980,8 @@ class AffineScalarFunc(object):
                 digits_limit = signif_d_to_limit(exp_ref_value,
                                                  num_signif_digits)
 
-                #!!!! test
-                print "EXP_REF_VAL", exp_ref_value
-                print "NUM_SIGNIF_DIGITS", num_signif_digits
+                # print "EXP_REF_VAL", exp_ref_value
+                # print "NUM_SIGNIF_DIGITS", num_signif_digits
                 
         #######################################
 
@@ -2028,10 +2022,9 @@ class AffineScalarFunc(object):
             
             common_exp = first_digit(round(exp_ref_value, -digits_limit))
 
-            #!!!!!! test
-            print "COMMON EXP TEST VALUE", common_exp
-            print "LIMIT EXP", common_exp-digits_limit+1
-            print "WITH digits_limit", digits_limit
+            # print "COMMON EXP TEST VALUE", common_exp
+            # print "LIMIT EXP", common_exp-digits_limit+1
+            # print "WITH digits_limit", digits_limit
             
             # The number of significant digits of the reference value
             # rounded at digits_limit is exponent-digits_limit+1:
