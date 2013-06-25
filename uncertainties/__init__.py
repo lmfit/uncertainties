@@ -1205,6 +1205,10 @@ def format_num(nom_val_main, error_main, common_exp,
     shorthand notation is not used.
     '''
 
+
+    print (nom_val_main, error_main, common_exp,
+           fmt_parts, prec, fixed_point_type, options)  #!!!!!!! test
+    
     # If a decimal point were always present in zero rounded errors
     # that are not zero, the formatting would be difficult, in general
     # (because the formatting options are very general): an example
@@ -1828,14 +1832,16 @@ class AffineScalarFunc(object):
         # should the number of significant digits on the uncertainty
         # be controlled?        
         uncert_controlled = (
-            not fmt_prec  # Default behavior: uncertainty controlled
-            or match.group('uncert_prec')  # Explicit control
+            (not fmt_prec  # Default behavior: uncertainty controlled
+             or match.group('uncert_prec'))  # Explicit control
             # The number of significant digits of the uncertainty must
             # be meaningful, otherwise the position of the significant
             # digits of the uncertainty do not have a clear
             # meaning. This gives us the *effective* uncertainty
             # control mode:
             and std_dev and not isnan(std_dev))
+
+        print "UNCERT CONTROLLED", uncert_controlled  #!!!!!! test
         
         # 'options' is the options that must be given to format_num():
         options = set(match.group('options'))
@@ -1946,6 +1952,10 @@ class AffineScalarFunc(object):
                 digits_limit = signif_d_to_limit(exp_ref_value,
                                                  num_signif_digits)
 
+                #!!!! test
+                print "EXP_REF_VAL", exp_ref_val
+                print "NUM_SIGNIF_DIGITS", num_signif_digits
+                
         #######################################
 
         # Common exponent notation: should it be used? use_exp is set
@@ -1985,6 +1995,11 @@ class AffineScalarFunc(object):
             
             common_exp = first_digit(round(exp_ref_value, -digits_limit))
 
+            #!!!!!! test
+            print "COMMON EXP TEST VALUE", common_exp
+            print "LIMIT EXP", common_exp-digits_limit+1
+            print "WITH digits_limit", digits_limit
+            
             # The number of significant digits of the reference value
             # rounded at digits_limit is exponent-digits_limit+1:
             if -4 <= common_exp < common_exp-digits_limit+1:
