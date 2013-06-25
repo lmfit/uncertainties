@@ -1730,6 +1730,9 @@ def test_format():
             # '{:+05}'.format(float('nan')) and format(1.) [which
             # differs from format(1)!):
             '+05': '+01.0+/-00nan',
+            # Should be the same as '+05', for floats, but is not, in
+            # Python 2.7:
+            '+05g': '+0001+/-00nan',
             # 5 is the *minimal* width, 6 is the default number of
             # digits after the decimal point:
             '+05%': '(+100.000000+/-00nan)%'
