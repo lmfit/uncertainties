@@ -1793,7 +1793,9 @@ def test_format():
         {}, {
             '<15': '3.1415e+10     +/-0              ',
             '<20S': '3.1415(0)e+10       ',
-            '=15': '=====3.1415e+10+/-==============0'
+            # Trying to trip the format parsing with a fill character
+            # which is an alignment character:
+            '=>15': '=====3.1415e+10+/-==============0'
         }),
         
         (1234.56789, 0): {
@@ -1901,7 +1903,11 @@ def test_format():
             # Parsing back into a number with uncertainty (unless the
             # LaTeX or comma notation is used):
             if (not set(format_spec).intersection('L,*%')  # * = fill with *
-                and '0nan' not in representation.lower()):  # "00nan"
+                # "00nan"
+                and '0nan' not in representation.lower()
+                # Specific case:
+                and '=====' not in representation):
+                
 
                 value_back = ufloat_fromstr(representation)
 
