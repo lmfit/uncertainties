@@ -1380,12 +1380,19 @@ def format_num(nom_val_main, error_main, common_exp,
         nom_val_fmt = fmt_prefix_n
         
         # Nicer representation of the main part, with no trailing
-        # zeros:
+        # zeros, when the error does not have a defined number of
+        # significant digits:
         if special_error and fmt_parts['type'] in 'gG':
+            # The main part is between 1 and 10 because any possible
+            # exponent is taken care of by common_exp, so it is
+            # formatted without an exponent (otherwise, the exponent
+            # would have to be handled for the LaTeX option):
             nom_val_fmt += (fmt_parts['prec'] or '')+fmt_parts['type']
         else:
             nom_val_fmt += '.%d%s' % (prec, main_fmt_type)
-            
+
+        print "NOM_VAL_FMT", nom_val_fmt  #!!!!!! test
+        
         nom_val_str = robust_format(nom_val_main, nom_val_fmt)
 
         if not exponent_factored:
