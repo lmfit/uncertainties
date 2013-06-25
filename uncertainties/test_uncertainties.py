@@ -1658,7 +1658,9 @@ def test_format():
             '.3ufS': '-123.456(567)',
         },
         (-123.456, 0.004): {
-            '.2fS': '-123.46(00)'
+            # The decimal point shows that the uncertainty is not
+            # exact:
+            '.2fS': '-123.46(0.00)'
         },
         
         # LaTeX notation:
