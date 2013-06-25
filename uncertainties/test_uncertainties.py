@@ -1777,7 +1777,7 @@ def test_format():
             'g': '0+/-0'
         },
         (1.2e-34, 5e-67): {
-            '.6g': '(1.2+/-5e-33)e-34',
+            '.6g': '(1.20000+/-0.00000)e-34',
             # The following form is unusual, but has the advantage of
             # clearly showing the relative magnitude of the
             # uncertainty:
@@ -1830,7 +1830,7 @@ def test_format():
 
         for (format_spec, result) in representations.iteritems():
 
-            print "FORMATTING", value, "WITH", format_spec
+            print "FORMATTING", value, "WITH", format_spec  #!!!!!! test
             
             # Jython 2.5.2 does not always represent NaN as nan or NAN
             # in the CPython way: for example, '%.2g' % float('nan')
