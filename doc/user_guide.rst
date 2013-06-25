@@ -42,6 +42,8 @@ with uncertainties can easily be parsed.  Thus, x = 0.20±0.01 can be
 expressed in many convenient ways, including:
 
 >>> x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
+
+>>> from uncertainties import ufloat_fromstr
 >>> x = ufloat_fromstr("0.20+/-0.01")
 >>> x = ufloat_fromstr(u"0.20±0.01")
 >>> x = ufloat_fromstr("(2+/-0.1)e-01")
@@ -145,28 +147,19 @@ completely **transparently**.
 Printing
 ========
 
-.. Basic examples:
+.. Overview:
 
-Numbers with uncertainties can be printed conveniently. The nominal
-value and the uncertainty have the **same precision** by default:
+Numbers with uncertainties can be printed conveniently:
 
 >>> print x
 0.200+/-0.010
 
-**Exponents** are generally automatically **factored**, for increased
-legibility:
+.. Precision matching:
 
->>> print x*1e7
-(2.00+/-0.10)e+06
+The nominal value and the uncertainty always have the **same
+precision**.
 
-.. Usage:
-
-When no explicit precision is given, the **rounding rules** of the
-`Particle Data Group
-<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ are
-**automatically applied** (they essentially keep the number of digits
-small, while preventing the uncertainty from being displayed with a
-large relative error).
+.. Formatting method:
 
 More **control over the format** can be obtained (in Python 2.6+)
 through the usual :func:`format` method of strings:
@@ -175,14 +168,16 @@ through the usual :func:`format` method of strings:
 Result =       0.20+/-      0.01
 
 (For Python before version 2.6, one can do ``'Result = %s' %
-x.format('10.2f')`` instead.) When a width is used, exponents are not
-factored, so that parts (nominal value and standard deviation) can be
-well aligned; using a (minimal) width of 1 is thus a way of forcing
-exponents to not be factored.
+x.format('10.2f')`` instead.) 
 
-**Almost all the float format specifications** are accepted (including
-those containing a fill character, an alignment option, a sign or zero
-option, and a width).
+.. Legacy formats and base syntax of the format specification:
+
+**All the float format specifications** are accepted, except those
+with the ``n`` format type. In particular, a fill character, an
+alignment option, a sign or zero option, a width, or the ``%`` format
+type are all supported.
+
+.. Precision control:
 
 It is possible to control the **number of significant digits of the
 uncertainty** by adding the modifier ``u`` after the precision:
@@ -191,6 +186,35 @@ uncertainty** by adding the modifier ``u`` after the precision:
 1 significant digit on the uncertainty: 0.20+/-0.01
 >>> print '3 significant digits on the uncertainty: {:.3u}'.format(x)
 3 significant digits on the uncertainty: 0.2000+/-0.0100
+
+When no *explicit* precision is given, the number of significant digits
+on the uncertainty is defined with the `Particle Data Group
+<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
+rules (the rules keep the number of digits small, while preventing the
+uncertainty from being displayed with a large relative error).
+
+
+.. Common exponent:
+
+A **common exponent** is automatically calculated if an exponent is
+needed for the larger of the nominal value (in absolute value) and the
+uncertainty. The exponent is generally **factored**, for increased
+legibility:
+
+>>> print x*1e7
+(2.00+/-0.10)e+06
+
+When a *format width* is used, the common exponent is not factored:
+
+>>> print 'Result = {:10.1e}'.format(x*1e-10)
+Result =    2.0e-11+/-   0.1e-11
+
+(Using a (minimal) width of 1 is thus a way of forcing exponents to
+not be factored.)
+
+Thanks to this feature, each part (nominal value and standard
+deviation) can be well aligned across multiple lines, and the relative
+magnitude of the error can be readily estimated.
 
 .. Options
 
@@ -207,7 +231,7 @@ for the **shorthand notation**, ``C`` for using a **single character
 
 Options can be combined.
 
-.. Output:
+.. Special cases:
 
 An uncertainty which is *exactly* **zero** is always formatted as an
 integer:

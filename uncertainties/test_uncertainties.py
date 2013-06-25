@@ -18,17 +18,6 @@ import math
 import random
 import sys
 
-# For some tests (test_format() and the "n" format specification):
-import locale
-locale_set = True
-try:
-    locale.setlocale(locale.LC_ALL, 'en_US')  # POSIX
-except locale.Error:
-    try:
-        locale.setlocale(locale.LC_ALL, 'american_usa')  
-    except locale.Error:
-        locale_set = False  # Some tests won't be run
-
         
 # 3rd-party modules
 # import nose.tools
@@ -1544,10 +1533,23 @@ def test_repr():
     # Tagging:
     x = ufloat(3, 1, "length")
     assert repr(x) == '< length = 3.0+/-1.0 >'
+
+def python26_add(dict0, dict1):
+    '''
+    If Python 2.6+ is running, Updates dict0 with dict1 and returns the
+    updated dict0.
+    '''
+    if sys.version_info >= (2, 6):
+        dict0.update(dict1)
+    return dict0
     
 def test_format():
     '''Test the formatting of numbers with uncertainty.'''
 
+    # The way NaN is formatted with F and E depends on the version of
+    # Python (NAN for Python 2.7+):
+    NaN_EF = '%F' % float('nan')
+    
     # Tests of each point of the docstring of
     # AffineScalarFunc.__format__() in turn, mostly in the same order.
 
@@ -1563,9 +1565,14 @@ def test_format():
         },
         
         # Full generalization of float formatting:
-        (3.1415, 0.0001): {
+        (3.1415, 0.0001): python26_add({
             '+09.2uf': '+03.14150+/-000.00010'
-        },
+        }, {
+            # Alignment is not available with the % formatting
+            # operator of Python < 2.6:
+            '*^+9.2uf': '+3.14150*+/-*0.00010*',
+            '>9f': '  3.14150+/-  0.00010'  # Width and align
+        }),
 
         # Number of digits of the uncertainty fixed:
         (123.456789, 0.00123): {
@@ -1590,9 +1597,14 @@ def test_format():
         # ... Same thing, but with an exponent:
         (12.3, 456.78): {
             '.1ue': '(0+/-5)e+02',
-            '.4ue': '(0.123+/-4.568)e+02'
+            '.4ue': '(0.123+/-4.568)e+02',
+            '.4ueS': '0.123(4.568)e+02'
         },
 
+        (23456.789123, 1234.56789123): {
+            '.6gS': '23456.8(1234.6)'
+        },
+        
         # Test of the various float formats: the nominal value should
         # have a similar representation as if it were directly
         # represented as a float:
@@ -1676,7 +1688,12 @@ def test_format():
             '.2ufS': '-123.46(57)',
             '.3ufS': '-123.456(567)',
         },
-
+        (-123.456, 0.004): {
+            # The decimal point shows that the uncertainty is not
+            # exact:
+            '.2fS': '-123.46(0.00)'
+        },
+        
         # LaTeX notation:
         #
         (1234.56789, 0.1): {
@@ -1698,19 +1715,34 @@ def test_format():
         },
 
         # Special cases for the uncertainty (0, nan) and format
-        # strings (extension S, L, U,..., global width, etc.):
-        (-1.4e-12, 0): {
-            'L': r'(-1.4 \pm 0) \times 10^{-12}',
-            '10C': u'  -1.4e-12±         0',
-            '13S': '  -1.4(0)e-12'
-        },
-        (-1.4e-12, float('nan')): {
-            'L': r'(-1.4 \pm nan) \times 10^{-12}',
-            '.2uG': '(-1.4+/-NAN)E-12',  # u ignored, format used
-            '10': '  -1.4e-12+/-       nan',
-            '15S': '  -1.4(nan)e-12',
-            '15GS': '  -1.4(NAN)E-12'
-        },
+        # strings (extension S, L, U,..., global width, etc.).
+        #
+        # Python 3.2 and 3.3 give 1.4e-12*1e+12 = 1.4000000000000001
+        # instead of 1.4 for Python 3.1. The problem does not appear
+        # with 1.2, so 1.2 is used.
+        (-1.2e-12, 0): python26_add({
+            '12.2gCL': ur'-1.2 \times 10^{-12}±           0'
+        }, {
+            # Pure "width" formats are not accepted by the % operator,
+            # and only %-compatible formats are accepted, for Python <
+            # 2.6:
+            '13S': '  -1.2(0)e-12',
+            '10C': u'  -1.2e-12±         0',
+            'L': r'(-1.2 \pm 0) \times 10^{-12}',
+            'SL': r'-1.2(0) \times 10^{-12}'            
+        }),
+
+        # Python 3.2 and 3.3 give 1.4e-12*1e+12 = 1.4000000000000001
+        # instead of 1.4 for Python 3.1. The problem does not appear
+        # with 1.2, so 1.2 is used.        
+        (-1.2e-12, float('nan')): python26_add({
+            '.2uG': '(-1.2+/-%s)E-12' % NaN_EF,  # u ignored, format used
+            '15GS': '  -1.2(%s)E-12' % NaN_EF
+        }, {
+            'L': r'(-1.2 \pm nan) \times 10^{-12}',        
+            '10': '  -1.2e-12+/-       nan',
+            '15S': '  -1.2(nan)e-12'            
+        }),
 
         (3.14e-10, 0.01e-10): {
             # Character (Unicode) strings:
@@ -1720,18 +1752,33 @@ def test_format():
             '.1e': '(3.1+/-0.0)e-10',
             '.1eS': '3.1(0.0)e-10'
         },
-        
+    
         # Some special cases:
-        (1, float('nan')): {
+        (1, float('nan')): python26_add({
             'g': '1+/-nan',
-            'G': '1+/-NAN',
+            'G': '1+/-%s' % NaN_EF,
             '%': '(100.000000+/-nan)%',  # The % format type is like f
-            # This is ugly, but consistent with '{:+05}'.format(float('nan'))
-            '+05': '+0001+/-00nan',
+            # Should be the same as '+05', for floats, but is not, in
+            # Python 2.7:
+            '+05g': '+0001+/-00nan',
             # 5 is the *minimal* width, 6 is the default number of
             # digits after the decimal point:
             '+05%': '(+100.000000+/-00nan)%'
-        },
+        }, {
+            # There is a difference between '{}'.format(1.) and
+            # '{:g}'.format(1.), which is not fully obvious in the
+            # documentation, which indicates that a None format type
+            # is like g. The reason is that the empty format string is
+            # actually interpreted as str(), and that str() does not
+            # have to behave like g ('{}'.format(1.234567890123456789)
+            # and '{:g}'.format(1.234567890123456789) are different).
+            '': '1.0+/-nan',
+            # This is ugly, but consistent with
+            # '{:+05}'.format(float('nan')) and format(1.) [which
+            # differs from format(1)!):
+            '+05': '+01.0+/-00nan'            
+            }),
+        
         (9.9, 0.1): {
             '.1ue': '(9.9+/-0.1)e+00',
             '.0fS': '10(0.)'
@@ -1743,15 +1790,27 @@ def test_format():
             '.1ue': '(1.00+/-0.01)e+01'  # Same exponent as for 9.99 alone
         },
         # 0 uncertainty: nominal value displayed like a float:
-        (1.2345, 0): {
+        (1.2345, 0): python26_add({
             '.2ue': '(1.23+/-0)e+00',
             '1.2ue': '1.23e+00+/-0',
             '.2uf': '1.23+/-0',
             '.2ufS': '1.23(0)',
             '.2fS': '1.23(0)',
-            '': '1.2345+/-0',
             'g': '1.2345+/-0'
+        }, {
+            '': '1.2345+/-0'
+        }),
+
+        (1234.56789, 0): {
+            '1.2ue': '1.23e+03+/-0',  # u ignored
+            '1.2e': '1.23e+03+/-0',
+            'eL': r'(1.234568 \pm 0) \times 10^{3}',  # Default precision = 6
+            'EL': r'(1.234568 \pm 0) \times 10^{3}',
+            'fL': '1234.567890 \pm 0',
+            'FL': '1234.567890 \pm 0',
+            '%L': '(123456.789000 \pm 0) \%'
         },
+
         (1e5, 0): {
             'g': '100000+/-0'
         }, 
@@ -1783,8 +1842,13 @@ def test_format():
         (0, 0): {  # Make defining the first significant digit problematic
             '.1f': '0.0+/-0',  # Simple float formatting
             'g': '0+/-0'
+        },
+        (1.2e-34, 5e-67): {
+            '.6g': '(1.20000+/-0.00000)e-34',
+            '13.6g': '  1.20000e-34+/-  0.00000e-34',
+            '13.6G': '  1.20000E-34+/-  0.00000E-34',
+            '.6GL': r'(1.20000 \pm 0.00000) \times 10^{-34}'
         }
-        
     }
 
     # ',' format option: introduced in Python 2.7
@@ -1801,23 +1865,6 @@ def test_format():
                 }
         })
         
-    if sys.version_info >= (2, 6):
-
-        # Alignment is not available with the % formatting
-        # operator of Python < 2.6:
-        tests[(3.1415, 0.0001)].update({
-            '*^+9.2uf': '+3.14150*+/-*0.00010*',
-            '>9f': '  3.14150+/-  0.00010'  # Width and align
-        })
-        
-    # If the locale was set to American (USA), the "n" format type can
-    # be tested:
-    if locale_set and sys.version_info >= (2, 6):
-        tests[(23456.789123, 1234.56789123)] = {
-            '.0n': '(2+/-0.1)e+04',
-            '.6n': '23,456.8+/-1,234.57'
-            }            
-
     # True if we can detect that the Jython interpreter is running this code:
     try:
         jython_detected = sys.subversion[0] == 'Jython'
@@ -1827,9 +1874,11 @@ def test_format():
     for (values, representations) in tests.iteritems():
 
         value = ufloat(*values)
-        
+
         for (format_spec, result) in representations.iteritems():
 
+            print "FORMATTING", repr(value), "WITH", format_spec  #!!!!!!!
+            
             # Jython 2.5.2 does not always represent NaN as nan or NAN
             # in the CPython way: for example, '%.2g' % float('nan')
             # is '\ufffd'. The test is skipped, in this case:
@@ -1855,7 +1904,7 @@ def test_format():
             
             # Parsing back into a number with uncertainty (unless the
             # LaTeX or comma notation is used):
-            if (not set(format_spec).intersection('L,*%n')  # * = fill with *
+            if (not set(format_spec).intersection('L,*%')  # * = fill with *
                 and '0nan' not in representation.lower()):  # "00nan"
 
                 value_back = ufloat_fromstr(representation)

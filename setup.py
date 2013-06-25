@@ -314,6 +314,8 @@ _of_uncertainty
     'Programming Language :: Python :: 3.1',
     'Programming Language :: Python :: 3.2',
     'Programming Language :: Python :: 3.3',
+    'Programming Language :: Python :: Implementation :: Jython',
+    'Programming Language :: Python :: Implementation :: PyPy',
     'Topic :: Education',
     'Topic :: Scientific/Engineering',
     'Topic :: Scientific/Engineering :: Mathematics',

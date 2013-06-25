@@ -1191,8 +1191,8 @@ class CallableStdDev(float):
 # an exponent): the keys are the possible mantissa formats:
 EXP_LETTERS = {'f': 'e', 'F': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
 
-def format_num(nom_val_main, error_main, exponent,
-               fmt_parts, prec, fixed_point_type, options):
+def format_num(nom_val_main, error_main, common_exp,
+               fmt_parts, prec, main_fmt_type, options):
     '''
     Returns a formatted number with uncertainty.
 
@@ -1200,21 +1200,25 @@ def format_num(nom_val_main, error_main, exponent,
     no decimal point.
     
     nom_val_main, error_main -- nominal value and error, before using
-    the exponent (e.g., "1.23e2" would have a main value of 1.23;
+    common_exp (e.g., "1.23e2" would have a main value of 1.23;
     similarly, "12.3+/-0.01" would have a main value of 12.3).
 
-    exponent -- common exponent to use. If None, no exponent is used.
+    common_exp -- common exponent to use. If None, no common exponent
+    is used.
 
     fmt_parts -- mapping that contains at least the following parts of
-    the format specification: fill_align, sign, zero, width, comma;
-    the value are strings. These format specification parts are
+    the format specification: fill_align, sign, zero, width, comma,
+    type; the value are strings. These format specification parts are
     handled. The width is applied to each value, or, if the shorthand
-    notation is used, globally.
+    notation is used, globally. If the error is special (zero or NaN),
+    the parts are applied as much as possible to the nominal value;
+    this fails with Python < 2.6 if the resulting format is not
+    accepted by the % operator.
     
-    prec -- precision to use with the fixed_point_type format type
+    prec -- precision to use with the main_fmt_type format type
     (see below).
 
-    fixed_point_type -- format specification type, in "eEfFgGn". This
+    main_fmt_type -- format specification type, in "eEfFgG". This
     defines how the mantissas, exponents and NaN values are
     represented (in the same way as for float). Note that None, the
     empty string, or "%" are not accepted.
@@ -1227,6 +1231,10 @@ def format_num(nom_val_main, error_main, exponent,
     shorthand notation is not used.
     '''
 
+
+    print (nom_val_main, error_main, common_exp,
+           fmt_parts, prec, main_fmt_type, options)  #!!!!!!!!!!!
+    
     # If a decimal point were always present in zero rounded errors
     # that are not zero, the formatting would be difficult, in general
     # (because the formatting options are very general): an example
@@ -1247,15 +1255,15 @@ def format_num(nom_val_main, error_main, exponent,
     # useful for the width handling of the shorthand notation.
     
     # Exponent part:
-    if exponent is None:
+    if common_exp is None:
         exp_str = ''
     else:
         if 'L' in options:
-            exp_str = r' \times 10^{%d}' % exponent
-        elif fixed_point_type in EXP_LETTERS:
+            exp_str = r' \times 10^{%d}' % common_exp
+        elif main_fmt_type in EXP_LETTERS:
             # Case of e or E. The same convention as Python 2.7
             # to 3.3 is used for the display of the exponent:
-            exp_str = EXP_LETTERS[fixed_point_type]+'%+03d' % exponent
+            exp_str = EXP_LETTERS[main_fmt_type]+'%+03d' % common_exp
         else:
             exp_str = ''  # No exponent format
 
@@ -1269,7 +1277,28 @@ def format_num(nom_val_main, error_main, exponent,
             # confuse emacs's syntax highlighting:
             percent_str += ' \\'
         percent_str += '%'
-            
+
+    ####################
+        
+    # Only true if the error should not have an exponent (has priority
+    # over common_exp):
+    special_error = not error_main or isnan(error_main)
+
+    # Nicer representation of the main part, with no trailing
+    # zeros, when the error does not have a defined number of
+    # significant digits:
+    if special_error and (fmt_parts['type'] in 'gG' or not fmt_parts['type']):
+        # The main part is between 1 and 10 because any possible
+        # exponent is taken care of by common_exp, so it is
+        # formatted without an exponent (otherwise, the exponent
+        # would have to be handled for the LaTeX option):
+        fmt_suffix_n = (fmt_parts['prec'] or '')+fmt_parts['type']
+    else:
+        fmt_suffix_n = '.%d%s' % (prec, main_fmt_type)
+
+
+    # print "FMT_SUFFIX_N", fmt_suffix_n
+    
     ####################
     
     # Calculation of the mostly final numerical part value_str (no %
@@ -1285,7 +1314,7 @@ def format_num(nom_val_main, error_main, exponent,
             # The error is exactly zero
             uncert_str = '0'
         elif isnan(error_main):
-            uncert_str = robust_format(error_main, fixed_point_type)
+            uncert_str = robust_format(error_main, main_fmt_type)
         else:  #  Error with a meaningful first digit (not 0, not NaN)
 
             uncert = round(error_main, prec)
@@ -1319,12 +1348,13 @@ def format_num(nom_val_main, error_main, exponent,
         # not included). This string is important for the handling of
         # the width:
         value_end = '(%s)%s%s' % (uncert_str, exp_str, percent_str)
-        exponent_factored = True  # Single exponent in the output
+        any_exp_factored = True  # Single exponent in the output
 
         ##########
         # Nominal value formatting:
 
-        # Calculation of the format nom_val_fmt:
+        # Calculation of fmt_prefix_n (prefix for the format of the
+        # main part of the nominal value):
         
         if fmt_parts['zero'] and fmt_parts['width']:
             
@@ -1332,18 +1362,24 @@ def format_num(nom_val_main, error_main, exponent,
             
             # Remaining width (for the nominal value):
             nom_val_width = max(int(fmt_parts['width']) - len(value_end), 0)
-            nom_val_fmt = '%s%s%d%s' % (
+            fmt_prefix_n = '%s%s%d%s' % (
                 fmt_parts['sign'], fmt_parts['zero'], nom_val_width,
                 fmt_parts['comma'])
             
         else:
             # Any 'zero' part should not do anything: it is not
             # included
-            nom_val_fmt = fmt_parts['sign']+fmt_parts['comma']
+            fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
 
-        nom_val_fmt += '.%d%s' % (prec, fixed_point_type)
+        print "FMT_PREFIX_N", fmt_prefix_n  #!!!!!!!!!!
+        print "FMT_SUFFIX_N", fmt_suffix_n
 
-        nom_val_str = robust_format(nom_val_main, nom_val_fmt)
+        # !! The following fails with Python < 2.6 when the format is
+        # not accepted by the % operator. This can happen when
+        # special_error is true, as the format used for the nominal
+        # value is essentially the format provided by the user, which
+        # may be empty:
+        nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
 
         value_str = nom_val_str+value_end
                                 
@@ -1352,12 +1388,15 @@ def format_num(nom_val_main, error_main, exponent,
             value_str = ('%%%ss' % fmt_parts['width']) % value_str
                                 
     else:  # +/- notation:
-
+        
         # True when the error part has an exponent directly attached
         # (case of an individual exponent for both the nominal value
-        # and the error, when the error is a non-0, non-NaN number):
-        error_has_exp = (fmt_parts['width'] and error_main
-                         and not isnan(error_main))
+        # and the error, when the error is a non-0, non-NaN number).
+        # The goal is to avoid the strange notation NaNe-10, and to
+        # avoid the 0e10 notation for an exactly zero uncertainty,
+        # because .0e can give this for a non-zero value (the goal is
+        # to have zero uncertainty be very explicit):
+        error_has_exp = fmt_parts['width'] and not special_error
         
         # Prefix for the parts:
         if fmt_parts['width']:
@@ -1365,7 +1404,7 @@ def format_num(nom_val_main, error_main, exponent,
             # The exponent is not factored, so as to have nice columns
             # for the nominal values and the errors (no shift due to a
             # varying exponent):
-            exponent_factored = False
+            any_exp_factored = False
 
             width = int(fmt_parts['width'])
             # Remaining width (for the nominal value):
@@ -1388,36 +1427,45 @@ def format_num(nom_val_main, error_main, exponent,
                 fmt_parts['comma'])
 
         else:
-            exponent_factored = True            
+            any_exp_factored = True            
             fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
             fmt_prefix_e = fmt_parts['comma']
         
         ####################
         # Nominal value formatting:
-        
-        nom_val_str = robust_format(
-            nom_val_main,
-            fmt_prefix_n+'.%d%s' % (prec, fixed_point_type))
 
-        if not exponent_factored:
+        # !! The following fails with Python < 2.6 when the format is
+        # not accepted by the % operator. This can happen when
+        # special_error is true, as the format used for the nominal
+        # value is essentially the format provided by the user, which
+        # may be empty:
+        
+        nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
+
+        print "FMT_PREFIX_N", fmt_prefix_n  #!!!!!!!!!!
+        print "FMT_SUFFIX_N", fmt_suffix_n
+        print "NOM_VAL_STR", nom_val_str
+        
+        if not any_exp_factored:
             nom_val_str += exp_str
             
         ####################
         # Error formatting:
+
+        # Note: .0f applied to a float has no decimal point, but
+        # this does not appear to be documented
+        # (http://docs.python.org/2/library/string.html#format-specification-mini-language). This
+        # feature is used anyway, because it allows a possible
+        # comma format parameter to be handled more conveniently
+        # than if the 'd' format was used.
+        #
+        # The following uses a special integer representation of a
+        # zero uncertainty:
+        fmt_suffix_e = '.%d%s' % (prec if error_main else 0, main_fmt_type)
+
         
-        if error_main:
-            fmt_suffix_e = '.%d%s' % (prec, fixed_point_type)
-        else:  # Exactly zero error
-            fmt_suffix_e = '.0f'  # No decimal point for zero
-            # Note: .0f applied to a float has no decimal point, but
-            # this does not appear to be documented
-            # (http://docs.python.org/2/library/string.html#format-specification-mini-language). This
-            # feature is used anyway, because it allows a possible
-            # comma format parameter to be handled more conveniently
-            # than if the 'd' format was used.
-
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
-
+        
         if error_has_exp:
             error_str += exp_str
         
@@ -1437,7 +1485,7 @@ def format_num(nom_val_main, error_main, exponent,
         
         # The nominal value and the error might have to be explicitly
         # grouped together, so as to prevent an ambiguous notation:
-        if exponent_factored and exponent is not None:
+        if any_exp_factored and common_exp is not None:
             value_str = '(%s%s%s)%s' % (
                 nom_val_str, pm_symbol, error_str, exp_str)
         else:
@@ -1445,7 +1493,7 @@ def format_num(nom_val_main, error_main, exponent,
             
         # Final form:
         if percent_str:
-            if exponent is not None and exponent_factored:
+            if common_exp is not None and any_exp_factored:
                 value_str += percent_str
             else:
                 value_str = '(%s)%s' % (value_str, percent_str)
@@ -1724,35 +1772,41 @@ class AffineScalarFunc(object):
 
         The format specification are the same as for format() for
         floats, as defined for Python 2.6+ (restricted to what the %
-        operator accepts, if using an earlier version of Python). In
-        particular, the usual precision, alignment, sign flag,
-        etc. can be used. The behavior of the various format types (f,
-        g, None, etc.) is similar. However, the format is extended:
-        the number of digits of the uncertainty can be controlled, as
-        is the way the uncertainty is indicated (with +/- or with the
-        short-hand notation 3.14(1), in LaTeX or with a simple text
-        string,...).
+        operator accepts, if using an earlier version of Python),
+        except that the n format type is not supported. In particular,
+        the usual precision, alignment, sign flag, etc. can be
+        used. The behavior of the various format types (f, g, None,
+        etc.) is similar (No format type is like g; a g format type is
+        either converted into an equivalent f or e format type,
+        etc.). Moreover, the format is extended: the number of digits
+        of the uncertainty can be controlled, as is the way the
+        uncertainty is indicated (with +/- or with the short-hand
+        notation 3.14(1), in LaTeX or with a simple text string,...).
 
         Beyond the use of options at the end of the format
         specification, the main difference with floats is that a "u"
         just before the format type (f, e, g, None, etc.) activates
-        the "uncertainty control" mode (e.g.: "u", or "ug"). This mode
-        is automatically activated when not using any explicit
-        precision (e.g.: "g", "10f", "+010,e" format
+        the "uncertainty control" mode (e.g.: "u", or "ug", or
+        ".6u"). This mode is automatically activated when not using
+        any explicit precision (e.g.: "g", "10f", "+010,e" format
         specifications). This mode is automatically deactivated if the
         uncertainty does not have a meaningful number of significant
         digits (0 and NaN uncertainties).
 
-        In the uncertainty control mode, the nominal value is returned
-        with a precision that matches that of the standard deviation,
-        like in 1.23+/-0.01. This generally implies trailing zeros,
-        even for the g format type.
+        The nominal value and the uncertainty always use the same
+        precision. This implies trailing zeros, in general, even with
+        the g format type (contrary to the float case). However, when
+        the number of significant digits of the uncertainty is not
+        defined (zero or NaN uncertainty), it has no precision, so
+        there is no matching. In this case, the original format
+        specification is used for the nominal value (any "u" is
+        ignored).
         
-        In this mode, the precision (".p", where p is a number) is
-        interpreted (if meaningful) as indicating the number p of
-        significant digits of the displayed uncertainty. Example: .1uf
-        will return a string with one significant digit in the
-        uncertainty (and no exponent).
+        In the uncertainty control mode, the precision (".p", where p
+        is a number) is interpreted (if meaningful) as indicating the
+        number p of significant digits of the displayed
+        uncertainty. Example: .1uf will return a string with one
+        significant digit in the uncertainty (and no exponent).
 
         In the uncertainty control mode, if no precision is given,
         then the rounding rules from the Particle Data Group are used,
@@ -1760,30 +1814,19 @@ class AffineScalarFunc(object):
         (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).--for
         example, the "f" format generally does not use the default 6
         digits after the decimal point, but applies the PDG rules.
-
-        In the uncertainty control mode, the "n" format type cannot be
-        used (because trailing zeros are removed by this format type,
-        for floats, which would prevent precision matching between the
-        nominal value and the uncertainty).
-
-        When the uncertainty control mode is not activated, the
-        formatting is similar to that of floats (any "u" in the format
-        is discarded). A compact notation for numbers with uncertainty
-        can thus be obtained with the ".6g" format (since "g" has a
-        default precision of 6); this can lead to representations like
-        "(1±1e-4)e123".
         
-        When the exponent notation is used, a single common exponent
-        is used. The exponent is defined through the larger of the
-        nominal value (in absolute value) and the standard deviation;
-        this way, the quantity that best describes the associated
-        probability distribution has a mantissa in the usual 1-10
-        range. The exponent is factored (as in
-        "(1.2+/-0.1)e-5"). unless the format specification contains an
-        explicit width (" 1.2e-5+/- 0.1e-5") (this allows numbers to
-        be in a single column, when printing numbers over many
-        lines). Specifying a minimum width of 1 is a way of forcing
-        the exponent to not be factored out.
+        A common exponent is used if an exponent is needed for the
+        larger of the nominal value (in absolute value) and the
+        standard deviation, unless this would result in a zero
+        uncertainty being represented as 0e... or a NaN uncertainty as
+        NaNe.... Thanks to this common exponent, the quantity that
+        best describes the associated probability distribution has a
+        mantissa in the usual 1-10 range. The common exponent is
+        factored (as in "(1.2+/-0.1)e-5"). unless the format
+        specification contains an explicit width (" 1.2e-5+/- 0.1e-5")
+        (this allows numbers to be in a single column, when printing
+        numbers over many lines). Specifying a minimum width of 1 is a
+        way of forcing any common exponent to not be factored out.
         
         The fill, align, zero and width parameters of the format
         specification are applied individually to each of the nominal
@@ -1803,14 +1846,16 @@ class AffineScalarFunc(object):
         specification. Multiple options can be specified.
         
         When option "S" is present (like in .1uS), the short-hand
-        notation 1.234(5) is used. When "C" is present, the single
-        character "±" separates the nominal value from the standard
+        notation 1.234(5) is used; if the digits of the uncertainty
+        straddle the decimal point, it uses a fixed-point notation,
+        like in 12.3(4.5). When "C" is present, the single character
+        "±" separates the nominal value from the standard
         deviation. When "L" is present, the output is formatted with
         LaTeX.
 
-        The "%" format type always forces the percent sign to be at
-        the end of the returned string (and not attached to each of
-        the nominal value and the standard deviation).
+        The "%" format type forces the percent sign to be at the end
+        of the returned string (it is not attached to each of the
+        nominal value and the standard deviation).
         
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
@@ -1841,7 +1886,7 @@ class AffineScalarFunc(object):
             (?:\.(?P<prec>\d+))?
             (?P<uncert_prec>u?)  # Precision for the uncertainty?
             # The type can be omitted. Options must not go here:
-            (?P<type>[eEfFgGn%]??)
+            (?P<type>[eEfFgG%]??)  # n not supported
             (?P<options>[LSC]*)$''',
             format_spec,
             re.VERBOSE)
@@ -1852,7 +1897,6 @@ class AffineScalarFunc(object):
                 'Format specification %r cannot be used with object of type %r'
                 # Sub-classes handled:
                 % (format_spec, self.__class__.__name__))
-       
         
         # Effective format type: f, e, g, etc. (never None or empty):
         #
@@ -1863,20 +1907,6 @@ class AffineScalarFunc(object):
         # Shortcut:
         fmt_prec = match.group('prec')  # Can be None
 
-        # Should the precision be interpreted like for a float, or
-        # should the number of significant digits on the uncertainty
-        # be controlled?        
-        uncert_controlled = (
-            not fmt_prec  # Default behavior: uncertainty controlled
-            or bool(match.group('uncert_prec')))  # Explicit control
-
-        # The n format type is not available when the uncertainty is
-        # normally controlled:        
-        if uncert_controlled and fmt_type == 'n':
-            raise ValueError(
-                'Format type %r cannot be used with the uncertainty control'
-                ' mode' % (fmt_type, match.group('uncert_prec')))
-        
         ########################################
                 
         # Since the '%' (percentage) format specification can change
@@ -1887,9 +1917,26 @@ class AffineScalarFunc(object):
         std_dev = self.std_dev
         nom_val = self.nominal_value
 
+        # Should the precision be interpreted like for a float, or
+        # should the number of significant digits on the uncertainty
+        # be controlled?        
+        uncert_controlled = (
+            (not fmt_prec  # Default behavior: uncertainty controlled
+             or match.group('uncert_prec'))  # Explicit control
+            # The number of significant digits of the uncertainty must
+            # be meaningful, otherwise the position of the significant
+            # digits of the uncertainty do not have a clear
+            # meaning. This gives us the *effective* uncertainty
+            # control mode:
+            and std_dev and not isnan(std_dev))
+
+        # print "UNCERT CONTROLLED", uncert_controlled
+        
         # 'options' is the options that must be given to format_num():
         options = set(match.group('options'))
 
+        ########################################
+        
         # The '%' format is treated internally as a display option: it
         # should not be applied individually to each part:
         if fmt_type == '%':
@@ -1905,22 +1952,18 @@ class AffineScalarFunc(object):
             fmt_type = 'f'
             options.add('%')
 
-        # At this point, fmt_type is in eEfFgGn (not None, not %).
+        # At this point, fmt_type is in eEfFgG (not None, not %).
             
         ########################################
 
-        # The number of significant digits of the uncertainty must be
-        # meaningful, otherwise the position of the significant digits
-        # of the uncertainty do not have a clear meaning. This gives
-        # us the *effective* uncertainty control mode:
-        uncert_controlled &= bool(std_dev) and not isnan(std_dev)
-
+        # Calculation of digits_limit, which defines the precision of
+        # the nominal value and of the standard deviation:
+        
         # Reference value for the calculation of a possible exponent,
         # if needed:
-        if fmt_type in set('eEgGn'):
+        if fmt_type in 'eEgG':
             # Reference value for the exponent
             exp_ref_value = max(abs(nom_val), std_dev)
-
         
         if uncert_controlled:
             # The number of significant digits on the uncertainty is
@@ -1963,7 +2006,7 @@ class AffineScalarFunc(object):
 
                 digits_limit = -prec
                 
-            else:  # Format type in eEgGn
+            else:  # Format type in eEgG
 
                 # We calculate first the number of significant digits
                 # to be displayed (if possible):
@@ -1985,14 +2028,14 @@ class AffineScalarFunc(object):
 
                     # The final number of significant digits to be
                     # displayed is not necessarily obvious: trailing
-                    # zeros are removed (with the gGn format type), so
+                    # zeros are removed (with the gG format type), so
                     # num_signif_digits is the number of significant
                     # digits if trailing zeros were not removed. This
                     # quantity is relevant for the rounding implied by
                     # the exponent test of the g/G/n format:
 
-                    # 0 is interpreted like 1 (as with floats with
-                    # a gGn format type):
+                    # 0 is interpreted like 1 (as with floats with a
+                    # gG format type):
                     num_signif_digits = prec or 1
 
                 
@@ -2001,11 +2044,14 @@ class AffineScalarFunc(object):
                 digits_limit = signif_d_to_limit(exp_ref_value,
                                                  num_signif_digits)
 
+                # print "EXP_REF_VAL", exp_ref_value
+                # print "NUM_SIGNIF_DIGITS", num_signif_digits
+                
         #######################################
 
-        # Exponent notation: should it be used? use_exp is set
-        # accordingly. If an exponent should be used (use_exp is
-        # True), 'exponent' is set to the exponent that should be
+        # Common exponent notation: should it be used? use_exp is set
+        # accordingly. If a common exponent should be used (use_exp is
+        # True), 'common_exp' is set to the exponent that should be
         # used.
 
         if fmt_type in 'fF':
@@ -2015,16 +2061,16 @@ class AffineScalarFunc(object):
             # !! This calculation might have been already done, for
             # instance when using the .0e format: signif_d_to_limit()
             # was called before, which prompted a similar calculation:
-            exponent = first_digit(round(exp_ref_value, -digits_limit))
-        else:  # g, G, n
+            common_exp = first_digit(round(exp_ref_value, -digits_limit))
+        else:  # g, G
 
             # The rules from
             # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
             # are applied.
 
             # Python's native formatting (whose result could be parsed
-            # in order to determine whether an exponent should be
-            # used) is not used because there is shared information
+            # in order to determine whether a common exponent should
+            # be used) is not used because there is shared information
             # between the nominal value and the standard error (same
             # last digit, common exponent) and extracting this
             # information from Python would entail parsing its
@@ -2038,11 +2084,15 @@ class AffineScalarFunc(object):
             # for floats is used ("-4 <= exponent of rounded value <
             # p"), on the nominal value.
             
-            exponent = first_digit(round(exp_ref_value, -digits_limit))
+            common_exp = first_digit(round(exp_ref_value, -digits_limit))
 
+            # print "COMMON EXP TEST VALUE", common_exp
+            # print "LIMIT EXP", common_exp-digits_limit+1
+            # print "WITH digits_limit", digits_limit
+            
             # The number of significant digits of the reference value
             # rounded at digits_limit is exponent-digits_limit+1:
-            if -4 <= exponent < exponent-digits_limit+1:
+            if -4 <= common_exp < common_exp-digits_limit+1:
                 use_exp = False
             else:
                 use_exp = True
@@ -2054,23 +2104,23 @@ class AffineScalarFunc(object):
         # number is non-positive), of nom_val_mantissa ("mantissa" for
         # the nominal value, i.e. value possibly corrected for a
         # factorized exponent), and std_dev_mantissa (similarly for
-        # the standard deviation). Exponent is also set to None if no
-        # exponent should be used.
+        # the standard deviation). common_exp is also set to None if no
+        # common exponent should be used.
         
         if use_exp:
 
-            factor = 10.**exponent  # Not 10.**(-exponent), for limit cases
+            factor = 10.**common_exp  # Not 10.**(-common_exp), for limit cases
             
             nom_val_mantissa = nom_val/factor
             std_dev_mantissa = std_dev/factor
             # Limit for the last digit of the mantissas (it should be
             # non-positive, as digits before the final decimal points
             # are always returned in full):
-            signif_limit = digits_limit - exponent
+            signif_limit = digits_limit - common_exp
 
-        else:  # No exponent
+        else:  # No common exponent
             
-            exponent = None
+            common_exp = None
 
             nom_val_mantissa = nom_val
             std_dev_mantissa = std_dev
@@ -2078,29 +2128,25 @@ class AffineScalarFunc(object):
 
         ########################################
 
-        # prec is the precision for the mantissa/field final format.
-        
-        # Formatting of individual fields:
-        if uncert_controlled or fmt_type in 'eEfF':
-            fixed_point_type = 'fF'[fmt_type.isupper()]
+        # Format of the main (i.e. with no exponent) parts:
+        main_fmt_type = 'fF'[fmt_type.isupper()]
+
+        # prec is the precision for the main parts of the final format:
+        if std_dev and not isnan(std_dev):
             # The decimal point location is always included in the
             # printed digits (e.g., printing 3456 with only 2
             # significant digits requires to print at least four
             # digits, like in 3456 or 3500):
             prec = max(-signif_limit, 0)
-        else:
-            # The original format type and precision are used (case of
-            # ".6g", ".3n", and of a zero or NaN uncertainty):
-            fixed_point_type = fmt_type
-            # prec was calculated above, for this case
-        
+        # 'prec' was defined above, for the other case
+
         ########################################
 
         # Final formatting:
-        return format_num(nom_val_mantissa, std_dev_mantissa, exponent, 
+        return format_num(nom_val_mantissa, std_dev_mantissa, common_exp, 
                           match.groupdict(),
                           prec=prec,
-                          fixed_point_type=fixed_point_type,
+                          main_fmt_type=main_fmt_type,
                           options=options)
 
     # Alternate name for __format__, for use with Python < 2.6:
@@ -2820,16 +2866,16 @@ def str_to_number_with_uncert(representation):
     match = re.match(u'(.*)(?:\+/-|±)(.*)', representation)
     if match:
 
-        # Simple form 1234.45+/-1.2 or 1234.45±1.2:
         (nom_value, uncert) = match.groups()
-
+        
         try:
+            # Simple form 1234.45+/-1.2 or 1234.45±1.2, or 1.23e-10+/-1e-23
             parsed_value = (float(nom_value)*factor, float(uncert)*factor)
         except ValueError:
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
         
     else:
-        # Form with parentheses or no uncertainty:
+        # Form with error parentheses or no uncertainty:
         try:
             parsed_value = parse_error_in_parentheses(representation)
         except NotParenUncert:
@@ -2853,7 +2899,7 @@ def ufloat_fromstr(representation, tag=None):
         12.3e10+/-5e3
         12.3e10±5e3  # Only as a unicode string (Python 2)
         (-3.1415 +/- 0.0001)e+02
-        # Double-float values:
+        # Double-exponent values:
         (-3.1415 +/- 1e-4)e+200
         (1e-20 +/- 3)e100
 
