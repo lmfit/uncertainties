@@ -1376,28 +1376,36 @@ def format_num(nom_val_main, error_main, common_exp,
         error_has_exp = fmt_parts['width'] and not special_error
         
         # Prefix for the parts:
-        if fmt_parts['width']:
+        if fmt_parts['width']:  # Individual widths
 
             # The exponent is not factored, so as to have nice columns
             # for the nominal values and the errors (no shift due to a
             # varying exponent):
             any_exp_factored = False
 
-            width = int(fmt_parts['width'])
-            # Remaining width (for the nominal value):
-            remaining_width = max(width - len(exp_str), 0)
-            
-            fmt_prefix_n = '%s%s%s%d%s' % (
-                fmt_parts['fill_align'],
-                fmt_parts['sign'], fmt_parts['zero'], remaining_width,
-                fmt_parts['comma'])
-            
-            fmt_prefix_e = '%s%s%d%s' % (
-                fmt_parts['fill_align'],
-                fmt_parts['zero'], remaining_width if error_has_exp else width,
-                fmt_parts['comma'])
+            # If zeros are needed, then the width is taken into
+            # account now (before the exponent is added):
+            if fmt_parts['zero']:
+                
+                width = int(fmt_parts['width'])
 
-        else:
+                # Remaining (minimum) width:
+                remaining_width = max(width - len(exp_str), 0)
+                
+                fmt_prefix_n = '%s%s%d%s' % (
+                    fmt_parts['sign'], fmt_parts['zero'],
+                    remaining_width, fmt_parts['comma'])
+
+                fmt_prefix_e = '%s%d%s' % (
+                    fmt_parts['zero'],
+                    remaining_width if error_has_exp else width,
+                    fmt_parts['comma'])
+                
+            else:
+                fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
+                fmt_prefix_e = fmt_parts['comma']
+
+        else:  # Global width
             any_exp_factored = True            
             fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
             fmt_prefix_e = fmt_parts['comma']
@@ -1420,6 +1428,16 @@ def format_num(nom_val_main, error_main, common_exp,
         
         if not any_exp_factored:
             nom_val_str += exp_str
+
+        if fmt_parts['width']:  # An individual alignment is needed:
+            print "ALIGNING", repr(nom_val_str), "WITH", repr(
+                fmt_parts['fill_align']+fmt_parts['width'])
+            
+            nom_val_str = robust_format(
+                nom_val_str,
+                # Default alignment, for numbers: to the right:
+                (fmt_parts['fill_align'] or '>')
+                +fmt_parts['width'])
             
         ####################
         # Error formatting:
@@ -1434,13 +1452,17 @@ def format_num(nom_val_main, error_main, common_exp,
         # The following uses a special integer representation of a
         # zero uncertainty:
         fmt_suffix_e = '.%d%s' % (prec if error_main else 0, main_fmt_type)
-
         
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
         
         if error_has_exp:
             error_str += exp_str
-        
+
+        if fmt_parts['width']:  # An individual alignment is needed:
+            nom_val_str = robust_format(
+                nom_val_str,
+                fmt_parts['fill_align']+fmt_parts['width'])
+            
         ####################            
         pm_symbol = (
             # Unicode has priority over LaTeX, so that users with a
