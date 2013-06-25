@@ -1713,7 +1713,10 @@ class AffineScalarFunc(object):
 
         The nominal value and the uncertainty always use the same
         precision. This implies trailing zeros, in general, even with
-        the g format type (contrary to the float case).
+        the g format type (contrary to the float case). However, when
+        the number of significant digits of the uncertainty is not
+        defined (zero or NaN uncertainty), it has no precision, so
+        there is no matching.
         
         In the uncertainty control mode, the precision (".p", where p
         is a number) is interpreted (if meaningful) as indicating the
@@ -2040,16 +2043,19 @@ class AffineScalarFunc(object):
 
         # prec is the precision for the mantissa/field final format.
 
-        fixed_point_type = 'fF'[fmt_type.isupper()]
-
         if std_dev and not isnan(std_dev):
+            fixed_point_type = 'fF'[fmt_type.isupper()]
             # The decimal point location is always included in the
             # printed digits (e.g., printing 3456 with only 2
             # significant digits requires to print at least four
             # digits, like in 3456 or 3500):
             prec = max(-signif_limit, 0)
-        # 'prec' was defined above, for the other case
-        
+        else:
+            #!!!!! not a fixed point type: update (= either fixed
+            #point type or type of nominal value only)
+            fixed_point_type = fmt_type
+            # 'prec' was defined above, for the other case
+
         ########################################
 
         # Final formatting:
