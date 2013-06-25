@@ -18,17 +18,6 @@ import math
 import random
 import sys
 
-# For some tests (test_format() and the "n" format specification):
-import locale
-locale_set = True
-try:
-    locale.setlocale(locale.LC_ALL, 'en_US')  # POSIX
-except locale.Error:
-    try:
-        locale.setlocale(locale.LC_ALL, 'american_usa')  
-    except locale.Error:
-        locale_set = False  # Some tests won't be run
-
         
 # 3rd-party modules
 # import nose.tools
@@ -1779,9 +1768,9 @@ def test_format():
         },
         (1.2e-34, 5e-67): {
             '.6g': '(1.20000+/-0.00000)e-34',
-            '11.6g': ' 1.20000e-34+/- 0.00000e-34',
-            '11.6G': ' 1.20000E-34+/- 0.00000E-34',
-            '11.6GL': r'1.20000 \time 10^{-34} \pm 0.00000 \times 10^{-34}'
+            '13.6g': '  1.20000e-34+/-  0.00000e-34',
+            '13.6G': '  1.20000E-34+/-  0.00000E-34',
+            '.6GL': r'(1.20000 \pm 0.00000) \times 10^{-34}'
         }
     }
 
@@ -1808,15 +1797,6 @@ def test_format():
             '>9f': '  3.14150+/-  0.00010'  # Width and align
         })
         
-    # If the locale was set to American (USA), the "n" format type can
-    # be tested:
-    if locale_set and sys.version_info >= (2, 6):
-        tests[(23456.789123, 1234.56789123)].update({
-            '.0n': '(2+/-0.1)e+04',
-            '.6n': '23,456.8+/-1,234.57',
-            '.6nS': '23,456.8(1,234.6)'
-            })
-
     # True if we can detect that the Jython interpreter is running this code:
     try:
         jython_detected = sys.subversion[0] == 'Jython'
