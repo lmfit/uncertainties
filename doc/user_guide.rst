@@ -167,8 +167,10 @@ through the usual :func:`format` method of strings:
 >>> print 'Result = {:10.2f}'.format(x)
 Result =       0.20+/-      0.01
 
-(For Python before version 2.6, one can do ``'Result = %s' %
-x.format('10.2f')`` instead.) 
+(Python 2.6 requires ``'{0:10.2f}'`` instead, with the usual explicit
+index. In Python 2.5 and earlier versions, :func:`str.format` is not
+available, but one can use the :func:`format` method of numbers with
+uncertainties instead: ``'Result = %s' % x.format('10.2f')``.)
 
 .. Legacy formats and base syntax of the format specification:
 
