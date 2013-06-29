@@ -197,8 +197,9 @@ that corresponds best to your version of Python to a location that
 Python can import from (directory in which scripts using
 :mod:`uncertainties` are run, etc.); the chosen
 :file:`uncertainties-py*` directory should then be renamed
-:file:`uncertainties`. Python 3 users should then run ``2to3 -w
-uncertainties`` so as to automatically adapt the code to Python 3.
+:file:`uncertainties`. Python 3 users should then run ``2to3 -w .``
+from inside this directory so as to automatically adapt the code to
+Python 3.
 
 Source code
 -----------
