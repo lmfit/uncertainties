@@ -212,9 +212,7 @@ When a *format width* is used, the common exponent is not factored:
 Result =    2.0e-11+/-   0.1e-11
 
 (Using a (minimal) width of 1 is thus a way of forcing exponents to
-not be factored.)
-
-Thanks to this feature, each part (nominal value and standard
+not be factored.) Thanks to this feature, each part (nominal value and standard
 deviation) can be well aligned across multiple lines, and the relative
 magnitude of the error can be readily estimated.
 
