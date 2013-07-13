@@ -2961,9 +2961,16 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     Valid string representations str_representation are listed in
     the documentation for ufloat_fromstr().
 
-    'tag' is an optional string tag for the variable.  Variables
-    don't have to have distinct tags.  Tags are useful for tracing
-    what values (and errors) enter in a given result (through the
+    nominal_value -- nominal value of the random variable. It is more
+    meaningful to use a value close to the central value or to the
+    mean. This value is propagated by mathematical operations as if it
+    was a float.
+
+    std_dev -- standard deviation of the random variable.
+    
+    tag -- optional string tag for the variable.  Variables don't have
+    to have distinct tags.  Tags are useful for tracing what values
+    (and errors) enter in a given result (through the
     error_components() method).
     """
 
