@@ -332,13 +332,13 @@ Contact
 =======
 
 **Feature requests, bug reports, or feedback are much welcome.** They
-can be sent to the creator of :mod:`uncertainties`, `Eric O. LEBIGOT
+can be sent_ to the creator of :mod:`uncertainties`, `Eric O. LEBIGOT
 (EOL)`_.
 
 .. figure:: _static/eol.*
    :height: 64
    :width:  64
-   :target: http://lebigot.pip.verisignlabs.com/
+   :target: http://linkedin.com/pub/eric-lebigot/22/293/277
    :align: center
    :alt: Eric O. LEBIGOT (EOL)
 
@@ -394,7 +394,8 @@ following options can be chosen:
 .. _setuptools: http://pypi.python.org/pypi/setuptools
 .. _download: http://pypi.python.org/pypi/uncertainties/#downloads
 .. _donations: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
-.. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
+.. _Eric O. LEBIGOT (EOL): http://linkedin.com/pub/eric-lebigot/22/293/277
+.. _sent: mailto:eric.lebigot@normalesup.org
 .. _Revised BSD License: http://opensource.org/licenses/BSD-3-Clause
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
 .. _pydoc: http://docs.python.org/library/pydoc.html
