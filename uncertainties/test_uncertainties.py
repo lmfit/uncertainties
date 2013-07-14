@@ -302,8 +302,18 @@ def test_ufloat_fromstr():
         '14.(15)': (14, 15),
         # Global exponent:
         '(3.141+/-0.001)E+02': (314.1, 0.1),
-        # ± sign:
+
+        
+        ## Pretty-print notation:
+        
+        # ± sign, global exponent (not pretty-printed):
         u'(3.141±0.001)E+02': (314.1, 0.1),
+        # ± sign, individual exponent:
+        u'3.141E+02±0.001e2': (314.1, 0.1),
+        
+        # ± sign, times symbol, superscript (= full pretty-print):
+        u'(3.141 ± 0.001) × 10²': (314.1, 0.1),
+        
         # NaN uncertainty:
         u'(3.141±nan)E+02': (314.1, float('nan')),
         '3.4(nan)e10': (3.4e10, float('nan')),

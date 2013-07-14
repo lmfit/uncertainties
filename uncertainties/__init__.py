@@ -1218,7 +1218,8 @@ TO_SUPERSCRIPT = {
 # Inverted TO_SUPERSCRIPT table, for use with unicode.translate():
 #
 #! Python 2.7+ can use a dictionary comprehension instead:
-FROM_SUPERSCRIPT = dict((sup, normal) for (normal, sup) in TO_SUPERSCRIPT)
+FROM_SUPERSCRIPT = dict(
+    (sup, normal) for (normal, sup) in TO_SUPERSCRIPT.items())
 
 def to_superscript(value):
     '''
@@ -1229,7 +1230,7 @@ def to_superscript(value):
     value -- integer.
     '''
 
-    return (u'%d' % value).translate(SUPERSCRIPT_TABLE)
+    return (u'%d' % value).translate(TO_SUPERSCRIPT)
     
     
 def format_num(nom_val_main, error_main, common_exp,
@@ -2915,8 +2916,13 @@ def ufloat_fromstr(representation, tag=None):
     Examples of valid string representations:
     
         12.3e10+/-5e3
-        12.3e10±5e3  # Only with a unicode string (Python 2)
-        (-3.1415 +/- 0.0001)e+02
+        (-3.1415 +/- 0.0001)e+02  # Factored exponent
+
+        # Pretty-print notation (only with a unicode string):
+        12.3e10 ± 5e3  # ± symbol
+        (12.3 ± 5.0) × 10⁻¹²  # Times symbol, superscript
+        12.3 ± 5e3  # Mixed notation (± symbol, but e exponent)
+        
         # Double-exponent values:
         (-3.1415 +/- 1e-4)e+200
         (1e-20 +/- 3)e100
