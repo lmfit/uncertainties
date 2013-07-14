@@ -1164,10 +1164,9 @@ class CallableStdDev(float):
                     ' anymore: use .std_dev instead of .std_dev().')
         return self
 
-# Exponent letter for all AffineScalarFunc format types (that can use
-# an exponent): the keys are the possible mantissa formats:
-EXP_LETTERS = {'f': 'e', 'F': 'E',
-               'g': 'e', 'G': 'E'}
+# Exponent letter: the keys are the possible main_fmt_type values of
+# format_num():
+EXP_LETTERS = {'f': 'e', 'F': 'E'}
 
 if sys.version_info >= (2, 6):
     
@@ -1227,7 +1226,7 @@ def format_num(nom_val_main, error_main, common_exp,
     prec -- precision to use with the main_fmt_type format type
     (see below).
 
-    main_fmt_type -- format specification type, in "eEfFgG". This
+    main_fmt_type -- format specification type, in "fF". This
     defines how the mantissas, exponents and NaN values are
     represented (in the same way as for float). Note that None, the
     empty string, or "%" are not accepted.
@@ -1269,12 +1268,10 @@ def format_num(nom_val_main, error_main, common_exp,
     else:
         if 'L' in options:
             exp_str = r' \times 10^{%d}' % common_exp
-        elif main_fmt_type in EXP_LETTERS:
+        else:
             # Case of e or E. The same convention as Python 2.7
             # to 3.3 is used for the display of the exponent:
             exp_str = EXP_LETTERS[main_fmt_type]+'%+03d' % common_exp
-        else:
-            exp_str = ''  # No exponent format
 
     # Possible % sign:
     percent_str = ''
