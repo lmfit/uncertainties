@@ -30,7 +30,7 @@ clean:
 	-rm -rf _build/*
 
 # The HTML needs latex because the PDF version is linked to:
-html: latex
+html: 
 	(cd _build/latex; make all-pdf)
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
 	@echo

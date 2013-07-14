@@ -45,10 +45,11 @@ expressed in many convenient ways, including:
 
 >>> from uncertainties import ufloat_fromstr
 >>> x = ufloat_fromstr("0.20+/-0.01")
->>> x = ufloat_fromstr(u"0.20±0.01")
->>> x = ufloat_fromstr("(2+/-0.1)e-01")
->>> x = ufloat_fromstr("0.20(1)")
->>> x = ufloat_fromstr("20(1)e-2")  # Exponential notation supported
+>>> x = ufloat_fromstr(u"0.20±0.01")  # Pretty-print form
+>>> x = ufloat_fromstr("20(1)×10⁻²")
+>>> x = ufloat_fromstr("(2+/-0.1)e-01")  # Factored exponent
+>>> x = ufloat_fromstr("0.20(1)")  # Short-hand notation
+>>> x = ufloat_fromstr("20(1)e-2")  # Exponent notation
 >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
 
 More information can be obtained with ``pydoc
@@ -615,3 +616,8 @@ information are given in the
 :doc:`tech_guide`.
 
 .. _NumPy: http://numpy.scipy.org/
+
+.. |minus2html| raw:: html
+
+   <sup>-2</sup>
+
