@@ -1235,13 +1235,9 @@ def to_superscript(value):
     
 def from_superscript(number_str):
     '''
-    Converts a string with superscript digits and sign into normal characters.
-
-    If the string is not a Unicode string, it is returned unchanged.    
+    Converts a string with superscript digits and sign into an integer.
     '''
-    return (number_str.translate(FROM_SUPERSCRIPT)
-            if isinstance(number_str, unicode)
-            else number_str)
+    return int(number_str.translate(FROM_SUPERSCRIPT))
     
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_fmt_type, options):
@@ -2883,11 +2879,16 @@ def str_to_number_with_uncert(representation):
     if match:  # We have a (1.23 +/- 0.01)e10 form
         # The representation is simplified, but the global factor is
         # calculated:
+        exp_value_str = match.group('exp_value')
         try:
-            factor = 10.**int(match.group('exp_value'))
+            exponent = (from_superscript(exp_value_str)
+                        if isinstance(exp_value_str, unicode)
+                        else int(exp_value_str))
         except ValueError:
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
-        
+
+        factor = 10.**exponent
+
         representation = match.group('simple_num_with_uncert')
     else:
         factor = 1  # No global exponential factor
