@@ -2788,7 +2788,7 @@ NUMBER_WITH_UNCERT_RE_STR = u'''
     (?:\(%s\))?  # Optional uncertainty
     (?:
         (?:[eE]|\s*×\s*10)
-        ([+-]?\d+)
+        (.*)
     )?  # Optional exponent
     ''' % (POSITIVE_DECIMAL_UNSIGNED_OR_NAN, POSITIVE_DECIMAL_UNSIGNED_OR_NAN)
 
