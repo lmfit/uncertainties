@@ -1637,7 +1637,7 @@ def test_format():
             # found in Python 2.7: '{:.1%}'.format(0.0055) is '0.5%'.
             '.1u%': '(42.0+/-0.5)%',
             '.1u%S': '42.0(5)%',
-            '%C': u'(42.0±0.5)%'
+            '%P': u'(42.0±0.5)%'
         },
         
         # Particle Data Group automatic convention, including limit cases:
@@ -1708,13 +1708,13 @@ def test_format():
         # instead of 1.4 for Python 3.1. The problem does not appear
         # with 1.2, so 1.2 is used.
         (-1.2e-12, 0): python26_add({
-            '12.2gCL': ur'-1.2 \times 10^{-12}±           0'
+            '12.2gPL': ur'-1.2 \times 10^{-12}±           0'
         }, {
             # Pure "width" formats are not accepted by the % operator,
             # and only %-compatible formats are accepted, for Python <
             # 2.6:
             '13S': '  -1.2(0)e-12',
-            '10C': u'  -1.2e-12±         0',
+            '10P': u'  -1.2e-12±         0',
             'L': r'(-1.2 \pm 0) \times 10^{-12}',
             'SL': r'-1.2(0) \times 10^{-12}'            
         }),
@@ -1733,8 +1733,8 @@ def test_format():
 
         (3.14e-10, 0.01e-10): {
             # Character (Unicode) strings:
-            u'C': u'(3.140±0.010)e-10',  # PDG rules: 2 digits
-            u'CL': ur'(3.140±0.010) \times 10^{-10}',
+            u'P': u'(3.140±0.010)e-10',  # PDG rules: 2 digits
+            u'PL': ur'(3.140±0.010) \times 10^{-10}',
             # Truncated non-zero uncertainty:
             '.1e': '(3.1+/-0.0)e-10',
             '.1eS': '3.1(0.0)e-10'
@@ -1943,7 +1943,7 @@ def test_unicode_format():
     x = ufloat(3.14159265358979, 0.25)
 
     assert isinstance(u'Résultat = %s' % x.format(''), unicode)
-    assert isinstance(u'Résultat = %s' % x.format('C'), unicode)
+    assert isinstance(u'Résultat = %s' % x.format('P'), unicode)
     
 ###############################################################################
 

@@ -1233,10 +1233,10 @@ def format_num(nom_val_main, error_main, common_exp,
 
     options -- options (as an object that support membership testing,
     like for instance a string). "S" is for the short-hand notation
-    1.23(1). "C" is for using the character "±" between the nominal
-    value and the error. "L" is for a LaTeX output. Options can be
-    combined. "%" adds a final percent sign, and parentheses if the
-    shorthand notation is not used.
+    1.23(1). "P" is for pretty-printing ("±" between the nominal value
+    and the error, superscript exponents, etc.). "L" is for a LaTeX
+    output. Options can be combined. "%" adds a final percent sign,
+    and parentheses if the shorthand notation is not used.
     '''
 
 
@@ -1510,7 +1510,7 @@ def format_num(nom_val_main, error_main, common_exp,
         pm_symbol = (
             # Unicode has priority over LaTeX, so that users with a
             # Unicode-compatible LaTeX source can use ±:
-            u'±' if 'C' in options else
+            u'±' if 'P' in options else
             ' \pm ' if 'L' in options else
             '+/-')
 
@@ -1875,10 +1875,10 @@ class AffineScalarFunc(object):
         When option "S" is present (like in .1uS), the short-hand
         notation 1.234(5) is used; if the digits of the uncertainty
         straddle the decimal point, it uses a fixed-point notation,
-        like in 12.3(4.5). When "C" is present, the single character
-        "±" separates the nominal value from the standard
-        deviation. When "L" is present, the output is formatted with
-        LaTeX.
+        like in 12.3(4.5). When "P" is present, the pretty-printing
+        mode is activated: "±" separates the nominal value from the
+        standard deviation, exponents use superscript characters,
+        etc. When "L" is present, the output is formatted with LaTeX.
 
         The "%" format type forces the percent sign to be at the end
         of the returned string (it is not attached to each of the
@@ -1914,7 +1914,7 @@ class AffineScalarFunc(object):
             (?P<uncert_prec>u?)  # Precision for the uncertainty?
             # The type can be omitted. Options must not go here:
             (?P<type>[eEfFgG%]??)  # n not supported
-            (?P<options>[LSC]*)$''',
+            (?P<options>[LSP]*)$''',
             format_spec,
             re.VERBOSE)
 
