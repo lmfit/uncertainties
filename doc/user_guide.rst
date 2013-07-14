@@ -155,6 +155,9 @@ Numbers with uncertainties can be printed conveniently:
 >>> print x
 0.200+/-0.010
 
+The resulting form can generally be parsed back with
+:func:`ufloat_fromstr` (except for the LaTeχ form).
+
 .. Precision matching:
 
 The nominal value and the uncertainty always have the **same
@@ -201,8 +204,8 @@ uncertainty from being displayed with a large relative error).
 
 A **common exponent** is automatically calculated if an exponent is
 needed for the larger of the nominal value (in absolute value) and the
-uncertainty. The exponent is generally **factored**, for increased
-legibility:
+uncertainty (the rule is the same as for floats). The exponent is
+generally **factored**, for increased legibility:
 
 >>> print x*1e7
 (2.00+/-0.10)e+06
