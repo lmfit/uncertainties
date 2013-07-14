@@ -298,6 +298,7 @@ Future developments
 
 Planned future developments include:
 
+- support for the units package Pint_;
 
 - `JSON <http://docs.python.org/library/json.html>`_ support;
 
@@ -404,3 +405,4 @@ following options can be chosen:
 .. _version history: https://pypi.python.org/pypi/uncertainties#version-history
 .. _soerp: https://pypi.python.org/pypi/soerp
 .. _mcerp: https://pypi.python.org/pypi/mcerp
+.. _Pint: https://pypi.python.org/pypi/Pint/
