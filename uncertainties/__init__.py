@@ -1201,7 +1201,7 @@ else:
 
 # Maps some Unicode code points ("-" and digits) to their
 # superscript version:
-SUPERSCRIPT_TABLE = {
+TO_SUPERSCRIPT = {
     0x2d: u'⁻',
     0x30: u'⁰',
     0x31: u'¹',
@@ -1214,6 +1214,11 @@ SUPERSCRIPT_TABLE = {
     0x38: u'⁸',
     0x39: u'⁹'
     }
+
+# Inverted TO_SUPERSCRIPT table, for use with unicode.translate():
+#
+#! Python 2.7+ can use a dictionary comprehension instead:
+FROM_SUPERSCRIPT = dict((sup, normal) for (normal, sup) in TO_SUPERSCRIPT)
 
 def to_superscript(value):
     '''
@@ -2910,7 +2915,7 @@ def ufloat_fromstr(representation, tag=None):
     Examples of valid string representations:
     
         12.3e10+/-5e3
-        12.3e10±5e3  # Only as a unicode string (Python 2)
+        12.3e10±5e3  # Only with a unicode string (Python 2)
         (-3.1415 +/- 0.0001)e+02
         # Double-exponent values:
         (-3.1415 +/- 1e-4)e+200
