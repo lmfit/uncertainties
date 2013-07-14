@@ -30,7 +30,9 @@ calculations are performed **analytically**.
 **Correlations** between variables are automatically handled, which
 sets this module apart from many existing error propagation codes.
 
-Let's now see how to use these unique features!
+You may want to check the following related uncertainty calculation
+Python packages to see if they better suit your needs: soerp_
+(higher-order approximations) and mcerp_ (Monte-Carlo approach).
 
 .. index:: calculator
 
@@ -399,3 +401,5 @@ following options can be chosen:
 .. _NumPy: http://numpy.scipy.org/
 .. _donating $10: donations_
 .. _version history: https://pypi.python.org/pypi/uncertainties#version-history
+.. _soerp: https://pypi.python.org/pypi/soerp
+.. _mcerp: https://pypi.python.org/pypi/mcerp
