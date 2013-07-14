@@ -1239,7 +1239,6 @@ def format_num(nom_val_main, error_main, common_exp,
     and parentheses if the shorthand notation is not used.
     '''
 
-
     # print (nom_val_main, error_main, common_exp,
     #        fmt_parts, prec, main_fmt_type, options)
     
@@ -1265,13 +1264,12 @@ def format_num(nom_val_main, error_main, common_exp,
     # Exponent part:
     if common_exp is None:
         exp_str = ''
+    elif 'L' in options:
+        exp_str = r' \times 10^{%d}' % common_exp
     else:
-        if 'L' in options:
-            exp_str = r' \times 10^{%d}' % common_exp
-        else:
-            # Case of e or E. The same convention as Python 2.7
-            # to 3.3 is used for the display of the exponent:
-            exp_str = EXP_LETTERS[main_fmt_type]+'%+03d' % common_exp
+        # Case of e or E. The same convention as Python 2.7
+        # to 3.3 is used for the display of the exponent:
+        exp_str = EXP_LETTERS[main_fmt_type]+'%+03d' % common_exp
 
     # Possible % sign:
     percent_str = ''
