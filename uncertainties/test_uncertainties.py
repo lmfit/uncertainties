@@ -1708,15 +1708,16 @@ def test_format():
         # instead of 1.4 for Python 3.1. The problem does not appear
         # with 1.2, so 1.2 is used.
         (-1.2e-12, 0): python26_add({
-            '12.2gPL': ur'-1.2 \times 10^{-12}±           0'
+            '12.2gPL': ur'-1.2×10⁻¹²±           0'
         }, {
             # Pure "width" formats are not accepted by the % operator,
             # and only %-compatible formats are accepted, for Python <
             # 2.6:
             '13S': '  -1.2(0)e-12',
-            '10P': u'  -1.2e-12±         0',
+            '10P': u'  -1.2×10⁻¹²±         0',
             'L': r'(-1.2 \pm 0) \times 10^{-12}',
-            'SL': r'-1.2(0) \times 10^{-12}'            
+            'SL': r'-1.2(0) \times 10^{-12}',
+            'SP': r'-1.2(0)×10⁻¹²'
         }),
 
         # Python 3.2 and 3.3 give 1.4e-12*1e+12 = 1.4000000000000001
@@ -1733,8 +1734,8 @@ def test_format():
 
         (3.14e-10, 0.01e-10): {
             # Character (Unicode) strings:
-            u'P': u'(3.140±0.010)e-10',  # PDG rules: 2 digits
-            u'PL': ur'(3.140±0.010) \times 10^{-10}',
+            u'P': u'(3.140±0.010)×10⁻¹⁰',  # PDG rules: 2 digits
+            u'PL': ur'(3.140±0.010)×10⁻¹⁰',  # Pretty-print has higher priority
             # Truncated non-zero uncertainty:
             '.1e': '(3.1+/-0.0)e-10',
             '.1eS': '3.1(0.0)e-10'
