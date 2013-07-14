@@ -370,8 +370,8 @@ I would also like to thank users who contributed with feedback and
 suggestions, which greatly helped improve this program: Joaquin Abian,
 Jason Moore, Martin Lutz, Víctor Terrón, Matt Newville, Matthew Peel,
 Don Peterson, Mika Pflueger, Albert Puig, Abraham Lee, Arian Sanusi,
-Martin Laloux, Jonathan Whitmore, Federico Vaggi, Marco A. Ferra, and
-many others.
+Martin Laloux, Jonathan Whitmore, Federico Vaggi, Marco A. Ferra,
+Hernan Grecco, and many others.
 
 I am also grateful to the Linux distribution maintainers of this
 package, and to Christoph Gohlke for including it in his Base
