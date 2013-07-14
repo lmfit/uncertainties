@@ -1238,11 +1238,13 @@ def from_superscript(number_str):
     Converts a string with superscript digits and sign into an integer.
 
     ValueError is raised if the conversion cannot be done.
+
+    number_str -- basestring object.
     '''
     #!!!!!!!!
     print "NORMAL SCRIPT VERSION", number_str.translate(FROM_SUPERSCRIPT)
     
-    return int(number_str.translate(FROM_SUPERSCRIPT))
+    return int(unicode(number_str).translate(FROM_SUPERSCRIPT))
     
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_fmt_type, options):
@@ -2833,8 +2835,8 @@ def parse_error_in_parentheses(representation):
                              " See the documentation of ufloat_fromstr()."
                              % representation)
 
-    # Global exponent:
-    factor = 10.**int(exponent) if exponent else 1
+    # Global exponent: #@@@@@@@ correct?
+    factor = 10.**from_superscript(exponent) if exponent else 1
     
     # Nominal value:
     value = float((sign or '')+main)*factor
@@ -2931,9 +2933,7 @@ def str_to_number_with_uncert(representation):
         print "GLOBAL EXPONENT STRING", exp_value_str  #!!!!!!!! test
         
         try:
-            exponent = (from_superscript(exp_value_str)
-                        if isinstance(exp_value_str, unicode)
-                        else int(exp_value_str))
+            exponent = from_superscript(exp_value_str)
         except ValueError:
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
 
@@ -2960,7 +2960,6 @@ def str_to_number_with_uncert(representation):
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
         
     else:
-        print "SHOULD BE SHORT-HAND OR NO UNCERT, AND NO EXP", representation
         # Form with error parentheses or no uncertainty:
         try:
             parsed_value = parse_error_in_parentheses(representation)
