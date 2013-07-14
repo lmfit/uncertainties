@@ -220,9 +220,9 @@ magnitude of the error can be readily estimated.
 .. Options
 
 Formatting options can be added at the end of the format string: ``S``
-for the **shorthand notation**, ``P`` for pretty-printing: **(±)** is
+for the **shorthand notation**, ``P`` for pretty-printing: "±" is
 used between the nominal value and the standard deviation, exponents
-use superscript characters, etc. ``L`` for a **LaTeχ** output:
+use superscript characters, etc., ``L`` for a **LaTeχ** output:
 
 >>> print '{:+.1uS}'.format(x)  # Sign, 1 digit for the uncertainty, shorthand
 +0.20(1)
