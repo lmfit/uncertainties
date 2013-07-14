@@ -1166,7 +1166,8 @@ class CallableStdDev(float):
 
 # Exponent letter for all AffineScalarFunc format types (that can use
 # an exponent): the keys are the possible mantissa formats:
-EXP_LETTERS = {'f': 'e', 'F': 'E', 'g': 'e', 'G': 'E'}
+EXP_LETTERS = {'f': 'e', 'F': 'E',
+               'g': 'e', 'G': 'E'}
 
 if sys.version_info >= (2, 6):
     
