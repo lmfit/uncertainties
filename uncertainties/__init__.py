@@ -2920,7 +2920,11 @@ def str_to_number_with_uncert(representation):
     # The representation is simplified, but the global factor is
     # calculated:
     
-    if match:  # We have a (1.23 +/- 0.01)e10 form
+    if match:
+
+        # We have a form with a factored exponent: (1.23 +/- 0.01)e10,
+        # etc.
+        
         exp_value_str = match.group('exp_value')
         
         print "GLOBAL EXPONENT STRING", exp_value_str  #!!!!!!!! test
@@ -2953,10 +2957,9 @@ def str_to_number_with_uncert(representation):
                             to_float(uncert)*factor)
         except ValueError:
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
-
-        
         
     else:
+        print "SHOULD BE SHORT-HAND OR NO UNCERT, AND NO EXP", representation
         # Form with error parentheses or no uncertainty:
         try:
             parsed_value = parse_error_in_parentheses(representation)
