@@ -1199,9 +1199,10 @@ else:
         return {'>': str.rjust, '<': str.ljust, '^': str.center}[align_option](
             orig_str, int(width), fill_char or ' ')
 
-# Maps some Unicode code points ("-" and digits) to their
+# Maps some Unicode code points ("-", "+", and digits) to their
 # superscript version:
 TO_SUPERSCRIPT = {
+    0x2b: u'⁺',
     0x2d: u'⁻',
     0x30: u'⁰',
     0x31: u'¹',
@@ -1232,6 +1233,15 @@ def to_superscript(value):
 
     return (u'%d' % value).translate(TO_SUPERSCRIPT)
     
+def from_superscript(number_str):
+    '''
+    Converts a string with superscript digits and sign into normal characters.
+
+    If the string is not a Unicode string, it is returned unchanged.    
+    '''
+    return (number_str.translate(FROM_SUPERSCRIPT)
+            if isinstance(number_str, unicode)
+            else number_str)
     
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_fmt_type, options):
@@ -2785,7 +2795,7 @@ NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(u'''
     \(
     (?P<simple_num_with_uncert>.*)
     \)
-    [eE](?P<exp_value>.*)
+    (?:[eE]|\s*×\s*10) (?P<exp_value>.*)
     $''', re.VERBOSE).match
 
 class NotParenUncert(ValueError):
