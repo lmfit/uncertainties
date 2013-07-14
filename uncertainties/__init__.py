@@ -1236,6 +1236,8 @@ def to_superscript(value):
 def from_superscript(number_str):
     '''
     Converts a string with superscript digits and sign into an integer.
+
+    ValueError is raised if the conversion cannot be done.
     '''
     #!!!!!!!!
     print "NORMAL SCRIPT VERSION", number_str.translate(FROM_SUPERSCRIPT)
@@ -2858,6 +2860,39 @@ def parse_error_in_parentheses(representation):
 
     return (value, uncert_value)
 
+# Regexp for catching the two variable parts of -1.2×10⁻¹²:
+PRETTY_PRINT_MATCH = re.compile(u'(.*?)\s*×\s*10(.*)').match
+
+def to_float(value_str):
+    '''
+    Converts a string representing a float to a float.
+
+    The usual valid Python float() representations are correctly
+    parsed.
+    
+    In addition, the pretty-print notation -1.2×10⁻¹² is also
+    converted.
+
+    ValueError is raised if no float can be obtained.
+    '''
+
+    try:
+        return float(value_str)
+    except ValueError:
+        pass
+    
+    # The pretty-print notation is tried:
+    match = PRETTY_PRINT_MATCH(value_str)
+    if match:
+        try:
+            return float(match.group(1))*10.**from_superscript(match.group(2))
+        except ValueError:
+            raise ValueError('Mantissa or exponent incorrect in pretty-print'
+                             ' form %s' % value_str)
+    else:
+        raise ValueError('No valid Python float or pretty-print form'
+                         ' recognized in %s' % value_str)
+    
 
 cannot_parse_ufloat_msg_pat = (
     'Cannot parse %s: see the documentation for ufloat_fromstr() for a'
@@ -2881,10 +2916,11 @@ def str_to_number_with_uncert(representation):
     """
 
     match = NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH(representation)
+
+    # The representation is simplified, but the global factor is
+    # calculated:
     
     if match:  # We have a (1.23 +/- 0.01)e10 form
-        # The representation is simplified, but the global factor is
-        # calculated:
         exp_value_str = match.group('exp_value')
         
         print "GLOBAL EXPONENT STRING", exp_value_str  #!!!!!!!! test
@@ -2906,12 +2942,19 @@ def str_to_number_with_uncert(representation):
     if match:
 
         (nom_value, uncert) = match.groups()
-        
+
+        #!!!!!!!! test
+        print "NOM_VALUE", nom_value, "UNCERT", uncert
+
         try:
             # Simple form 1234.45+/-1.2 or 1234.45±1.2, or 1.23e-10+/-1e-23
-            parsed_value = (float(nom_value)*factor, float(uncert)*factor)
+            # or -1.2×10⁻¹²±1e23:
+            parsed_value = (to_float(nom_value)*factor,
+                            to_float(uncert)*factor)
         except ValueError:
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
+
+        
         
     else:
         # Form with error parentheses or no uncertainty:
