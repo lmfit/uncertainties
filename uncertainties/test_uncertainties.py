@@ -1887,6 +1887,8 @@ def test_format():
             representation = value.format(format_spec)
 
             assert representation == result, (
+                # The representation is used, for terminal that do not
+                # support some characters like ±, and superscripts:
                 'Incorrect representation %r for format %r of %s+/-%s:'
                 ' %r expected.'
                 % (representation, format_spec, values[0], values[1],
