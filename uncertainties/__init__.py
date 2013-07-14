@@ -1220,7 +1220,7 @@ TO_SUPERSCRIPT = {
 #
 #! Python 2.7+ can use a dictionary comprehension instead:
 FROM_SUPERSCRIPT = dict(
-    (sup, normal) for (normal, sup) in TO_SUPERSCRIPT.items())
+    (ord(sup), normal) for (normal, sup) in TO_SUPERSCRIPT.items())
 
 def to_superscript(value):
     '''
@@ -1237,6 +1237,9 @@ def from_superscript(number_str):
     '''
     Converts a string with superscript digits and sign into an integer.
     '''
+    #!!!!!!!!
+    print "NORMAL SCRIPT VERSION", number_str.translate(FROM_SUPERSCRIPT)
+    
     return int(number_str.translate(FROM_SUPERSCRIPT))
     
 def format_num(nom_val_main, error_main, common_exp,
@@ -2779,7 +2782,10 @@ NUMBER_WITH_UNCERT_RE_STR = u'''
     ([+-])?  # Sign
     %s  # Main number
     (?:\(%s\))?  # Optional uncertainty
-    (?:[eE]([+-]?\d+))?  # Optional exponent
+    (?:
+        (?:[eE]|\s*×\s*10)
+        ([+-]?\d+)
+    )?  # Optional exponent
     ''' % (POSITIVE_DECIMAL_UNSIGNED_OR_NAN, POSITIVE_DECIMAL_UNSIGNED_OR_NAN)
 
 NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
@@ -2854,7 +2860,7 @@ def parse_error_in_parentheses(representation):
 
 
 cannot_parse_ufloat_msg_pat = (
-    'Cannot parse %s: see the documentation of ufloat_fromstr() for a'
+    'Cannot parse %s: see the documentation for ufloat_fromstr() for a'
     ' list of accepted formats')
 
 # The following function is not exposed because it can in effect be
@@ -2865,7 +2871,7 @@ def str_to_number_with_uncert(representation):
     Given a string that represents a number with uncertainty, returns the
     nominal value and the uncertainty.
 
-    See the documentation of ufloat_fromstr() for a list of accepted
+    See the documentation for ufloat_fromstr() for a list of accepted
     formats.
 
     When no numerical error is given, an uncertainty of 1 on the last
@@ -2880,6 +2886,9 @@ def str_to_number_with_uncert(representation):
         # The representation is simplified, but the global factor is
         # calculated:
         exp_value_str = match.group('exp_value')
+        
+        print "GLOBAL EXPONENT STRING", exp_value_str  #!!!!!!!! test
+        
         try:
             exponent = (from_superscript(exp_value_str)
                         if isinstance(exp_value_str, unicode)
