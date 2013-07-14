@@ -1241,9 +1241,6 @@ def from_superscript(number_str):
 
     number_str -- basestring object.
     '''
-    #!!!!!!!!
-    print "NORMAL SCRIPT VERSION", number_str.translate(FROM_SUPERSCRIPT)
-    
     return int(unicode(number_str).translate(FROM_SUPERSCRIPT))
     
 def format_num(nom_val_main, error_main, common_exp,
