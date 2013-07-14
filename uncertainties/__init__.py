@@ -2793,8 +2793,9 @@ NUMBER_WITH_UNCERT_RE_STR = u'''
 NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
     u"%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).match
 
-# Number with uncertainty of the form (... +/- ...)e10: this is a
-# loose matching, so as to accommodate for multiple formats:
+# Number with uncertainty with a factored exponent (e.g., of the form
+# (... +/- ...)e10): this is a loose matching, so as to accommodate
+# for multiple formats:
 NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(u'''
     \(
     (?P<simple_num_with_uncert>.*)
