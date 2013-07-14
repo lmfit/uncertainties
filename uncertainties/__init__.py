@@ -2927,8 +2927,6 @@ def str_to_number_with_uncert(representation):
         
         exp_value_str = match.group('exp_value')
         
-        print "GLOBAL EXPONENT STRING", exp_value_str  #!!!!!!!! test
-        
         try:
             exponent = from_superscript(exp_value_str)
         except ValueError:
@@ -2944,9 +2942,6 @@ def str_to_number_with_uncert(representation):
     if match:
 
         (nom_value, uncert) = match.groups()
-
-        #!!!!!!!! test
-        print "NOM_VALUE", nom_value, "UNCERT", uncert
 
         try:
             # Simple form 1234.45+/-1.2 or 1234.45±1.2, or 1.23e-10+/-1e-23

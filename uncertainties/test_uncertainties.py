@@ -1920,8 +1920,6 @@ def test_format():
                 # Specific case:
                 and '=====' not in representation):
                 
-                print 'PARSING BACK', representation  #!!!!!!test
-                
                 value_back = ufloat_fromstr(representation)
 
                 # The original number and the new one should be consistent
