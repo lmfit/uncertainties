@@ -1708,13 +1708,13 @@ def test_format():
         # instead of 1.4 for Python 3.1. The problem does not appear
         # with 1.2, so 1.2 is used.
         (-1.2e-12, 0): python26_add({
-            '12.2gPL': ur'-1.2×10⁻¹²±           0'
+            '12.2gPL': ur'  -1.2×10⁻¹²±           0'
         }, {
             # Pure "width" formats are not accepted by the % operator,
             # and only %-compatible formats are accepted, for Python <
             # 2.6:
             '13S': '  -1.2(0)e-12',
-            '10P': u'  -1.2×10⁻¹²±         0',
+            '10P': u'-1.2×10⁻¹²±         0',
             'L': r'(-1.2 \pm 0) \times 10^{-12}',
             'SL': r'-1.2(0) \times 10^{-12}',
             'SP': r'-1.2(0)×10⁻¹²'

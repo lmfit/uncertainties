@@ -1199,6 +1199,34 @@ else:
         return {'>': str.rjust, '<': str.ljust, '^': str.center}[align_option](
             orig_str, int(width), fill_char or ' ')
 
+# Maps some Unicode code points ("-" and digits) to their
+# superscript version:
+SUPERSCRIPT_TABLE = {
+    0x2d: u'⁻',
+    0x30: u'⁰',
+    0x31: u'¹',
+    0x32: u'²',
+    0x33: u'³',
+    0x34: u'⁴',
+    0x35: u'⁵',
+    0x36: u'⁶',
+    0x37: u'⁷',
+    0x38: u'⁸',
+    0x39: u'⁹'
+    }
+
+def to_superscript(value):
+    '''
+    Returns a (Unicode) string with the given value as superscript characters.
+
+    The value is formatted with the %d %-operator format.
+    
+    value -- integer.
+    '''
+
+    return (u'%d' % value).translate(SUPERSCRIPT_TABLE)
+    
+    
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_fmt_type, options):
     '''
@@ -1264,6 +1292,8 @@ def format_num(nom_val_main, error_main, common_exp,
     # Exponent part:
     if common_exp is None:
         exp_str = ''
+    elif 'P' in options:
+        exp_str = u'×10%s' % to_superscript(common_exp)
     elif 'L' in options:
         exp_str = r' \times 10^{%d}' % common_exp
     else:
