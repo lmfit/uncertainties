@@ -1244,7 +1244,7 @@ def from_superscript(number_str):
     return int(unicode(number_str).translate(FROM_SUPERSCRIPT))
 
 # Function that transforms an exponent produced by format_num() into
-# the corresponding string notation (for all non-default modes):
+# the corresponding string notation (for non-default modes):
 EXP_PRINT = {
     'pretty-print': lambda common_exp: u'×10%s' % to_superscript(common_exp),
     'latex': lambda common_exp: r' \times 10^{%d}' % common_exp}
@@ -1336,7 +1336,9 @@ def format_num(nom_val_main, error_main, common_exp,
 
     # Printing type for parts of the result (exponent, parentheses),
     # taking into account the priority of the pretty-print mode over
-    # the LaTeX mode:
+    # the LaTeX mode. This setting does not apply to everything: for
+    # example, NaN is formatted as \mathrm{nan} (or NAN) if the LaTeX
+    # mode is required.
     print_type = 'pretty-print' if 'P' in options else (
         'latex' if 'L' in options
         else 'default')
@@ -1399,6 +1401,8 @@ def format_num(nom_val_main, error_main, common_exp,
             uncert_str = '0'
         elif isnan(error_main):
             uncert_str = robust_format(error_main, main_fmt_type)
+            if 'L' in options:
+                uncert_str = '\mathrm{%s}' % uncert_str
         else:  #  Error with a meaningful first digit (not 0, not NaN)
 
             uncert = round(error_main, prec)
@@ -1558,7 +1562,10 @@ def format_num(nom_val_main, error_main, common_exp,
         fmt_suffix_e = '.%d%s' % (prec if error_main else 0, main_fmt_type)
         
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
-        
+
+        if 'L' in options and isnan(error_main):
+            error_str = '\mathrm{%s}' % error_str
+            
         if error_has_exp:
             error_str += exp_str
 
