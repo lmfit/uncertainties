@@ -281,6 +281,8 @@ What others say
   <http://dawes.wordpress.com/2011/01/02/scientific-python/>`_)
 - "*uncertainties makes error propagation dead simple.*" (`enrico
   documentation <http://readthedocs.org/docs/enrico/en/latest/setup.html>`_)
+- contains "*many inspiring ideas*" (`Abraham Lee
+  <https://pypi.python.org/pypi/soerp#acknowledgements>`_)
 - "*Those of us working with experimental data or simulation results
   will appreciate this.*" (`Konrad Hinsen
   <http://khinsen.wordpress.com/2010/07/12/euroscipy-2010/>`_)
