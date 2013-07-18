@@ -1173,7 +1173,6 @@ except NameError:  # !! format() is not defined (Python < 2.6)
         format_spec: a simple % formatting specification, without the
         leading % (e.g., 3.2f).
         '''
-        print "FORMAT_SPEC", format_spec #!!!!!!!test
         return ('%' + format_spec) % value
     
 class CallableStdDev(float):
