@@ -1555,6 +1555,10 @@ def test_format():
     # Tests of each point of the docstring of
     # AffineScalarFunc.__format__() in turn, mostly in the same order.
 
+    # The LaTeX tests do not use the customization of
+    # uncertainties.GROUP_SYMBOLS and uncertainties.EXP_PRINT: this
+    # way, problems in the customization themselves are caught.
+    
     tests = {  # (Nominal value, uncertainty): {format: result,...}
 
         # Usual float formatting, and individual widths, etc.:
@@ -1694,13 +1698,13 @@ def test_format():
         # LaTeX notation:
         #
         (1234.56789, 0.1): {
-            'eL': r'(1.23457 \pm 0.00010) \times 10^{3}',
-            'EL': r'(1.23457 \pm 0.00010) \times 10^{3}',
+            'eL': r'\left(1.23457 \pm 0.00010\right) \times 10^{3}',
+            'EL': r'\left(1.23457 \pm 0.00010\right) \times 10^{3}',
             'fL': '1234.57 \pm 0.10',
             'FL': '1234.57 \pm 0.10',
             'fL': '1234.57 \pm 0.10',
             'FL': '1234.57 \pm 0.10',            
-            '%L': '(123457 \pm 10) \%'
+            '%L': '\left(123457 \pm 10\right) \%'
         },
         #
         # ... combined with the spectroscopic notation:
@@ -1725,7 +1729,9 @@ def test_format():
             # 2.6:
             '13S': '  -1.2(0)e-12',
             '10P': u'-1.2×10⁻¹²±         0',
-            'L': r'(-1.2 \pm 0) \times 10^{-12}',
+            'L': r'\left(-1.2 \pm 0\right) \times 10^{-12}',
+            # No factored exponent, LaTeX
+            '1L': r'\left(-1.2 \times 10^{-12} \pm 0\right)',
             'SL': r'-1.2(0) \times 10^{-12}',
             'SP': ur'-1.2(0)×10⁻¹²'
         }),
@@ -1737,7 +1743,9 @@ def test_format():
             '.2uG': '(-1.2+/-%s)E-12' % NaN_EF,  # u ignored, format used
             '15GS': '  -1.2(%s)E-12' % NaN_EF
         }, {
-            'L': r'(-1.2 \pm nan) \times 10^{-12}',        
+            'L': r'\left(-1.2 \pm nan\right) \times 10^{-12}',
+            # Uppercase NaN and LaTeX:
+            'FL': r'\left(-1.2 \pm NAN\right) \times 10^{-12}',        
             '10': '  -1.2e-12+/-       nan',
             '15S': '  -1.2(nan)e-12'            
         }),
@@ -1812,11 +1820,12 @@ def test_format():
         (1234.56789, 0): {
             '1.2ue': '1.23e+03+/-0',  # u ignored
             '1.2e': '1.23e+03+/-0',
-            'eL': r'(1.234568 \pm 0) \times 10^{3}',  # Default precision = 6
-            'EL': r'(1.234568 \pm 0) \times 10^{3}',
+            # Default precision = 6
+            'eL': r'\left(1.234568 \pm 0\right) \times 10^{3}',
+            'EL': r'\left(1.234568 \pm 0\right) \times 10^{3}',
             'fL': '1234.567890 \pm 0',
             'FL': '1234.567890 \pm 0',
-            '%L': '(123456.789000 \pm 0) \%'
+            '%L': '\left(123456.789000 \pm 0\right) \%'
         },
 
         (1e5, 0): {
@@ -1855,7 +1864,7 @@ def test_format():
             '.6g': '(1.20000+/-0.00000)e-34',
             '13.6g': '  1.20000e-34+/-  0.00000e-34',
             '13.6G': '  1.20000E-34+/-  0.00000E-34',
-            '.6GL': r'(1.20000 \pm 0.00000) \times 10^{-34}'
+            '.6GL': r'\left(1.20000 \pm 0.00000\right) \times 10^{-34}'
         }
     }
 
