@@ -2458,6 +2458,7 @@ def get_ops_with_reflection():
         # calculated.  These derivatives are transformed to NaN if an
         # error happens during their calculation:
         'pow': ("0. if y == 0"
+                #!! Python 2.6+ y % 1 == 0 => y.is_integer():
                 " else y*x**(y-1) if x != 0 or y % 1 == 0"
                 " else float('nan')",
                 "0. if (x == 0) and (y > 0) else log(x)*x**y"),
