@@ -1578,8 +1578,8 @@ def format_num(nom_val_main, error_main, common_exp,
         # percent sign handling because this sign may too need
         # parentheses.
         if any_exp_factored and common_exp is not None:
-            value_str = '(%s%s%s)%s' % (
-                nom_val_str, pm_symbol, error_str, exp_str) + percent_str
+            value_str = '(%s%s%s)%s%s' % (
+                nom_val_str, pm_symbol, error_str, exp_str, percent_str)
         else:
             value_str = ''.join([nom_val_str, pm_symbol, error_str])
             if percent_str:
