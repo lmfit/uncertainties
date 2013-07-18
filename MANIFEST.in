@@ -8,5 +8,3 @@ recursive-include doc Makefile conf.py *.rst make.bat
 graft doc/_static
 graft doc/_templates
 prune doc/_build
-
-

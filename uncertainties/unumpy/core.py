@@ -125,12 +125,15 @@ def wrap_array_func(func):
     func() is given a NumPy array that contains numbers with
     uncertainties.
 
-    func() is supposed to return a NumPy array.
-
     This wrapper is similar to uncertainties.wrap(), except that it
     handles an array argument instead of float arguments.
+
+    However, the returned function is more restricted: the array
+    argument cannot be given as a keyword argument with the name in
+    the original function (it is not a drop-in replacement).
     
-    func -- version that takes and returns a single NumPy array.
+    func -- function whose first argument takes a single NumPy array,
+    and which returns a NumPy array.
     """
 
     @uncertainties.set_doc("""\
@@ -144,10 +147,10 @@ def wrap_array_func(func):
     
     Original documentation:
     %s""" % (func.__name__, func.__doc__))
-    def wrapped_func(arr, *args):
+    def wrapped_func(arr, *args, **kwargs):
         # Nominal value:
         arr_nominal_value = nominal_values(arr)
-        func_nominal_value = func(arr_nominal_value, *args)
+        func_nominal_value = func(arr_nominal_value, *args, **kwargs)
 
         # The algorithm consists in numerically calculating the derivatives
         # of func:
@@ -209,7 +212,7 @@ def wrap_array_func(func):
 
             # Origin value of array arr when var is shifted by shift_var:
             shifted_arr_values = arr_nominal_value + shift_arr
-            func_shifted = func(shifted_arr_values, *args)
+            func_shifted = func(shifted_arr_values, *args, **kwargs)
             numerical_deriv = (func_shifted-func_nominal_value)/shift_var
 
             # Update of the list of variables and associated
@@ -220,7 +223,7 @@ def wrap_array_func(func):
                 if derivative_value:
                     derivative_dict[var] = derivative_value
 
-        # numbers with uncertainties are build from the result:
+        # numbers with uncertainties are built from the result:
         return numpy.vectorize(uncertainties.AffineScalarFunc)(
             func_nominal_value, derivatives)
 
@@ -293,11 +296,12 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
     and the derivatives of this function with respect to multiple
     scalar parameters are calculated by func_with_derivatives().
     
-    func_with_derivatives(arr, input_type, derivatives, *args) returns
-    an iterator.  The first element is the value of the function at
-    point 'arr' (with the correct type).  The following elements are
-    arrays that represent the derivative of the function for each
-    derivative array from the iterator 'derivatives'.
+    func_with_derivatives(arr, input_type, derivatives, *args,
+    **kwargs) returns an iterator.  The first element is the value of
+    the function at point 'arr' (with the correct type).  The
+    following elements are arrays that represent the derivative of the
+    function for each derivative array from the iterator
+    'derivatives'.
 
       func_with_derivatives takes the following arguments:
 
@@ -318,7 +322,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
     Examples of func_with_derivatives: inv_with_derivatives().
     """
     
-    def wrapped_func(array_like, *args):
+    def wrapped_func(array_like, *args, **kwargs):
         """
         array_like -- array-like object that contains numbers with
         uncertainties (list, Numpy ndarray or matrix, etc.).
@@ -346,7 +350,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
             array_nominal,
             type(array_like),
             (array_derivative(array_version, var) for var in variables),
-            *args)
+            *args, **kwargs)
 
         func_nominal_value = func_and_derivs.next()
 
@@ -418,8 +422,8 @@ def inv_with_derivatives(arr, input_type, derivatives):
         derivative_mat = numpy.asmatrix(derivative)
         yield -inverse_mat * derivative_mat * inverse_mat
 
-_inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
-_inv.__doc__ = """\
+inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
+inv.__doc__ = """\
     Version of numpy.linalg.inv that works with array-like objects
     that contain numbers with uncertainties.
 
@@ -484,11 +488,11 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
 # Default rcond argument for the generalization of numpy.linalg.pinv:
 try:
     # Python 2.6+:
-    _pinv_default = numpy.linalg.pinv.__defaults__[0]
+    pinv_default = numpy.linalg.pinv.__defaults__[0]
 except AttributeError:
-    _pinv_default = 1e-15
+    pinv_default = 1e-15
 
-_pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
+pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
 @uncertainties.set_doc("""
     Version of numpy.linalg.pinv that works with array-like objects
@@ -502,8 +506,8 @@ _pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
     Original documentation:
     %s
     """ % numpy.linalg.pinv.__doc__)
-def _pinv(array_like, rcond=_pinv_default):
-    return _pinv_with_uncert(array_like, rcond)
+def pinv(array_like, rcond=pinv_default):
+    return pinv_with_uncert(array_like, rcond)
 
 ########## Matrix class
 
@@ -536,9 +540,9 @@ class matrix(numpy.matrix):
 
         M, N = self.shape
         if M == N:
-            func = _inv
+            func = inv
         else:
-            func = _pinv
+            func = pinv
         return func(self)
         
 

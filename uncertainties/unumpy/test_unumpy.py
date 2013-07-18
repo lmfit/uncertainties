@@ -19,7 +19,7 @@ except ImportError:
 import uncertainties
 from uncertainties import ufloat, unumpy, test_uncertainties
 from uncertainties.unumpy import core
-from uncertainties.test_uncertainties import _numbers_close, arrays_close
+from uncertainties.test_uncertainties import numbers_close, arrays_close
 from uncertainties import __author__
 
 def test_numpy():
@@ -86,7 +86,7 @@ def test_matrix():
     3*m
     m*3
 
-def _derivatives_close(x, y):
+def derivatives_close(x, y):
     """
     Returns True iff the AffineScalarFunc objects x and y have
     derivatives that are close to each other (they must depend
@@ -97,7 +97,7 @@ def _derivatives_close(x, y):
     if set(x.derivatives) != set(y.derivatives):
         return False  # Not the same variables
 
-    return all(_numbers_close(x.derivatives[var], y.derivatives[var])
+    return all(numbers_close(x.derivatives[var], y.derivatives[var])
                for var in x.derivatives)
 
 def test_inverse():
@@ -124,10 +124,10 @@ def test_inverse():
     # Checks of the numerical values: the diagonal elements of the
     # inverse should be the inverses of the diagonal elements of
     # m (because we started with a triangular matrix):
-    assert _numbers_close(1/m_nominal_values[0, 0],
+    assert numbers_close(1/m_nominal_values[0, 0],
                           m_inv_uncert[0, 0].nominal_value), "Wrong value"
     
-    assert _numbers_close(1/m_nominal_values[1, 1],
+    assert numbers_close(1/m_nominal_values[1, 1],
                           m_inv_uncert[1, 1].nominal_value), "Wrong value"
 
 
@@ -144,16 +144,16 @@ def test_inverse():
     m_double_inverse = m_inverse.I
     # The initial matrix should be recovered, including its
     # derivatives, which define covariances:
-    assert _numbers_close(m_double_inverse[0, 0].nominal_value,
+    assert numbers_close(m_double_inverse[0, 0].nominal_value,
                           m[0, 0].nominal_value)
-    assert _numbers_close(m_double_inverse[0, 0].std_dev,
+    assert numbers_close(m_double_inverse[0, 0].std_dev,
                           m[0, 0].std_dev)
 
     assert arrays_close(m_double_inverse, m)
 
     # Partial test:
-    assert _derivatives_close(m_double_inverse[0, 0], m[0, 0])
-    assert _derivatives_close(m_double_inverse[1, 1], m[1, 1])
+    assert derivatives_close(m_double_inverse[0, 0], m[0, 0])
+    assert derivatives_close(m_double_inverse[1, 1], m[1, 1])
 
     ####################
 
@@ -168,6 +168,42 @@ def test_inverse():
     # inversion:
     assert arrays_close(m * m_inverse,  numpy.eye(m.shape[0]))
 
+def test_wrap_array_func():
+    '''
+    Test of numpy.wrap_array_func(), with optional arguments and
+    keyword arguments.
+    '''
+
+    # Function that works with numbers with uncertainties in mat (if
+    # mat is an uncertainties.unumpy.matrix):
+    def f_unc(mat, *args, **kwargs):
+        return mat.I + args[0]*kwargs['factor']
+    
+    # Test with optional arguments and keyword arguments:
+    def f(mat, *args, **kwargs):
+        # This function is wrapped: it should only be called with pure
+        # numbers:
+        assert not any(isinstance(v, uncertainties.UFloat) for v in mat.flat)
+        return f_unc(mat, *args, **kwargs)
+
+        
+    # Wrapped function:
+    f_wrapped = core.wrap_array_func(f)
+
+    ##########
+    # Full rank rectangular matrix:
+    m = unumpy.matrix([[ufloat(10, 1), -3.1],
+                       [0, ufloat(3, 0)],
+                       [1, -3.1]])
+
+    # Numerical and package (analytical) pseudo-inverses: they must be
+    # the same:
+    m_f_wrapped = f_wrapped(m, 2, factor=10)
+    m_f_unc = f_unc(m, 2, factor=10)
+    
+    assert arrays_close(m_f_wrapped, m_f_unc)
+    
+    
 def test_pseudo_inverse():
     "Tests of the pseudo-inverse"
 
@@ -184,7 +220,7 @@ def test_pseudo_inverse():
     # the same:
     rcond = 1e-8  # Test of the second argument to pinv()
     m_pinv_num = pinv_num(m, rcond)
-    m_pinv_package = core._pinv(m, rcond)
+    m_pinv_package = core.pinv(m, rcond)
     assert arrays_close(m_pinv_num, m_pinv_package)
 
     ##########
@@ -192,14 +228,14 @@ def test_pseudo_inverse():
     vector = [ufloat(10, 1), -3.1, 11]
     m = unumpy.matrix([vector, vector])
     m_pinv_num = pinv_num(m, rcond)
-    m_pinv_package = core._pinv(m, rcond)
+    m_pinv_package = core.pinv(m, rcond)
     assert arrays_close(m_pinv_num, m_pinv_package)
     
     ##########
     # Example with a non-full-rank square matrix:
     m = unumpy.matrix([[ufloat(10, 1), 0], [3, 0]])
     m_pinv_num = pinv_num(m, rcond)
-    m_pinv_package = core._pinv(m, rcond)
+    m_pinv_package = core.pinv(m, rcond)
     assert arrays_close(m_pinv_num, m_pinv_package)
     
 def test_broadcast_funcs():
