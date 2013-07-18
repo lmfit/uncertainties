@@ -2881,7 +2881,7 @@ def parse_error_in_parentheses(representation):
                              " See the documentation of ufloat_fromstr()."
                              % representation)
 
-    # Global exponent: #@@@@@@@ correct?
+    # Global exponent:
     factor = 10.**from_superscript(exponent) if exponent else 1
     
     # Nominal value:
