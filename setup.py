@@ -139,6 +139,9 @@ Main features
 - Many **fast operations on arrays and matrices** of numbers with
   uncertainties are supported.
 
+- **Extensive support for printing** numbers with uncertainties
+  (including LaTeX support and pretty-printing).
+  
 - Most uncertainty calculations are performed **analytically**.
   
 - This module also gives access to the **derivatives** of any 
