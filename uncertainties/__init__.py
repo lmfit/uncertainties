@@ -1362,9 +1362,12 @@ def format_num(nom_val_main, error_main, common_exp,
     # the LaTeX mode. This setting does not apply to everything: for
     # example, NaN is formatted as \mathrm{nan} (or NAN) if the LaTeX
     # mode is required.
-    print_type = ('pretty-print' if 'P' in options else
-                  'latex' if 'L' in options
-                  else 'default')
+    if 'P' in options:
+        print_type = 'pretty-print'
+    elif 'L' in options:
+        print_type = 'latex'
+    else:
+        print_type = 'default'
     
     # Exponent part:
     if common_exp is None:
@@ -1621,7 +1624,7 @@ def format_num(nom_val_main, error_main, common_exp,
                 fmt_parts['width'])
 
         ####################
-        if 'C' in options:        
+        if 'P' in options:        
             # Unicode has priority over LaTeX, so that users with a
             # Unicode-compatible LaTeX source can use ±:
             pm_symbol = u'±'
