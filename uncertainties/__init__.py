@@ -1220,9 +1220,11 @@ else:
 
         width -- string that contains the width
         '''
-        return orig_str.getattr(
-            {'>': 'rjust', '<': 'ljust', '^': 'center'}[align_option])(
-                int(width), fill_char or ' ')
+        align_method = getattr(
+            orig_str,
+            {'>': 'rjust', '<': 'ljust', '^': 'center'}[align_option])
+        
+        return align_method(int(width), fill_char or ' ')
 
 # Maps some Unicode code points ("-", "+", and digits) to their
 # superscript version:
