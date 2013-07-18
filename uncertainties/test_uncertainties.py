@@ -1748,7 +1748,8 @@ def test_format():
             'PSL': u'-1.2(\mathrm{nan})×10⁻¹²',
             'L': r'\left(-1.2 \pm \mathrm{nan}\right) \times 10^{-12}',
             # Uppercase NaN and LaTeX:
-            '.1EL': r'\left(-1.2 \pm \mathrm{NAN}\right) \times 10^{-12}',
+            '.1EL': (r'\left(-1.2 \pm \mathrm{%s}\right) \times 10^{-12}'
+                     % NaN_EF),
             '10': '  -1.2e-12+/-       nan',
             '15S': '  -1.2(nan)e-12'
         }),
