@@ -48,7 +48,7 @@ expressed in many convenient ways:
   >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
 
 The available representations can be listed with ``pydoc
-uncertainties.ufloat``.  Representations that are invalid raise a
+uncertainties.ufloat_fromstr``.  Representations that are invalid raise a
 :class:`ValueError` exception.
 
 Basic math

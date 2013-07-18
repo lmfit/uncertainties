@@ -1,7 +1,12 @@
-include README.txt
-include LICENCE.txt
+include README.rst
+include INSTALL.txt
+include LICENSE.txt
 include setup.py
 recursive-include uncertainties-py23 *.py
 recursive-include uncertainties-py25 *.py
-prune uncertainties/
-prune README
+recursive-include doc Makefile conf.py *.rst make.bat
+graft doc/_static
+graft doc/_templates
+prune doc/_build
+
+

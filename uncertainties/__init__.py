@@ -609,7 +609,7 @@ class IndexableIter(object):
             return returned_elements[index]
 
     def __str__(self):
-        return '<{}: [{}...]>'.format(
+        return '<%s: [%s...]>' % (
             self.__class__.__name__,
             ', '.join(map(str, self.returned_elements)))
     
