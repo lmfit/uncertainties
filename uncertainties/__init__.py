@@ -1191,13 +1191,15 @@ else:
         '''
         Aligns the given string with the given fill character.
 
+        orig_str -- string to be aligned (str or unicode object).
+        
         align_option -- > < or ^
 
         width -- string that contains the width
         '''
-
-        return {'>': str.rjust, '<': str.ljust, '^': str.center}[align_option](
-            orig_str, int(width), fill_char or ' ')
+        return orig_str.getattr(
+            {'>': 'rjust', '<': 'ljust', '^': 'center'}[align_option])(
+                int(width), fill_char or ' ')
 
 # Maps some Unicode code points ("-", "+", and digits) to their
 # superscript version:
