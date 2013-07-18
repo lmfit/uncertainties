@@ -1252,7 +1252,12 @@ EXP_PRINT = {
 # Symbols used for grouping (typically between parentheses) in format_num():
 GROUP_SYMBOLS = {
     'pretty-print': ('(', ')'),
-    'latex': ('(', ')'),
+    # Because of possibly exponents inside the parentheses (case of a
+    # specified field width), it is better to use auto-adjusting
+    # parentheses. This has the side effect of making the part between
+    # the parentheses non-breakable (the text inside parentheses in a
+    # LaTeX math expression $...$ can be broken).
+    'latex': ('\left(', r'\right)'),
     'default': ('(', ')')  # Basic text mode
     }
 

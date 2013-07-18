@@ -232,7 +232,7 @@ standard deviation, exponents use superscript characters, etc.).
 >>> print u'{:.2eP}'.format(x)  # ± character, superscript characters,...
 (2.00±0.10)×10⁻¹
 >>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeχ
-(2.00 \pm 0.10) \times 10^{6}
+\left(2.00 \pm 0.10\right) \times 10^{6}
 
 Options can be combined.
 
