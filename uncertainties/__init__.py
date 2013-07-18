@@ -1967,6 +1967,9 @@ class AffineScalarFunc(object):
         
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
+
+        Some details of the formatting can be customized as described
+        in format_num().
         '''
 
         # Convention on limits "between" digits: 0 = exactly at the
