@@ -146,10 +146,8 @@ upgrade this package with
    easy_install --upgrade uncertainties
 
 The :mod:`uncertainties` package is also available for **Windows**
-through the `Python(x,y) distribution
-<https://code.google.com/p/pythonxy/>`_. It may also be included in
-Christoph Gohlke's Base distribution of `scientific Python packages
-<http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_.
+through the `Python(x,y)`_ distribution. It may also be included in
+Christoph Gohlke's Base distribution of `scientific Python packages`_.
 
 The :mod:`uncertainties` package is also available through the
 following **Linux** distributions and software platforms: `Ubuntu
@@ -375,9 +373,12 @@ Don Peterson, Mika Pflueger, Albert Puig, Abraham Lee, Arian Sanusi,
 Martin Laloux, Jonathan Whitmore, Federico Vaggi, Marco A. Ferra,
 Hernan Grecco, and many others.
 
-I am also grateful to the Linux distribution maintainers of this
-package, and to Christoph Gohlke for including it in his Base
-distribution of scientific Python packages for Windows.
+I am also grateful to Gabi Davar and Pierre Raybaut for including it
+in `Python(x,y)`_, to Christoph Gohlke for including it in his Base
+distribution of `scientific Python packages`_ for Windows, and to the
+Linux distribution maintainers of this package (David Paleino,
+Federico Ceratto, Roberto Colistete Jr, and Filipe Pires Alvarenga
+Fernandes).
 
 .. index:: license
 
@@ -392,6 +393,8 @@ following options can be chosen:
    this package.
 
 .. _Python: http://python.org/
+.. _Python(x,y): https://code.google.com/p/pythonxy/
+.. _scientific Python packages: http://www.lfd.uci.edu/~gohlke/pythonlibs/
 .. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
 .. _invoking the Python interpreter: http://docs.python.org/tutorial/interpreter.html
 .. _setuptools: http://pypi.python.org/pypi/setuptools
