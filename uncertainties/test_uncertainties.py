@@ -1744,7 +1744,7 @@ def test_format():
             '15GS': '  -1.2(%s)E-12' % NaN_EF,
             'SL': '-1.2(\mathrm{nan})e-12',  # LaTeX NaN
             # Pretty-print priority, but not for NaN:
-            'PSL': '-1.2(\mathrm{nan})×10⁻¹²'
+            'PSL': u'-1.2(\mathrm{nan})×10⁻¹²'
         }, {
             'L': r'\left(-1.2 \pm \mathrm{nan}\right) \times 10^{-12}',
             # Uppercase NaN and LaTeX:
