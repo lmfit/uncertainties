@@ -8,7 +8,7 @@ Welcome to the uncertainties package
 ====================================
 
 The `uncertainties package`_ is a free, cross-platform program that 
-transparently handles calculations with **numbers with uncertainties** 
+**transparently** handles calculations with **numbers with uncertainties** 
 (like 3.14±0.01).  It can also yield the **derivatives** of any 
 expression.
 
@@ -19,7 +19,7 @@ anymore!
 Calculations of results with uncertainties, or of derivatives, can be 
 performed either in an **interactive session** (as with a calculator), 
 or in **programs** written in the Python_ programming language.  
-Existing calculation code can **run with no or little change**.
+Existing calculation code can **run with little or no change**.
 
 Whatever the complexity of a calculation, this package returns its
 result with an uncertainty as predicted by linear `error propagation 
@@ -27,10 +27,12 @@ theory`_. It automatically :ref:`calculates derivatives <derivatives>`
 and uses them for calculating uncertainties. Almost all uncertainty 
 calculations are performed **analytically**.
 
-**Correlations** between variables are automatically handled, which 
-sets it apart from many existing error propagation codes.
+**Correlations** between variables are automatically handled, which
+sets this module apart from many existing error propagation codes.
 
-Let's now see how to use these unique features!
+You may want to check the following related uncertainty calculation
+Python packages to see if they better suit your needs: soerp_
+(higher-order approximations) and mcerp_ (Monte-Carlo approach).
 
 .. index:: calculator
 
@@ -44,13 +46,13 @@ calculations with **automatic error propagation** can be performed
 **transparently** (i.e., through the usual syntax for mathematical 
 formulas):
 
-  >>> from uncertainties import ufloat
-  >>> from uncertainties.umath import *  # sin(), etc.
-  >>> x = ufloat(1, 0.1)  # x = 1+/-0.1
-  >>> print 2*x
-  2.0+/-0.2
-  >>> sin(2*x)  # In a Python shell, "print" is optional
-  0.90929742682568171+/-0.083229367309428481
+>>> from uncertainties import ufloat
+>>> from uncertainties.umath import *  # sin(), etc.
+>>> x = ufloat(1, 0.1)  # x = 1+/-0.1
+>>> print 2*x
+2.00+/-0.20
+>>> sin(2*x)  # In a Python shell, "print" is optional
+0.9092974268256817+/-0.08322936730942848
 
 Thus, existing calculation code designed for regular numbers can run 
 with numbers with uncertainties with :ref:`no or little modification 
@@ -62,8 +64,8 @@ Another strength of this package is its correct handling of
 **correlations**.  For instance, the following quantity is exactly
 zero even though :data:`x` has an uncertainty:
 
-  >>> x-x
-  0.0
+>>> x-x
+0.0+/-0
 
 Many other error propagation codes return the incorrect value 0±0.1414… 
 because they wrongly assume that the two subtracted quantities are 
@@ -75,8 +77,8 @@ handled <simple_array_use>` too.
 
 **Derivatives** are similarly very :ref:`easy to obtain <derivatives>`:
 
-  >>> (2*x+1000).derivatives[x]
-  2.0
+>>> (2*x+1000).derivatives[x]
+2.0
 
 They are calculated with a :ref:`fast method <differentiation method>`.
 
@@ -197,8 +199,9 @@ that corresponds best to your version of Python to a location that
 Python can import from (directory in which scripts using
 :mod:`uncertainties` are run, etc.); the chosen
 :file:`uncertainties-py*` directory should then be renamed
-:file:`uncertainties`. Python 3 users should then run ``2to3 -w
-uncertainties`` so as to automatically adapt the code to Python 3.
+:file:`uncertainties`. Python 3 users should then run ``2to3 -w .``
+from inside this directory so as to automatically adapt the code to
+Python 3.
 
 Source code
 -----------
@@ -210,7 +213,7 @@ and `documentation source
 available `on GitHub <https://github.com/lebigot/uncertainties/>`_.
 The :mod:`uncertainties` package is written in pure Python and has no
 external dependency (the `NumPy`_ package is optional).  It contains
-about 6000 lines of code.  75 % of those lines are documentation
+about 7000 lines of code.  75 % of these lines are documentation
 strings and comments.  The remaining 25 % are split between unit tests
 (15 % of the total) and the calculation code proper (10 % of the
 total).  :mod:`uncertainties` is thus a **lightweight, portable
@@ -278,6 +281,8 @@ What others say
   <http://dawes.wordpress.com/2011/01/02/scientific-python/>`_)
 - "*uncertainties makes error propagation dead simple.*" (`enrico
   documentation <http://readthedocs.org/docs/enrico/en/latest/setup.html>`_)
+- contains "*many inspiring ideas*" (`Abraham Lee
+  <https://pypi.python.org/pypi/soerp#acknowledgements>`_)
 - "*Those of us working with experimental data or simulation results
   will appreciate this.*" (`Konrad Hinsen
   <http://khinsen.wordpress.com/2010/07/12/euroscipy-2010/>`_)
@@ -295,9 +300,7 @@ Future developments
 
 Planned future developments include:
 
-- support for Python `string formatting <http://docs.python.org/library/string.html#formatstrings>`_;
-
-- handling of complex numbers with uncertainties;
+- support for the units package Pint_;
 
 - `JSON <http://docs.python.org/library/json.html>`_ support;
 
@@ -311,6 +314,8 @@ Planned future developments include:
 - addition of new functions from the :mod:`math` module;
 
 - fitting routines that conveniently handle data with uncertainties;
+
+- handling of complex numbers with uncertainties;
 
 - a re-correlate function that puts correlations back between data
   that was saved in separate files;
@@ -330,13 +335,13 @@ Contact
 =======
 
 **Feature requests, bug reports, or feedback are much welcome.** They
-can be sent to the creator of :mod:`uncertainties`, `Eric O. LEBIGOT
+can be sent_ to the creator of :mod:`uncertainties`, `Eric O. LEBIGOT
 (EOL)`_.
 
 .. figure:: _static/eol.*
    :height: 64
    :width:  64
-   :target: http://lebigot.pip.verisignlabs.com/
+   :target: http://linkedin.com/pub/eric-lebigot/22/293/277
    :align: center
    :alt: Eric O. LEBIGOT (EOL)
 
@@ -358,15 +363,17 @@ The author wishes to thank all the people who made generous
 `donations`_: they help keep this project alive by providing positive 
 feedback.
 
+I greatly appreciated getting key technical input from Arnaud
+Delobelle, Pierre Cladé, and Sebastian Walter.  Patches by Pierre
+Cladé, Tim Head, José Sabater Montes, Martijn Pieters, Ram Rachum,
+Christoph Deil, and Gabi Davar are gratefully acknowledged.
+
 I would also like to thank users who contributed with feedback and
 suggestions, which greatly helped improve this program: Joaquin Abian,
 Jason Moore, Martin Lutz, Víctor Terrón, Matt Newville, Matthew Peel,
-Don Peterson and many others.
-
-I greatly appreciated getting key technical input from Arnaud
-Delobelle, Pierre Cladé, and Sebastian Walter.  Patches by Pierre
-Cladé, Tim Head, José Sabater Montes and Martijn Pieters are
-gratefully acknowledged.
+Don Peterson, Mika Pflueger, Albert Puig, Abraham Lee, Arian Sanusi,
+Martin Laloux, Jonathan Whitmore, Federico Vaggi, Marco A. Ferra,
+Hernan Grecco, and many others.
 
 I am also grateful to the Linux distribution maintainers of this
 package, and to Christoph Gohlke for including it in his Base
@@ -390,10 +397,14 @@ following options can be chosen:
 .. _setuptools: http://pypi.python.org/pypi/setuptools
 .. _download: http://pypi.python.org/pypi/uncertainties/#downloads
 .. _donations: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
-.. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
+.. _Eric O. LEBIGOT (EOL): http://linkedin.com/pub/eric-lebigot/22/293/277
+.. _sent: mailto:eric.lebigot@normalesup.org
 .. _Revised BSD License: http://opensource.org/licenses/BSD-3-Clause
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
 .. _pydoc: http://docs.python.org/library/pydoc.html
 .. _NumPy: http://numpy.scipy.org/
 .. _donating $10: donations_
 .. _version history: https://pypi.python.org/pypi/uncertainties#version-history
+.. _soerp: https://pypi.python.org/pypi/soerp
+.. _mcerp: https://pypi.python.org/pypi/mcerp
+.. _Pint: https://pypi.python.org/pypi/Pint/

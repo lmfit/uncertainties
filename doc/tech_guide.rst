@@ -28,13 +28,13 @@ package can be `pickled <http://docs.python.org/library/pickle.html>`_
 If multiple variables are pickled together (including when pickling
 :doc:`NumPy arrays <numpy_guide>`), their correlations are preserved:
 
-  >>> import pickle
-  >>> x = ufloat(2, 0.1)
-  >>> y = 2*x
-  >>> p = pickle.dumps([x, y])  # Pickling to a string
-  >>> (x2, y2) = pickle.loads(p)  # Unpickling into new variables
-  >>> y2 - 2*x2
-  0.0
+>>> import pickle
+>>> x = ufloat(2, 0.1)
+>>> y = 2*x
+>>> p = pickle.dumps([x, y])  # Pickling to a string
+>>> (x2, y2) = pickle.loads(p)  # Unpickling into new variables
+>>> y2 - 2*x2
+0.0+/-0
 
 The final result is exactly zero because the unpickled variables :data:`x2`
 and :data:`y2` are completely correlated.
@@ -44,8 +44,8 @@ relationship with the original variables (in fact, the pickled
 representation can be stored in a file and read from another program
 after the program that did the pickling is finished).  Thus
 
-  >>> x - x2
-  0.0+/-0.14142135623730953
+>>> x - x2
+0.0+/-0.14142135623730953
 
 which shows that the original variable :data:`x` and the new variable :data:`x2`
 are completely uncorrelated.
@@ -84,6 +84,15 @@ over 0±0.01.  However, ``cos(0+/-0.01)``, yields an approximate
 standard deviation of 0 because it is parabolic around 0 instead of
 linear; this might not be precise enough for all applications.
 
+**More precise uncertainty estimates** can be obtained, if necessary,
+with the soerp_ and mcerp_ packages. The soerp_ package performs
+*second-order* error propagation: this is still quite fast, but the
+standard deviation of higher-order functions like f(x) = x\ :sup:`3`
+for x = 0±0.1 is calculated as being exactly zero (as with
+:mod:`uncertainties`). The mcerp_ package performs Monte-Carlo
+calculations, and can in principle yield very precise results, but
+calculations are much slower than with approximation schemes.
+
 .. index:: NaN
 
 Not-a-number uncertainties
@@ -96,8 +105,8 @@ derivative.
 
 As a consequence, it is possible for uncertainties to be ``nan``:
 
-  >>> umath.sqrt(ufloat(0, 1))
-  0.0+/-nan
+>>> umath.sqrt(ufloat(0, 1))
+0.0+/-nan
 
 This indicates that **the derivative required by linear error
 propagation theory is not defined** (a Monte-Carlo calculation of the
@@ -106,8 +115,8 @@ resulting random variable is more adapted to this specific case).
 However, the :mod:`uncertainties` package **correctly handles
 perfectly precise numbers**, in this case:
 
-  >>> umath.sqrt(ufloat(0, 0))
-  0.0
+>>> umath.sqrt(ufloat(0, 0))
+0.0+/-0
 
 gives the correct result, despite the fact that the derivative of the
 square root is not defined in zero.
@@ -189,16 +198,16 @@ variables around their nominal values, *except*, possibly, for an
 
 Example:
 
-  >>> x = ufloat(3.14, 0.01)
-  >>> x == x
-  True
+>>> x = ufloat(3.14, 0.01)
+>>> x == x
+True
 
 because a sample from the probability distribution of :data:`x` is always
 equal to itself.  However:
 
-  >>> y = ufloat(3.14, 0.01)
-  >>> x != y
-  True
+>>> y = ufloat(3.14, 0.01)
+>>> x != y
+True
 
 since :data:`x` and :data:`y` are independent random variables that
 *almost* always give a different value. Note that this is different
@@ -207,10 +216,10 @@ from the result of ``z = 3.14; t = 3.14; print z != t``, because
 
 Similarly,
 
-  >>> x = ufloat(3.14, 0.01)
-  >>> y = ufloat(3.00, 0.01)
-  >>> x > y
-  True
+>>> x = ufloat(3.14, 0.01)
+>>> y = ufloat(3.00, 0.01)
+>>> x > y
+True
 
 because :data:`x` is supposed to have a probability distribution largely
 contained in the 3.14±~0.01 interval, while :data:`y` is supposed to be
@@ -227,8 +236,8 @@ the equivalent of the linearity of a real function, for boolean
 values).  Thus, it is not meaningful to compare the following two
 independent variables, whose probability distributions overlap:
 
-  >>> x = ufloat(3, 0.01)
-  >>> y = ufloat(3.0001, 0.01)
+>>> x = ufloat(3, 0.01)
+>>> y = ufloat(3.0001, 0.01)
 
 In fact the function (x, y) → (x > y) is not even continuous over the
 region where x and y are concentrated, which violates the assumption
@@ -239,14 +248,14 @@ a boolean result whose meaning is undefined.
 However, values with largely overlapping probability distributions can
 sometimes be compared unambiguously:
 
-  >>> x = ufloat(3, 1)
-  >>> x
-  3.0+/-1.0
-  >>> y = x + 0.0002
-  >>> y
-  3.0002+/-1.0
-  >>> y > x
-  True
+>>> x = ufloat(3, 1)
+>>> x
+3.0+/-1.0
+>>> y = x + 0.0002
+>>> y
+3.0002+/-1.0
+>>> y > x
+True
 
 In fact, correlations guarantee that :data:`y` is always larger than
 :data:`x`: ``y-x`` correctly satisfies the assumption of linearity,
@@ -291,13 +300,13 @@ This package keeps track of all the random variables a quantity
 depends on, which allows one to perform transparent calculations that
 yield correct uncertainties.  For example:
 
-  >>> x = ufloat(2, 0.1)
-  >>> a = 42
-  >>> poly = x**2 + a
-  >>> poly
-  46.0+/-0.4
-  >>> poly - x*x
-  42.0
+>>> x = ufloat(2, 0.1)
+>>> a = 42
+>>> poly = x**2 + a
+>>> poly
+46.0+/-0.4
+>>> poly - x*x
+42+/-0
 
 Even though ``x*x`` has a non-zero uncertainty, the result has a zero
 uncertainty, because it is equal to :data:`a`.
@@ -305,26 +314,26 @@ uncertainty, because it is equal to :data:`a`.
 If the variable :data:`a` above is modified, the value of :data:`poly` 
 is not modified, as is usual in Python:
 
-  >>> a = 123
-  >>> print poly
-  46.0+/-0.4  # Still equal to x**2 + 42, not x**2 + 123
+>>> a = 123
+>>> print poly
+46.0+/-0.4  # Still equal to x**2 + 42, not x**2 + 123
 
 Random variables can, on the other hand, have their uncertainty
 updated on the fly, because quantities with uncertainties (like
 :data:`poly`) keep track of them:
 
-  >>> x.std_dev = 0
-  >>> print poly
-  46.0  # Zero uncertainty, now
+>>> x.std_dev = 0
+>>> print poly
+46+/-0  # Zero uncertainty, now
 
 As usual, Python keeps track of objects as long as they are used.
 Thus, redefining the value of :data:`x` does not change the fact that
 :data:`poly` depends on the quantity with uncertainty previously stored
 in :data:`x`:
 
-  >>> x = 10000
-  >>> print poly
-  46.0  # Unchanged
+>>> x = 10000
+>>> print poly
+46+/-0  # Unchanged
 
 These mechanisms make quantities with uncertainties behave mostly like
 regular numbers, while providing a fully transparent way of handling
@@ -356,9 +365,9 @@ docstring, which can for instance displayed through pydoc_.
 The factory function :func:`ufloat` creates variables and thus returns
 a :class:`Variable` object:
 
-  >>> x = ufloat(1, 0.1)
-  >>> type(x)
-  <class 'uncertainties.Variable'>
+>>> x = ufloat(1, 0.1)
+>>> type(x)
+<class 'uncertainties.Variable'>
 
 :class:`Variable` objects can be used as if they were regular Python
 numbers (the summation, etc. of these objects is defined).
@@ -368,8 +377,8 @@ generally return :class:`AffineScalarFunc` objects, because they
 represent mathematical functions and not simple variables; these
 objects store all the variables they depend on:
 
-  >>> type(umath.sin(x))
-  <class 'uncertainties.AffineScalarFunc'>
+>>> type(umath.sin(x))
+<class 'uncertainties.AffineScalarFunc'>
 
 
 .. _automatic differentiation: http://en.wikipedia.org/wiki/Automatic_differentiation
@@ -378,3 +387,5 @@ objects store all the variables they depend on:
 
 .. _error propagation theory: http://en.wikipedia.org/wiki/Error_propagation
 
+.. _soerp: https://pypi.python.org/pypi/soerp
+.. _mcerp: https://pypi.python.org/pypi/mcerp
