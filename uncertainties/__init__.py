@@ -1242,7 +1242,13 @@ def from_superscript(number_str):
     number_str -- basestring object.
     '''
     return int(unicode(number_str).translate(FROM_SUPERSCRIPT))
-    
+
+# Function that transforms a numerical common exponent into the
+# corresponding string notation:
+EXP_FUNC = {
+    'pretty-print': lambda common_exp: u'×10%s' % to_superscript(common_exp),
+    'latex': lambda common_exp: r' \times 10^{%d}' % common_exp}
+
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_fmt_type, options):
     '''
@@ -1280,7 +1286,8 @@ def format_num(nom_val_main, error_main, common_exp,
     1.23(1). "P" is for pretty-printing ("±" between the nominal value
     and the error, superscript exponents, etc.). "L" is for a LaTeX
     output. Options can be combined. "%" adds a final percent sign,
-    and parentheses if the shorthand notation is not used.
+    and parentheses if the shorthand notation is not used. The P
+    option has priority over the L option (if both are given).
     '''
 
     # print (nom_val_main, error_main, common_exp,
@@ -1308,10 +1315,10 @@ def format_num(nom_val_main, error_main, common_exp,
     # Exponent part:
     if common_exp is None:
         exp_str = ''
-    elif 'P' in options:
-        exp_str = u'×10%s' % to_superscript(common_exp)
+    elif 'P' in options:  # Priority over other options
+        exp_str = EXP_FUNC['pretty-print'](common_exp)
     elif 'L' in options:
-        exp_str = r' \times 10^{%d}' % common_exp
+        exp_str = EXP_FUNC['latex'](common_exp)
     else:
         # Case of e or E. The same convention as Python 2.7
         # to 3.3 is used for the display of the exponent:
