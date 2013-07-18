@@ -1704,7 +1704,7 @@ def test_format():
             'FL': '1234.57 \pm 0.10',
             'fL': '1234.57 \pm 0.10',
             'FL': '1234.57 \pm 0.10',            
-            '%L': '\left(123457 \pm 10\right) \%'
+            '%L': r'\left(123457 \pm 10\right) \%'
         },
         #
         # ... combined with the spectroscopic notation:
@@ -1731,7 +1731,7 @@ def test_format():
             '10P': u'-1.2×10⁻¹²±         0',
             'L': r'\left(-1.2 \pm 0\right) \times 10^{-12}',
             # No factored exponent, LaTeX
-            '1L': r'\left(-1.2 \times 10^{-12} \pm 0\right)',
+            '1L': r'-1.2 \times 10^{-12} \pm 0',
             'SL': r'-1.2(0) \times 10^{-12}',
             'SP': ur'-1.2(0)×10⁻¹²'
         }),
@@ -1745,7 +1745,7 @@ def test_format():
         }, {
             'L': r'\left(-1.2 \pm nan\right) \times 10^{-12}',
             # Uppercase NaN and LaTeX:
-            'FL': r'\left(-1.2 \pm NAN\right) \times 10^{-12}',        
+            '.1EL': r'\left(-1.2 \pm NAN\right) \times 10^{-12}',        
             '10': '  -1.2e-12+/-       nan',
             '15S': '  -1.2(nan)e-12'            
         }),
@@ -1825,7 +1825,7 @@ def test_format():
             'EL': r'\left(1.234568 \pm 0\right) \times 10^{3}',
             'fL': '1234.567890 \pm 0',
             'FL': '1234.567890 \pm 0',
-            '%L': '\left(123456.789000 \pm 0\right) \%'
+            '%L': r'\left(123456.789000 \pm 0\right) \%'
         },
 
         (1e5, 0): {
