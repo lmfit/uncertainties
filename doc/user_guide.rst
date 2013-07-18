@@ -49,11 +49,11 @@ expressed in many convenient ways, including:
 >>> x = ufloat_fromstr("0.20(1)")  # Short-hand notation
 >>> x = ufloat_fromstr("20(1)e-2")  # Exponent notation
 >>> x = ufloat_fromstr(u"0.20±0.01")  # Pretty-print form
->>> x = ufloat_fromstr(u"20(1)×10⁻²")
 >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
 
 More information can be obtained with ``pydoc
-uncertainties.ufloat_fromstr``.
+uncertainties.ufloat_fromstr`` ("20(1)×10\ :sup:`-2`\ " is also
+recognized, etc.).
 
 
 Basic math
@@ -224,15 +224,16 @@ magnitude of the error can be readily estimated.
 
 Formatting options can be added at the end of the format string: ``S``
 for the **shorthand notation**, ``L`` for a **LaTeχ** output, ``P``
-for **pretty-printing** ("±" is used between the nominal value and the
-standard deviation, exponents use superscript characters, etc.).
+for **pretty-printing**:
 
 >>> print '{:+.1uS}'.format(x)  # Sign, 1 digit for the uncertainty, shorthand
 +0.20(1)
->>> print u'{:.2eP}'.format(x)  # ± character, superscript characters,...
-(2.00±0.10)×10⁻¹
 >>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeχ
 \left(2.00 \pm 0.10\right) \times 10^{6}
+
+The pretty-printing mode uses "±" and superscript exponents: ``print
+u'{:.2eP}'.format(x)`` yields "(2.00±0.10)×10\ :sup:`-1`\ ".
+
 
 Options can be combined.
 
