@@ -1742,7 +1742,9 @@ def test_format():
         (-1.2e-12, float('nan')): python26_add({
             '.2uG': '(-1.2+/-%s)E-12' % NaN_EF,  # u ignored, format used
             '15GS': '  -1.2(%s)E-12' % NaN_EF,
-            'SL': '-1.2(\mathrm{nan})e-12'
+            'SL': '-1.2(\mathrm{nan})e-12',  # LaTeX NaN
+            # Pretty-print priority, but not for NaN:
+            'PSL': '-1.2(\mathrm{nan})×10⁻¹²'
         }, {
             'L': r'\left(-1.2 \pm \mathrm{nan}\right) \times 10^{-12}',
             # Uppercase NaN and LaTeX:
