@@ -1187,9 +1187,9 @@ class CallableStdDev(float):
                     ' anymore: use .std_dev instead of .std_dev().')
         return self
 
-# Exponent letter for all AffineScalarFunc format types (that can use
-# an exponent): the keys are the possible mantissa formats:
-EXP_LETTERS = {'f': 'e', 'F': 'E', 'g': 'e', 'G': 'E', 'n': 'e'}
+# Exponent letter: the keys are the possible main_fmt_type values of
+# format_num():
+EXP_LETTERS = {'f': 'e', 'F': 'E'}
 
 if sys.version_info >= (2, 6):
     
@@ -1222,6 +1222,68 @@ else:
         return {'>': str.rjust, '<': str.ljust, '^': str.center}[align_option](
             orig_str, int(width), fill_char or ' ')
 
+# Maps some Unicode code points ("-", "+", and digits) to their
+# superscript version:
+TO_SUPERSCRIPT = {
+    0x2b: u'⁺',
+    0x2d: u'⁻',
+    0x30: u'⁰',
+    0x31: u'¹',
+    0x32: u'²',
+    0x33: u'³',
+    0x34: u'⁴',
+    0x35: u'⁵',
+    0x36: u'⁶',
+    0x37: u'⁷',
+    0x38: u'⁸',
+    0x39: u'⁹'
+    }
+
+# Inverted TO_SUPERSCRIPT table, for use with unicode.translate():
+#
+#! Python 2.7+ can use a dictionary comprehension instead:
+FROM_SUPERSCRIPT = dict(
+    (ord(sup), normal) for (normal, sup) in TO_SUPERSCRIPT.items())
+
+def to_superscript(value):
+    '''
+    Returns a (Unicode) string with the given value as superscript characters.
+
+    The value is formatted with the %d %-operator format.
+    
+    value -- integer.
+    '''
+
+    return (u'%d' % value).translate(TO_SUPERSCRIPT)
+    
+def from_superscript(number_str):
+    '''
+    Converts a string with superscript digits and sign into an integer.
+
+    ValueError is raised if the conversion cannot be done.
+
+    number_str -- basestring object.
+    '''
+    return int(unicode(number_str).translate(FROM_SUPERSCRIPT))
+
+# Function that transforms an exponent produced by format_num() into
+# the corresponding string notation (for non-default modes):
+EXP_PRINT = {
+    'pretty-print': lambda common_exp: u'×10%s' % to_superscript(common_exp),
+    'latex': lambda common_exp: r' \times 10^{%d}' % common_exp}
+
+# Symbols used for grouping (typically between parentheses) in format_num():
+GROUP_SYMBOLS = {
+    'pretty-print': ('(', ')'),
+    # Because of possibly exponents inside the parentheses (case of a
+    # specified field width), it is better to use auto-adjusting
+    # parentheses. This has the side effect of making the part between
+    # the parentheses non-breakable (the text inside parentheses in a
+    # LaTeX math expression $...$ can be broken).
+    'latex': ('\left(', r'\right)'),
+    'default': ('(', ')')  # Basic text mode
+    }
+
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_fmt_type, options):
     '''
@@ -1229,6 +1291,16 @@ def format_num(nom_val_main, error_main, common_exp,
 
     Null errors (error_main) are displayed as the integer 0, with
     no decimal point.
+
+    The formatting can be partially customized globally.  The EXP_PRINT
+    maps non-default modes ("latex", "pretty-print") to a function
+    that transforms a common exponent into a string (of the form
+    "times 10 to the power <exponent>", where "times" can be
+    represented, e.g., as a centered dot instead of the multiplication
+    symbol).  The GROUP_SYMBOLS mapping maps each of these modes to the
+    pair of strings used for grouping expressions (typically
+    parentheses, which can be for instance replaced by "\left(" and
+    "\right(" in LaTeX so as to create a non-breakable group).
     
     nom_val_main, error_main -- nominal value and error, before using
     common_exp (e.g., "1.23e2" would have a main value of 1.23;
@@ -1249,19 +1321,19 @@ def format_num(nom_val_main, error_main, common_exp,
     prec -- precision to use with the main_fmt_type format type
     (see below).
 
-    main_fmt_type -- format specification type, in "eEfFgG". This
+    main_fmt_type -- format specification type, in "fF". This
     defines how the mantissas, exponents and NaN values are
     represented (in the same way as for float). Note that None, the
     empty string, or "%" are not accepted.
 
     options -- options (as an object that support membership testing,
     like for instance a string). "S" is for the short-hand notation
-    1.23(1). "C" is for using the character "±" between the nominal
-    value and the error. "L" is for a LaTeX output. Options can be
-    combined. "%" adds a final percent sign, and parentheses if the
-    shorthand notation is not used.
+    1.23(1). "P" is for pretty-printing ("±" between the nominal value
+    and the error, superscript exponents, etc.). "L" is for a LaTeX
+    output. Options can be combined. "%" adds a final percent sign,
+    and parentheses if the shorthand notation is not used. The P
+    option has priority over the L option (if both are given).
     '''
-
 
     # print (nom_val_main, error_main, common_exp,
     #        fmt_parts, prec, main_fmt_type, options)
@@ -1284,19 +1356,25 @@ def format_num(nom_val_main, error_main, common_exp,
 
     # The suffix of the result is calculated first because it is
     # useful for the width handling of the shorthand notation.
+
+    # Printing type for parts of the result (exponent, parentheses),
+    # taking into account the priority of the pretty-print mode over
+    # the LaTeX mode. This setting does not apply to everything: for
+    # example, NaN is formatted as \mathrm{nan} (or NAN) if the LaTeX
+    # mode is required.
+    print_type = 'pretty-print' if 'P' in options else (
+        'latex' if 'L' in options
+        else 'default')
     
     # Exponent part:
     if common_exp is None:
         exp_str = ''
+    elif print_type == 'default':
+        # Case of e or E. The same convention as Python 2.7
+        # to 3.3 is used for the display of the exponent:
+        exp_str = EXP_LETTERS[main_fmt_type]+'%+03d' % common_exp
     else:
-        if 'L' in options:
-            exp_str = r' \times 10^{%d}' % common_exp
-        elif main_fmt_type in EXP_LETTERS:
-            # Case of e or E. The same convention as Python 2.7
-            # to 3.3 is used for the display of the exponent:
-            exp_str = EXP_LETTERS[main_fmt_type]+'%+03d' % common_exp
-        else:
-            exp_str = ''  # No exponent format
+        exp_str = EXP_PRINT[print_type](common_exp)
 
     # Possible % sign:
     percent_str = ''
@@ -1346,6 +1424,8 @@ def format_num(nom_val_main, error_main, common_exp,
             uncert_str = '0'
         elif isnan(error_main):
             uncert_str = robust_format(error_main, main_fmt_type)
+            if 'L' in options:
+                uncert_str = '\mathrm{%s}' % uncert_str
         else:  #  Error with a meaningful first digit (not 0, not NaN)
 
             uncert = round(error_main, prec)
@@ -1513,7 +1593,10 @@ def format_num(nom_val_main, error_main, common_exp,
             fmt_suffix_e = '.0%s' % main_fmt_type
         
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
-        
+
+        if 'L' in options and isnan(error_main):
+            error_str = '\mathrm{%s}' % error_str
+            
         if error_has_exp:
             error_str += exp_str
 
@@ -1549,22 +1632,27 @@ def format_num(nom_val_main, error_main, common_exp,
 
         ####################
 
-        # Construction of the final value, value_str:
+        # Construction of the final value, value_str, possibly with
+        # grouping (typically inside parentheses):
+
+        (LEFT_GROUPING, RIGHT_GROUPING) = GROUP_SYMBOLS[print_type]
         
         # The nominal value and the error might have to be explicitly
-        # grouped together, so as to prevent an ambiguous notation:
+        # grouped together with parentheses, so as to prevent an
+        # ambiguous notation. This is done in parallel with the
+        # percent sign handling because this sign may too need
+        # parentheses.
         if any_exp_factored and common_exp is not None:
-            value_str = '(%s%s%s)%s' % (
-                nom_val_str, pm_symbol, error_str, exp_str)
+            value_str = ''.join((
+                LEFT_GROUPING,
+                nom_val_str, pm_symbol, error_str,
+                RIGHT_GROUPING,
+                exp_str, percent_str))
         else:
             value_str = ''.join([nom_val_str, pm_symbol, error_str])
-            
-        # Final form:
-        if percent_str:
-            if common_exp is not None and any_exp_factored:
-                value_str += percent_str
-            else:
-                value_str = '(%s)%s' % (value_str, percent_str)
+            if percent_str:
+                value_str = ''.join((
+                    LEFT_GROUPING, value_str, RIGHT_GROUPING, percent_str))
     
     return value_str
 
@@ -1916,10 +2004,10 @@ class AffineScalarFunc(object):
         When option "S" is present (like in .1uS), the short-hand
         notation 1.234(5) is used; if the digits of the uncertainty
         straddle the decimal point, it uses a fixed-point notation,
-        like in 12.3(4.5). When "C" is present, the single character
-        "±" separates the nominal value from the standard
-        deviation. When "L" is present, the output is formatted with
-        LaTeX.
+        like in 12.3(4.5). When "P" is present, the pretty-printing
+        mode is activated: "±" separates the nominal value from the
+        standard deviation, exponents use superscript characters,
+        etc. When "L" is present, the output is formatted with LaTeX.
 
         The "%" format type forces the percent sign to be at the end
         of the returned string (it is not attached to each of the
@@ -1927,6 +2015,9 @@ class AffineScalarFunc(object):
         
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
+
+        Some details of the formatting can be customized as described
+        in format_num().
         '''
 
         # Convention on limits "between" digits: 0 = exactly at the
@@ -1955,7 +2046,7 @@ class AffineScalarFunc(object):
             (?P<uncert_prec>u?)  # Precision for the uncertainty?
             # The type can be omitted. Options must not go here:
             (?P<type>[eEfFgG%]??)  # n not supported
-            (?P<options>[LSC]*)$''',
+            (?P<options>[LSP]*)$''',
             format_spec,
             re.VERBOSE)
 
@@ -2816,19 +2907,23 @@ NUMBER_WITH_UNCERT_RE_STR = u'''
     ([+-])?  # Sign
     %s  # Main number
     (?:\(%s\))?  # Optional uncertainty
-    (?:[eE]([+-]?\d+))?  # Optional exponent
+    (?:
+        (?:[eE]|\s*×\s*10)
+        (.*)
+    )?  # Optional exponent
     ''' % (POSITIVE_DECIMAL_UNSIGNED_OR_NAN, POSITIVE_DECIMAL_UNSIGNED_OR_NAN)
 
 NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
     u"%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).match
 
-# Number with uncertainty of the form (... +/- ...)e10: this is a
-# loose matching, so as to accommodate for multiple formats:
+# Number with uncertainty with a factored exponent (e.g., of the form
+# (... +/- ...)e10): this is a loose matching, so as to accommodate
+# for multiple formats:
 NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(u'''
     \(
     (?P<simple_num_with_uncert>.*)
     \)
-    [eE](?P<exp_value>.*)
+    (?:[eE]|\s*×\s*10) (?P<exp_value>.*)
     $''', re.VERBOSE).match
 
 class NotParenUncert(ValueError):
@@ -2863,7 +2958,7 @@ def parse_error_in_parentheses(representation):
 
     # Global exponent:
     if exponent:
-        factor = 10.**int(exponent)
+        factor = 10.**from_superscript(exponent)
     else:
         factor = 1
     
@@ -2895,9 +2990,42 @@ def parse_error_in_parentheses(representation):
 
     return (value, uncert_value)
 
+# Regexp for catching the two variable parts of -1.2×10⁻¹²:
+PRETTY_PRINT_MATCH = re.compile(u'(.*?)\s*×\s*10(.*)').match
+
+def to_float(value_str):
+    '''
+    Converts a string representing a float to a float.
+
+    The usual valid Python float() representations are correctly
+    parsed.
+    
+    In addition, the pretty-print notation -1.2×10⁻¹² is also
+    converted.
+
+    ValueError is raised if no float can be obtained.
+    '''
+
+    try:
+        return float(value_str)
+    except ValueError:
+        pass
+    
+    # The pretty-print notation is tried:
+    match = PRETTY_PRINT_MATCH(value_str)
+    if match:
+        try:
+            return float(match.group(1))*10.**from_superscript(match.group(2))
+        except ValueError:
+            raise ValueError('Mantissa or exponent incorrect in pretty-print'
+                             ' form %s' % value_str)
+    else:
+        raise ValueError('No valid Python float or pretty-print form'
+                         ' recognized in %s' % value_str)
+    
 
 cannot_parse_ufloat_msg_pat = (
-    'Cannot parse %s: see the documentation of ufloat_fromstr() for a'
+    'Cannot parse %s: see the documentation for ufloat_fromstr() for a'
     ' list of accepted formats')
 
 # The following function is not exposed because it can in effect be
@@ -2908,7 +3036,7 @@ def str_to_number_with_uncert(representation):
     Given a string that represents a number with uncertainty, returns the
     nominal value and the uncertainty.
 
-    See the documentation of ufloat_fromstr() for a list of accepted
+    See the documentation for ufloat_fromstr() for a list of accepted
     formats.
 
     When no numerical error is given, an uncertainty of 1 on the last
@@ -2918,15 +3046,24 @@ def str_to_number_with_uncert(representation):
     """
 
     match = NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH(representation)
+
+    # The representation is simplified, but the global factor is
+    # calculated:
     
-    if match:  # We have a (1.23 +/- 0.01)e10 form
-        # The representation is simplified, but the global factor is
-        # calculated:
+    if match:
+
+        # We have a form with a factored exponent: (1.23 +/- 0.01)e10,
+        # etc.
+        
+        exp_value_str = match.group('exp_value')
+        
         try:
-            factor = 10.**int(match.group('exp_value'))
+            exponent = from_superscript(exp_value_str)
         except ValueError:
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
-        
+
+        factor = 10.**exponent
+
         representation = match.group('simple_num_with_uncert')
     else:
         factor = 1  # No global exponential factor
@@ -2935,10 +3072,12 @@ def str_to_number_with_uncert(representation):
     if match:
 
         (nom_value, uncert) = match.groups()
-        
+
         try:
             # Simple form 1234.45+/-1.2 or 1234.45±1.2, or 1.23e-10+/-1e-23
-            parsed_value = (float(nom_value)*factor, float(uncert)*factor)
+            # or -1.2×10⁻¹²±1e23:
+            parsed_value = (to_float(nom_value)*factor,
+                            to_float(uncert)*factor)
         except ValueError:
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
         
@@ -2965,8 +3104,13 @@ def ufloat_fromstr(representation, tag=None):
     Examples of valid string representations:
     
         12.3e10+/-5e3
-        12.3e10±5e3  # Only as a unicode string (Python 2)
-        (-3.1415 +/- 0.0001)e+02
+        (-3.1415 +/- 0.0001)e+02  # Factored exponent
+
+        # Pretty-print notation (only with a unicode string):
+        12.3e10 ± 5e3  # ± symbol
+        (12.3 ± 5.0) × 10⁻¹²  # Times symbol, superscript
+        12.3 ± 5e3  # Mixed notation (± symbol, but e exponent)
+        
         # Double-exponent values:
         (-3.1415 +/- 1e-4)e+200
         (1e-20 +/- 3)e100
@@ -3044,9 +3188,16 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     Valid string representations str_representation are listed in
     the documentation for ufloat_fromstr().
 
-    'tag' is an optional string tag for the variable.  Variables
-    don't have to have distinct tags.  Tags are useful for tracing
-    what values (and errors) enter in a given result (through the
+    nominal_value -- nominal value of the random variable. It is more
+    meaningful to use a value close to the central value or to the
+    mean. This value is propagated by mathematical operations as if it
+    was a float.
+
+    std_dev -- standard deviation of the random variable.
+    
+    tag -- optional string tag for the variable.  Variables don't have
+    to have distinct tags.  Tags are useful for tracing what values
+    (and errors) enter in a given result (through the
     error_components() method).
     """
 

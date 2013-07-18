@@ -45,10 +45,11 @@ expressed in many convenient ways, including:
 
 >>> from uncertainties import ufloat_fromstr
 >>> x = ufloat_fromstr("0.20+/-0.01")
->>> x = ufloat_fromstr(u"0.20±0.01")
->>> x = ufloat_fromstr("(2+/-0.1)e-01")
->>> x = ufloat_fromstr("0.20(1)")
->>> x = ufloat_fromstr("20(1)e-2")  # Exponential notation supported
+>>> x = ufloat_fromstr("(2+/-0.1)e-01")  # Factored exponent
+>>> x = ufloat_fromstr("0.20(1)")  # Short-hand notation
+>>> x = ufloat_fromstr("20(1)e-2")  # Exponent notation
+>>> x = ufloat_fromstr(u"0.20±0.01")  # Pretty-print form
+>>> x = ufloat_fromstr(u"20(1)×10⁻²")
 >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
 
 More information can be obtained with ``pydoc
@@ -154,6 +155,9 @@ Numbers with uncertainties can be printed conveniently:
 >>> print x
 0.200+/-0.010
 
+The resulting form can generally be parsed back with
+:func:`ufloat_fromstr` (except for the LaTeχ form).
+
 .. Precision matching:
 
 The nominal value and the uncertainty always have the **same
@@ -167,8 +171,10 @@ through the usual :func:`format` method of strings:
 >>> print 'Result = {:10.2f}'.format(x)
 Result =       0.20+/-      0.01
 
-(For Python before version 2.6, one can do ``'Result = %s' %
-x.format('10.2f')`` instead.) 
+(Python 2.6 requires ``'{0:10.2f}'`` instead, with the usual explicit
+index. In Python 2.5 and earlier versions, :func:`str.format` is not
+available, but one can use the :func:`format` method of numbers with
+uncertainties instead: ``'Result = %s' % x.format('10.2f')``.)
 
 .. Legacy formats and base syntax of the format specification:
 
@@ -198,8 +204,8 @@ uncertainty from being displayed with a large relative error).
 
 A **common exponent** is automatically calculated if an exponent is
 needed for the larger of the nominal value (in absolute value) and the
-uncertainty. The exponent is generally **factored**, for increased
-legibility:
+uncertainty (the rule is the same as for floats). The exponent is
+generally **factored**, for increased legibility:
 
 >>> print x*1e7
 (2.00+/-0.10)e+06
@@ -210,24 +216,23 @@ When a *format width* is used, the common exponent is not factored:
 Result =    2.0e-11+/-   0.1e-11
 
 (Using a (minimal) width of 1 is thus a way of forcing exponents to
-not be factored.)
-
-Thanks to this feature, each part (nominal value and standard
+not be factored.) Thanks to this feature, each part (nominal value and standard
 deviation) can be well aligned across multiple lines, and the relative
 magnitude of the error can be readily estimated.
 
 .. Options
 
 Formatting options can be added at the end of the format string: ``S``
-for the **shorthand notation**, ``C`` for using a **single character
-(±)**, ``L`` for a **LaTeχ** output:
+for the **shorthand notation**, ``L`` for a **LaTeχ** output, ``P``
+for **pretty-printing** ("±" is used between the nominal value and the
+standard deviation, exponents use superscript characters, etc.).
 
 >>> print '{:+.1uS}'.format(x)  # Sign, 1 digit for the uncertainty, shorthand
 +0.20(1)
->>> print u'{:.2eC}'.format(x)  # 2 digits after the decimal point, ± character
-(2.00±0.10)e-01
+>>> print u'{:.2eP}'.format(x)  # ± character, superscript characters,...
+(2.00±0.10)×10⁻¹
 >>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeχ
-(2.00 \pm 0.10) \times 10^{6}
+\left(2.00 \pm 0.10\right) \times 10^{6}
 
 Options can be combined.
 
@@ -257,7 +262,8 @@ representation:
 1.23456789012345+/-0.123456789
 
 **More information** on formatting can be obtained with ``pydoc
-uncertainties.UFloat.__format__``.
+uncertainties.UFloat.__format__`` (customization of the LaTeχ output,
+etc.).
 
 Global formatting
 -----------------
@@ -614,3 +620,8 @@ information are given in the
 :doc:`tech_guide`.
 
 .. _NumPy: http://numpy.scipy.org/
+
+.. |minus2html| raw:: html
+
+   <sup>-2</sup>
+

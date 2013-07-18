@@ -84,6 +84,15 @@ over 0±0.01.  However, ``cos(0+/-0.01)``, yields an approximate
 standard deviation of 0 because it is parabolic around 0 instead of
 linear; this might not be precise enough for all applications.
 
+**More precise uncertainty estimates** can be obtained, if necessary,
+with the soerp_ and mcerp_ packages. The soerp_ package performs
+*second-order* error propagation: this is still quite fast, but the
+standard deviation of higher-order functions like f(x) = x\ :sup:`3`
+for x = 0±0.1 is calculated as being exactly zero (as with
+:mod:`uncertainties`). The mcerp_ package performs Monte-Carlo
+calculations, and can in principle yield very precise results, but
+calculations are much slower than with approximation schemes.
+
 .. index:: NaN
 
 Not-a-number uncertainties
@@ -378,3 +387,5 @@ objects store all the variables they depend on:
 
 .. _error propagation theory: http://en.wikipedia.org/wiki/Error_propagation
 
+.. _soerp: https://pypi.python.org/pypi/soerp
+.. _mcerp: https://pypi.python.org/pypi/mcerp

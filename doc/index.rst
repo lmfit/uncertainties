@@ -30,7 +30,9 @@ calculations are performed **analytically**.
 **Correlations** between variables are automatically handled, which
 sets this module apart from many existing error propagation codes.
 
-Let's now see how to use these unique features!
+You may want to check the following related uncertainty calculation
+Python packages to see if they better suit your needs: soerp_
+(higher-order approximations) and mcerp_ (Monte-Carlo approach).
 
 .. index:: calculator
 
@@ -197,8 +199,9 @@ that corresponds best to your version of Python to a location that
 Python can import from (directory in which scripts using
 :mod:`uncertainties` are run, etc.); the chosen
 :file:`uncertainties-py*` directory should then be renamed
-:file:`uncertainties`. Python 3 users should then run ``2to3 -w
-uncertainties`` so as to automatically adapt the code to Python 3.
+:file:`uncertainties`. Python 3 users should then run ``2to3 -w .``
+from inside this directory so as to automatically adapt the code to
+Python 3.
 
 Source code
 -----------
@@ -295,6 +298,7 @@ Future developments
 
 Planned future developments include:
 
+- support for the units package Pint_;
 
 - `JSON <http://docs.python.org/library/json.html>`_ support;
 
@@ -329,13 +333,13 @@ Contact
 =======
 
 **Feature requests, bug reports, or feedback are much welcome.** They
-can be sent to the creator of :mod:`uncertainties`, `Eric O. LEBIGOT
+can be sent_ to the creator of :mod:`uncertainties`, `Eric O. LEBIGOT
 (EOL)`_.
 
 .. figure:: _static/eol.*
    :height: 64
    :width:  64
-   :target: http://lebigot.pip.verisignlabs.com/
+   :target: http://linkedin.com/pub/eric-lebigot/22/293/277
    :align: center
    :alt: Eric O. LEBIGOT (EOL)
 
@@ -366,8 +370,8 @@ I would also like to thank users who contributed with feedback and
 suggestions, which greatly helped improve this program: Joaquin Abian,
 Jason Moore, Martin Lutz, Víctor Terrón, Matt Newville, Matthew Peel,
 Don Peterson, Mika Pflueger, Albert Puig, Abraham Lee, Arian Sanusi,
-Martin Laloux, Jonathan Whitmore, Federico Vaggi, Marco A. Ferra, and
-many others.
+Martin Laloux, Jonathan Whitmore, Federico Vaggi, Marco A. Ferra,
+Hernan Grecco, and many others.
 
 I am also grateful to the Linux distribution maintainers of this
 package, and to Christoph Gohlke for including it in his Base
@@ -391,10 +395,14 @@ following options can be chosen:
 .. _setuptools: http://pypi.python.org/pypi/setuptools
 .. _download: http://pypi.python.org/pypi/uncertainties/#downloads
 .. _donations: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
-.. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
+.. _Eric O. LEBIGOT (EOL): http://linkedin.com/pub/eric-lebigot/22/293/277
+.. _sent: mailto:eric.lebigot@normalesup.org
 .. _Revised BSD License: http://opensource.org/licenses/BSD-3-Clause
 .. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
 .. _pydoc: http://docs.python.org/library/pydoc.html
 .. _NumPy: http://numpy.scipy.org/
 .. _donating $10: donations_
 .. _version history: https://pypi.python.org/pypi/uncertainties#version-history
+.. _soerp: https://pypi.python.org/pypi/soerp
+.. _mcerp: https://pypi.python.org/pypi/mcerp
+.. _Pint: https://pypi.python.org/pypi/Pint/

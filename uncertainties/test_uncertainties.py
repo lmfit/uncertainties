@@ -310,8 +310,18 @@ def test_ufloat_fromstr():
         '14.(15)': (14, 15),
         # Global exponent:
         '(3.141+/-0.001)E+02': (314.1, 0.1),
-        # ± sign:
+
+        
+        ## Pretty-print notation:
+        
+        # ± sign, global exponent (not pretty-printed):
         u'(3.141±0.001)E+02': (314.1, 0.1),
+        # ± sign, individual exponent:
+        u'3.141E+02±0.001e2': (314.1, 0.1),
+        
+        # ± sign, times symbol, superscript (= full pretty-print):
+        u'(3.141 ± 0.001) × 10²': (314.1, 0.1),
+        
         # NaN uncertainty:
         u'(3.141±nan)E+02': (314.1, float('nan')),
         '3.4(nan)e10': (3.4e10, float('nan')),
@@ -1553,6 +1563,10 @@ def test_format():
     # Tests of each point of the docstring of
     # AffineScalarFunc.__format__() in turn, mostly in the same order.
 
+    # The LaTeX tests do not use the customization of
+    # uncertainties.GROUP_SYMBOLS and uncertainties.EXP_PRINT: this
+    # way, problems in the customization themselves are caught.
+    
     tests = {  # (Nominal value, uncertainty): {format: result,...}
 
         # Usual float formatting, and individual widths, etc.:
@@ -1650,7 +1664,7 @@ def test_format():
             # found in Python 2.7: '{:.1%}'.format(0.0055) is '0.5%'.
             '.1u%': '(42.0+/-0.5)%',
             '.1u%S': '42.0(5)%',
-            '%C': u'(42.0±0.5)%'
+            '%P': u'(42.0±0.5)%'
         },
         
         # Particle Data Group automatic convention, including limit cases:
@@ -1697,13 +1711,13 @@ def test_format():
         # LaTeX notation:
         #
         (1234.56789, 0.1): {
-            'eL': r'(1.23457 \pm 0.00010) \times 10^{3}',
-            'EL': r'(1.23457 \pm 0.00010) \times 10^{3}',
+            'eL': r'\left(1.23457 \pm 0.00010\right) \times 10^{3}',
+            'EL': r'\left(1.23457 \pm 0.00010\right) \times 10^{3}',
             'fL': '1234.57 \pm 0.10',
             'FL': '1234.57 \pm 0.10',
             'fL': '1234.57 \pm 0.10',
             'FL': '1234.57 \pm 0.10',            
-            '%L': '(123457 \pm 10) \%'
+            '%L': r'\left(123457 \pm 10\right) \%'
         },
         #
         # ... combined with the spectroscopic notation:
@@ -1721,15 +1735,18 @@ def test_format():
         # instead of 1.4 for Python 3.1. The problem does not appear
         # with 1.2, so 1.2 is used.
         (-1.2e-12, 0): python26_add({
-            '12.2gCL': ur'-1.2 \times 10^{-12}±           0'
+            '12.2gPL': ur'  -1.2×10⁻¹²±           0'
         }, {
             # Pure "width" formats are not accepted by the % operator,
             # and only %-compatible formats are accepted, for Python <
             # 2.6:
             '13S': '  -1.2(0)e-12',
-            '10C': u'  -1.2e-12±         0',
-            'L': r'(-1.2 \pm 0) \times 10^{-12}',
-            'SL': r'-1.2(0) \times 10^{-12}'            
+            '10P': u'-1.2×10⁻¹²±         0',
+            'L': r'\left(-1.2 \pm 0\right) \times 10^{-12}',
+            # No factored exponent, LaTeX
+            '1L': r'-1.2 \times 10^{-12} \pm 0',
+            'SL': r'-1.2(0) \times 10^{-12}',
+            'SP': ur'-1.2(0)×10⁻¹²'
         }),
 
         # Python 3.2 and 3.3 give 1.4e-12*1e+12 = 1.4000000000000001
@@ -1737,17 +1754,22 @@ def test_format():
         # with 1.2, so 1.2 is used.        
         (-1.2e-12, float('nan')): python26_add({
             '.2uG': '(-1.2+/-%s)E-12' % NaN_EF,  # u ignored, format used
-            '15GS': '  -1.2(%s)E-12' % NaN_EF
+            '15GS': '  -1.2(%s)E-12' % NaN_EF,
+            'SL': r'-1.2(\mathrm{nan}) \times 10^{-12}',  # LaTeX NaN
+            # Pretty-print priority, but not for NaN:
+            'PSL': u'-1.2(\mathrm{nan})×10⁻¹²'
         }, {
-            'L': r'(-1.2 \pm nan) \times 10^{-12}',        
+            'L': r'\left(-1.2 \pm \mathrm{nan}\right) \times 10^{-12}',
+            # Uppercase NaN and LaTeX:
+            '.1EL': r'\left(-1.2 \pm \mathrm{NAN}\right) \times 10^{-12}',
             '10': '  -1.2e-12+/-       nan',
-            '15S': '  -1.2(nan)e-12'            
+            '15S': '  -1.2(nan)e-12'
         }),
 
         (3.14e-10, 0.01e-10): {
             # Character (Unicode) strings:
-            u'C': u'(3.140±0.010)e-10',  # PDG rules: 2 digits
-            u'CL': ur'(3.140±0.010) \times 10^{-10}',
+            u'P': u'(3.140±0.010)×10⁻¹⁰',  # PDG rules: 2 digits
+            u'PL': ur'(3.140±0.010)×10⁻¹⁰',  # Pretty-print has higher priority
             # Truncated non-zero uncertainty:
             '.1e': '(3.1+/-0.0)e-10',
             '.1eS': '3.1(0.0)e-10'
@@ -1814,11 +1836,12 @@ def test_format():
         (1234.56789, 0): {
             '1.2ue': '1.23e+03+/-0',  # u ignored
             '1.2e': '1.23e+03+/-0',
-            'eL': r'(1.234568 \pm 0) \times 10^{3}',  # Default precision = 6
-            'EL': r'(1.234568 \pm 0) \times 10^{3}',
+            # Default precision = 6
+            'eL': r'\left(1.234568 \pm 0\right) \times 10^{3}',
+            'EL': r'\left(1.234568 \pm 0\right) \times 10^{3}',
             'fL': '1234.567890 \pm 0',
             'FL': '1234.567890 \pm 0',
-            '%L': '(123456.789000 \pm 0) \%'
+            '%L': r'\left(123456.789000 \pm 0\right) \%'
         },
 
         (1e5, 0): {
@@ -1857,7 +1880,7 @@ def test_format():
             '.6g': '(1.20000+/-0.00000)e-34',
             '13.6g': '  1.20000e-34+/-  0.00000e-34',
             '13.6G': '  1.20000E-34+/-  0.00000E-34',
-            '.6GL': r'(1.20000 \pm 0.00000) \times 10^{-34}'
+            '.6GL': r'\left(1.20000 \pm 0.00000\right) \times 10^{-34}'
         }
     }
 
@@ -1899,6 +1922,8 @@ def test_format():
             representation = value.format(format_spec)
 
             assert representation == result, (
+                # The representation is used, for terminal that do not
+                # support some characters like ±, and superscripts:
                 'Incorrect representation %r for format %r of %s+/-%s:'
                 ' %r expected.'
                 % (representation, format_spec, values[0], values[1],
@@ -1920,7 +1945,6 @@ def test_format():
                 # Specific case:
                 and '=====' not in representation):
                 
-
                 value_back = ufloat_fromstr(representation)
 
                 # The original number and the new one should be consistent
@@ -1956,7 +1980,7 @@ def test_unicode_format():
     x = ufloat(3.14159265358979, 0.25)
 
     assert isinstance(u'Résultat = %s' % x.format(''), unicode)
-    assert isinstance(u'Résultat = %s' % x.format('C'), unicode)
+    assert isinstance(u'Résultat = %s' % x.format('P'), unicode)
     
 ###############################################################################
 
