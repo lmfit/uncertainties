@@ -1362,9 +1362,9 @@ def format_num(nom_val_main, error_main, common_exp,
     # the LaTeX mode. This setting does not apply to everything: for
     # example, NaN is formatted as \mathrm{nan} (or NAN) if the LaTeX
     # mode is required.
-    print_type = 'pretty-print' if 'P' in options else (
-        'latex' if 'L' in options
-        else 'default')
+    print_type = ('pretty-print' if 'P' in options else
+                  'latex' if 'L' in options
+                  else 'default')
     
     # Exponent part:
     if common_exp is None:
