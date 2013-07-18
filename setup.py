@@ -114,7 +114,7 @@ Basic examples
     >>> print random_vars
     [1.0+/-0.1 2.0+/-0.2]
     >>> print random_vars.mean()
-    1.5+/-0.11
+    1.50+/-0.11
     >>> print unumpy.cos(random_vars)
     [0.540302305868+/-0.0841470984808 -0.416146836547+/-0.181859485365]
 
