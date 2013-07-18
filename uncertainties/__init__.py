@@ -1256,6 +1256,11 @@ def format_num(nom_val_main, error_main, common_exp,
 
     Null errors (error_main) are displayed as the integer 0, with
     no decimal point.
+
+    The formatting can be partially customized globally by modifying
+    the EXP_FUNC mapping, which prints non-default modes ("latex",
+    "pretty-print") to a function that transforms a common exponent
+    into a string (of the form "times 10 to the power <exponent>").
     
     nom_val_main, error_main -- nominal value and error, before using
     common_exp (e.g., "1.23e2" would have a main value of 1.23;

@@ -262,7 +262,8 @@ representation:
 1.23456789012345+/-0.123456789
 
 **More information** on formatting can be obtained with ``pydoc
-uncertainties.UFloat.__format__``.
+uncertainties.UFloat.__format__`` (customization of the LaTeχ output,
+etc.).
 
 Global formatting
 -----------------
