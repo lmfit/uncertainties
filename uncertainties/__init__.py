@@ -1243,8 +1243,8 @@ def from_superscript(number_str):
     '''
     return int(unicode(number_str).translate(FROM_SUPERSCRIPT))
 
-# Function that transforms a numerical common exponent into the
-# corresponding string notation:
+# Function that transforms an exponent produced by format_num into the
+# corresponding string notation (for all non-default modes):
 EXP_FUNC = {
     'pretty-print': lambda common_exp: u'×10%s' % to_superscript(common_exp),
     'latex': lambda common_exp: r' \times 10^{%d}' % common_exp}
