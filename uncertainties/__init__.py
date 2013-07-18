@@ -1243,11 +1243,18 @@ def from_superscript(number_str):
     '''
     return int(unicode(number_str).translate(FROM_SUPERSCRIPT))
 
-# Function that transforms an exponent produced by format_num into the
-# corresponding string notation (for all non-default modes):
-EXP_FUNC = {
+# Function that transforms an exponent produced by format_num() into
+# the corresponding string notation (for all non-default modes):
+EXP_PRINT = {
     'pretty-print': lambda common_exp: u'×10%s' % to_superscript(common_exp),
     'latex': lambda common_exp: r' \times 10^{%d}' % common_exp}
+
+# Symbols used for grouping (typically between parentheses) in format_num():
+GROUP_SYMBOLS = {
+    'pretty-print': ('(', ')'),
+    'latex': ('(', ')'),
+    'default': ('(', ')')  # Basic text mode
+    }
 
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_fmt_type, options):
@@ -1257,10 +1264,15 @@ def format_num(nom_val_main, error_main, common_exp,
     Null errors (error_main) are displayed as the integer 0, with
     no decimal point.
 
-    The formatting can be partially customized globally by modifying
-    the EXP_FUNC mapping, which prints non-default modes ("latex",
-    "pretty-print") to a function that transforms a common exponent
-    into a string (of the form "times 10 to the power <exponent>").
+    The formatting can be partially customized globally.  The EXP_PRINT
+    maps non-default modes ("latex", "pretty-print") to a function
+    that transforms a common exponent into a string (of the form
+    "times 10 to the power <exponent>", where "times" can be
+    represented, e.g., as a centered dot instead of the multiplication
+    symbol).  The GROUP_SYMBOLS mapping maps each of these modes to the
+    pair of strings used for grouping expressions (typically
+    parentheses, which can be for instance replaced by "\left(" and
+    "\right(" in LaTeX so as to create a non-breakable group).
     
     nom_val_main, error_main -- nominal value and error, before using
     common_exp (e.g., "1.23e2" would have a main value of 1.23;
@@ -1316,18 +1328,23 @@ def format_num(nom_val_main, error_main, common_exp,
 
     # The suffix of the result is calculated first because it is
     # useful for the width handling of the shorthand notation.
+
+    # Printing type for parts of the result (exponent, parentheses),
+    # taking into account the priority of the pretty-print mode over
+    # the LaTeX mode:
+    print_type = 'pretty-print' if 'P' in options else (
+        'latex' if 'L' in options
+        else 'default')
     
     # Exponent part:
     if common_exp is None:
         exp_str = ''
-    elif 'P' in options:  # Priority over other options
-        exp_str = EXP_FUNC['pretty-print'](common_exp)
-    elif 'L' in options:
-        exp_str = EXP_FUNC['latex'](common_exp)
-    else:
+    elif print_type == 'default':
         # Case of e or E. The same convention as Python 2.7
         # to 3.3 is used for the display of the exponent:
         exp_str = EXP_LETTERS[main_fmt_type]+'%+03d' % common_exp
+    else:
+        exp_str = EXP_PRINT[print_type](common_exp)
 
     # Possible % sign:
     percent_str = ''
@@ -1570,7 +1587,10 @@ def format_num(nom_val_main, error_main, common_exp,
 
         ####################
 
-        # Construction of the final value, value_str:
+        # Construction of the final value, value_str, possibly with
+        # grouping (typically inside parentheses):
+
+        (LEFT_GROUPING, RIGHT_GROUPING) = GROUP_SYMBOLS[print_type]
         
         # The nominal value and the error might have to be explicitly
         # grouped together with parentheses, so as to prevent an
@@ -1578,12 +1598,16 @@ def format_num(nom_val_main, error_main, common_exp,
         # percent sign handling because this sign may too need
         # parentheses.
         if any_exp_factored and common_exp is not None:
-            value_str = '(%s%s%s)%s%s' % (
-                nom_val_str, pm_symbol, error_str, exp_str, percent_str)
+            value_str = ''.join((
+                LEFT_GROUPING,
+                nom_val_str, pm_symbol, error_str,
+                RIGHT_GROUPING,
+                exp_str, percent_str))
         else:
             value_str = ''.join([nom_val_str, pm_symbol, error_str])
             if percent_str:
-                value_str = '(%s)%s' % (value_str, percent_str)
+                value_str = ''.join((
+                    LEFT_GROUPING, value_str, RIGHT_GROUPING, percent_str))
     
     return value_str
 
