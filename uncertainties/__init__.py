@@ -1573,18 +1573,16 @@ def format_num(nom_val_main, error_main, common_exp,
         # Construction of the final value, value_str:
         
         # The nominal value and the error might have to be explicitly
-        # grouped together, so as to prevent an ambiguous notation:
+        # grouped together with parentheses, so as to prevent an
+        # ambiguous notation. This is done in parallel with the
+        # percent sign handling because this sign may too need
+        # parentheses.
         if any_exp_factored and common_exp is not None:
             value_str = '(%s%s%s)%s' % (
-                nom_val_str, pm_symbol, error_str, exp_str)
+                nom_val_str, pm_symbol, error_str, exp_str) + percent_str
         else:
             value_str = ''.join([nom_val_str, pm_symbol, error_str])
-            
-        # Final form:
-        if percent_str:
-            if common_exp is not None and any_exp_factored:
-                value_str += percent_str
-            else:
+            if percent_str:
                 value_str = '(%s)%s' % (value_str, percent_str)
     
     return value_str
