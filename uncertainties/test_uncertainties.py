@@ -1743,9 +1743,9 @@ def test_format():
             '.2uG': '(-1.2+/-%s)E-12' % NaN_EF,  # u ignored, format used
             '15GS': '  -1.2(%s)E-12' % NaN_EF
         }, {
-            'L': r'\left(-1.2 \pm nan\right) \times 10^{-12}',
+            'L': r'\left(-1.2 \pm \mathrm{nan}\right) \times 10^{-12}',
             # Uppercase NaN and LaTeX:
-            '.1EL': r'\left(-1.2 \pm NAN\right) \times 10^{-12}',        
+            '.1EL': r'\left(-1.2 \pm \mathrm{NAN}\right) \times 10^{-12}',
             '10': '  -1.2e-12+/-       nan',
             '15S': '  -1.2(nan)e-12'            
         }),
