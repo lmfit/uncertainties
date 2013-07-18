@@ -167,7 +167,7 @@ Main changes:
 
 - 2.4: Extensive support for the formatting_ of numbers with uncertainties. \
        A zero uncertainty is now explicitly displayed as the integer 0. \
-       Additional representations are understood by ``ufloat_fromstr()``. \
+       The new formats are generally understood by ``ufloat_fromstr()``. \
        Abbreviations for the nominal value (``n``) and the standard \
        deviation (``s``) are now available.
 - 2.3.6:  Full support for limit cases of the power operator \
