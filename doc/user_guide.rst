@@ -232,7 +232,7 @@ standard deviation, exponents use superscript characters, etc.).
 >>> print u'{:.2eP}'.format(x)  # ± character, superscript characters,...
 (2.00±0.10)×10⁻¹
 >>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeχ
-(2.00 \pm 0.10) \times 10^{6}
+\left(2.00 \pm 0.10\right) \times 10^{6}
 
 Options can be combined.
 
@@ -262,7 +262,8 @@ representation:
 1.23456789012345+/-0.123456789
 
 **More information** on formatting can be obtained with ``pydoc
-uncertainties.UFloat.__format__``.
+uncertainties.UFloat.__format__`` (customization of the LaTeχ output,
+etc.).
 
 Global formatting
 -----------------
