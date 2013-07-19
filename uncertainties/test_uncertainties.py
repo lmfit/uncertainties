@@ -1911,7 +1911,7 @@ def test_format():
 
         for (format_spec, result) in representations.iteritems():
 
-            print "FORMATTING", repr(value), "WITH", format_spec  #!!!!! debug
+            # print "FORMATTING", repr(value), "WITH", format_spec
             
             # Jython 2.5.2 does not always represent NaN as nan or NAN
             # in the CPython way: for example, '%.2g' % float('nan')
