@@ -220,10 +220,11 @@ When a *format width* is used, the common exponent is not factored:
 >>> print 'Result = {:10.1e}'.format(x*1e-10)
 Result =    2.0e-11+/-   0.1e-11
 
-(Using a (minimal) width of 1 is thus a way of forcing exponents to
-not be factored.) Thanks to this feature, each part (nominal value and standard
-deviation) can be well aligned across multiple lines, and the relative
-magnitude of the error can be readily estimated.
+(Using a (minimal) width of 1 is thus a way of forcing exponents to not 
+be factored.) Thanks to this feature, each part (nominal value and 
+standard deviation) is correctly aligned across multiple lines (the 
+relative magnitude of the error can still be readily estimated thanks to 
+the common exponent).
 
 .. Options
 
