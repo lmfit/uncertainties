@@ -255,6 +255,8 @@ integer:
 3.1415+/-0.0005
 >>> print '{:.2f}'.format(ufloat(3.14, 0.001))
 3.14+/-0.00
+>>> print '{:.2f}'.format(ufloat(3.14, 0.00))
+3.14+/-0
 
 **All the digits** of a number with uncertainty are given in its
 representation:
