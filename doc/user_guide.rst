@@ -240,8 +240,7 @@ for **pretty-printing**:
 The pretty-printing mode uses "±" and superscript exponents: ``print
 u'{:.2eP}'.format(x)`` yields "(2.00±0.10)×10\ :sup:`-1`\ ".
 
-
-Options can be combined.
+These formatting options can be combined.
 
 .. Special cases:
 
