@@ -185,18 +185,23 @@ type are all supported.
 
 .. Precision control:
 
-It is possible to control the **number of significant digits of the
-uncertainty** by adding the modifier ``u`` after the precision:
+It is possible to control the **number of significant digits of the 
+uncertainty** by adding the precision modifier ``u`` after the precision 
+(and before any valid float format type like ``f``, ``e``, etc.):
 
 >>> print '1 significant digit on the uncertainty: {:.1u}'.format(x)
 1 significant digit on the uncertainty: 0.20+/-0.01
 >>> print '3 significant digits on the uncertainty: {:.3u}'.format(x)
 3 significant digits on the uncertainty: 0.2000+/-0.0100
+>>> print '1 digit for the uncertainty, exponent notation: {:.1ue}'.format(x)
+1 significant digit, exponent notation: (2.0+/-0.1)e-01
+>>> print '1 digit for the uncertainty, percentage: {:.1u%}'.format(x)
+1 significant digit, percentage: (20+/-1)%
 
 When no *explicit* precision is given, the number of significant digits
 on the uncertainty is defined with the `Particle Data Group
 <http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
-rules (the rules keep the number of digits small, while preventing the
+rules (these rules keep the number of digits small, while preventing the
 uncertainty from being displayed with a large relative error).
 
 
@@ -215,10 +220,11 @@ When a *format width* is used, the common exponent is not factored:
 >>> print 'Result = {:10.1e}'.format(x*1e-10)
 Result =    2.0e-11+/-   0.1e-11
 
-(Using a (minimal) width of 1 is thus a way of forcing exponents to
-not be factored.) Thanks to this feature, each part (nominal value and standard
-deviation) can be well aligned across multiple lines, and the relative
-magnitude of the error can be readily estimated.
+(Using a (minimal) width of 1 is thus a way of forcing exponents to not 
+be factored.) Thanks to this feature, each part (nominal value and 
+standard deviation) is correctly aligned across multiple lines, while the 
+relative magnitude of the error can still be readily estimated thanks to 
+the common exponent.
 
 .. Options
 
@@ -234,8 +240,7 @@ for **pretty-printing**:
 The pretty-printing mode uses "±" and superscript exponents: ``print
 u'{:.2eP}'.format(x)`` yields "(2.00±0.10)×10\ :sup:`-1`\ ".
 
-
-Options can be combined.
+These formatting options can be combined.
 
 .. Special cases:
 
@@ -250,6 +255,8 @@ integer:
 3.1415+/-0.0005
 >>> print '{:.2f}'.format(ufloat(3.14, 0.001))
 3.14+/-0.00
+>>> print '{:.2f}'.format(ufloat(3.14, 0.00))
+3.14+/-0
 
 **All the digits** of a number with uncertainty are given in its
 representation:
