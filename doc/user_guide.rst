@@ -192,6 +192,10 @@ uncertainty** by adding the modifier ``u`` after the precision:
 1 significant digit on the uncertainty: 0.20+/-0.01
 >>> print '3 significant digits on the uncertainty: {:.3u}'.format(x)
 3 significant digits on the uncertainty: 0.2000+/-0.0100
+>>> print '1 digits in uncertainty, exponent notation: {:.1ue}'.format(x)
+1 significant digit, exponent notation: (2.0+/-0.1)e-01
+>>> print '1 significant digits, percentage: {:.1u%}'.format(x)
+1 significant digit, percentage: (20+/-1)%
 
 When no *explicit* precision is given, the number of significant digits
 on the uncertainty is defined with the `Particle Data Group
