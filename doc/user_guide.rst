@@ -222,9 +222,9 @@ Result =    2.0e-11+/-   0.1e-11
 
 (Using a (minimal) width of 1 is thus a way of forcing exponents to not 
 be factored.) Thanks to this feature, each part (nominal value and 
-standard deviation) is correctly aligned across multiple lines (the 
+standard deviation) is correctly aligned across multiple lines, while the 
 relative magnitude of the error can still be readily estimated thanks to 
-the common exponent).
+the common exponent.
 
 .. Options
 
