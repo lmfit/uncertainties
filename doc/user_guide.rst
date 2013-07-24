@@ -185,9 +185,10 @@ type are all supported.
 
 .. Precision control:
 
-It is possible to control the **number of significant digits of the 
-uncertainty** by adding the precision modifier ``u`` after the precision 
-(and before any valid float format type like ``f``, ``e``, etc.):
+It is possible to control the **number of significant digits of the
+uncertainty** by adding the precision modifier ``u`` after the
+precision (and before any valid float format type like ``f``, ``e``,
+the empty format type, etc.):
 
 >>> print '1 significant digit on the uncertainty: {:.1u}'.format(x)
 1 significant digit on the uncertainty: 0.20+/-0.01
@@ -198,12 +199,19 @@ uncertainty** by adding the precision modifier ``u`` after the precision
 >>> print '1 digit for the uncertainty, percentage: {:.1u%}'.format(x)
 1 significant digit, percentage: (20+/-1)%
 
-When no *explicit* precision is given, the number of significant digits
+The usual **float formats with a precision** retain their original
+meaning (e.g. ``.2e`` uses two digits after the decimal point): code
+that works with floats produces similar results when running with
+numbers with uncertainties.
+
+When **no explicit precision** is given, the number of significant digits
 on the uncertainty is defined with the `Particle Data Group
 <http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
 rules (these rules keep the number of digits small, while preventing the
-uncertainty from being displayed with a large relative error).
+uncertainty from being displayed with a large relative error):
 
+>>> print 'Automatic number of digits on the uncertainty: {}'.format(x)
+Automatic number of digits on the uncertainty: 0.200+/-0.010
 
 .. Common exponent:
 
@@ -226,7 +234,7 @@ standard deviation) is correctly aligned across multiple lines, while the
 relative magnitude of the error can still be readily estimated thanks to 
 the common exponent.
 
-.. Options
+.. Options:
 
 Formatting options can be added at the end of the format string: ``S``
 for the **shorthand notation**, ``L`` for a **LaTeχ** output, ``P``
