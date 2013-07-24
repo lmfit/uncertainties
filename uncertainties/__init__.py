@@ -1894,23 +1894,21 @@ class AffineScalarFunc(object):
         operator accepts, if using an earlier version of Python),
         except that the n format type is not supported. In particular,
         the usual precision, alignment, sign flag, etc. can be
-        used. The behavior of the various format types (f, g, None,
-        etc.) is similar (No format type is like g; a g format type is
-        either converted into an equivalent f or e format type,
-        etc.). Moreover, the format is extended: the number of digits
-        of the uncertainty can be controlled, as is the way the
-        uncertainty is indicated (with +/- or with the short-hand
+        used. The behavior of the various format types (e, f, g, none,
+        etc.) is similar. Moreover, the format is extended: the number
+        of digits of the uncertainty can be controlled, as is the way
+        the uncertainty is indicated (with +/- or with the short-hand
         notation 3.14(1), in LaTeX or with a simple text string,...).
 
         Beyond the use of options at the end of the format
         specification, the main difference with floats is that a "u"
-        just before the format type (f, e, g, None, etc.) activates
-        the "uncertainty control" mode (e.g.: "u", or "ug", or
-        ".6u"). This mode is automatically activated when not using
-        any explicit precision (e.g.: "g", "10f", "+010,e" format
-        specifications). This mode is automatically deactivated if the
+        just before the format type (f, e, g, none, etc.) activates
+        the "uncertainty control" mode (e.g.: ".6u").  This mode is
+        also activated when not using any explicit precision (e.g.:
+        "g", "10f", "+010,e" format specifications).  If the
         uncertainty does not have a meaningful number of significant
-        digits (0 and NaN uncertainties).
+        digits (0 and NaN uncertainties), this mode is automatically
+        deactivated.
 
         The nominal value and the uncertainty always use the same
         precision. This implies trailing zeros, in general, even with
@@ -1921,18 +1919,18 @@ class AffineScalarFunc(object):
         specification is used for the nominal value (any "u" is
         ignored).
         
-        In the uncertainty control mode, the precision (".p", where p
-        is a number) is interpreted (if meaningful) as indicating the
-        number p of significant digits of the displayed
+        Any precision (".p", where p is a number) is interpreted (if
+        meaningful), in the uncertainty control mode, as indicating
+        the number p of significant digits of the displayed
         uncertainty. Example: .1uf will return a string with one
         significant digit in the uncertainty (and no exponent).
 
-        In the uncertainty control mode, if no precision is given,
-        then the rounding rules from the Particle Data Group are used,
-        if possible
-        (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).--for
-        example, the "f" format generally does not use the default 6
-        digits after the decimal point, but applies the PDG rules.
+        If no precision is given, the rounding rules from the
+        Particle Data Group are used, if possible
+        (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf). For
+        example, the "f" format specification generally does not use
+        the default 6 digits after the decimal point, but applies the
+        PDG rules.
         
         A common exponent is used if an exponent is needed for the
         larger of the nominal value (in absolute value) and the
@@ -1956,10 +1954,10 @@ class AffineScalarFunc(object):
         to the nominal value (since the standard deviation is
         positive).
 
-        In the case of the standard text output, the returned string
-        can normally be parsed back with ufloat_fromstr(). This
-        however excludes cases where numbers use the "," thousands
-        separator, for example.
+        In the case of a non-LaTeX output, the returned string can
+        normally be parsed back with ufloat_fromstr(). This however
+        excludes cases where numbers use the "," thousands separator,
+        for example.
 
         Options can be added, at the end of the format
         specification. Multiple options can be specified.
@@ -1971,13 +1969,13 @@ class AffineScalarFunc(object):
         mode is activated: "±" separates the nominal value from the
         standard deviation, exponents use superscript characters,
         etc. When "L" is present, the output is formatted with LaTeX.
-
-        The "%" format type forces the percent sign to be at the end
-        of the returned string (it is not attached to each of the
-        nominal value and the standard deviation).
         
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
+        
+        The "%" format type forces the percent sign to be at the end
+        of the returned string (it is not attached to each of the
+        nominal value and the standard deviation).
 
         Some details of the formatting can be customized as described
         in format_num().
