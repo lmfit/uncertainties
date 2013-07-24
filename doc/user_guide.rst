@@ -234,7 +234,7 @@ standard deviation) is correctly aligned across multiple lines, while the
 relative magnitude of the error can still be readily estimated thanks to 
 the common exponent.
 
-.. Options
+.. Options:
 
 Formatting options can be added at the end of the format string: ``S``
 for the **shorthand notation**, ``L`` for a **LaTeχ** output, ``P``
