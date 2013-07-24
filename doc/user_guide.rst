@@ -186,8 +186,9 @@ type are all supported.
 .. Precision control:
 
 It is possible to control the **number of significant digits of the
-uncertainty** by adding the precision modifier ``u`` before any valid
-float format type like ``f``, ``e``, the empty format type, etc.:
+uncertainty** by adding the precision modifier ``u`` after the
+precision (and before any valid float format type like ``f``, ``e``,
+the empty format type, etc.):
 
 >>> print '1 significant digit on the uncertainty: {:.1u}'.format(x)
 1 significant digit on the uncertainty: 0.20+/-0.01
