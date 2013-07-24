@@ -1903,12 +1903,12 @@ class AffineScalarFunc(object):
         Beyond the use of options at the end of the format
         specification, the main difference with floats is that a "u"
         just before the format type (f, e, g, none, etc.) activates
-        the "uncertainty control" mode (e.g.: "u", or "ug", or
-        ".6u"). This mode is automatically activated when not using
-        any explicit precision (e.g.: "g", "10f", "+010,e" format
-        specifications). This mode is automatically deactivated if the
+        the "uncertainty control" mode (e.g.: ".6u").  This mode is
+        also activated when not using any explicit precision (e.g.:
+        "g", "10f", "+010,e" format specifications).  If the
         uncertainty does not have a meaningful number of significant
-        digits (0 and NaN uncertainties).
+        digits (0 and NaN uncertainties), this mode is automatically
+        deactivated.
 
         The nominal value and the uncertainty always use the same
         precision. This implies trailing zeros, in general, even with
@@ -1919,15 +1919,14 @@ class AffineScalarFunc(object):
         specification is used for the nominal value (any "u" is
         ignored).
         
-        In the uncertainty control mode, the precision (".p", where p
-        is a number) is interpreted (if meaningful) as indicating the
-        number p of significant digits of the displayed
+        Any precision (".p", where p is a number) is interpreted (if
+        meaningful), in the uncertainty control mode, as indicating
+        the number p of significant digits of the displayed
         uncertainty. Example: .1uf will return a string with one
         significant digit in the uncertainty (and no exponent).
 
-        In the uncertainty control mode, if no precision is given,
-        then the rounding rules from the Particle Data Group are used,
-        if possible
+        If no precision is given, the rounding rules from the
+        Particle Data Group are used, if possible
         (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf). For
         example, the "f" format specification generally does not use
         the default 6 digits after the decimal point, but applies the
