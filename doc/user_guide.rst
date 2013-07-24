@@ -199,6 +199,11 @@ the empty format type, etc.):
 >>> print '1 digit for the uncertainty, percentage: {:.1u%}'.format(x)
 1 significant digit, percentage: (20+/-1)%
 
+The usual **float formats with a precision** retain their original
+meaning (e.g. ``.2e`` uses 2 digits after the decimal point): code
+that works with floats produces similar results when running with
+numbers with uncertainties.
+
 When **no explicit precision** is given, the number of significant digits
 on the uncertainty is defined with the `Particle Data Group
 <http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
