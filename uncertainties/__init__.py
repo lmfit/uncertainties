@@ -1902,7 +1902,7 @@ class AffineScalarFunc(object):
 
         Beyond the use of options at the end of the format
         specification, the main difference with floats is that a "u"
-        just before the format type (f, e, g, None, etc.) activates
+        just before the format type (f, e, g, none, etc.) activates
         the "uncertainty control" mode (e.g.: "u", or "ug", or
         ".6u"). This mode is automatically activated when not using
         any explicit precision (e.g.: "g", "10f", "+010,e" format
@@ -1928,9 +1928,10 @@ class AffineScalarFunc(object):
         In the uncertainty control mode, if no precision is given,
         then the rounding rules from the Particle Data Group are used,
         if possible
-        (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).--for
-        example, the "f" format generally does not use the default 6
-        digits after the decimal point, but applies the PDG rules.
+        (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf). For
+        example, the "f" format specification generally does not use
+        the default 6 digits after the decimal point, but applies the
+        PDG rules.
         
         A common exponent is used if an exponent is needed for the
         larger of the nominal value (in absolute value) and the
@@ -1969,13 +1970,13 @@ class AffineScalarFunc(object):
         mode is activated: "±" separates the nominal value from the
         standard deviation, exponents use superscript characters,
         etc. When "L" is present, the output is formatted with LaTeX.
-
-        The "%" format type forces the percent sign to be at the end
-        of the returned string (it is not attached to each of the
-        nominal value and the standard deviation).
         
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
+        
+        The "%" format type forces the percent sign to be at the end
+        of the returned string (it is not attached to each of the
+        nominal value and the standard deviation).
 
         Some details of the formatting can be customized as described
         in format_num().
