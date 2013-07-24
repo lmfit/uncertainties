@@ -1894,12 +1894,10 @@ class AffineScalarFunc(object):
         operator accepts, if using an earlier version of Python),
         except that the n format type is not supported. In particular,
         the usual precision, alignment, sign flag, etc. can be
-        used. The behavior of the various format types (f, g, None,
-        etc.) is similar (No format type is like g; a g format type is
-        either converted into an equivalent f or e format type,
-        etc.). Moreover, the format is extended: the number of digits
-        of the uncertainty can be controlled, as is the way the
-        uncertainty is indicated (with +/- or with the short-hand
+        used. The behavior of the various format types (e, f, g, none,
+        etc.) is similar. Moreover, the format is extended: the number
+        of digits of the uncertainty can be controlled, as is the way
+        the uncertainty is indicated (with +/- or with the short-hand
         notation 3.14(1), in LaTeX or with a simple text string,...).
 
         Beyond the use of options at the end of the format
