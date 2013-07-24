@@ -23,5 +23,5 @@ The ``master`` branch is for Python 2.5+, while the
 ``master_python2.3`` branch is for Python 2.3 and 2.4.
 
 Other branches might be present in the GitHub repository, but they are 
-temporary and represent work in progress that do not necessarily run 
+temporary and represent work in progress that does not necessarily run 
 properly yet.
