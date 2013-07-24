@@ -1955,10 +1955,10 @@ class AffineScalarFunc(object):
         to the nominal value (since the standard deviation is
         positive).
 
-        In the case of the standard text output, the returned string
-        can normally be parsed back with ufloat_fromstr(). This
-        however excludes cases where numbers use the "," thousands
-        separator, for example.
+        In the case of a non-LaTeX output, the returned string can
+        normally be parsed back with ufloat_fromstr(). This however
+        excludes cases where numbers use the "," thousands separator,
+        for example.
 
         Options can be added, at the end of the format
         specification. Multiple options can be specified.
