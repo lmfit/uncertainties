@@ -84,11 +84,21 @@ many_scalars_to_scalar_funcs = []
 # no_std_wrapping = ['modf', 'frexp', 'ldexp', 'fsum', 'factorial']
 
 # Functions with numerical derivatives:
-num_deriv_funcs = ['fmod', 'gamma', 'isinf', 'isnan',
-                   'lgamma', 'trunc']
+num_deriv_funcs = ['fmod', 'gamma', 'lgamma']
+
+# Some functions are by definition locally constant (on real
+# numbers). Their value does not depend on the uncertainty (because
+# this uncertainty is supposed to lead to a good linear approximation
+# of the function in the uncertainty region). The type of their output
+# for floats is preserved, as users should not care about deviations
+# in their value: their value is locally constant due to the nature of
+# the function (0 derivative). This situation is similar to that of
+# comparisons (==, >, etc.).
+locally_cst_funcs = ['ceil', 'floor', 'isinf', 'isnan', 'trunc']
 
 # Functions that do not belong in many_scalars_to_scalar_funcs, but
-# that have a version that handles uncertainties:
+# that have a version that handles uncertainties. These functions are
+# also not in numpy (see unumpy/core.py).
 non_std_wrapped_funcs = []
 
 # Function that copies the relevant attributes from generalized
@@ -153,7 +163,6 @@ fixed_derivatives = {
     'atan2': [lambda y, x: x/(x**2+y**2),  # Correct for x == 0
               lambda y, x: -y/(x**2+y**2)],  # Correct for x == 0
     'atanh': [lambda x: 1/(1-x**2)],
-    'ceil': [lambda x: 0],
     'copysign': [lambda x, y: (1 if x >= 0 else -1) * math.copysign(1, y),
                  lambda x, y: 0],
     'cos': [lambda x: -math.sin(x)],
@@ -164,7 +173,6 @@ fixed_derivatives = {
     'exp': [math.exp],
     'expm1': [math.exp],
     'fabs': [lambda x: 1 if x >= 0 else -1],
-    'floor': [lambda x: 0],
     'hypot': [lambda x, y: x/math.hypot(x, y),
               lambda x, y: y/math.hypot(x, y)],
     'log': [log_der0,
@@ -200,20 +208,36 @@ for name in dir(math):
         # Functions whose derivatives are calculated numerically by
         # this module fall here (isinf, fmod,...):
         derivatives = []  # Means: numerical calculation required
-    else:
+    elif name not in locally_cst_funcs:
         continue  # 'name' not wrapped by this module (__doc__, e, etc.)
-
-    # Errors during the calculation of the derivatives are converted
-    # to a NaN result: it is assumed that a mathematical calculation
-    # that cannot be calculated indicates a non-defined derivative
-    # (the derivatives in fixed_derivatives must be written this way):
-    derivatives = map(uncertainties.nan_if_exception, derivatives)
     
     func = getattr(math, name)
-    
-    setattr(this_module, name,
-            wraps(uncertainties.wrap(func, derivatives), func))
-    
+
+    if name in locally_cst_funcs:
+        print "WRAPPING", name #!!!!!!!
+        def wrapped_func(*args, **kwargs):
+            # The arguments are converted to their nominal value:
+            # since the function is locally constant, the
+            # uncertainties should have no role in the result (since
+            # they are supposed to keep the function linear and hence,
+            # here, constant):
+            args_float = map(uncertainties.nominal_value, args)
+            # !! In Python 2.7+, dictionary comprehension: {argname:...}
+            kwargs_float = dict(
+                (arg_name, uncertainties.nominal_value(value))
+                for (arg_name, value) in kwargs.iteritems())
+            print "IN WRAPPED FUNC", func.__name__ #!!!!!!!!
+            return func(*args_float, **kwargs_float)
+    else:  # Function with analytical or numerical derivatives:
+        # Errors during the calculation of the derivatives are converted
+        # to a NaN result: it is assumed that a mathematical calculation
+        # that cannot be calculated indicates a non-defined derivative
+        # (the derivatives in fixed_derivatives must be written this way):
+        wrapped_func = uncertainties.wrap(
+            func, map(uncertainties.nan_if_exception, derivatives))
+        
+    setattr(this_module, name, wraps(wrapped_func, func))
+
     many_scalars_to_scalar_funcs.append(name)
 
 ###############################################################################
@@ -290,7 +314,6 @@ def modf(x):
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
         return (frac_part, int_part)
-    
 many_scalars_to_scalar_funcs.append('modf')
 
 @uncertainties.set_doc(math.ldexp.__doc__)
