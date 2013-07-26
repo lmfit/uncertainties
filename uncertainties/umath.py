@@ -86,8 +86,8 @@ many_scalars_to_scalar_funcs = []
 # Functions with numerical derivatives:
 num_deriv_funcs = ['fmod', 'gamma', 'lgamma']
 
-# Some functions are by definition locally constant (on real
-# numbers). Their value does not depend on the uncertainty (because
+# Functions are by definition locally constant (on real
+# numbers): their value does not depend on the uncertainty (because
 # this uncertainty is supposed to lead to a good linear approximation
 # of the function in the uncertainty region). The type of their output
 # for floats is preserved, as users should not care about deviations
@@ -199,6 +199,25 @@ fixed_derivatives = {
 
 this_module = sys.modules[__name__]
 
+def wrap_locally_cst_func(func):
+    '''
+    Returns a function that returns the same arguments as func, but
+    after converting any AffineScalarFunc object to its nominal value.
+
+    This function is useful for wrapping functions that are locally
+    constant: the uncertainties should have no role in the result
+    (since they are supposed to keep the function linear and hence,
+    here, constant).
+    '''
+    def wrapped_func(*args, **kwargs):
+        args_float = map(uncertainties.nominal_value, args)
+        # !! In Python 2.7+, dictionary comprehension: {argname:...}
+        kwargs_float = dict(
+            (arg_name, uncertainties.nominal_value(value))
+            for (arg_name, value) in kwargs.iteritems())
+        return func(*args_float, **kwargs_float)
+    return wrapped_func
+    
 # for (name, attr) in vars(math).items():
 for name in dir(math):
 
@@ -214,20 +233,7 @@ for name in dir(math):
     func = getattr(math, name)
 
     if name in locally_cst_funcs:
-        print "WRAPPING", name #!!!!!!!
-        def wrapped_func(*args, **kwargs):
-            # The arguments are converted to their nominal value:
-            # since the function is locally constant, the
-            # uncertainties should have no role in the result (since
-            # they are supposed to keep the function linear and hence,
-            # here, constant):
-            args_float = map(uncertainties.nominal_value, args)
-            # !! In Python 2.7+, dictionary comprehension: {argname:...}
-            kwargs_float = dict(
-                (arg_name, uncertainties.nominal_value(value))
-                for (arg_name, value) in kwargs.iteritems())
-            print "IN WRAPPED FUNC", func.__name__ #!!!!!!!!
-            return func(*args_float, **kwargs_float)
+        wrapped_func = wrap_locally_cst_func(func)
     else:  # Function with analytical or numerical derivatives:
         # Errors during the calculation of the derivatives are converted
         # to a NaN result: it is assumed that a mathematical calculation

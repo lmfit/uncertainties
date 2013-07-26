@@ -219,9 +219,13 @@ def test_math_module():
         # Boolean functions:
         assert not umath.isinf(x)
 
-        # Comparison, possibly between an AffineScalarFunc object and a
-        # boolean, which makes things more difficult for this code:
-        assert umath.isinf(x) == False
+        # "is" is used instead of == because umath.isinf() must return
+        # a boolean, like math.isinf():
+        assert umath.isinf(x) is False
+
+        # "is" is used instead of == because umath.isnan() must return
+        # a boolean, like math.isnan():
+        assert umath.isnan(x) is False
 
         # fsum is special because it does not take a fixed number of
         # variables:
