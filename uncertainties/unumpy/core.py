@@ -611,6 +611,9 @@ def define_vectorized_funcs():
         for f_name in ['acos', 'acosh', 'asin', 'atan', 'atan2', 'atanh']])
 
     new_func_names = [func_name_translations.get(function_name, function_name)
+                      # The functions from umath.non_std_wrapped_funcs
+                      # (available from umath) are normally not in
+                      # numpy, so they are not included here:
                       for function_name in umath.many_scalars_to_scalar_funcs]
         
     for (function_name, unumpy_name) in zip(
