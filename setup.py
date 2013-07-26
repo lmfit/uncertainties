@@ -50,7 +50,7 @@ except ImportError:
 
 distutils.core.setup(
     name='uncertainties',
-    version='2.4',
+    version='2.4.1',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://pythonhosted.org/uncertainties/',
@@ -168,6 +168,11 @@ Version history
 
 Main changes:
 
+- 2.4.1: In ``uncertainties.umath``, functions ``ceil()``, ``floor()``, \
+         ``isinf()``, ``isnan()`` and ``trunc()`` now return values of \
+         the same type as the corresponding ``math`` module function \
+         (instead of generally returning a value with a zero uncertainty \
+         ``...+/-0``).
 - 2.4: Extensive support for the formatting_ of numbers with uncertainties. \
        A zero uncertainty is now explicitly displayed as the integer 0. \
        The new formats are generally understood by ``ufloat_fromstr()``. \
