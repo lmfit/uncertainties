@@ -29,7 +29,12 @@ if sys.version_info < (2, 7) or sys.version_info[:2] == (3, 3):
 else:
 
     import os
-    import lib2to3.tests.support as support
+    try:
+        # lib2to3 test support moved to a new place in 2013:
+        import test.test_lib2to3.support as support
+    except ImportError:
+        # Pre-~2013 path for lib2to3 test support
+        import lib2to3.tests.support as support
 
     # The lib1to2.fixes package given to lib2to3 is the *local* package
     # (not to another installed module). This is important for the
