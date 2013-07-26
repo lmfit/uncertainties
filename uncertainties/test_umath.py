@@ -216,20 +216,23 @@ def test_math_module():
         # math.factorial()):
         assert umath.factorial(4) == 24
 
-        # Boolean functions:
-        assert not umath.isinf(x)
-
-        # "is" is used instead of == because umath.isinf() must return
-        # a boolean, like math.isinf():
-        assert umath.isinf(x) is False
-
-        # "is" is used instead of == because umath.isnan() must return
-        # a boolean, like math.isnan():
-        assert umath.isnan(x) is False
-
         # fsum is special because it does not take a fixed number of
         # variables:
         assert umath.fsum([x, x]).nominal_value == -3
+
+    # Functions that give locally constant results are tested: they
+    # should give the same result as their float equivalent:
+    for name in umath.locally_cst_funcs:
+
+        try:
+            func = getattr(umath, name)
+        except AttributeError:
+            continue  # Not in the math module, so not in umath either
+        
+        assert func(x) == func(x.nominal_value)
+        # The type should be left untouched. For example, isnan()
+        # should always give a boolean:
+        assert type(func(x)) == type(func(x.nominal_value))
 
     # The same exceptions should be generated when numbers with uncertainties
     # are used:
