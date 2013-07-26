@@ -30,7 +30,7 @@ else:
 
     import os
     try:
-        # lib2to3 test support moved to a new place in 2013:
+        # lib2to3 test support seems to have moved to a new place in 2013:
         import test.test_lib2to3.support as support
     except ImportError:
         # Pre-~2013 path for lib2to3 test support
