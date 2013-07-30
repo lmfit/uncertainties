@@ -303,7 +303,7 @@ for name in dir(math):
 # However, each of the arguments inside this single list can
 # be a variable.  We handle this in a specific way:
 
-if sys.version_info[:2] >= (2, 6):    
+if sys.version_info >= (2, 6):    
 
     # For drop-in compatibility with the math module:
     factorial = math.factorial
