@@ -533,7 +533,7 @@ class matrix(numpy.matrix):
     # The NumPy doc for getI is empty:
     # @uncertainties.set_doc(numpy.matrix.getI.__doc__)
     def getI(self):
-        "Matrix inverse of pseudo-inverse"
+        "Matrix inverse or pseudo-inverse"
         
         # numpy.matrix.getI is OK too, but the rest of the code assumes that
         # numpy.matrix.I is a property object anyway:
