@@ -539,12 +539,7 @@ class matrix(numpy.matrix):
         # numpy.matrix.I is a property object anyway:
 
         M, N = self.shape
-        if M == N:
-            func = inv
-        else:
-            func = pinv
-        return func(self)
-        
+        return (inv if M == N else pinv)(self)
 
     # ! In Python >= 2.6, this could be simplified as:
     # I = numpy.matrix.I.getter(__matrix_inverse)
