@@ -1693,6 +1693,7 @@ class AffineScalarFunc(object):
     # To save memory in large arrays:
     __slots__ = ('_nominal_value', 'derivatives')
 
+    # Temporary fix for mean() in NumPy 1.8:
     dtype = collections.namedtuple('dtype', 'type')(lambda value: value)
     
     #! The code could be modify in order to accommodate for non-float
