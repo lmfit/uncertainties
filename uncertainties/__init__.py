@@ -1692,6 +1692,8 @@ class AffineScalarFunc(object):
 
     # To save memory in large arrays:
     __slots__ = ('_nominal_value', 'derivatives')
+
+    dtype = collections.namedtuple('dtype', 'type')(lambda value: value)
     
     #! The code could be modify in order to accommodate for non-float
     # nominal values.  This could for instance be done through
