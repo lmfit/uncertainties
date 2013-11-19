@@ -71,7 +71,8 @@ def test_numpy():
 
     arr_floats = numpy.random.random((10, 3, 5))
     arr = unumpy.uarray(arr_floats, arr_floats/100)
-    assert arr.mean(axis=0).shape == (3, 5)    
+    assert arr.mean(axis=0).shape == (3, 5)
+    assert arr.mean(axis=1).shape == (10, 5)    
     arr.mean()  # Global mean
 
 def test_matrix():
