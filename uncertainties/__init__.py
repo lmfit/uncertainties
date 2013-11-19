@@ -125,7 +125,8 @@ probability distributions.  These probabilities are reduced to two
 numbers: a nominal value and an uncertainty.  Thus, both variables
 (Variable objects) and the result of mathematical operations
 (AffineScalarFunc objects) contain these two values (respectively in
-their nominal_value attribute and through their std_dev() method).
+their nominal_value and std_dev attributes).
+
 
 The uncertainty of a number with uncertainty is simply defined in
 this package as the standard deviation of the underlying probability
