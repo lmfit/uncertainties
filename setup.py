@@ -50,7 +50,7 @@ except ImportError:
 
 distutils.core.setup(
     name='uncertainties',
-    version='2.4.1',
+    version='2.4.2',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://pythonhosted.org/uncertainties/',
@@ -168,6 +168,7 @@ Version history
 
 Main changes:
 
+- 2.4.2: `NumPy 1.8 compatibility <https://github.com/numpy/numpy/issues/4063>`_.
 - 2.4.1: In ``uncertainties.umath``, functions ``ceil()``, ``floor()``, \
          ``isinf()``, ``isnan()`` and ``trunc()`` now return values of \
          the same type as the corresponding ``math`` module function \
