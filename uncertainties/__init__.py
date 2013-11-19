@@ -239,7 +239,6 @@ from math import sqrt, log  # Optimization: no attribute look-up
 import copy
 import warnings
 import itertools
-import collections
 import inspect
 
 # Numerical version:
