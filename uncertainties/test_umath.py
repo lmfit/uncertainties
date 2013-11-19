@@ -149,10 +149,12 @@ def test_monte_carlo_comparison():
                                         n_samples)
         y_samples = numpy.random.normal(y.nominal_value, y.std_dev,
                                         n_samples)
-        function_samples = function(x_samples, y_samples)
+
+        # !!! astype() is a temporary fix for NumPy 1.8:        
+        function_samples = function(x_samples, y_samples).astype(float)
 
         cov_mat = numpy.cov([x_samples, y_samples], function_samples)
-        
+
         return (numpy.median(function_samples), cov_mat)
         
     (nominal_value_samples, covariances_samples) = monte_carlo_calc(1000000)

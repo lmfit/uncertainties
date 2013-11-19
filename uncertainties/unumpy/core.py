@@ -549,18 +549,17 @@ class matrix(numpy.matrix):
     # The NumPy doc for getI is empty:
     # @uncertainties.set_doc(numpy.matrix.getI.__doc__)
     def getI(self):
-        "Matrix inverse of pseudo-inverse"
+        "Matrix inverse or pseudo-inverse"
         
         # numpy.matrix.getI is OK too, but the rest of the code assumes that
         # numpy.matrix.I is a property object anyway:
 
-        M, N = self.shape
-        if M == N:
+        m, n = self.shape
+        if m == n:
             func = inv
         else:
             func = pinv
         return func(self)
-        
 
     # ! In Python >= 2.6, this could be simplified as:
     # I = numpy.matrix.I.getter(__matrix_inverse)
