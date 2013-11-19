@@ -149,6 +149,11 @@ The :mod:`uncertainties` package is also available for **Windows**
 through the `Python(x,y)`_ distribution. It may also be included in
 Christoph Gohlke's Base distribution of `scientific Python packages`_.
 
+**Mac OS X** users who use the `MacPorts package manager <http://www.macports.org/>`_ can install :mod:`uncertainties` with
+``sudo port install py**-uncertainties``, and upgrade it with ``sudo
+port upgrade py**-uncertainties`` where ``**`` represents the desired
+Python version (``27``, ``33``, etc.).
+
 The :mod:`uncertainties` package is also available through the
 following **Linux** distributions and software platforms: `Ubuntu
 <https://launchpad.net/ubuntu/+source/uncertainties>`_, `Fedora
