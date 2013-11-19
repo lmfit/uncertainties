@@ -25,7 +25,8 @@ from uncertainties import __author__
 def test_numpy():
     
     """
-    Interaction with NumPy, including matrix inversion and correlated_values.
+    Interaction with NumPy, including matrix inversion,
+    correlated_values, and calculation of the mean.
     """
 
     arr = numpy.arange(3)
@@ -65,6 +66,13 @@ def test_numpy():
         pass  # ! This is usual (but could be avoided)
     else:
         raise Exception("numpy.exp unexpectedly worked")
+
+    # Calculation of the mean, global and with a specific axis:
+
+    arr_floats = numpy.random.random((10, 3, 5))
+    arr = unumpy.uarray(arr_floats, arr_floats/100)
+    assert arr.mean(axis=0).shape == (3, 5)    
+    arr.mean()  # Global mean
 
 def test_matrix():
     "Matrices of numbers with uncertainties"
