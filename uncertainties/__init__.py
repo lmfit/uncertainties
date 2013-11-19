@@ -240,6 +240,7 @@ import copy
 import warnings
 import itertools
 import inspect
+import collections
 
 from backport import *
 
@@ -1730,8 +1731,7 @@ class AffineScalarFunc(object):
     __slots__ = ('_nominal_value', 'derivatives')
 
     # !!! Temporary fix for mean() in NumPy 1.8:
-    class dtype(object):
-        type = lambda value: value
+    dtype = collections.namedtuple('dtype', 'type')(lambda value: value)
     
     #! The code could be modify in order to accommodate for non-float
     # nominal values.  This could for instance be done through
