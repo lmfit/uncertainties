@@ -1693,6 +1693,10 @@ class AffineScalarFunc(object):
 
     # To save memory in large arrays:
     __slots__ = ('_nominal_value', 'derivatives')
+
+    # !!! Temporary fix for mean() in NumPy 1.8:
+    class dtype(object):
+        type = staticmethod(lambda value: value)
     
     #! The code could be modify in order to accommodate for non-float
     # nominal values.  This could for instance be done through
@@ -2788,14 +2792,17 @@ def covariance_matrix(nums_with_uncert):
         derivatives1 = expr1.derivatives  # Optimization
         vars1 = set(derivatives1)
         coefs_expr1 = []
+
         for expr2 in nums_with_uncert[:i1+1]:
             derivatives2 = expr2.derivatives  # Optimization
-            coef = 0.
-            for var in vars1.intersection(derivatives2):
+            coefs_expr1.append(sum(
+                ((derivatives1[var]*derivatives2[var]*var._std_dev**2)
                 # var is a variable common to both numbers with
-                # uncertainties:
-                coef += (derivatives1[var]*derivatives2[var]*var._std_dev**2)
-            coefs_expr1.append(coef)
+                # uncertainties:                
+                for var in vars1.intersection(derivatives2)),
+                # The result is always a float:
+                0.))
+            
         covariance_matrix.append(coefs_expr1)
 
     # We symmetrize the matrix:
