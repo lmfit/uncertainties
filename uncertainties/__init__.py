@@ -2791,12 +2791,12 @@ def covariance_matrix(nums_with_uncert):
         for expr2 in nums_with_uncert[:i1+1]:
             derivatives2 = expr2.derivatives  # Optimization
             coefs_expr1.append(sum(
-                (derivatives1[var]*derivatives2[var]*var._std_dev**2)
+                ((derivatives1[var]*derivatives2[var]*var._std_dev**2)
                 # var is a variable common to both numbers with
                 # uncertainties:                
-                for var in vars1.intersection(derivatives2),
+                for var in vars1.intersection(derivatives2)),
                 # The result is always a float:
-                0.)
+                0.))
             
         covariance_matrix.append(coefs_expr1)
 
