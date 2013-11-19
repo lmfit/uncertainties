@@ -240,7 +240,6 @@ from math import sqrt, log  # Optimization: no attribute look-up
 import copy
 import warnings
 import itertools
-import collections
 import inspect
 
 # Numerical version:
@@ -1694,7 +1693,7 @@ class AffineScalarFunc(object):
     # To save memory in large arrays:
     __slots__ = ('_nominal_value', 'derivatives')
 
-    # !!! Temporary fix for mean() in NumPy 1.8:
+    # !! Fix for mean() in NumPy 1.8.0:
     class dtype(object):
         type = staticmethod(lambda value: value)
     
