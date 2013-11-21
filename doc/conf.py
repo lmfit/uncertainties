@@ -14,8 +14,8 @@
 from datetime import date
 
 import sys, os
-
-sys.path.insert(0, '..')
+import os.path as osp
+sys.path.insert(0, osp.abspath('..'))
 import uncertainties
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -163,7 +163,7 @@ html_show_sourcelink = False
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'uncertaintiesPythonPackagedoc'
+htmlhelp_basename = 'uncertaintiesdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
