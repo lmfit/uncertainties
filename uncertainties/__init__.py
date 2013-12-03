@@ -3130,10 +3130,7 @@ def ufloat(nominal_value, std_dev=None, tag=None):
 
     try:
         # Standard case:
-
-        #! The special ** syntax is for Python 2.5 and before (Python 2.6+
-        # understands tag=tag):
-        return Variable(nominal_value, std_dev, **{'tag': tag})
+        return Variable(nominal_value, std_dev, tag=tag)
     # Exception types raised by, respectively: tuple, string that
     # cannot be converted through float(), and string that can be
     # converted through float() (case of a number with no uncertainty):
