@@ -2701,7 +2701,7 @@ class Variable(AffineScalarFunc):
     def __hash__(self):
         # All Variable objects are by definition independent
         # variables, so they never compare equal; therefore, their
-        # id() are therefore allowed to differ
+        # id() are allowed to differ
         # (http://docs.python.org/reference/datamodel.html#object.__hash__):
         return id(self)
             
