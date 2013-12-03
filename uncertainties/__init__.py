@@ -26,7 +26,7 @@ Examples:
   x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
   x = ufloat_fromstr("0.20+/-0.01")  # Other representation
   x = ufloat_fromstr("0.20(1)")  # Other representation
-  # Implicit uncertainty of +/-1 on the last digit:  
+  # Implicit uncertainty of +/-1 on the last digit:
   x = ufloat_fromstr("0.20")
   print x**2  # Square: prints "0.040+/-0.004"
   print sin(x**2)  # Prints "0.0399...+/-0.00399..."
@@ -2772,7 +2772,7 @@ class Variable(AffineScalarFunc):
     def __hash__(self):
         # All Variable objects are by definition independent
         # variables, so they never compare equal; therefore, their
-        # id() are therefore allowed to differ
+        # id() are allowed to differ
         # (http://docs.python.org/reference/datamodel.html#object.__hash__):
         return id(self)
             
@@ -3160,7 +3160,7 @@ def ufloat_fromstr(representation, tag=None):
     
     return ufloat(nominal_value, std_dev, tag)
 
-def ufloat_obsolete(representation, tag=None):
+def _ufloat_obsolete(representation, tag=None):
     '''
     Legacy version of ufloat(). Will eventually be removed.
 
@@ -3215,10 +3215,7 @@ def ufloat(nominal_value, std_dev=None, tag=None):
 
     try:
         # Standard case:
-
-        #! The special ** syntax is for Python 2.5 and before (Python 2.6+
-        # understands tag=tag):
-        return Variable(nominal_value, std_dev, **{'tag': tag})
+        return Variable(nominal_value, std_dev, tag=tag)
     # Exception types raised by, respectively: tuple, string that
     # cannot be converted through float(), and string that can be
     # converted through float() (case of a number with no uncertainty):
@@ -3233,4 +3230,4 @@ def ufloat(nominal_value, std_dev=None, tag=None):
         else:
             tag_arg = std_dev  # 2 positional arguments form
             
-        return ufloat_obsolete(nominal_value, tag_arg)
+        return _ufloat_obsolete(nominal_value, tag_arg)
