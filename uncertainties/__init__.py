@@ -334,6 +334,8 @@ except AttributeError:  # Python < 2.6
         '''
         Equivalent to the math.isnan() of Python 2.6+.
         '''
+        if not isinstance(x, float):
+            raise TypeError('a float is required')
         return x != x
     
 ###############################################################################
@@ -3232,7 +3234,7 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     # Exception types raised by, respectively: tuple, string that
     # cannot be converted through float(), and string that can be
     # converted through float() (case of a number with no uncertainty):
-    except (TypeError, ValueError, NoneUncertainty):
+    except (TypeError, ValueError):
         # Obsolete, two-argument call:
         deprecation('either use ufloat(nominal_value, std_dev),'
                     ' ufloat(nominal_value, std_dev, tag), or the'
