@@ -3131,7 +3131,8 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     mean. This value is propagated by mathematical operations as if it
     was a float.
 
-    std_dev -- standard deviation of the random variable.
+    std_dev -- standard deviation of the random variable. The standard
+    deviation must be convertible to a positive float, or be NaN.
     
     tag -- optional string tag for the variable.  Variables don't have
     to have distinct tags.  Tags are useful for tracing what values
