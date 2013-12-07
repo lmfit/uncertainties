@@ -41,7 +41,6 @@ from __future__ import division  # Many analytical derivatives depend on this
 import math
 import sys
 import itertools
-import functools
 import inspect
 
 # Local modules
@@ -103,8 +102,29 @@ non_std_wrapped_funcs = []
 
 # Function that copies the relevant attributes from generalized
 # functions from the math module:
-wraps = functools.partial(functools.update_wrapper,
-                          assigned=('__doc__', '__name__'))
+# This is a copy&paste job from the functools module, changing
+# the default arugment for assigned
+def wraps(wrapper,
+          wrapped,
+          assigned=('__doc__',),
+          updated=('__dict__',)):
+    """Update a wrapper function to look like the wrapped function.
+    
+    wrapper -- function to be updated
+    wrapped -- original function
+    assigned -- tuple naming the attributes assigned directly
+    from the wrapped function to the wrapper function
+    updated -- tuple naming the attributes of the wrapper that
+    are updated with the corresponding attribute from the wrapped
+    function.
+    """
+    for attr in assigned:
+        setattr(wrapper, attr, getattr(wrapped, attr))
+    for attr in updated:
+        getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
+    # Return the wrapper so this can be used as a decorator via partial()
+    return wrapper
+                                    
 
 ########################################
 # Wrapping of math functions:
@@ -151,6 +171,32 @@ def log_der0(*args):
     #except TypeError:
     #    return 1/args[0]/math.log(args[1])  # 2-argument form
 
+def _deriv_copysign(x,y):
+    if x >= 0:
+        return math.copysign(1, y)
+    else:
+        return -math.copysign(1, y)
+    
+def _deriv_fabs(x):
+    if x >= 0:
+        return 1
+    else:
+        return -1
+
+def _deriv_pow_0(x, y):
+    if y == 0:
+        return  0.
+    elif x != 0 or y % 1 == 0:
+        return y*math.pow(x, y-1)
+    else:
+        return float('nan')
+
+def _deriv_pow_1(x, y):    
+    if x == 0 and y > 0:
+        return 0.
+    else:
+        return math.log(x) * math.pow(x, y)
+    
 erf_coef = 2/math.sqrt(math.pi)  # Optimization for erf()
 
 fixed_derivatives = {
@@ -163,7 +209,7 @@ fixed_derivatives = {
     'atan2': [lambda y, x: x/(x**2+y**2),  # Correct for x == 0
               lambda y, x: -y/(x**2+y**2)],  # Correct for x == 0
     'atanh': [lambda x: 1/(1-x**2)],
-    'copysign': [lambda x, y: (1 if x >= 0 else -1) * math.copysign(1, y),
+    'copysign': [_deriv_copysign,
                  lambda x, y: 0],
     'cos': [lambda x: -math.sin(x)],
     'cosh': [math.sinh],
@@ -172,20 +218,14 @@ fixed_derivatives = {
     'erfc': [lambda x: -exp(-x**2)*erf_coef],
     'exp': [math.exp],
     'expm1': [math.exp],
-    'fabs': [lambda x: 1 if x >= 0 else -1],
+    'fabs': [_deriv_fabs],
     'hypot': [lambda x, y: x/math.hypot(x, y),
               lambda x, y: y/math.hypot(x, y)],
     'log': [log_der0,
             lambda x, y: -math.log(x, y)/y/math.log(y)],
     'log10': [lambda x: 1/x/math.log(10)],
     'log1p': [lambda x: 1/(1+x)],
-    'pow': [lambda x, y:
-                0. if y == 0
-                else y*math.pow(x, y-1)  if x != 0 or y % 1 == 0
-                else float('nan'),
-            lambda x, y:
-                0. if (x == 0) and (y > 0)
-                else math.log(x) * math.pow(x, y)],
+    'pow': [_deriv_pow_0, _deriv_pow_1],
     'radians': [lambda x: math.radians(1)],
     'sin': [math.cos],
     'sinh': [math.cosh],
@@ -297,7 +337,7 @@ if sys.version_info >= (2, 6):
     non_std_wrapped_funcs.append('fsum')
 
 ##########
-@uncertainties.set_doc(math.modf.__doc__)
+
 def modf(x):
     """
     Version of modf that works for numbers with uncertainty, and also
@@ -320,9 +360,10 @@ def modf(x):
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
         return (frac_part, int_part)
+
+modf = uncertainties.set_doc(math.modf.__doc__)(modf)
 many_scalars_to_scalar_funcs.append('modf')
 
-@uncertainties.set_doc(math.ldexp.__doc__)
 def ldexp(x, y):
     # The code below is inspired by uncertainties.wrap().  It is
     # simpler because only 1 argument is given, and there is no
@@ -339,8 +380,8 @@ def ldexp(x, y):
         return AffineScalarFunc(
             math.ldexp(aff_func.nominal_value, y),
             # Chain rule:
-            dict((var, factor*deriv)
-                 for (var, deriv) in aff_func.derivatives.iteritems()))
+            dict([(var, factor*deriv)
+                  for (var, deriv) in aff_func.derivatives.iteritems()]))
     else:
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
@@ -351,9 +392,10 @@ def ldexp(x, y):
         # value of x coerced to a difference type [int->float, for
         # instance]):
         return math.ldexp(x, y)
+ldexp = uncertainties.set_doc(math.ldexp.__doc__)(ldexp)
+    
 many_scalars_to_scalar_funcs.append('ldexp')
 
-@uncertainties.set_doc(math.frexp.__doc__)
 def frexp(x):
     """
     Version of frexp that works for numbers with uncertainty, and also
@@ -374,8 +416,8 @@ def frexp(x):
             AffineScalarFunc(
                 result[0],
                 # Chain rule:
-                dict((var, factor*deriv)
-                     for (var, deriv) in aff_func.derivatives.iteritems())),
+                dict([(var, factor*deriv)
+                      for (var, deriv) in aff_func.derivatives.iteritems()])),
             # The exponent is an integer and is supposed to be
             # continuous (small errors):
             result[1])
@@ -383,6 +425,8 @@ def frexp(x):
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
         return math.frexp(x)
+frexp = uncertainties.set_doc(math.frexp.__doc__)(frexp)
+    
 non_std_wrapped_funcs.append('frexp')
 
 ###############################################################################
