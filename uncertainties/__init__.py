@@ -2682,6 +2682,10 @@ def add_operators_to_AffineScalarFunc():
 
 add_operators_to_AffineScalarFunc()  # Actual addition of class attributes
 
+class NegativeStdDev(Exception):
+    '''Raise for a negative standard deviation'''
+    pass
+
 class Variable(AffineScalarFunc):    
     """
     Representation of a float-like scalar random variable, along with
@@ -2698,7 +2702,12 @@ class Variable(AffineScalarFunc):
     def __init__(self, value, std_dev, tag=None):
         """
         The nominal value and the standard deviation of the variable
-        are set.  These values must be scalars.
+        are set.
+
+        The value is converted to float.
+
+        The standard deviation std_dev can be NaN. It should normally
+        be a float or an integer.
 
         'tag' is a tag that the user can associate to the variable.  This
         is useful for tracing variables.
@@ -2732,9 +2741,6 @@ class Variable(AffineScalarFunc):
         
         self.tag = tag
 
-    # !! In Python 2.6+, the std_dev property would be more simply
-    # implemented with @property(getter), then @std_dev.setter(setter).
-
     # Standard deviations can be modified (this is a feature).
     # AffineScalarFunc objects that depend on the Variable have their
     # std_dev automatically modified (recalculated with the new
@@ -2742,15 +2748,20 @@ class Variable(AffineScalarFunc):
     def _set_std_dev(self, std_dev):
     
         # We force the error to be float-like.  Since it is considered
-        # as a standard deviation, it must be positive:
-        assert std_dev >= 0 or isnan(std_dev), (
-            "the error must be a positive number, or NaN")
+        # as a standard deviation, it must be either positive or NaN:
+        # (Note: if NaN < 0 is False, there is no need to test
+        # separately for NaN. But this is not guaranteed, even if it
+        # should work on most platforms.)
+        if std_dev < 0 and not isnan(std_dev):
+            raise NegativeStdDev("The standard deviation cannot be negative")
 
         self._std_dev = CallableStdDev(std_dev)
     
     def _get_std_dev(self):
         return self._std_dev
-        
+
+    # !! In Python 2.6+, the std_dev property would be more simply
+    # implemented with @property(getter), then @std_dev.setter(setter).    
     std_dev = property(_get_std_dev, _set_std_dev)
     
     # Support for legacy method:
