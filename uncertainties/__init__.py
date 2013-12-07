@@ -2753,6 +2753,7 @@ class Variable(AffineScalarFunc):
         # separately for NaN. But this is not guaranteed, even if it
         # should work on most platforms.)
         if std_dev < 0 and not isnan(std_dev):
+            print "STD DEV", std_dev  #!!!!!!!!
             raise NegativeStdDev("The standard deviation cannot be negative")
 
         self._std_dev = CallableStdDev(std_dev)
@@ -3216,7 +3217,8 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     mean. This value is propagated by mathematical operations as if it
     was a float.
 
-    std_dev -- standard deviation of the random variable.
+    std_dev -- standard deviation of the random variable. The standard
+    deviation must be convertible to a positive float, or be NaN.
     
     tag -- optional string tag for the variable.  Variables don't have
     to have distinct tags.  Tags are useful for tracing what values
@@ -3230,7 +3232,7 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     # Exception types raised by, respectively: tuple, string that
     # cannot be converted through float(), and string that can be
     # converted through float() (case of a number with no uncertainty):
-    except (TypeError, ValueError, AssertionError):
+    except (TypeError, ValueError, NoneUncertainty):
         # Obsolete, two-argument call:
         deprecation('either use ufloat(nominal_value, std_dev),'
                     ' ufloat(nominal_value, std_dev, tag), or the'
