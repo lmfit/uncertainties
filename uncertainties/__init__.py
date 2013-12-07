@@ -332,8 +332,10 @@ try:
 except AttributeError:  # Python < 2.6
     def isnan(x):
         '''
-        Equivalent to the math.isnan() of Python 2.6+.
+        Similar to the math.isnan() of Python 2.6+.
         '''
+        if not isinstance(x, float):
+            raise TypeError('a float is required')
         return x != x
     
 ###############################################################################
@@ -3216,7 +3218,8 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     mean. This value is propagated by mathematical operations as if it
     was a float.
 
-    std_dev -- standard deviation of the random variable.
+    std_dev -- standard deviation of the random variable. The standard
+    deviation must be convertible to a positive float, or be NaN.
     
     tag -- optional string tag for the variable.  Variables don't have
     to have distinct tags.  Tags are useful for tracing what values
@@ -3227,10 +3230,11 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     try:
         # Standard case:
         return Variable(nominal_value, std_dev, tag=tag)
-    # Exception types raised by, respectively: tuple, string that
-    # cannot be converted through float(), and string that can be
-    # converted through float() (case of a number with no uncertainty):
-    except (TypeError, ValueError, AssertionError):
+    # Exception types raised by, respectively: tuple or string that
+    # can be converted through float() (case of a number with no
+    # uncertainty), and string that cannot be converted through
+    # float():
+    except (TypeError, ValueError):
         # Obsolete, two-argument call:
         deprecation('either use ufloat(nominal_value, std_dev),'
                     ' ufloat(nominal_value, std_dev, tag), or the'
