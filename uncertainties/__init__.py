@@ -3230,9 +3230,10 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     try:
         # Standard case:
         return Variable(nominal_value, std_dev, tag=tag)
-    # Exception types raised by, respectively: tuple, string that
-    # cannot be converted through float(), and string that can be
-    # converted through float() (case of a number with no uncertainty):
+    # Exception types raised by, respectively: tuple or string that
+    # can be converted through float() (case of a number with no
+    # uncertainty), and string that cannot be converted through
+    # float():
     except (TypeError, ValueError):
         # Obsolete, two-argument call:
         deprecation('either use ufloat(nominal_value, std_dev),'
