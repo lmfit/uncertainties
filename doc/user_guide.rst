@@ -51,9 +51,9 @@ expressed in many convenient ways, including:
 >>> x = ufloat_fromstr(u"0.20±0.01")  # Pretty-print form
 >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
 
-More information can be obtained with ``pydoc
-uncertainties.ufloat_fromstr`` ("20(1)×10\ :sup:`-2`\ " is also
-recognized, etc.).
+More information can be obtained with ``pydoc uncertainties.ufloat``
+and ``pydoc uncertainties.ufloat_fromstr`` ("20(1)×10\ :sup:`-2`\ " is
+also recognized, etc.).
 
 
 Basic math
