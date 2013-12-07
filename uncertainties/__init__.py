@@ -242,6 +242,8 @@ import warnings
 import itertools
 import inspect
 
+from backport import *
+
 # Numerical version:
 __version_info__ = (2, 4, 2)
 __version__ = '.'.join(map(str, __version_info__))
@@ -283,6 +285,7 @@ __all__ = [
 
     ]
 
+        
 ###############################################################################
 
 def set_doc(doc_string):
@@ -329,8 +332,10 @@ try:
 except AttributeError:  # Python < 2.6
     def isnan(x):
         '''
-        Equivalent to the math.isnan() of Python 2.6+.
+        Similar to the math.isnan() of Python 2.6+.
         '''
+        if not isinstance(x, float):
+            raise TypeError('a float is required')
         return x != x
     
 ###############################################################################
@@ -516,7 +521,10 @@ def partial_derivative(f, arg_ref):
 
         # The values in args need to be modified, for the
         # differentiation: it is converted to a list:
-        args_with_var = kwargs if change_kwargs else list(args)
+        if change_kwargs:
+            args_with_var = kwargs
+        else:
+            args_with_var = list(args)
        
         # The step is relative to the parameter being varied, so that
         # shifting it does not suffer from finite precision limitations:
@@ -527,15 +535,17 @@ def partial_derivative(f, arg_ref):
 
         args_with_var[arg_ref] += step
 
-        shifted_f_plus = (
-            f(*args, **args_with_var) if change_kwargs
-            else f(*args_with_var, **kwargs))
+        if change_kwargs:
+            shifted_f_plus = f(*args, **args_with_var)
+        else:
+            shifted_f_plus = f(*args_with_var, **kwargs)
 
         args_with_var[arg_ref] -= 2*step  # Optimization: only 1 list copy
-        
-        shifted_f_minus = (
-            f(*args, **args_with_var) if change_kwargs
-            else f(*args_with_var, **kwargs))
+
+        if change_kwargs:
+            shifted_f_minus = f(*args, **args_with_var)
+        else:
+            shifted_f_minus = f(*args_with_var, **kwargs)
 
         return (shifted_f_plus - shifted_f_minus)/2/step
 
@@ -743,18 +753,18 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     # parameters **kwargs, but also var-or-keyword parameters, and
     # keyword-only parameters (Python 3):
     
-    derivatives_all_kwargs = dict(
-        
-        # Python 2.7+: {name: ...}
-        (name,
-         # Optimization: None keyword-argument derivatives are converted
-         # right away to derivatives (instead of doing this every time a
-         # None derivative is encountered when calculating derivatives):
-         partial_derivative(f, name) if derivative is None
-         else derivative)
+    derivatives_all_kwargs = {}
 
-        for (name, derivative) in derivatives_kwargs.iteritems()
-    )
+    for (name, derivative) in derivatives_kwargs.iteritems():
+
+        # Optimization: None keyword-argument derivatives are converted
+        # right away to derivatives (instead of doing this every time a
+        # None derivative is encountered when calculating derivatives):
+        
+        if derivative is None:
+            derivatives_all_kwargs[name] = partial_derivative(f, name)
+        else:
+            derivatives_all_kwargs[name] = derivative
 
     # When the wrapped function is called with keyword arguments that
     # map to positional-or-keyword parameters, their derivative is
@@ -789,9 +799,10 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
             
             derivative = derivatives_args_index[index]
 
-            derivatives_all_kwargs[name] = (
-                partial_derivative(f, name)
-                if derivative is None else derivative)
+            if derivative is None:
+                derivatives_all_kwargs[name] = partial_derivative(f, name)
+            else:
+                derivatives_all_kwargs[name] = derivative
 
     # Optimization: None derivatives for the positional arguments are
     # converted to the corresponding numerical differentiation
@@ -799,12 +810,12 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     # None derivative is found):
 
     none_converter = lambda index: partial_derivative(f, index)
-    
-    derivatives_args_index.returned_elements = [
-        none_converter(index) if derivative is None
-        else derivative
-        for (index, derivative) in enumerate(
-            derivatives_args_index.returned_elements)]
+
+    for (index, derivative) in enumerate(
+        derivatives_args_index.returned_elements):
+        if derivative is None:
+            derivatives_args_index.returned_elements[index] = (
+                none_converter(index))
 
     # Future None values are also automatically converted:
     derivatives_args_index.none_converter = none_converter
@@ -902,6 +913,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
         # stability than numerically calculating the partial
         # derivatives through '[f(x + dx, y + dy, ...) -
         # f(x,y,...)]/da' where dx, dy,... are calculated by varying
+
         # 'a' by 'da'.  In fact, this allows the program to control
         # how big the dx, dy, etc. are, which is numerically more
         # precise.
@@ -971,16 +983,24 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
         # The function now returns an AffineScalarFunc object:        
         return AffineScalarFunc(f_nominal_value, derivatives_wrt_vars)
 
+    f_with_affine_output = set_doc("""\
+    Version of %s(...) that returns an affine approximation
+    (AffineScalarFunc object), if its result depends on variables
+    (Variable objects).  Otherwise, returns a simple constant (when
+    applied to constant arguments).
+    
+    Warning: arguments of the function that are not AffineScalarFunc
+    objects must not depend on uncertainties.Variable objects in any
+    way.  Otherwise, the dependence of the result in
+    uncertainties.Variable objects will be incorrect.
+    
+    Original documentation:
+    %s""" % (f.__name__, f.__doc__))(f_with_affine_output)
+
     # It is easier to work with f_with_affine_output, which represents
-    # a wrapped version of 'f', when it bears the same name as
-    # 'f'.
-    f_with_affine_output.__name__ = f.__name__
-    # !! Note: Setting __name__ is however not fully sufficient: the
-    # name f_with_affine_output is stored in
-    # f_with_affine_output.__code__.co_name; being able to change it
-    # would be useful for instance when f_with_affine_output() is
-    # called with unexpected arguments (unexpected keyword argument,
-    # etc.). co_name is read-only, though.
+    # a wrapped version of 'f', when it bears the same name as 'f':
+    # ! __name__ is read-only, in Python 2.3:
+    f_with_affine_output.name = f.__name__
 
     return f_with_affine_output
 
@@ -1093,7 +1113,10 @@ def first_digit(value):
     '''
     # Python 2.5 returns nan for math.log10(-4), but Python 2.7 raises
     # ValueError, so the value is directly tested:
-    return int(math.floor(math.log10(abs(value)))) if value else 0
+    if value:
+        return int(math.floor(math.log10(abs(value))))
+    else:
+        return 0
     
 def PDG_precision(std_dev):
     '''
@@ -1118,8 +1141,10 @@ def PDG_precision(std_dev):
     #
     # Furthermore, 10**(-exponent) is not used because the exponent
     # range for very small and very big floats is generally different.
-    (exponent, factor) = ((exponent-2, 1) if exponent >= 0
-                          else (exponent+1, 1000))
+    if exponent >= 0:
+        (exponent, factor) = (exponent-2, 1)
+    else:
+        (exponent, factor) = (exponent+1, 1000)
     
     digits = int(std_dev/10.**exponent*factor)  # int rounds towards zero
 
@@ -1343,9 +1368,12 @@ def format_num(nom_val_main, error_main, common_exp,
     # the LaTeX mode. This setting does not apply to everything: for
     # example, NaN is formatted as \mathrm{nan} (or NAN) if the LaTeX
     # mode is required.
-    print_type = ('pretty-print' if 'P' in options else
-                  'latex' if 'L' in options
-                  else 'default')
+    if 'P' in options:
+        print_type = 'pretty-print'
+    elif 'L' in options:
+        print_type = 'latex'
+    else:
+        print_type = 'default'
     
     # Exponent part:
     if common_exp is None:
@@ -1518,9 +1546,14 @@ def format_num(nom_val_main, error_main, common_exp,
                     fmt_parts['sign'], fmt_parts['zero'],
                     remaining_width, fmt_parts['comma'])
 
+                if error_has_exp:
+                    remaining_width_e = remaining_width
+                else:
+                    remaining_width_e = width
+                    
                 fmt_prefix_e = '%s%d%s' % (
                     fmt_parts['zero'],
-                    remaining_width if error_has_exp else width,
+                    remaining_width_e,
                     fmt_parts['comma'])
                 
             else:
@@ -1563,7 +1596,10 @@ def format_num(nom_val_main, error_main, common_exp,
         #
         # The following uses a special integer representation of a
         # zero uncertainty:
-        fmt_suffix_e = '.%d%s' % (prec if error_main else 0, main_fmt_type)
+        if error_main:
+            fmt_suffix_e = '.%d%s' % (prec, main_fmt_type)
+        else:
+            fmt_suffix_e = '.0%s' % main_fmt_type
         
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
 
@@ -1593,13 +1629,15 @@ def format_num(nom_val_main, error_main, common_exp,
                 error_str, fmt_parts['fill'], effective_align,
                 fmt_parts['width'])
 
-        ####################            
-        pm_symbol = (
+        ####################
+        if 'P' in options:        
             # Unicode has priority over LaTeX, so that users with a
             # Unicode-compatible LaTeX source can use ±:
-            u'±' if 'P' in options else
-            ' \pm ' if 'L' in options else
-            '+/-')
+            pm_symbol = u'±'
+        elif 'L' in options:
+            pm_symbol = ' \pm '
+        else:
+            pm_symbol = '+/-'
 
         ####################
 
@@ -1649,11 +1687,12 @@ def signif_d_to_limit(value, num_signif_d):
     rounded = round(value, -limit_no_rounding)
     fst_digit_rounded = first_digit(rounded)
 
-    return (limit_no_rounding if fst_digit_rounded <= fst_digit
-            # The rounded limit is fst_digit_rounded-num_signif_d+1;
-            # but this can only be 1 above the non-rounded limit:
-            else limit_no_rounding+1)
-
+    if fst_digit_rounded > fst_digit:
+        # The rounded limit is fst_digit_rounded-num_signif_d+1;
+        # but this can only be 1 above the non-rounded limit:        
+        limit_no_rounding += 1
+        
+    return limit_no_rounding
 
 class AffineScalarFunc(object):
     """
@@ -1734,10 +1773,10 @@ class AffineScalarFunc(object):
 
     # The following prevents the 'nominal_value' attribute from being
     # modified by the user:
-    @property
     def nominal_value(self):
         "Nominal value of the random number."
         return self._nominal_value
+    nominal_value = property(nominal_value)
     
     # Abbreviation (for formulas, etc.):
     n = nominal_value
@@ -1836,14 +1875,16 @@ class AffineScalarFunc(object):
         # Calculation of the variance:
         error_components = {}
 
-        for (variable, derivative) in self.derivatives.iteritems():            
+        for (variable, derivative) in self.derivatives.iteritems():
+
             # Individual standard error due to variable:
-            error_components[variable] = (
-                0.
-                # 0 is returned even for a NaN derivative, since an
-                # exact number has a 0 uncertainty:
-                if variable._std_dev == 0
-                else abs(derivative*variable._std_dev))
+
+            # 0 is returned even for a NaN derivative, since an
+            # exact number has a 0 uncertainty:
+            if variable._std_dev == 0:
+                error_components[variable] = 0
+            else:
+                error_components[variable] = abs(derivative*variable._std_dev)
             
         return error_components
     
@@ -1864,8 +1905,8 @@ class AffineScalarFunc(object):
         #std_dev value (in fact, many intermediate AffineScalarFunc do
         #not need to have their std_dev calculated: only the final
         #AffineScalarFunc returned to the user does).
-        return CallableStdDev(sqrt(sum(
-            delta**2 for delta in self.error_components().itervalues())))
+        return CallableStdDev(sqrt(sum([
+            delta**2 for delta in self.error_components().itervalues()])))
 
     # Abbreviation (for formulas, etc.):
     s = std_dev
@@ -1881,8 +1922,13 @@ class AffineScalarFunc(object):
         # A zero standard deviation is printed because otherwise,
         # ufloat_fromstr() does not correctly parse back the value
         # ("1.23" is interpreted as "1.23(1)"):
-        return "%r+/-%s" % (self.nominal_value,
-                            repr(std_dev) if std_dev else '0')
+
+        if std_dev:
+            std_dev_str = repr(std_dev)
+        else:
+            std_dev_str = '0'
+            
+        return "%r+/-%s" % (self.nominal_value, std_dev_str)
                     
     def __str__(self):
         # An empty format string and str() usually return the same
@@ -2121,7 +2167,10 @@ class AffineScalarFunc(object):
             # 3.141592±NaN with an "f" format specification, for
             # example):
 
-            prec = int(fmt_prec) if fmt_prec else 6
+            if fmt_prec:
+                prec = int(fmt_prec)
+            else:
+                prec = 6
 
             if fmt_type in 'fF':
 
@@ -2308,8 +2357,8 @@ class AffineScalarFunc(object):
         """
         return AffineScalarFunc(
             self._nominal_value,
-            dict((copy.deepcopy(var), deriv)
-                 for (var, deriv) in self.derivatives.iteritems()))
+            dict([(copy.deepcopy(var), deriv)
+                  for (var, deriv) in self.derivatives.iteritems()]))
 
     def __getstate__(self):
         """
@@ -2453,17 +2502,6 @@ def get_ops_with_reflection():
         # but it is calculated numerically, for convenience:
         'mod': ("1.", "partial_derivative(float.__mod__, 1)(x, y)"),
         'mul': ("y", "x"),
-        # The case x**y is constant one the line x = 0 and in y = 0;
-        # the corresponding derivatives must be zero in these
-        # cases. If the function is actually not defined (e.g. 0**-3),
-        # then an exception will be raised when the nominal value is
-        # calculated.  These derivatives are transformed to NaN if an
-        # error happens during their calculation:
-        'pow': ("0. if y == 0"
-                #!! Python 2.6+ y % 1 == 0 => y.is_integer():
-                " else y*x**(y-1) if x != 0 or y % 1 == 0"
-                " else float('nan')",
-                "0. if (x == 0) and (y > 0) else log(x)*x**y"),
         'sub': ("1.", "-1."),
         'truediv': ("1/y", "-x/y**2")
         }
@@ -2477,6 +2515,34 @@ def get_ops_with_reflection():
         ops_with_reflection["r"+op] = [
             eval("lambda y, x: %s" % expr) for expr in reversed(derivatives)]
 
+
+    # The derivatives of pow() are more complicated:
+
+    # The case x**y is constant one the line x = 0 and in y = 0;
+    # the corresponding derivatives must be zero in these
+    # cases. If the function is actually not defined (e.g. 0**-3),
+    # then an exception will be raised when the nominal value is
+    # calculated.  These derivatives are transformed to NaN if an
+    # error happens during their calculation:
+    
+    def pow_deriv_0(x, y):
+        if y == 0:
+            return 0.
+        elif x != 0 or y % 1 == 0:
+            return y*x**(y-1)
+        else:
+            return float('nan')
+
+    def pow_deriv_1(x, y):
+        if x == 0 and y > 0:
+            return 0.
+        else:
+            return log(x)*x**y
+        
+    ops_with_reflection['pow'] = [pow_deriv_0, pow_deriv_1]
+    ops_with_reflection['rpow'] = [lambda y, x: pow_deriv_1(x, y),
+                                   lambda y, x: pow_deriv_0(x, y)]
+            
     # Undefined derivatives are converted to NaN when the function
     # itself can be calculated:
     for op in ['pow']:
@@ -2547,10 +2613,16 @@ def add_operators_to_AffineScalarFunc():
 
     ## Operators that return a numerical value:
 
+    def _simple_add_deriv(x):
+        if x >= 0:
+            return 1.
+        else:
+            return -1.
+        
     # Single-argument operators that should be adapted from floats to
-    # AffineScalarFunc objects, associated to their derivative:
+    # AffineScalarFunc objects, associated to their derivative:        
     simple_numerical_operators_derivatives = {
-        'abs': lambda x: 1. if x>=0 else -1.,
+        'abs': _simple_add_deriv,
         'neg': lambda x: -1.,
         'pos': lambda x: 1.,
         'trunc': lambda x: 0.
@@ -2587,11 +2659,10 @@ def add_operators_to_AffineScalarFunc():
         # different versions of Python (for instance, __trunc__ was
         # introduced with Python 2.6):
         try:
-
-            func_to_wrap = (getattr(float, attribute_name)
-                            if op not in custom_ops
-                            else custom_ops[op])
-
+            if op not in custom_ops:
+                func_to_wrap = getattr(float, attribute_name)
+            else:
+                func_to_wrap = custom_ops[op]
         except AttributeError:
             pass
         else:
@@ -2706,8 +2777,10 @@ class Variable(AffineScalarFunc):
 
         num_repr  = super(Variable, self).__repr__()
         
-        return (num_repr if self.tag is None
-                else "< %s = %s >" % (self.tag, num_repr))
+        if self.tag is None:
+            return num_repr
+        else:
+            return "< %s = %s >" % (self.tag, num_repr)
 
     def __hash__(self):
         # All Variable objects are by definition independent
@@ -2762,7 +2835,10 @@ def nominal_value(x):
     numbers, when only some of them generally carry an uncertainty.
     """
 
-    return x.nominal_value if isinstance(x, AffineScalarFunc) else x
+    if isinstance(x, AffineScalarFunc):
+        return x.nominal_value
+    else:
+        return x
 
 def std_dev(x):
     """
@@ -2774,7 +2850,10 @@ def std_dev(x):
     numbers, when only some of them generally carry an uncertainty.
     """
 
-    return x.std_dev if isinstance(x, AffineScalarFunc) else 0.
+    if isinstance(x, AffineScalarFunc):
+        return x.std_dev
+    else:
+        return 0.
 
 def covariance_matrix(nums_with_uncert):
     """
@@ -2817,8 +2896,8 @@ def covariance_matrix(nums_with_uncert):
 
     # We symmetrize the matrix:
     for (i, covariance_coefs) in enumerate(covariance_matrix):
-        covariance_coefs.extend(covariance_matrix[j][i]
-                                for j in range(i+1, len(covariance_matrix)))
+        covariance_coefs.extend([covariance_matrix[j][i]
+                                 for j in range(i+1, len(covariance_matrix))])
 
     return covariance_matrix
 
@@ -2903,7 +2982,10 @@ def parse_error_in_parentheses(representation):
                              % representation)
 
     # Global exponent:
-    factor = 10.**from_superscript(exponent) if exponent else 1
+    if exponent:
+        factor = 10.**from_superscript(exponent)
+    else:
+        factor = 1
     
     # Nominal value:
     value = float((sign or '')+main)*factor
@@ -2921,8 +3003,11 @@ def parse_error_in_parentheses(representation):
 
         # The number of digits after the period defines the power of
         # 10 than must be applied to the provided uncertainty:
-        num_digits_after_period = (0 if main_dec is None
-                                   else len(main_dec)-1)
+        if main_dec is None:
+            num_digits_after_period = 0
+        else:
+            num_digits_after_period = len(main_dec)-1
+            
         uncert_value = int(uncert_int)/10.**num_digits_after_period
 
     # We apply the exponent to the uncertainty as well:
@@ -3096,9 +3181,11 @@ def _ufloat_obsolete(representation, tag=None):
     string representation of a number with uncertainty, in a format
     recognized by ufloat_fromstr().
     '''
-    return (ufloat(representation[0], representation[1], tag)
-            if isinstance(representation, tuple)
-            else ufloat_fromstr(representation, tag))
+
+    if isinstance(representation, tuple):
+        return ufloat(representation[0], representation[1], tag)
+    else:
+        return ufloat_fromstr(representation, tag)
 
 # The arguments are named for the new version, instead of bearing
 # names that are closer to their obsolete use (e.g., std_dev could be
@@ -3152,9 +3239,10 @@ def ufloat(nominal_value, std_dev=None, tag=None):
         deprecation('either use ufloat(nominal_value, std_dev),'
                     ' ufloat(nominal_value, std_dev, tag), or the'
                     ' ufloat_fromstr() function, for string representations.')
-        return _ufloat_obsolete(nominal_value,  # Tuple or string
-                                # tag keyword used:
-                                tag if tag is not None
-                                # 2 positional arguments form:
-                                else std_dev)
 
+        if tag is not None:
+            tag_arg = tag  # tag keyword used:
+        else:
+            tag_arg = std_dev  # 2 positional arguments form
+            
+        return _ufloat_obsolete(nominal_value, tag_arg)

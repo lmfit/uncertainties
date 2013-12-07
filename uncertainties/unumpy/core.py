@@ -71,7 +71,10 @@ def unumpy_to_numpy_matrix(arr):
     Otherwise, it is returned unchanged.
     """
 
-    return arr.view(numpy.matrix) if isinstance(arr, matrix) else arr        
+    if isinstance(arr, matrix):
+        return arr.view(numpy.matrix)
+    else:
+        return arr
 
 def nominal_values(arr):
     """
@@ -227,6 +230,18 @@ def wrap_array_func(func):
         return numpy.vectorize(uncertainties.AffineScalarFunc)(
             func_nominal_value, derivatives)
 
+    wrapped_func = uncertainties.set_doc("""\
+    Version of %s(...) that works even when its first argument is a NumPy
+    array that contains numbers with uncertainties.
+    
+    Warning: elements of the first argument array that are not
+    AffineScalarFunc objects must not depend on uncertainties.Variable
+    objects in any way.  Otherwise, the dependence of the result in
+    uncertainties.Variable objects will be incorrect.
+    
+    Original documentation:
+    %s""" % (func.__name__, func.__doc__))(wrapped_func)
+
     # It is easier to work with wrapped_func, which represents a
     # wrapped version of 'func', when it bears the same name as
     # 'func' (the name is used by repr(wrapped_func)).
@@ -349,7 +364,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         func_and_derivs = func_with_derivatives(
             array_nominal,
             type(array_like),
-            (array_derivative(array_version, var) for var in variables),
+            [array_derivative(array_version, var) for var in variables],
             *args, **kwargs)
 
         func_nominal_value = func_and_derivs.next()
@@ -494,7 +509,10 @@ except AttributeError:
 
 pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
-@uncertainties.set_doc("""
+def pinv(array_like, rcond=pinv_default):
+    return pinv_with_uncert(array_like, rcond)
+
+pinv = uncertainties.set_doc("""
     Version of numpy.linalg.pinv that works with array-like objects
     that contain numbers with uncertainties.
 
@@ -505,9 +523,7 @@ pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
     Original documentation:
     %s
-    """ % numpy.linalg.pinv.__doc__)
-def pinv(array_like, rcond=pinv_default):
-    return pinv_with_uncert(array_like, rcond)
+    """ % numpy.linalg.pinv.__doc__)(pinv)
 
 ########## Matrix class
 
@@ -539,19 +555,23 @@ class matrix(numpy.matrix):
         # numpy.matrix.I is a property object anyway:
 
         m, n = self.shape
-        return (inv if m == n else pinv)(self)
+        if m == n:
+            func = inv
+        else:
+            func = pinv
+        return func(self)
 
     # ! In Python >= 2.6, this could be simplified as:
     # I = numpy.matrix.I.getter(__matrix_inverse)
     I = property(getI, numpy.matrix.I.fset, numpy.matrix.I.fdel,
                  numpy.matrix.I.__doc__)
 
-    @property
     def nominal_values(self):
         """
         Nominal value of all the elements of the matrix.
         """
         return nominal_values(self)
+    nominal_values = property(nominal_values)
     
     std_devs = std_devs
     
@@ -585,9 +605,9 @@ def define_vectorized_funcs():
     this_module = sys.modules[__name__]
     # NumPy does not always use the same function names as the math
     # module:
-    func_name_translations = dict(
+    func_name_translations = dict([
         (f_name, 'arc'+f_name[1:])
-        for f_name in ['acos', 'acosh', 'asin', 'atan', 'atan2', 'atanh'])
+        for f_name in ['acos', 'acosh', 'asin', 'atan', 'atan2', 'atanh']])
 
     new_func_names = [func_name_translations.get(function_name, function_name)
                       # The functions from umath.non_std_wrapped_funcs
