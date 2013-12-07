@@ -2755,7 +2755,6 @@ class Variable(AffineScalarFunc):
         # separately for NaN. But this is not guaranteed, even if it
         # should work on most platforms.)
         if std_dev < 0 and not isnan(std_dev):
-            print "STD DEV", std_dev  #!!!!!!!!
             raise NegativeStdDev("The standard deviation cannot be negative")
 
         self._std_dev = CallableStdDev(std_dev)
