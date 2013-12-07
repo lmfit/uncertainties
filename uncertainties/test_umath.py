@@ -150,7 +150,7 @@ def test_monte_carlo_comparison():
         y_samples = numpy.random.normal(y.nominal_value, y.std_dev,
                                         n_samples)
 
-        # !!! astype() is a temporary fix for NumPy 1.8:        
+        # !! astype() is a fix for median() in NumPy 1.8.0:
         function_samples = function(x_samples, y_samples).astype(float)
 
         cov_mat = numpy.cov([x_samples, y_samples], function_samples)

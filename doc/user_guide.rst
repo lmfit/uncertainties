@@ -245,10 +245,14 @@ for **pretty-printing**:
 >>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeχ
 \left(2.00 \pm 0.10\right) \times 10^{6}
 
-The pretty-printing mode uses "±" and superscript exponents: ``print
-u'{:.2eP}'.format(x)`` yields "(2.00±0.10)×10\ :sup:`-1`\ ".
+The pretty-printing mode uses "±" and superscript exponents: the
+default output is such that ``print '{:.2e}'.format(x)`` yields
+"(2.00+/-0.10)e-01", whereas the pretty-printing mode in ``print
+u'{:.2eP}'.format(x)`` yields "(2.00±0.10)×10\ :sup:`-1`\ ". Note that
+the pretty-printing mode implies using Unicode format strings
+(``u'…'`` in Python 2, but simply ``'…'`` in Python 3).
 
-These formatting options can be combined.
+These formatting options can be combined (when meaningful).
 
 .. Special cases:
 

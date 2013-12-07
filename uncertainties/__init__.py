@@ -26,7 +26,7 @@ Examples:
   x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
   x = ufloat_fromstr("0.20+/-0.01")  # Other representation
   x = ufloat_fromstr("0.20(1)")  # Other representation
-  # Implicit uncertainty of +/-1 on the last digit:  
+  # Implicit uncertainty of +/-1 on the last digit:
   x = ufloat_fromstr("0.20")
   print x**2  # Square: prints "0.040+/-0.004"
   print sin(x**2)  # Prints "0.0399...+/-0.00399..."
@@ -245,7 +245,7 @@ import inspect
 from backport import *
 
 # Numerical version:
-__version_info__ = (2, 4, 2)
+__version_info__ = (2, 4, 3)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
@@ -332,8 +332,10 @@ try:
 except AttributeError:  # Python < 2.6
     def isnan(x):
         '''
-        Equivalent to the math.isnan() of Python 2.6+.
+        Similar to the math.isnan() of Python 2.6+.
         '''
+        if not isinstance(x, float):
+            raise TypeError('a float is required')
         return x != x
     
 ###############################################################################
@@ -1730,7 +1732,7 @@ class AffineScalarFunc(object):
     # To save memory in large arrays:
     __slots__ = ('_nominal_value', 'derivatives')
 
-    # !!! Temporary fix for mean() in NumPy 1.8:
+    # !! Fix for mean() in NumPy 1.8.0:
     class dtype(object):
         type = staticmethod(lambda value: value)
     
@@ -2682,6 +2684,10 @@ def add_operators_to_AffineScalarFunc():
 
 add_operators_to_AffineScalarFunc()  # Actual addition of class attributes
 
+class NegativeStdDev(Exception):
+    '''Raise for a negative standard deviation'''
+    pass
+
 class Variable(AffineScalarFunc):    
     """
     Representation of a float-like scalar random variable, along with
@@ -2698,7 +2704,12 @@ class Variable(AffineScalarFunc):
     def __init__(self, value, std_dev, tag=None):
         """
         The nominal value and the standard deviation of the variable
-        are set.  These values must be scalars.
+        are set.
+
+        The value is converted to float.
+
+        The standard deviation std_dev can be NaN. It should normally
+        be a float or an integer.
 
         'tag' is a tag that the user can associate to the variable.  This
         is useful for tracing variables.
@@ -2732,9 +2743,6 @@ class Variable(AffineScalarFunc):
         
         self.tag = tag
 
-    # !! In Python 2.6+, the std_dev property would be more simply
-    # implemented with @property(getter), then @std_dev.setter(setter).
-
     # Standard deviations can be modified (this is a feature).
     # AffineScalarFunc objects that depend on the Variable have their
     # std_dev automatically modified (recalculated with the new
@@ -2742,15 +2750,20 @@ class Variable(AffineScalarFunc):
     def _set_std_dev(self, std_dev):
     
         # We force the error to be float-like.  Since it is considered
-        # as a standard deviation, it must be positive:
-        assert std_dev >= 0 or isnan(std_dev), (
-            "the error must be a positive number, or NaN")
+        # as a standard deviation, it must be either positive or NaN:
+        # (Note: if NaN < 0 is False, there is no need to test
+        # separately for NaN. But this is not guaranteed, even if it
+        # should work on most platforms.)
+        if std_dev < 0 and not isnan(std_dev):
+            raise NegativeStdDev("The standard deviation cannot be negative")
 
         self._std_dev = CallableStdDev(std_dev)
     
     def _get_std_dev(self):
         return self._std_dev
-        
+
+    # !! In Python 2.6+, the std_dev property would be more simply
+    # implemented with @property(getter), then @std_dev.setter(setter).    
     std_dev = property(_get_std_dev, _set_std_dev)
     
     # Support for legacy method:
@@ -2772,7 +2785,7 @@ class Variable(AffineScalarFunc):
     def __hash__(self):
         # All Variable objects are by definition independent
         # variables, so they never compare equal; therefore, their
-        # id() are therefore allowed to differ
+        # id() are allowed to differ
         # (http://docs.python.org/reference/datamodel.html#object.__hash__):
         return id(self)
             
@@ -3160,7 +3173,7 @@ def ufloat_fromstr(representation, tag=None):
     
     return ufloat(nominal_value, std_dev, tag)
 
-def ufloat_obsolete(representation, tag=None):
+def _ufloat_obsolete(representation, tag=None):
     '''
     Legacy version of ufloat(). Will eventually be removed.
 
@@ -3205,7 +3218,8 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     mean. This value is propagated by mathematical operations as if it
     was a float.
 
-    std_dev -- standard deviation of the random variable.
+    std_dev -- standard deviation of the random variable. The standard
+    deviation must be convertible to a positive float, or be NaN.
     
     tag -- optional string tag for the variable.  Variables don't have
     to have distinct tags.  Tags are useful for tracing what values
@@ -3215,14 +3229,12 @@ def ufloat(nominal_value, std_dev=None, tag=None):
 
     try:
         # Standard case:
-
-        #! The special ** syntax is for Python 2.5 and before (Python 2.6+
-        # understands tag=tag):
-        return Variable(nominal_value, std_dev, **{'tag': tag})
-    # Exception types raised by, respectively: tuple, string that
-    # cannot be converted through float(), and string that can be
-    # converted through float() (case of a number with no uncertainty):
-    except (TypeError, ValueError, AssertionError):
+        return Variable(nominal_value, std_dev, tag=tag)
+    # Exception types raised by, respectively: tuple or string that
+    # can be converted through float() (case of a number with no
+    # uncertainty), and string that cannot be converted through
+    # float():
+    except (TypeError, ValueError):
         # Obsolete, two-argument call:
         deprecation('either use ufloat(nominal_value, std_dev),'
                     ' ufloat(nominal_value, std_dev, tag), or the'
@@ -3233,4 +3245,4 @@ def ufloat(nominal_value, std_dev=None, tag=None):
         else:
             tag_arg = std_dev  # 2 positional arguments form
             
-        return ufloat_obsolete(nominal_value, tag_arg)
+        return _ufloat_obsolete(nominal_value, tag_arg)

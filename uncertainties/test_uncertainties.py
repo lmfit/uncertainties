@@ -278,6 +278,19 @@ def test_value_construction():
     assert x.std_dev == x2.std_dev
     assert x.tag == 'pi'
     assert x2.tag == 'pi'
+
+    # Negative standard deviations should be caught in a nice way
+    # (with the right exception):
+    try:
+        x = ufloat(3, -0.1)
+    except uncertainties.NegativeStdDev:
+        pass
+    
+    try:
+        # Obsolete form:
+        x = ufloat((3, -0.1))
+    except uncertainties.NegativeStdDev:
+        pass
     
 def test_ufloat_fromstr():
     "Input of numbers with uncertainties as a string"
