@@ -332,7 +332,7 @@ try:
 except AttributeError:  # Python < 2.6
     def isnan(x):
         '''
-        Equivalent to the math.isnan() of Python 2.6+.
+        Similar to the math.isnan() of Python 2.6+.
         '''
         if not isinstance(x, float):
             raise TypeError('a float is required')
