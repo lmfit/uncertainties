@@ -338,6 +338,7 @@ _of_uncertainty
               'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes'],
 
     use_2to3 = True,
+    test_suite = 'nose.collector',
     install_requires = ['numpy'],
     tests_require = tests_require,
     extras_require = {
