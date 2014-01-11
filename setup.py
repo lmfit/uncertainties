@@ -168,6 +168,7 @@ Version history
 
 Main changes:
 
+- 2.4.4: The documentation license now allows its commercial use.
 - 2.4.2: `NumPy 1.8 compatibility <https://github.com/numpy/numpy/issues/4063>`_.
 - 2.4.1: In ``uncertainties.umath``, functions ``ceil()``, ``floor()``, \
          ``isinf()``, ``isnan()`` and ``trunc()`` now return values of \
