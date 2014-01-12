@@ -335,10 +335,7 @@ _of_uncertainty
     # Files are defined in MANIFEST (which is automatically created by
     # python setup.py sdist):
     packages=['uncertainties', 'uncertainties.unumpy',
-              'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes'],
-
-    # !!!! Used for what? does not allow python3 setup.py test to succeed:
-    use_2to3=True
+              'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes']
     )
 
 # The best available setup() is used (some users do not have
@@ -351,6 +348,9 @@ try:
     tests_require = ['nose']
     
     setup_options.update(dict(
+
+        # !!!! Used for what? does not allow python3 setup.py test to succeed:
+        use_2to3=True,
         
         # Enables nosetests testing via setup.py's test command:
         test_suite='nose.collector',
