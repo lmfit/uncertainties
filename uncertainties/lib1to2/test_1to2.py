@@ -21,8 +21,10 @@ import os
 
 
 if sys.version_info < (2, 6) or "TRAVIS" in os.environ:
+    
     # This package uses lib2to3, which requires Python 2.6+.
-    # lib2to3.tests.support is missing from 2.7.3 Travis python packages.
+    
+    # lib2to3.tests.support is missing from 2.7.3 Travis Python packages.
 
     # !!  Nosetests for Python 2.6 also fails (it looks like it tries
     # to run tests via lib2to3/tests/test_refactor.py):
