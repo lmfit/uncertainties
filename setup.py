@@ -3,19 +3,18 @@
 
 # !! This program must run with all version of Python since 2.3 included.
 
-from setuptools import setup
 import sys
 import os
 
 min_version = (2, 3)
-error_msg = ("I'm sorry.  This package is for Python %d.%d and higher only."
+error_msg = ("Sorry, this package is for Python %d.%d and higher only."
              % min_version)
+
 try:
     if sys.version_info < min_version:
         sys.exit(error_msg)
 except AttributeError:  # sys.version_info was introduced in Python 2.0
     sys.exit(error_msg)
-
 
 # Determination of the directory that contains the source code:
 if os.path.exists('uncertainties'):
@@ -40,9 +39,9 @@ else:
 # sys.path.insert(0, package_dir)
 # uncertainties = __import__(package_dir)
 
-tests_require = ['nose']
 
-setup(
+# Common options for distutils/setuptools's setup():
+setup_options = dict(
     name='uncertainties',
     version='2.4.4',
     author='Eric O. LEBIGOT (EOL)',
@@ -338,13 +337,36 @@ _of_uncertainty
     packages=['uncertainties', 'uncertainties.unumpy',
               'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes'],
 
-    use_2to3 = True,
-    test_suite = 'nose.collector',
-    install_requires = ['numpy'],
-    tests_require = tests_require,
-    extras_require = {
-        "tests": tests_require,
-        "docs": ["sphinx"],
-    }
-)
+    # !!!! Used for what? does not allow python3 setup.py test to succeed:
+    use_2to3=True
+    )
+
+# The best available setup() is used (some users do not have
+# setuptools):
+try:
+    from setuptools import setup
+
+    # Some setuptools-specific options can be added:
+    
+    tests_require = ['nose']
+    
+    setup_options.update(dict(
+        
+        # Enables nosetests testing via setup.py's test command:
+        test_suite='nose.collector',
+        # Automatically fetches nose if not yet installed:
+        tests_require=tests_require,
+        
+        # Optional setup.py commands: # !!! Used how?
+        extras_require={
+            'tests': tests_require,
+            'docs': ["sphinx"]
+            }
+        ))
+
+except ImportError:
+    from distutils.core import setup
+
+setup(**setup_options)
 # End of setup definition
+
