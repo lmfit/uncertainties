@@ -3,7 +3,7 @@
 
 # !! This program must run with all version of Python since 2.3 included.
 
-import distutils.core
+from setuptools import setup
 import sys
 import os
 
@@ -29,14 +29,6 @@ else:
     else:
         package_dir = 'uncertainties-py23'
 
-# Building through 2to3, for Python 3 (see also setup(...,
-# cmdclass=...), below:
-try:
-    from distutils.command.build_py import build_py_2to3 as build_py
-except ImportError:
-    # 2.x
-    from distutils.command.build_py import build_py
-
 #! The following code was intended to automatically fetch the version
 # number; however, it fails when run from Python3 if the downloaded
 # code is not the Python 3 version.  An alternative approach would be
@@ -48,7 +40,9 @@ except ImportError:
 # sys.path.insert(0, package_dir)
 # uncertainties = __import__(package_dir)
 
-distutils.core.setup(
+tests_require = ['nose']
+
+setup(
     name='uncertainties',
     version='2.4.4',
     author='Eric O. LEBIGOT (EOL)',
@@ -344,5 +338,13 @@ _of_uncertainty
     packages=['uncertainties', 'uncertainties.unumpy',
               'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes'],
 
-    cmdclass={'build_py': build_py}
-    )  # End of setup definition
+    use_2to3 = True,
+    test_suite = 'nose.collector',
+    install_requires = ['numpy'],
+    tests_require = tests_require,
+    extras_require = {
+        "tests": tests_require,
+        "docs": ["sphinx"],
+    }
+)
+# End of setup definition

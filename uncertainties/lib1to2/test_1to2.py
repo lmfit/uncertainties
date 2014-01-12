@@ -13,13 +13,16 @@ Meant to be run through nosetests.
 # - lib2to3.tests.test_fixers.py
 
 import sys
+import os
 
 # !! Would it be possible to use an import hook so as to stop the
 # import if the Python version is not high enough, instead of having
 # like here a whole indented block?
 
-if sys.version_info < (2, 7):
+
+if sys.version_info < (2, 6) or "TRAVIS" in os.environ:
     # This package uses lib2to3, which requires Python 2.6+.
+    # lib2to3.tests.support is missing from 2.7.3 Travis python packages.
 
     # !!  Nosetests for Python 2.6 also fails (it looks like it tries
     # to run tests via lib2to3/tests/test_refactor.py):
