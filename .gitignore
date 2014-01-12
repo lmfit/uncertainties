@@ -4,3 +4,4 @@ build
 doc/_build
 dist
 MANIFEST
+uncertainties.egg-info/

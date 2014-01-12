@@ -3,19 +3,18 @@
 
 # !! This program must run with all version of Python since 2.3 included.
 
-import distutils.core
 import sys
 import os
 
 min_version = (2, 3)
-error_msg = ("I'm sorry.  This package is for Python %d.%d and higher only."
+error_msg = ("Sorry, this package is for Python %d.%d and higher only."
              % min_version)
+
 try:
     if sys.version_info < min_version:
         sys.exit(error_msg)
 except AttributeError:  # sys.version_info was introduced in Python 2.0
     sys.exit(error_msg)
-
 
 # Determination of the directory that contains the source code:
 if os.path.exists('uncertainties'):
@@ -29,14 +28,6 @@ else:
     else:
         package_dir = 'uncertainties-py23'
 
-# Building through 2to3, for Python 3 (see also setup(...,
-# cmdclass=...), below:
-try:
-    from distutils.command.build_py import build_py_2to3 as build_py
-except ImportError:
-    # 2.x
-    from distutils.command.build_py import build_py
-
 #! The following code was intended to automatically fetch the version
 # number; however, it fails when run from Python3 if the downloaded
 # code is not the Python 3 version.  An alternative approach would be
@@ -48,7 +39,9 @@ except ImportError:
 # sys.path.insert(0, package_dir)
 # uncertainties = __import__(package_dir)
 
-distutils.core.setup(
+
+# Common options for distutils/setuptools's setup():
+setup_options = dict(
     name='uncertainties',
     version='2.4.4',
     author='Eric O. LEBIGOT (EOL)',
@@ -291,7 +284,6 @@ Main changes:
 .. _PEP 8: http://www.python.org/dev/peps/pep-0008/
 .. _error propagation theory: http://en.wikipedia.org/wiki/Propagation\
 _of_uncertainty
-.. _setuptools: http://pypi.python.org/pypi/setuptools
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
 .. _PayPal: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _main website: http://pythonhosted.org/uncertainties/
@@ -342,7 +334,38 @@ _of_uncertainty
     # Files are defined in MANIFEST (which is automatically created by
     # python setup.py sdist):
     packages=['uncertainties', 'uncertainties.unumpy',
-              'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes'],
+              'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes']
+    )
 
-    cmdclass={'build_py': build_py}
-    )  # End of setup definition
+# The best available setup() is used (some users do not have
+# setuptools):
+try:
+    from setuptools import setup
+
+    # Some setuptools-specific options can be added:
+    
+    tests_require = ['nose']
+    
+    setup_options.update(dict(
+
+        # !!!! Used for what? does not allow python3 setup.py test to succeed:
+        use_2to3=True,
+        
+        # Enables nosetests testing via setup.py's test command:
+        test_suite='nose.collector',
+        # Automatically fetches nose if not yet installed:
+        tests_require=tests_require,
+        
+        # Optional setup.py commands: # !!! Used how?
+        extras_require={
+            'tests': tests_require,
+            'docs': ["sphinx"]
+            }
+        ))
+
+except ImportError:
+    from distutils.core import setup
+
+setup(**setup_options)
+
+
