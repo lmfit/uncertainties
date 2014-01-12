@@ -20,7 +20,7 @@ import os
 # like here a whole indented block?
 
 
-if sys.version_info < (2, 6) or "TRAVIS" in os.environ:
+if sys.version_info < (2, 7) or "TRAVIS" in os.environ:
     
     # This package uses lib2to3, which requires Python 2.6+.
     
