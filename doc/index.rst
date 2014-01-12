@@ -178,8 +178,8 @@ program with
 
    python setup.py install
 
-or, for an installation in the user Python library (no additional access
-rights needed):
+or, for an installation with Python 2.6+ in the user Python library
+(no additional access rights needed):
 
 .. code-block:: sh
 
