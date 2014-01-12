@@ -29,9 +29,11 @@ help:
 clean:
 	-rm -rf _build/*
 
-# The HTML needs latex because the PDF version is linked to:
-html: latex
-	(cd _build/latex; make all-pdf)
+pdf: latex
+	(cd _build/latex; $(MAKE) all-pdf)
+
+# The HTML needs pdf because it contains a link to the PDF version:
+html: pdf
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
 	@echo
 	@echo "Build finished. The HTML pages are in _build/html."
@@ -51,11 +53,17 @@ json:
 	@echo
 	@echo "Build finished; now you can process the JSON files."
 
-htmlhelp:
+htmlhelp: pdf
 	$(SPHINXBUILD) -b htmlhelp $(ALLSPHINXOPTS) _build/htmlhelp
 	@echo
 	@echo "Build finished; now you can run HTML Help Workshop with the" \
 	      ".hhp project file in _build/htmlhelp."
+
+epub: pdf
+	$(SPHINXBUILD) -b epub $(ALLSPHINXOPTS) _build/epub
+	@echo
+	@echo "Build finished; the EPUB documentation is in" \
+	      "_build/epub."
 
 qthelp:
 	$(SPHINXBUILD) -b qthelp $(ALLSPHINXOPTS) _build/qthelp
