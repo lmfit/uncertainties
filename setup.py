@@ -284,7 +284,6 @@ Main changes:
 .. _PEP 8: http://www.python.org/dev/peps/pep-0008/
 .. _error propagation theory: http://en.wikipedia.org/wiki/Propagation\
 _of_uncertainty
-.. _setuptools: http://pypi.python.org/pypi/setuptools
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
 .. _PayPal: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
 .. _main website: http://pythonhosted.org/uncertainties/
@@ -368,5 +367,5 @@ except ImportError:
     from distutils.core import setup
 
 setup(**setup_options)
-# End of setup definition
+
 
