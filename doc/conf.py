@@ -14,8 +14,8 @@
 from datetime import date
 
 import sys, os
-import os.path as osp
-sys.path.insert(0, osp.abspath('..'))
+
+sys.path.insert(0, os.path.abspath('..'))
 import uncertainties
 
 # If extensions (or modules to document with autodoc) are in another directory,
