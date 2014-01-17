@@ -5,3 +5,5 @@ doc/_build
 dist
 MANIFEST
 uncertainties.egg-info/
+
+.idea/
