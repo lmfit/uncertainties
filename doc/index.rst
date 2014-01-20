@@ -178,20 +178,24 @@ program with
 
    python setup.py install
 
-or, for an installation with Python 2.6+ in the user Python library
+(where the default ``python`` interpreter must generally be replaced
+by the version of Python for which the package should be installed:
+``python3``, ``python3.3``, etc.).
+
+For an installation with Python 2.6+ in the *user* Python library
 (no additional access rights needed):
 
 .. code-block:: sh
 
    python setup.py install --user
 
-or, for an installation in a custom directory :file:`my_directory`:
+For an installation in a custom directory :file:`my_directory`:
 
 .. code-block:: sh
 
    python setup.py install --install-lib my_directory
 
-or, if additional access rights are needed (Unix):
+If additional access rights are needed (Unix):
 
 .. code-block:: sh
 
@@ -271,6 +275,7 @@ What others say
 
 - "*Superb,*" "*wonderful,*" "*It's like magic.*" (`Joaquin Abian
   <http://blog.garlicsim.org/post/1266209646/cool-python-module-uncertainties#comment-85154147>`_)
+- "*pretty amazing*" (`John Kitchin <http://kitchingroup.cheme.cmu.edu/blog/2013/03/07/Another-approach-to-error-propagation/>`_)
 - "*An awesome python package*" (`Jason Moore
   <http://biosport.ucdavis.edu/blog/2010/05/07/uncertainty-analysis>`_)
 - "*Utterly brilliant*" (`Jeffrey Simpson
@@ -284,7 +289,7 @@ What others say
   <http://dawes.wordpress.com/2011/01/02/scientific-python/>`_)
 - "*uncertainties makes error propagation dead simple.*" (`enrico
   documentation <http://readthedocs.org/docs/enrico/en/latest/setup.html>`_)
-- contains "*many inspiring ideas*" (`Abraham Lee
+- "*many inspiring ideas*" (`Abraham Lee
   <https://pypi.python.org/pypi/soerp#acknowledgements>`_)
 - "*Those of us working with experimental data or simulation results
   will appreciate this.*" (`Konrad Hinsen
