@@ -240,6 +240,7 @@ div.sphinxsidebar h4, div.sphinxsidebar h3 {
 div.sphinxsidebar ul {
     padding-left: 1.5em;
     margin-top: 7px;
+    margin-bottom: 7px;
     list-style: none;
     padding: 0;
     line-height: 130%;
