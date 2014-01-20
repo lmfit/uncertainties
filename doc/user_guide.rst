@@ -194,9 +194,9 @@ the empty format type, etc.):
 1 significant digit on the uncertainty: 0.20+/-0.01
 >>> print '3 significant digits on the uncertainty: {:.3u}'.format(x)
 3 significant digits on the uncertainty: 0.2000+/-0.0100
->>> print '1 digit for the uncertainty, exponent notation: {:.1ue}'.format(x)
+>>> print '1 significant digit, exponent notation: {:.1ue}'.format(x)
 1 significant digit, exponent notation: (2.0+/-0.1)e-01
->>> print '1 digit for the uncertainty, percentage: {:.1u%}'.format(x)
+>>> print '1 significant digit, percentage: {:.1u%}'.format(x)
 1 significant digit, percentage: (20+/-1)%
 
 The usual **float formats with a precision** retain their original
