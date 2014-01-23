@@ -342,26 +342,32 @@ try:
     from setuptools import setup
 
     # Some setuptools-specific options can be added:
-    tests_require = ['nose', 'numpy']
-    optional_require = ['numpy']
-    docs_require = ['sphinx']
-    all_extra = set(tests_require + optional_require + docs_require)
-    kw = {
-        # allows python setup.py nosetests to do the right thing
+    
+    addtl_setup_options = {
+        
+        # Allows python setup.py nosetests to do the right thing:
         'use_2to3': True,
-        # Automatically fetches nose if not yet installed:
-        'tests_require': tests_require,
+
+        'tests_require': ['nose', 'numpy'],
         # Optional dependencies install using:
         # `easy_install uncertainties[optional]`
         'extras_require': {
-            'optional': optional_require,
-            'tests': tests_require,
-            'docs': docs_require,
-            'all': all_extra
+            'optional': ['numpy'],
+            'docs': ['sphinx'],
         }
     }
-    setup_options.update(kw)
 
+    # easy_install uncertainties[test] option:
+    addtl_setup_options['extras_require']['tests'] = (
+        addtl_setup_options['tests_require'])
+    
+    # easy_install uncertainties[all] option: all dependencies are
+    # gathered
+    addtl_setup_options['extras_require']['all'] = set(
+        sum(addtl_setup_options['extras_require'].itervalues(), []))
+
+    setup_options.update(addtl_setup_options)
+    
 except ImportError:
     from distutils.core import setup
 
