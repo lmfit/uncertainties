@@ -4,6 +4,7 @@ build
 doc/_build
 dist
 MANIFEST
+# Created by setuptools:
 uncertainties.egg-info/
 # For PyCharm (contains project files):
 .idea/
