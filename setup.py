@@ -357,7 +357,7 @@ try:
         }
     }
 
-    # easy_install uncertainties[test] option:
+    # easy_install uncertainties[tests] option:
     addtl_setup_options['extras_require']['tests'] = (
         addtl_setup_options['tests_require'])
     
