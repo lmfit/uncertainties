@@ -333,8 +333,8 @@ _of_uncertainty
     # Files are defined in MANIFEST (which is automatically created by
     # python setup.py sdist):
     packages=['uncertainties', 'uncertainties.unumpy',
-              'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes'],
-)
+              'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes']
+    )
 
 # The best available setup() is used (some users do not have
 # setuptools):
