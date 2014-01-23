@@ -364,7 +364,7 @@ try:
     # easy_install uncertainties[all] option: all dependencies are
     # gathered
     addtl_setup_options['extras_require']['all'] = set(
-        sum(addtl_setup_options['extras_require'].itervalues(), []))
+        sum(addtl_setup_options['extras_require'].values(), []))
 
     setup_options.update(addtl_setup_options)
     
