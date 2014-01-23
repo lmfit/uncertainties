@@ -39,7 +39,6 @@ else:
 # sys.path.insert(0, package_dir)
 # uncertainties = __import__(package_dir)
 
-
 # Common options for distutils/setuptools's setup():
 setup_options = dict(
     name='uncertainties',
@@ -297,35 +296,35 @@ _of_uncertainty
               'derivatives', 'partial derivatives', 'differentiation'],
     
     classifiers=[
-    'Development Status :: 5 - Production/Stable',
-    'Intended Audience :: Developers',
-    'Intended Audience :: Education',
-    'Intended Audience :: Other Audience',
-    'Intended Audience :: Science/Research',
-    'License :: OSI Approved :: BSD License',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 2.3',
-    'Programming Language :: Python :: 2.4',
-    'Programming Language :: Python :: 2.5',
-    'Programming Language :: Python :: 2.6',
-    'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3',
-    # Python 3.1 failed because of a problem with NumPy 1.6.1 (whereas
-    # everything was fine with Python 3.2 and Python 2.7).
-    'Programming Language :: Python :: 3.1',
-    'Programming Language :: Python :: 3.2',
-    'Programming Language :: Python :: 3.3',
-    'Programming Language :: Python :: Implementation :: Jython',
-    'Programming Language :: Python :: Implementation :: PyPy',
-    'Topic :: Education',
-    'Topic :: Scientific/Engineering',
-    'Topic :: Scientific/Engineering :: Mathematics',
-    'Topic :: Scientific/Engineering :: Physics',
-    'Topic :: Software Development',
-    'Topic :: Software Development :: Libraries',
-    'Topic :: Software Development :: Libraries :: Python Modules',
-    'Topic :: Utilities'
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'Intended Audience :: Other Audience',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.3',
+        'Programming Language :: Python :: 2.4',
+        'Programming Language :: Python :: 2.5',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        # Python 3.1 failed because of a problem with NumPy 1.6.1 (whereas
+        # everything was fine with Python 3.2 and Python 2.7).
+        'Programming Language :: Python :: 3.1',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: Implementation :: Jython',
+        'Programming Language :: Python :: Implementation :: PyPy',
+        'Topic :: Education',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Scientific/Engineering :: Mathematics',
+        'Topic :: Scientific/Engineering :: Physics',
+        'Topic :: Software Development',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Utilities'
     ],
 
     # Where to find the source code:
@@ -344,28 +343,34 @@ try:
 
     # Some setuptools-specific options can be added:
     
-    tests_require = ['nose']
+    addtl_setup_options = {
+        
+        # Allows python setup.py nosetests to do the right thing:
+        'use_2to3': True,
+
+        'tests_require': ['nose', 'numpy'],
+        # Optional dependencies install using:
+        # `easy_install uncertainties[optional]`
+        'extras_require': {
+            'optional': ['numpy'],
+            'docs': ['sphinx'],
+        }
+    }
+
+    # easy_install uncertainties[tests] option:
+    addtl_setup_options['extras_require']['tests'] = (
+        addtl_setup_options['tests_require'])
     
-    setup_options.update(dict(
+    # easy_install uncertainties[all] option: all dependencies are
+    # gathered
+    addtl_setup_options['extras_require']['all'] = set(
+        sum(addtl_setup_options['extras_require'].values(), []))
 
-        # !!!! Used for what? does not allow python3 setup.py test to succeed:
-        use_2to3=True,
-        
-        # Enables nosetests testing via setup.py's test command:
-        test_suite='nose.collector',
-        # Automatically fetches nose if not yet installed:
-        tests_require=tests_require,
-        
-        # Optional setup.py commands: # !!! Used how?
-        extras_require={
-            'tests': tests_require,
-            'docs': ["sphinx"]
-            }
-        ))
-
+    setup_options.update(addtl_setup_options)
+    
 except ImportError:
     from distutils.core import setup
 
+# End of setup definition
+
 setup(**setup_options)
-
-
