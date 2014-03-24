@@ -193,6 +193,8 @@ uncertainty from being displayed with a large relative error):
 
 >>> print 'Automatic number of digits on the uncertainty: {}'.format(x)
 Automatic number of digits on the uncertainty: 0.200+/-0.010
+>>> print x
+0.200+/-0.010
 
 It is possible to control the **number of significant digits of the
 uncertainty** by adding the precision modifier ``u`` after the
