@@ -185,6 +185,15 @@ type are all supported.
 
 .. Precision control:
 
+When **no explicit precision** is given, the number of significant digits
+on the uncertainty is defined with the `Particle Data Group
+<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
+rules (these rules keep the number of digits small, while preventing the
+uncertainty from being displayed with a large relative error):
+
+>>> print 'Automatic number of digits on the uncertainty: {}'.format(x)
+Automatic number of digits on the uncertainty: 0.200+/-0.010
+
 It is possible to control the **number of significant digits of the
 uncertainty** by adding the precision modifier ``u`` after the
 precision (and before any valid float format type like ``f``, ``e``,
@@ -204,14 +213,6 @@ meaning (e.g. ``.2e`` uses two digits after the decimal point): code
 that works with floats produces similar results when running with
 numbers with uncertainties.
 
-When **no explicit precision** is given, the number of significant digits
-on the uncertainty is defined with the `Particle Data Group
-<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
-rules (these rules keep the number of digits small, while preventing the
-uncertainty from being displayed with a large relative error):
-
->>> print 'Automatic number of digits on the uncertainty: {}'.format(x)
-Automatic number of digits on the uncertainty: 0.200+/-0.010
 
 .. Common exponent:
 
