@@ -240,7 +240,7 @@ the common exponent.
 .. Options:
 
 Formatting options can be added at the end of the format string: ``S``
-for the **shorthand notation**, ``L`` for a **LaTeχ** output, ``P``
+for the **shorthand notation**, ``L`` for a **LaTeX** output, ``P``
 for **pretty-printing**:
 
 >>> print '{:+.1uS}'.format(x)  # Sign, 1 digit for the uncertainty, shorthand
