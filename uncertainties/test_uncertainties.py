@@ -1898,8 +1898,15 @@ def test_format():
         },
         (float('nan'), 100): {  # NaN *nominal value*
             '': 'nan+/-0',
-            '.1e': '(nan+/-1.0)e+02'
-        }
+            '.1e': '(nan+/-1.0)e+02',
+            '.1ue': '(nan+/-1)e+02',
+        },
+        (float('nan'), float('nan')): {  # *Double* NaN
+            '': 'nan+/-nan',
+            '.1e': 'nan+/-nan',
+            '.1ue': 'nan+/-nan'
+        },
+        
     }
 
     # ',' format option: introduced in Python 2.7
