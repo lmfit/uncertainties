@@ -2133,7 +2133,10 @@ class AffineScalarFunc(object):
         # Reference value for the calculation of a possible exponent,
         # if needed:
         if fmt_type in 'eEgG':
-            # Reference value for the exponent
+            # Reference value for the exponent: the largest value
+            # defines what the exponent will be (another convention
+            # could have been chosen, like using the exponent of the
+            # nominal value, irrespective of the standard deviation):
             #
             # !!!!!!!!! Should handle nom_val NaN: I guess NaN should
             # never be selected unless both are !!!!!!!F What is the
