@@ -1896,8 +1896,9 @@ def test_format():
             '13.6G': '  1.20000E-34+/-  0.00000E-34',
             '.6GL': r'\left(1.20000 \pm 0.00000\right) \times 10^{-34}'
         },
-        (float('nan'), 0): {
-            '': 'nan+/-0'
+        (float('nan'), 100): {  # NaN *nominal value*
+            '': 'nan+/-0',
+            '.1e': '(nan+/-1.0)e+02'
         }
     }
 
