@@ -156,7 +156,7 @@ Numbers with uncertainties can be printed conveniently:
 0.200+/-0.010
 
 The resulting form can generally be parsed back with
-:func:`ufloat_fromstr` (except for the LaTeχ form).
+:func:`ufloat_fromstr` (except for the LaTeX form).
 
 .. Precision matching:
 
@@ -245,7 +245,7 @@ for **pretty-printing**:
 
 >>> print '{:+.1uS}'.format(x)  # Sign, 1 digit for the uncertainty, shorthand
 +0.20(1)
->>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeχ
+>>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeX
 \left(2.00 \pm 0.10\right) \times 10^{6}
 
 The pretty-printing mode uses "±" and superscript exponents: the
@@ -285,7 +285,7 @@ representation:
 1.23456789012345+/-0.123456789
 
 **More information** on formatting can be obtained with ``pydoc
-uncertainties.UFloat.__format__`` (customization of the LaTeχ output,
+uncertainties.UFloat.__format__`` (customization of the LaTeX output,
 etc.).
 
 Global formatting
