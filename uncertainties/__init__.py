@@ -1107,7 +1107,8 @@ def first_digit(value):
     '''
     Returns the first digit position of the given value, as an integer.
 
-    0 is the digit just before the decimal point.
+    0 is the digit just before the decimal point. Digits to the right
+    of the decimal point have a negative position.
     
     Returns 0 for a null value.
     '''
