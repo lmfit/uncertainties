@@ -2129,13 +2129,17 @@ class AffineScalarFunc(object):
 
         # Calculation of digits_limit, which defines the precision of
         # the nominal value and of the standard deviation:
-        
+
         # Reference value for the calculation of a possible exponent,
         # if needed:
         if fmt_type in 'eEgG':
             # Reference value for the exponent
+            #
+            # !!!!!!!!! Should handle nom_val NaN: I guess NaN should
+            # never be selected unless both are !!!!!!!F What is the
+            # behavior of NaN in comparisons?
             exp_ref_value = max(abs(nom_val), std_dev)
-        
+
         if uncert_controlled:
             # The number of significant digits on the uncertainty is
             # controlled.
@@ -2212,6 +2216,8 @@ class AffineScalarFunc(object):
                 
                 # The number of significant digits is important for
                 # example for determining the exponent:
+                
+                #!!!!!!! fails if exp_ref_value is NaN:
                 digits_limit = signif_d_to_limit(exp_ref_value,
                                                  num_signif_digits)
 
@@ -2232,6 +2238,8 @@ class AffineScalarFunc(object):
             # !! This calculation might have been already done, for
             # instance when using the .0e format: signif_d_to_limit()
             # was called before, which prompted a similar calculation:
+            #
+            #!!!!!!!!  fails if exp_ref_value is NaN
             common_exp = first_digit(round(exp_ref_value, -digits_limit))
         else:  # g, G
 
@@ -2254,7 +2262,8 @@ class AffineScalarFunc(object):
             # Should the scientific notation be used? The same rule as
             # for floats is used ("-4 <= exponent of rounded value <
             # p"), on the nominal value.
-            
+
+            #!!!!!!! Fails if exp_ref_value is NoN
             common_exp = first_digit(round(exp_ref_value, -digits_limit))
 
             # print "COMMON EXP TEST VALUE", common_exp
