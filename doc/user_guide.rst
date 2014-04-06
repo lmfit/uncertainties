@@ -318,8 +318,8 @@ prints with the shorthand notation: ``Result = 0.20(1)``.
 
 
 .. index::
-   pair: nominal value; of scalar
-   pair: uncertainty; of scalar
+   pair: nominal value of; scalar
+   pair: uncertainty of; scalar
 
 Access to the uncertainty and to the nominal value
 ==================================================
