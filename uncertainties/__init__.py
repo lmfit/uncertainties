@@ -2202,7 +2202,7 @@ class AffineScalarFunc(object):
                     # num_signif_digits is the number of significant
                     # digits if trailing zeros were not removed. This
                     # quantity is relevant for the rounding implied by
-                    # the exponent test of the g/G/n format:
+                    # the exponent test of the g/G format:
 
                     # 0 is interpreted like 1 (as with floats with a
                     # gG format type):
