@@ -2140,11 +2140,6 @@ class AffineScalarFunc(object):
             # defines what the exponent will be (another convention
             # could have been chosen, like using the exponent of the
             # nominal value, irrespective of the standard deviation):
-            #
-            # !!!!!!!!! Should handle nom_val NaN: I guess NaN should
-            # never be selected unless both are !!!!!!!F What is the
-            # behavior of NaN in comparisons?
-
             non_nan_values = [value for value in (abs(nom_val), std_dev)
                               if not isnan(value)]
             try:
