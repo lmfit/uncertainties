@@ -2099,7 +2099,7 @@ class AffineScalarFunc(object):
              or match.group('uncert_prec'))  # Explicit control
             # The number of significant digits of the uncertainty must
             # be meaningful, otherwise the position of the significant
-            # digits of the uncertainty do not have a clear
+            # digits of the uncertainty does not have a clear
             # meaning. This gives us the *effective* uncertainty
             # control mode:
             and std_dev and not isnan(std_dev))
