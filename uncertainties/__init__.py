@@ -2151,11 +2151,9 @@ class AffineScalarFunc(object):
                 exp_ref_value = max(non_nan_values)
             except ValueError:  # No non-NaN value (should be rare)
                 # There is no common exponent:
-                #
-                # !!!!!!!!! how to handle the lower/uppercase
-                # distinction on NaN in this case?
-                #!!!!!!!!
-            print "EXP_REF_VALUE", exp_ref_value  #!!!!!!!!
+                exp_ref_value = None  # No meaningful exponent
+                
+            # print "EXP_REF_VALUE", exp_ref_value
             
         if uncert_controlled:
             # The number of significant digits on the uncertainty is
@@ -2233,8 +2231,8 @@ class AffineScalarFunc(object):
                 
                 # The number of significant digits is important for
                 # example for determining the exponent:
-                
-                #!!!!!!! fails if exp_ref_value is NaN:
+
+                #!!!!!!! Handle None exp_ref_value
                 digits_limit = signif_d_to_limit(exp_ref_value,
                                                  num_signif_digits)
 
@@ -2256,7 +2254,7 @@ class AffineScalarFunc(object):
             # instance when using the .0e format: signif_d_to_limit()
             # was called before, which prompted a similar calculation:
             #
-            #!!!!!!!!  fails if exp_ref_value is NaN
+            # !!!!!!! Handle None exp_ref_value
             common_exp = first_digit(round(exp_ref_value, -digits_limit))
         else:  # g, G
 
@@ -2280,7 +2278,7 @@ class AffineScalarFunc(object):
             # for floats is used ("-4 <= exponent of rounded value <
             # p"), on the nominal value.
 
-            #!!!!!!! Fails if exp_ref_value is NoN
+            # !!! Handle None exp_ref_value
             common_exp = first_digit(round(exp_ref_value, -digits_limit))
 
             # print "COMMON EXP TEST VALUE", common_exp
