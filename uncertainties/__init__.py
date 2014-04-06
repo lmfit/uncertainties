@@ -2171,10 +2171,7 @@ class AffineScalarFunc(object):
             # 3.141592±NaN with an "f" format specification, for
             # example):
 
-            if fmt_prec:
-                prec = int(fmt_prec)
-            else:
-                prec = 6
+            prec = int(fmt_prec) if fmt_prec else 6
 
             if fmt_type in 'fF':
 
