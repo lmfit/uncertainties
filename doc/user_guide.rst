@@ -161,7 +161,7 @@ The resulting form can generally be parsed back with
 .. Precision matching:
 
 The nominal value and the uncertainty always have the **same
-precision**.
+precision**: this makes it easier to compare them.
 
 .. Formatting method:
 
