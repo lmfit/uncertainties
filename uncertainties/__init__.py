@@ -2182,7 +2182,7 @@ class AffineScalarFunc(object):
                 
             else:  # Format type in eEgG
 
-                # We calculate first the number of significant digits
+                # We first calculate the number of significant digits
                 # to be displayed (if possible):
                 
                 if fmt_type in 'eE':
