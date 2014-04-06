@@ -1899,6 +1899,7 @@ def test_format():
         (float('nan'), 100): {  # NaN *nominal value*
             '': 'nan+/-100',
             '.1e': '(nan+/-1.0)e+02',
+            '.1E': '(%s+/-1.0)e+02' % NaN_EF,
             '.1ue': '(nan+/-1)e+02',
         },
         (float('nan'), float('nan')): {  # *Double* NaN
