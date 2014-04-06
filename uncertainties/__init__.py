@@ -2032,6 +2032,9 @@ class AffineScalarFunc(object):
         in format_num().
         '''
 
+        # !!!!!!!! Have a clear calculation/semantics of exp_ref_value,
+        # digits_limit, common_exp, 
+        
         # Convention on limits "between" digits: 0 = exactly at the
         # decimal point, -1 = after the first decimal, 1 = before the
         # units digit, etc.
@@ -2141,8 +2144,19 @@ class AffineScalarFunc(object):
             # !!!!!!!!! Should handle nom_val NaN: I guess NaN should
             # never be selected unless both are !!!!!!!F What is the
             # behavior of NaN in comparisons?
-            exp_ref_value = max(abs(nom_val), std_dev)
 
+            non_nan_values = [value for value in (abs(nom_val), std_dev)
+                              if not isnan(value)]
+            try:
+                exp_ref_value = max(non_nan_values)
+            except ValueError:  # No non-NaN value (should be rare)
+                # There is no common exponent:
+                #
+                # !!!!!!!!! how to handle the lower/uppercase
+                # distinction on NaN in this case?
+                #!!!!!!!!
+            print "EXP_REF_VALUE", exp_ref_value  #!!!!!!!!
+            
         if uncert_controlled:
             # The number of significant digits on the uncertainty is
             # controlled.
@@ -2316,6 +2330,8 @@ class AffineScalarFunc(object):
         main_fmt_type = 'fF'[fmt_type.isupper()]
 
         # prec is the precision for the main parts of the final format:
+        #
+        # !!!!!!!! Should the NaN test really be on the std_dev only?
         if std_dev and not isnan(std_dev):
             # The decimal point location is always included in the
             # printed digits (e.g., printing 3456 with only 2
