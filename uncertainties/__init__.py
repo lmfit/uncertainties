@@ -2091,21 +2091,6 @@ class AffineScalarFunc(object):
         std_dev = self.std_dev
         nom_val = self.nominal_value
 
-        # Should the precision be interpreted like for a float, or
-        # should the number of significant digits on the uncertainty
-        # be controlled?        
-        uncert_controlled = (
-            (not fmt_prec  # Default behavior: uncertainty controlled
-             or match.group('uncert_prec'))  # Explicit control
-            # The number of significant digits of the uncertainty must
-            # be meaningful, otherwise the position of the significant
-            # digits of the uncertainty does not have a clear
-            # meaning. This gives us the *effective* uncertainty
-            # control mode:
-            and std_dev and not isnan(std_dev))
-
-        # print "UNCERT CONTROLLED", uncert_controlled
-        
         # 'options' is the options that must be given to format_num():
         options = set(match.group('options'))
 
@@ -2149,8 +2134,19 @@ class AffineScalarFunc(object):
                 exp_ref_value = None  # No meaningful exponent
                 
             # print "EXP_REF_VALUE", exp_ref_value
+
+        # Should the precision be interpreted like for a float, or
+        # should the number of significant digits on the uncertainty
+        # be controlled?        
+        if ((not fmt_prec  # Default behavior: uncertainty controlled
+             or match.group('uncert_prec'))  # Explicit control
+            # The number of significant digits of the uncertainty must
+            # be meaningful, otherwise the position of the significant
+            # digits of the uncertainty does not have a clear
+            # meaning. This gives us the *effective* uncertainty
+            # control mode:
+            and std_dev and not isnan(std_dev)):  #!!!!!! should fail if any value is NaN
             
-        if uncert_controlled:
             # The number of significant digits on the uncertainty is
             # controlled.
 
