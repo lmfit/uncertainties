@@ -2182,7 +2182,6 @@ class AffineScalarFunc(object):
             # The usual default precision is used (this is useful for
             # 3.141592±NaN with an "f" format specification, for
             # example):
-
             prec = int(fmt_prec) if fmt_prec else 6
 
             if fmt_type in 'fF':
@@ -2202,7 +2201,7 @@ class AffineScalarFunc(object):
                     # the e/E format type):
                     num_signif_digits = prec+1
 
-                else:  # Format type in gGn
+                else:  # Format type in gG
                     
                     # Effective format specification precision: the rule
                     # of
