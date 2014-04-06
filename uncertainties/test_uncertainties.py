@@ -1904,6 +1904,7 @@ def test_format():
         (float('nan'), float('nan')): {  # *Double* NaN
             '': 'nan+/-nan',
             '.1e': 'nan+/-nan',
+            '.1E': '%s+/-%s' % (NaN_EF, NaN_EF),
             '.1ue': 'nan+/-nan'
         },
         
