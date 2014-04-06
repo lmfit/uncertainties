@@ -2283,7 +2283,8 @@ class AffineScalarFunc(object):
         
         if use_exp:
 
-            factor = 10.**common_exp  # Not 10.**(-common_exp), for limit cases
+            # Not 10.**(-common_exp), for limit values of common_exp:
+            factor = 10.**common_exp
             
             nom_val_mantissa = nom_val/factor
             std_dev_mantissa = std_dev/factor
