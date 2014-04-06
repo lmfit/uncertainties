@@ -2176,6 +2176,8 @@ class AffineScalarFunc(object):
 
         else:
 
+            print "PRECISION NOT BASED ON UNCERTAINTY" #!!!!!!!
+            
             # The precision has the same meaning as for floats (it is
             # not the uncertainty that defines the number of digits).
 
@@ -2186,6 +2188,7 @@ class AffineScalarFunc(object):
 
             if fmt_type in 'fF':
 
+                print "FORMAT TYPE in 'fF'"  #!!!!!
                 digits_limit = -prec
                 
             else:  # Format type in eEgG
@@ -2220,11 +2223,13 @@ class AffineScalarFunc(object):
                     # gG format type):
                     num_signif_digits = prec or 1
 
+                print "GETTING digits_limit..."  #!!!!!!!
                 
                 # The number of significant digits is important for
                 # example for determining the exponent:
 
                 #!!!!!!! Handle None exp_ref_value
+                print "EXP_REF_VALUE", exp_ref_value  #!!!!!
                 digits_limit = signif_d_to_limit(exp_ref_value,
                                                  num_signif_digits)
 
