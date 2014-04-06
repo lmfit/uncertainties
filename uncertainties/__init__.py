@@ -2115,6 +2115,11 @@ class AffineScalarFunc(object):
             
         ########################################
 
+        # NaN values (nominal value or standard deviation) must be
+        # handled in a specific way:
+        non_nan_values = [value for value in (abs(nom_val), std_dev)
+                          if not isnan(value)]
+        
         # Calculation of digits_limit, which defines the precision of
         # the nominal value and of the standard deviation:
 
@@ -2125,13 +2130,13 @@ class AffineScalarFunc(object):
             # defines what the exponent will be (another convention
             # could have been chosen, like using the exponent of the
             # nominal value, irrespective of the standard deviation):
-            non_nan_values = [value for value in (abs(nom_val), std_dev)
-                              if not isnan(value)]
             try:
                 exp_ref_value = max(non_nan_values)
             except ValueError:  # No non-NaN value (should be rare)
-                # There is no common exponent:
-                exp_ref_value = None  # No meaningful exponent
+                # There is no common exponent: #!!!!! or don't define
+                # exp_ref_value?
+                # !!!!!exp_ref_value = None  # No meaningful exponent
+                pass
                 
             # print "EXP_REF_VALUE", exp_ref_value
 
@@ -2145,7 +2150,7 @@ class AffineScalarFunc(object):
             # digits of the uncertainty does not have a clear
             # meaning. This gives us the *effective* uncertainty
             # control mode:
-            and std_dev and not isnan(std_dev)):  #!!!!!! should fail if any value is NaN
+            and std_dev and len(non_nan_values)==2):
             
             # The number of significant digits on the uncertainty is
             # controlled.
