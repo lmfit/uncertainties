@@ -1569,9 +1569,9 @@ def python26_add(dict0, dict1):
 def test_format():
     '''Test the formatting of numbers with uncertainty.'''
 
-    # The way NaN is formatted with F and E depends on the version of
-    # Python (NAN for Python 2.7+):
-    NaN_EF = '%F' % float('nan')
+    # The way NaN is formatted with F, E and G depends on the version
+    # of Python (NAN for Python 2.7+):
+    NaN_EFG = '%F' % float('nan')
     
     # Tests of each point of the docstring of
     # AffineScalarFunc.__format__() in turn, mostly in the same order.
@@ -1766,8 +1766,8 @@ def test_format():
         # instead of 1.4 for Python 3.1. The problem does not appear
         # with 1.2, so 1.2 is used.        
         (-1.2e-12, float('nan')): python26_add({
-            '.2uG': '(-1.2+/-%s)E-12' % NaN_EF,  # u ignored, format used
-            '15GS': '  -1.2(%s)E-12' % NaN_EF
+            '.2uG': '(-1.2+/-%s)E-12' % NaN_EFG,  # u ignored, format used
+            '15GS': '  -1.2(%s)E-12' % NaN_EFG
         }, {
             'SL': r'-1.2(\mathrm{nan}) \times 10^{-12}',  # LaTeX NaN
             # Pretty-print priority, but not for NaN:
@@ -1775,7 +1775,7 @@ def test_format():
             'L': r'\left(-1.2 \pm \mathrm{nan}\right) \times 10^{-12}',
             # Uppercase NaN and LaTeX:
             '.1EL': (r'\left(-1.2 \pm \mathrm{%s}\right) \times 10^{-12}'
-                     % NaN_EF),
+                     % NaN_EFG),
             '10': '  -1.2e-12+/-       nan',
             '15S': '  -1.2(nan)e-12'
         }),
@@ -1792,7 +1792,7 @@ def test_format():
         # Some special cases:
         (1, float('nan')): python26_add({
             'g': '1+/-nan',
-            'G': '1+/-%s' % NaN_EF,
+            'G': '1+/-%s' % NaN_EFG,
             '%': '(100.000000+/-nan)%',  # The % format type is like f
             # Should be the same as '+05', for floats, but is not, in
             # Python 2.7:
