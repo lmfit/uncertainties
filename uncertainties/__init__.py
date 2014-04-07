@@ -2221,10 +2221,8 @@ class AffineScalarFunc(object):
             # 3.141592±NaN with an "f" format specification, for
             # example):
             #
-            # !!!! The meaning of 'prec' should be defined: CHECK that
-            # the following is correct. prec is the usual float
-            # formatting precision: maximum number of digits after the
-            # decimal point:
+            # prec is the precision for the main parts of the final
+            # format (in the sense of float formatting):
             prec = int(fmt_prec) if fmt_prec else 6
 
             if fmt_type in 'fF':
@@ -2364,8 +2362,6 @@ class AffineScalarFunc(object):
         # Format of the main (i.e. with no exponent) parts:
         main_fmt_type = 'fF'[fmt_type.isupper()]
 
-        # prec is the precision for the main parts of the final format:
-        #
         # !!!!!!!! Should the NaN test really be on the std_dev only?
         if std_dev and not isnan(std_dev):
             # The decimal point location is always included in the
