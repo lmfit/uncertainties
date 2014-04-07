@@ -1907,12 +1907,18 @@ def test_format():
             '.1ue': '(nan+/-1)e+02',
             '10.1e': '       nan+/-     1e+02'
         },
-        (float('nan'), 100000000): {  # NaN *nominal value*
-            # Like '{:g}'.format(1e8), because '{}'.format(1e8) is not
-            # defined fully in the documentation
-            # (http://stackoverflow.com/questions/16525924/precise-definition-of-float-string-formatting)
-            '': 'nan+/-1e+08',
-            'g': 'nan+/-1e+08',  # Like '{:g}'.format()
+        (float('nan'), 1e8): {  # NaN *nominal value*
+            '': '(nan+/-1.0)e+08',  # Like '{}'.format(1.)
+            'g': '(nan+/-1)e+08',  # Like '{:g}'.format(1.)
+            '.1e': '(nan+/-1.0)e+08',
+            '.1E': '(%s+/-1.0)E+08' % NaN_EFG,
+            '.1ue': '(nan+/-1)e+08',
+            '10.1e': '       nan+/-     1e+08'  # 'nane+08' would be strange
+        },                
+        (float('nan'), 123456789): {  # NaN *nominal value*
+            #!!!!!! udpate
+            '': '(nan+/-1.0)e+08',
+            'g': '(nan+/-1)e+08',  # Like '{:g}'.format(1e8)
             '.1e': '(nan+/-1.0)e+08',
             '.1E': '(%s+/-1.0)E+08' % NaN_EFG,
             '.1ue': '(nan+/-1)e+08',
