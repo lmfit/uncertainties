@@ -1909,7 +1909,7 @@ def test_format():
         },
         (float('nan'), 100000000): {  # NaN *nominal value*
             # Like '{:g}'.format(1e8), because '{}'.format(1e8) is not
-            # defined fully correctly in the documentation
+            # defined fully in the documentation
             # (http://stackoverflow.com/questions/16525924/precise-definition-of-float-string-formatting)
             '': 'nan+/-1e+08',
             'g': 'nan+/-1e+08',  # Like '{:g}'.format()
