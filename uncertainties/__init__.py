@@ -2151,20 +2151,19 @@ class AffineScalarFunc(object):
             # meaning. This gives us the *effective* uncertainty
             # control mode:
             #
-            # !!!!!!!!!!!!!! The NaN handling here is not obvious:
-            # should NaN be like "treat the other part as if it were a
-            # float by itself", OR like "Treat the NaN in the same way
-            # as 0": 0±100 has a controlled uncertainty with 2
-            # significant PDG digits. NOTE THAT THE LATTER yields
-            # (0.0±1.0)e2, which makes sense: the 0 and the 1 are
-            # "aligned" properly, like in (0.1±1.0)e2; this is
-            # regular. NaN is different: there are no digits to align,
-            # I would print the other part in the default way. HOWEVER
-            # there is question: a NaN uncertainty can currently be
-            # factored, no? NOTE that the shorthand notation
-            # implicitly factors nan when there is an exponent: it
-            # would be consistent to keep this in the non-shorthand
-            # forms.
+            # !!! The NaN handling here is not obvious: should NaN be
+            # like "treat the other part as if it were a float by
+            # itself", OR like "Treat the NaN in the same way as 0":
+            # 0±100 has a controlled uncertainty with 2 significant
+            # PDG digits. NOTE THAT THE LATTER yields (0.0±1.0)e2,
+            # which makes sense: the 0 and the 1 are "aligned"
+            # properly, like in (0.1±1.0)e2; this is regular. NaN is
+            # different: there are no digits to align, I would print
+            # the other part in the default way. HOWEVER there is
+            # question: a NaN uncertainty can currently be factored,
+            # no? NOTE that the shorthand notation implicitly factors
+            # nan when there is an exponent: it would be consistent to
+            # keep this in the non-shorthand forms.
             and std_dev and len(non_nan_values)==2):
             
             # The number of significant digits on the uncertainty is
