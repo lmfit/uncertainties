@@ -1328,10 +1328,10 @@ def format_num(nom_val_main, error_main, common_exp,
     prec -- precision to use with the main_fmt_type format type
     (see below).
 
-    main_fmt_type -- format specification type, in "fF". This
-    defines how the mantissas, exponents and NaN values are
-    represented (in the same way as for float). Note that None, the
-    empty string, or "%" are not accepted.
+    main_fmt_type -- format specification type, in "fF". This defines
+    how the mantissas, exponents and NaN values are represented (in
+    the same way as for float). None, the empty string, or "%" are not
+    accepted.
 
     options -- options (as an object that support membership testing,
     like for instance a string). "S" is for the short-hand notation
@@ -2121,7 +2121,9 @@ class AffineScalarFunc(object):
                           if not isnan(value)]
         
         # Calculation of digits_limit, which defines the precision of
-        # the nominal value and of the standard deviation:
+        # the nominal value and of the standard deviation (None when
+        # this is not meaningful: case of NaN±NaN, for example). !!!!
+        # CHECK that this is implemented and correct.
 
         # Reference value for the calculation of a possible exponent,
         # if needed:
@@ -2218,6 +2220,11 @@ class AffineScalarFunc(object):
             # The usual default precision is used (this is useful for
             # 3.141592±NaN with an "f" format specification, for
             # example):
+            #
+            # !!!! The meaning of 'prec' should be defined: CHECK that
+            # the following is correct. prec is the usual float
+            # formatting precision: maximum number of digits after the
+            # decimal point:
             prec = int(fmt_prec) if fmt_prec else 6
 
             if fmt_type in 'fF':
