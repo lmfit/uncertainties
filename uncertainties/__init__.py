@@ -2251,13 +2251,13 @@ class AffineScalarFunc(object):
                 # The number of significant digits is important for
                 # example for determining the exponent:
 
+                # print "EXP_REF_VAL", exp_ref_value
+                # print "NUM_SIGNIF_DIGITS", num_signif_digits
+                
                 #!!!!!!! Handle None exp_ref_value
-                print "EXP_REF_VALUE", exp_ref_value  #!!!
                 digits_limit = signif_d_to_limit(exp_ref_value,
                                                  num_signif_digits)
 
-                # print "EXP_REF_VAL", exp_ref_value
-                # print "NUM_SIGNIF_DIGITS", num_signif_digits
                 
         #######################################
 
