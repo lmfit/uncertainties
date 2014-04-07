@@ -1905,7 +1905,10 @@ def test_format():
             '10.1e': '       nan+/-     1e+02'
         },
         (float('nan'), 100000000): {  # NaN *nominal value*
-            '': 'nan+/-100000000.0',  # Like '{}'.format()
+            # Like '{:g}'.format(1e8), because '{}'.format(1e8) is not
+            # defined in the documentation
+            # (http://stackoverflow.com/questions/16525924/precise-definition-of-float-string-formatting)
+            '': 'nan+/-1e+08',
             'g': 'nan+/-1e+08',  # Like '{:g}'.format()
             '.1e': '(nan+/-1.0)e+08',
             '.1E': '(%s+/-1.0)e+08' % NaN_EFG,
