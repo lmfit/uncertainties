@@ -1525,6 +1525,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # because .0e can give this for a non-zero value (the goal is
         # to have zero uncertainty be very explicit):
         error_has_exp = fmt_parts['width'] and not special_error
+        #!!!!!! Should be extended to NaN main value
         
         # Prefix for the parts:
         if fmt_parts['width']:  # Individual widths
@@ -1541,7 +1542,7 @@ def format_num(nom_val_main, error_main, common_exp,
                 width = int(fmt_parts['width'])
 
                 # Remaining (minimum) width:
-                remaining_width = max(width - len(exp_str), 0)
+                remaining_width = max(width-len(exp_str), 0)
                 
                 fmt_prefix_n = '%s%s%d%s' % (
                     fmt_parts['sign'], fmt_parts['zero'],
