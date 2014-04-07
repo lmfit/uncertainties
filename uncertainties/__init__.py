@@ -2166,11 +2166,12 @@ class AffineScalarFunc(object):
             # meaning. This gives us the *effective* uncertainty
             # control mode:
             and std_dev
-            # For a single NaN, the output is symmetrical: whether
-            # the NaN is the nominal value or the standard deviation
-            # does not change the format of the other part. In
-            # particular, there is no control of the number of digits
-            # of the uncertainty:
+            # Principle for formatting a number with uncertainty with
+            # a single NaN, the output is symmetrical: whether the NaN
+            # is the nominal value or the standard deviation does not
+            # change the format of the other part. In particular,
+            # there is no control of the number of digits of the
+            # uncertainty:
             and len(non_nan_values)==2):
             
             # The number of significant digits on the uncertainty is
