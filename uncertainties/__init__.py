@@ -2363,13 +2363,16 @@ class AffineScalarFunc(object):
         main_fmt_type = 'fF'[fmt_type.isupper()]
 
         # !!!!!!!! Should the NaN test really be on the std_dev only?
+        
+        # The precision of the main parts must be adjusted so as
+        # to take into account the special role of the decimal
+        # point:
         if std_dev and not isnan(std_dev):
             # The decimal point location is always included in the
             # printed digits (e.g., printing 3456 with only 2
             # significant digits requires to print at least four
             # digits, like in 3456 or 3500):
             prec = max(-signif_limit, 0)
-        # 'prec' was defined above, for the other case
 
         ########################################
 
