@@ -2379,9 +2379,17 @@ class AffineScalarFunc(object):
             # significant digits requires to print at least four
             # digits, like in 3456 or 3500):
             prec = max(-signif_limit, 0)
-
+        print "PREC", prec  #!!!
+            
         ########################################
 
+        print "FORMAT_NUM parameters:", (
+            nom_val_mantissa, std_dev_mantissa, common_exp, 
+            match.groupdict(),
+            prec,
+            main_fmt_type,
+            options)
+            
         # Final formatting:
         return format_num(nom_val_mantissa, std_dev_mantissa, common_exp, 
                           match.groupdict(),

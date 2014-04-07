@@ -1902,13 +1902,14 @@ def test_format():
             '.1e': '(nan+/-1.0)e+02',
             '.1E': '(%s+/-1.0)e+02' % NaN_EF,
             '.1ue': '(nan+/-1)e+02',
+            '10.1e': '       nan+/-     1e+02'
         },
         (float('nan'), float('nan')): {  # *Double* NaN
             '': 'nan+/-nan',
             '.1e': 'nan+/-nan',
             '.1E': '%s+/-%s' % (NaN_EF, NaN_EF),
             '.1ue': 'nan+/-nan'
-        },
+        }
         
     }
 
