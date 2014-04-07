@@ -1613,11 +1613,13 @@ def format_num(nom_val_main, error_main, common_exp,
         
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
 
-        if 'L' in options and isnan(error_main):
-            #!!!!!! Should be also done for the nominal value
-            error_str = '\mathrm{%s}' % error_str
+        if 'L' in options:
+            if isnan(nom_val_main):
+                nom_val_str = '\mathrm{%s}' % nom_val_str            
+            if isnan(error_main):
+                error_str = '\mathrm{%s}' % error_str
             
-        if error_has_exp:  #!!!! why any_exp_factored not used here but used above?
+        if error_has_exp:  #!!!! why any_exp_factored not used here but used above for nom_has_exp? CAN I create a test that shows why it's wrong?
             error_str += exp_str
 
         ####################
@@ -2162,8 +2164,6 @@ class AffineScalarFunc(object):
         # notation implicitly factors NaN when there is an exponent:
         # it would be consistent to keep this in the non-shorthand
         # forms.
-        #
-        # !!!! Principles of NaN display?
             
         # Should the precision be interpreted like for a float, or
         # should the number of significant digits on the uncertainty
@@ -2266,9 +2266,10 @@ class AffineScalarFunc(object):
                 print "EXP_REF_VAL", exp_ref_value  #!!!
                 print "NUM_SIGNIF_DIGITS", num_signif_digits  #!!!
 
-                #!!!!!!! Handle None exp_ref_value                
-                digits_limit = signif_dgt_to_limit(exp_ref_value,
-                                                   num_signif_digits)
+                digits_limit = (
+                    signif_dgt_to_limit(exp_ref_value, num_signif_digits)
+                    if exp_ref_value is not None
+                    else None)
 
                 print "DIGITS_LIMIT", digits_limit  #!!!
                 
@@ -2282,13 +2283,16 @@ class AffineScalarFunc(object):
         if fmt_type in 'fF':
             use_exp = False
         elif fmt_type in 'eE':
-            use_exp = True
-            # !! This calculation might have been already done, for
-            # instance when using the .0e format: signif_dgt_to_limit()
-            # was called before, which prompted a similar calculation:
-            #
-            # !!!!!!! Handle None exp_ref_value
-            common_exp = first_digit(round(exp_ref_value, -digits_limit))
+            if exp_ref_value is None:
+                use_exp = False
+            else:                
+                use_exp = True
+                # !! This calculation might have been already done,
+                # for instance when using the .0e format:
+                # signif_dgt_to_limit() was called before, which
+                # prompted a similar calculation:
+                common_exp = first_digit(round(exp_ref_value, -digits_limit))
+            
         else:  # g, G
 
             # The rules from
@@ -2311,19 +2315,22 @@ class AffineScalarFunc(object):
             # for floats is used ("-4 <= exponent of rounded value <
             # p"), on the nominal value.
 
-            # !!! Handle None exp_ref_value
-            common_exp = first_digit(round(exp_ref_value, -digits_limit))
-
-            # print "COMMON EXP TEST VALUE", common_exp
-            # print "LIMIT EXP", common_exp-digits_limit+1
-            # print "WITH digits_limit", digits_limit
-            
-            # The number of significant digits of the reference value
-            # rounded at digits_limit is exponent-digits_limit+1:
-            if -4 <= common_exp < common_exp-digits_limit+1:
+            if exp_ref_value is None:
                 use_exp = False
             else:
-                use_exp = True
+                # Common exponent *if* used:
+                common_exp = first_digit(round(exp_ref_value, -digits_limit))
+
+                # print "COMMON EXP TEST VALUE", common_exp
+                # print "LIMIT EXP", common_exp-digits_limit+1
+                # print "WITH digits_limit", digits_limit
+
+                # The number of significant digits of the reference value
+                # rounded at digits_limit is exponent-digits_limit+1:
+                if -4 <= common_exp < common_exp-digits_limit+1:
+                    use_exp = False
+                else:
+                    use_exp = True
 
         ########################################
 
