@@ -2392,12 +2392,16 @@ class AffineScalarFunc(object):
             
         ########################################
 
-        print "FORMAT_NUM parameters:", (
+        print (
+            "FORMAT_NUM parameters: nom_val_mantissa={},"
+            " std_dev_mantissa={}, common_exp={},"
+            " match.groupdict()={}, prec={}, main_fmt_type={},"
+            " options={}".format(
             nom_val_mantissa, std_dev_mantissa, common_exp, 
             match.groupdict(),
             prec,
             main_fmt_type,
-            options)
+            options))
             
         # Final formatting:
         return format_num(nom_val_mantissa, std_dev_mantissa, common_exp, 
