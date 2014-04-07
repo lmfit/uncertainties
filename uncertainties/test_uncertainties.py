@@ -1927,7 +1927,8 @@ def test_format():
             '': 'nan+/-nan',
             '.1e': 'nan+/-nan',
             '.1E': '%s+/-%s' % (NaN_EFG, NaN_EFG),
-            '.1ue': 'nan+/-nan'
+            '.1ue': 'nan+/-nan',
+            'EL': '\mathrm{%s} \pm \mathrm{%s}'.format(NaN_EFG, NaN_EFG)
         }
         
     }
@@ -1958,7 +1959,8 @@ def test_format():
 
         for (format_spec, result) in representations.iteritems():
 
-            # print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
+            # !!!
+            print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
             
             # Jython 2.5.2 does not always represent NaN as nan or NAN
             # in the CPython way: for example, '%.2g' % float('nan')
