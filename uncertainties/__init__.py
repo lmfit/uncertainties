@@ -2190,7 +2190,7 @@ class AffineScalarFunc(object):
 
         else:
 
-            print "PRECISION NOT BASED ON UNCERTAINTY" #!!!!!!!
+            print "PRECISION NOT BASED ON UNCERTAINTY" #!!!
             
             # The precision has the same meaning as for floats (it is
             # not the uncertainty that defines the number of digits).
@@ -2202,7 +2202,7 @@ class AffineScalarFunc(object):
 
             if fmt_type in 'fF':
 
-                print "FORMAT TYPE in 'fF'"  #!!!!!
+                print "FORMAT TYPE in 'fF'"  #!!!
                 digits_limit = -prec
                 
             else:  # Format type in eEgG
