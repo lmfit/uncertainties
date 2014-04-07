@@ -1666,7 +1666,7 @@ def format_num(nom_val_main, error_main, common_exp,
     
     return value_str
 
-def signif_d_to_limit(value, num_signif_d):
+def signif_dgt_to_limit(value, num_signif_d):
     '''
     Returns the precision limit necessary to display value with
     num_signif_d significant digits.
@@ -2195,7 +2195,7 @@ class AffineScalarFunc(object):
             else:
                 (num_signif_d, std_dev) = PDG_precision(std_dev)
 
-            digits_limit = signif_d_to_limit(std_dev, num_signif_d)
+            digits_limit = signif_dgt_to_limit(std_dev, num_signif_d)
 
         else:
 
@@ -2253,11 +2253,10 @@ class AffineScalarFunc(object):
 
                 # print "EXP_REF_VAL", exp_ref_value
                 # print "NUM_SIGNIF_DIGITS", num_signif_digits
-                
-                #!!!!!!! Handle None exp_ref_value
-                digits_limit = signif_d_to_limit(exp_ref_value,
-                                                 num_signif_digits)
 
+                #!!!!!!! Handle None exp_ref_value                
+                digits_limit = signif_dgt_to_limit(exp_ref_value,
+                                                   num_signif_digits)
                 
         #######################################
 
@@ -2271,7 +2270,7 @@ class AffineScalarFunc(object):
         elif fmt_type in 'eE':
             use_exp = True
             # !! This calculation might have been already done, for
-            # instance when using the .0e format: signif_d_to_limit()
+            # instance when using the .0e format: signif_dgt_to_limit()
             # was called before, which prompted a similar calculation:
             #
             # !!!!!!! Handle None exp_ref_value
