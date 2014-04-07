@@ -2403,11 +2403,6 @@ class AffineScalarFunc(object):
             main_fmt_type,
             options))
 
-        # !!!!!!! print ufloat(1e8, 1e8) does not yield the same thing
-        # as print 1e8: uncertainties uses an exponent, but Python
-        # does not, for floats: is this "normal"? (Python's behavior
-        # may not be fully documented and thus reproducible):
-        
         # Final formatting:
         return format_num(nom_val_mantissa, std_dev_mantissa, common_exp, 
                           match.groupdict(),
