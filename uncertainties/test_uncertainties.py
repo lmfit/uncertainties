@@ -1921,14 +1921,16 @@ def test_format():
             '.1e': '(nan+/-1.2)e+08',
             '.1E': '(%s+/-1.2)E+08' % NaN_EFG,
             '.1ue': '(nan+/-1)e+08',
-            '10.1e': '       nan+/-   1.2e+08'
+            '10.1e': '       nan+/-   1.2e+08',
+            '.1ueL': r'\left(\mathrm{nan} \pm 1\right) \times 10^{8}',
+            '10.1eL': '       nan+/-   1.2e+08'  # !!!! Update
         },        
         (float('nan'), float('nan')): {  # *Double* NaN
             '': 'nan+/-nan',
             '.1e': 'nan+/-nan',
             '.1E': '%s+/-%s' % (NaN_EFG, NaN_EFG),
             '.1ue': 'nan+/-nan',
-            'EL': '\mathrm{%s} \pm \mathrm{%s}'.format(NaN_EFG, NaN_EFG)
+            'EL': r'\mathrm{%s} \pm \mathrm{%s}'.format(NaN_EFG, NaN_EFG)
         }
         
     }
