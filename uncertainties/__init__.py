@@ -1529,9 +1529,9 @@ def format_num(nom_val_main, error_main, common_exp,
         # Prefix for the parts:
         if fmt_parts['width']:  # Individual widths
 
-            # The exponent is not factored, so as to have nice columns
-            # for the nominal values and the errors (no shift due to a
-            # varying exponent):
+            # The common exponent is not factored, so as to have nice
+            # columns for the nominal values and the errors (no shift
+            # due to a varying exponent):
             any_exp_factored = False
 
             # If zeros are needed, then the width is taken into
