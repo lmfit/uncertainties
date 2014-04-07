@@ -1900,7 +1900,7 @@ def test_format():
             '.6GL': r'\left(1.20000 \pm 0.00000\right) \times 10^{-34}'
         },
         (float('nan'), 100): {  # NaN *nominal value*
-            '': 'nan+/-100',  # Like '{:g}'.format(100.)
+            '': 'nan+/-100.0',  # Like '{}'.format(100.)
             'g': 'nan+/-100',  # Like '{:g}'.format(100.)
             '.1e': '(nan+/-1.0)e+02',  # Similar to 1±nan
             '.1E': '(%s+/-1.0)E+02' % NaN_EFG,
