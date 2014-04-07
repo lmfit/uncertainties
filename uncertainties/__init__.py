@@ -1399,9 +1399,6 @@ def format_num(nom_val_main, error_main, common_exp,
 
     ####################
 
-    # !!!!! I should have the same special treatment when either the
-    # error_main or the nom_val_main is NaN.
-    
     # Only true if the error should not have an exponent (has priority
     # over common_exp):
     special_error = not error_main or isnan(error_main)
@@ -1523,7 +1520,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # True when the error part has an exponent directly attached
         # (case of an individual exponent for both the nominal value
         # and the error, when the error is a non-0, non-NaN number).
-        # The goal is to avoid the strange notation NaNe-10, and to
+        # The goal is to avoid the strange notation nane-10, and to
         # avoid the 0e10 notation for an exactly zero uncertainty,
         # because .0e can give this for a non-zero value (the goal is
         # to have zero uncertainty be very explicit):
@@ -1601,6 +1598,8 @@ def format_num(nom_val_main, error_main, common_exp,
         # The following uses a special integer representation of a
         # zero uncertainty:
         if error_main:
+            # Handling of NaN in the nominal value identical to the
+            # handling of NaN in the standard deviation:
             if (isnan(nom_val_main)
                 # Only some formats have a nicer representation:
                 and fmt_parts['type'] in ('', 'g', 'G')):
@@ -1614,6 +1613,7 @@ def format_num(nom_val_main, error_main, common_exp,
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
 
         if 'L' in options and isnan(error_main):
+            #!!!!!! Should be also done for the nominal value
             error_str = '\mathrm{%s}' % error_str
             
         if error_has_exp:
@@ -2144,18 +2144,8 @@ class AffineScalarFunc(object):
             try:
                 exp_ref_value = max(non_nan_values)
             except ValueError:  # No non-NaN value (should be rare)
-                # There is no common exponent: #!!!!! or don't define
-                # exp_ref_value?
-                # !!!!!exp_ref_value = None  # No meaningful exponent
-                #
-                # !!!! Should the format type be forced to "no
-                # exponent" so as to bypass all the exponent
-                # calculations, which have no meaning since
-                # exp_ref_value is not defined? This could be
-                # fmt_type='f' or 'F', for instance. MAYBE there is a
-                # cleaner way, like skipping exponent calculations if
-                # exp_ref_value is None or non_nan_values is empty…
-                pass
+                # No meaningful exponent can be obtained:
+                exp_ref_value = None
                 
             # print "EXP_REF_VALUE", exp_ref_value
 
