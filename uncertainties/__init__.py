@@ -1398,12 +1398,15 @@ def format_num(nom_val_main, error_main, common_exp,
         percent_str += '%'
 
     ####################
-        
+
+    # !!!!! I should have the same special treatment when either the
+    # error_main or the nom_val_main is NaN.
+    
     # Only true if the error should not have an exponent (has priority
     # over common_exp):
     special_error = not error_main or isnan(error_main)
 
-    # Nicer representation of the main part, with no trailing
+    # Nicer representation of the main nominal part, with no trailing
     # zeros, when the error does not have a defined number of
     # significant digits:
     if special_error and (not fmt_parts['type'] or fmt_parts['type'] in 'gG'):
@@ -1588,17 +1591,21 @@ def format_num(nom_val_main, error_main, common_exp,
         ####################
         # Error formatting:
 
-        # Note: .0f applied to a float has no decimal point, but
+        # !! Note: .0f applied to a float has no decimal point, but
         # this does not appear to be documented
         # (http://docs.python.org/2/library/string.html#format-specification-mini-language). This
-        # feature is used anyway, because it allows a possible
-        # comma format parameter to be handled more conveniently
-        # than if the 'd' format was used.
+        # feature is used anyway, because it allows a possible comma
+        # format parameter to be handled more conveniently than if the
+        # 'd' format was used.
         #
         # The following uses a special integer representation of a
         # zero uncertainty:
         if error_main:
-            fmt_suffix_e = '.%d%s' % (prec, main_fmt_type)
+            if isnan(nom_val_main):
+                # The error can be formatted independently:
+                fmt_suffix_e = (fmt_parts['prec'] or '')+fmt_parts['type']
+            else:
+                fmt_suffix_e = '.%d%s' % (prec, main_fmt_type)
         else:
             fmt_suffix_e = '.0%s' % main_fmt_type
         
