@@ -1905,7 +1905,7 @@ def test_format():
             '.1e': '(nan+/-1.0)e+02',  # Similar to 1±nan
             '.1E': '(%s+/-1.0)E+02' % NaN_EFG,
             '.1ue': '(nan+/-1)e+02',
-            '10.1e': '       nan+/-     1e+02'
+            '10.1e': '       nan+/-   1.0e+02'
         },
         (float('nan'), 1e8): {  # NaN *nominal value*
             '': '(nan+/-1.0)e+08',  # Like '{}'.format(1.)
