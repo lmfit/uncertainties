@@ -2207,6 +2207,9 @@ class AffineScalarFunc(object):
 
         else:
 
+            # No control of the number of significant digits on the
+            # uncertainty.
+
             print "PRECISION NOT BASED ON UNCERTAINTY" #!!!
             
             # The precision has the same meaning as for floats (it is
