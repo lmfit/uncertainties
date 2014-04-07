@@ -1913,7 +1913,7 @@ def test_format():
             '.1e': '(nan+/-1.0)e+08',
             '.1E': '(%s+/-1.0)E+08' % NaN_EFG,
             '.1ue': '(nan+/-1)e+08',
-            '10.1e': '       nan+/-     1e+08'  # 'nane+08' would be strange
+            '10.1e': '       nan+/-   1.0e+08'  # 'nane+08' would be strange
         },                
         (float('nan'), 123456789): {  # NaN *nominal value*
             #!!!!!! udpate
