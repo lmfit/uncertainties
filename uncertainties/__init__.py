@@ -2142,7 +2142,7 @@ class AffineScalarFunc(object):
 
         # Should the precision be interpreted like for a float, or
         # should the number of significant digits on the uncertainty
-        # be controlled?        
+        # be controlled?
         if ((not fmt_prec  # Default behavior: uncertainty controlled
              or match.group('uncert_prec'))  # Explicit control
             # The number of significant digits of the uncertainty must
@@ -2161,9 +2161,10 @@ class AffineScalarFunc(object):
             # regular. NaN is different: there are no digits to align,
             # I would print the other part in the default way. HOWEVER
             # there is question: a NaN uncertainty can currently be
-            # factored, no? I MUST CHECK the current official
-            # guarantees of the exponential modes (factored
-            # exponential guaranteed with the eEgG formatting?).
+            # factored, no? NOTE that the shorthand notation
+            # implicitly factors nan when there is an exponent: it
+            # would be consistent to keep this in the non-shorthand
+            # forms.
             and std_dev and len(non_nan_values)==2):
             
             # The number of significant digits on the uncertainty is
