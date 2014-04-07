@@ -1525,7 +1525,10 @@ def format_num(nom_val_main, error_main, common_exp,
         # because .0e can give this for a non-zero value (the goal is
         # to have zero uncertainty be very explicit):
         error_has_exp = fmt_parts['width'] and not special_error
-        #!!!!!! Should be extended to NaN main value
+
+        # Like error_has_exp, but only for NaN handling (there is not
+        # special meaning to a zero nominal value):
+        nom_has_exp = fmt_parts['width'] and not isnan(nom_val_main)
         
         # Prefix for the parts:
         if fmt_parts['width']:  # Individual widths
@@ -1541,21 +1544,18 @@ def format_num(nom_val_main, error_main, common_exp,
                 
                 width = int(fmt_parts['width'])
 
-                # Remaining (minimum) width:
+                # Remaining (minimum) width after including the
+                # exponent:
                 remaining_width = max(width-len(exp_str), 0)
                 
                 fmt_prefix_n = '%s%s%d%s' % (
                     fmt_parts['sign'], fmt_parts['zero'],
-                    remaining_width, fmt_parts['comma'])
+                    remaining_width if nom_has_exp else width,
+                    fmt_parts['comma'])
 
-                if error_has_exp:
-                    remaining_width_e = remaining_width
-                else:
-                    remaining_width_e = width
-                    
                 fmt_prefix_e = '%s%d%s' % (
                     fmt_parts['zero'],
-                    remaining_width_e,
+                    remaining_width if error_has_exp else width,
                     fmt_parts['comma'])
                 
             else:
@@ -1583,7 +1583,7 @@ def format_num(nom_val_main, error_main, common_exp,
 
         # print "NOM_VAL_STR", nom_val_str
         
-        if not any_exp_factored:
+        if not any_exp_factored and nom_has_exp:
             nom_val_str += exp_str
 
         ####################
@@ -1617,7 +1617,7 @@ def format_num(nom_val_main, error_main, common_exp,
             #!!!!!! Should be also done for the nominal value
             error_str = '\mathrm{%s}' % error_str
             
-        if error_has_exp:
+        if error_has_exp:  #!!!! why any_exp_factored not used here but used above?
             error_str += exp_str
 
         ####################
@@ -2168,22 +2168,20 @@ class AffineScalarFunc(object):
         # Should the precision be interpreted like for a float, or
         # should the number of significant digits on the uncertainty
         # be controlled?
-        if ((not fmt_prec  # Default behavior: uncertainty controlled
-             or match.group('uncert_prec'))  # Explicit control
+        if ((
+            # Default behavior: number of significant digits on the
+            # uncertainty controlled (if useful, i.e. only in
+            # situations where the nominal value and the standard
+            # error digits are truncated at the same place):
+            (not fmt_prec and len(non_nan_values)==2)
+            or match.group('uncert_prec'))  # Explicit control
             # The number of significant digits of the uncertainty must
             # be meaningful, otherwise the position of the significant
             # digits of the uncertainty does not have a clear
             # meaning. This gives us the *effective* uncertainty
             # control mode:
             and std_dev
-            # Principle for formatting a number with uncertainty with
-            # a single NaN, the output is symmetrical: whether the NaN
-            # is the nominal value or the standard deviation does not
-            # change the format of the other part. In particular,
-            # there is no control of the number of digits of the
-            # uncertainty (since there is no need to align the digits
-            # of both parts):
-            and len(non_nan_values)==2):
+            and not isnan(std_dev)):
             
             # The number of significant digits on the uncertainty is
             # controlled.
