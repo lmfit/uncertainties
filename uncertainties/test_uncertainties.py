@@ -1916,13 +1916,12 @@ def test_format():
             '10.1e': '       nan+/-   1.0e+08'  # 'nane+08' would be strange
         },                
         (float('nan'), 123456789): {  # NaN *nominal value*
-            #!!!!!! udpate
-            '': '(nan+/-1.0)e+08',
-            'g': '(nan+/-1)e+08',  # Like '{:g}'.format(1e8)
-            '.1e': '(nan+/-1.0)e+08',
-            '.1E': '(%s+/-1.0)E+08' % NaN_EFG,
+            '': '(nan+/-1.23456789)e+08',  # Similar to '{}'.format(123456789.)
+            'g': '(nan+/-1.23457)e+08',  # Similar to '{:g}'.format(123456789.)
+            '.1e': '(nan+/-1.2)e+08',
+            '.1E': '(%s+/-1.2)E+08' % NaN_EFG,
             '.1ue': '(nan+/-1)e+08',
-            '10.1e': '       nan+/-     1e+08'
+            '10.1e': '       nan+/-   1.2e+08'
         },        
         (float('nan'), float('nan')): {  # *Double* NaN
             '': 'nan+/-nan',
