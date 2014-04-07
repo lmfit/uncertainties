@@ -2357,6 +2357,8 @@ class AffineScalarFunc(object):
             std_dev_mantissa = std_dev
             signif_limit = digits_limit
 
+        print "SIGNIF_LIMIT", signif_limit  #!!!
+            
         ########################################
 
         # Format of the main (i.e. with no exponent) parts:
@@ -2368,6 +2370,10 @@ class AffineScalarFunc(object):
         # to take into account the special role of the decimal
         # point:
         if std_dev and not isnan(std_dev):
+            # !!!!! This part is strange: this is the most common
+            # case, and it looks like any previous calculation of prec
+            # is generally discarded: CHECK.
+            #
             # The decimal point location is always included in the
             # printed digits (e.g., printing 3456 with only 2
             # significant digits requires to print at least four
