@@ -337,7 +337,10 @@ def test_ufloat_fromstr():
         
         # NaN uncertainty:
         u'(3.141±nan)E+02': (314.1, float('nan')),
+        '3.141e+02+/-nan': (314.1, float('nan')),
         '3.4(nan)e10': (3.4e10, float('nan')),
+        # NaN value:
+        'nan+/-3.14e2': (float('nan'), 314),
         # "Double-floats"
         '(-3.1415 +/- 1e-4)e+200': (-3.1415e200, 1e196),
         '(-3.1415e-10 +/- 1e-4)e+200': (-3.1415e190, 1e196),
@@ -1906,7 +1909,7 @@ def test_format():
         },
         (float('nan'), 100000000): {  # NaN *nominal value*
             # Like '{:g}'.format(1e8), because '{}'.format(1e8) is not
-            # defined in the documentation
+            # defined fully correctly in the documentation
             # (http://stackoverflow.com/questions/16525924/precise-definition-of-float-string-formatting)
             '': 'nan+/-1e+08',
             'g': 'nan+/-1e+08',  # Like '{:g}'.format()
