@@ -1930,7 +1930,7 @@ def test_format():
             '.1e': 'nan+/-nan',
             '.1E': '%s+/-%s' % (NaN_EFG, NaN_EFG),
             '.1ue': 'nan+/-nan',
-            'EL': r'\mathrm{%s} \pm \mathrm{%s}'.format(NaN_EFG, NaN_EFG)
+            'EL': r'\mathrm{%s} \pm \mathrm{%s}' % (NaN_EFG, NaN_EFG)
         }
         
     }
