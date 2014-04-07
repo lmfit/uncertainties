@@ -161,7 +161,7 @@ The resulting form can generally be parsed back with
 .. Precision matching:
 
 The nominal value and the uncertainty always have the **same
-precision**.
+precision**: this makes it easier to compare them.
 
 .. Formatting method:
 
@@ -319,8 +319,8 @@ prints with the shorthand notation: ``Result = 0.20(1)``.
 
 
 .. index::
-   pair: nominal value; of scalar
-   pair: uncertainty; of scalar
+   pair: nominal value; scalar
+   pair: uncertainty; scalar
 
 Access to the uncertainty and to the nominal value
 ==================================================
