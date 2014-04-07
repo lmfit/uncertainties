@@ -2136,6 +2136,14 @@ class AffineScalarFunc(object):
                 # There is no common exponent: #!!!!! or don't define
                 # exp_ref_value?
                 # !!!!!exp_ref_value = None  # No meaningful exponent
+                #
+                # !!!! Should the format type be forced to "no
+                # exponent" so as to bypass all the exponent
+                # calculations, which have no meaning since
+                # exp_ref_value is not defined? This could be
+                # fmt_type='f' or 'F', for instance. MAYBE there is a
+                # cleaner way, like skipping exponent calculations if
+                # exp_ref_value is None or non_nan_values is empty…
                 pass
                 
             # print "EXP_REF_VALUE", exp_ref_value
@@ -2246,17 +2254,17 @@ class AffineScalarFunc(object):
                     # gG format type):
                     num_signif_digits = prec or 1
 
-                print "GETTING digits_limit..."  #!!!
-                
                 # The number of significant digits is important for
                 # example for determining the exponent:
 
-                # print "EXP_REF_VAL", exp_ref_value
-                # print "NUM_SIGNIF_DIGITS", num_signif_digits
+                print "EXP_REF_VAL", exp_ref_value  #!!!
+                print "NUM_SIGNIF_DIGITS", num_signif_digits  #!!!
 
                 #!!!!!!! Handle None exp_ref_value                
                 digits_limit = signif_dgt_to_limit(exp_ref_value,
                                                    num_signif_digits)
+
+                print "DIGITS_LIMIT", digits_limit  #!!!
                 
         #######################################
 
