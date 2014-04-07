@@ -2171,7 +2171,8 @@ class AffineScalarFunc(object):
             # is the nominal value or the standard deviation does not
             # change the format of the other part. In particular,
             # there is no control of the number of digits of the
-            # uncertainty:
+            # uncertainty (since there is no need to align the digits
+            # of both parts):
             and len(non_nan_values)==2):
             
             # The number of significant digits on the uncertainty is
