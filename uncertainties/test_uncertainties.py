@@ -1810,7 +1810,7 @@ def test_format():
             # and '{:g}'.format(1.234567890123456789) are different).
             '': '1.0+/-nan',
             # This is ugly, but consistent with
-            # '{:+05}'.format(float('nan')) and format(1.) [which
+            # '{:+05}'.format(float('nan')) and format(1.) (which
             # differs from format(1)!):
             '+05': '+01.0+/-00nan'            
             }),
