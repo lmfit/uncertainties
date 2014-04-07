@@ -1409,7 +1409,7 @@ def format_num(nom_val_main, error_main, common_exp,
     # Nicer representation of the main nominal part, with no trailing
     # zeros, when the error does not have a defined number of
     # significant digits:
-    if special_error and (not fmt_parts['type'] or fmt_parts['type'] in 'gG'):
+    if special_error and fmt_parts['type'] in ('g', 'G', ''):
         # The main part is between 1 and 10 because any possible
         # exponent is taken care of by common_exp, so it is
         # formatted without an exponent (otherwise, the exponent
@@ -1601,7 +1601,9 @@ def format_num(nom_val_main, error_main, common_exp,
         # The following uses a special integer representation of a
         # zero uncertainty:
         if error_main:
-            if isnan(nom_val_main):
+            if (isnan(nom_val_main)
+                # Only some formats have a nicer representation:
+                and fmt_parts['type'] in ('g', 'G', '')):
                 # The error can be formatted independently:
                 fmt_suffix_e = (fmt_parts['prec'] or '')+fmt_parts['type']
             else:
