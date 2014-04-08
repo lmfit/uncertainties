@@ -2352,9 +2352,7 @@ class AffineScalarFunc(object):
             
             nom_val_mantissa = nom_val/factor
             std_dev_mantissa = std_dev/factor
-            # Limit for the last digit of the mantissas (it should be
-            # non-positive, as digits before the final decimal points
-            # are always returned in full):
+            # Limit for the last digit of the mantissas:
             signif_limit = digits_limit - common_exp
 
         else:  # No common exponent
@@ -2375,15 +2373,18 @@ class AffineScalarFunc(object):
         # The precision of the main parts must be adjusted so as
         # to take into account the special role of the decimal
         # point:
-        if signif_limit is not None:  # signif_limit must be non-None
-            # !!!!! This part is strange: this is the most common
-            # case, and it looks like any previous calculation of prec
-            # is generally discarded: CHECK.
-            #
+        if signif_limit is not None:  # If signif_limit is pertinent
             # The decimal point location is always included in the
             # printed digits (e.g., printing 3456 with only 2
             # significant digits requires to print at least four
-            # digits, like in 3456 or 3500):
+            # digits, like in 3456 or 3500).
+            # 
+            # The max() is important for example for
+            # 1234567.89123+/-12345.678 with the f format: in this
+            # case, signif_limit is +3 (2 significant digits necessary
+            # for the error, as per the PDG rules), but the (Python
+            # float formatting) precision to be used for the main
+            # parts is 0 (all digits must be shown):
             prec = max(-signif_limit, 0)
         print "PREC", prec  #!!!
             
