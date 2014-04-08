@@ -1517,7 +1517,7 @@ def format_num(nom_val_main, error_main, common_exp,
             
     else:  # +/- notation:
         
-        # True when the error part has an exponent directly attached
+        # True when the error part has any exponent directly attached
         # (case of an individual exponent for both the nominal value
         # and the error, when the error is a non-0, non-NaN number).
         # The goal is to avoid the strange notation nane-10, and to
