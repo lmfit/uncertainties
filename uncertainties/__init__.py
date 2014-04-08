@@ -3198,8 +3198,6 @@ def ufloat_fromstr(representation, tag=None):
     Surrounding spaces are ignored.
     """
 
-    #! The special ** syntax is for Python 2.5 and before (Python 2.6+
-    # understands tag=tag):
     (nominal_value, std_dev) = str_to_number_with_uncert(
         representation.strip())
     
