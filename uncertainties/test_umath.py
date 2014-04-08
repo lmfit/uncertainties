@@ -207,20 +207,16 @@ def test_math_module():
     # Regular operations are chosen to be unchanged:
     assert isinstance(umath.sin(3), float)
 
-    # Python >=2.6 functions:
+    # factorial() must not be "damaged" by the umath module, so as 
+    # to help make it a drop-in replacement for math (even though 
+    # factorial() does not work on numbers with uncertainties 
+    # because it is restricted to integers, as for 
+    # math.factorial()):
+    assert umath.factorial(4) == 24
 
-    if sys.version_info >= (2, 6):
-    
-        # factorial() must not be "damaged" by the umath module, so as 
-        # to help make it a drop-in replacement for math (even though 
-        # factorial() does not work on numbers with uncertainties 
-        # because it is restricted to integers, as for 
-        # math.factorial()):
-        assert umath.factorial(4) == 24
-
-        # fsum is special because it does not take a fixed number of
-        # variables:
-        assert umath.fsum([x, x]).nominal_value == -3
+    # fsum is special because it does not take a fixed number of
+    # variables:
+    assert umath.fsum([x, x]).nominal_value == -3
 
     # Functions that give locally constant results are tested: they
     # should give the same result as their float equivalent:
