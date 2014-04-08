@@ -769,8 +769,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
         # arguments (and therefore to use inspect.getfullargspec())
         # because they are already handled by derivatives_kwargs.
 
-        # ! Python 2.6+: argspec.args
-        for (index, name) in enumerate(argspec[0]):
+        for (index, name) in enumerate(argspec.args):
             
             # The following test handles the case of
             # positional-or-keyword parameter for which automatic
