@@ -316,10 +316,7 @@ def test_power_special_cases():
     err_msg = 'A proper exception should have been raised'
 
     # An exception must have occurred:
-    if sys.version_info >= (2, 6):
-        assert err_class == ValueError, err_msg
-    else:
-        assert err_class == OverflowError, err_msg
+    assert err_class == ValueError, err_msg
             
     try:
         result = umath.pow(negative, positive)
@@ -331,11 +328,7 @@ def test_power_special_cases():
         # know how to calculate it.
         pass
     else:
-        if sys.version_info >= (2, 6):
-            raise Exception('A proper exception should have been raised')
-        else:
-            assert test_uncertainties.isnan(result.nominal_value)
-            assert test_uncertainties.isnan(result.std_dev)
+        raise Exception('A proper exception should have been raised')
     
 def test_power_wrt_ref():
     '''
