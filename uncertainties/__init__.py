@@ -1587,7 +1587,7 @@ def format_num(nom_val_main, error_main, common_exp,
 
         # print "NOM_VAL_STR", nom_val_str
         
-        if not any_exp_factored and nom_has_exp:
+        if nom_has_exp:
             nom_val_str += exp_str
 
         ####################
