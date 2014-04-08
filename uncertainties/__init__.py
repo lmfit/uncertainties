@@ -1523,7 +1523,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # The goal is to avoid the strange notation nane-10, and to
         # avoid the 0e10 notation for an exactly zero uncertainty,
         # because .0e can give this for a non-zero value (the goal is
-        # to have zero uncertainty be very explicit):
+        # to have a zero uncertainty be very explicit):
         error_has_exp = fmt_parts['width'] and not special_error
 
         # Like error_has_exp, but only for NaN handling (there is not
