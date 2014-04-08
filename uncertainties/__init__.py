@@ -2336,11 +2336,12 @@ class AffineScalarFunc(object):
 
         # Calculation of signif_limit (position of the significant
         # digits limit in the final fixed point representations; this
-        # number is non-positive), of nom_val_mantissa ("mantissa" for
-        # the nominal value, i.e. value possibly corrected for a
-        # factorized exponent), and std_dev_mantissa (similarly for
-        # the standard deviation). common_exp is also set to None if no
-        # common exponent should be used.
+        # is either a non-positive number, or None), of
+        # nom_val_mantissa ("mantissa" for the nominal value,
+        # i.e. value possibly corrected for a factorized exponent),
+        # and std_dev_mantissa (similarly for the standard
+        # deviation). common_exp is also set to None if no common
+        # exponent should be used.
         
         if use_exp:
 
@@ -2374,7 +2375,7 @@ class AffineScalarFunc(object):
         # The precision of the main parts must be adjusted so as
         # to take into account the special role of the decimal
         # point:
-        if std_dev and not isnan(std_dev):
+        if signif_limit is not None:  # signif_limit must be non-None
             # !!!!! This part is strange: this is the most common
             # case, and it looks like any previous calculation of prec
             # is generally discarded: CHECK.
