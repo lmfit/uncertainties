@@ -2909,14 +2909,12 @@ def covariance_matrix(nums_with_uncert):
     # See PSI.411 in EOL's notes.
 
     covariance_matrix = []
-    # ! In Python 2.6+, this could be replaced by enumerate(..., 1),
-    # along with updating places where i1 is used (i1+1 => i1).
-    for (i1, expr1) in enumerate(nums_with_uncert):
+    for (i1, expr1) in enumerate(nums_with_uncert, 1):
         derivatives1 = expr1.derivatives  # Optimization
         vars1 = set(derivatives1)
         coefs_expr1 = []
 
-        for expr2 in nums_with_uncert[:i1+1]:
+        for expr2 in nums_with_uncert[:i1]:
             derivatives2 = expr2.derivatives  # Optimization
             coefs_expr1.append(sum(
                 ((derivatives1[var]*derivatives2[var]*var._std_dev**2)
