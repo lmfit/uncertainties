@@ -1516,6 +1516,12 @@ def format_num(nom_val_main, error_main, common_exp,
                 fmt_parts['width'])
             
     else:  # +/- notation:
+
+        # The common exponent is factored or not, depending on the
+        # width. This gives nice columns for the nominal values and
+        # the errors (no shift due to a varying exponent), when a need
+        # is given:
+        any_exp_factored = fmt_parts['width']
         
         # True when the error part has any exponent directly attached
         # (case of an individual exponent for both the nominal value
@@ -1524,19 +1530,14 @@ def format_num(nom_val_main, error_main, common_exp,
         # avoid the 0e10 notation for an exactly zero uncertainty,
         # because .0e can give this for a non-zero error (the goal is
         # to have a zero uncertainty be very explicit):
-        error_has_exp = fmt_parts['width'] and not special_error
+        error_has_exp = any_exp_factored and not special_error
 
         # Like error_has_exp, but only for NaN handling (there is not
         # special meaning to a zero nominal value):
-        nom_has_exp = fmt_parts['width'] and not isnan(nom_val_main)
+        nom_has_exp = any_exp_factored and not isnan(nom_val_main)
         
         # Prefix for the parts:
         if fmt_parts['width']:  # Individual widths
-
-            # The common exponent is not factored, so as to have nice
-            # columns for the nominal values and the errors (no shift
-            # due to a varying exponent):
-            any_exp_factored = False
 
             # If zeros are needed, then the width is taken into
             # account now (before the exponent is added):
@@ -1563,10 +1564,13 @@ def format_num(nom_val_main, error_main, common_exp,
                 fmt_prefix_e = fmt_parts['comma']
 
         else:  # Global width
-            any_exp_factored = True            
             fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
             fmt_prefix_e = fmt_parts['comma']
-        
+
+        print "ANY_EXP_FACTORED", any_exp_factored  #!!!
+        print "ERROR_HAS_EXP", error_has_exp  #!!!
+        print "NOM_HAS_EXP", nom_has_exp  #!!!
+            
         ####################
         # Nominal value formatting:
 
