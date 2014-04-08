@@ -1292,9 +1292,7 @@ def format_num(nom_val_main, error_main, common_exp,
     type; the value are strings. These format specification parts are
     handled. The width is applied to each value, or, if the shorthand
     notation is used, globally. If the error is special (zero or NaN),
-    the parts are applied as much as possible to the nominal value;
-    this fails with Python < 2.6 if the resulting format is not
-    accepted by the % operator.
+    the parts are applied as much as possible to the nominal value.
     
     prec -- precision to use with the main_fmt_type format type
     (see below).
@@ -1466,11 +1464,6 @@ def format_num(nom_val_main, error_main, common_exp,
         # print "FMT_PREFIX_N", fmt_prefix_n
         # print "FMT_SUFFIX_N", fmt_suffix_n
 
-        # !! The following fails with Python < 2.6 when the format is
-        # not accepted by the % operator. This can happen when
-        # special_error is true, as the format used for the nominal
-        # value is essentially the format provided by the user, which
-        # may be empty:
         nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
 
         value_str = nom_val_str+value_end
