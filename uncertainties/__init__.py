@@ -1567,9 +1567,9 @@ def format_num(nom_val_main, error_main, common_exp,
             fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
             fmt_prefix_e = fmt_parts['comma']
 
-        print "ANY_EXP_FACTORED", any_exp_factored  #!!!
-        print "ERROR_HAS_EXP", error_has_exp  #!!!
-        print "NOM_HAS_EXP", nom_has_exp  #!!!
+        ## print "ANY_EXP_FACTORED", any_exp_factored
+        ## print "ERROR_HAS_EXP", error_has_exp
+        ## print "NOM_HAS_EXP", nom_has_exp
             
         ####################
         # Nominal value formatting:
@@ -2149,24 +2149,8 @@ class AffineScalarFunc(object):
             except ValueError:  # No non-NaN value: NaN±NaN…
                 # No meaningful common exponent can be obtained:
                 pass
-            else:
-                print "EXP_REF_VAL", exp_ref_value  #!!!
-
-                
-            # print "EXP_REF_VALUE", exp_ref_value
-
-        # !!! The NaN handling here is not obvious: should NaN be like
-        # "treat the other part as if it were a float by itself", OR
-        # like "Treat the NaN in the same way as 0": 0±100 has a
-        # controlled uncertainty with 2 significant PDG digits. NOTE
-        # THAT THE LATTER yields (0.0±1.0)e2, which makes sense: the 0
-        # and the 1 are "aligned" properly, like in (0.1±1.0)e2; this
-        # is regular. NaN is different: there are no digits to align,
-        # I would print the other part in the default way. HOWEVER, a
-        # NaN uncertainty can currently be factored: the shorthand
-        # notation implicitly factors NaN when there is an exponent:
-        # it would be consistent to keep this in the non-shorthand
-        # forms.
+            ## else:
+            ##     print "EXP_REF_VAL", exp_ref_value
             
         # Should the precision be interpreted like for a float, or
         # should the number of significant digits on the uncertainty
@@ -2213,7 +2197,7 @@ class AffineScalarFunc(object):
             # No control of the number of significant digits on the
             # uncertainty.
 
-            print "PRECISION NOT BASED ON UNCERTAINTY" #!!!
+            ## print "PRECISION NOT BASED ON UNCERTAINTY"
             
             # The precision has the same meaning as for floats (it is
             # not the uncertainty that defines the number of digits).
@@ -2228,7 +2212,6 @@ class AffineScalarFunc(object):
 
             if fmt_type in 'fF':
 
-                print "FORMAT TYPE in 'fF'"  #!!!
                 digits_limit = -prec
                 
             else:  # Format type in eEgG
@@ -2266,14 +2249,14 @@ class AffineScalarFunc(object):
                 # The number of significant digits is important for
                 # example for determining the exponent:
 
-                print "NUM_SIGNIF_DIGITS", num_signif_digits  #!!!
+                ## print "NUM_SIGNIF_DIGITS", num_signif_digits
 
                 digits_limit = (
                     signif_dgt_to_limit(exp_ref_value, num_signif_digits)
                     if non_nan_values
                     else None)
 
-                print "DIGITS_LIMIT", digits_limit  #!!!
+                ## print "DIGITS_LIMIT", digits_limit
                 
         #######################################
 
@@ -2363,7 +2346,7 @@ class AffineScalarFunc(object):
             std_dev_mantissa = std_dev
             signif_limit = digits_limit
 
-        print "SIGNIF_LIMIT", signif_limit  #!!!
+        ## print "SIGNIF_LIMIT", signif_limit
             
         ########################################
 
@@ -2386,20 +2369,20 @@ class AffineScalarFunc(object):
             # float formatting) precision to be used for the main
             # parts is 0 (all digits must be shown):
             prec = max(-signif_limit, 0)
-        print "PREC", prec  #!!!
+        ## print "PREC", prec
             
         ########################################
 
-        print (
-            "FORMAT_NUM parameters: nom_val_mantissa={},"
-            " std_dev_mantissa={}, common_exp={},"
-            " match.groupdict()={}, prec={}, main_fmt_type={},"
-            " options={}".format(
-            nom_val_mantissa, std_dev_mantissa, common_exp, 
-            match.groupdict(),
-            prec,
-            main_fmt_type,
-            options))
+        ## print (
+        ##     "FORMAT_NUM parameters: nom_val_mantissa={},"
+        ##     " std_dev_mantissa={}, common_exp={},"
+        ##     " match.groupdict()={}, prec={}, main_fmt_type={},"
+        ##     " options={}".format(
+        ##     nom_val_mantissa, std_dev_mantissa, common_exp, 
+        ##     match.groupdict(),
+        ##     prec,
+        ##     main_fmt_type,
+        ##     options))
 
         # Final formatting:
         return format_num(nom_val_mantissa, std_dev_mantissa, common_exp, 
