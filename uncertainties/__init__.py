@@ -2135,7 +2135,7 @@ class AffineScalarFunc(object):
         
         # Calculation of digits_limit, which defines the precision of
         # the nominal value and of the standard deviation (it can be
-        # None when it does not matter):
+        # None when it does not matter, like for NaN±NaN):
 
         # Reference value for the calculation of a possible exponent,
         # if needed:
@@ -2145,10 +2145,13 @@ class AffineScalarFunc(object):
             # could have been chosen, like using the exponent of the
             # nominal value, irrespective of the standard deviation):
             try:
-                exp_ref_value = max(non_nan_values)
-            except ValueError:  # No non-NaN value (should be rare)
-                # No meaningful exponent can be obtained:
-                exp_ref_value = None
+                exp_ref_value = max(non_nan_values)                
+            except ValueError:  # No non-NaN value: NaN±NaN…
+                # No meaningful common exponent can be obtained:
+                pass
+            else:
+                print "EXP_REF_VAL", exp_ref_value  #!!!
+
                 
             # print "EXP_REF_VALUE", exp_ref_value
 
@@ -2263,12 +2266,11 @@ class AffineScalarFunc(object):
                 # The number of significant digits is important for
                 # example for determining the exponent:
 
-                print "EXP_REF_VAL", exp_ref_value  #!!!
                 print "NUM_SIGNIF_DIGITS", num_signif_digits  #!!!
 
                 digits_limit = (
                     signif_dgt_to_limit(exp_ref_value, num_signif_digits)
-                    if exp_ref_value is not None
+                    if non_nan_values
                     else None)
 
                 print "DIGITS_LIMIT", digits_limit  #!!!
@@ -2283,7 +2285,7 @@ class AffineScalarFunc(object):
         if fmt_type in 'fF':
             use_exp = False
         elif fmt_type in 'eE':
-            if exp_ref_value is None:
+            if not non_nan_values:
                 use_exp = False
             else:                
                 use_exp = True
@@ -2315,7 +2317,7 @@ class AffineScalarFunc(object):
             # for floats is used ("-4 <= exponent of rounded value <
             # p"), on the nominal value.
 
-            if exp_ref_value is None:
+            if not non_nan_values:
                 use_exp = False
             else:
                 # Common exponent *if* used:
