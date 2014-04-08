@@ -1521,7 +1521,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # width. This gives nice columns for the nominal values and
         # the errors (no shift due to a varying exponent), when a need
         # is given:
-        any_exp_factored = fmt_parts['width']
+        any_exp_factored = not fmt_parts['width']
         
         # True when the error part has any exponent directly attached
         # (case of an individual exponent for both the nominal value
@@ -1530,11 +1530,11 @@ def format_num(nom_val_main, error_main, common_exp,
         # avoid the 0e10 notation for an exactly zero uncertainty,
         # because .0e can give this for a non-zero error (the goal is
         # to have a zero uncertainty be very explicit):
-        error_has_exp = any_exp_factored and not special_error
+        error_has_exp = not any_exp_factored and not special_error
 
         # Like error_has_exp, but only for NaN handling (there is not
         # special meaning to a zero nominal value):
-        nom_has_exp = any_exp_factored and not isnan(nom_val_main)
+        nom_has_exp = not any_exp_factored and not isnan(nom_val_main)
         
         # Prefix for the parts:
         if fmt_parts['width']:  # Individual widths

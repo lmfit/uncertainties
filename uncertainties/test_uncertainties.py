@@ -1831,7 +1831,7 @@ def test_format():
         # 0 uncertainty: nominal value displayed like a float:
         (1.2345, 0): python26_add({
             '.2ue': '(1.23+/-0)e+00',
-            '1.2ue': '1.23e+00+/-0',
+            '1.2ue': '1.23e+00+/-0',  # No factored exponent
             '.2uf': '1.23+/-0',
             '.2ufS': '1.23(0)',
             '.2fS': '1.23(0)',
