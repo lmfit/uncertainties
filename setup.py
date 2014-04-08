@@ -42,7 +42,7 @@ else:
 # Common options for distutils/setuptools's setup():
 setup_options = dict(
     name='uncertainties',
-    version='2.4.4',
+    version='2.4.5',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://pythonhosted.org/uncertainties/',
@@ -160,6 +160,7 @@ Version history
 
 Main changes:
 
+- 2.4.5: String formatting now works for ``NaN+/-...`` numbers.
 - 2.4.4: The documentation license now allows its commercial use.
 - 2.4.2: `NumPy 1.8 compatibility <https://github.com/numpy/numpy/issues/4063>`_.
 - 2.4.1: In ``uncertainties.umath``, functions ``ceil()``, ``floor()``, \
@@ -315,6 +316,7 @@ _of_uncertainty
         'Programming Language :: Python :: 3.1',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: Implementation :: Jython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Education',
