@@ -1603,8 +1603,8 @@ def format_num(nom_val_main, error_main, common_exp,
         # The following uses a special integer representation of a
         # zero uncertainty:
         if error_main:
-            # Handling of NaN in the nominal value identical to the
-            # handling of NaN in the standard deviation:
+            # The handling of NaN in the nominal value identical to
+            # the handling of NaN in the standard deviation:
             if (isnan(nom_val_main)
                 # Only some formats have a nicer representation:
                 and fmt_parts['type'] in ('', 'g', 'G')):
