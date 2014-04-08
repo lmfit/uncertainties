@@ -241,6 +241,7 @@ import copy
 import warnings
 import itertools
 import inspect
+import numbers
 
 from backport import *
 
@@ -303,9 +304,7 @@ def set_doc(doc_string):
 # Some types known to not depend on Variable objects are put in
 # CONSTANT_TYPES.  The most common types can be put in front, as this
 # may slightly improve the execution speed.
-#
-#! In Python 2.6+, numbers.Number could be used instead, here:
-FLOAT_LIKE_TYPES = (float, int, long)
+FLOAT_LIKE_TYPES = (numbers.Number,)
 CONSTANT_TYPES = FLOAT_LIKE_TYPES+(complex,)
 
 ###############################################################################
