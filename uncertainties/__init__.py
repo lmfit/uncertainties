@@ -1623,7 +1623,7 @@ def format_num(nom_val_main, error_main, common_exp,
             if isnan(error_main):
                 error_str = '\mathrm{%s}' % error_str
             
-        if error_has_exp:  #!!!! why any_exp_factored not used here but used above for nom_has_exp? CAN I create a test that shows why it's wrong?
+        if error_has_exp:
             error_str += exp_str
 
         ####################
