@@ -599,8 +599,7 @@ class IndexableIter(object):
             
             for pos in range(len(returned_elements), index+1):
 
-                # ! Python 2.6+: next(...)
-                value = self.iterable.next()
+                value = next(self.iterable)
 
                 if value is None:
                     value = self.none_converter(pos)
