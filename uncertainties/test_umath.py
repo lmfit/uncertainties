@@ -240,62 +240,33 @@ def test_math_module():
     ## surprisingly catches OverflowError. So, tests are written in a
     ## version-specific manner (until the Nose issue is resolved).
 
-    if sys.version_info < (2, 6):
-            
-        try:
-            math.log(0)
-        except OverflowError as err_math:
-            pass
-        else:
-            raise Exception('OverflowError exception expected')
-        try:
-            umath.log(0)
-        except OverflowError as err_ufloat:
-            assert err_math.args == err_ufloat.args
-        else:
-            raise Exception('OverflowError exception expected')
-        try:
-            umath.log(ufloat(0, 0))
-        except OverflowError as err_ufloat:
-            assert err_math.args == err_ufloat.args
-        else:
-            raise Exception('OverflowError exception expected')
-        try:
-            umath.log(ufloat(0, 1))
-        except OverflowError as err_ufloat:
-            assert err_math.args == err_ufloat.args
-        else:
-            raise Exception('OverflowError exception expected')
-
+    try:
+        math.log(0)
+    except ValueError as err_math:
+        # Python 3 does not make exceptions local variables: they are
+        # restricted to their except block:
+        err_math_args = err_math.args
     else:
+        raise Exception('ValueError exception expected')
 
-        try:
-            math.log(0)
-        except ValueError as err_math:
-            # Python 3 does not make exceptions local variables: they are
-            # restricted to their except block:
-            err_math_args = err_math.args
-        else:
-            raise Exception('ValueError exception expected')
-
-        try:
-            umath.log(0)
-        except ValueError as err_ufloat:
-            assert err_math_args == err_ufloat.args
-        else:
-            raise Exception('ValueError exception expected')
-        try:
-            umath.log(ufloat(0, 0))
-        except ValueError as err_ufloat:
-            assert err_math_args == err_ufloat.args
-        else:
-            raise Exception('ValueError exception expected')
-        try:
-            umath.log(ufloat(0, 1))
-        except ValueError as err_ufloat:
-            assert err_math_args == err_ufloat.args
-        else:
-            raise Exception('ValueError exception expected')
+    try:
+        umath.log(0)
+    except ValueError as err_ufloat:
+        assert err_math_args == err_ufloat.args
+    else:
+        raise Exception('ValueError exception expected')
+    try:
+        umath.log(ufloat(0, 0))
+    except ValueError as err_ufloat:
+        assert err_math_args == err_ufloat.args
+    else:
+        raise Exception('ValueError exception expected')
+    try:
+        umath.log(ufloat(0, 1))
+    except ValueError as err_ufloat:
+        assert err_math_args == err_ufloat.args
+    else:
+        raise Exception('ValueError exception expected')
 
     
 def test_hypot():
