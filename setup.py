@@ -23,8 +23,8 @@ if os.path.exists('uncertainties'):
     package_dir = 'uncertainties'
 else:
     # Case of a PyPI package download:
-    if sys.version_info >= (2, 5):
-        package_dir = 'uncertainties-py25'
+    if sys.version_info >= (2, 6):
+        package_dir = 'uncertainties-py26'
     else:
         package_dir = 'uncertainties-py23'
 
