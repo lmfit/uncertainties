@@ -2044,9 +2044,6 @@ class AffineScalarFunc(object):
         in format_num().
         '''
 
-        # !!!!!!!! Have a clear calculation/semantics of exp_ref_value,
-        # digits_limit, common_exp, 
-        
         # Convention on limits "between" digits: 0 = exactly at the
         # decimal point, -1 = after the first decimal, 1 = before the
         # units digit, etc.
@@ -2133,9 +2130,8 @@ class AffineScalarFunc(object):
                           if not isnan(value)]
         
         # Calculation of digits_limit, which defines the precision of
-        # the nominal value and of the standard deviation (None when
-        # this is not meaningful: case of NaN±NaN, for example). !!!!
-        # CHECK that this is implemented and correct.
+        # the nominal value and of the standard deviation (it can be
+        # None when it does not matter):
 
         # Reference value for the calculation of a possible exponent,
         # if needed:
