@@ -2372,8 +2372,6 @@ class AffineScalarFunc(object):
         # Format of the main (i.e. with no exponent) parts:
         main_fmt_type = 'fF'[fmt_type.isupper()]
 
-        # !!!!!!!! Should the NaN test really be on the std_dev only?
-        
         # The precision of the main parts must be adjusted so as
         # to take into account the special role of the decimal
         # point:
