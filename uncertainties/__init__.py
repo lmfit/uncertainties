@@ -1143,24 +1143,11 @@ def PDG_precision(std_dev):
         # std_dev:
         return (2, 10.**exponent*(1000/factor))
 
-# Definition of a basic (format specification only) formatting
-# function that works whatever the version of Python. This function
-# exists so that the more capable format() is used instead of the %
-# formatting operator, if available.
-try:
-
-    robust_format = format
-    
-except NameError:  # !! format() is not defined (Python < 2.6)
-    
-    def robust_format(value, format_spec):
-        '''
-        Formats the given value with the given format specification.
-
-        format_spec: a simple % formatting specification, without the
-        leading % (e.g., 3.2f).
-        '''
-        return ('%' + format_spec) % value
+# Definition of a basic (format specification only, no full-feature
+# format string) formatting function that works whatever the version
+# of Python. This function exists so that the more capable format() is
+# used instead of the % formatting operator, if available:
+robust_format = format
     
 class CallableStdDev(float):
     '''
