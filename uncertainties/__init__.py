@@ -236,7 +236,7 @@ from __future__ import division  # Many analytical derivatives depend on this
 import sys
 import re
 import math
-from math import sqrt, log  # Optimization: no attribute look-up
+from math import sqrt, log, isnan  # Optimization: no attribute look-up
 import copy
 import warnings
 import itertools
@@ -324,19 +324,6 @@ def deprecation(message):
                   ' python -m uncertainties.1to2 -w ProgramDirectory.'
                   % message, stacklevel=3)
 
-###############################################################################
-
-try:
-    isnan = math.isnan
-except AttributeError:  # Python < 2.6
-    def isnan(x):
-        '''
-        Similar to the math.isnan() of Python 2.6+.
-        '''
-        if not isinstance(x, float):
-            raise TypeError('a float is required')
-        return x != x
-    
 ###############################################################################
 
 ## Definitions that depend on the availability of NumPy:
