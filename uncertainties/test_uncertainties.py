@@ -1581,7 +1581,7 @@ def test_format():
         
         # Full generalization of float formatting:
         (3.1415, 0.0001): {
-            '+09.2uf': '+03.14150+/-000.00010'
+            '+09.2uf': '+03.14150+/-000.00010',
             # Alignment is not available with the % formatting
             # operator of Python < 2.6:
             '*^+9.2uf': '+3.14150*+/-*0.00010*',
@@ -1735,7 +1735,7 @@ def test_format():
         # instead of 1.4 for Python 3.1. The problem does not appear
         # with 1.2, so 1.2 is used.
         (-1.2e-12, 0): {
-            '12.2gPL': ur'  -1.2×10⁻¹²±           0'
+            '12.2gPL': ur'  -1.2×10⁻¹²±           0',
             # Pure "width" formats are not accepted by the % operator,
             # and only %-compatible formats are accepted, for Python <
             # 2.6:
@@ -1753,7 +1753,7 @@ def test_format():
         # with 1.2, so 1.2 is used.        
         (-1.2e-12, float('nan')): {
             '.2uG': '(-1.2+/-%s)E-12' % NaN_EFG,  # u ignored, format used
-            '15GS': '  -1.2(%s)E-12' % NaN_EFG
+            '15GS': '  -1.2(%s)E-12' % NaN_EFG,
             'SL': r'-1.2(\mathrm{nan}) \times 10^{-12}',  # LaTeX NaN
             # Pretty-print priority, but not for NaN:
             'PSL': u'-1.2(\mathrm{nan})×10⁻¹²',
@@ -1784,7 +1784,7 @@ def test_format():
             '+05g': '+0001+/-00nan',
             # 5 is the *minimal* width, 6 is the default number of
             # digits after the decimal point:
-            '+05%': '(+100.000000+/-00nan)%'
+            '+05%': '(+100.000000+/-00nan)%',
             # There is a difference between '{}'.format(1.) and
             # '{:g}'.format(1.), which is not fully obvious in the
             # documentation, which indicates that a None format type
@@ -1816,7 +1816,7 @@ def test_format():
             '.2uf': '1.23+/-0',
             '.2ufS': '1.23(0)',
             '.2fS': '1.23(0)',
-            'g': '1.2345+/-0'
+            'g': '1.2345+/-0',
             '': '1.2345+/-0'
         },
 
