@@ -121,6 +121,8 @@ perfectly precise numbers**, in this case:
 gives the correct result, despite the fact that the derivative of the
 square root is not defined in zero.
 
+.. _math_def_num_uncert:
+
 Mathematical definition of numbers with uncertainties
 -----------------------------------------------------
 
