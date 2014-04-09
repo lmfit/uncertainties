@@ -501,11 +501,7 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
         yield term1+term2+term3
 
 # Default rcond argument for the generalization of numpy.linalg.pinv:
-try:
-    # Python 2.6+:
-    pinv_default = numpy.linalg.pinv.__defaults__[0]
-except AttributeError:
-    pinv_default = 1e-15
+pinv_default = numpy.linalg.pinv.__defaults__[0]  # Python 2.6+:
 
 pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
@@ -555,16 +551,9 @@ class matrix(numpy.matrix):
         # numpy.matrix.I is a property object anyway:
 
         m, n = self.shape
-        if m == n:
-            func = inv
-        else:
-            func = pinv
-        return func(self)
+        return (inv if m == n else pinv)(self)
 
-    # ! In Python >= 2.6, this could be simplified as:
-    # I = numpy.matrix.I.getter(__matrix_inverse)
-    I = property(getI, numpy.matrix.I.fset, numpy.matrix.I.fdel,
-                 numpy.matrix.I.__doc__)
+    I = numpy.matrix.I.getter(getI)
 
     def nominal_values(self):
         """
