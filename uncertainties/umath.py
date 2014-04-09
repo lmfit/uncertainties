@@ -303,38 +303,38 @@ for name in dir(math):
 # However, each of the arguments inside this single list can
 # be a variable.  We handle this in a specific way:
 
-if sys.version_info >= (2, 6):    
+# Only for Python 2.6+:
 
-    # For drop-in compatibility with the math module:
-    factorial = math.factorial
-    non_std_wrapped_funcs.append('factorial')
+# For drop-in compatibility with the math module:
+factorial = math.factorial
+non_std_wrapped_funcs.append('factorial')
 
 
-    # We wrap math.fsum
+# We wrap math.fsum
 
-    original_func = math.fsum  # For optimization purposes
+original_func = math.fsum  # For optimization purposes
 
-    # The function below exists so that temporary variables do not
-    # pollute the module namespace:
-    def wrapped_fsum():
-        """
-        Returns an uncertainty-aware version of math.fsum, which must
-        be contained in _original_func.
-        """
+# The function below exists so that temporary variables do not
+# pollute the module namespace:
+def wrapped_fsum():
+    """
+    Returns an uncertainty-aware version of math.fsum, which must
+    be contained in _original_func.
+    """
 
-        # The fsum function is flattened, in order to use the
-        # wrap() wrapper:
+    # The fsum function is flattened, in order to use the
+    # wrap() wrapper:
 
-        flat_fsum = lambda *args: original_func(args)
+    flat_fsum = lambda *args: original_func(args)
 
-        flat_fsum_wrap = uncertainties.wrap(
-            flat_fsum, itertools.repeat(lambda *args: 1))
+    flat_fsum_wrap = uncertainties.wrap(
+        flat_fsum, itertools.repeat(lambda *args: 1))
 
-        return wraps(lambda arg_list: flat_fsum_wrap(*arg_list),
-                     original_func)
+    return wraps(lambda arg_list: flat_fsum_wrap(*arg_list),
+                 original_func)
 
-    fsum = wrapped_fsum()
-    non_std_wrapped_funcs.append('fsum')
+fsum = wrapped_fsum()
+non_std_wrapped_funcs.append('fsum')
 
 ##########
 
