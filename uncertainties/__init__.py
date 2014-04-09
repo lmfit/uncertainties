@@ -1165,40 +1165,21 @@ class CallableStdDev(float):
 # format_num():
 EXP_LETTERS = {'f': 'e', 'F': 'E'}
 
-if sys.version_info >= (2, 6):
-    
-    def robust_align(orig_str, fill_char, align_option, width):
-        '''
-        Aligns the given string with the given fill character.
+def robust_align(orig_str, fill_char, align_option, width):
+    '''
+    Aligns the given string with the given fill character.
 
-        fill_char -- if empty, space is used.
-        
-        align_option -- as accepted by format().
+    fill_char -- if empty, space is used.
 
-        wdith -- string that contains the width.
-        '''
-        
-        # print "ALIGNING", repr(orig_str), "WITH", fill_char+align_option,
-        # print "WIDTH", width
-        
-        return format(orig_str, fill_char+align_option+width)
+    align_option -- as accepted by format().
 
-else:
-    def robust_align(orig_str, fill_char, align_option, width):
-        '''
-        Aligns the given string with the given fill character.
+    wdith -- string that contains the width.
+    '''
 
-        orig_str -- string to be aligned (str or unicode object).
-        
-        align_option -- > < or ^
+    # print "ALIGNING", repr(orig_str), "WITH", fill_char+align_option,
+    # print "WIDTH", width
 
-        width -- string that contains the width
-        '''
-        align_method = getattr(
-            orig_str,
-            {'>': 'rjust', '<': 'ljust', '^': 'center'}[align_option])
-        
-        return align_method(int(width), fill_char or ' ')
+    return format(orig_str, fill_char+align_option+width)
 
 # Maps some Unicode code points ("-", "+", and digits) to their
 # superscript version:
