@@ -1169,6 +1169,8 @@ def robust_align(orig_str, fill_char, align_option, width):
     '''
     Aligns the given string with the given fill character.
 
+    orig_str -- string to be aligned (str or unicode object).
+    
     fill_char -- if empty, space is used.
 
     align_option -- as accepted by format().
