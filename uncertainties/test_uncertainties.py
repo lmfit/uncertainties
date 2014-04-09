@@ -1820,7 +1820,7 @@ def test_format():
             '': '1.2345+/-0'
         },
 
-        # Alignment and filling characters:
+        # Alignment and filling characters (supported in Python 2.6+):
         (3.1415e10, 0): {
             '<15': '3.1415e+10     +/-0              ',
             '<20S': '3.1415(0)e+10       ',
