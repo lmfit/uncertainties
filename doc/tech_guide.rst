@@ -135,9 +135,9 @@ Mathematically, **numbers with uncertainties** are, in this package,
 probability distributions are reduced to two numbers: a nominal value
 and an uncertainty.
 
-Thus, both variables (:class:`Variable` objects) and the result of
-mathematical operations (:class:`AffineScalarFunc` objects) contain
-these two values (respectively in their :attr:`nominal_value`
+Thus, both independent variables (:class:`Variable` objects) and the
+result of mathematical operations (:class:`AffineScalarFunc` objects)
+contain these two values (respectively in their :attr:`nominal_value`
 and :attr:`std_dev` attributes).
 
 .. index:: uncertainty; definition
