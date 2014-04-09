@@ -3,12 +3,13 @@
 language: python
 
 python:
-    # !!!!! All version to be put back later
-    # - "2.5"
-    # - "2.6"
+    - 2.4
+    - 2.5
+    - 2.6
     - 2.7
-    # "3.2"
+    - 3.2
     - 3.3
+    - 3.4
 
 matrix:
 
@@ -17,6 +18,8 @@ env:
     # - NUMPY=false  #!!!!!! to be put back later
     # - NUMPY=false PYTHON=python3 PYSUF=3 # uses Python 3.2
     # - NUMPY=true PYTHON=python3 PYSUF=3 # uses Python 3.2
+
+# !!!! wheel needed, below??
 
 # command to install dependencies
 before_install:
