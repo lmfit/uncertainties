@@ -15,6 +15,7 @@ from __future__ import division
 import copy
 import weakref
 import math
+from math import isnan
 import random
 import sys
         
@@ -52,11 +53,11 @@ def numbers_close(x, y, tolerance=1e-6):
     # NaN could appear silently:
 
     if x != 0 and y != 0:
-        if not uncertainties.isnan(x):
+        if not isnan(x):
             # Symmetric form of the test:
             return 2*abs(x-y)/(abs(x)+abs(y)) < tolerance
         else:
-            return uncertainties.isnan(y)
+            return isnan(y)
     else:  # Either x or y is zero
         return abs(x or y) < tolerance 
 
@@ -188,7 +189,7 @@ def compare_derivatives(func, numerical_derivatives,
                                               num_deriv_value, 1e-4):
 
                             # It is possible that the result is NaN:
-                            if not math.isnan(func_approx):
+                            if not isnan(func_approx):
                                 raise DerivativesDiffer(
                                     "Derivative #%d of function '%s' may be"
                                     " wrong: at args = %s,"
