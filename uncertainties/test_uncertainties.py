@@ -1798,7 +1798,7 @@ def test_format():
             # '{:+05}'.format(float('nan')) and format(1.) (which
             # differs from format(1)!):
             '+05': '+01.0+/-00nan'            
-            },
+        },
         
         (9.9, 0.1): {
             '.1ue': '(9.9+/-0.1)e+00',
