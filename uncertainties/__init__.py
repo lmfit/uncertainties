@@ -2032,11 +2032,9 @@ class AffineScalarFunc(object):
                 # Sub-classes handled:
                 % (format_spec, self.__class__.__name__))
         
-        # Effective format type: f, e, g, etc. (never None or empty):
-        #
-        # g is the default, like for floats
-        # (http://docs.python.org/2/library/string.html#format-specification-mini-language):
-        fmt_type = match.group('type') or 'g'
+        # Effective format type: f, e, g, etc., or None, like in
+        # https://docs.python.org/3.4/library/string.html#format-specification-mini-language.
+        fmt_type = match.group('type') or None
 
         # Shortcut:
         fmt_prec = match.group('prec')  # Can be None
@@ -2086,7 +2084,7 @@ class AffineScalarFunc(object):
 
         # Reference value for the calculation of a possible exponent,
         # if needed:
-        if fmt_type in 'eEgG':
+        if fmt_type in (None, 'e', 'E', 'g', 'G'):
             # Reference value for the exponent: the largest value
             # defines what the exponent will be (another convention
             # could have been chosen, like using the exponent of the
@@ -2155,18 +2153,25 @@ class AffineScalarFunc(object):
             #
             # prec is the precision for the main parts of the final
             # format (in the sense of float formatting):
-            prec = int(fmt_prec) if fmt_prec else 6
+            #
+            # https://docs.python.org/3.4/library/string.html#format-specification-mini-language
+            if fmt_prec:
+                prec = int(fmt_prec)
+            elif fmt_type is None:
+                prec = 12
+            else:
+                prec = 6
 
-            if fmt_type in 'fF':
+            if fmt_type in ('f', 'F'):
 
                 digits_limit = -prec
                 
-            else:  # Format type in eEgG
+            else:  # Format type in None, eEgG
 
                 # We first calculate the number of significant digits
                 # to be displayed (if possible):
                 
-                if fmt_type in 'eE':
+                if fmt_type in ('e', 'E'):
                     # The precision is the number of significant
                     # digits required - 1 (because there is a single
                     # digit before the decimal point, which is not
@@ -2174,7 +2179,7 @@ class AffineScalarFunc(object):
                     # the e/E format type):
                     num_signif_digits = prec+1
 
-                else:  # Format type in gG
+                else:  # Format type in None, g, G
                     
                     # Effective format specification precision: the rule
                     # of
@@ -2212,9 +2217,9 @@ class AffineScalarFunc(object):
         # True), 'common_exp' is set to the exponent that should be
         # used.
 
-        if fmt_type in 'fF':
+        if fmt_type in ('f', 'F'):
             use_exp = False
-        elif fmt_type in 'eE':
+        elif fmt_type in ('e', 'E'):
             if not non_nan_values:
                 use_exp = False
             else:                
@@ -2225,10 +2230,10 @@ class AffineScalarFunc(object):
                 # prompted a similar calculation:
                 common_exp = first_digit(round(exp_ref_value, -digits_limit))
             
-        else:  # g, G
+        else:  # None, g, G
 
             # The rules from
-            # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
+            # https://docs.python.org/3.4/library/string.html#format-specification-mini-language
             # are applied.
 
             # Python's native formatting (whose result could be parsed
@@ -2297,8 +2302,10 @@ class AffineScalarFunc(object):
             
         ########################################
 
-        # Format of the main (i.e. with no exponent) parts:
-        main_fmt_type = 'fF'[fmt_type.isupper()]
+        # Format of the main (i.e. with no exponent) parts (the None
+        # format type is similar to the g format type):
+        
+        main_fmt_type = 'fF'[(fmt_type or 'g').isupper()]
 
         # The precision of the main parts must be adjusted so as
         # to take into account the special role of the decimal
@@ -2314,8 +2321,12 @@ class AffineScalarFunc(object):
             # case, signif_limit is +3 (2 significant digits necessary
             # for the error, as per the PDG rules), but the (Python
             # float formatting) precision to be used for the main
-            # parts is 0 (all digits must be shown):
-            prec = max(-signif_limit, 0)
+            # parts is 0 (all digits must be shown).
+            #
+            # The 1 for the None fmt_type represents "at least one
+            # digit past the decimal point"
+            # (https://docs.python.org/3.4/library/string.html#format-specification-mini-language):
+            prec = max(-signif_limit, 1 if fmt_type is None else 0)
         ## print "PREC", prec
             
         ########################################
