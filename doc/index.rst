@@ -381,7 +381,7 @@ suggestions, which greatly helped improve this program: Joaquin Abian,
 Jason Moore, Martin Lutz, Víctor Terrón, Matt Newville, Matthew Peel,
 Don Peterson, Mika Pflueger, Albert Puig, Abraham Lee, Arian Sanusi,
 Martin Laloux, Jonathan Whitmore, Federico Vaggi, Marco A. Ferra,
-Hernan Grecco, and many others.
+Hernan Grecco, David Zwicker, and many others.
 
 I am also grateful to Gabi Davar and Pierre Raybaut for including it
 in `Python(x,y)`_, to Christoph Gohlke for including it in his Base
