@@ -246,7 +246,7 @@ import numbers
 from backport import *
 
 # Numerical version:
-__version_info__ = (2, 4, 5)
+__version_info__ = (2, 4, 6)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
