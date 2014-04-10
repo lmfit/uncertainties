@@ -1888,8 +1888,8 @@ def test_format():
             '10.1e': '       nan+/-   1.0e+02'
         },
         (float('nan'), 1e8): {  # NaN *nominal value*
-            '': '(nan+/-1.0)e+08',  # Like '{}'.format(1.)
-            'g': '(nan+/-1)e+08',  # Like '{:g}'.format(1.)
+            '': 'nan+/-100000000.0',  # Like '{}'.format(1e8)
+            'g': '(nan+/-1)e+08',  # Like '{:g}'.format(1e8)
             '.1e': '(nan+/-1.0)e+08',
             '.1E': '(%s+/-1.0)E+08' % NaN_EFG,
             '.1ue': '(nan+/-1)e+08',
@@ -1957,8 +1957,8 @@ def test_format():
                 # support some characters like ±, and superscripts:
                 'Incorrect representation %r for format %r of %s+/-%s:'
                 ' %r expected.'
-                % (representation, format_spec, values[0], values[1],
-                   result))
+                % (representation, format_spec, value.nominal_value,
+                   value.std_dev, result))
 
             # An empty format string is like calling str()
             # (http://docs.python.org/2/library/string.html#formatspec):
