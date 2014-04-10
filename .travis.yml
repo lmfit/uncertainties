@@ -3,6 +3,9 @@
 language: python
 
 python:
+    # Travis does not have Python 2.4 and 2.5:
+    # - 2.4
+    # - 2.5
     - 2.6
     - 2.7
     - 3.2
@@ -12,12 +15,8 @@ python:
 matrix:
 
 env:
-    #- NUMPY=true
-    # - NUMPY=false  #!!!!!! to be put back later
-    # - NUMPY=false PYTHON=python3 PYSUF=3 # uses Python 3.2
-    # - NUMPY=true PYTHON=python3 PYSUF=3 # uses Python 3.2
 
-# !!!! wheel needed, below??
+# !!! Is wheel necessary?
 
 # command to install dependencies
 before_install:
@@ -29,6 +28,7 @@ before_install:
     #- sudo apt-get install python-numpy cython libatlas-dev liblapack-dev gfortran
     - sudo apt-get update
 
+# !!! Is astropy/wheel necessary??
 install:    
     - pip install --find-links http://wheels2.astropy.org/ --use-wheel --use-mirrors --upgrade "numpy==1.8.0"
 
@@ -39,4 +39,3 @@ script:
     # Generate documentation
     #- cd doc
     #- make html
- 
