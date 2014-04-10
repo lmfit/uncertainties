@@ -1823,11 +1823,11 @@ def test_format():
 
         # Alignment and filling characters (supported in Python 2.6+):
         (3.1415e10, 0): {
-            '<15': '3.1415e+10     +/-0              ',
-            '<20S': '3.1415(0)e+10       ',
+            '<15': '31415000000.0  +/-0              ',
+            '<20S': '31415000000.0(0)    ',
             # Trying to trip the format parsing with a fill character
             # which is an alignment character:
-            '=>15': '=====3.1415e+10+/-==============0'
+            '=>15': '==31415000000.0+/-==============0'
         },
         
         (1234.56789, 0): {
@@ -1896,7 +1896,7 @@ def test_format():
             '10.1e': '       nan+/-   1.0e+08'  # 'nane+08' would be strange
         },                
         (float('nan'), 123456789): {  # NaN *nominal value*
-            '': '(nan+/-1.23456789)e+08',  # Similar to '{}'.format(123456789.)
+            '': 'nan+/-123456789.0',  # Similar to '{}'.format(123456789.)
             'g': '(nan+/-1.23457)e+08',  # Similar to '{:g}'.format(123456789.)
             '.1e': '(nan+/-1.2)e+08',
             '.1E': '(%s+/-1.2)E+08' % NaN_EFG,
@@ -1955,10 +1955,9 @@ def test_format():
             assert representation == result, (
                 # The representation is used, for terminal that do not
                 # support some characters like ±, and superscripts:
-                'Incorrect representation %r for format %r of %s+/-%s:'
+                'Incorrect representation %r for format %r of %r:'
                 ' %r expected.'
-                % (representation, format_spec, value.nominal_value,
-                   value.std_dev, result))
+                % (representation, format_spec, value, result))
 
             # An empty format string is like calling str()
             # (http://docs.python.org/2/library/string.html#formatspec):
