@@ -2467,7 +2467,7 @@ class AffineScalarFunc(object):
 
 # Nicer name, for users: isinstance(ufloat(...), UFloat) is
 # True. Also: isinstance(..., UFloat) is the test for "is this a
-# number with uncertainties from the uncertainties package?".
+# number with uncertainties from the uncertainties package?":
 UFloat = AffineScalarFunc
 
 ###############################################################################
