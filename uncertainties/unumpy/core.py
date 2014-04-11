@@ -500,7 +500,7 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
         yield term1+term2+term3
 
 # Default rcond argument for the generalization of numpy.linalg.pinv:
-pinv_default = numpy.linalg.pinv.__defaults__[0]  # Python 2.6+:
+pinv_default = numpy.linalg.pinv.__defaults__[0]  # Python 1, 2.6+:
 
 pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
@@ -541,8 +541,8 @@ class matrix(numpy.matrix):
         else:
             return numeric.dot(other, self)  # The order is important
 
-    @uncertainties.set_doc(numpy.matrix.getI.__doc__)
     def getI(self):
+        """Matrix inverse of pseudo-inverse."""
         m, n = self.shape
         return (inv if m == n else pinv)(self)
 
