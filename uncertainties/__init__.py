@@ -1904,20 +1904,21 @@ class AffineScalarFunc(object):
         The format specification are the same as for format() for
         floats, as defined for Python 2.6+ (restricted to what the %
         operator accepts, if using an earlier version of Python),
-        except that the n format type is not supported. In particular,
-        the usual precision, alignment, sign flag, etc. can be
-        used. The behavior of the various format types (e, f, g, none,
-        etc.) is similar. Moreover, the format is extended: the number
-        of digits of the uncertainty can be controlled, as is the way
-        the uncertainty is indicated (with +/- or with the short-hand
-        notation 3.14(1), in LaTeX or with a simple text string,...).
+        except that the n presentation type is not supported. In
+        particular, the usual precision, alignment, sign flag,
+        etc. can be used. The behavior of the various presentation
+        types (e, f, g, none, etc.) is similar. Moreover, the format
+        is extended: the number of digits of the uncertainty can be
+        controlled, as is the way the uncertainty is indicated (with
+        +/- or with the short-hand notation 3.14(1), in LaTeX or with
+        a simple text string,...).
 
         Beyond the use of options at the end of the format
         specification, the main difference with floats is that a "u"
-        just before the format type (f, e, g, none, etc.) activates
-        the "uncertainty control" mode (e.g.: ".6u").  This mode is
-        also activated when not using any explicit precision (e.g.:
-        "g", "10f", "+010,e" format specifications).  If the
+        just before the presentation type (f, e, g, none, etc.)
+        activates the "uncertainty control" mode (e.g.: ".6u").  This
+        mode is also activated when not using any explicit precision
+        (e.g.: "g", "10f", "+010,e" format specifications).  If the
         uncertainty does not have a meaningful number of significant
         digits (0 and NaN uncertainties), this mode is automatically
         deactivated.
@@ -2030,7 +2031,8 @@ class AffineScalarFunc(object):
                 # Sub-classes handled:
                 % (format_spec, self.__class__.__name__))
         
-        # Effective format type: f, e, g, etc., or None, like in
+        # Effective format presentation type: f, e, g, etc., or None,
+        # like in
         # https://docs.python.org/3.4/library/string.html#format-specification-mini-language.
         pres_type = match.group('type') or None
 
@@ -2177,7 +2179,7 @@ class AffineScalarFunc(object):
                     # the e/E format type):
                     num_signif_digits = prec+1
 
-                else:  # Format type in None, g, G
+                else:  # Presentation type in None, g, G
                     
                     # Effective format specification precision: the rule
                     # of
@@ -2186,14 +2188,15 @@ class AffineScalarFunc(object):
 
                     # The final number of significant digits to be
                     # displayed is not necessarily obvious: trailing
-                    # zeros are removed (with the gG format type), so
-                    # num_signif_digits is the number of significant
-                    # digits if trailing zeros were not removed. This
-                    # quantity is relevant for the rounding implied by
-                    # the exponent test of the g/G format:
+                    # zeros are removed (with the gG presentation
+                    # type), so num_signif_digits is the number of
+                    # significant digits if trailing zeros were not
+                    # removed. This quantity is relevant for the
+                    # rounding implied by the exponent test of the g/G
+                    # format:
 
                     # 0 is interpreted like 1 (as with floats with a
-                    # gG format type):
+                    # gG presentation type):
                     num_signif_digits = prec or 1
 
                 # The number of significant digits is important for
@@ -2301,7 +2304,7 @@ class AffineScalarFunc(object):
         ########################################
 
         # Format of the main (i.e. with no exponent) parts (the None
-        # format type is similar to the g format type):
+        # presentation type is similar to the g format type):
         
         main_pres_type = 'fF'[(pres_type or 'g').isupper()]
 
