@@ -1278,10 +1278,10 @@ def format_num(nom_val_main, error_main, common_exp,
     prec -- precision to use with the main_pres_type format type
     (see below).
 
-    main_pres_type -- format specification type, in "fF". This defines
-    how the mantissas, exponents and NaN values are represented (in
-    the same way as for float). None, the empty string, or "%" are not
-    accepted.
+    main_pres_type -- format presentation type, either "f" or
+    "F". This defines how the mantissas, exponents and NaN values are
+    represented (in the same way as for float). None, the empty
+    string, or "%" are not accepted.
 
     options -- options (as an object that support membership testing,
     like for instance a string). "S" is for the short-hand notation
