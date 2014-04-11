@@ -346,9 +346,8 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         func_with_derivatives.
         """
 
-        # So that .flat works even if array_like is a list.  Later
-        # useful for faster code:
-        array_version = numpy.asarray(array_like)
+        # So that .flat works even if array_like is a list:
+        array_version = numpy.asanyarray(array_like)
 
         # Variables on which the array depends are collected:
         variables = set()
