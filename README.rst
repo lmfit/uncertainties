@@ -18,7 +18,7 @@ GitHub
 
 The current version of the ``master*`` branches in the Github
 repository are bleeding-edge, but they are *working* versions that
-passed the tests for all version of Python starting at 2.4.
+passed the tests for all versions of Python starting at 2.4.
 
 The ``master`` branch is for Python 2.6+ (and Python 3+ with through 
 ``2to3``), while the ``master_python2.3`` branch is for Python 2.3 to 2.5.
