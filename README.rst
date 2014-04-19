@@ -4,12 +4,14 @@ uncertainties
 .. image:: https://travis-ci.org/lebigot/uncertainties.png
    :target: https://travis-ci.org/lebigot/uncertainties
 
-This is the uncertainties Python package.
+This is the uncertainties Python package, which performs transparent 
+calculations with uncertainties (aka "error propagation"). This package 
+also calculates derivatives.
 
 * Documentation: http://pythonhosted.org/uncertainties/
-* Python Package Index: http://pypi.python.org/pypi/uncertainties/
-* Code: https://github.com/lebigot/uncertainties/
 * Issues: https://github.com/lebigot/uncertainties/issues/
+* Python Package Index entry: http://pypi.python.org/pypi/uncertainties/
+* Code: https://github.com/lebigot/uncertainties/
 
 GitHub
 ------
