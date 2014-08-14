@@ -345,12 +345,13 @@ accessed independently:
 Access to the individual sources of uncertainty
 ===============================================
 
-The various contributions to an uncertainty can be obtained through
-the :func:`error_components` method, which maps the **independent
-variables a quantity depends on** to their **contribution to the total
-uncertainty**. According to the :ref:`linear error propagation theory
-<linear_method>` implemented in :mod:`uncertainties`, the sum of the
-squares of these contributions is the squared uncertainty.
+The various contributions to an uncertainty can be obtained through the 
+:func:`error_components` method, which maps the **independent variables 
+a quantity depends on** to their **contribution to the total 
+uncertainty**. According to :ref:`linear error propagation theory 
+<linear_method>` (which is the method followed by :mod:`uncertainties`), 
+the sum of the squares of these contributions is the squared 
+uncertainty.
 
 The individual contributions to the uncertainty are more easily usable
 when the variables are **tagged**:

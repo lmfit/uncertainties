@@ -22,8 +22,6 @@ from uncertainties.unumpy import core
 from uncertainties.test_uncertainties import numbers_close, arrays_close
 from uncertainties import __author__
 
-from uncertainties.backport import *
-
 def test_numpy():
     
     """
