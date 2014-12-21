@@ -322,7 +322,7 @@ ones):
 - `JSON <http://docs.python.org/library/json.html>`_ support;
 
 - addition of :attr:`real` and :attr:`imag` attributes, for increased
-  compatibility with existing code (Python numbers have these attributes).
+  compatibility with existing code (Python numbers have these attributes);
     
 - addition of new functions from the :mod:`math` module;
 
@@ -331,7 +331,7 @@ ones):
 - a re-correlate function that puts correlations back between data
   that was saved in separate files;
 
-- support for multi-precision numbers with uncertainties;
+- support for multi-precision numbers with uncertainties.
 
 **Call for contributions**: I got multiple requests for complex
  numbers with uncertainties, Fourier Transform support, and the
