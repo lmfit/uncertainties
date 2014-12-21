@@ -334,12 +334,12 @@ ones):
 - support for multi-precision numbers with uncertainties.
 
 **Call for contributions**: I got multiple requests for complex
- numbers with uncertainties, Fourier Transform support, and the
- automatic wrapping of functions that accept or produce arrays. Please
- contact me if you are interested in contributing. Patches are
- welcome. They must have a high standard of legibility and quality in
- order to be accepted (otherwise it is always possible to create a new
- Python package by branching off this one).
+numbers with uncertainties, Fourier Transform support, and the
+automatic wrapping of functions that accept or produce arrays. Please
+contact me if you are interested in contributing. Patches are
+welcome. They must have a high standard of legibility and quality in
+order to be accepted (otherwise it is always possible to create a new
+Python package by branching off this one).
   
 **Please support the continued development of this program** by using
 `gittip <https://www.gittip.com/lebigot/>`_ or by `donating $10`_ or
