@@ -339,7 +339,8 @@ automatic wrapping of functions that accept or produce arrays. Please
 contact me if you are interested in contributing. Patches are
 welcome. They must have a high standard of legibility and quality in
 order to be accepted (otherwise it is always possible to create a new
-Python package by branching off this one).
+Python package by branching off this one, and I would still be happy
+to help with the effort).
   
 **Please support the continued development of this program** by using
 `gittip <https://www.gittip.com/lebigot/>`_ or by `donating $10`_ or
