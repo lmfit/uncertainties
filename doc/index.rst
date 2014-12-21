@@ -307,31 +307,40 @@ What others say
 Future developments
 ===================
 
-Planned future developments include:
+Planned future developments include (starting from the most requested
+ones):
+
+- handling of complex numbers with uncertainties;
+
+- increased support for `NumPy`_: Fourier Transform with
+  uncertainties, automatic wrapping of functions that accept or
+  produce arrays, standard deviation of arrays, more convenient matrix
+  creation, new linear algebra methods (eigenvalue and QR
+  decompositions, determinant,…), input of arrays with uncertainties
+  as strings (like in NumPy),…;
 
 - `JSON <http://docs.python.org/library/json.html>`_ support;
 
-- increased support for `NumPy`_: new linear
-  algebra methods (eigenvalue and QR decompositions, determinant,…),
-  more convenient matrix creation, standard deviation of arrays,
-  automatic wrapping of functions that accept arrays of numbers with
-  uncertainties, input of arrays with uncertainties as strings (like
-  in NumPy),…;
-
+- addition of :attr:`real` and :attr:`imag` attributes, for increased
+  compatibility with existing code (Python numbers have these attributes).
+    
 - addition of new functions from the :mod:`math` module;
 
 - fitting routines that conveniently handle data with uncertainties;
-
-- handling of complex numbers with uncertainties;
 
 - a re-correlate function that puts correlations back between data
   that was saved in separate files;
 
 - support for multi-precision numbers with uncertainties;
 
-- addition of :attr:`real` and :attr:`imag` attributes, for increased
-  compatibility with existing code (Python numbers have these attributes).
-
+**Call for contributions**: I got multiple requests for complex
+ numbers with uncertainties, Fourier Transform support, and the
+ automatic wrapping of functions that accept or produce arrays. Please
+ contact me if you are interested in contributing. Patches are
+ welcome. They must have a high standard of legibility and quality in
+ order to be accepted (otherwise it is always possible to create a new
+ Python package by branching off this one).
+  
 **Please support the continued development of this program** by using
 `gittip <https://www.gittip.com/lebigot/>`_ or by `donating $10`_ or
 more through PayPal (no PayPal account necessary).
