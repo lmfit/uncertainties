@@ -309,8 +309,6 @@ Future developments
 
 Planned future developments include:
 
-- support for the units package Pint_;
-
 - `JSON <http://docs.python.org/library/json.html>`_ support;
 
 - increased support for `NumPy`_: new linear
