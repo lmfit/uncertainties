@@ -169,7 +169,8 @@ def test_monte_carlo_comparison():
 
     # !! The test could be done directly with NumPy's comparison
     # tools, no? See assert_allclose, assert_array_almost_equal_nulp
-    # or assert_array_max_ulp.
+    # or assert_array_max_ulp. This is relevant for all vectorized
+    # occurrences of numbers_close.
 
     assert numpy.vectorize(test_uncertainties.numbers_close)(
         covariances_this_module,
