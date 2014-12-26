@@ -166,7 +166,11 @@ def test_monte_carlo_comparison():
 
     # We rely on the fact that covariances_samples very rarely has
     # null elements:
-    
+
+    # !! The test could be done directly with NumPy's comparison
+    # tools, no? See assert_allclose, assert_array_almost_equal_nulp
+    # or assert_array_max_ulp.
+
     assert numpy.vectorize(test_uncertainties.numbers_close)(
         covariances_this_module,
         covariances_samples,
