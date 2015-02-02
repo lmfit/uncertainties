@@ -163,119 +163,119 @@ Main changes:
 - 2.4.5: String formatting now works for ``NaN+/-...`` numbers.
 - 2.4.4: The documentation license now allows its commercial use.
 - 2.4.2: `NumPy 1.8 compatibility <https://github.com/numpy/numpy/issues/4063>`_.
-- 2.4.1: In ``uncertainties.umath``, functions ``ceil()``, ``floor()``, \
-         ``isinf()``, ``isnan()`` and ``trunc()`` now return values of \
-         the same type as the corresponding ``math`` module function \
-         (instead of generally returning a value with a zero uncertainty \
-         ``...+/-0``).
-- 2.4: Extensive support for the formatting_ of numbers with uncertainties. \
-       A zero uncertainty is now explicitly displayed as the integer 0. \
-       The new formats are generally understood by ``ufloat_fromstr()``. \
-       Abbreviations for the nominal value (``n``) and the standard \
-       deviation (``s``) are now available.
-- 2.3.6:  Full support for limit cases of the power operator \
-          ``umath.pow()``.
-- 2.3.5: Uncertainties and derivatives can now be NaN (not-a-number). \
-         Full support for numbers with a zero uncertainty \
-         (``sqrt(ufloat(0, 0))`` now works). \
-         Full support for limit cases of the power operator (``x**y``).
-- 2.3: Functions wrapped \
-       so that they accept numbers with uncertainties instead of floats \
-       now have full keyword arguments support \
-       (improved ``wrap()`` function). Incompatible change: \
-       ``wrap(..., None)`` should be replaced by ``wrap(...)`` or \
-       ``wrap(..., [])``.
-- 2.2: Creating arrays and matrices of numbers with uncertainties \
-       with ``uarray()`` and ``umatrix()`` now requires two simple arguments \
-       (nominal values and standard deviations) instead of a tuple argument. \
-       This is consistent with the new, simpler ``ufloat()`` interface. \
-       The previous \
-       usage will be supported for some time. Users are encouraged to update \
-       their code, for instance through the newly provided `code updater`_, \
-       which in addition now automatically converts ``.set_std_dev(v)`` to \
-       ``.std_dev = v``.
-- 2.1: Numbers with uncertainties are now created more directly like \
-       ``ufloat(3, 0.1)``, ``ufloat(3, 0.1, "pi")``, \
-       ``ufloat_fromstr("3.0(1)")``, or ``ufloat_fromstr("3.0(1)", "pi")``. \
-       The previous ``ufloat((3, 0.1))`` and ``ufloat("3.0(1)")`` forms \
-       will be supported for some time. Users are encouraged to update \
-       their code, for instance through the newly provided `code updater`_.
-- 2.0: The standard deviation is now obtained more directly without an \
-       explicit \
-       call (``x.std_dev`` instead of ``x.std_dev()``). ``x.std_dev()`` \
-       will be supported for some time. Users are encouraged to update \
-       their code. The standard deviation of a variable can now be \
-       directly updated with ``x.std_dev = 0.1``. As a consequence, \
-       ``x.set_std_dev()`` is deprecated.
+- 2.4.1: In ``uncertainties.umath``, functions ``ceil()``, ``floor()``,
+  ``isinf()``, ``isnan()`` and ``trunc()`` now return values of 
+  the same type as the corresponding ``math`` module function
+  (instead of generally returning a value with a zero uncertainty
+  ``...+/-0``).
+- 2.4: Extensive support for the formatting_ of numbers with uncertainties. 
+  A zero uncertainty is now explicitly displayed as the integer 0. 
+  The new formats are generally understood by ``ufloat_fromstr()``. 
+  Abbreviations for the nominal value (``n``) and the standard 
+  deviation (``s``) are now available.
+- 2.3.6:  Full support for limit cases of the power operator 
+  ``umath.pow()``.
+- 2.3.5: Uncertainties and derivatives can now be NaN (not-a-number). 
+  Full support for numbers with a zero uncertainty 
+  (``sqrt(ufloat(0, 0))`` now works). 
+  Full support for limit cases of the power operator (``x**y``).
+- 2.3: Functions wrapped 
+  so that they accept numbers with uncertainties instead of floats 
+  now have full keyword arguments support 
+  (improved ``wrap()`` function). Incompatible change: 
+  ``wrap(..., None)`` should be replaced by ``wrap(...)`` or 
+  ``wrap(..., [])``.
+- 2.2: Creating arrays and matrices of numbers with uncertainties 
+  with ``uarray()`` and ``umatrix()`` now requires two simple arguments 
+  (nominal values and standard deviations) instead of a tuple argument. 
+  This is consistent with the new, simpler ``ufloat()`` interface. 
+  The previous 
+  usage will be supported for some time. Users are encouraged to update 
+  their code, for instance through the newly provided `code updater`_, 
+  which in addition now automatically converts ``.set_std_dev(v)`` to 
+  ``.std_dev = v``.
+- 2.1: Numbers with uncertainties are now created more directly like 
+  ``ufloat(3, 0.1)``, ``ufloat(3, 0.1, "pi")``, 
+  ``ufloat_fromstr("3.0(1)")``, or ``ufloat_fromstr("3.0(1)", "pi")``. 
+  The previous ``ufloat((3, 0.1))`` and ``ufloat("3.0(1)")`` forms 
+  will be supported for some time. Users are encouraged to update 
+  their code, for instance through the newly provided `code updater`_.
+- 2.0: The standard deviation is now obtained more directly without an 
+  explicit 
+  call (``x.std_dev`` instead of ``x.std_dev()``). ``x.std_dev()`` 
+  will be supported for some time. Users are encouraged to update 
+  their code. The standard deviation of a variable can now be 
+  directly updated with ``x.std_dev = 0.1``. As a consequence, 
+  ``x.set_std_dev()`` is deprecated.
 - 1.9.1: Support added for pickling subclasses of ``UFloat`` (= ``Variable``).
-- 1.9: Added functions for handling correlation matrices: \
-       ``correlation_matrix()`` and \
-       ``correlated_values_norm()``. (These new functions mirror the \
-       covariance-matrix based ``covariance_matrix()`` and \
-       ``correlated_values()``.) ``UFloat.position_in_sigmas()`` is \
-       now named ``UFloat.std_score()``, so as to follow the common \
-       naming convention (`standard score \
-       <http://en.wikipedia.org/wiki/Standard_score>`_).  Obsolete \
-       functions were removed (from the main module: \
-       ``NumberWithUncert``, ``num_with_uncert``, ``array_u``, \
-       ``nominal_values``, ``std_devs``).
+- 1.9: Added functions for handling correlation matrices: 
+  ``correlation_matrix()`` and 
+  ``correlated_values_norm()``. (These new functions mirror the 
+  covariance-matrix based ``covariance_matrix()`` and 
+  ``correlated_values()``.) ``UFloat.position_in_sigmas()`` is 
+  now named ``UFloat.std_score()``, so as to follow the common 
+  naming convention (`standard score 
+  <http://en.wikipedia.org/wiki/Standard_score>`_).  Obsolete 
+  functions were removed (from the main module: 
+  ``NumberWithUncert``, ``num_with_uncert``, ``array_u``, 
+  ``nominal_values``, ``std_devs``).
 - 1.8: Compatibility with Python 3.2 added.
-- 1.7.2: Compatibility with Python 2.3, Python 2.4, Jython 2.5.1 and \
-         Jython 2.5.2 added.
-- 1.7.1: New semantics: ``ufloat("12.3(78)")`` now represents 12.3+/-7.8 \
-         instead of 12.3+/-78.
-- 1.7: ``ufloat()`` now raises ValueError instead of a generic Exception, \
-       when given an incorrect \
-       string representation, like ``float()`` does.
-- 1.6: Testing whether an object is a number with uncertainty should now \
-       be done with ``isinstance(..., UFloat)``. \
-       ``AffineScalarFunc`` is not imported by ``from uncertainties import *`` \
-       anymore, but its new alias ``UFloat`` is.
-- 1.5.5: The first possible license is now the Revised BSD License \
-         instead of GPLv2, which \
-         makes it easier to include this package in other projects.
+- 1.7.2: Compatibility with Python 2.3, Python 2.4, Jython 2.5.1 and 
+  Jython 2.5.2 added.
+- 1.7.1: New semantics: ``ufloat("12.3(78)")`` now represents 12.3+/-7.8 
+  instead of 12.3+/-78.
+- 1.7: ``ufloat()`` now raises ValueError instead of a generic Exception, 
+  when given an incorrect 
+  string representation, like ``float()`` does.
+- 1.6: Testing whether an object is a number with uncertainty should now 
+  be done with ``isinstance(..., UFloat)``. 
+  ``AffineScalarFunc`` is not imported by ``from uncertainties import *`` 
+  anymore, but its new alias ``UFloat`` is.
+- 1.5.5: The first possible license is now the Revised BSD License 
+  instead of GPLv2, which 
+  makes it easier to include this package in other projects.
 - 1.5.4.2: Added ``umath.modf()`` and ``umath.frexp()``.
-- 1.5.4: ``ufloat`` does not accept a single number (nominal value) anymore. \
-       This removes some potential confusion about \
-       ``ufloat(1.1)`` (zero uncertainty) being different from \
-       ``ufloat("1.1")`` (uncertainty of 1 on the last digit).
-- 1.5.2: ``float_u``, ``array_u`` and ``matrix_u`` renamed ``ufloat``, \
-       ``uarray`` and ``umatrix``, for ease of typing.
-- 1.5:  Added functions ``nominal_value`` and ``std_dev``, and \
-       modules ``unumpy`` (additional support for NumPy_ arrays and \
-       matrices) and ``unumpy.ulinalg`` (generalization of some \
-       functions from ``numpy.linalg``). \
-       Memory footprint of arrays of numbers with uncertainties \
-       divided by 3. \
-       Function ``array_u`` is 5 times faster. \
-       Main function ``num_with_uncert`` renamed \
-       ``float_u``, for consistency with ``unumpy.array_u`` and \
-       ``unumpy.matrix_u``, with the added benefit of a shorter name.
+- 1.5.4: ``ufloat`` does not accept a single number (nominal value) anymore. 
+  This removes some potential confusion about 
+  ``ufloat(1.1)`` (zero uncertainty) being different from 
+  ``ufloat("1.1")`` (uncertainty of 1 on the last digit).
+- 1.5.2: ``float_u``, ``array_u`` and ``matrix_u`` renamed ``ufloat``, 
+  ``uarray`` and ``umatrix``, for ease of typing.
+- 1.5:  Added functions ``nominal_value`` and ``std_dev``, and 
+  modules ``unumpy`` (additional support for NumPy_ arrays and 
+  matrices) and ``unumpy.ulinalg`` (generalization of some 
+  functions from ``numpy.linalg``). 
+  Memory footprint of arrays of numbers with uncertainties 
+  divided by 3. 
+  Function ``array_u`` is 5 times faster. 
+  Main function ``num_with_uncert`` renamed 
+  ``float_u``, for consistency with ``unumpy.array_u`` and 
+  ``unumpy.matrix_u``, with the added benefit of a shorter name.
 - 1.4.5: Added support for the standard ``pickle`` module.
 - 1.4.2: Added support for the standard ``copy`` module.
-- 1.4: Added utilities for manipulating NumPy_ arrays of numbers with\
-       uncertainties (``array_u``, ``nominal_values`` and ``std_devs``).
-- 1.3: Numbers with uncertainties are now constructed with \
-  ``num_with_uncert()``, which replaces ``NumberWithUncert()``.  This \
+- 1.4: Added utilities for manipulating NumPy_ arrays of numbers with
+  uncertainties (``array_u``, ``nominal_values`` and ``std_devs``).
+- 1.3: Numbers with uncertainties are now constructed with 
+  ``num_with_uncert()``, which replaces ``NumberWithUncert()``.  This 
   simplifies the class hierarchy by removing the ``NumberWithUncert`` class.
-- 1.2.5: Numbers with uncertainties can now be entered as \
-         ``NumberWithUncert("1.23+/-0.45")`` too.
-- 1.2.3: ``log(x, base)`` is now supported by ``umath.log()``, in addition \
-         to ``log(x)``.
-- 1.2.2: Values with uncertainties are now output like 3+/-1, in order \
-         to avoid confusing 3+-1 with 3+(-1).
-- 1.2: A new function, ``wrap()``, is exposed, which allows non-Python \
-       functions (e.g. Fortran or C used through a module such as SciPy) to \
-       handle numbers with uncertainties.
-- 1.1: Mathematical functions (such as cosine, etc.) are in a new \
-       uncertainties.umath module; \
-       they do not override functions from the ``math`` module anymore.
-- 1.0.12: Main class (``Number_with_uncert``) renamed ``NumberWithUncert`` \
-          so as to follow `PEP 8`_.
-- 1.0.11: ``origin_value`` renamed more appropriately as \
-          ``nominal_value``.
-- 1.0.9: ``correlations()`` renamed more appropriately as \
-         ``covariance_matrix()``.
+- 1.2.5: Numbers with uncertainties can now be entered as 
+  ``NumberWithUncert("1.23+/-0.45")`` too.
+- 1.2.3: ``log(x, base)`` is now supported by ``umath.log()``, in addition 
+  to ``log(x)``.
+- 1.2.2: Values with uncertainties are now output like 3+/-1, in order 
+  to avoid confusing 3+-1 with 3+(-1).
+- 1.2: A new function, ``wrap()``, is exposed, which allows non-Python 
+  functions (e.g. Fortran or C used through a module such as SciPy) to 
+  handle numbers with uncertainties.
+- 1.1: Mathematical functions (such as cosine, etc.) are in a new 
+  uncertainties.umath module; 
+  they do not override functions from the ``math`` module anymore.
+- 1.0.12: Main class (``Number_with_uncert``) renamed ``NumberWithUncert`` 
+  so as to follow `PEP 8`_.
+- 1.0.11: ``origin_value`` renamed more appropriately as 
+  ``nominal_value``.
+- 1.0.9: ``correlations()`` renamed more appropriately as 
+  ``covariance_matrix()``.
 
 .. _Python: http://docs.python.org/tutorial/interpreter.html
 .. _IPython: http://ipython.scipy.org/
