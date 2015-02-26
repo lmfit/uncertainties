@@ -27,3 +27,9 @@ The ``master`` branch is for Python 2.6+ (and Python 3+ through
 Other branches might be present in the GitHub repository, but they are 
 temporary and represent work in progress that does not necessarily run 
 properly yet.
+
+License
+-------
+
+This package and its documentation are released under the Revised BSD 
+License.
