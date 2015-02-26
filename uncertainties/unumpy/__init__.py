@@ -60,7 +60,7 @@ documentation for this module).
 
 This module requires the NumPy package.
 
-(c) 2009-2013 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
+(c) 2009-2015 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 Please send feature requests, bug reports, or feedback to this address.
 
 This software is released under a dual license.  (1) The BSD license.

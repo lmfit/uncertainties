@@ -214,7 +214,7 @@ is the result of x != 0.
 - This package contains tests.  They can be run either manually or
 automatically with the nose unit testing framework (nosetests).
 
-(c) 2009-2013 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
+(c) 2009-2015 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 Please send feature requests, bug reports, or feedback to this address.
 
 Please support future development by donating $10 or more through PayPal!

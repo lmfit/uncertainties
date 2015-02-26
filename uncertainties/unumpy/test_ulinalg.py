@@ -3,7 +3,7 @@ Tests for uncertainties.unumpy.ulinalg.
 
 These tests can be run through the Nose testing framework.
 
-(c) 2010-2013 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
+(c) 2010-2015 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 """
 
 # Some tests are already performed in test_unumpy (unumpy contains a
