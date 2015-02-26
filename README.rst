@@ -31,5 +31,5 @@ properly yet.
 License
 -------
 
-This package and its documentation are released under the Revised BSD 
-License.
+This package and its documentation are released under the `Revised BSD 
+License <LICENSE.txt>`_.
