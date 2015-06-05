@@ -947,6 +947,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
             variables |= set(expr.derivatives)
         
         # Initial value for the chain rule (is updated below):
+        # !! In Python 2.7+: dictionary comprehension
         derivatives_wrt_vars = dict((var, 0.) for var in variables)
 
         ## The chain rule is used...
