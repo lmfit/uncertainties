@@ -75,7 +75,7 @@ website`_.
 Basic examples
 ==============
 
-::
+.. code-block:: python
 
     >>> from uncertainties import ufloat
     
