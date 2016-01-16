@@ -1583,7 +1583,7 @@ def format_num(nom_val_main, error_main, common_exp,
             if isnan(error_main):
                 error_str = '\mathrm{%s}' % error_str
             elif isinf(error_main):
-                error_val_str = '\infty'
+                error_str = '\infty'
 
         if error_has_exp:
             error_str += exp_str
