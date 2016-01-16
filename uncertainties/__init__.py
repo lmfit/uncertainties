@@ -2117,7 +2117,7 @@ class AffineScalarFunc(object):
             # situations where the nominal value and the standard
             # error digits are truncated at the same place):
             (not fmt_prec and len(non_nan_values)==2)
-            or match.group('uncert_prec'))  # Explicit control
+             or match.group('uncert_prec'))  # Explicit control
             # The number of significant digits of the uncertainty must
             # be meaningful, otherwise the position of the significant
             # digits of the uncertainty does not have a clear
