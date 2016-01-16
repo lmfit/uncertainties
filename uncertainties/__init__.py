@@ -240,7 +240,7 @@ from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
 
 try:
     from math import isinfinite  # Python 3.2+
-else:
+except ImportError:
     isinfinite = lambda x: isinf(x) or isnan(x)
 
 import copy
