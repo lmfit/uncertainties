@@ -2124,7 +2124,8 @@ class AffineScalarFunc(object):
             # meaning. This gives us the *effective* uncertainty
             # control mode:
             and std_dev
-            and not isnan(std_dev)):
+            and not isnan(std_dev)
+            and not isinf(std_dev)):
 
             # The number of significant digits on the uncertainty is
             # controlled.
