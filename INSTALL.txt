@@ -2,7 +2,7 @@
 
   python setup.py install
 
-or, for an installation in the user Python library (no additional access 
+or, for an installation in the user Python library (no additional access
 rights needed):
 
   python setup.py install --user
@@ -15,13 +15,19 @@ or, if additional access rights are needed (Unix):
 
   sudo python setup.py install
 
-You can also simply move the uncertainties/ or uncertainties-py*/ 
-directory to a location that Python can import from (directory in which 
-scripts using uncertainties are run, etc.), and then rename it 
-uncertainties/ if necessary (with no Python version number).
+You can also simply move the uncertainties/ or uncertainties-py*/
+directory to a location that Python can import from (directory in
+which scripts using uncertainties are run, etc.), and then rename it
+uncertainties/ if necessary (with no Python version number). In this
+case, if the Python 3 version is needed instead, the command
 
-* The tests programs (test_*.py) are meant to be run through the Nose 
-testing framework.  This can be achieved for instance with a command 
+  2to3 -w .
+
+must be run inside the uncertainties/ directory, so as to convert the
+Python 2 version to the Python 3 version.
+
+* The tests programs (test_*.py) are meant to be run through the Nose
+testing framework.  This can be achieved for instance with a command
 like
 
   nosetests -sv uncertainties/
