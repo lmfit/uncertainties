@@ -1955,7 +1955,43 @@ def test_format():
             '.1E': '%s+/-%s' % (Inf_EFG, Inf_EFG),
             '.1ue': 'inf+/-inf',
             'EL': r'\infty \pm \infty'
+        },
+
+        # Like the tests for +infinity, but for -infinity:
+        (float('-inf'), 100): {  # Inf *nominal value*
+            '': '-inf+/-100.0',  # Like '{}'.format(100.)
+            'g': '-inf+/-100',  # Like '{:g}'.format(100.)
+            '.1e': '(-inf+/-1.0)e+02',  # Similar to 1±inf
+            '.1E': '(-%s+/-1.0)E+02' % Inf_EFG,
+            '.1ue': '(-inf+/-1)e+02',
+            '10.1e': '      -inf+/-   1.0e+02'
+        },
+        (float('-inf'), 1e8): {  # Inf *nominal value*
+            '': '-inf+/-100000000.0',  # Like '{}'.format(1e8)
+            'g': '(-inf+/-1)e+08',  # Like '{:g}'.format(1e8)
+            '.1e': '(-inf+/-1.0)e+08',
+            '.1E': '(-%s+/-1.0)E+08' % Inf_EFG,
+            '.1ue': '(-inf+/-1)e+08',
+            '10.1e': '      -inf+/-   1.0e+08'  # 'infe+08' would be strange
+        },
+        (float('-inf'), 123456789): {  # Inf *nominal value*
+            '': '-inf+/-123456789.0',  # Similar to '{}'.format(123456789.)
+            'g': '(-inf+/-1.23457)e+08',  # Similar to '{:g}'.format(123456789.)
+            '.1e': '(-inf+/-1.2)e+08',
+            '.1E': '(-%s+/-1.2)E+08' % Inf_EFG,
+            '.1ue': '(-inf+/-1)e+08',
+            '.1ueL': r'\left(-\infty \pm 1\right) \times 10^{8}',
+            '10.1e': '      -inf+/-   1.2e+08',
+            '10.1eL': r'   -\infty \pm 1.2 \times 10^{8}'
+        },
+        (float('-inf'), float('inf')): {  # *Double* Inf
+            '': '-inf+/-inf',
+            '.1e': '-inf+/-inf',
+            '.1E': '-%s+/-%s' % (Inf_EFG, Inf_EFG),
+            '.1ue': '-inf+/-inf',
+            'EL': r'-\infty \pm \infty'
         }
+
     }
 
     # ',' format option: introduced in Python 2.7
