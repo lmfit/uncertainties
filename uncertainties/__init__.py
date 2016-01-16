@@ -1602,8 +1602,6 @@ def format_num(nom_val_main, error_main, common_exp,
             # robust_format() is used because it may handle alignment
             # options, where the % operator does not:
 
-            # !!!!!!! Somehow inf goes here with format 10.1eL when
-            # NaN does not.
             nom_val_str = robust_align(
                 nom_val_str, fmt_parts['fill'], effective_align,
                 fmt_parts['width'])
@@ -2094,10 +2092,8 @@ class AffineScalarFunc(object):
 
         ########################################
 
-        # !!!! Should this actually be real values?
-
-        # NaN values (nominal value or standard deviation) must be
-        # handled in a specific way:
+        # Non-real values (nominal value or standard deviation) must
+        # be handled in a specific way:
         real_values = [value for value in [abs(nom_val), std_dev]
                        if not isinfinite(value)]
 
