@@ -1579,7 +1579,7 @@ def format_num(nom_val_main, error_main, common_exp,
             if isnan(nom_val_main):
                 nom_val_str = '\mathrm{%s}' % nom_val_str
             elif isinf(nom_val_main):
-                nom_val_str = '\infty'
+                nom_val_str = '%s\infty' % ('-' if nom_val_main < 0 else '')
 
             if isnan(error_main):
                 error_str = '\mathrm{%s}' % error_str
