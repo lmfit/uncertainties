@@ -15,7 +15,7 @@ from __future__ import division
 import copy
 import weakref
 import math
-from math import isnan
+from math import isnan, isinf
 import random
 import sys
 
@@ -54,11 +54,14 @@ def numbers_close(x, y, tolerance=1e-6):
     # NaN could appear silently:
 
     if x != 0 and y != 0:
-        if not isnan(x):
+        if isinf(x):
+            return isinf(y)
+        elif isnan(x):
+            return isnan(y)
+        else:
             # Symmetric form of the test:
             return 2*abs(x-y)/(abs(x)+abs(y)) < tolerance
-        else:
-            return isnan(y)
+
     else:  # Either x or y is zero
         return abs(x or y) < tolerance
 
@@ -1981,7 +1984,7 @@ def test_format():
 
         for (format_spec, result) in representations.iteritems():
 
-            ## print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
+            print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
 
             # Jython 2.5.2 does not always represent NaN as nan or NAN
             # in the CPython way: for example, '%.2g' % float('nan')
@@ -2037,7 +2040,8 @@ def test_format():
 
                 except AssertionError:
                     # !! The following string formatting requires
-                    # str() to work (to not raise an exception):
+                    # str() to work (to not raise an exception) on the
+                    # values (which have a non-standard class):
                     raise AssertionError(
                         'Original value %s and value %s parsed from %r'
                         ' (obtained through format specification %r)'
