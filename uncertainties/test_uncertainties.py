@@ -1951,7 +1951,7 @@ def test_format():
             '.1e': 'inf+/-inf',
             '.1E': '%s+/-%s' % (Inf_EFG, Inf_EFG),
             '.1ue': 'inf+/-inf',
-            'EL': r'\infty \pm \mathrm{%s}' % (Inf_EFG, Inf_EFG)
+            'EL': r'\infty \pm \infty'
         }
     }
 
