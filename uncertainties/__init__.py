@@ -236,7 +236,7 @@ from __future__ import division  # Many analytical derivatives depend on this
 import sys
 import re
 import math
-from math import sqrt, log, isnan  # Optimization: no attribute look-up
+from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
 import copy
 import warnings
 import itertools
@@ -1387,6 +1387,11 @@ def format_num(nom_val_main, error_main, common_exp,
             uncert_str = robust_format(error_main, main_pres_type)
             if 'L' in options:
                 uncert_str = '\mathrm{%s}' % uncert_str
+        elif isinf(error_main):
+            if 'L' in options:
+                uncert_str = '\infty'
+            else:
+                uncert_str = robust_format(error_main, main_pres_type)
         else:  #  Error with a meaningful first digit (not 0, not NaN)
 
             uncert = round(error_main, prec)
@@ -1478,7 +1483,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # to have a zero uncertainty be very explicit):
         error_has_exp = not any_exp_factored and not special_error
 
-        # Like error_has_exp, but only for NaN handling (there is not
+         # Like error_has_exp, but only for NaN handling (there is no
         # special meaning to a zero nominal value):
         nom_has_exp = not any_exp_factored and not isnan(nom_val_main)
 
