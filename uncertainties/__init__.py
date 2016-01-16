@@ -1279,14 +1279,14 @@ def format_num(nom_val_main, error_main, common_exp,
     the format specification: fill, align, sign, zero, width, comma,
     type; the value are strings. These format specification parts are
     handled. The width is applied to each value, or, if the shorthand
-    notation is used, globally. If the error is special (zero or NaN),
+    notation is used, globally. If the error is special (zero, NaN, inf),
     the parts are applied as much as possible to the nominal value.
 
     prec -- precision to use with the main_pres_type format type
     (see below).
 
     main_pres_type -- format presentation type, either "f" or
-    "F". This defines how the mantissas, exponents and NaN values are
+    "F". This defines how the mantissas, exponents and NaN/inf values are
     represented (in the same way as for float). None, the empty
     string, or "%" are not accepted.
 
@@ -1398,7 +1398,7 @@ def format_num(nom_val_main, error_main, common_exp,
                 uncert_str = '\infty'
             else:
                 uncert_str = robust_format(error_main, main_pres_type)
-        else:  #  Error with a meaningful first digit (not 0, not NaN)
+        else:  #  Error with a meaningful first digit (not 0, and real number)
 
             uncert = round(error_main, prec)
 
@@ -1482,15 +1482,15 @@ def format_num(nom_val_main, error_main, common_exp,
 
         # True when the error part has any exponent directly attached
         # (case of an individual exponent for both the nominal value
-        # and the error, when the error is a non-0, non-NaN number).
+        # and the error, when the error is a non-0, real number).
         # The goal is to avoid the strange notation nane-10, and to
         # avoid the 0e10 notation for an exactly zero uncertainty,
         # because .0e can give this for a non-zero error (the goal is
         # to have a zero uncertainty be very explicit):
         error_has_exp = not any_exp_factored and not special_error
 
-         # Like error_has_exp, but only for NaN handling (there is no
-        # special meaning to a zero nominal value):
+         # Like error_has_exp, but only for real number handling
+        # (there is no special meaning to a zero nominal value):
         nom_has_exp = not any_exp_factored and not isinfinite(nom_val_main)
 
         # Prefix for the parts:
@@ -1691,7 +1691,7 @@ class AffineScalarFunc(object):
     Main attributes and methods:
 
     - nominal_value, std_dev: value at the origin / nominal value, and
-      standard deviation.  The standard deviation can be NaN.
+      standard deviation.  The standard deviation can be NaN or infinity.
 
     - error_components(): error_components()[x] is the error due to
       Variable x.
