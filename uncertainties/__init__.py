@@ -236,9 +236,13 @@ from __future__ import division  # Many analytical derivatives depend on this
 import sys
 import re
 import math
-# !!! Python 3.2+ can use math.isinfinite() in some places, instead of
-# a double test with "isnan() or isinf()".
 from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
+
+try:
+    from math import isinfinite  # Python 3.2+
+else:
+    isinfinite = lambda x: isinf(x) or isnan(x)
+
 import copy
 import warnings
 import itertools
@@ -1354,7 +1358,7 @@ def format_num(nom_val_main, error_main, common_exp,
 
     # Only true if the error should not have an exponent (has priority
     # over common_exp):
-    special_error = not error_main or isnan(error_main)
+    special_error = not error_main or isinfinite(error_main)
 
     # Nicer representation of the main nominal part, with no trailing
     # zeros, when the error does not have a defined number of
@@ -1487,7 +1491,7 @@ def format_num(nom_val_main, error_main, common_exp,
 
          # Like error_has_exp, but only for NaN handling (there is no
         # special meaning to a zero nominal value):
-        nom_has_exp = not any_exp_factored and not isnan(nom_val_main)
+        nom_has_exp = not any_exp_factored and not isinfinite(nom_val_main)
 
         # Prefix for the parts:
         if fmt_parts['width']:  # Individual widths
@@ -1556,9 +1560,9 @@ def format_num(nom_val_main, error_main, common_exp,
         # The following uses a special integer representation of a
         # zero uncertainty:
         if error_main:
-            # The handling of NaN in the nominal value identical to
-            # the handling of NaN in the standard deviation:
-            if (isnan(nom_val_main)
+            # The handling of NaN/inf in the nominal value identical to
+            # the handling of NaN/inf in the standard deviation:
+            if (isinfinite(nom_val_main)
                 # Only some formats have a nicer representation:
                 and fmt_parts['type'] in ('', 'g', 'G')):
                 # The error can be formatted independently:
@@ -2090,8 +2094,8 @@ class AffineScalarFunc(object):
 
         # NaN values (nominal value or standard deviation) must be
         # handled in a specific way:
-        real_values = [value for value in (abs(nom_val), std_dev)
-                       if not isnan(value) and not isinf(value)]
+        real_values = [value for value in [abs(nom_val), std_dev]
+                       if not isinfinite(value)]
 
         # Calculation of digits_limit, which defines the precision of
         # the nominal value and of the standard deviation (it can be
@@ -2128,8 +2132,7 @@ class AffineScalarFunc(object):
             # meaning. This gives us the *effective* uncertainty
             # control mode:
             and std_dev
-            and not isnan(std_dev)
-            and not isinf(std_dev)):
+            and not isinfinite(std_dev)):
 
             # The number of significant digits on the uncertainty is
             # controlled.
@@ -2806,7 +2809,7 @@ class Variable(AffineScalarFunc):
         # (Note: if NaN < 0 is False, there is no need to test
         # separately for NaN. But this is not guaranteed, even if it
         # should work on most platforms.)
-        if std_dev < 0 and not isnan(std_dev):
+        if std_dev < 0 and not isinfinite(std_dev):
             raise NegativeStdDev("The standard deviation cannot be negative")
 
         self._std_dev = CallableStdDev(std_dev)
