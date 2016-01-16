@@ -1571,8 +1571,13 @@ def format_num(nom_val_main, error_main, common_exp,
         if 'L' in options:
             if isnan(nom_val_main):
                 nom_val_str = '\mathrm{%s}' % nom_val_str
+            elif isinf(nom_val_main):
+                nom_val_str = '\infty'
+
             if isnan(error_main):
                 error_str = '\mathrm{%s}' % error_str
+            elif isinf(error_main):
+                nom_val_str = '\infty'
 
         if error_has_exp:
             error_str += exp_str
