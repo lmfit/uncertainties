@@ -236,6 +236,8 @@ from __future__ import division  # Many analytical derivatives depend on this
 import sys
 import re
 import math
+# !!! Python 3.2+ can use math.isinfinite() in some places, instead of
+# a double test with "isnan() or isinf()".
 from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
 import copy
 import warnings
@@ -2084,10 +2086,12 @@ class AffineScalarFunc(object):
 
         ########################################
 
+        # !!!! Should this actually be real values?
+
         # NaN values (nominal value or standard deviation) must be
         # handled in a specific way:
-        non_nan_values = [value for value in (abs(nom_val), std_dev)
-                          if not isnan(value)]
+        real_values = [value for value in (abs(nom_val), std_dev)
+                       if not isnan(value) and not isinf(value)]
 
         # Calculation of digits_limit, which defines the precision of
         # the nominal value and of the standard deviation (it can be
@@ -2101,7 +2105,7 @@ class AffineScalarFunc(object):
             # could have been chosen, like using the exponent of the
             # nominal value, irrespective of the standard deviation):
             try:
-                exp_ref_value = max(non_nan_values)
+                exp_ref_value = max(real_values)
             except ValueError:  # No non-NaN value: NaN±NaN…
                 # No meaningful common exponent can be obtained:
                 pass
@@ -2116,7 +2120,7 @@ class AffineScalarFunc(object):
             # uncertainty controlled (if useful, i.e. only in
             # situations where the nominal value and the standard
             # error digits are truncated at the same place):
-            (not fmt_prec and len(non_nan_values)==2)
+            (not fmt_prec and len(real_values)==2)
              or match.group('uncert_prec'))  # Explicit control
             # The number of significant digits of the uncertainty must
             # be meaningful, otherwise the position of the significant
@@ -2218,7 +2222,7 @@ class AffineScalarFunc(object):
 
                 digits_limit = (
                     signif_dgt_to_limit(exp_ref_value, num_signif_digits)
-                    if non_nan_values
+                    if real_values
                     else None)
 
                 ## print "DIGITS_LIMIT", digits_limit
@@ -2233,7 +2237,7 @@ class AffineScalarFunc(object):
         if pres_type in ('f', 'F'):
             use_exp = False
         elif pres_type in ('e', 'E'):
-            if not non_nan_values:
+            if not real_values:
                 use_exp = False
             else:
                 use_exp = True
@@ -2265,7 +2269,7 @@ class AffineScalarFunc(object):
             # for floats is used ("-4 <= exponent of rounded value <
             # p"), on the nominal value.
 
-            if not non_nan_values:
+            if not real_values:
                 use_exp = False
             else:
                 # Common exponent *if* used:
