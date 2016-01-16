@@ -1566,7 +1566,7 @@ def test_format():
     # !! The way NaN is formatted with F, E and G might depend on the
     # version of Python, if it is like NaN (could be tested with
     # Python 2.3 or 2.4 vs Python 2.7):
-    Int_EFG = '%F' % float('inf')
+    Inf_EFG = '%F' % float('inf')
 
     # Tests of each point of the docstring of
     # AffineScalarFunc.__format__() in turn, mostly in the same order.
