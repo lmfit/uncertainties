@@ -48,7 +48,7 @@ def numbers_close(x, y, tolerance=1e-6):
     NaN is allowed: it is considered close to itself.
     """
 
-    # !!! Python 3.5 has math.isclose(): maybe it could be used here.
+    # !!! Python 3.5+ has math.isclose(): maybe it could be used here.
 
     # Instead of using a try and ZeroDivisionError, we do a test,
     # NaN could appear silently:
