@@ -2369,7 +2369,9 @@ class AffineScalarFunc(object):
                           main_pres_type=main_pres_type,
                           options=options)
 
-    # Alternate name for __format__, for use with Python < 2.6:
+    # Alternate name for __format__, for use with Python < 2.6 (and
+    # other Python versions if the user so chooses: this helps moving
+    # code from Python 2.6 to more recent versions):
     @set_doc("""
         Returns the same result as self.__format__(format_spec), or
         equivalently as the format(self, format_spec) of Python 2.6+.
