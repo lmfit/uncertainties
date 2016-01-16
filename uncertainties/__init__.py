@@ -1575,6 +1575,7 @@ def format_num(nom_val_main, error_main, common_exp,
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
 
         if 'L' in options:
+
             if isnan(nom_val_main):
                 nom_val_str = '\mathrm{%s}' % nom_val_str
             elif isinf(nom_val_main):
@@ -1600,6 +1601,9 @@ def format_num(nom_val_main, error_main, common_exp,
 
             # robust_format() is used because it may handle alignment
             # options, where the % operator does not:
+
+            # !!!!!!! Somehow inf goes here with format 10.1eL when
+            # NaN does not.
             nom_val_str = robust_align(
                 nom_val_str, fmt_parts['fill'], effective_align,
                 fmt_parts['width'])

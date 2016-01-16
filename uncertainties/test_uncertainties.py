@@ -1947,7 +1947,7 @@ def test_format():
             '.1ue': '(inf+/-1)e+08',
             '.1ueL': r'\left(\infty \pm 1\right) \times 10^{8}',
             '10.1e': '       inf+/-   1.2e+08',
-            '10.1eL': r'\infty \pm 1.2 \times 10^{8}'
+            '10.1eL': r'    \infty \pm 1.2 \times 10^{8}'
         },
         (float('inf'), float('inf')): {  # *Double* Inf
             '': 'inf+/-inf',
@@ -1984,6 +1984,7 @@ def test_format():
 
         for (format_spec, result) in representations.iteritems():
 
+            # !!!!!!!!!
             print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
 
             # Jython 2.5.2 does not always represent NaN as nan or NAN
