@@ -14,8 +14,8 @@ only require a simple import:
 
 >>> from uncertainties import ufloat
 
-The :func:`ufloat` function creates numbers with uncertainties. Existing 
-calculation code can usually run with no or little modification and 
+The :func:`ufloat` function creates numbers with uncertainties. Existing
+calculation code can usually run with no or little modification and
 automatically produce results with uncertainties.
 
 .. The "import uncertainties" is put here because some examples requires
@@ -108,7 +108,7 @@ matrices:
 Thus, usual operations on NumPy arrays can be performed transparently
 even when these arrays contain numbers with uncertainties.
 
-:doc:`More complex operations on NumPy arrays and matrices 
+:doc:`More complex operations on NumPy arrays and matrices
 <numpy_guide>` can be
 performed through the dedicated :mod:`uncertainties.unumpy` module.
 
@@ -189,11 +189,13 @@ type are all supported.
 .. Precision control:
 
 When :mod:`uncertainties` must **choose the number of significant
-digits on the uncertainty**, it is defined with the `Particle Data
-Group <http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_
-rounding rules (these rules keep the number of digits small, while
-preventing the uncertainty from being displayed with a large relative
-error):
+digits on the uncertainty**, it is usually defined with the `Particle
+Data Group
+<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
+rules (these rules keep the number of digits small, which is
+convenient for reading numbers with uncertainties, and at the same
+time prevent the uncertainty from being displayed with too few
+digits):
 
 >>> print 'Automatic number of digits on the uncertainty: {}'.format(x)
 Automatic number of digits on the uncertainty: 0.200+/-0.010
@@ -235,10 +237,10 @@ When a *format width* is used, the common exponent is not factored:
 >>> print 'Result = {:10.1e}'.format(x*1e-10)
 Result =    2.0e-11+/-   0.1e-11
 
-(Using a (minimal) width of 1 is thus a way of forcing exponents to not 
-be factored.) Thanks to this feature, each part (nominal value and 
-standard deviation) is correctly aligned across multiple lines, while the 
-relative magnitude of the error can still be readily estimated thanks to 
+(Using a (minimal) width of 1 is thus a way of forcing exponents to not
+be factored.) Thanks to this feature, each part (nominal value and
+standard deviation) is correctly aligned across multiple lines, while the
+relative magnitude of the error can still be readily estimated thanks to
 the common exponent.
 
 .. Options:
@@ -345,12 +347,12 @@ accessed independently:
 Access to the individual sources of uncertainty
 ===============================================
 
-The various contributions to an uncertainty can be obtained through the 
-:func:`error_components` method, which maps the **independent variables 
-a quantity depends on** to their **contribution to the total 
-uncertainty**. According to :ref:`linear error propagation theory 
-<linear_method>` (which is the method followed by :mod:`uncertainties`), 
-the sum of the squares of these contributions is the squared 
+The various contributions to an uncertainty can be obtained through the
+:func:`error_components` method, which maps the **independent variables
+a quantity depends on** to their **contribution to the total
+uncertainty**. According to :ref:`linear error propagation theory
+<linear_method>` (which is the method followed by :mod:`uncertainties`),
+the sum of the squares of these contributions is the squared
 uncertainty.
 
 The individual contributions to the uncertainty are more easily usable
@@ -643,7 +645,7 @@ Additional information
 The capabilities of the :mod:`uncertainties` package in terms of array
 handling are detailed in :doc:`numpy_guide`.
 
-Details about the theory behind this package and implementation 
+Details about the theory behind this package and implementation
 information are given in the
 :doc:`tech_guide`.
 
@@ -652,4 +654,3 @@ information are given in the
 .. |minus2html| raw:: html
 
    <sup>-2</sup>
-
