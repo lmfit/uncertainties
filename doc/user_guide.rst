@@ -189,7 +189,7 @@ type are all supported.
 .. Precision control:
 
 When :mod:`uncertainties` must **choose the number of significant
-digits on the uncertainty**, it is usually defined with the `Particle
+digits on the uncertainty**, it is defined with the `Particle
 Data Group
 <http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
 rules (these rules keep the number of digits small, which is
