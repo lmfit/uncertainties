@@ -1578,7 +1578,7 @@ def test_format():
     # uncertainties.GROUP_SYMBOLS and uncertainties.EXP_PRINT: this
     # way, problems in the customization themselves are caught.
 
-    tests = {  # (Nominal value, uncertainty): {format: result,...}
+    tests = { # (Nominal value, uncertainty): {format: result,...}
 
         # Usual float formatting, and individual widths, etc.:
         (3.1415, 0.0001): {
@@ -1653,7 +1653,7 @@ def test_format():
 
         (3.1415, 0.0001): {
             '+09.2uf': '+03.14150+/-000.00010'
-            },
+        },
 
         (1234.56789, 0.1): {
             '.0f': '(1234+/-0.)',  # Approximate error indicated with "."
@@ -1814,8 +1814,8 @@ def test_format():
             '.0fS': '10(0.)'
         },
         (9.99, 0.1): {
-             # The precision has an effect on the exponent, like for
-             # floats:
+            # The precision has an effect on the exponent, like for
+            # floats:
             '.2ue': '(9.99+/-0.10)e+00',  # Same exponent as for 9.99 alone
             '.1ue': '(1.00+/-0.01)e+01'  # Same exponent as for 9.99 alone
         },
@@ -1990,99 +1990,110 @@ def test_format():
             '.1E': '-%s+/-%s' % (Inf_EFG, Inf_EFG),
             '.1ue': '-inf+/-inf',
             'EL': r'-\infty \pm \infty'
+        },
+
+        # The Particle Data Group convention trumps the "at least one
+        # digit past the decimal point" for Python floats, but only
+        # for a non-zero uncertainty:
+        (724.2, 26.4): {
+        '': '724+/-26'
+        },
+        (724, 0): {
+        '': '724.0+/-0'
         }
 
-    }
 
-    # ',' format option: introduced in Python 2.7
-    if sys.version_info >= (2, 7):
+        }
+
+        # ',' format option: introduced in Python 2.7
+        if sys.version_info >= (2, 7):
 
         tests.update({
-            (1234.56789, 0.012): {
-                ',.1uf': '1,234.57+/-0.01'
-                },
+        (1234.56789, 0.012): {
+        ',.1uf': '1,234.57+/-0.01'
+        },
 
-            (123456.789123, 1234.5678): {
-                ',f': '123,457+/-1,235',  # Particle Data Group convention
-                ',.4f': '123,456.7891+/-1,234.5678'
-                }
+        (123456.789123, 1234.5678): {
+        ',f': '123,457+/-1,235',  # Particle Data Group convention
+        ',.4f': '123,456.7891+/-1,234.5678'
+        }
         })
 
-    # True if we can detect that the Jython interpreter is running this code:
-    try:
+        # True if we can detect that the Jython interpreter is running this code:
+        try:
         jython_detected = sys.subversion[0] == 'Jython'
-    except AttributeError:
+        except AttributeError:
         jython_detected = False
 
-    for (values, representations) in tests.iteritems():
+        for (values, representations) in tests.iteritems():
 
         value = ufloat(*values)
 
         for (format_spec, result) in representations.iteritems():
 
-            # print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
+        # print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
 
-            # Jython 2.5.2 does not always represent NaN as nan or NAN
-            # in the CPython way: for example, '%.2g' % float('nan')
-            # is '\ufffd'. The test is skipped, in this case:
-            if jython_detected and isnan(value.std_dev):
-                continue
+        # Jython 2.5.2 does not always represent NaN as nan or NAN
+        # in the CPython way: for example, '%.2g' % float('nan')
+        # is '\ufffd'. The test is skipped, in this case:
+        if jython_detected and isnan(value.std_dev):
+        continue
 
-            # Call that works with Python < 2.6 too:
-            representation = value.format(format_spec)
+        # Call that works with Python < 2.6 too:
+        representation = value.format(format_spec)
 
-            assert representation == result, (
-                # The representation is used, for terminal that do not
-                # support some characters like ±, and superscripts:
-                'Incorrect representation %r for format %r of %r:'
-                ' %r expected.'
-                % (representation, format_spec, value, result))
+        assert representation == result, (
+        # The representation is used, for terminal that do not
+        # support some characters like ±, and superscripts:
+        'Incorrect representation %r for format %r of %r:'
+        ' %r expected.'
+        % (representation, format_spec, value, result))
 
-            # An empty format string is like calling str()
-            # (http://docs.python.org/2/library/string.html#formatspec):
-            if not format_spec:
-                assert representation == str(value), (
-                    'Empty format should give the same thing as str():'
-                    ' %s obtained instead of %s'
-                    % (representation, str(value)))
+        # An empty format string is like calling str()
+        # (http://docs.python.org/2/library/string.html#formatspec):
+        if not format_spec:
+        assert representation == str(value), (
+        'Empty format should give the same thing as str():'
+        ' %s obtained instead of %s'
+        % (representation, str(value)))
 
-            # Parsing back into a number with uncertainty (unless the
-            # LaTeX or comma notation is used):
-            if (not set(format_spec).intersection('L,*%')  # * = fill with *
-                # "00nan"
-                and '0nan' not in representation.lower()
-                # Specific case:
-                and '=====' not in representation):
+        # Parsing back into a number with uncertainty (unless the
+        # LaTeX or comma notation is used):
+        if (not set(format_spec).intersection('L,*%')  # * = fill with *
+        # "00nan"
+        and '0nan' not in representation.lower()
+        # Specific case:
+        and '=====' not in representation):
 
-                value_back = ufloat_fromstr(representation)
+        value_back = ufloat_fromstr(representation)
 
-                # The original number and the new one should be consistent
-                # with each other:
-                try:
+        # The original number and the new one should be consistent
+        # with each other:
+        try:
 
-                    # The nominal value can be rounded to 0 when the
-                    # uncertainty is larger (because p digits on the
-                    # uncertainty can still show 0.00... for the
-                    # nominal value). The relative error is infinite,
-                    # so this should not cause an error:
-                    if value_back.nominal_value:
-                        assert numbers_close(value.nominal_value,
-                                              value_back.nominal_value, 2.4e-1)
+        # The nominal value can be rounded to 0 when the
+        # uncertainty is larger (because p digits on the
+        # uncertainty can still show 0.00... for the
+        # nominal value). The relative error is infinite,
+        # so this should not cause an error:
+        if value_back.nominal_value:
+        assert numbers_close(value.nominal_value,
+        value_back.nominal_value, 2.4e-1)
 
-                    # If the uncertainty is zero, then the relative
-                    # change can be large:
-                    assert numbers_close(value.std_dev,
-                                         value_back.std_dev, 3e-1)
+        # If the uncertainty is zero, then the relative
+        # change can be large:
+        assert numbers_close(value.std_dev,
+        value_back.std_dev, 3e-1)
 
-                except AssertionError:
-                    # !! The following string formatting requires
-                    # str() to work (to not raise an exception) on the
-                    # values (which have a non-standard class):
-                    raise AssertionError(
-                        'Original value %s and value %s parsed from %r'
-                        ' (obtained through format specification %r)'
-                        ' are not close enough'
-                        % (value, value_back, representation, format_spec))
+        except AssertionError:
+        # !! The following string formatting requires
+        # str() to work (to not raise an exception) on the
+        # values (which have a non-standard class):
+        raise AssertionError(
+        'Original value %s and value %s parsed from %r'
+        ' (obtained through format specification %r)'
+        ' are not close enough'
+        % (value, value_back, representation, format_spec))
 
 def test_unicode_format():
     '''Test of the unicode formatting of numbers with uncertainties'''
