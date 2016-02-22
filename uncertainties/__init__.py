@@ -2344,12 +2344,12 @@ class AffineScalarFunc(object):
             # parts is 0 (all digits must be shown).
             #
             # The 1 for the None pres_type represents "at least one
-            # digit past the decimal point"
+            # digit past the decimal point" of Python
             # (https://docs.python.org/3.4/library/string.html#format-specification-mini-language). This
-            # can give a different number of digits than the PDG
-            # recommendation (example: 724.2±24.6, which prints 3
-            # digits for the uncertainty).
-            prec = max(-signif_limit, 1 if pres_type is None else 0)
+            # is only applied for null uncertainties.
+            prec = max(-signif_limit,
+                       1 if pres_type is None and not std_dev
+                       else 0)
         ## print "PREC", prec
 
         ########################################
