@@ -128,7 +128,7 @@ else:
 
     def correlated_values(nom_values, covariance_mat, tags=None):
         """
-        Returns numbers with uncertainties (AffineScalarFunc objects)
+        Return numbers with uncertainties (AffineScalarFunc objects)
         that correctly reproduce the given covariance matrix, and have
         the given (float) values as their nominal value.
 
@@ -190,7 +190,7 @@ else:
     def correlated_values_norm(values_with_std_dev, correlation_mat,
                                tags=None):
         '''
-        Returns correlated values like correlated_values(), but takes
+        Return correlated values like correlated_values(), but takes
         instead as input:
 
         - nominal (float) values along with their standard deviation, and
@@ -261,7 +261,7 @@ except AttributeError:
 # expensive in time than the tests done here.
 def partial_derivative(f, arg_ref):
     """
-    Returns a function that numerically calculates the partial
+    Return a function that numerically calculates the partial
     derivative of function f with respect to its argument arg_ref.
 
     arg_ref -- describes which variable to use for the
@@ -332,7 +332,7 @@ class NumericalDerivatives(object):
 
     def __getitem__(self, n):
         """
-        Returns the n-th numerical derivative of the function.
+        Return the n-th numerical derivative of the function.
         """
         return partial_derivative(self._function, n)
 
@@ -782,7 +782,7 @@ def force_aff_func_args(func):
 
     def op_on_upcast_args(x, y):
         """
-        Returns %s(self, to_affine_scalar(y)) if y can be upcast
+        Return %s(self, to_affine_scalar(y)) if y can be upcast
         through to_affine_scalar.  Otherwise returns NotImplemented.
         """ % func.__name__
 
@@ -869,12 +869,12 @@ def le_on_aff_funcs(self, y_with_uncert):
 
 def first_digit(value):
     '''
-    Returns the first digit position of the given value, as an integer.
+    Return the first digit position of the given value, as an integer.
 
     0 is the digit just before the decimal point. Digits to the right
     of the decimal point have a negative position.
 
-    Returns 0 for a null value.
+    Return 0 for a null value.
     '''
     # Python 2.5 returns nan for math.log10(-4), but Python 2.7 raises
     # ValueError, so the value is directly tested:
@@ -885,7 +885,7 @@ def first_digit(value):
 
 def PDG_precision(std_dev):
     '''
-    Returns the number of significant digits to be used for the given
+    Return the number of significant digits to be used for the given
     standard deviation, according to the rounding rules of the
     Particle Data Group (2010)
     (http://pdg.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf).
@@ -988,7 +988,7 @@ FROM_SUPERSCRIPT = dict(
 
 def to_superscript(value):
     '''
-    Returns a (Unicode) string with the given value as superscript characters.
+    Return a (Unicode) string with the given value as superscript characters.
 
     The value is formatted with the %d %-operator format.
 
@@ -1028,7 +1028,7 @@ GROUP_SYMBOLS = {
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_pres_type, options):
     '''
-    Returns a formatted number with uncertainty.
+    Return a formatted number with uncertainty.
 
     Null errors (error_main) are displayed as the integer 0, with
     no decimal point.
@@ -1439,7 +1439,7 @@ def format_num(nom_val_main, error_main, common_exp,
 
 def signif_dgt_to_limit(value, num_signif_d):
     '''
-    Returns the precision limit necessary to display value with
+    Return the precision limit necessary to display value with
     num_signif_d significant digits.
 
     The precision limit is given as -1 for 1 digit after the decimal
@@ -2167,7 +2167,7 @@ class AffineScalarFunc(object):
     # other Python versions if the user so chooses: this helps moving
     # code from Python 2.6 to more recent versions):
     @set_doc("""
-        Returns the same result as self.__format__(format_spec), or
+        Return the same result as self.__format__(format_spec), or
         equivalently as the format(self, format_spec) of Python 2.6+.
 
         This method is meant to be used for formatting numbers with
@@ -2179,7 +2179,7 @@ class AffineScalarFunc(object):
 
     def std_score(self, value):
         """
-        Returns 'value' - nominal value, in units of the standard
+        Return 'value' - nominal value, in units of the standard
         deviation.
 
         Raises a ValueError exception if the standard deviation is zero.
@@ -2315,7 +2315,7 @@ def nan_if_exception(f):
 def get_ops_with_reflection():
 
     """
-    Returns operators with a reflection, along with their derivatives
+    Return operators with a reflection, along with their derivatives
     (for float operands).
     """
 
@@ -2418,7 +2418,7 @@ else:
 
     def no_complex_result(func):
         '''
-        Returns a function that does like func, but that raises a
+        Return a function that does like func, but that raises a
         ValueError if the result is complex.
         '''
         def no_complex_func(*args, **kwargs):
@@ -2673,7 +2673,7 @@ class Variable(AffineScalarFunc):
 
 def nominal_value(x):
     """
-    Returns the nominal value of x if it is a quantity with
+    Return the nominal value of x if it is a quantity with
     uncertainty (i.e., an AffineScalarFunc object); otherwise, returns
     x unchanged.
 
@@ -2688,7 +2688,7 @@ def nominal_value(x):
 
 def std_dev(x):
     """
-    Returns the standard deviation of x if it is a quantity with
+    Return the standard deviation of x if it is a quantity with
     uncertainty (i.e., an AffineScalarFunc object); otherwise, returns
     the float 0.
 
@@ -2703,7 +2703,7 @@ def std_dev(x):
 
 def covariance_matrix(nums_with_uncert):
     """
-    Returns a matrix that contains the covariances between the given
+    Return a matrix that contains the covariances between the given
     sequence of numbers with uncertainties (AffineScalarFunc objects).
     The resulting matrix implicitly depends on their ordering in
     'nums_with_uncert'.
@@ -2752,7 +2752,7 @@ except ImportError:
 else:
     def correlation_matrix(nums_with_uncert):
         '''
-        Returns the correlation matrix of the given sequence of
+        Return the correlation matrix of the given sequence of
         numbers with uncertainties, as a NumPy array of floats.
         '''
 
@@ -2805,7 +2805,7 @@ class NotParenUncert(ValueError):
 
 def parse_error_in_parentheses(representation):
     """
-    Returns (value, error) from a string representing a number with
+    Return (value, error) from a string representing a number with
     uncertainty like 12.34(5), 12.34(142), 12.5(3.4), 12.3(4.2)e3, or
     13.4(nan)e10.  If no parenthesis is given, an uncertainty of one
     on the last digit is assumed.
@@ -2962,7 +2962,7 @@ def str_to_number_with_uncert(representation):
 
 def ufloat_fromstr(representation, tag=None):
     """
-    Returns a new random variable (Variable object) from a string.
+    Return a new random variable (Variable object) from a string.
 
     Strings 'representation' of the form '12.345+/-0.015',
     '12.345(15)', '12.3' or u'1.2±0.1' (Unicode string) are recognized
@@ -3039,7 +3039,7 @@ def _ufloat_obsolete(representation, tag=None):
 # supported anymore.
 def ufloat(nominal_value, std_dev=None, tag=None):
     """
-    Returns a new random variable (Variable object).
+    Return a new random variable (Variable object).
 
     The only non-obsolete use is:
 
