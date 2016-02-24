@@ -798,7 +798,7 @@ def test_no_coercion():
 
 def test_wrapped_func_no_args_no_kwargs():
     '''
-    Wraps a function that takes only positional-or-keyword parameters.
+    Wrap a function that takes only positional-or-keyword parameters.
     '''
 
     def f_auto_unc(x, y):
@@ -850,7 +850,7 @@ def test_wrapped_func_no_args_no_kwargs():
 
 def test_wrapped_func_args_no_kwargs():
     '''
-    Wraps a function that takes only positional-or-keyword and
+    Wrap a function that takes only positional-or-keyword and
     var-positional parameters.
     '''
 
@@ -899,7 +899,7 @@ def test_wrapped_func_args_no_kwargs():
 
 def test_wrapped_func_no_args_kwargs():
     '''
-    Wraps a function that takes only positional-or-keyword and
+    Wrap a function that takes only positional-or-keyword and
     var-keyword parameters.
     '''
 
@@ -991,7 +991,7 @@ def test_wrapped_func_no_args_kwargs():
 
 def test_wrapped_func_args_kwargs():
     '''
-    Wraps a function that takes positional-or-keyword, var-positional
+    Wrap a function that takes positional-or-keyword, var-positional
     and var-keyword parameters.
     '''
 
