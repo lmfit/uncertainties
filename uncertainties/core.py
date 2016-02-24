@@ -2486,6 +2486,7 @@ def add_operators_to_AffineScalarFunc():
             setattr(AffineScalarFunc, attribute_name,
                     wrap(getattr(float, attribute_name), [derivative]))
         except AttributeError:
+            # Version of Python where floats don't have attribute_name:
             pass
         else:
             modified_operators.append(op)
