@@ -822,57 +822,6 @@ def test_wrapped_func_no_args_no_kwargs():
     # Call with keyword arguments:
     assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
-    ## Automatic additional derivatives for non-defined derivatives:
-    f_wrapped = uncert_core.wrap(f, [None])  # No derivative for y
-    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
-
-    # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
-
-    ### Explicit derivatives:
-
-    ## Fully defined derivatives:
-    f_wrapped = uncert_core.wrap(f, [lambda x, y: 2,
-                                       lambda x, y: math.cos(y)])
-
-    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
-
-    # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
-
-    ## Automatic additional derivatives for non-defined derivatives:
-    f_wrapped = uncert_core.wrap(f, [lambda x, y: 2])  # No derivative for y
-    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
-
-    # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
-
-def test_wrapped_func_no_args_no_kwargs():
-    '''
-    Wraps a function that takes only positional-or-keyword parameters.
-    '''
-
-    def f_auto_unc(x, y):
-        return 2*x+umath.sin(y)
-
-    # Like f_auto_unc, but does not accept numbers with uncertainties:
-    def f(x, y):
-        assert not isinstance(x, uncert_core.UFloat)
-        assert not isinstance(y, uncert_core.UFloat)
-        return f_auto_unc(x, y)
-
-    x = uncert_core.ufloat(1, 0.1)
-    y = uncert_core.ufloat(10, 2)
-
-    ### Automatic numerical derivatives:
-
-    ## Fully automatic numerical derivatives:
-    f_wrapped = uncert_core.wrap(f)
-    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
-
-    # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
-
     ## Automatic additional derivatives for non-defined derivatives,
     ## and explicit None derivative:
     f_wrapped = uncert_core.wrap(f, [None])  # No derivative for y
