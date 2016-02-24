@@ -2007,7 +2007,10 @@ def test_format():
             'S': '-inf(inf)',
             'LS': '-\infty(\infty)',
             'L': '-\infty \pm \infty',
-            'LP': u'-\infty±\infty'
+            'LP': u'-\infty±\infty',
+            # The following is consistent with Python's
+            # "{:020}".format(float("-inf")):
+            '020S': '-00000000000inf(inf)'
         },
         (-float('nan'), float('inf')): {
             'S': 'nan(inf)',
@@ -2015,6 +2018,11 @@ def test_format():
             'L': '\mathrm{nan} \pm \infty',
             'LP': u'\mathrm{nan}±\infty'
         },
+
+        # Leading zeroes in the shorthand notation:
+        (-2, 3): {
+            "020S": "-000000000002.0(3.0)"
+        }
 
     }
 
