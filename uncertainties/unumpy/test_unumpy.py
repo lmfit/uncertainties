@@ -3,7 +3,7 @@ Tests of the code in uncertainties/unumpy/__init__.py.
 
 These tests can be run through the Nose testing framework.
 
-(c) 2010-2015 by Eric O. LEBIGOT (EOL).
+(c) 2010-2016 by Eric O. LEBIGOT (EOL).
 """
 
 from __future__ import division
@@ -13,17 +13,17 @@ try:
     import numpy
 except ImportError:
     import sys
-    sys.exit()  # There is no reason to test the interface to NumPy    
+    sys.exit()  # There is no reason to test the interface to NumPy
 
 # Local modules:
 import uncertainties
+import uncertainties.core as uncert_core
 from uncertainties import ufloat, unumpy, test_uncertainties
 from uncertainties.unumpy import core
 from uncertainties.test_uncertainties import numbers_close, arrays_close
-from uncertainties import __author__
 
 def test_numpy():
-    
+
     """
     Interaction with NumPy, including matrix inversion,
     correlated_values, and calculation of the mean.
@@ -72,7 +72,7 @@ def test_numpy():
     arr_floats = numpy.random.random((10, 3, 5))
     arr = unumpy.uarray(arr_floats, arr_floats/100)
     assert arr.mean(axis=0).shape == (3, 5)
-    assert arr.mean(axis=1).shape == (10, 5)    
+    assert arr.mean(axis=1).shape == (10, 5)
     arr.mean()  # Global mean
 
 def test_matrix():
@@ -89,7 +89,7 @@ def test_matrix():
     # Test of the nominal_value attribute:
     assert numpy.all(m_nominal_values == m.nominal_values)
 
-    assert type(m[0, 0]) == uncertainties.Variable
+    assert type(m[0, 0]) == uncert_core.Variable
 
     # Test of scalar multiplication, both sides:
     3*m
@@ -128,14 +128,14 @@ def test_inverse():
     # The inverse contains uncertainties: it must support custom
     # operations on matrices with uncertainties:
     assert isinstance(m_inv_uncert, unumpy.matrix)
-    assert type(m_inv_uncert[0, 0]) == uncertainties.AffineScalarFunc
+    assert type(m_inv_uncert[0, 0]) == uncert_core.AffineScalarFunc
 
     # Checks of the numerical values: the diagonal elements of the
     # inverse should be the inverses of the diagonal elements of
     # m (because we started with a triangular matrix):
     assert numbers_close(1/m_nominal_values[0, 0],
                           m_inv_uncert[0, 0].nominal_value), "Wrong value"
-    
+
     assert numbers_close(1/m_nominal_values[1, 1],
                           m_inv_uncert[1, 1].nominal_value), "Wrong value"
 
@@ -148,7 +148,7 @@ def test_inverse():
                        [0, 3+2*x]])
 
     m_inverse = m.I
-    
+
     # Check of the properties of the inverse:
     m_double_inverse = m_inverse.I
     # The initial matrix should be recovered, including its
@@ -187,15 +187,15 @@ def test_wrap_array_func():
     # mat is an uncertainties.unumpy.matrix):
     def f_unc(mat, *args, **kwargs):
         return mat.I + args[0]*kwargs['factor']
-    
+
     # Test with optional arguments and keyword arguments:
     def f(mat, *args, **kwargs):
         # This function is wrapped: it should only be called with pure
         # numbers:
-        assert not any(isinstance(v, uncertainties.UFloat) for v in mat.flat)
+        assert not any(isinstance(v, uncert_core.UFloat) for v in mat.flat)
         return f_unc(mat, *args, **kwargs)
 
-        
+
     # Wrapped function:
     f_wrapped = core.wrap_array_func(f)
 
@@ -209,10 +209,10 @@ def test_wrap_array_func():
     # the same:
     m_f_wrapped = f_wrapped(m, 2, factor=10)
     m_f_unc = f_unc(m, 2, factor=10)
-    
+
     assert arrays_close(m_f_wrapped, m_f_unc)
-    
-    
+
+
 def test_pseudo_inverse():
     "Tests of the pseudo-inverse"
 
@@ -239,21 +239,21 @@ def test_pseudo_inverse():
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core.pinv(m, rcond)
     assert arrays_close(m_pinv_num, m_pinv_package)
-    
+
     ##########
     # Example with a non-full-rank square matrix:
     m = unumpy.matrix([[ufloat(10, 1), 0], [3, 0]])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core.pinv(m, rcond)
     assert arrays_close(m_pinv_num, m_pinv_package)
-    
+
 def test_broadcast_funcs():
     """
     Test of mathematical functions that work with NumPy arrays of
     numbers with uncertainties.
     """
 
-    x = uncertainties.ufloat(0.2, 0.1)
+    x = ufloat(0.2, 0.1)
     arr = numpy.array([x, 2*x])
     assert unumpy.cos(arr)[1] == uncertainties.umath.cos(arr[1])
 
@@ -267,7 +267,7 @@ def test_broadcast_funcs():
 
     # Test of the __all__ variable:
     assert 'acos' not in unumpy.__all__
-    
+
 def test_array_and_matrix_creation():
     "Test of custom array creation"
 
@@ -280,7 +280,7 @@ def test_array_and_matrix_creation():
     mat = unumpy.umatrix([1, 2], [0.1, 0.2])
     assert mat[0,1].nominal_value == 2
     assert mat[0,1].std_dev == 0.2
-    
+
 def test_component_extraction():
     "Extracting the nominal values and standard deviations from an array"
 
@@ -296,7 +296,7 @@ def test_component_extraction():
     assert numpy.all(unumpy.nominal_values(mat) == [1, 2])
     assert numpy.all(unumpy.std_devs(mat) == [0.1, 0.2])
     assert type(unumpy.nominal_values(mat)) == numpy.matrix
-    
+
 
 def test_array_comparisons():
     "Test of array and matrix comparisons"
@@ -320,10 +320,9 @@ def test_obsolete():
     assert arrays_close(arr_obs, arr)
 
     # The new and old calls should give the same results:
-    
+
     # The unusual syntax is here to protect against automatic code
     # update:
     mat_obs = unumpy.umatrix.__call__(([1, 2], [1, 4]))  # Obsolete call
     mat = unumpy.umatrix([1, 2], [1, 4])
     assert arrays_close(mat_obs, mat)
-

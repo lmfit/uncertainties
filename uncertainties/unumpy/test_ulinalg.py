@@ -3,7 +3,7 @@ Tests for uncertainties.unumpy.ulinalg.
 
 These tests can be run through the Nose testing framework.
 
-(c) 2010-2015 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
+(c) 2010-2016 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 """
 
 # Some tests are already performed in test_unumpy (unumpy contains a
@@ -19,8 +19,6 @@ except ImportError:
 
 from uncertainties import unumpy, ufloat
 from uncertainties.unumpy.test_unumpy import arrays_close
-
-from uncertainties import __author__
 
 def test_list_inverse():
     "Test of the inversion of a square matrix"
@@ -48,13 +46,13 @@ def test_list_inverse():
     assert not isinstance(mat_list_inv, unumpy.matrix)
 
     # Individual element check:
-    assert isinstance(mat_list_inv[1,1], float)    
+    assert isinstance(mat_list_inv[1,1], float)
     assert mat_list_inv[1,1] == -1
 
     x = ufloat(1, 0.1)
     y = ufloat(2, 0.1)
     mat = unumpy.matrix([[x, x], [y, 0]])
-    
+
     # Internal consistency: ulinalg.inv() must coincide with the
     # unumpy.matrix inverse, for square matrices (.I is the
     # pseudo-inverse, for non-square matrices, but inv() is not).
@@ -75,7 +73,7 @@ def test_list_pseudo_inverse():
                           # Support for the optional pinv argument is
                           # tested:
                           unumpy.ulinalg.pinv(mat, 1e-15), 1e-4)
-    
+
     # Non-square matrices:
     x = ufloat(1, 0.1)
     y = ufloat(2, 0.1)
