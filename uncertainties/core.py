@@ -55,13 +55,7 @@ __all__ = [
 
     # Wrapper for allowing non-pure-Python function to handle
     # quantitities with uncertainties:
-    'wrap',
-
-    # The documentation for wrap() indicates that numerical
-    # derivatives are calculated through partial_derivative().  The
-    # user might also want to change the size of the numerical
-    # differentiation step.
-    'partial_derivative'
+    'wrap'
 
     ]
 
@@ -195,7 +189,7 @@ else:
 
         - nominal (float) values along with their standard deviation, and
 
-        - a correlation matrix (i.e. a normalized covariance matrix
+        - a correlation matrix (i.e. a normalized covariance matrix,
           normalized with individual standard deviations).
 
         values_with_std_dev -- sequence of (nominal value, standard
@@ -492,7 +486,8 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     not mandatory) to supply instead a derivative function that
     returns NaN where the function is not differentiable. This
     function can still numerically calculate the derivative where
-    defined, for instance by using the partial_derivative() function.
+    defined, for instance by using the
+    uncertainties.core.partial_derivative() function.
 
     The correctness of the supplied analytical derivatives an be
     tested by setting them to None instead and comparing the
