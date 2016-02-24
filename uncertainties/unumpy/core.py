@@ -111,7 +111,7 @@ def std_devs(arr):
 
 def derivative(u, var):
     """
-    Returns the derivative of u along var, if u is an
+    Return the derivative of u along var, if u is an
     uncert_core.AffineScalarFunc instance, and if var is one of the
     variables on which it depends.  Otherwise, return 0.
     """
@@ -125,7 +125,7 @@ def derivative(u, var):
 
 def wrap_array_func(func):
     """
-    Returns a version of the function func() that works even when
+    Return a version of the function func() that works even when
     func() is given a NumPy array that contains numbers with
     uncertainties.
 
@@ -255,7 +255,7 @@ def wrap_array_func(func):
 
 def uarray(nominal_values, std_devs=None):
     """
-    Returns a NumPy array of numbers with uncertainties
+    Return a NumPy array of numbers with uncertainties
     initialized with the given nominal values and standard
     deviations.
 
@@ -283,7 +283,7 @@ def uarray(nominal_values, std_devs=None):
 
 def array_derivative(array_like, var):
     """
-    Returns the derivative of the given array with respect to the
+    Return the derivative of the given array with respect to the
     given variable.
 
     The returned derivative is a Numpy ndarray of the same shape as
@@ -303,7 +303,7 @@ def array_derivative(array_like, var):
 
 def func_with_deriv_to_uncert_func(func_with_derivatives):
     """
-    Returns a function that can be applied to array-like objects that
+    Return a function that can be applied to array-like objects that
     contain numbers with uncertainties (lists, lists of lists, Numpy
     arrays, etc.).
 
