@@ -2765,7 +2765,7 @@ else:
 ###############################################################################
 # Parsing of values with uncertainties:
 
-POSITIVE_DECIMAL_UNSIGNED_OR_NAN = ur'((\d+)(\.\d*)?|nan|NAN)'
+POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = ur'((\d+)(\.\d*)?|nan|NAN|inf|INF)'
 
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where
 # the uncertainty is optional (in which case the uncertainty is
@@ -2778,7 +2778,8 @@ NUMBER_WITH_UNCERT_RE_STR = u'''
         (?:[eE]|\s*×\s*10)
         (.*)
     )?  # Optional exponent
-    ''' % (POSITIVE_DECIMAL_UNSIGNED_OR_NAN, POSITIVE_DECIMAL_UNSIGNED_OR_NAN)
+    ''' % (POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE,
+           POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE)
 
 NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
     u"%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).match
@@ -2838,7 +2839,7 @@ def parse_error_in_parentheses(representation):
         uncert_int = '1'  # The other parts of the uncertainty are None
 
     # Do we have a fully explicit uncertainty?
-    if uncert_dec is not None or uncert in ('nan', 'NAN'):
+    if uncert_dec is not None or uncert in {'nan', 'NAN', 'inf', 'INF'}:
         uncert_value = float(uncert)
     else:
         # uncert_int represents an uncertainty on the last digits:

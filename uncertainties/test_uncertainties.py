@@ -2001,17 +2001,20 @@ def test_format():
             '': '724.0+/-0'
         },
 
-        # LaTeX and shorthand:
+        # More NaN and infinity, in particular with LaTeX and various
+        # options:
         (-float('inf'), float('inf')): {
+            'S': '-inf(inf)',
             'LS': '-\infty(\infty)',
             'L': '-\infty \pm \infty',
             'LP': u'-\infty±\infty'
         },
         (-float('nan'), float('inf')): {
+            'S': 'nan(inf)',
             'LS': '\mathrm{nan}(\infty)',
             'L': '\mathrm{nan} \pm \infty',
             'LP': u'\mathrm{nan}±\infty'
-        }
+        },
 
     }
 
