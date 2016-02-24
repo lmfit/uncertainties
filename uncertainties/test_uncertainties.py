@@ -2009,7 +2009,7 @@ def test_format():
             'L': '-\infty \pm \infty',
             'LP': u'-\infty±\infty',
             # The following is consistent with Python's
-            # "{:020}".format(float("-inf")):
+            # "{:020}".format(float("-inf")) ('-0000000000000000inf'):
             '020S': '-00000000000inf(inf)'
         },
         (-float('nan'), float('inf')): {
@@ -2081,8 +2081,10 @@ def test_format():
             # Parsing back into a number with uncertainty (unless the
             # LaTeX or comma notation is used):
             if (not set(format_spec).intersection('L,*%')  # * = fill with *
-                # "00nan"
+                # "0nan"
                 and '0nan' not in representation.lower()
+                # "0inf"
+                and '0inf' not in representation.lower()
                 # Specific case:
                 and '=====' not in representation):
 
