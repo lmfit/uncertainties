@@ -2511,6 +2511,7 @@ def add_operators_to_AffineScalarFunc():
             else:
                 func_to_wrap = custom_ops[op]
         except AttributeError:
+            # Version of Python with floats that don't have attribute_name:
             pass
         else:
             setattr(AffineScalarFunc, attribute_name,
