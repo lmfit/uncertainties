@@ -543,12 +543,15 @@ class matrix(numpy.matrix):
             return numeric.dot(other, self)  # The order is important
 
     def getI(self):
-        """Matrix inverse of pseudo-inverse."""
+        """Matrix inverse or pseudo-inverse."""
         m, n = self.shape
         return (inv if m == n else pinv)(self)
 
     I = numpy.matrix.I.getter(getI)
 
+
+    # !!! The following function is not in the official documentation
+    # of the module.
     def nominal_values(self):
         """
         Nominal value of all the elements of the matrix.
@@ -556,6 +559,11 @@ class matrix(numpy.matrix):
         return nominal_values(self)
     nominal_values = property(nominal_values)
 
+    # !!! The following function is not in the official documentation
+    # of the module.
+    #
+    # !!! Furthermore, std_devs() is a function, unlike for UFloats,
+    # which is not consistent.
     std_devs = std_devs
 
 def umatrix(nominal_values, std_devs=None):
