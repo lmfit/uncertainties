@@ -1999,8 +1999,19 @@ def test_format():
         },
         (724, 0): {
             '': '724.0+/-0'
-        }
+        },
 
+        # LaTeX and shorthand:
+        (-float('inf'), float('inf')): {
+            'LS': '-\infty(\infty)',
+            'L': '-\infty \pm \infty',
+            'LP': u'-\infty±\infty'
+        },
+        (-float('nan'), float('inf')): {
+            'LS': '\mathrm{nan}(\infty)',
+            'L': '\mathrm{nan} \pm \infty',
+            'LP': u'\mathrm{nan}±\infty'
+        }
 
     }
 

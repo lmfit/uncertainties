@@ -1157,6 +1157,7 @@ def format_num(nom_val_main, error_main, common_exp,
 
     # Error formatting:
 
+
     if 'S' in options:  # Shorthand notation:
 
         # Calculation of the uncertainty part, uncert_str:
@@ -1233,6 +1234,18 @@ def format_num(nom_val_main, error_main, common_exp,
         # print "FMT_SUFFIX_N", fmt_suffix_n
 
         nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
+
+        ##########
+        # Overriding of nom_val_str for LaTeX,; possibly based on the
+        # existing value (for NaN vs nan):
+        if 'L' in options:
+
+            if isnan(nom_val_main):
+                nom_val_str = '\mathrm{%s}' % nom_val_str
+            elif isinf(nom_val_main):
+                # !! It is wasteful, in this case to replace
+                # nom_val_str: the control flow could be better?
+                nom_val_str = '%s\infty' % ('-' if nom_val_main < 0 else '')
 
         value_str = nom_val_str+value_end
 
@@ -1319,9 +1332,6 @@ def format_num(nom_val_main, error_main, common_exp,
 
         # print "NOM_VAL_STR", nom_val_str
 
-        if nom_has_exp:
-            nom_val_str += exp_str
-
         ####################
         # Error formatting:
 
@@ -1349,6 +1359,8 @@ def format_num(nom_val_main, error_main, common_exp,
 
         error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
 
+        ##########
+        # Overriding of nom_val_str and error_str for LaTeX:
         if 'L' in options:
 
             if isnan(nom_val_main):
@@ -1361,6 +1373,8 @@ def format_num(nom_val_main, error_main, common_exp,
             elif isinf(error_main):
                 error_str = '\infty'
 
+        if nom_has_exp:
+            nom_val_str += exp_str
         if error_has_exp:
             error_str += exp_str
 
