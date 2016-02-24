@@ -15,8 +15,6 @@ import itertools
 import inspect
 
 # Local modules
-import uncertainties
-
 import uncertainties.core as uncert_core
 from uncertainties.core import to_affine_scalar, AffineScalarFunc
 
