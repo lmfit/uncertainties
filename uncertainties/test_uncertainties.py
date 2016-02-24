@@ -2161,11 +2161,11 @@ else:
             elmt2 = uncert_core.to_affine_scalar(elmt2)
 
             if not numbers_close(elmt1.nominal_value,
-                                  elmt2.nominal_value, precision):
+                                 elmt2.nominal_value, precision):
                 return False
 
             if not numbers_close(elmt1.std_dev,
-                                  elmt2.std_dev, precision):
+                                 elmt2.std_dev, precision):
                 return False
         return True
 
@@ -2282,6 +2282,12 @@ else:
         assert arrays_close(numpy.array([sum_value]), numpy.array([sum2]))
         assert arrays_close(numpy.array([0]),
                             numpy.array([sum2-(u2+2*v2)]))
+
+
+        # Spot checks of the correlation matrix:
+        corr_matrix = uncert_core.correlation_matrix([u, v, sum_value])
+        assert numbers_close(corr_matrix[0,0], 1)
+        assert numbers_close(corr_matrix[1,2], 2*v.std_dev/sum_value.std_dev)
 
 
     def test_correlated_values_correlation_mat():
