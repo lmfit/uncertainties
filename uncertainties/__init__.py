@@ -224,7 +224,7 @@ author.'''
 from core import *
 
 # Numerical version:
-__version_info__ = (2, 4, 7, 1)
+__version_info__ = (2, 4, 8)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
