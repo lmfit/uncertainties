@@ -532,7 +532,7 @@ class matrix(numpy.matrix):
     """
 
     def __rmul__(self, other):
-        # ! NumPy's matrix __rmul__ uses an apparently a restrictive
+        # ! NumPy's matrix __rmul__ uses an apparently restrictive
         # dot() function that cannot handle the multiplication of a
         # scalar and of a matrix containing objects (when the
         # arguments are given in this order).  We go around this
