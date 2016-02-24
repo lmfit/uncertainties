@@ -2281,7 +2281,7 @@ else:
         assert arrays_close(numpy.array([v]), numpy.array([v2]))
         assert arrays_close(numpy.array([sum_value]), numpy.array([sum2]))
         assert arrays_close(numpy.array([0]),
-                              numpy.array([sum2-(u2+2*v2)]))
+                            numpy.array([sum2-(u2+2*v2)]))
 
 
     def test_correlated_values_correlation_mat():
