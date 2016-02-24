@@ -1,39 +1,10 @@
-'''
-Mathematical operations that generalize many operations from the
-standard math module so that they also work on numbers with
-uncertainties.
+"""
+Implementation of umath.py, with internals.
+"""
 
-Examples:
-
-  from umath import sin
-  
-  # Manipulation of numbers with uncertainties:
-  x = uncertainties.ufloat(3, 0.1)
-  print sin(x)  # prints 0.141120008...+/-0.098999...
-
-  # The umath functions also work on regular Python floats:
-  print sin(3)  # prints 0.141120008...  This is a Python float.
-
-Importing all the functions from this module into the global namespace
-is possible.  This is encouraged when using a Python shell as a
-calculator.  Example:
-
-  import uncertainties
-  from uncertainties.umath import *  # Imports tan(), etc.
-  
-  x = uncertainties.ufloat(3, 0.1)
-  print tan(x)  # tan() is the uncertainties.umath.tan function
-
-The numbers with uncertainties handled by this module are objects from
-the uncertainties module, from either the Variable or the
-AffineScalarFunc class.
-
-(c) 2009-2015 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
-Please send feature requests, bug reports, or feedback to this address.
-
-This software is released under a dual license.  (1) The BSD license.
-(2) Any other license, as long as it is obtained from the original
-author.'''
+# This module exists so as to define __all__, which in turn defines
+# which functions are visible to the user in umath.py through from
+# umath import * and Python shell completion.
 
 from __future__ import division  # Many analytical derivatives depend on this
 
@@ -46,7 +17,7 @@ import inspect
 # Local modules
 import uncertainties
 
-from uncertainties import __author__, to_affine_scalar, AffineScalarFunc
+from uncertainties.core import to_affine_scalar, AffineScalarFunc
 
 ###############################################################################
 
@@ -109,7 +80,7 @@ def wraps(wrapper,
           assigned=('__doc__',),
           updated=('__dict__',)):
     """Update a wrapper function to look like the wrapped function.
-    
+
     wrapper -- function to be updated
     wrapped -- original function
     assigned -- tuple naming the attributes assigned directly
@@ -124,7 +95,7 @@ def wraps(wrapper,
         getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
     # Return the wrapper so this can be used as a decorator via partial()
     return wrapper
-                                    
+
 
 ########################################
 # Wrapping of math functions:
@@ -156,14 +127,14 @@ def log_der0(*args):
     Derivative of math.log() with respect to its first argument.
 
     Works whether 1 or 2 arguments are given.
-    """    
+    """
     if len(args) == 1:
         return 1/args[0]
     else:
         return 1/args[0]/math.log(args[1])  # 2-argument form
 
     # The following version goes about as fast:
-    
+
     ## A 'try' is used for the most common case because it is fast when no
     ## exception is raised:
     #try:
@@ -176,7 +147,7 @@ def _deriv_copysign(x,y):
         return math.copysign(1, y)
     else:
         return -math.copysign(1, y)
-    
+
 def _deriv_fabs(x):
     if x >= 0:
         return 1
@@ -191,12 +162,12 @@ def _deriv_pow_0(x, y):
     else:
         return float('nan')
 
-def _deriv_pow_1(x, y):    
+def _deriv_pow_1(x, y):
     if x == 0 and y > 0:
         return 0.
     else:
         return math.log(x) * math.pow(x, y)
-    
+
 erf_coef = 2/math.sqrt(math.pi)  # Optimization for erf()
 
 fixed_derivatives = {
@@ -257,7 +228,7 @@ def wrap_locally_cst_func(func):
             for (arg_name, value) in kwargs.iteritems())
         return func(*args_float, **kwargs_float)
     return wrapped_func
-    
+
 # for (name, attr) in vars(math).items():
 for name in dir(math):
 
@@ -269,7 +240,7 @@ for name in dir(math):
         derivatives = []  # Means: numerical calculation required
     elif name not in locally_cst_funcs:
         continue  # 'name' not wrapped by this module (__doc__, e, etc.)
-    
+
     func = getattr(math, name)
 
     if name in locally_cst_funcs:
@@ -281,13 +252,13 @@ for name in dir(math):
         # (the derivatives in fixed_derivatives must be written this way):
         wrapped_func = uncertainties.wrap(
             func, map(uncertainties.nan_if_exception, derivatives))
-        
+
     setattr(this_module, name, wraps(wrapped_func, func))
 
     many_scalars_to_scalar_funcs.append(name)
 
 ###############################################################################
-    
+
 ########################################
 # Special cases: some of the functions from no_std_wrapping:
 
@@ -343,11 +314,11 @@ def modf(x):
     Version of modf that works for numbers with uncertainty, and also
     for regular numbers.
     """
-    
+
     # The code below is inspired by uncertainties.wrap().  It is
     # simpler because only 1 argument is given, and there is no
     # delegation to other functions involved (as for __mul__, etc.).
-    
+
     aff_func = to_affine_scalar(x)
 
     (frac_part, int_part) = math.modf(aff_func.nominal_value)
@@ -393,7 +364,7 @@ def ldexp(x, y):
         # instance]):
         return math.ldexp(x, y)
 ldexp = uncertainties.set_doc(math.ldexp.__doc__)(ldexp)
-    
+
 many_scalars_to_scalar_funcs.append('ldexp')
 
 def frexp(x):
@@ -426,11 +397,10 @@ def frexp(x):
         # argument: there is no need to return numbers with uncertainties:
         return math.frexp(x)
 frexp = uncertainties.set_doc(math.frexp.__doc__)(frexp)
-    
+
 non_std_wrapped_funcs.append('frexp')
 
 ###############################################################################
 # Exported functions:
 
 __all__ = many_scalars_to_scalar_funcs + non_std_wrapped_funcs
-
