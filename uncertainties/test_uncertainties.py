@@ -5,7 +5,7 @@ Tests of the code in uncertainties/__init__.py.
 
 These tests can be run through the Nose testing framework.
 
-(c) 2010-2015 by Eric O. LEBIGOT (EOL).
+(c) 2010-2016 by Eric O. LEBIGOT (EOL).
 """
 
 from __future__ import division
@@ -25,9 +25,7 @@ import sys
 # Local modules
 
 import uncertainties
-from uncertainties import ufloat, AffineScalarFunc, ufloat_fromstr, umath
-
-from uncertainties import __author__
+from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr, umath
 
 # The following information is useful for making sure that the right
 # version of Python is running the tests (for instance with the Travis
