@@ -211,7 +211,7 @@ this_module = sys.modules[__name__]
 
 def wrap_locally_cst_func(func):
     '''
-    Returns a function that returns the same arguments as func, but
+    Return a function that returns the same arguments as func, but
     after converting any AffineScalarFunc object to its nominal value.
 
     This function is useful for wrapping functions that are locally
@@ -288,7 +288,7 @@ original_func = math.fsum  # For optimization purposes
 # pollute the module namespace:
 def wrapped_fsum():
     """
-    Returns an uncertainty-aware version of math.fsum, which must
+    Return an uncertainty-aware version of math.fsum, which must
     be contained in _original_func.
     """
 
