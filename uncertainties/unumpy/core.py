@@ -1,7 +1,7 @@
 """
 Core functions used by unumpy and some of its submodules.
 
-(c) 2010-2015 by Eric O. LEBIGOT (EOL).
+(c) 2010-2016 by Eric O. LEBIGOT (EOL).
 """
 
 # The functions found in this module cannot be defined in unumpy or
@@ -19,10 +19,9 @@ import numpy
 from numpy.core import numeric
 
 # Local modules:
-import uncertainties
-from uncertainties import umath, deprecation
-
-from uncertainties import __author__
+import uncertainties.umath as umath
+import uncertainties.core as uncert_core
+from uncertainties.core import deprecation
 
 __all__ = [
     # Factory functions:
@@ -43,7 +42,7 @@ __all__ = [
 # might well directly build arrays of numbers with uncertainties
 # without going through the factory functions found in this module
 # (uarray() and umatrix()).  Thus,
-# numpy.array([uncertainties.ufloat((1, 0.1))]) would not
+# numpy.array([uncert_core.ufloat((1, 0.1))]) would not
 # have a nominal_values() method.  Adding such a method to, say,
 # unumpy.matrix, would break the symmetry between NumPy arrays and
 # matrices (no nominal_values() method), and objects defined in this
@@ -54,15 +53,15 @@ __all__ = [
 # nominal_values (i.e. the documentation of its class):
 
 to_nominal_values = numpy.vectorize(
-    uncertainties.nominal_value,
+    uncert_core.nominal_value,
     otypes=[float],  # Because vectorize() has side effects (dtype setting)
-    doc=("Applies uncertainties.nominal_value to the elements of"
-         " a NumPy (or unumpy) array (this includes matrices)."))
+    doc=("Return the nominal value of the numbers with uncertainties contained"
+         " in a NumPy (or unumpy) array (this includes matrices)."))
 
 to_std_devs = numpy.vectorize(
-    uncertainties.std_dev,
+    uncert_core.std_dev,
     otypes=[float],  # Because vectorize() has side effects (dtype setting)
-    doc=("Returns the standard deviation of the numbers with uncertainties"
+    doc=("Return the standard deviation of the numbers with uncertainties"
          " contained in a NumPy array, or zero for other objects."))
 
 def unumpy_to_numpy_matrix(arr):
@@ -78,11 +77,12 @@ def unumpy_to_numpy_matrix(arr):
 
 def nominal_values(arr):
     """
-    Returns the nominal values of the numbers in NumPy array arr.
+    Return the nominal values of the numbers in NumPy array arr.
 
-    Elements that are not uncertainties.AffineScalarFunc are passed
-    through untouched (because a numpy.array can contain numbers with
-    uncertainties and pure floats simultaneously).
+    Elements that are not numbers with uncertainties (derived from a
+    class from this module) are passed through untouched (because a
+    numpy.array can contain numbers with uncertainties and pure floats
+    simultaneously).
 
     If arr is of type unumpy.matrix, the returned array is a
     numpy.matrix, because the resulting matrix does not contain
@@ -93,11 +93,12 @@ def nominal_values(arr):
 
 def std_devs(arr):
     """
-    Returns the standard deviations of the numbers in NumPy array arr.
+    Return the standard deviations of the numbers in NumPy array arr.
 
-    Elements that are not uncertainties.AffineScalarFunc are given a
-    zero uncertainty ((because a numpy.array can contain numbers with
-    uncertainties and pure floats simultaneously)..
+    Elements that are not numbers with uncertainties (derived from a
+    class from this module) are passed through untouched (because a
+    numpy.array can contain numbers with uncertainties and pure floats
+    simultaneously).
 
     If arr is of type unumpy.matrix, the returned array is a
     numpy.matrix, because the resulting matrix does not contain
@@ -111,10 +112,10 @@ def std_devs(arr):
 def derivative(u, var):
     """
     Returns the derivative of u along var, if u is an
-    uncertainties.AffineScalarFunc instance, and if var is one of the
+    uncert_core.AffineScalarFunc instance, and if var is one of the
     variables on which it depends.  Otherwise, return 0.
     """
-    if isinstance(u, uncertainties.AffineScalarFunc):
+    if isinstance(u, uncert_core.AffineScalarFunc):
         try:
             return u.derivatives[var]
         except KeyError:
@@ -128,7 +129,7 @@ def wrap_array_func(func):
     func() is given a NumPy array that contains numbers with
     uncertainties.
 
-    This wrapper is similar to uncertainties.wrap(), except that it
+    This wrapper is similar to uncert_core.wrap(), except that it
     handles an array argument instead of float arguments.
 
     However, the returned function is more restricted: the array
@@ -139,14 +140,14 @@ def wrap_array_func(func):
     and which returns a NumPy array.
     """
 
-    @uncertainties.set_doc("""\
+    @uncert_core.set_doc("""\
     Version of %s(...) that works even when its first argument is a NumPy
     array that contains numbers with uncertainties.
 
     Warning: elements of the first argument array that are not
-    AffineScalarFunc objects must not depend on uncertainties.Variable
+    AffineScalarFunc objects must not depend on uncert_core.Variable
     objects in any way.  Otherwise, the dependence of the result in
-    uncertainties.Variable objects will be incorrect.
+    uncert_core.Variable objects will be incorrect.
 
     Original documentation:
     %s""" % (func.__name__, func.__doc__))
@@ -162,7 +163,7 @@ def wrap_array_func(func):
         variables = set()
         for element in arr.flat:
             # floats, etc. might be present
-            if isinstance(element, uncertainties.AffineScalarFunc):
+            if isinstance(element, uncert_core.AffineScalarFunc):
                 variables |= set(element.derivatives.iterkeys())
 
         # If the matrix has no variables, then the function value can be
@@ -227,17 +228,17 @@ def wrap_array_func(func):
                     derivative_dict[var] = derivative_value
 
         # numbers with uncertainties are built from the result:
-        return numpy.vectorize(uncertainties.AffineScalarFunc)(
+        return numpy.vectorize(uncert_core.AffineScalarFunc)(
             func_nominal_value, derivatives)
 
-    wrapped_func = uncertainties.set_doc("""\
+    wrapped_func = uncert_core.set_doc("""\
     Version of %s(...) that works even when its first argument is a NumPy
     array that contains numbers with uncertainties.
 
     Warning: elements of the first argument array that are not
-    AffineScalarFunc objects must not depend on uncertainties.Variable
+    AffineScalarFunc objects must not depend on uncert_core.Variable
     objects in any way.  Otherwise, the dependence of the result in
-    uncertainties.Variable objects will be incorrect.
+    uncert_core.Variable objects will be incorrect.
 
     Original documentation:
     %s""" % (func.__name__, func.__doc__))(wrapped_func)
@@ -272,10 +273,10 @@ def uarray(nominal_values, std_devs=None):
         (nominal_values, std_devs) = nominal_values
 
     return (numpy.vectorize(
-        # ! Looking up uncertainties.Variable beforehand through
-        # '_Variable = uncertainties.Variable' does not result in a
+        # ! Looking up uncert_core.Variable beforehand through
+        # '_Variable = uncert_core.Variable' does not result in a
         # significant speed up:
-        lambda v, s: uncertainties.Variable(v, s), otypes=[object])
+        lambda v, s: uncert_core.Variable(v, s), otypes=[object])
         (nominal_values, std_devs))
 
 ###############################################################################
@@ -353,7 +354,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         variables = set()
         for element in array_version.flat:
             # floats, etc. might be present
-            if isinstance(element, uncertainties.AffineScalarFunc):
+            if isinstance(element, uncert_core.AffineScalarFunc):
                 variables |= set(element.derivatives.iterkeys())
 
         array_nominal = nominal_values(array_version)
@@ -398,7 +399,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
 
         # An array of numbers with uncertainties are built from the
         # result:
-        result = numpy.vectorize(uncertainties.AffineScalarFunc)(
+        result = numpy.vectorize(uncert_core.AffineScalarFunc)(
             func_nominal_value, derivatives)
 
         # Numpy matrices that contain numbers with uncertainties are
@@ -507,7 +508,7 @@ pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 def pinv(array_like, rcond=pinv_default):
     return pinv_with_uncert(array_like, rcond)
 
-pinv = uncertainties.set_doc("""
+pinv = uncert_core.set_doc("""
     Version of numpy.linalg.pinv that works with array-like objects
     that contain numbers with uncertainties.
 
