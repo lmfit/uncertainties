@@ -17,6 +17,7 @@ import inspect
 # Local modules
 import uncertainties
 
+import uncertainties.core as uncert_core
 from uncertainties.core import to_affine_scalar, AffineScalarFunc
 
 ###############################################################################
@@ -221,10 +222,10 @@ def wrap_locally_cst_func(func):
     here, constant).
     '''
     def wrapped_func(*args, **kwargs):
-        args_float = map(uncertainties.nominal_value, args)
+        args_float = map(uncert_core.nominal_value, args)
         # !! In Python 2.7+, dictionary comprehension: {argname:...}
         kwargs_float = dict(
-            (arg_name, uncertainties.nominal_value(value))
+            (arg_name, uncert_core.nominal_value(value))
             for (arg_name, value) in kwargs.iteritems())
         return func(*args_float, **kwargs_float)
     return wrapped_func
@@ -250,8 +251,8 @@ for name in dir(math):
         # to a NaN result: it is assumed that a mathematical calculation
         # that cannot be calculated indicates a non-defined derivative
         # (the derivatives in fixed_derivatives must be written this way):
-        wrapped_func = uncertainties.wrap(
-            func, map(uncertainties.nan_if_exception, derivatives))
+        wrapped_func = uncert_core.wrap(
+            func, map(uncert_core.nan_if_exception, derivatives))
 
     setattr(this_module, name, wraps(wrapped_func, func))
 
@@ -298,7 +299,7 @@ def wrapped_fsum():
 
     flat_fsum = lambda *args: original_func(args)
 
-    flat_fsum_wrap = uncertainties.wrap(
+    flat_fsum_wrap = uncert_core.wrap(
         flat_fsum, itertools.repeat(lambda *args: 1))
 
     return wraps(lambda arg_list: flat_fsum_wrap(*arg_list),
@@ -315,7 +316,7 @@ def modf(x):
     for regular numbers.
     """
 
-    # The code below is inspired by uncertainties.wrap().  It is
+    # The code below is inspired by uncert_core.wrap().  It is
     # simpler because only 1 argument is given, and there is no
     # delegation to other functions involved (as for __mul__, etc.).
 
@@ -332,16 +333,16 @@ def modf(x):
         # argument: there is no need to return numbers with uncertainties:
         return (frac_part, int_part)
 
-modf = uncertainties.set_doc(math.modf.__doc__)(modf)
+modf = uncert_core.set_doc(math.modf.__doc__)(modf)
 many_scalars_to_scalar_funcs.append('modf')
 
 def ldexp(x, y):
-    # The code below is inspired by uncertainties.wrap().  It is
+    # The code below is inspired by uncert_core.wrap().  It is
     # simpler because only 1 argument is given, and there is no
     # delegation to other functions involved (as for __mul__, etc.).
 
     # Another approach would be to add an additional argument to
-    # uncertainties.wrap() so that some arguments are automatically
+    # uncert_core.wrap() so that some arguments are automatically
     # considered as constants.
 
     aff_func = to_affine_scalar(x)  # y must be an integer, for math.ldexp
@@ -363,7 +364,7 @@ def ldexp(x, y):
         # value of x coerced to a difference type [int->float, for
         # instance]):
         return math.ldexp(x, y)
-ldexp = uncertainties.set_doc(math.ldexp.__doc__)(ldexp)
+ldexp = uncert_core.set_doc(math.ldexp.__doc__)(ldexp)
 
 many_scalars_to_scalar_funcs.append('ldexp')
 
@@ -373,7 +374,7 @@ def frexp(x):
     for regular numbers.
     """
 
-    # The code below is inspired by uncertainties.wrap().  It is
+    # The code below is inspired by uncert_core.wrap().  It is
     # simpler because only 1 argument is given, and there is no
     # delegation to other functions involved (as for __mul__, etc.).
 
@@ -396,7 +397,7 @@ def frexp(x):
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
         return math.frexp(x)
-frexp = uncertainties.set_doc(math.frexp.__doc__)(frexp)
+frexp = uncert_core.set_doc(math.frexp.__doc__)(frexp)
 
 non_std_wrapped_funcs.append('frexp')
 
