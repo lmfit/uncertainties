@@ -19,7 +19,7 @@ import numpy
 from numpy.core import numeric
 
 # Local modules:
-import uncertainties.umath as umath
+import uncertainties.umath_core as umath_core
 import uncertainties.core as uncert_core
 from uncertainties.core import deprecation
 
@@ -579,7 +579,7 @@ def umatrix(nominal_values, std_devs=None):
 
 def define_vectorized_funcs():
     """
-    Defines vectorized versions of functions from uncertainties.umath.
+    Defines vectorized versions of functions from uncertainties.umath_core.
 
     Some functions have their name translated, so as to follow NumPy's
     convention (example: math.acos -> numpy.arccos).
@@ -592,20 +592,21 @@ def define_vectorized_funcs():
         (f_name, 'arc'+f_name[1:])
         for f_name in ['acos', 'acosh', 'asin', 'atan', 'atan2', 'atanh']])
 
-    new_func_names = [func_name_translations.get(function_name, function_name)
-                      # The functions from umath.non_std_wrapped_funcs
-                      # (available from umath) are normally not in
-                      # numpy, so they are not included here:
-                      for function_name in umath.many_scalars_to_scalar_funcs]
+    new_func_names = [
+        func_name_translations.get(function_name, function_name)
+        # The functions from umath_core.non_std_wrapped_funcs
+        # (available from umath) are normally not in
+        # numpy, so they are not included here:
+        for function_name in umath_core.many_scalars_to_scalar_funcs]
 
     for (function_name, unumpy_name) in zip(
-        umath.many_scalars_to_scalar_funcs, new_func_names):
+        umath_core.many_scalars_to_scalar_funcs, new_func_names):
 
         # ! The newly defined functions (uncertainties.unumpy.cos, etc.)
         # do not behave exactly like their NumPy equivalent (numpy.cos,
         # etc.): cos(0) gives an array() and not a
         # numpy.float... (equality tests succeed, though).
-        func = getattr(umath, function_name)
+        func = getattr(umath_core, function_name)
         setattr(
             this_module, unumpy_name,
             numpy.vectorize(func,
