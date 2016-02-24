@@ -222,7 +222,7 @@ This software is released under a dual license.  (1) The BSD license.
 author.'''
 
 from .core import *
-from .core import __all__
+from .core import __all__  # For a correct help(uncertainties)
 
 # Numerical version:
 __version_info__ = (2, 4, 8)

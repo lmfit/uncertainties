@@ -69,11 +69,9 @@ author."""
 
 
 # Local modules:
-from core import *
-from uncertainties.unumpy import core
-from uncertainties.unumpy import ulinalg  # Local sub-module
 
-from uncertainties import __author__
+from .core import *
+from . import ulinalg  # Local sub-module
 
 # __all__ is set so that pydoc shows all important functions:
 __all__ = core.__all__

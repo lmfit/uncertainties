@@ -523,6 +523,28 @@ pinv = uncert_core.set_doc("""
 
 ########## Matrix class
 
+class CallableStdDevs(numpy.matrix):
+    '''
+    Class for standard deviation results, which used to be
+    callable. Provided for compatibility with old code. Issues an
+    obsolescence warning upon call.
+
+    New objects must be created by passing an existing
+    '''
+
+    def __new__(cls, matrix):
+        # The following prevents a copy of the original matrix, which
+        # could be expensive, and is unnecessary (the CallableStdDevs
+        # is just a wrapping around the original matrix, which can be
+        # modified):
+        matrix.__class__ = cls
+        return matrix
+
+    def __call__ (self):
+        deprecation('the std_devs attribute should not be called'
+                    ' anymore: use .std_devs instead of .std_devs().')
+        return self
+
 class matrix(numpy.matrix):
     # The name of this class is the same as NumPy's, which is why it
     # does not follow PEP 8.
@@ -564,7 +586,9 @@ class matrix(numpy.matrix):
     #
     # !!! Furthermore, std_devs() is a function, unlike for UFloats,
     # which is not consistent.
-    std_devs = std_devs
+    @property
+    def std_devs(self):
+        return CallableStdDevs(std_devs(self))
 
 def umatrix(nominal_values, std_devs=None):
     """
