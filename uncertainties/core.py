@@ -1243,8 +1243,10 @@ def format_num(nom_val_main, error_main, common_exp,
             if isnan(nom_val_main):
                 nom_val_str = '\mathrm{%s}' % nom_val_str
             elif isinf(nom_val_main):
-                # !! It is wasteful, in this case to replace
-                # nom_val_str: the control flow could be better?
+                # !! It is wasteful, in this case, to replace
+                # nom_val_str: could this be avoided while avoiding to
+                # duplicate the formula for nom_val_str for the common
+                # case (robust_format(...))?
                 nom_val_str = '%s\infty' % ('-' if nom_val_main < 0 else '')
 
         value_str = nom_val_str+value_end
