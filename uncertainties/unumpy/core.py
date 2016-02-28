@@ -124,19 +124,26 @@ def derivative(u, var):
         return 0.
 
 def wrap_array_func(func):
+    # !!! This function is not used in the code, and is also not
+    # in the user guide: should it be promoted?
+    #
+    # !!! The implementation seems superficially similar to
+    # !!! uncertainties.core.wrap(): is there code/logic duplication
+    # !!! (which should be removed)?
     """
     Return a version of the function func() that works even when
     func() is given a NumPy array that contains numbers with
-    uncertainties.
+    uncertainties, as first argument.
 
-    This wrapper is similar to uncert_core.wrap(), except that it
-    handles an array argument instead of float arguments.
+    This wrapper is similar to uncertainties.core.wrap(), except that
+    it handles an array argument instead of float arguments, and that
+    the result can be an array.
 
     However, the returned function is more restricted: the array
     argument cannot be given as a keyword argument with the name in
     the original function (it is not a drop-in replacement).
 
-    func -- function whose first argument takes a single NumPy array,
+    func -- function whose first argument is a single NumPy array,
     and which returns a NumPy array.
     """
 
