@@ -291,6 +291,16 @@ def test_value_construction():
     except uncert_core.NegativeStdDev:
         pass
 
+    ## Incorrect forms should not raise any deprecation warning, but
+    ## raise an exception:
+
+    try:
+        ufloat(1)  # Form that has never been allowed
+    except:
+        pass
+    else:
+        raise Exception("An exception should be raised")
+
 def test_ufloat_fromstr():
     "Input of numbers with uncertainties as a string"
 

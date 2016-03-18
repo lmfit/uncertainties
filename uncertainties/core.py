@@ -3073,14 +3073,20 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     # uncertainty), and string that cannot be converted through
     # float():
     except (TypeError, ValueError):
-        # Obsolete, two-argument call:
-        deprecation('either use ufloat(nominal_value, std_dev),'
-                    ' ufloat(nominal_value, std_dev, tag), or the'
-                    ' ufloat_fromstr() function, for string representations.')
 
         if tag is not None:
             tag_arg = tag  # tag keyword used:
         else:
             tag_arg = std_dev  # 2 positional arguments form
 
-        return _ufloat_obsolete(nominal_value, tag_arg)
+        try:
+            final_ufloat = _ufloat_obsolete(nominal_value, tag_arg)
+        except:  # The input is incorrect, not obsolete
+            raise
+        else:
+            # Obsolete, two-argument call:
+            deprecation(
+                'either use ufloat(nominal_value, std_dev),'
+                ' ufloat(nominal_value, std_dev, tag), or the'
+                ' ufloat_fromstr() function, for string representations.')
+            return final_ufloat
