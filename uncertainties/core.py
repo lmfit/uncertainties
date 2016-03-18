@@ -3011,7 +3011,7 @@ def ufloat_fromstr(representation, tag=None):
 
     return ufloat(nominal_value, std_dev, tag)
 
-def _ufloat_obsolete(representation, tag=None):
+def ufloat_obsolete(representation, tag=None):
     '''
     Legacy version of ufloat(). Will eventually be removed.
 
@@ -3080,7 +3080,7 @@ def ufloat(nominal_value, std_dev=None, tag=None):
             tag_arg = std_dev  # 2 positional arguments form
 
         try:
-            final_ufloat = _ufloat_obsolete(nominal_value, tag_arg)
+            final_ufloat = ufloat_obsolete(nominal_value, tag_arg)
         except:  # The input is incorrect, not obsolete
             raise
         else:
