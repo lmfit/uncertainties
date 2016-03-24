@@ -2837,7 +2837,7 @@ def parse_error_in_parentheses(representation):
 
     # Do we have a fully explicit uncertainty?
     #
-    # !!! Python 2.7+: in {'nan',...} is faster
+    # !!! Python 2.7+: in {'nan',...} is faster (x10)
     if uncert_dec is not None or uncert in ['nan', 'NAN', 'inf', 'INF']:
         uncert_value = float(uncert)
     else:
