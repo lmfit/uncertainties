@@ -1979,7 +1979,13 @@ def test_format():
             # which no format type is equivalent to "g", for
             # floats. If the better behavior was needed, internal
             # formatting could in principle force the "g" formatting
-            # type when none is given.
+            # type when none is given; however, Python does not
+            # actually fully treat the none format type in the same
+            # was as the "g" format, so this solution cannot be used,
+            # as it would break other formatting behaviors in this
+            # code. It is thus best to mimic the native behavior of
+            # none type formatting (even if it does not look so good
+            # in Python 2.6).
             '020S': '%s(inf)' % format(float("-inf"), "015")
         },
         (-float('nan'), float('inf')): {
