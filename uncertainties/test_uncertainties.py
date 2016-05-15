@@ -1962,14 +1962,17 @@ def test_format():
 
         # More NaN and infinity, in particular with LaTeX and various
         # options:
-        (-float('inf'), float('inf')): {
+        (float('-inf'), float('inf')): {
             'S': '-inf(inf)',
             'LS': '-\infty(\infty)',
             'L': '-\infty \pm \infty',
             'LP': u'-\infty±\infty',
-            # The following is consistent with Python's
-            # "{:020}".format(float("-inf")) ('-0000000000000000inf'):
-            '020S': '-00000000000inf(inf)'
+            # The following is consistent with Python's own
+            # formatting, which depends on the version of Python:
+            # "{:020}".format(float("-inf")) gives
+            # '-0000000000000000inf' with Python 2.7, but
+            # '-00000000000000.0inf' with Python 2.6:
+            '020S': '%s(inf)' % format(float("-inf"), "015")
         },
         (-float('nan'), float('inf')): {
             'S': 'nan(inf)',
