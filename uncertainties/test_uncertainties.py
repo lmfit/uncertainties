@@ -1969,10 +1969,13 @@ def test_format():
             'LP': u'-\infty±\infty',
             # The following is consistent with Python's own
             # formatting, which depends on the version of Python:
-            # "{:020}".format(float("-inf")) gives
+            # formatting float("-inf") with format(..., "020") gives
             # '-0000000000000000inf' with Python 2.7, but
-            # '-00000000000000.0inf' with Python 2.6:
-            '020S': '%015f(inf)' % float("-inf")
+            # '-00000000000000.0inf' with Python 2.6. However, Python
+            # 2.6 gives the better, Python 2.7 form when format()ting
+            # with "020f" instead, so this formatting would be better,
+            # in principle, and similarly for "%020f" % ...
+            '020S': '%s(inf)' % format(float("-inf"), "015")
         },
         (-float('nan'), float('inf')): {
             'S': 'nan(inf)',
