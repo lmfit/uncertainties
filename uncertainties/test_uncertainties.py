@@ -1972,7 +1972,7 @@ def test_format():
             # "{:020}".format(float("-inf")) gives
             # '-0000000000000000inf' with Python 2.7, but
             # '-00000000000000.0inf' with Python 2.6:
-            '020S': '%s(inf)' % format(float("-inf"), "015")
+            '020S': '%015f(inf)' % float("-inf")
         },
         (-float('nan'), float('inf')): {
             'S': 'nan(inf)',
