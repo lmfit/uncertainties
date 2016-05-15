@@ -2019,7 +2019,8 @@ def test_format():
             # Jython 2.5.2 does not always represent NaN as nan or NAN
             # in the CPython way: for example, '%.2g' % float('nan')
             # is '\ufffd'. The test is skipped, in this case:
-            if jython_detected and isnan(value.std_dev):
+            if jython_detected and (
+                    isnan(value.std_dev) or isnan(value.nominal_value)):
                 continue
 
             # Call that works with Python < 2.6 too:
