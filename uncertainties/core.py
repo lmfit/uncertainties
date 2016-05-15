@@ -1875,6 +1875,9 @@ class AffineScalarFunc(object):
             options.add('%')
 
         # At this point, pres_type is in eEfFgG (not None, not %).
+        #
+        # !!! This is contradictory with tests of pres_type handling
+        # "None" separately, below.
 
         ########################################
 
@@ -1889,6 +1892,9 @@ class AffineScalarFunc(object):
 
         # Reference value for the calculation of a possible exponent,
         # if needed:
+        #
+        # !!! Contradictory with "pres_type is in ... (not None,...)"
+        # above:
         if pres_type in (None, 'e', 'E', 'g', 'G'):
             # Reference value for the exponent: the largest value
             # defines what the exponent will be (another convention
