@@ -1973,8 +1973,13 @@ def test_format():
             # '-0000000000000000inf' with Python 2.7, but
             # '-00000000000000.0inf' with Python 2.6. However, Python
             # 2.6 gives the better, Python 2.7 form when format()ting
-            # with "020f" instead, so this formatting would be better,
-            # in principle, and similarly for "%020f" % ...
+            # with "020g" instead, so this formatting would be better,
+            # in principle, and similarly for "%020g" % ... Thus,
+            # Python's format() breaks the official rule according to
+            # which no format type is equivalent to "g", for
+            # floats. If the better behavior was needed, internal
+            # formatting could in principle force the "g" formatting
+            # type when none is given.
             '020S': '%s(inf)' % format(float("-inf"), "015")
         },
         (-float('nan'), float('inf')): {
