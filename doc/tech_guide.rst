@@ -63,14 +63,16 @@ This package calculates the standard deviation of mathematical
 expressions through the linear approximation of `error propagation
 theory`_.
 
-The standard deviations and nominal values calculated by this package
-are thus meaningful approximations as long as the final calculated
-functions have **precise linear expansions in the region where the
-probability distribution of their variables is the
-largest**. Mathematically, this means that the linear terms of the
-final calculated functions around the nominal values of their
-variables should be much larger than the remaining higher-order terms
-over the region of significant probability.
+The standard deviations and nominal values calculated by this package 
+are thus meaningful approximations as long as **uncertainties are 
+small**. A more precise version of this constraint is that the final 
+calculated functions must have **precise linear expansions in the region 
+where the probability distribution of their variables is the largest**. 
+Mathematically, this means that the linear terms of the final calculated 
+functions around the nominal values of their variables should be much 
+larger than the remaining higher-order terms over the region of 
+significant probability (because such higher-order contributions are 
+neglected).
 
 For example, calculating ``x*10`` with :data:`x` = 5±3 gives a
 *perfect result* since the calculated function is linear. So does
