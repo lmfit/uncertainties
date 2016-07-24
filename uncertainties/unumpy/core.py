@@ -646,24 +646,36 @@ def define_vectorized_funcs():
         # etc.): cos(0) gives an array() and not a
         # numpy.float... (equality tests succeed, though).
         func = getattr(umath_core, function_name)
+
+
+        # Data type of the result of the unumpy function:
+        otypes = (
+            # It is much more convenient to preserve the type of
+            # functions that return a number without
+            # uncertainty. Thus, for example, unumpy.isnan() can
+            # return an array with a boolean data type (instead of
+            # object), which allows the result to be used with NumPy's
+            # boolean indexing.
+            {} if function_name in umath_core.locally_cst_funcs
+            # If by any chance a function returns, in a particular
+            # case, an integer instead of a number with uncertainty,
+            # side-effects in vectorize() would fix the resulting
+            # dtype to integer, which is not what is wanted (as
+            # vectorize(), at least in NumPy around 2010 maybe,
+            # decided about the output data type by looking at the
+            # type of first element only).
+            else {'otypes': [object]})
+
         setattr(
             this_module, unumpy_name,
             numpy.vectorize(func,
-                            # If by any chance a function returns, in
-                            # a particular case, an integer,
-                            # side-effects in vectorize() would fix
-                            # the resulting dtype to integer, which is
-                            # not what is wanted (as vectorize(), at
-                            # least in NumPy around 2010 maybe,
-                            # decided about the output data type by
-                            # looking at the type of first element
-                            # only):
-                            otypes=[object],
                             doc="""\
 Vectorized version of umath.%s.
 
 Original documentation:
-%s""" % (function_name, func.__doc__)))
+%s""" % (function_name, func.__doc__),
+                            **otypes))
+
 
         __all__.append(unumpy_name)
 
