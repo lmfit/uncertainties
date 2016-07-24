@@ -252,6 +252,7 @@ for name in dir(math):
         wrapped_func = uncert_core.wrap(
             func, map(uncert_core.nan_if_exception, derivatives))
 
+    # !! The same effect could be achieved with globals()[...] = ...
     setattr(this_module, name, wraps(wrapped_func, func))
 
     many_scalars_to_scalar_funcs.append(name)
