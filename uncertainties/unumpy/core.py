@@ -649,11 +649,15 @@ def define_vectorized_funcs():
         setattr(
             this_module, unumpy_name,
             numpy.vectorize(func,
-                            # If by any chance a function returns,
-                            # in a particular case, an integer,
-                            # side-effects in vectorize() would
-                            # fix the resulting dtype to integer,
-                            # which is not what is wanted:
+                            # If by any chance a function returns, in
+                            # a particular case, an integer,
+                            # side-effects in vectorize() would fix
+                            # the resulting dtype to integer, which is
+                            # not what is wanted (as vectorize(), at
+                            # least in NumPy around 2010 maybe,
+                            # decided about the output data type by
+                            # looking at the type of first element
+                            # only):
                             otypes=[object],
                             doc="""\
 Vectorized version of umath.%s.
