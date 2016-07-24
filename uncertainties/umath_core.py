@@ -63,7 +63,9 @@ num_deriv_funcs = ['fmod', 'gamma', 'lgamma']
 # in their value: their value is locally constant due to the nature of
 # the function (0 derivative). This situation is similar to that of
 # comparisons (==, >, etc.).
-locally_cst_funcs = ['ceil', 'floor', 'isinf', 'isnan', 'trunc']
+#
+# !! Python 2.7+: {..., ...}
+locally_cst_funcs = set(['ceil', 'floor', 'isinf', 'isnan', 'trunc'])
 
 # Functions that do not belong in many_scalars_to_scalar_funcs, but
 # that have a version that handles uncertainties. These functions are
