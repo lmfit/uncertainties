@@ -635,7 +635,7 @@ def define_vectorized_funcs():
         func_name_translations.get(function_name, function_name)
         # The functions from umath_core.non_std_wrapped_funcs
         # (available from umath) are normally not in
-        # numpy, so they are not included here:
+        # NumPy, so they are not included here:
         for function_name in umath_core.many_scalars_to_scalar_funcs]
 
     for (function_name, unumpy_name) in zip(
