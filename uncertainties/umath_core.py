@@ -53,7 +53,9 @@ many_scalars_to_scalar_funcs = []
 # no_std_wrapping = ['modf', 'frexp', 'ldexp', 'fsum', 'factorial']
 
 # Functions with numerical derivatives:
-num_deriv_funcs = ['fmod', 'gamma', 'lgamma']
+#
+# !! Python2.7+: {..., ...}
+num_deriv_funcs = set(['fmod', 'gamma', 'lgamma'])
 
 # Functions are by definition locally constant (on real
 # numbers): their value does not depend on the uncertainty (because
