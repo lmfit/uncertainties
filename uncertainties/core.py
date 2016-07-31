@@ -681,7 +681,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
         # of f that have a number with uncertainty.
 
         # Mappings of each relevant argument reference (numerical
-        # index in args, or name in kwargs to the value of the
+        # index in args, or name in kwargs) to the value of the
         # corresponding partial derivative of f (only for those
         # arguments that contain a number with uncertainty).
 
