@@ -1654,6 +1654,8 @@ class AffineScalarFunc(object):
             # variable obviously leads to no uncertainty in the
             # functions that depend on it.
             if variable._std_dev == 0:
+                # !!! Shouldn't the errors always be floats, as a
+                # convention of this module?
                 error_components[variable] = 0
             else:
                 error_components[variable] = abs(derivative*variable._std_dev)
