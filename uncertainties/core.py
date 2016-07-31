@@ -1500,7 +1500,7 @@ class AffineScalarFunc(object):
     """
 
     # To save memory in large arrays:
-    __slots__ = ('_nominal_value', 'derivatives')
+    __slots__ = ('_nominal_value', '_local_derivatives')  # !!!!!!! add for real
 
     # !! Fix for mean() in NumPy 1.8.0:
     class dtype(object):
@@ -1539,7 +1539,7 @@ class AffineScalarFunc(object):
         # be possible.
 
         self._nominal_value = float(nominal_value)
-        self.derivatives = derivatives
+        self._local_derivatives = local_derivatives
 
     # The following prevents the 'nominal_value' attribute from being
     # modified by the user:
@@ -1553,6 +1553,12 @@ class AffineScalarFunc(object):
 
     ############################################################
 
+    @property
+    def derivatives(self):
+        # !!!!!!! Calculate derivatives from self._local_derivatives
+        # !!!!!!! Cache the result
+
+    ############################################################
 
     ### Operators: operators applied to AffineScalarFunc and/or
     ### float-like objects only are supported.  This is why methods
