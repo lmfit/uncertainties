@@ -1675,8 +1675,8 @@ class AffineScalarFunc(object):
         #std_dev value (in fact, many intermediate AffineScalarFunc do
         #not need to have their std_dev calculated: only the final
         #AffineScalarFunc returned to the user does).
-        return CallableStdDev(sqrt(sum([
-            delta**2 for delta in self.error_components().itervalues()])))
+        return CallableStdDev(sqrt(sum(
+            delta**2 for delta in self.error_components().itervalues())))
 
     # Abbreviation (for formulas, etc.):
     s = std_dev
