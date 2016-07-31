@@ -174,6 +174,8 @@ else:
 
         # Representation of the initial correlated values:
         values_funcs = tuple(
+            # !!!!!!! Update for the new _local_derivatives in
+            # AffineScalarFunc:
             AffineScalarFunc(value, dict(zip(variables, coords)))
             for (coords, value) in zip(transform, nom_values))
 
@@ -740,6 +742,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
 
         # The function now returns an AffineScalarFunc object:
+        # !!!!! The call should be updated for the new _local_derivatives
         return AffineScalarFunc(f_nominal_value, derivatives_wrt_vars)
 
     f_with_affine_output = set_doc("""\
@@ -2216,7 +2219,7 @@ class AffineScalarFunc(object):
         return AffineScalarFunc(
             self._nominal_value,
             dict([(copy.deepcopy(var), deriv)
-                  for (var, deriv) in self.derivatives.iteritems()]))
+                  for (var, deriv) in self._local_derivatives.iteritems()]))
 
     def __getstate__(self):
         """
