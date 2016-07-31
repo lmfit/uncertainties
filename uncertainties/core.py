@@ -710,15 +710,24 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
                 *args_values, **kwargs)
 
         ########################################
-        # Calculation of the derivative of f with respect to all the
-        # variables (Variable objects) involved.
 
-        # Involved variables (Variable objects):
+        # !!!!!!!! Part of the code below should be moved to the new
+        # .derivatives attribute.
+
+        # Calculation of the derivatives of f with respect to each
+        # argument with uncertainty:
+
+        # Linear part of the function value, defined by (coefficient,
+        # argument) pairs, where 'argument' is an AffineScalarFunc:
+        # !!!!!!!!!
         variables = set()
 
         for expr in itertools.chain(
             (args[index] for index in pos_w_uncert),  # From args
             kwargs_uncert_values.itervalues()):  # From kwargs
+
+            # !!!!!!! This is where the ._linear_part is created
+
 
             # !! In Python 2.7+: |= expr.derivatives.viewkeys()
             variables |= set(expr.derivatives)
