@@ -931,6 +931,9 @@ class CallableStdDev(float):
     obsolescence warning upon call.
     '''
 
+    # This class is a float. It must be set to the standard deviation
+    # upon construction.
+
     def __call__ (self):
         deprecation('the std_dev attribute should not be called'
                     ' anymore: use .std_dev instead of .std_dev().')
