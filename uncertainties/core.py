@@ -2218,8 +2218,8 @@ class AffineScalarFunc(object):
         """
         return AffineScalarFunc(
             self._nominal_value,
-            dict([(copy.deepcopy(var), coef)
-                  for (var, coef) in self._linear_part.iteritems()]))
+            dict([(copy.deepcopy(expr), coef)
+                  for (expr, coef) in self._linear_part.iteritems()]))
 
     def __getstate__(self):
         """
