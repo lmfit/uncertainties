@@ -644,7 +644,8 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
         # values with uncertainty are modified:
 
         # The original values with uncertainties are needed: they are
-        # saved in the following dictionary:
+        # saved in the following dictionary (which only contains
+        # values with uncertainty):
 
         kwargs_uncert_values = {}
 
@@ -722,6 +723,8 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
         # !!!!!!!!!
         variables = set()
 
+        # Iteration over all the arguments that have an uncertainty
+        # (AffineScalarFunc):
         for expr in itertools.chain(
             (args[index] for index in pos_w_uncert),  # From args
             kwargs_uncert_values.itervalues()):  # From kwargs
