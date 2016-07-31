@@ -671,7 +671,6 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
         # stability than numerically calculating the partial
         # derivatives through '[f(x + dx, y + dy, ...) -
         # f(x,y,...)]/da' where dx, dy,... are calculated by varying
-
         # 'a' by 'da'.  In fact, this allows the program to control
         # how big the dx, dy, etc. are, which is numerically more
         # precise.
