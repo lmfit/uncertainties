@@ -1649,8 +1649,10 @@ class AffineScalarFunc(object):
 
             # Individual standard error due to variable:
 
-            # 0 is returned even for a NaN derivative, since an
-            # exact number has a 0 uncertainty:
+            # 0 is returned even for a NaN derivative (in this case no
+            # multiplication by the derivative is performed): an exact
+            # variable obviously leads to no uncertainty in the
+            # functions that depend on it.
             if variable._std_dev == 0:
                 error_components[variable] = 0
             else:
