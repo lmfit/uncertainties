@@ -606,12 +606,13 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
         # The arguments that contain an uncertainty (AffineScalarFunc
         # objects) are gathered, as positions or names; they will be
-        # replaced by simple floats.
+        # replaced by their nominal value in order to calculate
+        # the necessary derivatives of f.
 
         pos_w_uncert = [index for (index, value) in enumerate(args)
                         if isinstance(value, AffineScalarFunc)]
-        names_w_uncert = set(key for (key, value) in kwargs.iteritems()
-                             if isinstance(value, AffineScalarFunc))
+        names_w_uncert = [key for (key, value) in kwargs.iteritems()
+                          if isinstance(value, AffineScalarFunc)]
 
         ########################################
         # Value of f() at the nominal value of the arguments with
@@ -669,32 +670,19 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
         ########################################
 
-        # The chain rule will be applied.  In the case of numerical
-        # derivatives, this method gives a better-controlled numerical
-        # stability than numerically calculating the partial
-        # derivatives through '[f(x + dx, y + dy, ...) -
-        # f(x,y,...)]/da' where dx, dy,... are calculated by varying
-        # 'a' by 'da'.  In fact, this allows the program to control
-        # how big the dx, dy, etc. are, which is numerically more
-        # precise.
-
-        ########################################
-
-        # Calculation of the derivatives with respect to the variables
-        # of f that have a number with uncertainty.
-
-        # Mappings of each relevant argument reference (numerical
-        # index in args, or name in kwargs) to the value of the
-        # corresponding partial derivative of f (only for those
-        # arguments that contain a number with uncertainty).
-
-        derivatives_num_args = {}
+        # Calculation of the linear part of the function value,
+        # defined by (coefficient, argument) pairs, where 'argument'
+        # is an AffineScalarFunc (for all AffineScalarFunc found as
+        # argument of f):
+        linear_part = []
 
         for pos in pos_w_uncert:
-            derivatives_num_args[pos] = derivatives_args_index[pos](
-                *args_values, **kwargs)
+            linear_part.append((
+                # Coefficient:
+                derivatives_args_index[pos](*args_values, **kwargs),
+                # AffineScalarFunc expression:
+                args[pos]))
 
-        derivatives_num_kwargs = {}
         for name in names_w_uncert:
 
             # Optimization: caching of the automatic numerical
@@ -707,54 +695,15 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
                 # Derivative never needed before:
                 partial_derivative(f, name))
 
-            derivatives_num_kwargs[name] = derivative(
-                *args_values, **kwargs)
+            linear_part.append((
+                # Coefficient:
+                derivative(*args_values, **kwargs),
+                # AffineScalarFunc expression:
+                (kwargs_uncert_values[name])))
 
-        ########################################
-
-        # !!!!!!!! Part of the code below should be moved to the new
-        # .derivatives attribute.
-
-        # Calculation of the derivatives of f with respect to each
-        # argument with uncertainty:
-
-        # Linear part of the function value, defined by (coefficient,
-        # argument) pairs, where 'argument' is an AffineScalarFunc:
-        # !!!!!!!!!
-        variables = set()
-
-        # Iteration over all the arguments that have an uncertainty
-        # (AffineScalarFunc):
-        for expr in itertools.chain(
-            (args[index] for index in pos_w_uncert),  # From args
-            kwargs_uncert_values.itervalues()):  # From kwargs
-
-            # !!!!!!! This is where the ._linear_part is created
-
-
-            # !! In Python 2.7+: |= expr.derivatives.viewkeys()
-            variables |= set(expr.derivatives)
-
-        # Initial value for the chain rule (is updated below):
-        # !! In Python 2.7+: dictionary comprehension
-        derivatives_wrt_vars = dict((var, 0.) for var in variables)
-
-        ## The chain rule is used...
-
-        # ... on args:
-        for (pos, f_derivative) in derivatives_num_args.iteritems():
-            for (var, arg_derivative) in args[pos].derivatives.iteritems():
-                derivatives_wrt_vars[var] += f_derivative * arg_derivative
-        # ... on kwargs:
-        for (name, f_derivative) in derivatives_num_kwargs.iteritems():
-            for (var, arg_derivative) in (kwargs_uncert_values[name]
-                                          .derivatives.iteritems()):
-                derivatives_wrt_vars[var] += f_derivative * arg_derivative
-
-
-        # The function now returns an AffineScalarFunc object:
-        # !!!!! The call should be updated for the new _linear_part
-        return AffineScalarFunc(f_nominal_value, derivatives_wrt_vars)
+        # The function now returns the necessary linear approximation
+        # to the function:
+        return AffineScalarFunc(f_nominal_value, linear_part)
 
     f_with_affine_output = set_doc("""\
     Version of %s(...) that returns an affine approximation
@@ -776,6 +725,58 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     f_with_affine_output.name = f.__name__
 
     return f_with_affine_output
+
+"""
+!!!!!!!! Chain rule. Will be updated and included somewhere else
+
+        ########################################
+
+        # !!!!!!!! Part of the code below should be moved to the new
+        # .derivatives attribute.
+
+        # Calculation of the derivatives of f with respect to each
+        # argument with uncertainty:
+
+
+        # Iteration over all the arguments that have an uncertainty
+        # (AffineScalarFunc):
+        for expr in itertools.chain(
+            (args[index] for index in pos_w_uncert),  # From args
+            kwargs_uncert_values.itervalues()):  # From kwargs
+
+            # !!!!!!! This is where the .linear_part is created
+            linear_part.append(
+                (,
+                 expr)]
+
+
+            # !! In Python 2.7+: |= expr.derivatives.viewkeys()
+            variables |= set(expr.derivatives)
+
+        # Initial value for the chain rule (is updated below):
+        # !! In Python 2.7+: dictionary comprehension
+        derivatives_wrt_vars = dict((var, 0.) for var in variables)
+
+        # The chain rule is used... In the case of numerical
+        # derivatives, this method gives a better-controlled numerical
+        # stability than numerically calculating the partial
+        # derivatives through '[f(x + dx, y + dy, ...) -
+        # f(x,y,...)]/da' where dx, dy,... are calculated by varying
+        # 'a' by 'da'.  In fact, this allows the program to control
+        # how big the dx, dy, etc. are, which is numerically more
+        # precise.
+
+
+        # ... on args:
+        for (pos, f_derivative) in derivatives_num_args.iteritems():
+            for (var, arg_derivative) in args[pos].derivatives.iteritems():
+                derivatives_wrt_vars[var] += f_derivative * arg_derivative
+        # ... on kwargs:
+        for (name, f_derivative) in derivatives_num_kwargs.iteritems():
+            for (var, arg_derivative) in (kwargs_uncert_values[name]
+                                          .derivatives.iteritems()):
+                derivatives_wrt_vars[var] += f_derivative * arg_derivative
+"""
 
 def force_aff_func_args(func):
     """
@@ -1527,20 +1528,20 @@ class AffineScalarFunc(object):
     # operator.__*__ functions (while taking care of properly handling
     # reverse operations: __radd__, etc.).
 
-    def __init__(self, nominal_value, derivatives):
+    def __init__(self, nominal_value, linear_part):
         """
-        nominal_value -- value of the function at the origin.
-        nominal_value must not depend in any way of the Variable
-        objects in 'derivatives' (the value at the origin of the
-        function being defined is a constant).
+        nominal_value -- value of the function when the linear part is
+        zero.
 
-        derivatives -- maps each Variable object on which the function
-        being defined depends to the value of the derivative with
-        respect to that variable, taken at the nominal value of all
-        variables.
-
-        Warning: the above constraint is not checked, and the user is
-        responsible for complying with it.
+        linear_part -- sequence of (coefficient, AffineScalarFunc)
+        pairs that describe the factor to be applied to the linear
+        part of the AffineScalarFunc in order to obtain the linear
+        terms of the new AffineScalarFunc. For instance, a value of
+        [(a, g), (b,h)] means that f = f_nominal + a*g_linear +
+        b*h_linear, where g = g_nominal + g_linear, with, e.g.,
+        g_linear = t*x + u*y. Thus, f(x,y,...) = f_nominal + a*t*x +
+        ... In practice, this allows the chain rule to be applied: a =
+        df/dg, and t = dg/dx, etc.
         """
 
         # Defines the value at the origin:
@@ -1569,6 +1570,17 @@ class AffineScalarFunc(object):
 
     @property
     def derivatives(self):
+        """
+        # !!!!!!!! Update
+        derivatives -- maps each Variable object on which the function
+        being defined depends to the value of the derivative with
+        respect to that variable, taken at the nominal value of all
+        variables.
+
+
+        Warning: the above constraint is not checked, and the user is
+        responsible for complying with it.
+        """
         # !!!!!!! Calculate derivatives from self._linear_part
         # !!!!!!! Cache the result
 
@@ -2611,7 +2623,7 @@ class Variable(AffineScalarFunc):
         # takes much more memory.  Thus, this implementation chooses
         # more cycles and a smaller memory footprint instead of no
         # cycles and a larger memory footprint.
-        super(Variable, self).__init__(value, {})
+        super(Variable, self).__init__(value, [])
 
         self.std_dev = std_dev  # Assignment through a Python property
 
