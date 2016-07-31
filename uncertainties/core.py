@@ -174,7 +174,7 @@ else:
 
         # Representation of the initial correlated values:
         values_funcs = tuple(
-            # !!!!!!! Update for the new _local_derivatives in
+            # !!!!!!! Update for the new _linear_part in
             # AffineScalarFunc:
             AffineScalarFunc(value, dict(zip(variables, coords)))
             for (coords, value) in zip(transform, nom_values))
@@ -742,7 +742,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
 
         # The function now returns an AffineScalarFunc object:
-        # !!!!! The call should be updated for the new _local_derivatives
+        # !!!!! The call should be updated for the new _linear_part
         return AffineScalarFunc(f_nominal_value, derivatives_wrt_vars)
 
     f_with_affine_output = set_doc("""\
@@ -1503,7 +1503,7 @@ class AffineScalarFunc(object):
     """
 
     # To save memory in large arrays:
-    __slots__ = ('_nominal_value', '_local_derivatives')  # !!!!!!! add for real
+    __slots__ = ('_nominal_value', '_linear_part')  # !!!!!!! add for real
 
     # !! Fix for mean() in NumPy 1.8.0:
     class dtype(object):
@@ -1542,7 +1542,7 @@ class AffineScalarFunc(object):
         # be possible.
 
         self._nominal_value = float(nominal_value)
-        self._local_derivatives = local_derivatives
+        self._linear_part = linear_part
 
     # The following prevents the 'nominal_value' attribute from being
     # modified by the user:
@@ -1558,7 +1558,7 @@ class AffineScalarFunc(object):
 
     @property
     def derivatives(self):
-        # !!!!!!! Calculate derivatives from self._local_derivatives
+        # !!!!!!! Calculate derivatives from self._linear_part
         # !!!!!!! Cache the result
 
     ############################################################
@@ -2218,8 +2218,8 @@ class AffineScalarFunc(object):
         """
         return AffineScalarFunc(
             self._nominal_value,
-            dict([(copy.deepcopy(var), deriv)
-                  for (var, deriv) in self._local_derivatives.iteritems()]))
+            dict([(copy.deepcopy(var), coef)
+                  for (var, coef) in self._linear_part.iteritems()]))
 
     def __getstate__(self):
         """
@@ -2600,7 +2600,7 @@ class Variable(AffineScalarFunc):
         # takes much more memory.  Thus, this implementation chooses
         # more cycles and a smaller memory footprint instead of no
         # cycles and a larger memory footprint.
-        super(Variable, self).__init__(value, {self: 1.})
+        super(Variable, self).__init__(value, {})
 
         self.std_dev = std_dev  # Assignment through a Python property
 
@@ -2654,6 +2654,9 @@ class Variable(AffineScalarFunc):
         """
         Hook for the standard copy module.
         """
+
+        # !!!!!! The comment below might not be valid anymore now that
+        # Variables do not contain derivatives anymore.
 
         # This copy implicitly takes care of the reference of the
         # variable to itself (in self.derivatives): the new Variable
