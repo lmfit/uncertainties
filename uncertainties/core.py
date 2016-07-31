@@ -1482,7 +1482,7 @@ class AffineScalarFunc(object):
     - nominal_value, std_dev: value at the origin / nominal value, and
       standard deviation.  The standard deviation can be NaN or infinity.
 
-    - n, s: abbreviations for nominal_value and std_dev.xvv
+    - n, s: abbreviations for nominal_value and std_dev.
 
     - error_components(): error_components()[x] is the error due to
       Variable x.
@@ -1500,7 +1500,7 @@ class AffineScalarFunc(object):
     """
 
     # To save memory in large arrays:
-    __slots__ = ('_nominal_value', 'local_derivatives')
+    __slots__ = ('_nominal_value', 'derivatives')
 
     # !! Fix for mean() in NumPy 1.8.0:
     class dtype(object):
