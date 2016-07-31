@@ -1470,8 +1470,6 @@ class AffineScalarFunc(object):
     (addition, etc.).  Such functions can for instance be used for
     representing the local (linear) behavior of any function.
 
-    This class is mostly meant to be used internally.
-
     This class can also be used to represent constants.
 
     The variables of affine scalar functions are Variable objects.
