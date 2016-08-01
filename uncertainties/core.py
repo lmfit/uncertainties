@@ -726,57 +726,6 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
     return f_with_affine_output
 
-"""
-!!!!!!!! Chain rule. Will be updated and included somewhere else
-
-        ########################################
-
-        # !!!!!!!! Part of the code below should be moved to the new
-        # .derivatives attribute.
-
-        # Calculation of the derivatives of f with respect to each
-        # argument with uncertainty:
-
-
-        # Iteration over all the arguments that have an uncertainty
-        # (AffineScalarFunc):
-        for expr in itertools.chain(
-            (args[index] for index in pos_w_uncert),  # From args
-            kwargs_uncert_values.itervalues()):  # From kwargs
-
-            # !!!!!!! This is where the .linear_part is created
-            linear_part.append(
-                (,
-                 expr)]
-
-
-            # !! In Python 2.7+: |= expr.derivatives.viewkeys()
-            variables |= set(expr.derivatives)
-
-        # Initial value for the chain rule (is updated below):
-        # !! In Python 2.7+: dictionary comprehension
-        derivatives_wrt_vars = dict((var, 0.) for var in variables)
-
-        # The chain rule is used... In the case of numerical
-        # derivatives, this method gives a better-controlled numerical
-        # stability than numerically calculating the partial
-        # derivatives through '[f(x + dx, y + dy, ...) -
-        # f(x,y,...)]/da' where dx, dy,... are calculated by varying
-        # 'a' by 'da'.  In fact, this allows the program to control
-        # how big the dx, dy, etc. are, which is numerically more
-        # precise.
-
-
-        # ... on args:
-        for (pos, f_derivative) in derivatives_num_args.iteritems():
-            for (var, arg_derivative) in args[pos].derivatives.iteritems():
-                derivatives_wrt_vars[var] += f_derivative * arg_derivative
-        # ... on kwargs:
-        for (name, f_derivative) in derivatives_num_kwargs.iteritems():
-            for (var, arg_derivative) in (kwargs_uncert_values[name]
-                                          .derivatives.iteritems()):
-                derivatives_wrt_vars[var] += f_derivative * arg_derivative
-"""
 
 def force_aff_func_args(func):
     """
@@ -1577,24 +1526,41 @@ class AffineScalarFunc(object):
         (self) depends to the value of the derivative with respect to
         that variable.
 
+        This mapping should not be modified.
+
         Derivative values are always floats.
 
-        This mapping is cached in self.derivatives (which replaces
-        this method).
+        This mapping is cached, for subsequent calls.
         """
 
-        derivatives = self._factored_derivatives(1.)
-        self.derivatives = #!!!!!!!!!!!
+        # Most of the time, the derivatives have not yet been
+        # calculated (because they are rarely cached, so that the
+        # asymptotic memory (and time!) consumption is limited. As a
+        # consequence, try return self._derivatives_cached
+        # except... is not used, as it is slower when an exception is
+        # raised (which would be the most common case).
 
-        # !!!!!!! Cache the result
+        if hasattr(self, '_derivatives_cached'):
+            return self._derivatives_cached
+
+        derivatives = self._factored_derivatives(1.)
+
+        self._derivatives_cached = derivatives
+
+        return derivatives
+
 
     def _factored_derivatives(self, factor):
         """
-        Like derivatives(), but multiplies all the derivatives by the
-        given factor (this is an efficient operation) and does not
-        cache the result (which limits the memory footprint and
-        therefore the asymptotic calculation time, as creating new
-        structures in memory takes time).
+        Like derivatives(), but:
+
+        - Multiplies all the derivatives by the given factor (this is
+        an efficient operation) and does not cache the result (which
+        limits the memory footprint and therefore the asymptotic
+        calculation time, as creating new structures in memory takes
+        time).
+
+        - The returned mapping can be updated.
         """
 
         # The term for each _linear_part is first collected (as a
@@ -1608,9 +1574,62 @@ class AffineScalarFunc(object):
             terms.append(expression._factored_derivatives(factor*local_factor))
 
         # !!!!!!! Calculate derivatives from terms by summing
-        # Variables in more than one term.
+        # the factors of Variables in more than one term.
 
         #!!!!!!!!!!!!!
+
+"""
+!!!!!!!! Chain rule. Will be updated and included somewhere else
+
+        ########################################
+
+        # !!!!!!!! Part of the code below should be moved to the new
+        # .derivatives attribute.
+
+        # Calculation of the derivatives of f with respect to each
+        # argument with uncertainty:
+
+
+        # Iteration over all the arguments that have an uncertainty
+        # (AffineScalarFunc):
+        for expr in itertools.chain(
+            (args[index] for index in pos_w_uncert),  # From args
+            kwargs_uncert_values.itervalues()):  # From kwargs
+
+            # !!!!!!! This is where the .linear_part is created
+            linear_part.append(
+                (,
+                 expr)]
+
+
+            # !! In Python 2.7+: |= expr.derivatives.viewkeys()
+            variables |= set(expr.derivatives)
+
+        # Initial value for the chain rule (is updated below):
+        # !! In Python 2.7+: dictionary comprehension
+        derivatives_wrt_vars = dict((var, 0.) for var in variables)
+
+        # The chain rule is used... In the case of numerical
+        # derivatives, this method gives a better-controlled numerical
+        # stability than numerically calculating the partial
+        # derivatives through '[f(x + dx, y + dy, ...) -
+        # f(x,y,...)]/da' where dx, dy,... are calculated by varying
+        # 'a' by 'da'.  In fact, this allows the program to control
+        # how big the dx, dy, etc. are, which is numerically more
+        # precise.
+
+
+        # ... on args:
+        for (pos, f_derivative) in derivatives_num_args.iteritems():
+            for (var, arg_derivative) in args[pos].derivatives.iteritems():
+                derivatives_wrt_vars[var] += f_derivative * arg_derivative
+        # ... on kwargs:
+        for (name, f_derivative) in derivatives_num_kwargs.iteritems():
+            for (var, arg_derivative) in (kwargs_uncert_values[name]
+                                          .derivatives.iteritems()):
+                derivatives_wrt_vars[var] += f_derivative * arg_derivative
+"""
+
 
     ############################################################
 
