@@ -2657,6 +2657,11 @@ class Variable(AffineScalarFunc):
 
         self.tag = tag
 
+    # Same semantics as the parent class:
+    @set_doc(AffineScalarFunc._factored_derivatives.__doc__)
+    def _factored_derivatives(self, factor):
+        return {self: factor}
+
     @property
     def std_dev(self):
         return self._std_dev
