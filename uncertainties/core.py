@@ -1558,10 +1558,10 @@ class AffineScalarFunc(object):
 
     # The following prevents the 'nominal_value' attribute from being
     # modified by the user:
+    @property
     def nominal_value(self):
         "Nominal value of the random number."
         return self._nominal_value
-    nominal_value = property(nominal_value)
 
     # Abbreviation (for formulas, etc.):
     n = nominal_value
