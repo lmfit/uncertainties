@@ -2,7 +2,7 @@
 
 # This script must be run before packaging (python setup.py sdist upload).
 
-# WARNING: this script erases any uncertainties-py23 and uncertainties-py26
+# WARNING: this script erases any uncertainties-py23 and uncertainties-py27
 # found in the current directory.
 
 ## Only committed versions are packaged, to help with debugging published code:
@@ -16,13 +16,13 @@ git merge release
 # Default branch for working on the code:
 git checkout release
 
-## Getting the Python 2.6+ version:
+## Getting the Python 2.7+ version:
 
-rm -rf uncertainties-py26 && \
+rm -rf uncertainties-py27 && \
 git archive --output /tmp/u.tar master uncertainties && \
 tar -C /tmp -xf /tmp/u.tar && \
-mv /tmp/uncertainties uncertainties-py26 && \
-echo "Python 2.6+ version imported"
+mv /tmp/uncertainties uncertainties-py27 && \
+echo "Python 2.7+ version imported"
 
 ## Getting the Python 2.3 version:
 
