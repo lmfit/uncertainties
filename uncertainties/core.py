@@ -81,22 +81,6 @@ CONSTANT_TYPES = FLOAT_LIKE_TYPES+(complex,)
 
 ###############################################################################
 
-
-# !! The function keyview() dfined here exists only as an
-# optimization, for Python 2.7+:
-
-if sys.version_info >= (2, 7):
-    keyview = lambda dict_obj: dict_obj.viewkeys()
-else:
-    keyview = lambda dict_obj: set(dict_obj.keys())
-
-keyview = set_doc(
-    """
-    Return the keys of the given dictionary, with a type that supports the
-    intersection (&) operator.
-    """)(keyview)
-
-###############################################################################
 # Utility for issuing deprecation warnings
 
 def deprecation(message):
@@ -1480,7 +1464,13 @@ class AffineScalarFunc(object):
     """
 
     # To save memory in large arrays:
-    __slots__ = ('_nominal_value', '_linear_part')
+    #
+    # !!! To save more memory, the _linear_part and
+    # _derivatives_cached could be merged (as the _linear_part is not
+    # needed anymore when _derivatives_cached is calculated). Checking
+    # what the merged attribute contains could be implemented via type
+    # checking (including with a custom class for each kind of data):
+    __slots__ = ('_nominal_value', '_linear_part', '_derivatives_cached')
 
     # !! Fix for mean() in NumPy 1.8.0:
     class dtype(object):
@@ -1588,77 +1578,35 @@ class AffineScalarFunc(object):
         # collected later (their coefficients will be summed).
         terms = []
         for (local_factor, expression) in self._linear_part:
+            # Part of the chain rule is effectively applied here:
+            # df/dx * dx/dt:
             terms.append(expression._factored_derivatives(factor*local_factor))
 
         # The final mapping of derivatives is built by updating one of
         # the terms. In order to minimize copies, the largest term is
         # the one which is updated (this is only a heuristics):
-        result = max(terms, key=len)
+        derivatives = max(terms, key=len)
 
+        # The factors of Variables in all the terms are summed together:
         for term in terms:
 
-            if term is result:
+            if term is derivatives:  # Initial term (which is being updated)
                 continue
 
-            common_vars = keyview(result) & keyview(term)
+            # Common variables between 'derivatives' and 'term'
+            # require a special update, as their coefficients must be
+            # summed together:
+            common_vars = derivatives.viewkeys() & term.viewkeys()
+            prev_derivatives = {var: derivatives[var]
+                                for var in common_vars}
+            derivatives.update(term)
+            for var in common_vars:
+                # This is where the summation part of the chain rule
+                # is effectively applied: df/dt = df/dx * dx/dt +
+                # df/dy + dy/dt + ...:
+                derivatives[var] += prev_derivatives[var]
 
-        # !!!!!!! Calculate derivatives from terms by summing
-        # the factors of Variables in more than one term.
-
-        #!!!!!!!!!!!!!
-
-"""
-!!!!!!!! Chain rule. Will be updated and included somewhere else
-
-        ########################################
-
-        # !!!!!!!! Part of the code below should be moved to the new
-        # .derivatives attribute.
-
-        # Calculation of the derivatives of f with respect to each
-        # argument with uncertainty:
-
-
-        # Iteration over all the arguments that have an uncertainty
-        # (AffineScalarFunc):
-        for expr in itertools.chain(
-            (args[index] for index in pos_w_uncert),  # From args
-            kwargs_uncert_values.itervalues()):  # From kwargs
-
-            # !!!!!!! This is where the .linear_part is created
-            linear_part.append(
-                (,
-                 expr)]
-
-
-            # !! In Python 2.7+: |= expr.derivatives.viewkeys()
-            variables |= set(expr.derivatives)
-
-        # Initial value for the chain rule (is updated below):
-        # !! In Python 2.7+: dictionary comprehension
-        derivatives_wrt_vars = dict((var, 0.) for var in variables)
-
-        # The chain rule is used... In the case of numerical
-        # derivatives, this method gives a better-controlled numerical
-        # stability than numerically calculating the partial
-        # derivatives through '[f(x + dx, y + dy, ...) -
-        # f(x,y,...)]/da' where dx, dy,... are calculated by varying
-        # 'a' by 'da'.  In fact, this allows the program to control
-        # how big the dx, dy, etc. are, which is numerically more
-        # precise.
-
-
-        # ... on args:
-        for (pos, f_derivative) in derivatives_num_args.iteritems():
-            for (var, arg_derivative) in args[pos].derivatives.iteritems():
-                derivatives_wrt_vars[var] += f_derivative * arg_derivative
-        # ... on kwargs:
-        for (name, f_derivative) in derivatives_num_kwargs.iteritems():
-            for (var, arg_derivative) in (kwargs_uncert_values[name]
-                                          .derivatives.iteritems()):
-                derivatives_wrt_vars[var] += f_derivative * arg_derivative
-"""
-
+        return derivatives
 
     ############################################################
 
