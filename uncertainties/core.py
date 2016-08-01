@@ -1571,18 +1571,39 @@ class AffineScalarFunc(object):
     @property
     def derivatives(self):
         """
-        # !!!!!!!! Update
-        derivatives -- maps each Variable object on which the function
-        being defined depends to the value of the derivative with
-        respect to that variable, taken at the nominal value of all
-        variables.
+        Return a mapping from each Variable object on which the function
+        (self) depends to the value of the derivative with respect to
+        that variable.
 
-
-        Warning: the above constraint is not checked, and the user is
-        responsible for complying with it.
+        This mapping is cached in self.derivatives (which replaces
+        this method).
         """
-        # !!!!!!! Calculate derivatives from self._linear_part
+
+        # The term for each _linear_part is first collected (as a
+        # mapping from a Variable to the associated coefficient): each
+        # term represents a linear combination of variables.
+        # Variables that appear in more than one term will be
+        # collected later (their coefficients will be summed).
+        terms = []
+        for (factor, expression) in self._linear_part:
+            terms.append(expression._factored_derivatives(factor))
+
+                # !!!!!!!! Add _factored_derivatives to Variable?
+
+        # !!!!!!! Calculate derivatives from self._linear_part by
+        # summing Variables in more than one term.
+
         # !!!!!!! Cache the result
+
+    def _factored_derivatives(self, factor):
+        """
+        Like derivatives(), but multiplies all the derivatives by the
+        given factor (this can be optimized) and does not cache the
+        result (which limits the memory footprint and therefore the
+        calculation time, as creating new structures in memory takes
+        time).
+        """
+        #!!!!!!!!!!!!!
 
     ############################################################
 
