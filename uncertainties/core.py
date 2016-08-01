@@ -1515,7 +1515,7 @@ class AffineScalarFunc(object):
     """
 
     # To save memory in large arrays:
-    __slots__ = ('_nominal_value', '_linear_part')  # !!!!!!! add for real
+    __slots__ = ('_nominal_value', '_linear_part')
 
     # !! Fix for mean() in NumPy 1.8.0:
     class dtype(object):
@@ -1568,6 +1568,8 @@ class AffineScalarFunc(object):
 
     ############################################################
 
+    # Making derivatives a property gives the user a clean syntax,
+    # which is consistent with derivatives becoming a dictionary.
     @property
     def derivatives(self):
         """
@@ -1575,8 +1577,24 @@ class AffineScalarFunc(object):
         (self) depends to the value of the derivative with respect to
         that variable.
 
+        Derivative values are always floats.
+
         This mapping is cached in self.derivatives (which replaces
         this method).
+        """
+
+        derivatives = self._factored_derivatives(1.)
+        self.derivatives = #!!!!!!!!!!!
+
+        # !!!!!!! Cache the result
+
+    def _factored_derivatives(self, factor):
+        """
+        Like derivatives(), but multiplies all the derivatives by the
+        given factor (this is an efficient operation) and does not
+        cache the result (which limits the memory footprint and
+        therefore the asymptotic calculation time, as creating new
+        structures in memory takes time).
         """
 
         # The term for each _linear_part is first collected (as a
@@ -1585,24 +1603,13 @@ class AffineScalarFunc(object):
         # Variables that appear in more than one term will be
         # collected later (their coefficients will be summed).
         terms = []
-        for (factor, expression) in self._linear_part:
-            terms.append(expression._factored_derivatives(factor))
+        for (local_factor, expression) in self._linear_part:
+            # !!!!!!!! Add _factored_derivatives to Variable? I guess yes
+            terms.append(expression._factored_derivatives(factor*local_factor))
 
-                # !!!!!!!! Add _factored_derivatives to Variable?
+        # !!!!!!! Calculate derivatives from terms by summing
+        # Variables in more than one term.
 
-        # !!!!!!! Calculate derivatives from self._linear_part by
-        # summing Variables in more than one term.
-
-        # !!!!!!! Cache the result
-
-    def _factored_derivatives(self, factor):
-        """
-        Like derivatives(), but multiplies all the derivatives by the
-        given factor (this can be optimized) and does not cache the
-        result (which limits the memory footprint and therefore the
-        calculation time, as creating new structures in memory takes
-        time).
-        """
         #!!!!!!!!!!!!!
 
     ############################################################
