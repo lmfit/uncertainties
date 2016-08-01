@@ -59,7 +59,6 @@ __all__ = [
 
     ]
 
-
 ###############################################################################
 
 def set_doc(doc_string):
@@ -79,6 +78,23 @@ def set_doc(doc_string):
 # may slightly improve the execution speed.
 FLOAT_LIKE_TYPES = (numbers.Number,)
 CONSTANT_TYPES = FLOAT_LIKE_TYPES+(complex,)
+
+###############################################################################
+
+
+# !! The function keyview() dfined here exists only as an
+# optimization, for Python 2.7+:
+
+if sys.version_info >= (2, 7):
+    keyview = lambda dict_obj: dict_obj.viewkeys()
+else:
+    keyview = lambda dict_obj: set(dict_obj.keys())
+
+keyview = set_doc(
+    """
+    Return the keys of the given dictionary, with a type that supports the
+    intersection (&) operator.
+    """)(keyview)
 
 ###############################################################################
 # Utility for issuing deprecation warnings
@@ -1543,6 +1559,8 @@ class AffineScalarFunc(object):
         if hasattr(self, '_derivatives_cached'):
             return self._derivatives_cached
 
+        # !! Python 3.3+ could make the mapping read-only through
+        # types.MappingProxyType.
         derivatives = self._factored_derivatives(1.)
 
         self._derivatives_cached = derivatives
@@ -1560,7 +1578,7 @@ class AffineScalarFunc(object):
         calculation time, as creating new structures in memory takes
         time).
 
-        - The returned mapping can be updated.
+        - The returned mapping can be modified.
         """
 
         # The term for each _linear_part is first collected (as a
@@ -1570,8 +1588,19 @@ class AffineScalarFunc(object):
         # collected later (their coefficients will be summed).
         terms = []
         for (local_factor, expression) in self._linear_part:
-            # !!!!!!!! Add _factored_derivatives to Variable? I guess yes
             terms.append(expression._factored_derivatives(factor*local_factor))
+
+        # The final mapping of derivatives is built by updating one of
+        # the terms. In order to minimize copies, the largest term is
+        # the one which is updated (this is only a heuristics):
+        result = max(terms, key=len)
+
+        for term in terms:
+
+            if term is result:
+                continue
+
+            common_vars = keyview(result) & keyview(term)
 
         # !!!!!!! Calculate derivatives from terms by summing
         # the factors of Variables in more than one term.
