@@ -1,5 +1,11 @@
 # coding=utf-8
 
+# !!!!!!! Fix sum([uncertainties.ufloat(1, 0.1) for _ in
+# range(5000)]): infinte recursion!
+
+# !!!!!!!!!! CHeck all calls to AffineScalarFunc in all programs and
+# adapt to the new interface.
+
 """
 Main module for the uncertainties package, with internals.
 """
@@ -175,8 +181,8 @@ else:
         # Representation of the initial correlated values:
         values_funcs = tuple(
             # !!!!!!! Update for the new _linear_part in
-            # AffineScalarFunc:
-            AffineScalarFunc(value, dict(zip(variables, coords)))
+            # AffineScalarFunc? maybe the following is incorrect
+            AffineScalarFunc(value, zip(variables, coords))
             for (coords, value) in zip(transform, nom_values))
 
         return values_funcs
@@ -235,7 +241,7 @@ def to_affine_scalar(x):
 
     if isinstance(x, CONSTANT_TYPES):
         # No variable => no derivative:
-        return AffineScalarFunc(x, {})
+        return Variable(x, [])
 
     # Case of lists, etc.
     raise NotUpcast("%s cannot be converted to a number with"
@@ -1429,6 +1435,13 @@ def signif_dgt_to_limit(value, num_signif_d):
     return limit_no_rounding
 
 class AffineScalarFunc(object):
+
+    # !! Instances should not be mutated, because they are generally
+    # linked together in a tree (that represents a linear combination
+    # as linear combinations of linear combinations, etc.). Instances
+    # can be modified, but so long as their semantic contents does not
+    # change (e.g., caching some results is fine).
+
     """
     Affine functions that support basic mathematical operations
     (addition, etc.).  Such functions can for instance be used for
@@ -1488,12 +1501,12 @@ class AffineScalarFunc(object):
         nominal_value -- value of the function when the linear part is
         zero.
 
-        linear_part -- sequence of (coefficient, AffineScalarFunc)
-        pairs that describe the factor to be applied to the linear
-        part of the AffineScalarFunc in order to obtain the linear
-        terms of the new AffineScalarFunc. For instance, a value of
-        [(a, g), (b,h)] means that f = f_nominal + a*g_linear +
-        b*h_linear, where g = g_nominal + g_linear, with, e.g.,
+        linear_part -- non-empty sequence of (coefficient,
+        AffineScalarFunc) pairs that describe the factor to be applied
+        to the linear part of the AffineScalarFunc in order to obtain
+        the linear terms of the new AffineScalarFunc. For instance, a
+        value of [(a, g), (b,h)] means that f = f_nominal + a*g_linear
+        + b*h_linear, where g = g_nominal + g_linear, with, e.g.,
         g_linear = t*x + u*y. Thus, f(x,y,...) = f_nominal + a*t*x +
         ... In practice, this allows the chain rule to be applied: a =
         df/dg, and t = dg/dx, etc.
@@ -1509,6 +1522,8 @@ class AffineScalarFunc(object):
         # be possible.
 
         self._nominal_value = float(nominal_value)
+        if not isinstance(self, Variable):
+            assert linear_part
         self._linear_part = linear_part
 
     # The following prevents the 'nominal_value' attribute from being
@@ -1584,7 +1599,8 @@ class AffineScalarFunc(object):
 
         # The final mapping of derivatives is built by updating one of
         # the terms. In order to minimize copies, the largest term is
-        # the one which is updated (this is only a heuristics):
+        # the one which is updated (this is only a heuristics). The
+        # fact that the ._linear_part is non-empty is used:
         derivatives = max(terms, key=len)
 
         # The factors of Variables in all the terms are summed together:
@@ -2254,6 +2270,10 @@ class AffineScalarFunc(object):
             raise ValueError("The standard deviation is zero:"
                              " undefined result")
 
+    # !!!! Copies and pickling might want to handle the new
+    #  _derivatives_cached?
+
+
     def __deepcopy__(self, memo):
         """
         Hook for the standard copy module.
@@ -2265,8 +2285,8 @@ class AffineScalarFunc(object):
         """
         return AffineScalarFunc(
             self._nominal_value,
-            dict([(copy.deepcopy(expr), coef)
-                  for (expr, coef) in self._linear_part.iteritems()]))
+            {copy.deepcopy(expr): coef
+             for (expr, coef) in self._linear_part})
 
     def __getstate__(self):
         """
