@@ -313,6 +313,9 @@ non_std_wrapped_funcs.append('fsum')
 
 ##########
 
+# !!!!!!!!!! Check the logic of all the creations of AffineScalarFunc
+# below, and adapt to the new _linear_part
+
 def modf(x):
     """
     Version of modf that works for numbers with uncertainty, and also
@@ -327,10 +330,10 @@ def modf(x):
 
     (frac_part, int_part) = math.modf(aff_func.nominal_value)
 
-    if aff_func.derivatives:
+    if aff_func._linear_part:
         # The derivative of the fractional part is simply 1: the
         # derivatives of modf(x)[0] are the derivatives of x:
-        return (AffineScalarFunc(frac_part, aff_func.derivatives), int_part)
+        return (AffineScalarFunc(frac_part, aff_func._linear_part), int_part)
     else:
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
@@ -350,13 +353,13 @@ def ldexp(x, y):
 
     aff_func = to_affine_scalar(x)  # y must be an integer, for math.ldexp
 
-    if aff_func.derivatives:
+    if aff_func._linear_part:
         factor = 2**y
         return AffineScalarFunc(
             math.ldexp(aff_func.nominal_value, y),
             # Chain rule:
-            dict([(var, factor*deriv)
-                  for (var, deriv) in aff_func.derivatives.iteritems()]))
+            [(var, factor*deriv)
+             for (var, deriv) in aff_func._linear_part])
     else:
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:

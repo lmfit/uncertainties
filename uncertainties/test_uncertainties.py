@@ -189,7 +189,7 @@ def compare_derivatives(func, numerical_derivatives,
                             funcname, args, arg_num)
 
                         if not numbers_close(fixed_deriv_value,
-                                              num_deriv_value, 1e-4):
+                                             num_deriv_value, 1e-4):
 
                             # It is possible that the result is NaN:
                             if not isnan(func_approx):
