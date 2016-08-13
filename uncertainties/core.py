@@ -1435,6 +1435,14 @@ def signif_dgt_to_limit(value, num_signif_d):
 
     return limit_no_rounding
 
+class Derivatives(dict):
+    """
+    Numerical value of the derivatives of a function.
+
+    Mapping from Variable objects to the derivative with respect to
+    the variable.
+    """
+
 class AffineScalarFunc(object):
 
     # !! Instances should not be mutated, because they are generally
@@ -1468,9 +1476,10 @@ class AffineScalarFunc(object):
       Variable x.
 
     - derivatives: derivatives[x] is the (value of the) derivative
-      with respect to Variable x.  This attribute is a dictionary
-      whose keys are the Variable objects on which the function
-      depends.
+      with respect to Variable x.  This attribute is a Derivatives
+      dictionary whose keys are the Variable objects on which the
+      function depends. The values are the numerical values of the
+      derivatives.
 
       All the Variable objects on which the function depends are in
       'derivatives'.
@@ -1479,14 +1488,15 @@ class AffineScalarFunc(object):
       nominal value, in units of the standard deviation.
     """
 
-    # To save memory in large arrays:
+    # The ._linear_part attribute can be either:
     #
-    # !!! To save more memory, the _linear_part and
-    # _derivatives_cached could be merged (as the _linear_part is not
-    # needed anymore when _derivatives_cached is calculated). Checking
-    # what the merged attribute contains could be implemented via type
-    # checking (including with a custom class for each kind of data):
-    __slots__ = ('_nominal_value', '_linear_part', '_derivatives_cached')
+    # - The Derivatives of the AffineScalarFunc with respect to its Variables.
+    #
+    # - A sequence of (coefficient, AffineScalarFunc) pairs
+    # that defines the linear part of the AffineScalarFunc.
+
+    # To save memory in large arrays:
+    __slots__ = ('_nominal_value', '_linear_part')
 
     # !! Fix for mean() in NumPy 1.8.0:
     class dtype(object):
@@ -1504,12 +1514,11 @@ class AffineScalarFunc(object):
         nominal_value -- value of the function when the linear part is
         zero.
 
-        linear_part -- non-empty sequence of (coefficient,
-        AffineScalarFunc) pairs that describe the factor to be applied
-        to the linear part of the AffineScalarFunc in order to obtain
-        the linear terms of the new AffineScalarFunc. For instance, a
-        value of [(a, g), (b,h)] means that f = f_nominal + a*g_linear
-        + b*h_linear, where g = g_nominal + g_linear, with, e.g.,
+        linear_part -- sequence of (coefficient, AffineScalarFunc)
+        pairs that describe a linear combination (which is the linear
+        terms of the new AffineScalarFunc). For instance, a value of
+        [(a, g), (b,h)] means that f = f_nominal + a*g_linear +
+        b*h_linear, where g = g_nominal + g_linear, with, e.g.,
         g_linear = t*x + u*y. Thus, f(x,y,...) = f_nominal + a*t*x +
         ... In practice, this allows the chain rule to be applied: a =
         df/dg, and t = dg/dx, etc.
@@ -1525,8 +1534,7 @@ class AffineScalarFunc(object):
         # be possible.
 
         self._nominal_value = float(nominal_value)
-        if not isinstance(self, Variable):
-            assert linear_part
+
         self._linear_part = linear_part
 
     # The following prevents the 'nominal_value' attribute from being
@@ -1559,25 +1567,26 @@ class AffineScalarFunc(object):
 
         # Most of the time, the derivatives have not yet been
         # calculated (because they are rarely cached, so that the
-        # asymptotic memory (and time!) consumption is limited. As a
-        # consequence, try return self._derivatives_cached
-        # except... is not used, as it is slower when an exception is
-        # raised (which would be the most common case).
-
-        if hasattr(self, '_derivatives_cached'):
-            return self._derivatives_cached
+        # asymptotic memory (and time!) consumption is limited (for
+        # example when calculating a sum of many numbers with
+        # uncertainty). As a consequence, try: return
+        # self._linear_part except:... is not used, as it is slower
+        # when an exception is raised (which would be the most common
+        # case):
+        if isinstance(self._linear_part, Derivatives):
+            return self._linear_part
 
         # !! Python 3.3+ could make the mapping read-only through
         # types.MappingProxyType.
         derivatives = self._factored_derivatives(1.)
 
-        self._derivatives_cached = derivatives
+        self._linear_part = derivatives
 
         return derivatives
 
 
     def _factored_derivatives(self, factor):
-        """
+    """
         Like derivatives(), but:
 
         - Multiplies all the derivatives by the given factor (this is
@@ -2272,10 +2281,6 @@ class AffineScalarFunc(object):
         except ZeroDivisionError:
             raise ValueError("The standard deviation is zero:"
                              " undefined result")
-
-    # !!!! Copies and pickling might want to handle the new
-    #  _derivatives_cached?
-
 
     def __deepcopy__(self, memo):
         """
