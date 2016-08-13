@@ -1,11 +1,7 @@
 # coding=utf-8
 
-# !!!!!!! Fix sum([uncertainties.ufloat(1, 0.1) for _ in
-# range(5000)]): only works if sys.setrecursionlimit() is used. BUT does not
-# work with 50k terms: Python crashes!
-
-# !!!!!!!!!! CHeck all calls to AffineScalarFunc in all programs and
-# adapt to the new interface.
+# !!!!!!!!!! CHeck all calls to AffineScalarFunc in all programs,
+# including this one, and adapt to the new interface.
 
 """
 Main module for the uncertainties package, with internals.
@@ -688,8 +684,8 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
             linear_part.append((
                 # Coefficient:
                 derivatives_args_index[pos](*args_values, **kwargs),
-                # AffineScalarFunc expression:
-                args[pos]))
+                # Linear part of the AffineScalarFunc expression:
+                args[pos]._linear_part))
 
         for name in names_w_uncert:
 
@@ -706,8 +702,8 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
             linear_part.append((
                 # Coefficient:
                 derivative(*args_values, **kwargs),
-                # AffineScalarFunc expression:
-                (kwargs_uncert_values[name])))
+                # Linear part of the AffineScalarFunc expression:
+                kwargs_uncert_values[name]._linear_part))
 
         # The function now returns the necessary linear approximation
         # to the function:
@@ -1448,15 +1444,24 @@ class Derivatives(collections.defaultdict):
     the default_factory attribute.
     """
 
+class LinearCombination(list):
+    """
+    List of (float_coefficient, LinearCombination) or
+    (float_coefficient, Variable) pairs, that represents their linear
+    combination.
+    """
+
 class AffineScalarFunc(object):
 
-    # !! Instances should not be mutated, because they are generally
-    # linked together in a tree (that represents a linear combination
-    # of variables as a linear combinations of linear combinations,
-    # etc.). Instances can be modified, but so long as their semantic
-    # contents does not change (e.g., calculating the expanded form of
-    # the linear combination is fine, for instance as a way of caching
-    # it).
+    # !!!!!!!!!!
+
+    # !! Instances should generally not be semantically mutated,
+    # because they are generally linked together in a tree (that
+    # represents a linear combination of variables as a linear
+    # combinations of linear combinations, etc.). Instances can be
+    # modified, but so long as their semantic contents does not change
+    # (e.g., calculating the expanded form of the associated linear
+    # combination in ._linear_part is fine, for instance).
 
     """
     Affine functions that support basic mathematical operations
@@ -1493,11 +1498,14 @@ class AffineScalarFunc(object):
       nominal value, in units of the standard deviation.
     """
 
+    # !!!!!!!! Redefine ._linear_part: it should be either a
+    # Derivatives object or a LinearCombination object.
+
     # The ._linear_part attribute can be either:
     #
     # - The Derivatives of the AffineScalarFunc with respect to its Variables.
     #
-    # - A sequence of (coefficient, AffineScalarFunc) pairs
+    # - A list of (coefficient, AffineScalarFunc) pairs
     # that defines the linear part of the AffineScalarFunc.
 
     # To save memory in large arrays:
@@ -1580,6 +1588,8 @@ class AffineScalarFunc(object):
         # case):
         if isinstance(self._linear_part, Derivatives):
             return self._linear_part
+        # At this point, the _linear_part is a list of (factor,
+        # AffineScalarFunc) terms.
 
         ##
 
@@ -1598,10 +1608,24 @@ class AffineScalarFunc(object):
             # One of the terms is expanded or, if no expansion is
             # needed (case of a variable), simply added to the
             # existing derivatives:
-            factor, expr = remaining_terms.pop()
+            main_factor, main_expr = remaining_terms.pop()
 
-            if isinstance(expr, Variable):
+            if isinstance(main_expr, Variable):
+                derivatives[main_expr] += main_factor
+                continue
+            # At this point, the main expression main_expr is another
+            # AffineScalarFunc. Either it is the Derivatives of the
+            # expression, or some uncalculated LinearCombination.
 
+            # !!!!!!!!!!!! Clarify AffineScalarFunc in ._linear_part
+            # !!!!!!!!!!!! vs LinearCombination in ._linear_part.
+
+            #
+
+            # The only remaining case is that the derivatives of
+            # main_expr are already known (main_expr is a Derivatives
+            # object):
+            for
 
 
         # The term for each _linear_part is first collected (as a
@@ -2308,8 +2332,7 @@ class AffineScalarFunc(object):
         """
         return AffineScalarFunc(
             self._nominal_value,
-            {copy.deepcopy(expr): coef
-             for (expr, coef) in self._linear_part})
+            copy.deepcopy(self._linear_part))
 
     def __getstate__(self):
         """
