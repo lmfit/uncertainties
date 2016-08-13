@@ -36,6 +36,7 @@ import warnings
 import itertools
 import inspect
 import numbers
+import collections
 
 # Attributes that are always exported (some other attributes are
 # exported only if the NumPy module is available...):
@@ -1435,12 +1436,16 @@ def signif_dgt_to_limit(value, num_signif_d):
 
     return limit_no_rounding
 
-class Derivatives(dict):
+class Derivatives(collections.defaultdict):
     """
     Numerical value of the derivatives of a function.
 
     Mapping from Variable objects to the derivative with respect to
     the variable.
+
+    The default value is defined upon initialization (as with
+    collections.defaultdict) and can be modified later by modifying
+    the default_factory attribute.
     """
 
 class AffineScalarFunc(object):
@@ -1514,14 +1519,14 @@ class AffineScalarFunc(object):
         nominal_value -- value of the function when the linear part is
         zero.
 
-        linear_part -- sequence of (coefficient, AffineScalarFunc)
-        pairs that describe a linear combination (which is the linear
-        terms of the new AffineScalarFunc). For instance, a value of
-        [(a, g), (b,h)] means that f = f_nominal + a*g_linear +
-        b*h_linear, where g = g_nominal + g_linear, with, e.g.,
-        g_linear = t*x + u*y. Thus, f(x,y,...) = f_nominal + a*t*x +
-        ... In practice, this allows the chain rule to be applied: a =
-        df/dg, and t = dg/dx, etc.
+        linear_part -- list of (coefficient, AffineScalarFunc) pairs
+        that describe a linear combination (which is the linear terms
+        of the new AffineScalarFunc). WARNING: this list can be
+        modified. Example of the semantics: a value of [(a, g), (b,h)]
+        means that f = f_nominal + a*g_linear + b*h_linear, where g =
+        g_nominal + g_linear, with, e.g., g_linear = t*x + u*y. Thus,
+        f(x,y,...) = f_nominal + a*t*x + ... In practice, this allows
+        the chain rule to be applied: a = df/dg, and t = dg/dx, etc.
         """
 
         # Defines the value at the origin:
@@ -1576,27 +1581,28 @@ class AffineScalarFunc(object):
         if isinstance(self._linear_part, Derivatives):
             return self._linear_part
 
-        # !! Python 3.3+ could make the mapping read-only through
-        # types.MappingProxyType.
-        derivatives = self._factored_derivatives(1.)
+        ##
 
-        self._linear_part = derivatives
+        # The derivatives are built progressively by expanding each
+        # term of the linear combination self._linear_part until there
+        # is no linear combination to be expanded.
 
-        return derivatives
+        # Final derivatives, constructed progressively:
+        derivatives = Derivatives(float)
+        # List with the remaining terms of the linear combination, as
+        # (float_coefficient, AffineScalarFunc) pairs:
+        remaining_terms = self._linear_part  # ._linear_part is replaced here
+
+        while remaining_terms:
+
+            # One of the terms is expanded or, if no expansion is
+            # needed (case of a variable), simply added to the
+            # existing derivatives:
+            factor, expr = remaining_terms.pop()
+
+            if isinstance(expr, Variable):
 
 
-    def _factored_derivatives(self, factor):
-    """
-        Like derivatives(), but:
-
-        - Multiplies all the derivatives by the given factor (this is
-        an efficient operation) and does not cache the result (which
-        limits the memory footprint and therefore the asymptotic
-        calculation time, as creating new structures in memory takes
-        time).
-
-        - The returned mapping can be modified.
-        """
 
         # The term for each _linear_part is first collected (as a
         # mapping from a Variable to the associated coefficient): each
@@ -1634,7 +1640,16 @@ class AffineScalarFunc(object):
                 # df/dy + dy/dt + ...:
                 derivatives[var] += prev_derivatives[var]
 
+        # !!!!!!!!!!!!!!!!!!!!!
+
+        # KeyError if trying to access the derivative with respect to
+        # variable that self does not depend on:
+        derivatives.default_factory = None
+
+        self._linear_part = derivatives  # Caching
         return derivatives
+
+        #!!!!!!!!!! Implement the same for Variable
 
     ############################################################
 
