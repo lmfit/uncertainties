@@ -23,7 +23,7 @@ import math
 from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
 
 try:
-    from math import isinfinite  # Python 3.2+
+    from math import isinfinite  # !! Python 3.2+
 except ImportError:
     isinfinite = lambda x: isinf(x) or isnan(x)
 
@@ -1432,26 +1432,61 @@ def signif_dgt_to_limit(value, num_signif_d):
 
     return limit_no_rounding
 
-class FlatLinearCombination(collections.defaultdict):
-    """
-    Simple linear combination of Variables, expressed as a mapping
-    from Variable objects to the coefficient associated with that
-    Variable.
-
-    The default value is defined upon initialization (as with
-    collections.defaultdict) and can be modified later by modifying
-    the default_factory attribute.
-    """
-
+# !!!!!!!! This creates a copy of the list, when the expression is
+# built: I should probably just store linear_combo.  !!!!!!! SAME for
+# a new FlatLinearCombination, that I would access explicitly between
+# class that know how it works.
 class NestedLinearCombination(list):
     """
     List of (float_coefficient, NestedLinearCombination) or
-    (float_coefficient, FlatLinearCombination) pairs, that represents
-    a possibly nested linear combination of Variables.
+    (float_coefficient, dict) pairs, that represents a possibly nested
+    linear combination of Variables.
+
+    Any dict in a term must map Variables to their coefficient.
 
     Example: a value of f = [(a, g), (b,h)] represents a*g + b*h,
     where, e.g., g = t*x + u*y. Thus, f(x,y,...) = a*t*x + ...
     """
+
+    def expand_and_empty(self):
+        """
+        Return the expansion of the linear combination as a
+        collections.defaultdict(float). The object itself is emptied.
+        """
+
+        # The derivatives are built progressively by expanding each
+        # term of the linear combination until there is no linear
+        # combination to be expanded.
+
+        # Final derivatives, constructed progressively:
+        derivatives = collections.defaultdict(float)
+
+        while self:  # The list of terms is emptied progressively
+
+            # One of the terms is expanded or, if no expansion is
+            # needed, simply added to the existing derivatives.
+            #
+            # Optimization note: since Python's operations are
+            # left-associative, a long sum of Variables can be built
+            # such that the last term is essentially a Variable (and
+            # not a NestedLinearCombination): popping from the
+            # remaining terms allows this term to be quickly put in
+            # the final result, which limits the number of terms
+            # remaining (and whose size can temporarily grow):
+            main_factor, main_expr = self.pop()
+
+            if isinstance(main_expr, NestedLinearCombination):
+
+                for (factor, expr) in main_expr.iteritems():
+                    # The main_factor is applied to expr:
+                        self.append((main_factor*factor, expr))
+
+            else:  # We directly have an expanded linear combination
+
+                for (factor, var) in main_expr.iteritems():
+                    derivatives[var] += main_factor*factor
+
+        return derivatives
 
 class AffineScalarFunc(object):
     """
@@ -1516,14 +1551,16 @@ class AffineScalarFunc(object):
         nominal_value -- value of the function when the linear part is
         zero.
 
-        linear_part -- can be either:
-
-          - A FlatLinearCombination that represents the list of
-          derivatives of the function, or
-
-          - A NestedLinearCombination (which in practice represents a
-          lazily evaluated nested linear combination expression).
+        linear_part -- can be any expression contained in a
+        NestedLinearCombination (another NestedLinearCombination,
+        which represents a formal linear combination, or a dict, which
+        represents typically a cached, expanded linear combination).
         """
+
+        # ! A technical consistency requirement is that the
+        # linear_part can be nested inside a NestedLinearCombination
+        # (because this is how functions on AffineScalarFunc calculate
+        # their result: by constructing nested expressions for them).
 
         # Defines the value at the origin:
 
@@ -1536,6 +1573,12 @@ class AffineScalarFunc(object):
 
         self._nominal_value = float(nominal_value)
 
+        # In order to have a linear execution time for long sums, the
+        # _linear_part is generally left as is (otherwise, each
+        # successive term would expand to a linearly growing sum of
+        # terms: efficiently handling such terms [so, without copies]
+        # is not obvious, when the algorithm should work for all
+        # functions beyond sums).
         self._linear_part = linear_part
 
     # The following prevents the 'nominal_value' attribute from being
@@ -1566,102 +1609,12 @@ class AffineScalarFunc(object):
         This mapping is cached, for subsequent calls.
         """
 
-        # Most of the time, the derivatives have not yet been
-        # calculated (because they are rarely cached, so that the
-        # asymptotic memory (and time!) consumption is limited (for
-        # example when calculating a sum of many numbers with
-        # uncertainty). As a consequence, try: return
-        # self._linear_part except:... is not used, as it is slower
-        # when an exception is raised (which would be the most common
-        # case):
-        if isinstance(self._linear_part, Derivatives):
-            return self._linear_part
-        # At this point, the _linear_part is a list of (factor,
-        # AffineScalarFunc) terms.
-
-        ##
-
-        # The derivatives are built progressively by expanding each
-        # term of the linear combination self._linear_part until there
-        # is no linear combination to be expanded.
-
-        # Final derivatives, constructed progressively:
-        derivatives = Derivatives(float)
-        # List with the remaining terms of the linear combination, as
-        # (float_coefficient, AffineScalarFunc) pairs:
-        remaining_terms = self._linear_part  # ._linear_part is replaced here
-
-        while remaining_terms:
-
-            # One of the terms is expanded or, if no expansion is
-            # needed (case of a variable), simply added to the
-            # existing derivatives:
-            main_factor, main_expr = remaining_terms.pop()
-
-            if isinstance(main_expr, Variable):
-                derivatives[main_expr] += main_factor
-                continue
-            # At this point, the main expression main_expr is another
-            # AffineScalarFunc. Either it is the Derivatives of the
-            # expression, or some uncalculated LinearCombination.
-
-            # !!!!!!!!!!!! Clarify AffineScalarFunc in ._linear_part
-            # !!!!!!!!!!!! vs LinearCombination in ._linear_part.
-
-            #
-
-            # The only remaining case is that the derivatives of
-            # main_expr are already known (main_expr is a Derivatives
-            # object):
-            for
-
-
-        # The term for each _linear_part is first collected (as a
-        # mapping from a Variable to the associated coefficient): each
-        # term represents a linear combination of variables.
-        # Variables that appear in more than one term will be
-        # collected later (their coefficients will be summed).
-        terms = []
-        for (local_factor, expression) in self._linear_part:
-            # Part of the chain rule is effectively applied here:
-            # df/dx * dx/dt:
-            terms.append(expression._factored_derivatives(factor*local_factor))
-
-        # The final mapping of derivatives is built by updating one of
-        # the terms. In order to minimize copies, the largest term is
-        # the one which is updated (this is only a heuristics). The
-        # fact that the ._linear_part is non-empty is used:
-        derivatives = max(terms, key=len)
-
-        # The factors of Variables in all the terms are summed together:
-        for term in terms:
-
-            if term is derivatives:  # Initial term (which is being updated)
-                continue
-
-            # Common variables between 'derivatives' and 'term'
-            # require a special update, as their coefficients must be
-            # summed together:
-            common_vars = derivatives.viewkeys() & term.viewkeys()
-            prev_derivatives = {var: derivatives[var]
-                                for var in common_vars}
-            derivatives.update(term)
-            for var in common_vars:
-                # This is where the summation part of the chain rule
-                # is effectively applied: df/dt = df/dx * dx/dt +
-                # df/dy + dy/dt + ...:
-                derivatives[var] += prev_derivatives[var]
-
-        # !!!!!!!!!!!!!!!!!!!!!
-
-        # KeyError if trying to access the derivative with respect to
-        # variable that self does not depend on:
-        derivatives.default_factory = None
-
-        self._linear_part = derivatives  # Caching
-        return derivatives
-
-        #!!!!!!!!!! Implement the same for Variable
+        if isinstance(self._linear_part, NestedLinearCombination):
+            self._linear_part = self._linear_part.expand_and_empty()
+            # Attempts to get the contribution of a variable that the
+            # function does not depend on raise a KeyError:
+            self._linear_part.default_factory = None
+        return self._linear_part
 
     ############################################################
 
@@ -2701,16 +2654,11 @@ class Variable(AffineScalarFunc):
         # takes much more memory.  Thus, this implementation chooses
         # more cycles and a smaller memory footprint instead of no
         # cycles and a larger memory footprint.
-        super(Variable, self).__init__(value, [])
+        super(Variable, self).__init__(value, {self: 1.})
 
         self.std_dev = std_dev  # Assignment through a Python property
 
         self.tag = tag
-
-    # Same semantics as the parent class:
-    @set_doc(AffineScalarFunc._factored_derivatives.__doc__)
-    def _factored_derivatives(self, factor):
-        return {self: factor}
 
     @property
     def std_dev(self):
