@@ -1432,37 +1432,28 @@ def signif_dgt_to_limit(value, num_signif_d):
 
     return limit_no_rounding
 
-class Derivatives(collections.defaultdict):
+class FlatLinearCombination(collections.defaultdict):
     """
-    Numerical value of the derivatives of a function.
-
-    Mapping from Variable objects to the derivative with respect to
-    the variable.
+    Simple linear combination of Variables, expressed as a mapping
+    from Variable objects to the coefficient associated with that
+    Variable.
 
     The default value is defined upon initialization (as with
     collections.defaultdict) and can be modified later by modifying
     the default_factory attribute.
     """
 
-class LinearCombination(list):
+class NestedLinearCombination(list):
     """
-    List of (float_coefficient, LinearCombination) or
-    (float_coefficient, Variable) pairs, that represents their linear
-    combination.
+    List of (float_coefficient, NestedLinearCombination) or
+    (float_coefficient, FlatLinearCombination) pairs, that represents
+    a possibly nested linear combination of Variables.
+
+    Example: a value of f = [(a, g), (b,h)] represents a*g + b*h,
+    where, e.g., g = t*x + u*y. Thus, f(x,y,...) = a*t*x + ...
     """
 
 class AffineScalarFunc(object):
-
-    # !!!!!!!!!!
-
-    # !! Instances should generally not be semantically mutated,
-    # because they are generally linked together in a tree (that
-    # represents a linear combination of variables as a linear
-    # combinations of linear combinations, etc.). Instances can be
-    # modified, but so long as their semantic contents does not change
-    # (e.g., calculating the expanded form of the associated linear
-    # combination in ._linear_part is fine, for instance).
-
     """
     Affine functions that support basic mathematical operations
     (addition, etc.).  Such functions can for instance be used for
@@ -1498,15 +1489,13 @@ class AffineScalarFunc(object):
       nominal value, in units of the standard deviation.
     """
 
-    # !!!!!!!! Redefine ._linear_part: it should be either a
-    # Derivatives object or a LinearCombination object.
-
-    # The ._linear_part attribute can be either:
-    #
-    # - The Derivatives of the AffineScalarFunc with respect to its Variables.
-    #
-    # - A list of (coefficient, AffineScalarFunc) pairs
-    # that defines the linear part of the AffineScalarFunc.
+    # !! Instances should generally not be semantically mutated,
+    # because they are generally linked together in a tree (that
+    # represents a linear combination of variables as a linear
+    # combinations of linear combinations, etc.). Instances can be
+    # modified, but so long as their semantic contents does not change
+    # (e.g., calculating the expanded form of the associated linear
+    # combination in ._linear_part is fine, for instance).
 
     # To save memory in large arrays:
     __slots__ = ('_nominal_value', '_linear_part')
@@ -1515,7 +1504,7 @@ class AffineScalarFunc(object):
     class dtype(object):
         type = staticmethod(lambda value: value)
 
-    #! The code could be modify in order to accommodate for non-float
+    #! The code could be modified in order to accommodate for non-float
     # nominal values.  This could for instance be done through
     # the operator module: instead of delegating operations to
     # float.__*__ operations, they could be delegated to
@@ -1527,14 +1516,13 @@ class AffineScalarFunc(object):
         nominal_value -- value of the function when the linear part is
         zero.
 
-        linear_part -- list of (coefficient, AffineScalarFunc) pairs
-        that describe a linear combination (which is the linear terms
-        of the new AffineScalarFunc). WARNING: this list can be
-        modified. Example of the semantics: a value of [(a, g), (b,h)]
-        means that f = f_nominal + a*g_linear + b*h_linear, where g =
-        g_nominal + g_linear, with, e.g., g_linear = t*x + u*y. Thus,
-        f(x,y,...) = f_nominal + a*t*x + ... In practice, this allows
-        the chain rule to be applied: a = df/dg, and t = dg/dx, etc.
+        linear_part -- can be either:
+
+          - A FlatLinearCombination that represents the list of
+          derivatives of the function, or
+
+          - A NestedLinearCombination (which in practice represents a
+          lazily evaluated nested linear combination expression).
         """
 
         # Defines the value at the origin:
