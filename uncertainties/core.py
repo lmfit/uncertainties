@@ -239,7 +239,7 @@ def to_affine_scalar(x):
 
     if isinstance(x, CONSTANT_TYPES):
         # No variable => no derivative:
-        return Variable(x, [])
+        return Variable(x, NestedLinearCombination())
 
     # Case of lists, etc.
     raise NotUpcast("%s cannot be converted to a number with"
@@ -707,7 +707,8 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
         # The function now returns the necessary linear approximation
         # to the function:
-        return AffineScalarFunc(f_nominal_value, linear_part)
+        return AffineScalarFunc(f_nominal_value,
+                                NestedLinearCombination(linear_part))
 
     f_with_affine_output = set_doc("""\
     Version of %s(...) that returns an affine approximation
@@ -1435,7 +1436,9 @@ def signif_dgt_to_limit(value, num_signif_d):
 # !!!!!!!! This creates a copy of the list, when the expression is
 # built: I should probably just store linear_combo.  !!!!!!! SAME for
 # a new FlatLinearCombination, that I would access explicitly between
-# class that know how it works.
+# class that know how it works. Using slots should be quite cheap in
+# memory. BUT I would pay with attribute access, when doing
+# calculations.
 class NestedLinearCombination(list):
     """
     List of (float_coefficient, NestedLinearCombination) or
@@ -1475,16 +1478,21 @@ class NestedLinearCombination(list):
             # remaining (and whose size can temporarily grow):
             main_factor, main_expr = self.pop()
 
+            # print "MAINS", main_factor, main_expr  #!!!!!!!!!!!!
+
             if isinstance(main_expr, NestedLinearCombination):
 
-                for (factor, expr) in main_expr.iteritems():
+                for (factor, expr) in main_expr:
                     # The main_factor is applied to expr:
                         self.append((main_factor*factor, expr))
 
             else:  # We directly have an expanded linear combination
 
-                for (factor, var) in main_expr.iteritems():
+                for (var, factor) in main_expr.iteritems():
                     derivatives[var] += main_factor*factor
+
+            # print "DERIV", derivatives  #!!!!!!!!!!!
+
 
         return derivatives
 
@@ -1614,6 +1622,7 @@ class AffineScalarFunc(object):
             # Attempts to get the contribution of a variable that the
             # function does not depend on raise a KeyError:
             self._linear_part.default_factory = None
+
         return self._linear_part
 
     ############################################################
@@ -1710,6 +1719,10 @@ class AffineScalarFunc(object):
         error_components = {}
 
         for (variable, derivative) in self.derivatives.iteritems():
+
+            # print "TYPE", type(variable), type(derivative)  #!!!!!!!!!!!!
+
+
 
             # Individual standard error due to variable:
 
