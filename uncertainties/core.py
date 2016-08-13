@@ -1,7 +1,8 @@
 # coding=utf-8
 
 # !!!!!!! Fix sum([uncertainties.ufloat(1, 0.1) for _ in
-# range(5000)]): infinte recursion!
+# range(5000)]): only works if sys.setrecursionlimit() is used. BUT does not
+# work with 50k terms: Python crashes!
 
 # !!!!!!!!!! CHeck all calls to AffineScalarFunc in all programs and
 # adapt to the new interface.
@@ -1438,9 +1439,11 @@ class AffineScalarFunc(object):
 
     # !! Instances should not be mutated, because they are generally
     # linked together in a tree (that represents a linear combination
-    # as linear combinations of linear combinations, etc.). Instances
-    # can be modified, but so long as their semantic contents does not
-    # change (e.g., caching some results is fine).
+    # of variables as a linear combinations of linear combinations,
+    # etc.). Instances can be modified, but so long as their semantic
+    # contents does not change (e.g., calculating the expanded form of
+    # the linear combination is fine, for instance as a way of caching
+    # it).
 
     """
     Affine functions that support basic mathematical operations
