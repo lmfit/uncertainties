@@ -178,7 +178,9 @@ else:
 
         # Representation of the initial correlated values:
         values_funcs = tuple(
-            AffineScalarFunc(value, dict(iterools.izip(variables, coords)))
+            AffineScalarFunc(
+                value,
+                FlatLinearCombination(iterools.izip(variables, coords)))
             for (coords, value) in zip(transform, nom_values))
 
         return values_funcs
@@ -1430,6 +1432,12 @@ def signif_dgt_to_limit(value, num_signif_d):
         limit_no_rounding += 1
 
     return limit_no_rounding
+
+# !!!!!! Document
+class FlatLinearCombination(collections.defaultdict):
+    def __init__(self, vars_to_coefs):
+        super(FlatLinearCombination, self).__init__(float, vars_to_coefs)
+
 
 # !!!!!!!! This creates a copy of the list, when the expression is
 # built: I should probably just store linear_combo.  !!!!!!! SAME for
