@@ -1433,6 +1433,43 @@ def signif_dgt_to_limit(value, num_signif_d):
 
     return limit_no_rounding
 
+# !!!!!!!! There is a mistake in the linear combinations: the linear
+# combinations are not of Variables!! They are combinations of
+# *differentials* of the variables.
+
+# !!!!!!!!! NEW IDEA for implementing the differential of a function
+# (instead of using FlatLinearCombination and
+# NestedLinearCombination): have a single class, that contains a flag
+# expanded that indicates if the linear combination is already
+# expanded or not, and stores the linear combination either as a list
+# of pairs (like NestedLinearCombination) if not expanded, or as a
+# dictionary (not default, but like FlatLinearCombination) if
+# expanded. Advantages:
+#
+# - No copy upon initialization (but it should be documented that the
+#   initialization value might be changed)
+#
+# - Modifiying the value used for initialization is fine, since the object
+#   itself can keep the same value but expanded. This will not disturb
+#   the semantics of objects that refer to the linear combination, since
+#   the linear combination does not change (only maybe the value used for
+#   initialization will change).
+#
+# - Any update/expansion of the object will benefit all other
+#   references to the object (whereas currently a
+#   NestedLinearCombination does not transform itself into an expanded
+#   FlatLinearCombination: it merely returns one).
+#
+# - This would give a single, unified type for representing formal
+#   expressions of linear combinations, which is simpler.
+#
+# DISADVANTAGES:
+#
+# - The code inside the class should be a bit more cumbersome, since
+#   there is the need to access the representation of the linear part
+#   through an attribute (instead of directly with the current system
+#   of inheritance).
+
 class FlatLinearCombination(collections.defaultdict):
 
     # This class mostly exists for legibility purposes: instead of
@@ -1492,6 +1529,13 @@ class NestedLinearCombination(list):
 
         # Final derivatives, constructed progressively:
         derivatives = FlatLinearCombination()
+
+        # !!!!!!!!! This is a bug: if multiple AffineScalarFunc share
+        # the same linear combination, they will be emptied. It would
+        # be much better if NestedLinearCombination could be
+        # transparently transformed into FlatLinearCombination upon
+        # expansion. Example: x = ufloat(); y = 2*x; t = modf(y)[0]; print t;
+        # print y => no uncertainty on y!
 
         while self:  # The list of terms is emptied progressively
 
