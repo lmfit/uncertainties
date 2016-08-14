@@ -1,7 +1,7 @@
 # coding=utf-8
 
-# !!!!!!!!!! CHeck all calls to AffineScalarFunc in all programs,
-# including this one, and adapt to the new interface.
+# !!!!!!!!!! CHeck all calls to Variable and AffineScalarFunc in all
+# programs, including this one, and adapt to the new interface.
 
 """
 Main module for the uncertainties package, with internals.
@@ -1476,7 +1476,7 @@ class NestedLinearCombination(list):
             # remaining terms allows this term to be quickly put in
             # the final result, which limits the number of terms
             # remaining (and whose size can temporarily grow):
-            main_factor, main_expr = self.pop()
+            (main_factor, main_expr) = self.pop()
 
             # print "MAINS", main_factor, main_expr  #!!!!!!!!!!!!
 
