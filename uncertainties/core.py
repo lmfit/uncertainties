@@ -1433,28 +1433,48 @@ def signif_dgt_to_limit(value, num_signif_d):
 
     return limit_no_rounding
 
-# !!!!!! Document
 class FlatLinearCombination(collections.defaultdict):
 
     # This class mostly exists for legibility purposes: instead of
+    # manipulating defaultdicts that map Variables to their
+    # coefficient, it is clearer to explicitly tag such defaultdicts
+    # as FlatLinearCombination objects. Now, the downside is that if
+    # the object is initialized with a pre-built dictionary, for
+    # instance, then a copy of this dictionary is made, when this is
+    # not needed.
 
-    def __init__(self, vars_to_coefs):
-        super(FlatLinearCombination, self).__init__(float, vars_to_coefs)
+    """
+    Mapping from Variables to their coefficient as a
+    collections.defaultdict.
+
+    The default_factory can be changed.
+    """
+
+    def __init__(self, *args, **kwargs):
+        """
+        The arguments are like those of collections.defaultdict, except
+        for the factory function, which is set to float.
+
+        This is typically called with a mapping from Variables to
+        their coefficient, or no argument.
+        """
+        super(FlatLinearCombination, self).__init__(float, *args, **kwargs)
 
 
-# !!!!!!!! This creates a copy of the list, when the expression is
-# built: I should probably just store linear_combo.  !!!!!!! SAME for
-# a new FlatLinearCombination, that I would access explicitly between
-# class that know how it works. Using slots should be quite cheap in
-# memory. BUT I would pay with attribute access, when doing
-# calculations.
 class NestedLinearCombination(list):
+
+    # This class mostly exists for legibility purposes: instead of
+    # manipulating lists that associate NestedLinearCombination and
+    # FlatLinearCombination to their coefficient, it is clearer to
+    # explicitly tag such defaultdicts as NestedLinearCombination
+    # objects. Now, the downside is that if the object is initialized
+    # with a pre-built list, for instance, then a copy of this
+    # list is made, when this is not needed.
+
     """
     List of (float_coefficient, NestedLinearCombination) or
-    (float_coefficient, dict) pairs, that represents a possibly nested
-    linear combination of Variables.
-
-    Any dict in a term must map Variables to their coefficient.
+    (float_coefficient, FlatLinearCombination) pairs, that represents
+    a possibly nested linear combination of Variables.
 
     Example: a value of f = [(a, g), (b,h)] represents a*g + b*h,
     where, e.g., g = t*x + u*y. Thus, f(x,y,...) = a*t*x + ...
@@ -1463,9 +1483,8 @@ class NestedLinearCombination(list):
     def expand_and_empty(self):
         """
         Return the expansion of the linear combination as a
-        collections.defaultdict(float). The object itself is emptied
-        (this makes the code run faster, and this also frees some
-        memory).
+        FlatLinearCombination. The object itself is emptied (this
+        makes the code run faster, and this also frees some memory).
         """
 
         # The derivatives are built progressively by expanding each
@@ -1473,7 +1492,7 @@ class NestedLinearCombination(list):
         # combination to be expanded.
 
         # Final derivatives, constructed progressively:
-        derivatives = collections.defaultdict(float)
+        derivatives = FlatLinearCombination()
 
         while self:  # The list of terms is emptied progressively
 
@@ -1489,7 +1508,7 @@ class NestedLinearCombination(list):
             # remaining (and whose size can temporarily grow):
             (main_factor, main_expr) = self.pop()
 
-            # print "MAINS", main_factor, main_expr  #!!!!!!!!!!!!
+            # print "MAINS", main_factor, main_expr
 
             if isinstance(main_expr, NestedLinearCombination):
 
@@ -1502,7 +1521,7 @@ class NestedLinearCombination(list):
                 for (var, factor) in main_expr.iteritems():
                     derivatives[var] += main_factor*factor
 
-            # print "DERIV", derivatives  #!!!!!!!!!!!
+            # print "DERIV", derivatives
 
 
         return derivatives
@@ -1572,8 +1591,9 @@ class AffineScalarFunc(object):
 
         linear_part -- can be any expression contained in a
         NestedLinearCombination (another NestedLinearCombination,
-        which represents a formal linear combination, or a dict, which
-        represents typically a cached, expanded linear combination).
+        which represents a formal linear combination, or a
+        FlatLinearCombination, which represents typically a cached,
+        expanded linear combination).
         """
 
         # ! A technical consistency requirement is that the
