@@ -229,7 +229,7 @@ def to_affine_scalar(x):
     (AffineScalarFunc), unless it is already an AffineScalarFunc (in
     which case x is returned unchanged).
 
-    Raises an exception unless 'x' belongs to some specific classes of
+    Raises an exception unless x belongs to some specific classes of
     objects that are known not to depend on AffineScalarFunc objects
     (which then cannot be considered as constants).
     """
@@ -239,7 +239,7 @@ def to_affine_scalar(x):
 
     if isinstance(x, CONSTANT_TYPES):
         # No variable => no derivative:
-        return Variable(x, NestedLinearCombination())
+        return AffineScalarFunc(x, FlatLinearCombination())
 
     # Case of lists, etc.
     raise NotUpcast("%s cannot be converted to a number with"
@@ -1460,7 +1460,6 @@ class FlatLinearCombination(collections.defaultdict):
         """
         super(FlatLinearCombination, self).__init__(float, *args, **kwargs)
 
-
 class NestedLinearCombination(list):
 
     # This class mostly exists for legibility purposes: instead of
@@ -1751,9 +1750,7 @@ class AffineScalarFunc(object):
 
         for (variable, derivative) in self.derivatives.iteritems():
 
-            # print "TYPE", type(variable), type(derivative)  #!!!!!!!!!!!!
-
-
+            # print "TYPE", type(variable), type(derivative)
 
             # Individual standard error due to variable:
 
