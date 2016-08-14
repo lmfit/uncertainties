@@ -1449,11 +1449,12 @@ def signif_dgt_to_limit(value, num_signif_d):
 # - No copy upon initialization (but it should be documented that the
 #   initialization value might be changed)
 #
-# - Modifiying the value used for initialization is fine, since the object
-#   itself can keep the same value but expanded. This will not disturb
-#   the semantics of objects that refer to the linear combination, since
-#   the linear combination does not change (only maybe the value used for
-#   initialization will change).
+# - Modifiying the value used for initialization is fine, since the
+#   object itself can keep the same value but expanded. This will not
+#   disturb the semantics of objects that refer to the linear
+#   combination, since the linear combination does not change its
+#   value, only its form (only maybe the value used for initialization
+#   will change).
 #
 # - Any update/expansion of the object will benefit all other
 #   references to the object (whereas currently a
