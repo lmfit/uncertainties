@@ -1538,6 +1538,13 @@ class NestedLinearCombination(list):
         # expansion. Example: x = ufloat(); y = 2*x; t = modf(y)[0]; print t;
         # print y => no uncertainty on y!
 
+        # !!!!!!! Another, efficient but less legible option would be
+        # to not empty self, but to instead use it as a source of
+        # terms that would fill another, temporary list that would be
+        # emptied: for index in xrange(len(self)-1, -1, -1): ... we
+        # look at the term in self[index], process it and put any new
+        # term in a new list, we do the same thing on this list until
+        # it's empty, and we move on to the next index.
         while self:  # The list of terms is emptied progressively
 
             # One of the terms is expanded or, if no expansion is
