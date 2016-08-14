@@ -178,7 +178,7 @@ else:
 
         # Representation of the initial correlated values:
         values_funcs = tuple(
-            AffineScalarFunc(value, dict(zip(variables, coords)))
+            AffineScalarFunc(value, dict(iterools.izip(variables, coords)))
             for (coords, value) in zip(transform, nom_values))
 
         return values_funcs
