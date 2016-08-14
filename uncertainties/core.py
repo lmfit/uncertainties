@@ -2282,9 +2282,8 @@ class AffineScalarFunc(object):
         New variables are specially created for the returned
         AffineScalarFunc object.
         """
-        return AffineScalarFunc(
-            self._nominal_value,
-            copy.deepcopy(self._linear_part))
+        return AffineScalarFunc(self._nominal_value,
+                                copy.deepcopy(self._linear_part))
 
     def __getstate__(self):
         """
