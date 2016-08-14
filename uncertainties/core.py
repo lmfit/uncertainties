@@ -1,6 +1,6 @@
 # coding=utf-8
 
-# !!!!!!!!!! CHeck all calls to Variable and AffineScalarFunc in all
+# !!!!!!!!!! CHeck all calls to AffineScalarFunc in all
 # programs, including this one, and adapt to the new interface.
 
 """
@@ -178,9 +178,7 @@ else:
 
         # Representation of the initial correlated values:
         values_funcs = tuple(
-            # !!!!!!! Update for the new _linear_part in
-            # AffineScalarFunc? maybe the following is incorrect
-            AffineScalarFunc(value, zip(variables, coords))
+            AffineScalarFunc(value, dict(zip(variables, coords)))
             for (coords, value) in zip(transform, nom_values))
 
         return values_funcs
