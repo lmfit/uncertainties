@@ -178,7 +178,9 @@ else:
 
         # Representation of the initial correlated values:
         values_funcs = tuple(
-            AffineScalarFunc(value, dict(zip(variables, coords)))
+            AffineScalarFunc(
+                value,
+                FlatLinearCombination(dict(itertools.izip(variables, coords))))
             for (coords, value) in zip(transform, nom_values))
 
         return values_funcs
@@ -1431,28 +1433,79 @@ def signif_dgt_to_limit(value, num_signif_d):
 
     return limit_no_rounding
 
-# !!!!!!!! This creates a copy of the list, when the expression is
-# built: I should probably just store linear_combo.  !!!!!!! SAME for
-# a new FlatLinearCombination, that I would access explicitly between
-# class that know how it works. Using slots should be quite cheap in
-# memory. BUT I would pay with attribute access, when doing
-# calculations.
-class NestedLinearCombination(list):
+
+class FlatLinearCombination(object):
+
+    # This class is essentially a usual mapping. It does exist so as
+    # to make the concept of linear combination in the code more
+    # explicit.
+
+    # ! Implementation note: inheriting from map forces a useless
+    # copy, in initializations like
+    # NestedLinearCombination([...]). Inheriting from list and then
+    # changing the class in __new__ is prevented by the fact that list
+    # is built-in.
+
     """
-    List of (float_coefficient, NestedLinearCombination) or
-    (float_coefficient, dict) pairs, that represents a possibly nested
+    Linear combination of Variables.
+
+    Each Variable in the linear_combo attribute is mapped to its
+    coefficient.
+    """
+
+    __slots__ = "linear_combo"
+
+    def __init__(self, linear_combo):
+        """
+        linear_combo -- mapping from Variables to their coefficient.
+        """
+        self.linear_combo = linear_combo
+
+    # !!!!!!! I could implement a restricted set of methods, or use
+    # __getattr__ to redirect everything.
+
+class NestedLinearCombination(object):
+
+    # This class is essentially a usual list. It does exist so as
+    # to make the concept of linear combination in the code more
+    # explicit.
+
+    # ! Implementation note: inheriting from list forces a useless
+    # copy, in initializations like
+    # NestedLinearCombination([...]). Inheriting from list and then
+    # changing the class in __new__ is prevented by the fact that list
+    # is built-in.
+
+    """
+    Expression representing a linear combination.
+
+    The linear_combo attribute is a list of (float_coefficient,
+    NestedLinearCombination) or (float_coefficient,
+    FlatLinearCombination) pairs, that represents a possibly nested
     linear combination of Variables.
 
-    Any dict in a term must map Variables to their coefficient.
-
-    Example: a value of f = [(a, g), (b,h)] represents a*g + b*h,
+    Example: a value of f = [(a, g), (b,h)] can represent a*g + b*h,
     where, e.g., g = t*x + u*y. Thus, f(x,y,...) = a*t*x + ...
     """
 
-    def expand_and_empty(self):
+    __slots__ = "linear_combo"
+
+    def __init__(self, linear_combo):
         """
-        Return the expansion of the linear combination as a
-        collections.defaultdict(float). The object itself is emptied.
+        linear_combo -- list of (float_coefficient,
+        NestedLinearCombination) or (float_coefficient,
+        FlatLinearCombination) pairs, that represents a possibly
+        nested linear combination of Variables.
+        """
+        self.linear_combo = linear_combo
+
+    def expand(self):
+        """
+        Replace the expression by its expanded form (the class becomes
+        FlatLinearCombination) and return it.
+
+        The result is given as a FlatLinearCombination whose mapping
+        is a collections.defaultdict(float).
         """
 
         # The derivatives are built progressively by expanding each
@@ -1462,7 +1515,9 @@ class NestedLinearCombination(list):
         # Final derivatives, constructed progressively:
         derivatives = collections.defaultdict(float)
 
-        while self:  # The list of terms is emptied progressively
+        # !!!!!!!! self.linear_combo could be cached, for a speedup
+
+        while self.linear_combo:  # The list of terms is emptied progressively
 
             # One of the terms is expanded or, if no expansion is
             # needed, simply added to the existing derivatives.
@@ -1474,25 +1529,28 @@ class NestedLinearCombination(list):
             # remaining terms allows this term to be quickly put in
             # the final result, which limits the number of terms
             # remaining (and whose size can temporarily grow):
-            (main_factor, main_expr) = self.pop()
+            (main_factor, main_expr) = self.linear_combo.pop()
 
             # print "MAINS", main_factor, main_expr  #!!!!!!!!!!!!
 
             if isinstance(main_expr, NestedLinearCombination):
 
-                for (factor, expr) in main_expr:
-                    # The main_factor is applied to expr:
-                        self.append((main_factor*factor, expr))
+                for (factor, expr) in main_expr.linear_combo:
+                    # The main_factor is applied to expr and the
+                    # expression will be expanded later:
+                    self.linear_combo.append((main_factor*factor, expr))
 
-            else:  # We directly have an expanded linear combination
+            else:  # We directly have a FlatLinearCombination
 
-                for (var, factor) in main_expr.iteritems():
+                for (var, factor) in main_expr.linear_combo.iteritems():
                     derivatives[var] += main_factor*factor
 
             # print "DERIV", derivatives  #!!!!!!!!!!!
 
-
-        return derivatives
+        # Replacement by the expanded form:
+        self.linear_combo = derivatives
+        self.__class__ = FlatLinearCombination
+        return self
 
 class AffineScalarFunc(object):
     """
@@ -1529,6 +1587,9 @@ class AffineScalarFunc(object):
     - std_score(x): position of number x with respect to the
       nominal value, in units of the standard deviation.
     """
+
+    # !!!!!!!!! Re-document _linear_part: FlatLinearCombination or
+    # NestedLinearCombination.
 
     # !! Instances should generally not be semantically mutated,
     # because they are generally linked together in a tree (that
@@ -1616,12 +1677,12 @@ class AffineScalarFunc(object):
         """
 
         if isinstance(self._linear_part, NestedLinearCombination):
-            self._linear_part = self._linear_part.expand_and_empty()
+            self._linear_part.expand()
             # Attempts to get the contribution of a variable that the
             # function does not depend on raise a KeyError:
-            self._linear_part.default_factory = None
+            self._linear_part.linear_combo.default_factory = None
 
-        return self._linear_part
+        return self._linear_part.linear_combo
 
     ############################################################
 
@@ -2664,7 +2725,8 @@ class Variable(AffineScalarFunc):
         # takes much more memory.  Thus, this implementation chooses
         # more cycles and a smaller memory footprint instead of no
         # cycles and a larger memory footprint.
-        super(Variable, self).__init__(value, {self: 1.})
+        super(Variable, self).__init__(
+            value, FlatLinearCombination({self: 1.}))
 
         self.std_dev = std_dev  # Assignment through a Python property
 
