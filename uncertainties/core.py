@@ -247,7 +247,7 @@ def to_affine_scalar(x):
 
 # Step constant for numerical derivatives in
 # partial_derivative(). Value chosen to as to get better numerical
-# result:
+# results:
 try:
     STEP_SIZE = sqrt(sys.float_info.epsilon)
 except AttributeError:
@@ -1435,6 +1435,9 @@ def signif_dgt_to_limit(value, num_signif_d):
 
 # !!!!!! Document
 class FlatLinearCombination(collections.defaultdict):
+
+    # This class mostly exists for legibility purposes: instead of
+
     def __init__(self, vars_to_coefs):
         super(FlatLinearCombination, self).__init__(float, vars_to_coefs)
 
@@ -1460,7 +1463,9 @@ class NestedLinearCombination(list):
     def expand_and_empty(self):
         """
         Return the expansion of the linear combination as a
-        collections.defaultdict(float). The object itself is emptied.
+        collections.defaultdict(float). The object itself is emptied
+        (this makes the code run faster, and this also frees some
+        memory).
         """
 
         # The derivatives are built progressively by expanding each
