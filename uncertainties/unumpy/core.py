@@ -13,6 +13,7 @@ from __future__ import division
 
 # Standard modules:
 import sys
+import itertools
 
 # 3rd-party modules:
 import numpy
@@ -406,7 +407,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         # progressively build the matrix of derivatives, by
         # progressively adding the derivatives with respect to
         # successive variables.
-        for (var, deriv_wrt_var) in zip(variables, func_and_derivs):
+        for (var, deriv_wrt_var) in itertools.izip(variables, func_and_derivs):
 
             # Update of the list of variables and associated
             # derivatives, for each element:
@@ -592,7 +593,9 @@ class matrix(numpy.matrix):
 
 
     # !!! The following function is not in the official documentation
-    # of the module.
+    # of the module. Maybe this is because arrays with uncertainties
+    # do not have any equivalent in this module, and they should be
+    # the first ones to have such methods?
     @property
     def nominal_values(self):
         """
@@ -601,7 +604,9 @@ class matrix(numpy.matrix):
         return nominal_values(self)
 
     # !!! The following function is not in the official documentation
-    # of the module.
+    # of the module. Maybe this is because arrays with uncertainties
+    # do not have any equivalent in this module, and they should be
+    # the first ones to have such methods?
     @property
     def std_devs(self):
         return CallableStdDevs(std_devs(self))
