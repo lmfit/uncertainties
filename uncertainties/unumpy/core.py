@@ -314,7 +314,7 @@ def array_derivative(array_like, var):
 def func_with_deriv_to_uncert_func(func_with_derivatives):
     """
     Return a function that can be applied to array-like objects that
-    contain numbers with uncertainties (lists, lists of lists, Numpy
+    contain numbers with uncertainties (lists, lists of lists, NumPy
     arrays, etc.).
 
     func_with_derivatives -- defines a function that takes array-like
