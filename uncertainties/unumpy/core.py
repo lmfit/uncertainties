@@ -296,7 +296,7 @@ def array_derivative(array_like, var):
     Return the derivative of the given array with respect to the
     given variable.
 
-    The returned derivative is a Numpy ndarray of the same shape as
+    The returned derivative is a NumPy ndarray of the same shape as
     array_like, that contains floats.
 
     array_like -- array-like object (list, etc.)  that contains
@@ -353,7 +353,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
     def wrapped_func(array_like, *args, **kwargs):
         """
         array_like -- array-like object that contains numbers with
-        uncertainties (list, Numpy ndarray or matrix, etc.).
+        uncertainties (list, NumPy ndarray or matrix, etc.).
 
         args -- additional arguments that are passed directly to
         func_with_derivatives.
@@ -421,7 +421,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
             func_nominal_value,
             numpy.vectorize(uncert_core.LinearCombination)(derivatives))
 
-        # Numpy matrices that contain numbers with uncertainties are
+        # NumPy matrices that contain numbers with uncertainties are
         # better as unumpy matrices:
         if isinstance(result, numpy.matrix):
             result = result.view(matrix)
