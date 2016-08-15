@@ -335,8 +335,9 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
       arr -- Numpy ndarray of scalars where the function must be
       evaluated.
 
-      input_type -- type of the input array-like object.  This type is
-      used for determining the type that the function should return.
+      input_type -- data type of the input array-like object.  This
+      type is used for determining the type that the function should
+      return.
 
       derivatives -- iterator that returns the derivatives of the
       argument of the function with respect to multiple scalar
