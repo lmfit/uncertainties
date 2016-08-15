@@ -170,9 +170,9 @@ def wrap_array_func(func):
         for element in arr.flat:
             # floats, etc. might be present
             if isinstance(element, uncert_core.AffineScalarFunc):
-                # !!!!!!! This forces an evaluation of the
-                # derivatives!? This does not look good, when
-                # summing a large number of arrays.
+                # !!!! This forces an evaluation of the
+                # derivatives!? Isn't this very slow, when
+                # working with a large number of arrays?
                 variables |= set(element.derivatives.iterkeys())
 
         # If the matrix has no variables, then the function value can be
@@ -593,18 +593,15 @@ class matrix(numpy.matrix):
 
     # !!! The following function is not in the official documentation
     # of the module.
+    @property
     def nominal_values(self):
         """
         Nominal value of all the elements of the matrix.
         """
         return nominal_values(self)
-    nominal_values = property(nominal_values)
 
     # !!! The following function is not in the official documentation
     # of the module.
-    #
-    # !!! Furthermore, std_devs() is a function, unlike for UFloats,
-    # which is not consistent.
     @property
     def std_devs(self):
         return CallableStdDevs(std_devs(self))
