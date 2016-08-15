@@ -409,7 +409,8 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         # progressively build the matrix of derivatives, by
         # progressively adding the derivatives with respect to
         # successive variables.
-        for (var, deriv_wrt_var) in itertools.izip(variables, func_then_derivs):
+        for (var, deriv_wrt_var) in itertools.izip(variables,
+                                                   func_then_derivs):
 
             # Update of the list of variables and associated
             # derivatives, for each element:
