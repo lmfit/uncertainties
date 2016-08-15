@@ -19,7 +19,8 @@ import inspect
 
 # Local modules
 import uncertainties.core as uncert_core
-from uncertainties.core import to_affine_scalar, AffineScalarFunc
+from uncertainties.core import (to_affine_scalar, AffineScalarFunc,
+                                LinearCombination)
 
 ###############################################################################
 
@@ -360,7 +361,7 @@ def ldexp(x, i):
     if aff_func._linear_part:
         return AffineScalarFunc(
             math.ldexp(aff_func.nominal_value, i),
-            uncert_core.LinearCombination([(2**i, aff_func._linear_part)]))
+            LinearCombination([(2**i, aff_func._linear_part)]))
     else:
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
