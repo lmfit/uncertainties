@@ -1,8 +1,5 @@
 # coding=utf-8
 
-# !!!!!!!!!! CHeck all calls to AffineScalarFunc in all
-# programs, including this one, and adapt to the new interface.
-
 """
 Main module for the uncertainties package, with internals.
 """
