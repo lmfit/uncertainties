@@ -299,28 +299,34 @@ def test_power_special_cases():
     test_uncertainties.power_special_cases(umath_core.pow)
 
     # We want the same behavior for numbers with uncertainties and for
-    # math.pow() at their nominal values:
+    # math.pow() at their nominal values.
 
     positive = ufloat(0.3, 0.01)
     negative = ufloat(-0.3, 0.01)
+
+    # The type of the expected exception is first determined, because
+    # it varies between versions of Python (OverflowError in Python
+    # 2.6+, ValueError in Python 2.5,...):
+    try:
+        math.pow(0, negative.nominal_value)
+    except Exception, err_math:  # "as", for Python 2.6+
+        # Python 3 does not make exceptions local variables: they are
+        # restricted to their except block:
+        err_math_args = err_math.args
+        exception_class = err_math.__class__
 
     # http://stackoverflow.com/questions/10282674/difference-between-the-built-in-pow-and-math-pow-for-floats-in-python
 
     try:
         umath_core.pow(ufloat(0, 0.1), negative)
-    except (ValueError, OverflowError) as err:
-        err_class = err.__class__  # For Python 3: err is destroyed after except
+    except exception_class, err:  # "as err", for Python 2.6+
+        pass
     else:
-        err_class = None
-
-    err_msg = 'A proper exception should have been raised'
-
-    # An exception must have occurred:
-    assert err_class == ValueError, err_msg
+        raise Exception('%s exception expected' % exception_class.__name__)
 
     try:
         result = umath_core.pow(negative, positive)
-    except ValueError:
+    except exception_class:  # Assumed: same exception as for pow(0, negative)
         # The reason why it should also fail in Python 3 is that the
         # result of Python 3 is a complex number, which uncertainties
         # does not handle (no uncertainties on complex numbers). In
@@ -328,7 +334,7 @@ def test_power_special_cases():
         # know how to calculate it.
         pass
     else:
-        raise Exception('A proper exception should have been raised')
+        raise Exception('%s exception expected' % exception_class.__name__)
 
 def test_power_wrt_ref():
     '''
