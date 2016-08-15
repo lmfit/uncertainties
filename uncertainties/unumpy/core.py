@@ -411,7 +411,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
 
             # Update of the list of variables and associated
             # derivatives, for each element:
-            for (derivative_dict, derivative_value) in zip(
+            for (derivative_dict, derivative_value) in itertools.izip(
                 derivatives.flat, deriv_wrt_var.flat):
                 if derivative_value:
                     derivative_dict[var] = derivative_value
