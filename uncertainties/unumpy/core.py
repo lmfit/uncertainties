@@ -378,16 +378,16 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
                 variables |= element.derivatives.viewkeys()
 
         array_nominal = nominal_values(array_version)
-        # Function value, and derivatives at array_nominal (the
+        # Function value, then derivatives at array_nominal (the
         # derivatives are with respect to the variables contained in
         # array_like):
-        func_and_derivs = func_with_derivatives(
+        func_then_derivs = func_with_derivatives(
             array_nominal,
             type(array_like),
             (array_derivative(array_version, var) for var in variables),
             *args, **kwargs)
 
-        func_nominal_value = next(func_and_derivs)
+        func_nominal_value = next(func_then_derivs)
 
         if not variables:
             return func_nominal_value
@@ -409,7 +409,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         # progressively build the matrix of derivatives, by
         # progressively adding the derivatives with respect to
         # successive variables.
-        for (var, deriv_wrt_var) in itertools.izip(variables, func_and_derivs):
+        for (var, deriv_wrt_var) in itertools.izip(variables, func_then_derivs):
 
             # Update of the list of variables and associated
             # derivatives, for each element:
