@@ -1,3 +1,6 @@
+# !!!!!!!!!!! Add a header to the documentation, stating somethign
+# about the uncertainties.UFloat-compatible version of..., for all functions
+
 """
 Implementation of umath.py, with internals.
 """
@@ -308,10 +311,12 @@ def wrapped_fsum():
     return wraps(lambda arg_list: flat_fsum_wrap(*arg_list),
                  original_func)
 
+# !!!!!!!! Documented?
 fsum = wrapped_fsum()
 non_std_wrapped_funcs.append('fsum')
 
 ##########
+
 
 # !!!!!!!!!! Check the logic of all the creations of AffineScalarFunc
 # below, and adapt to the new _linear_part
