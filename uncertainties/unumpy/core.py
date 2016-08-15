@@ -234,9 +234,16 @@ def wrap_array_func(func):
                 if derivative_value:
                     derivative_dict[var] = derivative_value
 
+
+        # !!!!!!!!!!!! Does this code benefit from the speedup in
+        # sum(AffineScalarFunc)? I could check the absolute and
+        # asymptotic speeds of summing 100,000 small identical arrays
+        # together.
+
         # numbers with uncertainties are built from the result:
         return numpy.vectorize(uncert_core.AffineScalarFunc)(
-            func_nominal_value, derivatives)
+            func_nominal_value,
+            numpy.vectorize(uncert_core.LinearCombination)(derivatives))
 
     wrapped_func = uncert_core.set_doc("""\
     Version of %s(...) that works even when its first argument is a NumPy
@@ -407,7 +414,8 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         # An array of numbers with uncertainties are built from the
         # result:
         result = numpy.vectorize(uncert_core.AffineScalarFunc)(
-            func_nominal_value, derivatives)
+            func_nominal_value,
+            uncert_core.LinearCombination(derivatives))
 
         # Numpy matrices that contain numbers with uncertainties are
         # better as unumpy matrices:
