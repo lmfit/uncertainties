@@ -1526,6 +1526,12 @@ class LinearCombination(object):
 
         self.linear_combo = derivatives
 
+    def __getstate__(self):
+        return self.linear_combo
+
+    def __setstate__(self, state):
+        self.linear_combo = state
+
 class AffineScalarFunc(object):
     """
     Affine functions that support basic mathematical operations
@@ -2377,6 +2383,9 @@ class AffineScalarFunc(object):
         Hook for the pickle module.
         """
         for (name, value) in data_dict.iteritems():
+            # Contrary to the default __setstate__(), this does not
+            # necessarily save to the instance dictionary (because the
+            # instance might contain slots):
             setattr(self, name, value)
 
 # Nicer name, for users: isinstance(ufloat(...), UFloat) is
