@@ -353,8 +353,9 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
 
     def wrapped_func(array_like, *args, **kwargs):
         """
-        array_like -- array-like object that contains numbers with
-        uncertainties (list, NumPy ndarray or matrix, etc.).
+        array_like -- n-dimensional array-like object that contains
+        numbers with uncertainties (list, NumPy ndarray or matrix,
+        etc.).
 
         args -- additional arguments that are passed directly to
         func_with_derivatives.
