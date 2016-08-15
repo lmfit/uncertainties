@@ -180,7 +180,7 @@ else:
         values_funcs = tuple(
             AffineScalarFunc(
                 value,
-                FlatLinearCombination(iterools.izip(variables, coords)))
+                LinearCombination(dict(iterools.izip(variables, coords))))
             for (coords, value) in zip(transform, nom_values))
 
         return values_funcs
@@ -239,7 +239,7 @@ def to_affine_scalar(x):
 
     if isinstance(x, CONSTANT_TYPES):
         # No variable => no derivative:
-        return AffineScalarFunc(x, FlatLinearCombination())
+        return AffineScalarFunc(x, LinearCombination({}))
 
     # Case of lists, etc.
     raise NotUpcast("%s cannot be converted to a number with"
@@ -707,8 +707,8 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
         # The function now returns the necessary linear approximation
         # to the function:
-        return AffineScalarFunc(f_nominal_value,
-                                NestedLinearCombination(linear_part))
+        return AffineScalarFunc(
+            f_nominal_value, LinearCombination(linear_part))
 
     f_with_affine_output = set_doc("""\
     Version of %s(...) that returns an affine approximation
@@ -1517,11 +1517,56 @@ class NestedLinearCombination(list):
     where, e.g., g = t*x + u*y. Thus, f(x,y,...) = a*t*x + ...
     """
 
-    def expand_and_empty(self):
+
+# !!!!!!! DOCUMENT
+class LinearCombination(object):
+    """
+    Linear combination of Variable differentials.
+
+    The linear_combo attribute can change formally, but its value
+    always remains the same. Typically, the linear combination can
+    thus be expanded.
+
+    The expanded form of linear_combo is a mapping from Variables to
+    the coefficient of their differential.
+    """
+
+    # ! linear_combo is represented internally exactly as the
+    # linear_combo argument to __init__().
+
+    __slots__ = "linear_combo"
+
+    def __init__(self, linear_combo):
         """
-        Return the expansion of the linear combination as a
-        FlatLinearCombination. The object itself is emptied (this
-        makes the code run faster, and this also frees some memory).
+        linear_combo can be modified by the object, during its
+        lifetime. This allows the object to change its internal
+        representation over time (for instance by expanding the linear
+        combination and replacing the original expression with the
+        expanded one).
+
+        linear_combo -- if linear_combo is a dict, then it represents
+        an expanded linear combination and must map Variables to the
+        coefficient of their differential. Otherwise, it should be a
+        list of (coefficient, LinearCombination) pairs (that
+        represents a linear combination expression).
+        """
+
+        self.linear_combo = linear_combo
+
+    def expanded(self):
+        """
+        Return True if and only if the linear combination is expanded.
+        """
+        return isinstance(self.linear_combo, dict)
+
+    def expand(self):
+        """
+        Expand the linear combination.
+
+        The expansion is a collections.defaultdict(float).
+
+        This should only be called if the linear combination is not
+        yet expanded.
         """
 
         # The derivatives are built progressively by expanding each
@@ -1529,23 +1574,9 @@ class NestedLinearCombination(list):
         # combination to be expanded.
 
         # Final derivatives, constructed progressively:
-        derivatives = FlatLinearCombination()
+        derivatives = collections.defaultdict(float)
 
-        # !!!!!!!!! This is a bug: if multiple AffineScalarFunc share
-        # the same linear combination, they will be emptied. It would
-        # be much better if NestedLinearCombination could be
-        # transparently transformed into FlatLinearCombination upon
-        # expansion. Example: x = ufloat(); y = 2*x; t = modf(y)[0]; print t;
-        # print y => no uncertainty on y!
-
-        # !!!!!!! Another, efficient but less legible option would be
-        # to not empty self, but to instead use it as a source of
-        # terms that would fill another, temporary list that would be
-        # emptied: for index in xrange(len(self)-1, -1, -1): ... we
-        # look at the term in self[index], process it and put any new
-        # term in a new list, we do the same thing on this list until
-        # it's empty, and we move on to the next index.
-        while self:  # The list of terms is emptied progressively
+        while self.linear_combo:  # The list of terms is emptied progressively
 
             # One of the terms is expanded or, if no expansion is
             # needed, simply added to the existing derivatives.
@@ -1557,25 +1588,22 @@ class NestedLinearCombination(list):
             # remaining terms allows this term to be quickly put in
             # the final result, which limits the number of terms
             # remaining (and whose size can temporarily grow):
-            (main_factor, main_expr) = self.pop()
+            (main_factor, main_expr) = self.linear_combo.pop()
 
             # print "MAINS", main_factor, main_expr
 
-            if isinstance(main_expr, NestedLinearCombination):
-
-                for (factor, expr) in main_expr:
-                    # The main_factor is applied to expr:
-                        self.append((main_factor*factor, expr))
-
-            else:  # We directly have an expanded linear combination
-
-                for (var, factor) in main_expr.iteritems():
+            if main_expr.expanded():
+                for (var, factor) in main_expr.linear_combo.iteritems():
                     derivatives[var] += main_factor*factor
+
+            else:  # Non-expanded form
+                for (factor, expr) in main_expr.linear_combo:
+                    # The main_factor is applied to expr:
+                    self.linear_combo.append((main_factor*factor, expr))
 
             # print "DERIV", derivatives
 
-
-        return derivatives
+        self.linear_combo = derivatives
 
 class AffineScalarFunc(object):
     """
@@ -1613,14 +1641,6 @@ class AffineScalarFunc(object):
       nominal value, in units of the standard deviation.
     """
 
-    # !! Instances should generally not be semantically mutated,
-    # because they are generally linked together in a tree (that
-    # represents a linear combination of variables as a linear
-    # combinations of linear combinations, etc.). Instances can be
-    # modified, but so long as their semantic contents does not change
-    # (e.g., calculating the expanded form of the associated linear
-    # combination in ._linear_part is fine, for instance).
-
     # To save memory in large arrays:
     __slots__ = ('_nominal_value', '_linear_part')
 
@@ -1640,11 +1660,8 @@ class AffineScalarFunc(object):
         nominal_value -- value of the function when the linear part is
         zero.
 
-        linear_part -- can be any expression contained in a
-        NestedLinearCombination (another NestedLinearCombination,
-        which represents a formal linear combination, or a
-        FlatLinearCombination, which represents typically a cached,
-        expanded linear combination).
+        linear_part -- LinearCombination that describes the linear
+        part of the AffineScalarFunc.
         """
 
         # ! A technical consistency requirement is that the
@@ -1699,13 +1716,13 @@ class AffineScalarFunc(object):
         This mapping is cached, for subsequent calls.
         """
 
-        if isinstance(self._linear_part, NestedLinearCombination):
-            self._linear_part = self._linear_part.expand_and_empty()
+        if not self._linear_part.expanded():
+            self._linear_part.expand()
             # Attempts to get the contribution of a variable that the
             # function does not depend on raise a KeyError:
-            self._linear_part.default_factory = None
+            self._linear_part.linear_combo.default_factory = None
 
-        return self._linear_part
+        return self._linear_part.linear_combo
 
     ############################################################
 
@@ -2746,7 +2763,7 @@ class Variable(AffineScalarFunc):
         # takes much more memory.  Thus, this implementation chooses
         # more cycles and a smaller memory footprint instead of no
         # cycles and a larger memory footprint.
-        super(Variable, self).__init__(value, {self: 1.})
+        super(Variable, self).__init__(value, LinearCombination({self: 1.}))
 
         self.std_dev = std_dev  # Assignment through a Python property
 
