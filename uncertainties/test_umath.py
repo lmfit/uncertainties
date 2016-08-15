@@ -239,39 +239,35 @@ def test_math_module():
     # The same exceptions should be generated when numbers with uncertainties
     # are used:
 
-    ## !! The Nose testing framework seems to catch an exception when
-    ## it is aliased: "exc = OverflowError; ... except exc:..."
-    ## surprisingly catches OverflowError. So, tests are written in a
-    ## version-specific manner (until the Nose issue is resolved).
-
+    # The type of the expected exception is first determined, because
+    # it varies between versions of Python (OverflowError in Python
+    # 2.6+, ValueError in Python 2.5,...):
     try:
         math.log(0)
-    except ValueError as err_math:
+    except Exception, err_math:  # "as", for Python 2.6+
         # Python 3 does not make exceptions local variables: they are
         # restricted to their except block:
         err_math_args = err_math.args
-    else:
-        raise Exception('ValueError exception expected')
+        exception_class = err_math.__class__
 
     try:
         umath_core.log(0)
-    except ValueError as err_ufloat:
+    except exception_class, err_ufloat:  # "as", for Python 2.6+
         assert err_math_args == err_ufloat.args
     else:
-        raise Exception('ValueError exception expected')
+        raise Exception('%s exception expected' % exception_class.__name__)
     try:
         umath_core.log(ufloat(0, 0))
-    except ValueError as err_ufloat:
+    except exception_class, err_ufloat:  # "as", for Python 2.6+
         assert err_math_args == err_ufloat.args
     else:
-        raise Exception('ValueError exception expected')
+        raise Exception('%s exception expected' % exception_class.__name__)
     try:
         umath_core.log(ufloat(0, 1))
-    except ValueError as err_ufloat:
+    except exception_class, err_ufloat:  # "as", for Python 2.6+
         assert err_math_args == err_ufloat.args
     else:
-        raise Exception('ValueError exception expected')
-
+        raise Exception('%s exception expected' % exception_class.__name__)
 
 def test_hypot():
     '''
