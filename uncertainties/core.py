@@ -1613,10 +1613,6 @@ class AffineScalarFunc(object):
         # terms: efficiently handling such terms [so, without copies]
         # is not obvious, when the algorithm should work for all
         # functions beyond sums).
-
-        if not isinstance(linear_part.linear_combo, (dict, list)):
-            raise Exception(str(type(linear_part.linear_combo)))
-
         self._linear_part = linear_part
 
     # The following prevents the 'nominal_value' attribute from being
