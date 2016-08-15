@@ -330,7 +330,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
     function for each derivative array from the iterator
     'derivatives'.
 
-      func_with_derivatives takes the following arguments:
+      func_with_derivatives() takes the following arguments:
 
       arr -- Numpy ndarray of scalars where the function must be
       evaluated.
