@@ -1997,7 +1997,7 @@ def test_format():
             # code. It is thus best to mimic the native behavior of
             # none type formatting (even if it does not look so good
             # in Python 2.6).
-            '020S': '%s(inf)' % format(float("-inf"), "015")
+            '020S': format(float("-inf"), '015')+'(inf)'
         },
         (-float('nan'), float('inf')): {
             'S': 'nan(inf)',
