@@ -357,7 +357,7 @@ def ldexp(x, i):
     if aff_func._linear_part:
         return AffineScalarFunc(
             math.ldexp(aff_func.nominal_value, i),
-            NestedLinearCombination([(2**i, aff_func._linear_part)]))
+            uncert_core.LinearCombination([(2**i, aff_func._linear_part)]))
     else:
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
@@ -370,6 +370,7 @@ def ldexp(x, i):
         return math.ldexp(x, y)
 many_scalars_to_scalar_funcs.append('ldexp')
 
+# !!!!!! Adapt to new LinearCombination and AffineScalarFunc
 @uncert_core.set_doc(math.frexp.__doc__)
 def frexp(x):
     """
@@ -383,7 +384,7 @@ def frexp(x):
 
     aff_func = to_affine_scalar(x)
 
-    if aff_func.derivatives:
+    if aff_func._linear_part:
         result = math.frexp(aff_func.nominal_value)
         # With frexp(x) = (m, e), dm/dx = 1/(2**e):
         factor = 1/(2**result[1])
