@@ -313,6 +313,8 @@ def array_derivative(array_like, var):
                            otypes=[float])(array_like)
 
 def func_with_deriv_to_uncert_func(func_with_derivatives):
+    # This function is used for instance for the calculation of the
+    # inverse and pseudo-inverse of a matrix with uncertainties.
     """
     Return a function that can be applied to array-like objects that
     contain numbers with uncertainties (lists, lists of lists, NumPy
@@ -361,11 +363,17 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         func_with_derivatives.
         """
 
-        # !!!!!!!!!!!! This code is used for the inverse and
-        # pseudo-inverse of a matrix. THINK about a way of
-        # accelerating the calculation with a lazy evaluation similar
-        # to the current implementation in
-        # AffineScalarFunc.derivatives().
+        # The calculation below is not lazy, contrary to the linear
+        # error propagation done in AffineScalarFunc. Making it lazy
+        # in the same way would be quite a specific task: basically
+        # this would amount to generalizing scalar coefficients in
+        # core.LinearCombination to more general matrix
+        # multiplications, and to replace Variable differentials by
+        # full matrices of coefficients. This does not look very
+        # efficient, as matrices are quite big, and since caching the
+        # result of a few matrix functions that are not typically
+        # stringed one after the other (unlike a big sum of numbers)
+        # should not be needed.
 
         # So that .flat works even if array_like is a list:
         array_version = numpy.asanyarray(array_like)
