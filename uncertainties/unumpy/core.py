@@ -320,7 +320,8 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
     func_with_derivatives -- defines a function that takes array-like
     objects containing scalars and returns an array.  Both the value
     and the derivatives of this function with respect to multiple
-    scalar parameters are calculated by func_with_derivatives().
+    scalar parameters are calculated by this func_with_derivatives()
+    argument.
 
     func_with_derivatives(arr, input_type, derivatives, *args,
     **kwargs) returns an iterator.  The first element is the value of
