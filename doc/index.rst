@@ -7,24 +7,24 @@
 Welcome to the uncertainties package
 ====================================
 
-The `uncertainties package`_ is a free, cross-platform program that 
-**transparently** handles calculations with **numbers with uncertainties** 
-(like 3.14±0.01).  It can also yield the **derivatives** of any 
+The `uncertainties package`_ is a free, cross-platform program that
+**transparently** handles calculations with **numbers with uncertainties**
+(like 3.14±0.01).  It can also yield the **derivatives** of any
 expression.
 
-The :mod:`uncertainties` package **takes the pain and complexity out** 
-of uncertainty calculations. Error propagation is not to be feared 
+The :mod:`uncertainties` package **takes the pain and complexity out**
+of uncertainty calculations. Error propagation is not to be feared
 anymore!
 
-Calculations of results with uncertainties, or of derivatives, can be 
-performed either in an **interactive session** (as with a calculator), 
-or in **programs** written in the Python_ programming language.  
+Calculations of results with uncertainties, or of derivatives, can be
+performed either in an **interactive session** (as with a calculator),
+or in **programs** written in the Python_ programming language.
 Existing calculation code can **run with little or no change**.
 
 Whatever the complexity of a calculation, this package returns its
-result with an uncertainty as predicted by linear `error propagation 
-theory`_. It automatically :ref:`calculates derivatives <derivatives>` 
-and uses them for calculating uncertainties. Almost all uncertainty 
+result with an uncertainty as predicted by linear `error propagation
+theory`_. It automatically :ref:`calculates derivatives <derivatives>`
+and uses them for calculating uncertainties. Almost all uncertainty
 calculations are performed **analytically**.
 
 **Correlations** between variables are automatically handled, which
@@ -39,11 +39,11 @@ Python packages to see if they better suit your needs: soerp_
 An easy-to-use calculator
 =========================
 
-Calculations involving **numbers with uncertainties** can be performed 
-even without knowing anything about the Python_ programming language. 
-After `installing this package`_ and `invoking the Python interpreter`_, 
-calculations with **automatic error propagation** can be performed 
-**transparently** (i.e., through the usual syntax for mathematical 
+Calculations involving **numbers with uncertainties** can be performed
+even without knowing anything about the Python_ programming language.
+After `installing this package`_ and `invoking the Python interpreter`_,
+calculations with **automatic error propagation** can be performed
+**transparently** (i.e., through the usual syntax for mathematical
 formulas):
 
 >>> from uncertainties import ufloat
@@ -54,8 +54,8 @@ formulas):
 >>> sin(2*x)  # In a Python shell, "print" is optional
 0.9092974268256817+/-0.08322936730942848
 
-Thus, existing calculation code designed for regular numbers can run 
-with numbers with uncertainties with :ref:`no or little modification 
+Thus, existing calculation code designed for regular numbers can run
+with numbers with uncertainties with :ref:`no or little modification
 <user guide>`.
 
 .. index:: correlations; simple example
@@ -67,8 +67,8 @@ zero even though :data:`x` has an uncertainty:
 >>> x-x
 0.0+/-0
 
-Many other error propagation codes return the incorrect value 0±0.1414… 
-because they wrongly assume that the two subtracted quantities are 
+Many other error propagation codes return the incorrect value 0±0.1414…
+because they wrongly assume that the two subtracted quantities are
 *independent* random variables.
 
 **Arrays** of numbers with uncertainties are :ref:`transparently
@@ -94,10 +94,10 @@ The :doc:`tech_guide` gives advanced technical details.
 
 .. only:: html
 
-   A :download:`PDF version <_build/latex/uncertaintiesPythonPackage.pdf>` 
+   A :download:`PDF version <_build/latex/uncertaintiesPythonPackage.pdf>`
    of the documentation is also available.
 
-Additional information is available through the pydoc_ command, which 
+Additional information is available through the pydoc_ command, which
 gives access to many of the documentation strings included in the code.
 
 .. index:: installation
@@ -123,12 +123,12 @@ Finder).
 Automatic install or upgrade
 ----------------------------
 
-One of the automatic installation or upgrade procedures below might work 
-on your system, if you have a Python package installer or use certain 
+One of the automatic installation or upgrade procedures below might work
+on your system, if you have a Python package installer or use certain
 Linux distributions.
 
-Under Unix, it may be necessary to prefix the commands below with 
-``sudo``, so that the installation program has **sufficient access 
+Under Unix, it may be necessary to prefix the commands below with
+``sudo``, so that the installation program has **sufficient access
 rights to the system**.
 
 If you have `pip <http://pip.openplans.org/>`_, you can try to install
@@ -281,7 +281,7 @@ What others say
   <http://biosport.ucdavis.edu/blog/2010/05/07/uncertainty-analysis>`_)
 - "*Utterly brilliant*" (`Jeffrey Simpson
   <http://twitter.com/#!/GeekyJeffrey>`_)
-- "*An amazing time saver*" (`Paul Nakroshis 
+- "*An amazing time saver*" (`Paul Nakroshis
   <http://scipyscriptrepo.com/wp/?p=41>`_)
 - "*Seems to be the gold standard for this kind of thing*" (`Peter Williams
   <http://newton.cx/~peter/work/?p=660>`_)
@@ -323,7 +323,7 @@ ones):
 
 - addition of :attr:`real` and :attr:`imag` attributes, for increased
   compatibility with existing code (Python numbers have these attributes);
-    
+
 - addition of new functions from the :mod:`math` module;
 
 - fitting routines that conveniently handle data with uncertainties;
@@ -341,10 +341,11 @@ welcome. They must have a high standard of legibility and quality in
 order to be accepted (otherwise it is always possible to create a new
 Python package by branching off this one, and I would still be happy
 to help with the effort).
-  
-**Please support the continued development of this program** by using
-`gittip <https://www.gittip.com/lebigot/>`_ or by `donating $10`_ or
-more through PayPal (no PayPal account necessary).
+
+**Please support the continued development of this program** by
+`donating $10`_ or more through PayPal (no PayPal account
+necessary). I love modern board games, so this will go towards giving
+my friends and I some special gaming time!
 
 .. index:: support
 
@@ -376,8 +377,8 @@ number is optional.
 Acknowledgments
 ===============
 
-The author wishes to thank all the people who made generous 
-`donations`_: they help keep this project alive by providing positive 
+The author wishes to thank all the people who made generous
+`donations`_: they help keep this project alive by providing positive
 feedback.
 
 I greatly appreciated getting key technical input from Arnaud
