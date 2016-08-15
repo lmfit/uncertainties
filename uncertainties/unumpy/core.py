@@ -171,6 +171,9 @@ def wrap_array_func(func):
         for element in arr.flat:
             # floats, etc. might be present
             if isinstance(element, uncert_core.AffineScalarFunc):
+                # !!!!!!! This forces an evaluation of the
+                # derivatives!? This does not look good, when
+                # summing a large number of arrays.
                 variables |= set(element.derivatives.iterkeys())
 
         # If the matrix has no variables, then the function value can be
@@ -415,7 +418,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         # result:
         result = numpy.vectorize(uncert_core.AffineScalarFunc)(
             func_nominal_value,
-            uncert_core.LinearCombination(derivatives))
+            numpy.vectorize(uncert_core.LinearCombination)(derivatives))
 
         # Numpy matrices that contain numbers with uncertainties are
         # better as unumpy matrices:
