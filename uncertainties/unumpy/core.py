@@ -416,7 +416,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
                 if derivative_value:
                     derivative_dict[var] = derivative_value
 
-        # An array of numbers with uncertainties are built from the
+        # An array of numbers with uncertainties is built from the
         # result:
         result = numpy.vectorize(uncert_core.AffineScalarFunc)(
             func_nominal_value,
