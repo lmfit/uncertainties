@@ -124,12 +124,11 @@ def derivative(u, var):
         return 0.
 
 def wrap_array_func(func):
-    # !!! This function is not used in the code, and is also not
-    # in the user guide: should it be promoted?
+    # !!! This function is not used in the code, except in the tests.
     #
     # !!! The implementation seems superficially similar to
-    # !!! uncertainties.core.wrap(): is there code/logic duplication
-    # !!! (which should be removed)?
+    # uncertainties.core.wrap(): is there code/logic duplication
+    # (which should be removed)?
     """
     Return a version of the function func() that works even when
     func() is given a NumPy array that contains numbers with
@@ -236,12 +235,6 @@ def wrap_array_func(func):
 
                 if derivative_value:
                     derivative_dict[var] = derivative_value
-
-
-        # !!!!!!!!!!!! Does this code benefit from the speedup in
-        # sum(AffineScalarFunc)? I could check the absolute and
-        # asymptotic speeds of summing 100,000 small identical arrays
-        # together.
 
         # numbers with uncertainties are built from the result:
         return numpy.vectorize(uncert_core.AffineScalarFunc)(
@@ -372,6 +365,12 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         for element in array_version.flat:
             # floats, etc. might be present
             if isinstance(element, uncert_core.AffineScalarFunc):
+
+                # !!!!!!!!!!!! Does this code benefit from the speedup in
+                # sum(AffineScalarFunc)? I could check the absolute and
+                # asymptotic speeds of summing 100,000 small identical arrays
+                # together.
+
                 variables |= set(element.derivatives.iterkeys())
 
         array_nominal = nominal_values(array_version)
