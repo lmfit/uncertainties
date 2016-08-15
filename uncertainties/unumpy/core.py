@@ -325,11 +325,11 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
     argument.
 
     func_with_derivatives(arr, input_type, derivatives, *args,
-    **kwargs) must return an iterator.  The first element is the value
-    of the function at point 'arr' (with the correct type).  The
-    following elements are arrays that represent the derivative of the
-    function for each derivative array from the iterator
-    'derivatives'.
+    **kwargs) must return an iterator.  The first element returned by
+    this iterator is the value of the function at point 'arr' (with
+    the correct type).  The following elements are arrays that
+    represent the derivative of the function for each derivative array
+    from the iterator 'derivatives'.
 
     func_with_derivatives() takes the following arguments:
 
