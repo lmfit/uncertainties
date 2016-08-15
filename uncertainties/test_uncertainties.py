@@ -563,7 +563,7 @@ def test_pickling():
     # so __setstate__() would not be called and the original empty
     # linear combination would not be set in linear_combo.
     x = uncert_core.LinearCombination({})
-    assess pickle.loads(pickle.dumps(x)).linear_combo == {}
+    assert pickle.loads(pickle.dumps(x)).linear_combo == {}
 
 def test_int_div():
     "Integer division"
