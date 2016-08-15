@@ -371,7 +371,7 @@ def ldexp(x, i):
         # math.ldexp, this way (aff_func.nominal_value might be the
         # value of x coerced to a difference type [int->float, for
         # instance]):
-        return math.ldexp(x, y)
+        return math.ldexp(x, i)
 many_scalars_to_scalar_funcs.append('ldexp')
 
 @uncert_core.set_doc(math.frexp.__doc__)
