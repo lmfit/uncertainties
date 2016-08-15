@@ -317,9 +317,12 @@ non_std_wrapped_funcs.append('fsum')
 
 ##########
 
+# Some functions that either return multiple arguments (modf, frexp)
+# or take some non-float arguments (which should not be converted to
+# numbers with uncertainty).
 
-# !!!!!!!!!! Check the logic of all the creations of AffineScalarFunc
-# below, and adapt to the new _linear_part
+# ! The arguments have the same names as in the math module
+# documentation, so that the docstrings are consistent with them.
 
 @uncert_core.set_doc(math.modf.__doc__)
 def modf(x):
@@ -370,7 +373,6 @@ def ldexp(x, i):
         return math.ldexp(x, y)
 many_scalars_to_scalar_funcs.append('ldexp')
 
-# !!!!!! Adapt to new LinearCombination and AffineScalarFunc
 @uncert_core.set_doc(math.frexp.__doc__)
 def frexp(x):
     """
@@ -385,19 +387,16 @@ def frexp(x):
     aff_func = to_affine_scalar(x)
 
     if aff_func._linear_part:
-        result = math.frexp(aff_func.nominal_value)
+        (mantissa, exponent) = math.frexp(aff_func.nominal_value)
         # With frexp(x) = (m, e), dm/dx = 1/(2**e):
-        factor = 1/(2**result[1])
+        factor =
         return (
             AffineScalarFunc(
-                result[0],
-                # Chain rule:
-                # !!!!!!!!!! Revise!!!!!
-                dict([(var, factor*deriv)
-                      for (var, deriv) in aff_func.derivatives.iteritems()])),
+                mantissa,
+                LinearCombination([2**(-exponent), aff_func._linear_part])),
             # The exponent is an integer and is supposed to be
-            # continuous (small errors):
-            result[1])
+            # continuous (errors must be small):
+            exponent)
     else:
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
