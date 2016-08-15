@@ -378,7 +378,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
                 # lazy evaluation similar to the current
                 # implementation in AffineScalarFunc.derivatives().
 
-                variables |= set(element.derivatives.iterkeys())
+                variables |= element.derivatives.viewkeys()
 
         array_nominal = nominal_values(array_version)
         # Function value, and derivatives at array_nominal (the
