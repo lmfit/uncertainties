@@ -388,12 +388,13 @@ def frexp(x):
 
     if aff_func._linear_part:
         (mantissa, exponent) = math.frexp(aff_func.nominal_value)
-        # With frexp(x) = (m, e), dm/dx = 1/(2**e):
-        factor =
         return (
             AffineScalarFunc(
                 mantissa,
-                LinearCombination([2**(-exponent), aff_func._linear_part])),
+                # With frexp(x) = (m, e), x = m*2**e, so m = x*2**-e
+                # and therefore dm/dx = 2**-e (as e in an integer that
+                # does not vary when x changes):
+                LinearCombination([2**-exponent, aff_func._linear_part])),
             # The exponent is an integer and is supposed to be
             # continuous (errors must be small):
             exponent)
