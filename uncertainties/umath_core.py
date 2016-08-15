@@ -333,13 +333,12 @@ def modf(x):
 
     if aff_func._linear_part:  # If not a constant
         # The derivative of the fractional part is simply 1: the
-        # derivatives of modf(x)[0] are the derivatives of x:
+        # linear part of modf(x)[0] is the linear part of x:
         return (AffineScalarFunc(frac_part, aff_func._linear_part), int_part)
     else:
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
         return (frac_part, int_part)
-
 many_scalars_to_scalar_funcs.append('modf')
 
 @uncert_core.set_doc(math.ldexp.__doc__)
@@ -364,7 +363,6 @@ def ldexp(x, i):
         # value of x coerced to a difference type [int->float, for
         # instance]):
         return math.ldexp(x, y)
-
 many_scalars_to_scalar_funcs.append('ldexp')
 
 @uncert_core.set_doc(math.frexp.__doc__)
@@ -398,7 +396,6 @@ def frexp(x):
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
         return math.frexp(x)
-
 non_std_wrapped_funcs.append('frexp')
 
 ###############################################################################
