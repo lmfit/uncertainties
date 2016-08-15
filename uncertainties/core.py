@@ -180,7 +180,7 @@ else:
         values_funcs = tuple(
             AffineScalarFunc(
                 value,
-                LinearCombination(dict(iterools.izip(variables, coords))))
+                LinearCombination(dict(itertools.izip(variables, coords))))
             for (coords, value) in zip(transform, nom_values))
 
         return values_funcs
