@@ -2524,6 +2524,8 @@ if sys.version_info < (3,):
 
 else:
 
+    # !!! This code is not run by the tests. It would be nice to have
+    # it be tested.
     def no_complex_result(func):
         '''
         Return a function that does like func, but that raises a
