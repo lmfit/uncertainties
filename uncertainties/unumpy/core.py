@@ -384,7 +384,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         func_and_derivs = func_with_derivatives(
             array_nominal,
             type(array_like),
-            [array_derivative(array_version, var) for var in variables],
+            (array_derivative(array_version, var) for var in variables),
             *args, **kwargs)
 
         func_nominal_value = next(func_and_derivs)
