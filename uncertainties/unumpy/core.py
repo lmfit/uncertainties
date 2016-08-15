@@ -360,6 +360,12 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         func_with_derivatives.
         """
 
+        # !!!!!!!!!!!! This code is used for the inverse and
+        # pseudo-inverse of a matrix. THINK about a way of
+        # accelerating the calculation with a lazy evaluation similar
+        # to the current implementation in
+        # AffineScalarFunc.derivatives().
+
         # So that .flat works even if array_like is a list:
         array_version = numpy.asanyarray(array_like)
 
@@ -368,16 +374,6 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         for element in array_version.flat:
             # floats, etc. might be present
             if isinstance(element, uncert_core.AffineScalarFunc):
-
-                # !!!!!!!!!!!! Does this code benefit from the speedup
-                # in sum(AffineScalarFunc)? I could check the absolute
-                # and asymptotic speeds of summing 100,000 small
-                # identical arrays together?? This code is used for
-                # the inverse and pseudo-inverse of a matrix: THINK
-                # about a way of accelerating the calculation with a
-                # lazy evaluation similar to the current
-                # implementation in AffineScalarFunc.derivatives().
-
                 variables |= element.derivatives.viewkeys()
 
         array_nominal = nominal_values(array_version)
