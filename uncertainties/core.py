@@ -1445,9 +1445,8 @@ class LinearCombination(object):
     the coefficient of their differential.
     """
 
-    # ! linear_combo is represented internally exactly as the
-    # linear_combo argument to __init__().
-
+    # ! Invariant: linear_combo is represented internally exactly as
+    # the linear_combo argument to __init__():
     __slots__ = "linear_combo"
 
     def __init__(self, linear_combo):
@@ -1527,10 +1526,11 @@ class LinearCombination(object):
         self.linear_combo = derivatives
 
     def __getstate__(self):
-        return self.linear_combo
+        # Not false, otherwise __setstate__() will not be called:
+        return (self.linear_combo,)
 
     def __setstate__(self, state):
-        self.linear_combo = state
+        (self.linear_combo,) = state
 
 class AffineScalarFunc(object):
     """
