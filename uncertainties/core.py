@@ -2878,7 +2878,7 @@ else:
 ###############################################################################
 # Parsing of values with uncertainties:
 
-POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = ur'((\d+)(\.\d*)?|nan|NAN|inf|INF)'
+POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = ur'((\d*)(\.\d*)?|nan|NAN|inf|INF)'
 
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where
 # the uncertainty is optional (in which case the uncertainty is
@@ -2930,7 +2930,7 @@ def parse_error_in_parentheses(representation):
         # The 'main' part is the nominal value, with 'int'eger part, and
         # 'dec'imal part.  The 'uncert'ainty is similarly broken into its
         # integer and decimal parts.
-        (sign, main, main_int, main_dec, uncert, uncert_int, uncert_dec,
+        (sign, main, _, main_dec, uncert, uncert_int, uncert_dec,
          exponent) = match.groups()
     else:
         raise NotParenUncert("Unparsable number representation: '%s'."
