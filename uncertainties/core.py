@@ -1806,7 +1806,7 @@ class AffineScalarFunc(object):
         # An empty format string and str() usually return the same
         # string
         # (http://docs.python.org/2/library/string.html#format-specification-mini-language):
-        return self.__format__('')  # Works with Python < 2.6, not format()
+        return self.format('')
 
     def __format__(self, format_spec):
         '''Formats a number with uncertainty.
