@@ -947,8 +947,8 @@ TO_SUPERSCRIPT = {
 # Inverted TO_SUPERSCRIPT table, for use with unicode.translate():
 #
 #! Python 2.7+ can use a dictionary comprehension instead:
-FROM_SUPERSCRIPT = dict(
-    (ord(sup), normal) for (normal, sup) in TO_SUPERSCRIPT.items())
+FROM_SUPERSCRIPT = {
+    ord(sup): normal for (normal, sup) in TO_SUPERSCRIPT.iteritems()}
 
 def to_superscript(value):
     '''
