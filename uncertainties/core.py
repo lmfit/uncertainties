@@ -2952,9 +2952,7 @@ def parse_error_in_parentheses(representation):
         uncert_int = '1'  # The other parts of the uncertainty are None
 
     # Do we have a fully explicit uncertainty?
-    #
-    # !!! Python 2.7+: in {'nan',...} is faster (x10)
-    if uncert_dec is not None or uncert in ['nan', 'NAN', 'inf', 'INF']:
+    if uncert_dec is not None or uncert in {'nan', 'NAN', 'inf', 'INF'}:
         uncert_value = float(uncert)
     else:
         # uncert_int represents an uncertainty on the last digits:
