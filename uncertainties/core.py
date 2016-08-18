@@ -837,11 +837,9 @@ def first_digit(value):
 
     Return 0 for a null value.
     '''
-    # Python 2.5 returns nan for math.log10(-4), but Python 2.7 raises
-    # ValueError, so the value is directly tested:
-    if value:
+    try:
         return int(math.floor(math.log10(abs(value))))
-    else:
+    except ValueError:  # Case of value == 0
         return 0
 
 def PDG_precision(std_dev):
