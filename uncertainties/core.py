@@ -2876,6 +2876,12 @@ else:
 ###############################################################################
 # Parsing of values with uncertainties:
 
+# Parsing of (part of) numbers. The reason why the decimal part is
+# parsed (if any), instead of using the parsing built in float(), is
+# that the presence (or not) of a decimal point does matter, in the
+# semantics of some representations (e.g. .1(2.) = .1+/-2, whereas
+# .1(2) = .1+/-0.2), so just getting the numerical value of the part
+# in parentheses would not be sufficient.
 POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = ur'((\d*)(\.\d*)?|nan|NAN|inf|INF)'
 
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where
