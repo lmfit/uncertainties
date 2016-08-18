@@ -3117,6 +3117,8 @@ def ufloat_fromstr(representation, tag=None):
         12.3(0.4)e-5
         169.0(7)
         169.1(15)
+        .123(4)
+        .1(.4)
 
         # NaN uncertainties:
         12.3(nan)
