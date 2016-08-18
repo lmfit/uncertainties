@@ -3124,6 +3124,11 @@ def ufloat_fromstr(representation, tag=None):
         3±nan
 
     Surrounding spaces are ignored.
+
+    About the "shorthand" notation: 1.23(3) == 1.23 ± 0.03 but
+    1.23(3.) == 1.32 ± 3.00. Thus, the presence of a decimal point in
+    the uncertainty signals an absolute uncertainty (instead of an
+    uncertainty on the last digits of the nominal value).
     """
 
     (nominal_value, std_dev) = str_to_number_with_uncert(
