@@ -2960,7 +2960,7 @@ def parse_error_in_parentheses(representation):
         # uncert_int represents an uncertainty on the last digits:
 
         # The number of digits after the period defines the power of
-        # 10 than must be applied to the provided uncertainty:
+        # 10 that must be applied to the provided uncertainty:
         if main_dec is None:
             num_digits_after_period = 0
         else:
