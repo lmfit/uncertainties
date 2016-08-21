@@ -396,9 +396,9 @@ Hernan Grecco, David Zwicker, and many others.
 I am also grateful to Gabi Davar and Pierre Raybaut for including it
 in `Python(x,y)`_, to Christoph Gohlke for including it in his Base
 distribution of `scientific Python packages`_ for Windows, and to the
-Mac OS X and Linux distribution maintainers of this package (Jonathan
-Stickel, David Paleino, Federico Ceratto, Roberto Colistete Jr, and
-Filipe Pires Alvarenga Fernandes).
+Conda, macOS  and Linux distribution maintainers of this package (Jonathan
+Stickel, David Paleino, Federico Ceratto, Roberto Colistete Jr, 
+Filipe Pires Alvarenga Fernandes, and Felix Yan).
 
 .. index:: license
 
