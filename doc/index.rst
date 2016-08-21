@@ -381,7 +381,7 @@ The author wishes to thank all the people who made generous
 `donations`_: they help keep this project alive by providing positive
 feedback.
 
-I greatly appreciated getting key technical input from Arnaud
+I greatly appreciate having gotten key technical input from Arnaud
 Delobelle, Pierre Cladé, and Sebastian Walter.  Patches by Pierre
 Cladé, Tim Head, José Sabater Montes, Martijn Pieters, Ram Rachum,
 Christoph Deil, and Gabi Davar are gratefully acknowledged.
