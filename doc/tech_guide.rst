@@ -65,7 +65,7 @@ theory`_.
 
 The standard deviations and nominal values calculated by this package 
 are thus meaningful approximations as long as **uncertainties are 
-small**. A more precise version of this constraint is that the final 
+"small"**. A more precise version of this constraint is that the final 
 calculated functions must have **precise linear expansions in the region 
 where the probability distribution of their variables is the largest**. 
 Mathematically, this means that the linear terms of the final calculated 
