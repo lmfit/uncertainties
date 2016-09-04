@@ -281,7 +281,7 @@ Main changes:
   ``covariance_matrix()``.
 
 .. _Python: http://docs.python.org/tutorial/interpreter.html
-.. _IPython: http://ipython.scipy.org/
+.. _IPython: http://ipython.readthedocs.io/en/stable/
 .. _NumPy: http://numpy.scipy.org/
 .. _math: http://docs.python.org/library/math.html
 .. _PEP 8: http://www.python.org/dev/peps/pep-0008/
