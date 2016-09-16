@@ -8,5 +8,7 @@ MANIFEST
 uncertainties.egg-info/
 # For PyCharm (contains project files):
 .idea/
+# py.test cache files (normally we are using nose though)
 .cache
+# vim temporary files
 .*.swp

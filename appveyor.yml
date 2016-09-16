@@ -1,4 +1,4 @@
-# 
+# Adapted from https://github.com/bsmurphy/PyKrige/blob/master/appveyor.yml
 build: false
 
 environment:
