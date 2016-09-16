@@ -384,7 +384,7 @@ feedback.
 I greatly appreciate having gotten key technical input from Arnaud
 Delobelle, Pierre Cladé, and Sebastian Walter.  Patches by Pierre
 Cladé, Tim Head, José Sabater Montes, Martijn Pieters, Ram Rachum,
-Christoph Deil, and Gabi Davar are gratefully acknowledged.
+Christoph Deil, Gabi Davar and Roman Yurchak are gratefully acknowledged.
 
 I would also like to thank users who contributed with feedback and
 suggestions, which greatly helped improve this program: Joaquin Abian,
@@ -397,7 +397,7 @@ I am also grateful to Gabi Davar and Pierre Raybaut for including it
 in `Python(x,y)`_, to Christoph Gohlke for including it in his Base
 distribution of `scientific Python packages`_ for Windows, and to the
 Anaconda, macOS and Linux distribution maintainers of this package (Jonathan
-Stickel, David Paleino, Federico Ceratto, Roberto Colistete Jr, 
+Stickel, David Paleino, Federico Ceratto, Roberto Colistete Jr,
 Filipe Pires Alvarenga Fernandes, and Felix Yan).
 
 .. index:: license
