@@ -1,0 +1,42 @@
+# 
+build: false
+
+environment:
+  global:
+    # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
+    # /E:ON and /V:ON options are not enabled in the batch script intepreter
+    # See: http://stackoverflow.com/a/13751649/163740
+    WITH_COMPILER: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_compiler.cmd"
+  matrix:
+    - PYTHON_VERSION: 2.7
+      PYTHON_ARCH: "64"
+      MINICONDA: C:\Miniconda-x64
+    - PYTHON_VERSION: 2.7
+      PYTHON_ARCH: "32"
+      MINICONDA: C:\Miniconda
+    - PYTHON_VERSION: 3.5
+      PYTHON_ARCH: "32"
+      MINICONDA: C:\Miniconda3
+    - PYTHON_VERSION: 3.5
+      PYTHON_ARCH: "64"
+      MINICONDA: C:\Miniconda3-x64
+
+init:
+  - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH% %MINICONDA%"
+
+install:
+  - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
+  # create a conda virtual environement 
+  - "conda create -n uncty-env numpy=1.10 nose python=%PYTHON_VERSION%"
+  - activate uncty-env
+
+
+
+test_script:
+  - "cd C:\\projects\\uncertainties"
+  - activate uncty-env # activate the virtualenv
+  - python setup.py egg_info
+  - python setup.py nosetests -sv
