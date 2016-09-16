@@ -11,15 +11,17 @@ environment:
     - PYTHON_VERSION: 2.7
       PYTHON_ARCH: "64"
       MINICONDA: C:\Miniconda-x64
-    - PYTHON_VERSION: 2.7
-      PYTHON_ARCH: "32"
-      MINICONDA: C:\Miniconda
-    - PYTHON_VERSION: 3.5
-      PYTHON_ARCH: "32"
-      MINICONDA: C:\Miniconda3
     - PYTHON_VERSION: 3.5
       PYTHON_ARCH: "64"
       MINICONDA: C:\Miniconda3-x64
+    # not running the tests on 32 bit Python at the moment
+    # as AppVeyor is just too slow
+    #- PYTHON_VERSION: 2.7
+    #  PYTHON_ARCH: "32"
+    #  MINICONDA: C:\Miniconda
+    #- PYTHON_VERSION: 3.5
+    #  PYTHON_ARCH: "32"
+    #  MINICONDA: C:\Miniconda3
 
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH% %MINICONDA%"
