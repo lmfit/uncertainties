@@ -8,3 +8,5 @@ MANIFEST
 uncertainties.egg-info/
 # For PyCharm (contains project files):
 .idea/
+.cache
+.*.swp

@@ -1,9 +1,9 @@
 uncertainties
 =============
 
-..
-    .. image:: https://travis-ci.org/lebigot/uncertainties.png
-       :target: https://travis-ci.org/lebigot/uncertainties
+
+.. image:: https://travis-ci.org/lebigot/uncertainties.png
+   :target: https://travis-ci.org/lebigot/uncertainties
 
 This is the uncertainties Python package, which performs transparent
 calculations with uncertainties (aka "error propagation"). This package
