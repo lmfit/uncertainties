@@ -4,10 +4,6 @@ sudo: false # use the new faster dockerized containers on Travis CI
 
 matrix:
     include:
-    # A the moment PY2.6 fails due to the use of dictionary comprehension
-    # not sure if we want to support it
-    #- python: "2.6"
-    #  env: DEPS="numpy==1.8 nose"
     - python: "2.7"
       env: DEPS="numpy==1.9 nose"
     - python: "3.3"
