@@ -1,7 +1,7 @@
 # coding=utf-8
 
 """
-Main module for the uncertainties package, with internals.
+Main module for the uncertainties package, with internal functions.
 """
 
 # The idea behind this module is to replace the result of mathematical
