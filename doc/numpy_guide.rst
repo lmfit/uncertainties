@@ -154,9 +154,21 @@ The file can then be read back by instructing NumPy to convert all the
 columns with :func:`uncertainties.ufloat_fromstr`. The number
 :data:`num_cols` of columns in the input file (1, in our example) must
 be determined in advance, because NumPy requires a converter for each
-column separately:
+column separately. For Python 2:
 
 >>> converters = dict.fromkeys(range(num_cols), uncertainties.ufloat_fromstr)
+
+For Python 3, since :func:`numpy.loadtxt` passes bytes to converters, 
+they must first be converted into a string (the encoding used in 
+:func:`numpy.savetxt` seems to be the one hardcoded in 
+:func:`numpy.compat.asbytes()` [Latin 1, for NumPy 1.12]):
+
+>>> converters = dict.fromkeys(
+        range(num_cols),
+        lambda col_bytes: uncertainties.ufloat_fromstr(col_bytes.decode("latin1")))
+
+The array can then be loaded:
+
 >>> arr = numpy.loadtxt('arr.txt', converters=converters, dtype=object)
 
 .. index:: linear algebra; additional functions, ulinalg
