@@ -159,7 +159,7 @@ column separately. For Python 2:
 >>> converters = dict.fromkeys(range(num_cols), uncertainties.ufloat_fromstr)
 
 For Python 3, since :func:`numpy.loadtxt` passes bytes to converters, 
-they must first be converted into a string
+they must first be converted into a string:
 
 >>> converters = dict.fromkeys(
         range(num_cols),
