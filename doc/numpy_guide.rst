@@ -165,11 +165,9 @@ they must first be converted into a string
         range(num_cols),
         lambda col_bytes: uncertainties.ufloat_fromstr(col_bytes.decode("latin1")))
 
-(Latin 1 comes from the encoding used in 
-:func:`numpy.savetxt` [NumPy 1.12], which needs to be decoded. This 
-:encoding seems
+(Latin 1 appears to in fact be the encoding used in 
+:func:`numpy.savetxt` [as of NumPy 1.12]. This encoding seems
 to be the one hardcoded in func:`numpy.compat.asbytes`.)
-
 
 The array can then be loaded:
 
