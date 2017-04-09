@@ -159,13 +159,17 @@ column separately. For Python 2:
 >>> converters = dict.fromkeys(range(num_cols), uncertainties.ufloat_fromstr)
 
 For Python 3, since :func:`numpy.loadtxt` passes bytes to converters, 
-they must first be converted into a string (the encoding used in 
-:func:`numpy.savetxt` seems to be the one hardcoded in 
-:func:`numpy.compat.asbytes()` [Latin 1, for NumPy 1.12]):
+they must first be converted into a string
 
 >>> converters = dict.fromkeys(
         range(num_cols),
         lambda col_bytes: uncertainties.ufloat_fromstr(col_bytes.decode("latin1")))
+
+(Latin 1 comes from the encoding used in 
+:func:`numpy.savetxt` [NumPy 1.12], which needs to be decoded. This 
+:encoding seems
+to be the one hardcoded in func:`numpy.compat.asbytes`.)
+
 
 The array can then be loaded:
 
