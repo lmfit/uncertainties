@@ -7,7 +7,7 @@ uncertainties
 .. image:: https://ci.appveyor.com/api/projects/status/j5238244myqx0a0r?svg=true
    :target: https://ci.appveyor.com/project/lebigot/uncertainties
 
-This is the uncertainties Python package, which performs **transparent
+This is the ``uncertainties`` Python package, which performs **transparent
 calculations with uncertainties** (aka "error propagation"). This package
 also calculates derivatives.
 
