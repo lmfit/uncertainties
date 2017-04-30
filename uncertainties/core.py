@@ -245,10 +245,7 @@ def to_affine_scalar(x):
 # Step constant for numerical derivatives in
 # partial_derivative(). Value chosen to as to get better numerical
 # results:
-try:
-    STEP_SIZE = sqrt(sys.float_info.epsilon)
-except AttributeError:
-    STEP_SIZE = 1e-8
+STEP_SIZE = sqrt(sys.float_info.epsilon)
 
 # !! It would be possible to split the partial derivative calculation
 # into two functions: one for positional arguments (case of integer
