@@ -1,5 +1,5 @@
-# !!!!!!!!!!! Add a header to the documentation, stating somethign
-# about the uncertainties.UFloat-compatible version of..., for all functions
+# !!!!!!!!!!! Add a header to the documentation, that starts with something
+# like "uncertainties.UFloat-compatible version of...", for all functions.
 
 """
 Implementation of umath.py, with internals.
