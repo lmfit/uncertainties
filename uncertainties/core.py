@@ -1755,6 +1755,24 @@ class AffineScalarFunc(object):
 
         return error_components
 
+    def error_contribution_from(self, filter_tag):
+        """
+        Provides contribution from given error components.
+
+        Provides the error contribution from error components for
+        which filter_tag(tag) returns True.
+        """
+
+        errors_that_contribute = []
+        for variable, derivative in self.error_components().iteritems():
+            if filter_tag(variable.tag):
+                errors_that_contribute.append(derivative**2)
+
+        # Since error components already does the heavy lifting of separating
+        # errors into a linear combination, we select only the ones we are
+        # interested in.
+        return sqrt(sum(errors_that_contribute))
+
     @property
     def std_dev(self):
         """
