@@ -45,7 +45,7 @@ setup_options = dict(
     version='3.0.1',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
-    url='http://pythonhosted.org/uncertainties/',
+    url='http://uncertainties-python-package.readthedocs.io/',
 
     license='''\
 This software can be used under one of the following two licenses: \
@@ -146,7 +146,7 @@ Installation or upgrade
 =======================
 
 Installation instructions are available on the `main web site
-<http://pythonhosted.org/uncertainties/#installation-and-download>`_
+<http://uncertainties-python-package.readthedocs.io/en/latest/index.html#installation-and-download>`_
 for this package.
 
 Contact
@@ -288,10 +288,9 @@ Main changes:
 .. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
 .. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
 .. _PayPal: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
-.. _main website: http://pythonhosted.org/uncertainties/
-.. _code updater: http://pythonhosted.org/uncertainties/#migration-from-version-1-to-version-2
-.. _formatting: http://pythonhosted.org/uncertainties/user_guide.html#printing
-''',
+.. _main website: http://uncertainties-python-package.readthedocs.io/
+.. _code updater: http://uncertainties-python-package.readthedocs.io/en/latest/index.html#migration-from-version-1-to-version-2
+.. _formatting: http://uncertainties-python-package.readthedocs.io/en/latest/user_guide.html#printing''',
 
     keywords=['error propagation', 'uncertainties',
               'uncertainty calculations',
