@@ -287,9 +287,8 @@ fast and precise method: :mod:`uncertainties` transparently implements
 essentially consists in keeping track of the value of derivatives, and 
 in automatically applying the `chain rule 
 <http://en.wikipedia.org/wiki/Chain_rule>`_. Automatic differentiation 
-is often faster than symbolic differentiation and more precise than 
-numerical differentiation (when used with analytical formulas, like in
-:mod:`uncertainties`).
+is faster than symbolic differentiation and more precise than 
+numerical differentiation.
 
 The derivatives of any expression can be obtained with 
 :mod:`uncertainties` in a simple way, as demonstrated in the :ref:`User 
