@@ -95,10 +95,11 @@ for x = 0±0.1 is calculated as being exactly zero (as with
 calculations, and can in principle yield very precise results, but
 calculations are much slower than with approximation schemes.
 
-.. index:: NaN
+.. index::
+   pair: uncertainty; NaN
 
-Not-a-number uncertainties
-==========================
+NaN uncertainty
+===============
 
 If linear `error propagation theory`_ cannot be applied, the functions
 defined by :mod:`uncertainties` internally use a `not-a-number value

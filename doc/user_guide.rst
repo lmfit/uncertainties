@@ -430,10 +430,11 @@ More detailed information on the semantics of comparison operators for
 numbers with uncertainties can be found in the :ref:`Technical Guide
 <comparison_operators>`.
 
-.. index:: NaN values
+.. index::
+   pair: testing (scalar); NaN
 
-NaN handling
-============
+NaN testing
+===========
 
 NaN values can appear in a number with uncertainty ``x``. Care must be 
 taken with such values, as values like NaN±1, 1±NaN and NaN±NaN are by 

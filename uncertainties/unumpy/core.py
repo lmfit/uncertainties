@@ -672,7 +672,6 @@ def define_vectorized_funcs():
         # numpy.float... (equality tests succeed, though).
         func = getattr(umath_core, function_name)
 
-
         # Data type of the result of the unumpy function:
         otypes = (
             # It is much more convenient to preserve the type of
@@ -693,6 +692,9 @@ def define_vectorized_funcs():
 
         setattr(
             this_module, unumpy_name,
+            #!!!! For umath_core.locally_cst_funcs, would it make sense
+            # to optimize this by using instead the equivalent (? see
+            # above) vectorized NumPy function on the nominal values?
             numpy.vectorize(func,
                             doc="""\
 Vectorized version of umath.%s.
