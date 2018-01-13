@@ -440,10 +440,12 @@ NaN values can appear in a number with uncertainty ``x``. Care must be
 taken with such values, as values like NaN±1, 1±NaN and NaN±NaN are by 
 definition *not* NaN, which is a float.
 
-NaN values should thus be handled by testing the nominal value, and if 
-needed the uncertainty, with ``math.isnan(x.nominal_value)`` (or 
-equivalently ``math.isnan(x.n)``) and ``math.isnan(x.std_dev)`` (or 
-equivalently ``math.isnan(x.s)``).
+Testing whether a number with uncertainty has a NaN *nominal value* can 
+be done with the provided function ``uncertainties.umath.isnan()``.
+
+Whether the uncertainty of ``x`` is NaN can be performed directly with 
+the standard function: ``math.isnan(x.std_dev)`` (or equivalently 
+``math.isnan(x.s)``).
  
 .. index:: covariance matrix
 

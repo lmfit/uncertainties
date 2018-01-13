@@ -122,6 +122,32 @@ functions is available in the documentation for
 :mod:`uncertainties.umath` (which is accessible through :func:`help`
 or ``pydoc``).
 
+.. index::
+   pair: testing and operations (in arrays); NaN
+
+NaN testing and NaN-aware operations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+One particular function pertains to NaN testing: ``unumupy.isnan()``. It
+returns true for each NaN *nominal value* (and false otherwise).
+
+Since NaN±1 is *not* (the scalar) NaN, functions like 
+``numpy.nanmean()`` do not skip such values. This is where 
+``unumpy.isnan()`` is useful, as it can be used for masking out numbers 
+with a NaN nominal value:
+
+>>> nan = float("nan")
+>>> arr = numpy.array([nan, unc.ufloat(nan, 1), unc.ufloat(1, nan), 2])
+>>> arr
+array([nan, nan+/-1.0, 1.0+/-nan, 2], dtype=object)
+>>> arr[~unumpy.isnan(arr)].mean()
+1.5+/-nan
+
+or equivalently, by using masked arrays:
+
+>>> masked_arr = np.ma.array(arr, mask=unumpy.isnan(arr))
+>>> masked_arr.mean()
+1.5+/-nan
 
 .. index:: saving to file; array
 .. index:: reading from file; array
