@@ -278,7 +278,7 @@ The :mod:`uncertainties` package automatically calculates the
 derivatives required by linear error propagation theory.
 
 Almost all the derivatives of the fundamental functions provided by
-:mod:`uncertainties` are obtained through a analytical formulas (the
+:mod:`uncertainties` are obtained through analytical formulas (the
 few mathematical functions that are instead differentiated through
 numerical approximation are listed in ``umath_core.num_deriv_funcs``).
 
