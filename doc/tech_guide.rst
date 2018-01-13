@@ -14,7 +14,7 @@ uncertainty handled by this module is by checking whether
 
 .. index:: pickling
 .. index:: saving to file; number with uncertainty
-.. index:: reading from file; number with uncertainty 
+.. index:: reading from file; number with uncertainty
 
 .. _pickling:
 
@@ -63,15 +63,15 @@ This package calculates the standard deviation of mathematical
 expressions through the linear approximation of `error propagation
 theory`_.
 
-The standard deviations and nominal values calculated by this package 
-are thus meaningful approximations as long as **uncertainties are 
-"small"**. A more precise version of this constraint is that the final 
-calculated functions must have **precise linear expansions in the region 
-where the probability distribution of their variables is the largest**. 
-Mathematically, this means that the linear terms of the final calculated 
-functions around the nominal values of their variables should be much 
-larger than the remaining higher-order terms over the region of 
-significant probability (because such higher-order contributions are 
+The standard deviations and nominal values calculated by this package
+are thus meaningful approximations as long as **uncertainties are
+"small"**. A more precise version of this constraint is that the final
+calculated functions must have **precise linear expansions in the region
+where the probability distribution of their variables is the largest**.
+Mathematically, this means that the linear terms of the final calculated
+functions around the nominal values of their variables should be much
+larger than the remaining higher-order terms over the region of
+significant probability (because such higher-order contributions are
 neglected).
 
 For example, calculating ``x*10`` with :data:`x` = 5±3 gives a
@@ -115,14 +115,15 @@ This indicates that **the derivative required by linear error
 propagation theory is not defined** (a Monte-Carlo calculation of the
 resulting random variable is more adapted to this specific case).
 
-However, the :mod:`uncertainties` package **correctly handles
-perfectly precise numbers**, in this case:
+However, even in this case where the derivative at the nominal value
+is infinite, the :mod:`uncertainties` package **correctly handles
+perfectly precise numbers**:
 
 >>> umath.sqrt(ufloat(0, 0))
 0.0+/-0
 
-gives the correct result, despite the fact that the derivative of the
-square root is not defined in zero.
+is thus the correct result, despite the fact that the derivative of
+the square root is not defined in zero.
 
 .. _math_def_num_uncert:
 
@@ -282,17 +283,17 @@ Almost all the derivatives of the fundamental functions provided by
 few mathematical functions that are instead differentiated through
 numerical approximation are listed in ``umath_core.num_deriv_funcs``).
 
-The derivatives of mathematical *expressions* are evaluated through a 
-fast and precise method: :mod:`uncertainties` transparently implements 
-`automatic differentiation`_ with reverse accumulation. This method 
-essentially consists in keeping track of the value of derivatives, and 
-in automatically applying the `chain rule 
-<http://en.wikipedia.org/wiki/Chain_rule>`_. Automatic differentiation 
-is faster than symbolic differentiation and more precise than 
+The derivatives of mathematical *expressions* are evaluated through a
+fast and precise method: :mod:`uncertainties` transparently implements
+`automatic differentiation`_ with reverse accumulation. This method
+essentially consists in keeping track of the value of derivatives, and
+in automatically applying the `chain rule
+<http://en.wikipedia.org/wiki/Chain_rule>`_. Automatic differentiation
+is faster than symbolic differentiation and more precise than
 numerical differentiation.
 
-The derivatives of any expression can be obtained with 
-:mod:`uncertainties` in a simple way, as demonstrated in the :ref:`User 
+The derivatives of any expression can be obtained with
+:mod:`uncertainties` in a simple way, as demonstrated in the :ref:`User
 Guide <derivatives>`.
 
 .. _variable_tracking:
@@ -315,7 +316,7 @@ yield correct uncertainties.  For example:
 Even though ``x*x`` has a non-zero uncertainty, the result has a zero
 uncertainty, because it is equal to :data:`a`.
 
-If the variable :data:`a` above is modified, the value of :data:`poly` 
+If the variable :data:`a` above is modified, the value of :data:`poly`
 is not modified, as is usual in Python:
 
 >>> a = 123
