@@ -137,7 +137,7 @@ Since NaN±1 is *not* (the scalar) NaN, functions like
 with a NaN nominal value:
 
 >>> nan = float("nan")
->>> arr = numpy.array([nan, unc.ufloat(nan, 1), unc.ufloat(1, nan), 2])
+>>> arr = numpy.array([nan, uncertainties.ufloat(nan, 1), uncertainties.ufloat(1, nan), 2])
 >>> arr
 array([nan, nan+/-1.0, 1.0+/-nan, 2], dtype=object)
 >>> arr[~unumpy.isnan(arr)].mean()
@@ -145,9 +145,15 @@ array([nan, nan+/-1.0, 1.0+/-nan, 2], dtype=object)
 
 or equivalently, by using masked arrays:
 
->>> masked_arr = np.ma.array(arr, mask=unumpy.isnan(arr))
+>>> masked_arr = numpy.ma.array(arr, mask=unumpy.isnan(arr))
 >>> masked_arr.mean()
 1.5+/-nan
+
+In this case the uncertainty is NaN as it should be, because one of
+the numbers does have an undefined uncertainty, which makes the final
+uncertainty undefined (but the average is well defined). In general,
+uncertainties are not NaN and one obtains the mean of the non-NaN
+values.
 
 .. index:: saving to file; array
 .. index:: reading from file; array
