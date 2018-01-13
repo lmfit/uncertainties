@@ -128,12 +128,12 @@ or ``pydoc``).
 NaN testing and NaN-aware operations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-One particular function pertains to NaN testing: ``unumupy.isnan()``. It
+One particular function pertains to NaN testing: ``unumpy.isnan()``. It
 returns true for each NaN *nominal value* (and false otherwise).
 
-Since NaN±1 is *not* (the scalar) NaN, functions like 
-``numpy.nanmean()`` do not skip such values. This is where 
-``unumpy.isnan()`` is useful, as it can be used for masking out numbers 
+Since NaN±1 is *not* (the scalar) NaN, functions like
+``numpy.nanmean()`` do not skip such values. This is where
+``unumpy.isnan()`` is useful, as it can be used for masking out numbers
 with a NaN nominal value:
 
 >>> nan = float("nan")
@@ -184,14 +184,14 @@ column separately. For Python 2:
 
 >>> converters = dict.fromkeys(range(num_cols), uncertainties.ufloat_fromstr)
 
-For Python 3, since :func:`numpy.loadtxt` passes bytes to converters, 
+For Python 3, since :func:`numpy.loadtxt` passes bytes to converters,
 they must first be converted into a string:
 
 >>> converters = dict.fromkeys(
         range(num_cols),
         lambda col_bytes: uncertainties.ufloat_fromstr(col_bytes.decode("latin1")))
 
-(Latin 1 appears to in fact be the encoding used in 
+(Latin 1 appears to in fact be the encoding used in
 :func:`numpy.savetxt` [as of NumPy 1.12]. This encoding seems
 to be the one hardcoded in :func:`numpy.compat.asbytes`.)
 
