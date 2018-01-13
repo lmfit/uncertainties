@@ -89,6 +89,25 @@ module:
 The list of available mathematical functions can be obtained with the
 ``pydoc uncertainties.umath`` command.
 
+.. index::
+   pair: testing (scalar); NaN
+
+NaN testing
+-----------
+
+NaN values can appear in a number with uncertainty. Care must be
+taken with such values, as values like NaN±1, 1±NaN and NaN±NaN are by
+definition *not* NaN, which is a float.
+
+Testing whether a number with uncertainty has a **NaN nominal value** can
+be done with the provided function ``uncertainties.umath.isnan()``,
+which generalizes the standard ``math.isnan()``.
+
+Checking whether the *uncertainty* of ``x`` is NaN can be done directly
+with the standard function: ``math.isnan(x.std_dev)`` (or equivalently
+``math.isnan(x.s)``).
+
+
 .. index:: arrays; simple use, matrices; simple use
 
 .. _simple_array_use:
@@ -143,6 +162,212 @@ floats.  When various quantities are combined through mathematical
 operations, the result is calculated by taking into account all the
 correlations between the quantities involved.  All of this is done
 completely **transparently**.
+
+
+Access to the uncertainty and to the nominal value
+==================================================
+
+The nominal value and the uncertainty (standard deviation) can also be
+accessed independently:
+
+>>> print square
+0.040+/-0.004
+>>> print square.nominal_value
+0.04
+>>> print square.n  # Abbreviation
+0.04
+>>> print square.std_dev
+0.004
+>>> print square.s  # Abbreviation
+0.004
+
+Access to the individual sources of uncertainty
+===============================================
+
+The various contributions to an uncertainty can be obtained through the
+:func:`error_components` method, which maps the **independent variables
+a quantity depends on** to their **contribution to the total
+uncertainty**. According to :ref:`linear error propagation theory
+<linear_method>` (which is the method followed by :mod:`uncertainties`),
+the sum of the squares of these contributions is the squared
+uncertainty.
+
+The individual contributions to the uncertainty are more easily usable
+when the variables are **tagged**:
+
+>>> u = ufloat(1, 0.1, "u variable")  # Tag
+>>> v = ufloat(10, 0.1, "v variable")
+>>> sum_value = u+2*v
+>>> sum_value
+21.0+/-0.223606797749979
+>>> for (var, error) in sum_value.error_components().items():
+...     print "{}: {}".format(var.tag, error)
+...
+u variable: 0.1
+v variable: 0.2
+
+The variance (i.e. squared uncertainty) of the result
+(:data:`sum_value`) is the quadratic sum of these independent
+uncertainties, as it should be (``0.1**2 + 0.2**2``).
+
+The tags *do not have to be distinct*. For instance, *multiple* random
+variables can be tagged as ``"systematic"``, and their contribution to
+the total uncertainty of :data:`result` can simply be obtained as:
+
+>>> syst_error = math.sqrt(sum(  # Error from *all* systematic errors
+...     error**2
+...     for (var, error) in result.error_components().items()
+...     if var.tag == "systematic"))
+
+The remaining contribution to the uncertainty is:
+
+>>> other_error = math.sqrt(result.std_dev**2 - syst_error**2)
+
+The variance of :data:`result` is in fact simply the quadratic sum of
+these two errors, since the variables from
+:func:`result.error_components` are independent.
+
+.. index:: comparison operators
+
+Comparison operators
+====================
+
+Comparison operators behave in a natural way:
+
+>>> print x
+0.200+/-0.010
+>>> y = x + 0.0001
+>>> y
+0.2001+/-0.01
+>>> y > x
+True
+>>> y > 0
+True
+
+One important concept to keep in mind is that :func:`ufloat` creates a
+random variable, so that two numbers with the same nominal value and
+standard deviation are generally different:
+
+>>> y = ufloat(1, 0.1)
+>>> z = ufloat(1, 0.1)
+>>> print y
+1.00+/-0.10
+>>> print z
+1.00+/-0.10
+>>> y == y
+True
+>>> y == z
+False
+
+In physical terms, two rods of the same nominal length and uncertainty
+on their length are generally of different sizes: :data:`y` is different
+from :data:`z`.
+
+More detailed information on the semantics of comparison operators for
+numbers with uncertainties can be found in the :ref:`Technical Guide
+<comparison_operators>`.
+
+.. index:: covariance matrix
+
+Covariance and correlation matrices
+===================================
+
+Covariance matrix
+-----------------
+
+The covariance matrix between various variables or calculated
+quantities can be simply obtained:
+
+>>> sum_value = u+2*v
+>>> cov_matrix = uncertainties.covariance_matrix([u, v, sum_value])
+
+has value
+
+::
+
+  [[0.01, 0.0,  0.01],
+   [0.0,  0.01, 0.02],
+   [0.01, 0.02, 0.05]]
+
+In this matrix, the zero covariances indicate that :data:`u` and :data:`v` are
+independent from each other; the last column shows that :data:`sum_value`
+does depend on these variables.  The :mod:`uncertainties` package
+keeps track at all times of all correlations between quantities
+(variables and functions):
+
+>>> sum_value - (u+2*v)
+0.0+/-0
+
+Correlation matrix
+------------------
+
+If the NumPy_ package is available, the correlation matrix can be
+obtained as well:
+
+>>> corr_matrix = uncertainties.correlation_matrix([u, v, sum_value])
+>>> corr_matrix
+array([[ 1.        ,  0.        ,  0.4472136 ],
+       [ 0.        ,  1.        ,  0.89442719],
+       [ 0.4472136 ,  0.89442719,  1.        ]])
+
+.. index:: correlations; correlated variables
+
+Correlated variables
+====================
+
+Reciprocally, **correlated variables can be created** transparently,
+provided that the NumPy_ package is available.
+
+Use of a covariance matrix
+--------------------------
+
+Correlated variables can be obtained through the *covariance* matrix:
+
+>>> (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 21], cov_matrix)
+
+creates three new variables with the listed nominal values, and the given
+covariance matrix:
+
+>>> sum_value
+21.0+/-0.223606797749979
+>>> sum2
+21.0+/-0.223606797749979
+>>> sum2 - (u2+2*v2)
+0.0+/-3.83371856862256e-09
+
+The theoretical value of the last expression is exactly zero, like for
+``sum - (u+2*v)``, but numerical errors yield a small uncertainty
+(3e-9 is indeed very small compared to the uncertainty on :data:`sum2`:
+correlations should in fact cancel the uncertainty on :data:`sum2`).
+
+The covariance matrix is the desired one:
+
+>>> uncertainties.covariance_matrix([u2, v2, sum2])
+
+reproduces the original covariance matrix :data:`cov_matrix` (up to
+rounding errors).
+
+Use of a correlation matrix
+---------------------------
+
+Alternatively, correlated values can be defined through a
+*correlation* matrix (the correlation matrix is the covariance matrix
+normalized with individual standard deviations; it has ones on its
+diagonal), along with a list of nominal values and standard deviations:
+
+>>> (u3, v3, sum3) = uncertainties.correlated_values_norm(
+...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)], corr_matrix)
+>>> print u3
+1.00+/-0.10
+
+The three returned numbers with uncertainties have the correct
+uncertainties and correlations (:data:`corr_matrix` can be recovered
+through :func:`correlation_matrix`).
+
+.. index::
+   single: C code; wrapping
+   single: Fortran code; wrapping
+   single: wrapping (C, Fortran,…) functions
 
 .. index::
    printing
@@ -326,228 +551,6 @@ prints with the shorthand notation: ``Result = 0.20(1)``.
 .. index::
    pair: nominal value; scalar
    pair: uncertainty; scalar
-
-Access to the uncertainty and to the nominal value
-==================================================
-
-The nominal value and the uncertainty (standard deviation) can also be
-accessed independently:
-
->>> print square
-0.040+/-0.004
->>> print square.nominal_value
-0.04
->>> print square.n  # Abbreviation
-0.04
->>> print square.std_dev
-0.004
->>> print square.s  # Abbreviation
-0.004
-
-Access to the individual sources of uncertainty
-===============================================
-
-The various contributions to an uncertainty can be obtained through the
-:func:`error_components` method, which maps the **independent variables
-a quantity depends on** to their **contribution to the total
-uncertainty**. According to :ref:`linear error propagation theory
-<linear_method>` (which is the method followed by :mod:`uncertainties`),
-the sum of the squares of these contributions is the squared
-uncertainty.
-
-The individual contributions to the uncertainty are more easily usable
-when the variables are **tagged**:
-
->>> u = ufloat(1, 0.1, "u variable")  # Tag
->>> v = ufloat(10, 0.1, "v variable")
->>> sum_value = u+2*v
->>> sum_value
-21.0+/-0.223606797749979
->>> for (var, error) in sum_value.error_components().items():
-...     print "{}: {}".format(var.tag, error)
-...
-u variable: 0.1
-v variable: 0.2
-
-The variance (i.e. squared uncertainty) of the result
-(:data:`sum_value`) is the quadratic sum of these independent
-uncertainties, as it should be (``0.1**2 + 0.2**2``).
-
-The tags *do not have to be distinct*. For instance, *multiple* random
-variables can be tagged as ``"systematic"``, and their contribution to
-the total uncertainty of :data:`result` can simply be obtained as:
-
->>> syst_error = math.sqrt(sum(  # Error from *all* systematic errors
-...     error**2
-...     for (var, error) in result.error_components().items()
-...     if var.tag == "systematic"))
-
-The remaining contribution to the uncertainty is:
-
->>> other_error = math.sqrt(result.std_dev**2 - syst_error**2)
-
-The variance of :data:`result` is in fact simply the quadratic sum of
-these two errors, since the variables from
-:func:`result.error_components` are independent.
-
-.. index:: comparison operators
-
-Comparison operators
-====================
-
-Comparison operators behave in a natural way:
-
->>> print x
-0.200+/-0.010
->>> y = x + 0.0001
->>> y
-0.2001+/-0.01
->>> y > x
-True
->>> y > 0
-True
-
-One important concept to keep in mind is that :func:`ufloat` creates a
-random variable, so that two numbers with the same nominal value and
-standard deviation are generally different:
-
->>> y = ufloat(1, 0.1)
->>> z = ufloat(1, 0.1)
->>> print y
-1.00+/-0.10
->>> print z
-1.00+/-0.10
->>> y == y
-True
->>> y == z
-False
-
-In physical terms, two rods of the same nominal length and uncertainty
-on their length are generally of different sizes: :data:`y` is different
-from :data:`z`.
-
-More detailed information on the semantics of comparison operators for
-numbers with uncertainties can be found in the :ref:`Technical Guide
-<comparison_operators>`.
-
-.. index::
-   pair: testing (scalar); NaN
-
-NaN testing
-===========
-
-NaN values can appear in a number with uncertainty ``x``. Care must be 
-taken with such values, as values like NaN±1, 1±NaN and NaN±NaN are by 
-definition *not* NaN, which is a float.
-
-Testing whether a number with uncertainty has a NaN *nominal value* can 
-be done with the provided function ``uncertainties.umath.isnan()``.
-
-Whether the uncertainty of ``x`` is NaN can be performed directly with 
-the standard function: ``math.isnan(x.std_dev)`` (or equivalently 
-``math.isnan(x.s)``).
- 
-.. index:: covariance matrix
-
-Covariance and correlation matrices
-===================================
-
-Covariance matrix
------------------
-
-The covariance matrix between various variables or calculated
-quantities can be simply obtained:
-
->>> sum_value = u+2*v
->>> cov_matrix = uncertainties.covariance_matrix([u, v, sum_value])
-
-has value
-
-::
-
-  [[0.01, 0.0,  0.01],
-   [0.0,  0.01, 0.02],
-   [0.01, 0.02, 0.05]]
-
-In this matrix, the zero covariances indicate that :data:`u` and :data:`v` are
-independent from each other; the last column shows that :data:`sum_value`
-does depend on these variables.  The :mod:`uncertainties` package
-keeps track at all times of all correlations between quantities
-(variables and functions):
-
->>> sum_value - (u+2*v)
-0.0+/-0
-
-Correlation matrix
-------------------
-
-If the NumPy_ package is available, the correlation matrix can be
-obtained as well:
-
->>> corr_matrix = uncertainties.correlation_matrix([u, v, sum_value])
->>> corr_matrix
-array([[ 1.        ,  0.        ,  0.4472136 ],
-       [ 0.        ,  1.        ,  0.89442719],
-       [ 0.4472136 ,  0.89442719,  1.        ]])
-
-.. index:: correlations; correlated variables
-
-Correlated variables
-====================
-
-Reciprocally, **correlated variables can be created** transparently,
-provided that the NumPy_ package is available.
-
-Use of a covariance matrix
---------------------------
-
-Correlated variables can be obtained through the *covariance* matrix:
-
->>> (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 21], cov_matrix)
-
-creates three new variables with the listed nominal values, and the given
-covariance matrix:
-
->>> sum_value
-21.0+/-0.223606797749979
->>> sum2
-21.0+/-0.223606797749979
->>> sum2 - (u2+2*v2)
-0.0+/-3.83371856862256e-09
-
-The theoretical value of the last expression is exactly zero, like for
-``sum - (u+2*v)``, but numerical errors yield a small uncertainty
-(3e-9 is indeed very small compared to the uncertainty on :data:`sum2`:
-correlations should in fact cancel the uncertainty on :data:`sum2`).
-
-The covariance matrix is the desired one:
-
->>> uncertainties.covariance_matrix([u2, v2, sum2])
-
-reproduces the original covariance matrix :data:`cov_matrix` (up to
-rounding errors).
-
-Use of a correlation matrix
----------------------------
-
-Alternatively, correlated values can be defined through a
-*correlation* matrix (the correlation matrix is the covariance matrix
-normalized with individual standard deviations; it has ones on its
-diagonal), along with a list of nominal values and standard deviations:
-
->>> (u3, v3, sum3) = uncertainties.correlated_values_norm(
-...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)], corr_matrix)
->>> print u3
-1.00+/-0.10
-
-The three returned numbers with uncertainties have the correct
-uncertainties and correlations (:data:`corr_matrix` can be recovered
-through :func:`correlation_matrix`).
-
-.. index::
-   single: C code; wrapping
-   single: Fortran code; wrapping
-   single: wrapping (C, Fortran,…) functions
 
 Making custom functions accept numbers with uncertainties
 =========================================================
