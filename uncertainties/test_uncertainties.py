@@ -2159,7 +2159,7 @@ else:
 
 
     def test_numpy_comparison():
-        "Comparison with a Numpy array."
+        "Comparison with a NumPy array."
 
         x = ufloat(1, 0.1)
 
