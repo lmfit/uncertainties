@@ -35,7 +35,7 @@ install:
   - conda update -q conda
   - conda info -a
   # create a conda virtual environement 
-  - "conda create -n uncty-env numpy=1.10 nose python=%PYTHON_VERSION%"
+  - "conda create -n uncty-env numpy=1.14 nose python=%PYTHON_VERSION%"
   - activate uncty-env
 
 
