@@ -5,13 +5,15 @@ sudo: false # use the new faster dockerized containers on Travis CI
 matrix:
     include:
     - python: "2.7"
-      env: DEPS="numpy==1.9 nose"
+      env: DEPS="numpy==1.14 nose"
     - python: "3.3"
-      env: DEPS="numpy==1.9 nose"
+      env: DEPS="numpy==1.14 nose"
     - python: "3.4"
-      env: DEPS="numpy==1.11 nose"
+      env: DEPS="numpy==1.14 nose"
     - python: "3.5"
-      env: DEPS="numpy==1.11 nose"
+      env: DEPS="numpy==1.14 nose"
+    - python: "3.6"
+      env: DEPS="numpy==1.14 nose"
 
 
 before_install:
