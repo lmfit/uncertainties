@@ -25,7 +25,7 @@ before_install:
 script:
     - python setup.py egg_info
     - python setup.py nosetests -sv --with-coverage
-    # - codecov
+    - codecov
     # Generate documentation
     #- cd doc
     #- make html
