@@ -413,7 +413,7 @@ following options can be chosen:
    this package.
 
 .. _Python: http://python.org/
-.. _Python(x,y): https://code.google.com/p/pythonxy/
+.. _Python(x,y): https://python-xy.github.io/
 .. _scientific Python packages: http://www.lfd.uci.edu/~gohlke/pythonlibs/
 .. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
 .. _invoking the Python interpreter: http://docs.python.org/tutorial/interpreter.html
