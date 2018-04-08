@@ -42,10 +42,11 @@ If multiple variables are pickled together (including when pickling
 The final result is exactly zero because the unpickled variables :data:`x2`
 and :data:`y2` are completely correlated.
 
-However, unpickling necessarily creates *new* variables that bear no
-relationship with the original variables (in fact, the pickled
+However, **unpickling necessarily creates new variables that bear no
+relationship with the original variables** (in fact, the pickled
 representation can be stored in a file and read from another program
-after the program that did the pickling is finished).  Thus
+after the program that did the pickling is finished: the unpickled
+variables cannot be correlated to variables that can disappear).  Thus
 
 >>> x - x2
 0.0+/-0.14142135623730953
