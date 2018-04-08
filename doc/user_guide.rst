@@ -391,11 +391,8 @@ The resulting form can generally be parsed back with
 The nominal value and the uncertainty always have the **same
 precision**: this makes it easier to compare them.
 
-Formats
--------
-
 Standard formats
-^^^^^^^^^^^^^^^^
+----------------
 
 .. Formatting method:
 
@@ -423,7 +420,7 @@ that works with floats produces similar results when running with
 numbers with uncertainties.
 
 Precision control
-^^^^^^^^^^^^^^^^^
+-----------------
 
 .. Precision control:
 
@@ -455,8 +452,8 @@ Automatic number of digits on the uncertainty: 0.200+/-0.010
 >>> print x
 0.200+/-0.010
 
-Custom options: pretty-printing, shorthand notation and LaTeX
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Custom options
+--------------
 
 .. Options:
 
@@ -493,7 +490,7 @@ formatting options. They can be added at the end of the format string:
 These non-standard formatting options **can be combined** (when meaningful).
 
 Details
-^^^^^^^
+-------
 
 .. Common exponent:
 
