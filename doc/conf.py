@@ -181,7 +181,7 @@ latex_documents = [
    u'Eric O. LEBIGOT (EOL)', 'manual'),
 ]
 
-latex_engine = "xelatex"
+#latex_engine = "xelatex"  # Not recognized by readthedocs.io as of 2018-04-08
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
@@ -192,7 +192,10 @@ latex_engine = "xelatex"
 #latex_use_parts = False
 
 # Additional stuff for the LaTeX preamble.
-# latex_preamble = ''
+#latex_preamble = r'\DeclareUnicodeCharacter{207B}{$^-$}'
+latex_elements = {
+    'preamble': r'\DeclareUnicodeCharacter{207B}{$^-$}'
+}
 
 # Documents to append as an appendix to all manuals.
 #latex_appendices = []
