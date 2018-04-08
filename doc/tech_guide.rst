@@ -4,6 +4,17 @@
 Technical Guide
 ===============
 
+
+
+Testing whether an object is a number with uncertainty
+------------------------------------------------------
+
+The recommended way of testing whether :data:`value` carries an
+uncertainty handled by this module is by checking whether
+:data:`value` is an instance of :class:`UFloat`, through
+``isinstance(value, uncertainties.UFloat)``.
+
+
 .. index:: comparison operators; technical details
 
 .. _comparison_operators:
@@ -102,15 +113,6 @@ since it is a constant "random" function (with value 0.0002, even
 though :data:`y` and :data:`x` are random). Thus, it is indeed true
 that :data:`y` > :data:`x`.
 
-
-
-Testing whether an object is a number with uncertainty
-------------------------------------------------------
-
-The recommended way of testing whether :data:`value` carries an
-uncertainty handled by this module is by checking whether
-:data:`value` is an instance of :class:`UFloat`, through
-``isinstance(value, uncertainties.UFloat)``.
 
 .. index:: pickling
 .. index:: saving to file; number with uncertainty
