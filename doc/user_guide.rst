@@ -391,6 +391,12 @@ The resulting form can generally be parsed back with
 The nominal value and the uncertainty always have the **same
 precision**: this makes it easier to compare them.
 
+Formats
+-------
+
+Standard formats
+^^^^^^^^^^^^^^^^
+
 .. Formatting method:
 
 More **control over the format** can be obtained (in Python 2.6+)
@@ -415,6 +421,9 @@ The usual **float formats with a precision** retain their original
 meaning (e.g. ``.2e`` uses two digits after the decimal point): code
 that works with floats produces similar results when running with
 numbers with uncertainties.
+
+Precision control
+^^^^^^^^^^^^^^^^^
 
 .. Precision control:
 
@@ -446,11 +455,14 @@ Automatic number of digits on the uncertainty: 0.200+/-0.010
 >>> print x
 0.200+/-0.010
 
+Non-standard formats
+^^^^^^^^^^^^^^^^^^^^
+
 .. Options:
 
-Formatting options can be added at the end of the format string: ``S``
-for the **shorthand notation**, ``L`` for a **LaTeX** output, ``P``
-for **pretty-printing**:
+Non-standard formatting options are available. They can be added at
+the end of the format string: ``S`` for the **shorthand notation**,
+``L`` for a **LaTeX** output, ``P`` for **pretty-printing**:
 
 >>> print '{:+.1uS}'.format(x)  # Sign, 1 digit for the uncertainty, shorthand
 +0.20(1)
@@ -465,6 +477,9 @@ the pretty-printing mode implies using Unicode format strings
 (``u'…'`` in Python 2, but simply ``'…'`` in Python 3).
 
 These formatting options can be combined (when meaningful).
+
+Details
+^^^^^^^
 
 .. Common exponent:
 
