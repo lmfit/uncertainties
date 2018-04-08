@@ -4,6 +4,106 @@
 Technical Guide
 ===============
 
+.. index:: comparison operators; technical details
+
+.. _comparison_operators:
+
+
+Comparison operators
+--------------------
+
+Comparison operations (>, ==, etc.) on numbers with uncertainties have
+a **pragmatic semantics**, in this package: numbers with uncertainties
+can be used wherever Python numbers are used, most of the time with a
+result identical to the one that would be obtained with their nominal
+value only.  This allows code that runs with pure numbers to also work
+with numbers with uncertainties.
+
+.. index:: boolean value
+
+The **boolean value** (``bool(x)``, ``if x …``) of a number with
+uncertainty :data:`x` is defined as the result of ``x != 0``, as usual.
+
+However, since the objects defined in this module represent
+probability distributions and not pure numbers, comparison operators
+are interpreted in a specific way.
+
+The result of a comparison operation is defined so as to be
+essentially consistent with the requirement that uncertainties be
+small: the **value of a comparison operation** is True only if the
+operation yields True for all *infinitesimal* variations of its random
+variables around their nominal values, *except*, possibly, for an
+*infinitely small number* of cases.
+
+Example:
+
+>>> x = ufloat(3.14, 0.01)
+>>> x == x
+True
+
+because a sample from the probability distribution of :data:`x` is always
+equal to itself.  However:
+
+>>> y = ufloat(3.14, 0.01)
+>>> x != y
+True
+
+since :data:`x` and :data:`y` are independent random variables that
+*almost* always give a different value. Note that this is different
+from the result of ``z = 3.14; t = 3.14; print z != t``, because
+:data:`x` and :data:`y` are *random variables*, not pure numbers.
+
+Similarly,
+
+>>> x = ufloat(3.14, 0.01)
+>>> y = ufloat(3.00, 0.01)
+>>> x > y
+True
+
+because :data:`x` is supposed to have a probability distribution largely
+contained in the 3.14±~0.01 interval, while :data:`y` is supposed to be
+well in the 3.00±~0.01 one: random samples of :data:`x` and :data:`y` will
+most of the time be such that the sample from :data:`x` is larger than the
+sample from :data:`y`.  Therefore, it is natural to consider that for all
+practical purposes, ``x > y``.
+
+Since comparison operations are subject to the same constraints as
+other operations, as required by the :ref:`linear approximation
+<linear_method>` method, their result should be essentially *constant*
+over the regions of highest probability of their variables (this is
+the equivalent of the linearity of a real function, for boolean
+values).  Thus, it is not meaningful to compare the following two
+independent variables, whose probability distributions overlap:
+
+>>> x = ufloat(3, 0.01)
+>>> y = ufloat(3.0001, 0.01)
+
+In fact the function (x, y) → (x > y) is not even continuous over the
+region where x and y are concentrated, which violates the assumption
+of approximate linearity made in this package on operations involving
+numbers with uncertainties.  Comparing such numbers therefore returns
+a boolean result whose meaning is undefined.
+
+However, values with largely overlapping probability distributions can
+sometimes be compared unambiguously:
+
+>>> x = ufloat(3, 1)
+>>> x
+3.0+/-1.0
+>>> y = x + 0.0002
+>>> y
+3.0002+/-1.0
+>>> y > x
+True
+
+In fact, correlations guarantee that :data:`y` is always larger than
+:data:`x`: ``y-x`` correctly satisfies the assumption of linearity,
+since it is a constant "random" function (with value 0.0002, even
+though :data:`y` and :data:`x` are random). Thus, it is indeed true
+that :data:`y` > :data:`x`.
+
+
+
 Testing whether an object is a number with uncertainty
 ------------------------------------------------------
 
@@ -170,104 +270,6 @@ but this does not imply any property on the nominal value (beyond the
 fact that the nominal value is normally inside the region of high
 probability density), or that the probability distribution of the
 result is symmetrical (this is rarely strictly the case).
-
-.. index:: comparison operators; technical details
-
-.. _comparison_operators:
-
-
-Comparison operators
---------------------
-
-Comparison operations (>, ==, etc.) on numbers with uncertainties have
-a **pragmatic semantics**, in this package: numbers with uncertainties
-can be used wherever Python numbers are used, most of the time with a
-result identical to the one that would be obtained with their nominal
-value only.  This allows code that runs with pure numbers to also work
-with numbers with uncertainties.
-
-.. index:: boolean value
-
-The **boolean value** (``bool(x)``, ``if x …``) of a number with
-uncertainty :data:`x` is defined as the result of ``x != 0``, as usual.
-
-However, since the objects defined in this module represent
-probability distributions and not pure numbers, comparison operators
-are interpreted in a specific way.
-
-The result of a comparison operation is defined so as to be
-essentially consistent with the requirement that uncertainties be
-small: the **value of a comparison operation** is True only if the
-operation yields True for all *infinitesimal* variations of its random
-variables around their nominal values, *except*, possibly, for an
-*infinitely small number* of cases.
-
-Example:
-
->>> x = ufloat(3.14, 0.01)
->>> x == x
-True
-
-because a sample from the probability distribution of :data:`x` is always
-equal to itself.  However:
-
->>> y = ufloat(3.14, 0.01)
->>> x != y
-True
-
-since :data:`x` and :data:`y` are independent random variables that
-*almost* always give a different value. Note that this is different
-from the result of ``z = 3.14; t = 3.14; print z != t``, because
-:data:`x` and :data:`y` are *random variables*, not pure numbers.
-
-Similarly,
-
->>> x = ufloat(3.14, 0.01)
->>> y = ufloat(3.00, 0.01)
->>> x > y
-True
-
-because :data:`x` is supposed to have a probability distribution largely
-contained in the 3.14±~0.01 interval, while :data:`y` is supposed to be
-well in the 3.00±~0.01 one: random samples of :data:`x` and :data:`y` will
-most of the time be such that the sample from :data:`x` is larger than the
-sample from :data:`y`.  Therefore, it is natural to consider that for all
-practical purposes, ``x > y``.
-
-Since comparison operations are subject to the same constraints as
-other operations, as required by the :ref:`linear approximation
-<linear_method>` method, their result should be essentially *constant*
-over the regions of highest probability of their variables (this is
-the equivalent of the linearity of a real function, for boolean
-values).  Thus, it is not meaningful to compare the following two
-independent variables, whose probability distributions overlap:
-
->>> x = ufloat(3, 0.01)
->>> y = ufloat(3.0001, 0.01)
-
-In fact the function (x, y) → (x > y) is not even continuous over the
-region where x and y are concentrated, which violates the assumption
-of approximate linearity made in this package on operations involving
-numbers with uncertainties.  Comparing such numbers therefore returns
-a boolean result whose meaning is undefined.
-
-However, values with largely overlapping probability distributions can
-sometimes be compared unambiguously:
-
->>> x = ufloat(3, 1)
->>> x
-3.0+/-1.0
->>> y = x + 0.0002
->>> y
-3.0002+/-1.0
->>> y > x
-True
-
-In fact, correlations guarantee that :data:`y` is always larger than
-:data:`x`: ``y-x`` correctly satisfies the assumption of linearity,
-since it is a constant "random" function (with value 0.0002, even
-though :data:`y` and :data:`x` are random). Thus, it is indeed true
-that :data:`y` > :data:`x`.
 
 
 .. _differentiation method:
