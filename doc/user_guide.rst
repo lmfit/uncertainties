@@ -455,8 +455,8 @@ Automatic number of digits on the uncertainty: 0.200+/-0.010
 >>> print x
 0.200+/-0.010
 
-Custom options
-^^^^^^^^^^^^^^
+Custom options: pretty-printing, shorthand notation and LaTeX
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. Options:
 
