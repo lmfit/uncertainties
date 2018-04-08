@@ -433,7 +433,7 @@ the empty format type, etc.):
 1 significant digit, percentage: (20+/-1)%
 
 When :mod:`uncertainties` must **choose the number of significant
-digits on the uncertainty**, it is defined with the `Particle
+digits on the uncertainty**, it uses the `Particle
 Data Group
 <http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
 rules (these rules keep the number of digits small, which is
@@ -446,6 +446,25 @@ Automatic number of digits on the uncertainty: 0.200+/-0.010
 >>> print x
 0.200+/-0.010
 
+.. Options:
+
+Formatting options can be added at the end of the format string: ``S``
+for the **shorthand notation**, ``L`` for a **LaTeX** output, ``P``
+for **pretty-printing**:
+
+>>> print '{:+.1uS}'.format(x)  # Sign, 1 digit for the uncertainty, shorthand
++0.20(1)
+>>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeX
+\left(2.00 \pm 0.10\right) \times 10^{6}
+
+The pretty-printing mode uses "±" and superscript exponents: the
+default output is such that ``print '{:.2e}'.format(x)`` yields
+"(2.00+/-0.10)e-01", whereas the pretty-printing mode in ``print
+u'{:.2eP}'.format(x)`` yields "(2.00±0.10)×10\ :sup:`-1`\ ". Note that
+the pretty-printing mode implies using Unicode format strings
+(``u'…'`` in Python 2, but simply ``'…'`` in Python 3).
+
+These formatting options can be combined (when meaningful).
 
 .. Common exponent:
 
@@ -467,26 +486,6 @@ be factored.) Thanks to this feature, each part (nominal value and
 standard deviation) is correctly aligned across multiple lines, while the
 relative magnitude of the error can still be readily estimated thanks to
 the common exponent.
-
-.. Options:
-
-Formatting options can be added at the end of the format string: ``S``
-for the **shorthand notation**, ``L`` for a **LaTeX** output, ``P``
-for **pretty-printing**:
-
->>> print '{:+.1uS}'.format(x)  # Sign, 1 digit for the uncertainty, shorthand
-+0.20(1)
->>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeX
-\left(2.00 \pm 0.10\right) \times 10^{6}
-
-The pretty-printing mode uses "±" and superscript exponents: the
-default output is such that ``print '{:.2e}'.format(x)`` yields
-"(2.00+/-0.10)e-01", whereas the pretty-printing mode in ``print
-u'{:.2eP}'.format(x)`` yields "(2.00±0.10)×10\ :sup:`-1`\ ". Note that
-the pretty-printing mode implies using Unicode format strings
-(``u'…'`` in Python 2, but simply ``'…'`` in Python 3).
-
-These formatting options can be combined (when meaningful).
 
 .. Special cases:
 
