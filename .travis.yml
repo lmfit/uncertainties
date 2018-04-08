@@ -20,10 +20,14 @@ before_install:
     - pip install setuptools --upgrade
     - pip install pip --upgrade
     - pip install $DEPS
+    - pip install codecov
 
 script:
     - python setup.py egg_info
-    - python setup.py nosetests -sv
+    - python setup.py nosetests -sv --with-coverage
     # Generate documentation
     #- cd doc
     #- make html
+    
+after_success:
+    - codecov
