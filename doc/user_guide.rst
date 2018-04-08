@@ -411,21 +411,12 @@ with the ``n`` format type. In particular, a fill character, an
 alignment option, a sign or zero option, a width, or the ``%`` format
 type are all supported.
 
+The usual **float formats with a precision** retain their original
+meaning (e.g. ``.2e`` uses two digits after the decimal point): code
+that works with floats produces similar results when running with
+numbers with uncertainties.
+
 .. Precision control:
-
-When :mod:`uncertainties` must **choose the number of significant
-digits on the uncertainty**, it is defined with the `Particle
-Data Group
-<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
-rules (these rules keep the number of digits small, which is
-convenient for reading numbers with uncertainties, and at the same
-time prevent the uncertainty from being displayed with too few
-digits):
-
->>> print 'Automatic number of digits on the uncertainty: {}'.format(x)
-Automatic number of digits on the uncertainty: 0.200+/-0.010
->>> print x
-0.200+/-0.010
 
 It is possible to **control the number of significant digits of the
 uncertainty** by adding the precision modifier ``u`` after the
@@ -441,10 +432,19 @@ the empty format type, etc.):
 >>> print '1 significant digit, percentage: {:.1u%}'.format(x)
 1 significant digit, percentage: (20+/-1)%
 
-The usual **float formats with a precision** retain their original
-meaning (e.g. ``.2e`` uses two digits after the decimal point): code
-that works with floats produces similar results when running with
-numbers with uncertainties.
+When :mod:`uncertainties` must **choose the number of significant
+digits on the uncertainty**, it is defined with the `Particle
+Data Group
+<http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf>`_ rounding
+rules (these rules keep the number of digits small, which is
+convenient for reading numbers with uncertainties, and at the same
+time prevent the uncertainty from being displayed with too few
+digits):
+
+>>> print 'Automatic number of digits on the uncertainty: {}'.format(x)
+Automatic number of digits on the uncertainty: 0.200+/-0.010
+>>> print x
+0.200+/-0.010
 
 
 .. Common exponent:
