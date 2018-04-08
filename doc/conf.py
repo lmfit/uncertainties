@@ -181,6 +181,8 @@ latex_documents = [
    u'Eric O. LEBIGOT (EOL)', 'manual'),
 ]
 
+latex_engine = "xelatex"
+
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
 #latex_logo = None
@@ -190,7 +192,7 @@ latex_documents = [
 #latex_use_parts = False
 
 # Additional stuff for the LaTeX preamble.
-#latex_preamble = ''
+# latex_preamble = ''
 
 # Documents to append as an appendix to all manuals.
 #latex_appendices = []
