@@ -487,7 +487,7 @@ formatting options. They can be added at the end of the format string:
   >>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeX
   \left(2.00 \pm 0.10\right) \times 10^{6}
 
-These non-standard formatting options **can be combined** (when meaningful).
+These custom formatting options **can be combined** (when meaningful).
 
 Details
 -------
