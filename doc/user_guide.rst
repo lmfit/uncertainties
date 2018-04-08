@@ -455,13 +455,13 @@ Automatic number of digits on the uncertainty: 0.200+/-0.010
 >>> print x
 0.200+/-0.010
 
-Non-standard options
-^^^^^^^^^^^^^^^^^^^^
+Custom options
+^^^^^^^^^^^^^^
 
 .. Options:
 
-Non-standard formatting options are available. They can be added at
-the end of the format string:
+:mod:`uncertainties` provides even more flexibility through custom
+formatting options. They can be added at the end of the format string:
 
 - ``P`` for **pretty-printing**:
 
