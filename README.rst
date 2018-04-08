@@ -8,7 +8,9 @@ uncertainties
    :target: https://ci.appveyor.com/project/lebigot/uncertainties
 .. image:: https://codecov.io/gh/lebigot/uncertainties/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/lebigot/uncertainties/
-
+.. image: https://readthedocs.org/projects/uncertainties-python-package/badge/?version=latest
+   :target: http://uncertainties-python-package.readthedocs.io/en/latest/?badge=latest
+   
 This is the ``uncertainties`` Python package, which performs **transparent
 calculations with uncertainties** (aka "error propagation"). This package
 also calculates derivatives.
