@@ -15,6 +15,45 @@ uncertainty handled by this module is by checking whether
 ``isinstance(value, uncertainties.UFloat)``.
 
 
+.. index:: pickling
+.. index:: saving to file; number with uncertainty
+.. index:: reading from file; number with uncertainty
+
+.. _pickling:
+
+Pickling
+--------
+
+The quantities with uncertainties created by the :mod:`uncertainties`
+package can be `pickled <http://docs.python.org/library/pickle.html>`_
+(they can be stored in a file, for instance).
+
+If multiple variables are pickled together (including when pickling
+:doc:`NumPy arrays <numpy_guide>`), their correlations are preserved:
+
+>>> import pickle
+>>> x = ufloat(2, 0.1)
+>>> y = 2*x
+>>> p = pickle.dumps([x, y])  # Pickling to a string
+>>> (x2, y2) = pickle.loads(p)  # Unpickling into new variables
+>>> y2 - 2*x2
+0.0+/-0
+
+The final result is exactly zero because the unpickled variables :data:`x2`
+and :data:`y2` are completely correlated.
+
+However, unpickling necessarily creates *new* variables that bear no
+relationship with the original variables (in fact, the pickled
+representation can be stored in a file and read from another program
+after the program that did the pickling is finished).  Thus
+
+>>> x - x2
+0.0+/-0.14142135623730953
+
+which shows that the original variable :data:`x` and the new variable :data:`x2`
+are completely uncorrelated.
+
+
 .. index:: comparison operators; technical details
 
 .. _comparison_operators:
@@ -113,44 +152,6 @@ since it is a constant "random" function (with value 0.0002, even
 though :data:`y` and :data:`x` are random). Thus, it is indeed true
 that :data:`y` > :data:`x`.
 
-
-.. index:: pickling
-.. index:: saving to file; number with uncertainty
-.. index:: reading from file; number with uncertainty
-
-.. _pickling:
-
-Pickling
---------
-
-The quantities with uncertainties created by the :mod:`uncertainties`
-package can be `pickled <http://docs.python.org/library/pickle.html>`_
-(they can be stored in a file, for instance).
-
-If multiple variables are pickled together (including when pickling
-:doc:`NumPy arrays <numpy_guide>`), their correlations are preserved:
-
->>> import pickle
->>> x = ufloat(2, 0.1)
->>> y = 2*x
->>> p = pickle.dumps([x, y])  # Pickling to a string
->>> (x2, y2) = pickle.loads(p)  # Unpickling into new variables
->>> y2 - 2*x2
-0.0+/-0
-
-The final result is exactly zero because the unpickled variables :data:`x2`
-and :data:`y2` are completely correlated.
-
-However, unpickling necessarily creates *new* variables that bear no
-relationship with the original variables (in fact, the pickled
-representation can be stored in a file and read from another program
-after the program that did the pickling is finished).  Thus
-
->>> x - x2
-0.0+/-0.14142135623730953
-
-which shows that the original variable :data:`x` and the new variable :data:`x2`
-are completely uncorrelated.
 
 .. index:: linear propagation of uncertainties
 .. _linear_method:
