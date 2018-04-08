@@ -194,6 +194,7 @@ latex_documents = [
 # Additional stuff for the LaTeX preamble.
 #latex_preamble = r'\DeclareUnicodeCharacter{207B}{$^-$}'
 latex_elements = {
+    # Superscript -, for pdflatex (unnecessary, with xelatex):
     'preamble': r'\DeclareUnicodeCharacter{207B}{$^-$}'
 }
 

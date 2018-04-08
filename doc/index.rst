@@ -392,11 +392,11 @@ Don Peterson, Mika Pflueger, Albert Puig, Abraham Lee, Arian Sanusi,
 Martin Laloux, Jonathan Whitmore, Federico Vaggi, Marco A. Ferra,
 Hernan Grecco, David Zwicker, James Hester, Andrew Nelson, and many others.
 
-I am grateful to the Anaconda, macOS and Linux distribution maintainers 
-of this package (Jonathan Stickel, David Paleino, Federico Ceratto, 
-Roberto Colistete Jr, Filipe Pires Alvarenga Fernandes, and Felix Yan) 
-and also to Gabi Davar and Pierre Raybaut for including it in 
-`Python(x,y)`_ and to Christoph Gohlke for including it in his Base 
+I am grateful to the Anaconda, macOS and Linux distribution maintainers
+of this package (Jonathan Stickel, David Paleino, Federico Ceratto,
+Roberto Colistete Jr, Filipe Pires Alvarenga Fernandes, and Felix Yan)
+and also to Gabi Davar and Pierre Raybaut for including it in
+`Python(x,y)`_ and to Christoph Gohlke for including it in his Base
 distribution of `scientific Python packages`_ for Windows.
 
 
