@@ -23,8 +23,8 @@ also calculates derivatives.
 GitHub
 ------
 
-The ``release`` branch is for Python 2.7+ (including Python 3+ through
-``2to3``), while the ``release_python2.3`` branch is for Python 2.3 to
+The ``release`` branch is the latest stable release for Python 2.7+ (including Python 3+ through
+``2to3``), while the ``release_python2.3`` branch is the same but for Python 2.3 to
 2.6 (with unit tests only run with Python 2.6).
 
 
