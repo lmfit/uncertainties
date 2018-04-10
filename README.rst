@@ -25,7 +25,7 @@ GitHub
 
 The ``release`` branch is the latest stable release for Python 2.7+ (including Python 3+ through
 ``2to3``), while the ``release_python2.3`` branch is the same but for Python 2.3 to
-2.6 (with unit tests only run with Python 2.6).
+2.6 (with unit tests only run with Python 2.6). They should pass the tests.
 
 
 ``master*`` branches in the Github repository are bleeding-edge, and do not necessarily pass the tests. The ``master`` and ``master_python2.3`` are the latest, relatively stable versions (while other ``master*`` branches are more experimental).
