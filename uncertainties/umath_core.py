@@ -15,7 +15,6 @@ from __future__ import division  # Many analytical derivatives depend on this
 import math
 import sys
 import itertools
-import inspect
 
 # Local modules
 import uncertainties.core as uncert_core
