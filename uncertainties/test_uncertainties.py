@@ -185,8 +185,8 @@ def compare_derivatives(func, numerical_derivatives,
                         # This message is useful: the user can see that
                         # tests are really performed (instead of not being
                         # performed, silently):
-                        print "Testing %s at %s, arg #%d" % (
-                            funcname, args, arg_num)
+                        print "Testing derivative #%d of %s at %s" % (
+                            arg_num, funcname, args_scalar)
 
                         if not numbers_close(fixed_deriv_value,
                                              num_deriv_value, 1e-4):
