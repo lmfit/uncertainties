@@ -2,9 +2,6 @@
 language: python
 sudo: false # use the new faster dockerized containers on Travis CI
 
-install:
-    if [[ $TRAVIS_PYTHON_VERSION == 3.3 ]]; then pip install virtualenv==15.2.0; fi
-    
 matrix:
     include:
     - python: "2.7"
