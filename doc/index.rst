@@ -138,7 +138,7 @@ you can install the latest version with
 
    conda install -c conda-forge uncertainties
 
-If you have `pip <http://pip.openplans.org/>`_, you can try to install
+If you have `pip <hhttps://pypi.org/project/pip/`_, you can try to install
 the latest version with
 
 .. code-block:: sh
