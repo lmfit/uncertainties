@@ -131,6 +131,13 @@ Under Unix, it may be necessary to prefix the commands below with
 ``sudo``, so that the installation program has **sufficient access
 rights to the system**.
 
+If you use the `Anaconda distribution <https://www.anaconda.com>`_, 
+you can install the latest version with
+
+.. code-block:: sh
+
+   conda install -c conda-forge uncertainties
+
 If you have `pip <http://pip.openplans.org/>`_, you can try to install
 the latest version with
 
