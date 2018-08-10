@@ -110,7 +110,7 @@ except ImportError:
 else:
 
     # NumPy numbers do not depend on Variable objects:
-    FLOAT_LIKE_TYPES += (numpy.number,)
+    FLOAT_LIKE_TYPES += (numpy.generic,)
     CONSTANT_TYPES += FLOAT_LIKE_TYPES[-1:]
 
     # Entering variables as a block of correlated values.  Only available
