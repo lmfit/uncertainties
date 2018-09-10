@@ -12,8 +12,21 @@ uncertainties
    :target: http://uncertainties-python-package.readthedocs.io/en/latest/?badge=latest
    
 This is the ``uncertainties`` Python package, which performs **transparent
-calculations with uncertainties** (aka "error propagation"). This package
-also calculates derivatives.
+calculations with uncertainties** (aka "error propagation"):
+
+    >>> from uncertainties import ufloat
+    >>> from uncertainties.umath import *  # sin(), etc.
+    >>> x = ufloat(1, 0.1)  # x = 1+/-0.1
+    >>> print 2*x
+    2.00+/-0.20
+    >>> sin(2*x)  # In a Python shell, "print" is optional
+    0.9092974268256817+/-0.08322936730942848
+
+This package also automatically calculates derivatives:
+
+    >>> (2*x+1000).derivatives[x]
+    2.0
+
 
 * Documentation: http://uncertainties-python-package.readthedocs.io/
 * Issues: https://github.com/lebigot/uncertainties/issues/
