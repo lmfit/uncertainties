@@ -27,6 +27,7 @@ This package also automatically calculates derivatives:
     >>> (2*x+1000).derivatives[x]
     2.0
 
+Some useful links:
 
 * Documentation: http://uncertainties-python-package.readthedocs.io/
 * Issues: https://github.com/lebigot/uncertainties/issues/
