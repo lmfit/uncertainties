@@ -531,7 +531,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     # additional derivatives:
 
     try:
-        argspec = inspect.getargspec(f)
+        argspec = inspect.getfullargspec(f)
     except TypeError:
         # Some functions do not provide meta-data about their
         # arguments (see PEP 362). One cannot use keyword arguments
