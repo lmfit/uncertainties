@@ -31,6 +31,11 @@ import inspect
 import numbers
 import collections
 
+if sys.version_info < (3,):
+    from inspect import getargspec
+else:
+    from inspect import getfullargspec as getargspec
+
 # Attributes that are always exported (some other attributes are
 # exported only if the NumPy module is available...):
 __all__ = [
@@ -531,7 +536,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     # additional derivatives:
 
     try:
-        argspec = inspect.getargspec(f)
+        argspec = getargspec(f)
     except TypeError:
         # Some functions do not provide meta-data about their
         # arguments (see PEP 362). One cannot use keyword arguments
