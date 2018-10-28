@@ -42,7 +42,7 @@ else:
 # Common options for distutils/setuptools's setup():
 setup_options = dict(
     name='uncertainties',
-    version='3.0.2',
+    version='3.0.3',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://uncertainties-python-package.readthedocs.io/',
