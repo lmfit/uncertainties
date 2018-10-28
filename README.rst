@@ -10,6 +10,9 @@ uncertainties
    :target: https://codecov.io/gh/lebigot/uncertainties/
 .. image:: https://readthedocs.org/projects/uncertainties-python-package/badge/?version=latest
    :target: http://uncertainties-python-package.readthedocs.io/en/latest/?badge=latest
+.. image:: https://img.shields.io/pypi/v/uncertainties.svg
+   :target: https://pypi.org/project/uncertainties/
+
    
 This is the ``uncertainties`` Python package, which performs **transparent
 calculations with uncertainties** (aka "error propagation"):
