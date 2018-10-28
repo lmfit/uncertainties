@@ -31,6 +31,8 @@ import inspect
 import numbers
 import collections
 
+# The following restricts the local function getargspec() to the common
+# features of inspect.getargspec() and inspect.getfullargspec():
 if sys.version_info < (3,):
     from inspect import getargspec
 else:
