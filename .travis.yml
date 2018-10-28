@@ -6,8 +6,9 @@ matrix:
     include:
     - python: "2.7"
       env: DEPS="numpy nose"
-    - python: "3.3"
-      env: DEPS="numpy nose"
+    # As of 2018-10, Travis has installation problems with the DEPS below, so Python 3.3 is not tested anymore:
+    #- python: "3.3"
+    #  env: DEPS="numpy nose"
     - python: "3.4"
       env: DEPS="numpy nose"
     - python: "3.5"
