@@ -134,8 +134,8 @@ performed through the dedicated :mod:`uncertainties.unumpy` module.
 .. index:: correlations; detailed example
 
 
-Correlated variables
-====================
+Automatic correlations
+======================
 
 Correlations between variables are **automatically handled** whatever
 the number of variables involved, and whatever the complexity of the
