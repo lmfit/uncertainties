@@ -360,6 +360,7 @@ Alternatively, correlated values can be defined through:
   list of lists, or a NumPy array.
 
 Example: 
+
 >>> (u3, v3, sum3) = uncertainties.correlated_values_norm(
 ...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)], corr_matrix)
 >>> print u3
