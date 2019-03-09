@@ -154,6 +154,8 @@ else:
         matrix, i.e., not the normalized covariance matrix). For
         example, the first element of this matrix is the variance of
         the first returned number with uncertainty.
+        This matrix must be an NumPy array-like (list of lists, 
+        NumPy array, etc.).
         """
 
         # If no tags were given, we prepare tags for the newly created
@@ -208,6 +210,8 @@ else:
 
         correlation_mat -- correlation matrix (i.e. the normalized
         covariance matrix, a matrix with ones on its diagonal).
+        This matrix must be an NumPy array-like (list of lists, 
+        NumPy array, etc.).
         '''
 
         (nominal_values, std_devs) = numpy.transpose(values_with_std_dev)

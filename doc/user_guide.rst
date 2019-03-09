@@ -350,11 +350,16 @@ rounding errors).
 Use of a correlation matrix
 ---------------------------
 
-Alternatively, correlated values can be defined through a
-*correlation* matrix (the correlation matrix is the covariance matrix
-normalized with individual standard deviations; it has ones on its
-diagonal), along with a list of nominal values and standard deviations:
+Alternatively, correlated values can be defined through:
 
+- a sequence of nominal values and standard deviations, and
+- a *correlation* matrix between each variable of this sequence
+  (the correlation matrix is the covariance matrix
+  normalized with individual standard deviations; it has ones on its
+  diagonal)—in the form of a NumPy array-like object, e.g. a 
+  list of lists, or a NumPy array.
+
+Example: 
 >>> (u3, v3, sum3) = uncertainties.correlated_values_norm(
 ...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)], corr_matrix)
 >>> print u3
