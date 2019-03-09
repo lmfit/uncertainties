@@ -1,6 +1,9 @@
 # Config file for automatic testing at travis-ci.org
 language: python
-sudo: false # use the new faster dockerized containers on Travis CI
+language: python
+# Workaround for being able to use Python 3.7 (2019-03)
+sudo: required
+dist: xenial
 
 matrix:
     include:
