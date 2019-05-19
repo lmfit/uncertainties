@@ -42,7 +42,7 @@ else:
 # Common options for distutils/setuptools's setup():
 setup_options = dict(
     name='uncertainties',
-    version='3.0.3',
+    version='3.1',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://uncertainties-python-package.readthedocs.io/',
@@ -160,6 +160,10 @@ Version history
 
 Main changes:
 
+- 3.1: Variables built through a correlation or covariance matrix, and that
+  have uncertainties that span many orders of magnitude are now 
+  calculated more accurately (improved ``correlated_values()`` and
+  ``correlated_values_norm()`` functions).
 - 3.0: Massive speedup for some operations involving large numbers of numbers with uncertainty, like ``sum(ufloat(1, 1) for _ in xrange(100000))`` (this is about 5,000 times faster than before).
 - 2.4.8: Friendlier completions in Python shells, etc.: internal functions should not appear anymore (for the user modules: ``uncertainties``, ``uncertainties.umath`` and  ``uncertainties.unumpy``). Parsing the shorthand notation (e.g. ``3.1(2)``) now works with infinite values (e.g. ``-inf(inf)``); this mirrors the ability to print such numbers with uncertainty. The Particle Data Group rounding rule is applied in more cases (e.g. printing 724.2±26.2 now gives ``724±26``). The shorthand+LaTeX formatting of numbers with an infinite nominal value is fixed. ``uncertainties.unumpy.matrix`` now uses ``.std_devs`` instead of ``.std_devs()``, for consistency with floats with uncertainty (automatic conversion of code added to ``uncertainties.1to2``).
 - 2.4.7: String formatting now works for ``(-)inf+/-...`` numbers.
