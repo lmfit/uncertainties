@@ -2132,7 +2132,8 @@ else:
         both their nominal value and uncertainty are equal (up to the
         given precision).
 
-        m1, m2 -- NumPy matrices.
+        m1, m2 -- NumPy arrays.
+
         precision -- precision passed through to
         uncertainties.test_uncertainties.numbers_close().
         """
@@ -2155,6 +2156,7 @@ else:
             if not numbers_close(elmt1.std_dev,
                                  elmt2.std_dev, precision):
                 return False
+        
         return True
 
 
@@ -2287,9 +2289,16 @@ else:
         cov[[0, 1], 2] = -3e-34
         cov[2, [0, 1]] = -3e-34
         variables = uncert_core.correlated_values([0]*3, cov)
-        assert arrays_close(
-                cov,
-                numpy.asarray(uncert_core.covariance_matrix(variables)))
+
+        print (cov[0,0], variables[0].s**2)
+        print (cov[1,1], variables[1].s**2)
+        # Since the numbers are very small, we need to compare them
+        # in a stricter way, that handles the case of a 0 variance
+        # in `variables`:
+        assert numbers_close(
+                1e66*cov[0,0], 1e66*variables[0].s**2, tolerance=1e-5)
+        assert numbers_close(
+                1e66*cov[1,1], 1e66*variables[1].s**2, tolerance=1e-5)
 
     def test_correlated_values_correlation_mat():
         '''
