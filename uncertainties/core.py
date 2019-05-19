@@ -143,9 +143,6 @@ else:
         The numbers with uncertainties returned depend on newly
         created, independent variables (Variable objects).
 
-        If 'tags' is not None, it must list the tag of each new
-        independent variable.
-
         nom_values -- sequence with the nominal (real) values of the
         numbers with uncertainties to be returned.
 
@@ -155,41 +152,28 @@ else:
         example, the first element of this matrix is the variance of
         the first returned number with uncertainty.
         This matrix must be an NumPy array-like (list of lists, 
-        NumPy array, etc.).
+        NumPy array, etc.). No variance must be 0 (i.e. there must be
+        no 0 on the diagonal); this would mean that there is a constant
+        "variable".
+
+        tags -- if 'tags' is not None, it must list the tag of each new
+        independent variable.
         """
 
-        # If no tags were given, we prepare tags for the newly created
-        # variables:
-        if tags is None:
-            tags = (None,) * len(nom_values)
+        # !!! It would in principle be possible to handle 0 variance
+        # variables by first selecting the sub-matrix that does not contain
+        # such variables (with the help of numpy.ix_()), and creating 
+        # them separately.
+        
+        std_devs = numpy.sqrt(numpy.diag(covariance_mat))
 
-        # The covariance matrix is diagonalized in order to define
-        # the independent variables that model the given values:
+        return correlated_values_norm(
+            # !! The following zip() is a bit suboptimal: correlated_values()
+            # separates back the nominal values and the standard deviations:
+            zip(nom_values, std_devs),
+            covariance_mat/std_devs/std_devs[:,numpy.newaxis],
+            tags)
 
-        (variances, transform) = numpy.linalg.eigh(covariance_mat)
-
-        # Numerical errors might make some variances negative: we set
-        # them to zero:
-        variances[variances < 0] = 0.
-
-        # Creation of new, independent variables:
-
-        # We use the fact that the eigenvectors in 'transform' are
-        # special: 'transform' is unitary: its inverse is its transpose:
-
-        variables = tuple(
-            # The variables represent "pure" uncertainties:
-            Variable(0, sqrt(variance), tag)
-            for (variance, tag) in zip(variances, tags))
-
-        # Representation of the initial correlated values:
-        values_funcs = tuple(
-            AffineScalarFunc(
-                value,
-                LinearCombination(dict(itertools.izip(variables, coords))))
-            for (coords, value) in zip(transform, nom_values))
-
-        return values_funcs
 
     __all__.append('correlated_values')
 
@@ -212,14 +196,53 @@ else:
         covariance matrix, a matrix with ones on its diagonal).
         This matrix must be an NumPy array-like (list of lists, 
         NumPy array, etc.).
+
+        tags -- like for correlated_values().
         '''
+
+        # If no tags were given, we prepare tags for the newly created
+        # variables:
+        if tags is None:
+            tags = (None,) * len(values_with_std_dev)
 
         (nominal_values, std_devs) = numpy.transpose(values_with_std_dev)
 
-        return correlated_values(
-            nominal_values,
-            correlation_mat*std_devs*std_devs[numpy.newaxis].T,
-            tags)
+        # We diagonalize the correlation matrix instead of the
+        # covariance matrix, because this is generally more stable
+        # numerically. In fact, the covariance matrix can have
+        # coefficients with arbitrary values, through changes of units
+        # of its input variables. This creates numerical instabilities.
+        #
+        # The covariance matrix is diagonalized in order to define
+        # the independent variables that model the given values:
+        (variances, transform) = numpy.linalg.eigh(correlation_mat)
+
+        # Numerical errors might make some variances negative: we set
+        # them to zero:
+        variances[variances < 0] = 0.
+
+        # Creation of new, independent variables:
+
+        # We use the fact that the eigenvectors in 'transform' are
+        # special: 'transform' is unitary: its inverse is its transpose:
+
+        variables = tuple(
+            # The variables represent "pure" uncertainties:
+            Variable(0, sqrt(variance), tag)
+            for (variance, tag) in zip(variances, tags))
+
+        # The coordinates of each new uncertainty as a function of the
+        # new variables must include the variable scale (standard deviation):
+        transform *= std_devs[:, numpy.newaxis] 
+        
+        # Representation of the initial correlated values:
+        values_funcs = tuple(
+            AffineScalarFunc(
+                value,
+                LinearCombination(dict(zip(variables, coords))))
+            for (coords, value) in zip(transform, nominal_values))
+
+        return values_funcs
 
     __all__.append('correlated_values_norm')
 
