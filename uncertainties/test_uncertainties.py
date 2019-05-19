@@ -2289,10 +2289,10 @@ else:
         cov[[0, 1], 2] = -3e-34
         cov[2, [0, 1]] = -3e-34
         variables = uncert_core.correlated_values([0]*3, cov)
-        #assert arrays_close(
-        print(
-                cov,
-                numpy.asarray(uncert_core.covariance_matrix(variables)))
+        # Since the numbers are very small, we need to compare them
+        # in a stricter way:
+        assert numbers_close(cov[0,0], variables[0].s**2, tolerance=1e-75)
+        assert numbers_close(cov[1,1], variables[1].s**2, tolerance=1e-75)
 
     def test_correlated_values_correlation_mat():
         '''
