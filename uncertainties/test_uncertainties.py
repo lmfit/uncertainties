@@ -2277,6 +2277,17 @@ else:
         assert numbers_close(corr_matrix[0,0], 1)
         assert numbers_close(corr_matrix[1,2], 2*v.std_dev/sum_value.std_dev)
 
+        ####################
+
+        # Test of numerical robustness despite wildly different
+        # orders of magnitude (see
+        # https://github.com/lebigot/uncertainties/issues/95):
+        cov = numpy.diag([1e-70, 1e-70, 1e10])
+        cov[0, 1] = cov[1, 0] = 0.9e-70
+        cov[[0, 1], 2] = -3e-34
+        cov[2, [0, 1]] = -3e-34
+        variables = uncert_core.correlated_values([0]*3, cov)
+        assert arrays_close(cov, uncert_core.correlation_matrix(variables))
 
     def test_correlated_values_correlation_mat():
         '''
