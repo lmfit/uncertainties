@@ -2300,6 +2300,26 @@ else:
         assert numbers_close(
                 1e66*cov[1,1], 1e66*variables[1].s**2, tolerance=1e-5)
 
+        ####################
+
+        # 0 variances are a bit special, since the correlation matrix
+        # cannot be calculated naively, so we test that there is no
+        # specific problem in this case:
+
+        cov = numpy.diag([0, 0, 10])
+        nom_values = [1, 2, 3]
+        variables = uncert_core.correlated_values(nom_values, cov)
+
+        for (variable, nom_value, variance) in zip(
+            variables, nom_values, cov.diagonal()):
+            
+            assert numbers_close(variable.n, nom_value)
+            assert numbers_close(variable.s**2, variance) 
+        
+        assert arrays_close(
+            cov,
+            numpy.array(uncert_core.covariance_matrix(variables)))
+
     def test_correlated_values_correlation_mat():
         '''
         Tests the input of correlated value.

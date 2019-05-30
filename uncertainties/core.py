@@ -146,15 +146,10 @@ else:
         nom_values -- sequence with the nominal (real) values of the
         numbers with uncertainties to be returned.
 
-        covariance_mat -- full covariance matrix of the returned
-        numbers with uncertainties (not the statistical correlation
-        matrix, i.e., not the normalized covariance matrix). For
-        example, the first element of this matrix is the variance of
-        the first returned number with uncertainty.
-        This matrix must be an NumPy array-like (list of lists, 
-        NumPy array, etc.). No variance must be 0 (i.e. there must be
-        no 0 on the diagonal); this would mean that there is a constant
-        "variable".
+        covariance_mat -- full covariance matrix of the returned numbers with
+        uncertainties. For example, the first element of this matrix is the
+        variance of the first number with uncertainty. This matrix must be a
+        NumPy array-like (list of lists, NumPy array, etc.). 
 
         tags -- if 'tags' is not None, it must list the tag of each new
         independent variable.
@@ -167,13 +162,21 @@ else:
         
         std_devs = numpy.sqrt(numpy.diag(covariance_mat))
 
+        # For numerical stability reasons, we go through the correlation
+        # matrix, because it is insensitive to any change of scale in the
+        # quantities returned. However, care must be taken with 0 variance
+        # variables: calculating the correlation matrix cannot be simply done
+        # by dividing by standard deviations. We thus use specific
+        # normalization values, with no null value:
+        norm_vector = std_devs.copy()
+        norm_vector[norm_vector==0] = 1
+
         return correlated_values_norm(
             # !! The following zip() is a bit suboptimal: correlated_values()
             # separates back the nominal values and the standard deviations:
             zip(nom_values, std_devs),
-            covariance_mat/std_devs/std_devs[:,numpy.newaxis],
+            covariance_mat/norm_vector/norm_vector[:,numpy.newaxis],
             tags)
-
 
     __all__.append('correlated_values')
 
@@ -184,17 +187,19 @@ else:
         instead as input:
 
         - nominal (float) values along with their standard deviation, and
-
-        - a correlation matrix (i.e. a normalized covariance matrix,
-          normalized with individual standard deviations).
+        - a correlation matrix (i.e. a normalized covariance matrix).
 
         values_with_std_dev -- sequence of (nominal value, standard
         deviation) pairs. The returned, correlated values have these
         nominal values and standard deviations.
 
-        correlation_mat -- correlation matrix (i.e. the normalized
-        covariance matrix, a matrix with ones on its diagonal).
-        This matrix must be an NumPy array-like (list of lists, 
+        correlation_mat -- correlation matrix between the given values, except
+        that any value with a 0 standard deviation must have its correlations
+        set to 0, with a diagonal element set to an arbitrary value (something
+        close to 0-1 is recommended, for a better numerical precision).  When
+        no value has a 0 variance, this is the covariance matrix normalized by
+        standard deviations, and thus a symmetric matrix with ones on its
+        diagonal.  This matrix must be an NumPy array-like (list of lists,
         NumPy array, etc.).
 
         tags -- like for correlated_values().
