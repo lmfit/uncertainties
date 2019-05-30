@@ -2290,8 +2290,6 @@ else:
         cov[2, [0, 1]] = -3e-34
         variables = uncert_core.correlated_values([0]*3, cov)
 
-        print (cov[0,0], variables[0].s**2)
-        print (cov[1,1], variables[1].s**2)
         # Since the numbers are very small, we need to compare them
         # in a stricter way, that handles the case of a 0 variance
         # in `variables`:
