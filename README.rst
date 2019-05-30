@@ -34,7 +34,7 @@ Some useful links:
 
 * Documentation: http://uncertainties-python-package.readthedocs.io/
 * Issues: https://github.com/lebigot/uncertainties/issues/
-* Python Package Index entry: http://pypi.python.org/pypi/uncertainties/
+* Python Package Index entry: https://pypi.org/project/uncertainties
 * Code: https://github.com/lebigot/uncertainties/
 
 GitHub
