@@ -1019,13 +1019,13 @@ GROUP_SYMBOLS = {
     # parentheses. This has the side effect of making the part between
     # the parentheses non-breakable (the text inside parentheses in a
     # LaTeX math expression $...$ can be broken).
-    'latex': ('\left(', r'\right)'),
+    'latex': (r'\left(', r'\right)'),
     'default': ('(', ')')  # Basic text mode
     }
 
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_pres_type, options):
-    '''
+    r'''
     Return a formatted number with uncertainty.
 
     Null errors (error_main) are displayed as the integer 0, with
@@ -1166,10 +1166,10 @@ def format_num(nom_val_main, error_main, common_exp,
         elif isnan(error_main):
             uncert_str = robust_format(error_main, main_pres_type)
             if 'L' in options:
-                uncert_str = '\mathrm{%s}' % uncert_str
+                uncert_str = r'\mathrm{%s}' % uncert_str
         elif isinf(error_main):
             if 'L' in options:
-                uncert_str = '\infty'
+                uncert_str = r'\infty'
             else:
                 uncert_str = robust_format(error_main, main_pres_type)
         else:  #  Error with a meaningful first digit (not 0, and real number)
@@ -1239,13 +1239,13 @@ def format_num(nom_val_main, error_main, common_exp,
         if 'L' in options:
 
             if isnan(nom_val_main):
-                nom_val_str = '\mathrm{%s}' % nom_val_str
+                nom_val_str = r'\mathrm{%s}' % nom_val_str
             elif isinf(nom_val_main):
                 # !! It is wasteful, in this case, to replace
                 # nom_val_str: could this be avoided while avoiding to
                 # duplicate the formula for nom_val_str for the common
                 # case (robust_format(...))?
-                nom_val_str = '%s\infty' % ('-' if nom_val_main < 0 else '')
+                nom_val_str = r'%s\infty' % ('-' if nom_val_main < 0 else '')
 
         value_str = nom_val_str+value_end
 
@@ -1364,14 +1364,14 @@ def format_num(nom_val_main, error_main, common_exp,
         if 'L' in options:
 
             if isnan(nom_val_main):
-                nom_val_str = '\mathrm{%s}' % nom_val_str
+                nom_val_str = r'\mathrm{%s}' % nom_val_str
             elif isinf(nom_val_main):
-                nom_val_str = '%s\infty' % ('-' if nom_val_main < 0 else '')
+                nom_val_str = r'%s\infty' % ('-' if nom_val_main < 0 else '')
 
             if isnan(error_main):
-                error_str = '\mathrm{%s}' % error_str
+                error_str = r'\mathrm{%s}' % error_str
             elif isinf(error_main):
-                error_str = '\infty'
+                error_str = r'\infty'
 
         if nom_has_exp:
             nom_val_str += exp_str
@@ -1405,7 +1405,7 @@ def format_num(nom_val_main, error_main, common_exp,
             # Unicode-compatible LaTeX source can use ±:
             pm_symbol = u'±'
         elif 'L' in options:
-            pm_symbol = ' \pm '
+            pm_symbol = r' \pm '
         else:
             pm_symbol = '+/-'
 
@@ -1954,7 +1954,7 @@ class AffineScalarFunc(object):
 
         # Format specification parsing:
 
-        match = re.match('''
+        match = re.match(r'''
             (?P<fill>[^{}]??)(?P<align>[<>=^]?)  # fill cannot be { or }
             (?P<sign>[-+ ]?)
             (?P<zero>0?)
@@ -2923,7 +2923,7 @@ POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = ur'((\d*)(\.\d*)?|nan|NAN|inf|INF)'
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where
 # the uncertainty is optional (in which case the uncertainty is
 # implicit). The uncertainty can also be nan or NAN:
-NUMBER_WITH_UNCERT_RE_STR = u'''
+NUMBER_WITH_UNCERT_RE_STR = ur'''
     ([+-])?  # Sign
     %s  # Main number
     (?:\(%s\))?  # Optional uncertainty
@@ -2940,7 +2940,7 @@ NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
 # Number with uncertainty with a factored exponent (e.g., of the form
 # (... +/- ...)e10): this is a loose matching, so as to accommodate
 # for multiple formats:
-NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(u'''
+NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(ur'''
     \(
     (?P<simple_num_with_uncert>.*)
     \)
@@ -3012,7 +3012,7 @@ def parse_error_in_parentheses(representation):
     return (value, uncert_value)
 
 # Regexp for catching the two variable parts of -1.2×10⁻¹²:
-PRETTY_PRINT_MATCH = re.compile(u'(.*?)\s*×\s*10(.*)').match
+PRETTY_PRINT_MATCH = re.compile(ur'(.*?)\s*×\s*10(.*)').match
 
 def to_float(value_str):
     '''
@@ -3089,7 +3089,7 @@ def str_to_number_with_uncert(representation):
     else:
         factor = 1  # No global exponential factor
 
-    match = re.match(u'(.*)(?:\+/-|±)(.*)', representation)
+    match = re.match(ur'(.*)(?:\+/-|±)(.*)', representation)
     if match:
 
         (nom_value, uncert) = match.groups()
