@@ -157,28 +157,74 @@ else:
 
         # !!! It would in principle be possible to handle 0 variance
         # variables by first selecting the sub-matrix that does not contain
-        # such variables (with the help of numpy.ix_()), and creating 
+        # such variables (with the help of numpy.ix_()), and creating
         # them separately.
-        
-        std_devs = numpy.sqrt(numpy.diag(covariance_mat))
 
-        # For numerical stability reasons, we go through the correlation
-        # matrix, because it is insensitive to any change of scale in the
-        # quantities returned. However, care must be taken with 0 variance
-        # variables: calculating the correlation matrix cannot be simply done
-        # by dividing by standard deviations. We thus use specific
-        # normalization values, with no null value:
-        norm_vector = std_devs.copy()
-        norm_vector[norm_vector==0] = 1
+        try:
+            L = numpy.cholesky(covariance_mat)
+            if tags is None:
+                tags = (None, ) * len(nom_values)
+            variables = [Variable(0, 1, tag) for tag in tags]
+            return nom_values + numpy.dot(L, variables)
+        except numpy.LinAlgError:
+            std_devs = numpy.sqrt(numpy.diag(covariance_mat))
 
-        return correlated_values_norm(
-            # !! The following zip() is a bit suboptimal: correlated_values()
-            # separates back the nominal values and the standard deviations:
-            zip(nom_values, std_devs),
-            covariance_mat/norm_vector/norm_vector[:,numpy.newaxis],
-            tags)
+            # For numerical stability reasons, we go through the correlation
+            # matrix, because it is insensitive to any change of scale in the
+            # quantities returned. However, care must be taken with 0 variance
+            # variables: calculating the correlation matrix cannot be simply done
+            # by dividing by standard deviations. We thus use specific
+            # normalization values, with no null value:
+            norm_vector = std_devs.copy()
+            norm_vector[norm_vector==0] = 1
+
+            return correlated_values_norm(
+                # !! The following zip() is a bit suboptimal: correlated_values()
+                # separates back the nominal values and the standard deviations:
+                zip(nom_values, std_devs),
+                covariance_mat/norm_vector/norm_vector[:,numpy.newaxis],
+                tags)
 
     __all__.append('correlated_values')
+
+    def ldl(A):
+        """
+        Return the LDL factorisation of a symmetric, positive semidefinite
+        matrix. If the matrix is not square, symmetric or positive
+        semi-definite, an error is raised.
+
+        A -- a square symmetric positive semi-definite matrix
+        """
+        EPS = 1.49e-8 # square root of eps
+
+        n, n_ = numpy.shape(A)
+        if n != n_:
+            raise numpy.linalg.LinAlgError('matrix must be square')
+
+        A = numpy.array(A, copy=True)
+        L = numpy.zeros_like(A) # we will only write in the lower half of L
+        D = numpy.zeros(n)
+
+        for i in range(n):
+            L[i, i] = 1
+
+            a = A[i, i]
+            l = A[i+1:, i]
+            if a < -EPS or (a <= 0 and abs(l).max() >= EPS):
+                raise numpy.linalg.LinAlgError('matrix must be positive '
+                    'semidefinite (failed on %s-th diagonal entry)' % i)
+
+            if a <= 0:
+                D[i] = 0
+                continue
+            else:
+                D[i] = a
+                L[i+1:, i] = l / a
+                A[i+1:, i+1:] -= numpy.outer(l, l) / a
+
+        return L, D
+
+
 
     def correlated_values_norm(values_with_std_dev, correlation_mat,
                                tags=None):
@@ -239,7 +285,7 @@ else:
         # The coordinates of each new uncertainty as a function of the
         # new variables must include the variable scale (standard deviation):
         transform *= std_devs[:, numpy.newaxis] 
-        
+
         # Representation of the initial correlated values:
         values_funcs = tuple(
             AffineScalarFunc(
