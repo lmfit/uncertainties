@@ -195,7 +195,7 @@ else:
 
             a = A[i, i]
             l = A[i+1:, i]
-            if a < -EPS or (a <= 0 and abs(l).max() >= EPS):
+            if a < -EPS or (a <= 0 and len(l) > 0 and abs(l).max() >= EPS):
                 raise numpy.linalg.LinAlgError('matrix must be positive '
                     'semidefinite (failed on %s-th diagonal entry)' % i)
 
