@@ -155,35 +155,20 @@ else:
         independent variable.
         """
 
-        # !!! It would in principle be possible to handle 0 variance
-        # variables by first selecting the sub-matrix that does not contain
-        # such variables (with the help of numpy.ix_()), and creating
-        # them separately.
-
+        # We perform a cholesky decomposition of the covariance matrix.
+        # If the matrix is only positive semidefinite numpy will refuse to
+        # perform a cholesky decomposition so we 'manually' do a LDL
+        # decomposition
         try:
             L = numpy.cholesky(covariance_mat)
-            if tags is None:
-                tags = (None, ) * len(nom_values)
-            variables = [Variable(0, 1, tag) for tag in tags]
-            return nom_values + numpy.dot(L, variables)
         except numpy.LinAlgError:
-            std_devs = numpy.sqrt(numpy.diag(covariance_mat))
+            L0, D = ldl(covariance_mat)
+            L = numpy.dot(L0, sqrt(D))
 
-            # For numerical stability reasons, we go through the correlation
-            # matrix, because it is insensitive to any change of scale in the
-            # quantities returned. However, care must be taken with 0 variance
-            # variables: calculating the correlation matrix cannot be simply done
-            # by dividing by standard deviations. We thus use specific
-            # normalization values, with no null value:
-            norm_vector = std_devs.copy()
-            norm_vector[norm_vector==0] = 1
-
-            return correlated_values_norm(
-                # !! The following zip() is a bit suboptimal: correlated_values()
-                # separates back the nominal values and the standard deviations:
-                zip(nom_values, std_devs),
-                covariance_mat/norm_vector/norm_vector[:,numpy.newaxis],
-                tags)
+        if tags is None:
+            tags = (None, ) * len(nom_values)
+        variables = [Variable(0, 1, tag) for tag in tags]
+        return nom_values + numpy.dot(L, variables)
 
     __all__.append('correlated_values')
 
@@ -195,7 +180,7 @@ else:
 
         A -- a square symmetric positive semi-definite matrix
         """
-        EPS = 1.49e-8 # square root of eps
+        EPS = 1.49e-8 # square root of float64-accuracy
 
         n, n_ = numpy.shape(A)
         if n != n_:
