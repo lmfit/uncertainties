@@ -160,10 +160,10 @@ else:
         # perform a cholesky decomposition so we 'manually' do a LDL
         # decomposition
         try:
-            L = numpy.cholesky(covariance_mat)
-        except numpy.LinAlgError:
+            L = numpy.linalg.cholesky(covariance_mat)
+        except numpy.linalg.LinAlgError:
             L0, D = ldl(covariance_mat)
-            L = numpy.dot(L0, sqrt(D))
+            L = L0 * numpy.sqrt(D)
 
         if tags is None:
             tags = (None, ) * len(nom_values)
@@ -186,7 +186,7 @@ else:
         if n != n_:
             raise numpy.linalg.LinAlgError('matrix must be square')
 
-        A = numpy.array(A, copy=True)
+        A = numpy.array(A, copy=True, dtype=numpy.float64)
         L = numpy.zeros_like(A) # we will only write in the lower half of L
         D = numpy.zeros(n)
 
