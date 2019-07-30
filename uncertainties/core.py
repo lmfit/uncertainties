@@ -180,7 +180,7 @@ else:
 
         A -- a square symmetric positive semi-definite matrix
         """
-        EPS = 1.49e-8 # square root of float64-accuracy
+        TOL = 1.49e-8 # square root of float64-accuracy
 
         n, n_ = numpy.shape(A)
         if n != n_:
