@@ -532,7 +532,13 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
         yield term1+term2+term3
 
 # Default rcond argument for the generalization of numpy.linalg.pinv:
-pinv_default = numpy.linalg.pinv.__defaults__[0]  # Python 1, 2.6+:
+try:
+    pinv_default = numpy.linalg.pinv.__defaults__[0]  # Python 1, 2.6+:
+except TypeError:
+    # In numpy 1.17+, pinv is wrapped using a decorator which unfortunately
+    # results in the metadata (argument defaults) being lost. However, we can
+    # still get at the original function using the __wrapped__ attribute.
+    pinv_default = numpy.linalg.pinv.__wrapped__.__defaults__[0]
 
 pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
