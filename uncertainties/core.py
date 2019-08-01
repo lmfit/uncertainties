@@ -240,12 +240,12 @@ else:
         tags -- like for correlated_values().
         '''
 
+        (nominal_values, std_devs) = numpy.transpose(values_with_std_dev)
+
         # If no tags were given, we prepare tags for the newly created
         # variables:
         if tags is None:
-            tags = (None,) * len(values_with_std_dev)
-
-        (nominal_values, std_devs) = numpy.transpose(values_with_std_dev)
+            tags = (None,) * len(nominal_values)
 
         # For values with zero uncertainty we ignore the corresponding entries
         # in the correlation matrix
