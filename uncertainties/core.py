@@ -241,7 +241,7 @@ else:
         tags -- like for correlated_values().
         '''
 
-        (nominal_values, std_devs) = numpy.transpose(values_with_std_dev)
+        nominal_values, std_devs = numpy.transpose(values_with_std_dev)
 
         # If no tags were given, we prepare tags for the newly created
         # variables:
