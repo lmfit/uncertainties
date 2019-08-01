@@ -62,8 +62,11 @@ def test_numpy():
     # Equivalent with an array of AffineScalarFunc objects:
     try:
         numpy.exp(arr + ufloat(0, 0))
-    except AttributeError:
-        pass  # ! This is usual (but could be avoided)
+    except (AttributeError, TypeError):
+        # In numpy<1.17, an AttributeError is raised in this situation. This was
+        # considered a bug however, and in numpy 1.17 it was changed to a
+        # TypeError (see PR #12700 in numpy repository)
+        pass
     else:
         raise Exception("numpy.exp unexpectedly worked")
 
