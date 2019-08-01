@@ -201,13 +201,14 @@ else:
 
             a = A[i, i]
             l = A[i+1:, i]
-            if a < -TOL or (a <= 0 and len(l) > 0 and abs(l).max() >= TOL):
-                raise numpy.linalg.LinAlgError('matrix must be positive '
-                    'semidefinite (failed on %s-th diagonal entry)' % i)
 
             if a <= 0:
+                if a < -TOL or (i < n - 1 and any(abs(l) >= TOL)):
+                    raise numpy.linalg.LinAlgError('matrix must be positive '
+                        'semidefinite (failed on %s-th diagonal entry)' % i)
+                # If we get here, then the whole first column of L[i:, i:] is
+                # (nearly) zero
                 D[i] = 0
-                continue
             else:
                 D[i] = a
                 L[i+1:, i] = l / a
