@@ -42,7 +42,7 @@ else:
 # Common options for distutils/setuptools's setup():
 setup_options = dict(
     name='uncertainties',
-    version='3.1.1',
+    version='3.1.2',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://uncertainties-python-package.readthedocs.io/',
@@ -160,6 +160,7 @@ Version history
 
 Main changes:
 
+- 3.1.2: Partial fix for NumPy 1.17 and `unumpy.ulinalg.pinv()`.
 - 3.1: Variables built through a correlation or covariance matrix, and that
   have uncertainties that span many orders of magnitude are now 
   calculated more accurately (improved ``correlated_values()`` and
