@@ -14,6 +14,7 @@ from __future__ import division
 # Standard modules:
 import sys
 import itertools
+import inspect
 
 # 3rd-party modules:
 import numpy
@@ -532,13 +533,20 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
         yield term1+term2+term3
 
 # Default rcond argument for the generalization of numpy.linalg.pinv:
-try:
-    pinv_default = numpy.linalg.pinv.__defaults__[0]  # Python 1, 2.6+:
-except TypeError:
-    # In numpy 1.17+, pinv is wrapped using a decorator which unfortunately
-    # results in the metadata (argument defaults) being lost. However, we can
-    # still get at the original function using the __wrapped__ attribute.
-    pinv_default = numpy.linalg.pinv.__wrapped__.__defaults__[0]
+#
+# Most common modern case first:
+try: 
+    pinv_default = (
+        inspect.signature(numpy.linalg.pinv).parameters["rcond"].default)
+except AttributeError:  # No inspect.signature() before Python 3.3
+    try:
+        # In numpy 1.17+, pinv is wrapped using a decorator which unfortunately
+        # results in the metadata (argument defaults) being lost. However, we
+        # can still get at the original function using the __wrapped__
+        # attribute (which is what inspect.signature() does).
+        pinv_default = numpy.linalg.pinv.__wrapped__.__defaults__[0]
+    except AttributeError:  # Function not wrapped in NumPy < 1.17
+        pinv_default = numpy.linalg.pinv.__defaults__[0]  # Python 1, 2.6+:
 
 pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
