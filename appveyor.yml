@@ -36,9 +36,9 @@ install:
   - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
-  - conda info -a
   # Set paths correctly:
-  - call C:\Miniconda3\Scripts\activate
+  - "call %MINICONDA\Scripts\activate"
+  - conda info -a
   # create a conda virtual environement 
   - "conda create -n uncty-env numpy nose python=%PYTHON_VERSION%"
   - activate uncty-env
