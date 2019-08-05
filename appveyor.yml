@@ -20,7 +20,7 @@ environment:
     - PYTHON_VERSION: 3.7
       PYTHON_ARCH: "64"
       MINICONDA: C:\Miniconda3-x64
-    # not running the tests on 32 bit Python at the moment
+    # Not running the tests on 32 bit Python at the moment
     # as AppVeyor is just too slow
     #- PYTHON_VERSION: 2.7
     #  PYTHON_ARCH: "32"
@@ -36,10 +36,11 @@ install:
   - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
-  # Set paths correctly:
+  # Set paths correctly (https://github.com/conda/conda/issues/8865#issuecomment-508865446):
   - "call %MINICONDA%\\Scripts\\activate"
+  - conda init cmd.exe
   - conda info -a
-  # create a conda virtual environement 
+  # Create a conda virtual environement 
   - "conda create -n uncty-env numpy nose python=%PYTHON_VERSION%"
   - activate uncty-env
 
@@ -47,6 +48,6 @@ install:
 
 test_script:
   - "cd C:\\projects\\uncertainties"
-  - activate uncty-env # activate the virtualenv
+  - activate uncty-env # Activate the virtual environment
   - python setup.py egg_info
   - python setup.py nosetests -sv
