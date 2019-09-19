@@ -155,30 +155,68 @@ else:
         independent variable.
         """
 
-        # !!! It would in principle be possible to handle 0 variance
-        # variables by first selecting the sub-matrix that does not contain
-        # such variables (with the help of numpy.ix_()), and creating 
-        # them separately.
-        
-        std_devs = numpy.sqrt(numpy.diag(covariance_mat))
+        # We perform a cholesky decomposition of the covariance matrix.
+        # If the matrix is only positive semidefinite numpy will refuse to
+        # perform a cholesky decomposition, so we 'manually' do a LDL
+        # decomposition
+        try:
+            L = numpy.linalg.cholesky(covariance_mat)
+        except numpy.linalg.LinAlgError:
+            L0, D = ldl(covariance_mat)
+            L = L0 * numpy.sqrt(D)
 
-        # For numerical stability reasons, we go through the correlation
-        # matrix, because it is insensitive to any change of scale in the
-        # quantities returned. However, care must be taken with 0 variance
-        # variables: calculating the correlation matrix cannot be simply done
-        # by dividing by standard deviations. We thus use specific
-        # normalization values, with no null value:
-        norm_vector = std_devs.copy()
-        norm_vector[norm_vector==0] = 1
+        # Creation of new, independent variables:
+        if tags is None:
+            tags = (None, ) * len(nom_values)
+        variables = tuple(Variable(0, 1, tag) for tag in tags)
 
-        return correlated_values_norm(
-            # !! The following zip() is a bit suboptimal: correlated_values()
-            # separates back the nominal values and the standard deviations:
-            zip(nom_values, std_devs),
-            covariance_mat/norm_vector/norm_vector[:,numpy.newaxis],
-            tags)
+        return nom_values + numpy.dot(L, variables)
 
     __all__.append('correlated_values')
+
+    def ldl(A):
+        """
+        Return the LDL factorisation of a symmetric, positive semidefinite
+        matrix.  This is a lower triangular matrix L and an array representing
+        the diagonal matrix D.  If the matrix is not square or positive
+        semi-definite, an error is raised.
+
+        A -- a square (symmetric) positive semi-definite matrix.  Only the
+        lower half of A is read.
+        """
+        # square root of float64-accuracy. In places where there should be
+        # a positive number we will only accept numbers larger than -TOL
+        TOL = 1.49e-8
+
+        n, n_ = numpy.shape(A)
+        if n != n_:
+            raise numpy.linalg.LinAlgError('matrix must be square')
+
+        A = numpy.array(A, copy=True, dtype=numpy.float64)
+        L = numpy.zeros_like(A) # we will only write in the lower half of L
+        D = numpy.zeros(n)
+
+        for i in range(n):
+            L[i, i] = 1
+
+            a = A[i, i]
+            l = A[i+1:, i]
+
+            if a <= 0:
+                if a < -TOL or (i < n - 1 and any(abs(l) >= TOL)):
+                    raise numpy.linalg.LinAlgError('matrix must be positive '
+                        'semidefinite (failed on %s-th diagonal entry)' % i)
+                # If we get here, then the whole first column of L[i:, i:] is
+                # (nearly) zero
+                D[i] = 0
+            else:
+                D[i] = a
+                L[i+1:, i] = l / a
+                A[i+1:, i+1:] -= numpy.outer(l, l) / a
+
+        return L, D
+
+
 
     def correlated_values_norm(values_with_std_dev, correlation_mat,
                                tags=None):
@@ -193,10 +231,8 @@ else:
         deviation) pairs. The returned, correlated values have these
         nominal values and standard deviations.
 
-        correlation_mat -- correlation matrix between the given values, except
-        that any value with a 0 standard deviation must have its correlations
-        set to 0, with a diagonal element set to an arbitrary value (something
-        close to 0-1 is recommended, for a better numerical precision).  When
+        correlation_mat -- correlation matrix between the given values.  The
+        entries corresponding to values with 0 variance are ignored.  When
         no value has a 0 variance, this is the covariance matrix normalized by
         standard deviations, and thus a symmetric matrix with ones on its
         diagonal.  This matrix must be an NumPy array-like (list of lists,
@@ -205,49 +241,50 @@ else:
         tags -- like for correlated_values().
         '''
 
+        nominal_values, std_devs = numpy.transpose(values_with_std_dev)
+
         # If no tags were given, we prepare tags for the newly created
         # variables:
         if tags is None:
-            tags = (None,) * len(values_with_std_dev)
+            tags = (None,) * len(nominal_values)
 
-        (nominal_values, std_devs) = numpy.transpose(values_with_std_dev)
+        # For values with zero uncertainty we ignore the corresponding entries
+        # in the correlation matrix
+        zero_stdev = numpy.where(std_devs == 0)[0]
+        eff_corr_mat = numpy.delete(
+            numpy.delete(correlation_mat, zero_stdev, axis=0),
+            zero_stdev,
+            axis=1
+        )
 
-        # We diagonalize the correlation matrix instead of the
-        # covariance matrix, because this is generally more stable
-        # numerically. In fact, the covariance matrix can have
-        # coefficients with arbitrary values, through changes of units
-        # of its input variables. This creates numerical instabilities.
-        #
-        # The covariance matrix is diagonalized in order to define
-        # the independent variables that model the given values:
-        (variances, transform) = numpy.linalg.eigh(correlation_mat)
-
-        # Numerical errors might make some variances negative: we set
-        # them to zero:
-        variances[variances < 0] = 0.
+        # We perform a cholesky decomposition of the correlation matrix.
+        # If the matrix is only positive semidefinite numpy will refuse to
+        # perform a cholesky decomposition, so we 'manually' do a LDL
+        # decomposition
+        try:
+            L = numpy.linalg.cholesky(eff_corr_mat)
+        except numpy.linalg.LinAlgError:
+            L0, D = ldl(eff_corr_mat)
+            L = L0 * numpy.sqrt(D)
 
         # Creation of new, independent variables:
-
-        # We use the fact that the eigenvectors in 'transform' are
-        # special: 'transform' is unitary: its inverse is its transpose:
-
-        variables = tuple(
+        eff_variables = tuple(
             # The variables represent "pure" uncertainties:
-            Variable(0, sqrt(variance), tag)
-            for (variance, tag) in zip(variances, tags))
+            Variable(0, 1, tag) for i, tag in enumerate(tags)
+                                if std_devs[i] != 0
+        )
+        zero_stdev_variables = tuple(
+            Variable(0, 0, tag) for i, tag in enumerate(tags)
+                                if std_devs[i] == 0
+        )
 
-        # The coordinates of each new uncertainty as a function of the
-        # new variables must include the variable scale (standard deviation):
-        transform *= std_devs[:, numpy.newaxis] 
-        
-        # Representation of the initial correlated values:
-        values_funcs = tuple(
-            AffineScalarFunc(
-                value,
-                LinearCombination(dict(zip(variables, coords))))
-            for (coords, value) in zip(transform, nominal_values))
+        uncert = std_devs[std_devs != 0] * numpy.dot(L, eff_variables)
+        # we need to subtract arange(len(zero_stdev)) because the indices in 
+        # zero_stdev refer to the original array
+        numpy.insert(uncert, zero_stdev - numpy.arange(len(zero_stdev)),
+                     zero_stdev_variables)
 
-        return values_funcs
+        return nominal_values + uncert
 
     __all__.append('correlated_values_norm')
 
