@@ -30,6 +30,7 @@ import itertools
 import inspect
 import numbers
 import collections
+import six
 
 # The following restricts the local function getargspec() to the common
 # features of inspect.getargspec() and inspect.getfullargspec():
@@ -553,7 +554,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
     derivatives_all_kwargs = {}
 
-    for (name, derivative) in derivatives_kwargs.items():
+    for (name, derivative) in six.iteritems(derivatives_kwargs):
 
         # Optimization: None keyword-argument derivatives are converted
         # right away to derivatives (instead of doing this every time a
@@ -648,7 +649,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
         pos_w_uncert = [index for (index, value) in enumerate(args)
                         if isinstance(value, AffineScalarFunc)]
-        names_w_uncert = [key for (key, value) in kwargs.items()
+        names_w_uncert = [key for (key, value) in six.iteritems(kwargs)
                           if isinstance(value, AffineScalarFunc)]
 
         ########################################
@@ -982,7 +983,7 @@ TO_SUPERSCRIPT = {
 #
 #! Python 2.7+ can use a dictionary comprehension instead:
 FROM_SUPERSCRIPT = {
-    ord(sup): normal for (normal, sup) in TO_SUPERSCRIPT.items()}
+    ord(sup): normal for (normal, sup) in six.iteritems(TO_SUPERSCRIPT)}
 
 def to_superscript(value):
     '''
@@ -1544,7 +1545,7 @@ class LinearCombination(object):
             # print "MAINS", main_factor, main_expr
 
             if main_expr.expanded():
-                for (var, factor) in main_expr.linear_combo.items():
+                for (var, factor) in six.iteritems(main_expr.linear_combo):
                     derivatives[var] += main_factor*factor
 
             else:  # Non-expanded form
@@ -1775,7 +1776,7 @@ class AffineScalarFunc(object):
         # Calculation of the variance:
         error_components = {}
 
-        for (variable, derivative) in self.derivatives.items():
+        for (variable, derivative) in six.iteritems(self.derivatives):
 
             # print "TYPE", type(variable), type(derivative)
 
@@ -2413,7 +2414,7 @@ class AffineScalarFunc(object):
         """
         Hook for the pickle module.
         """
-        for (name, value) in data_dict.items():
+        for (name, value) in six.iteritems(data_dict):
             # Contrary to the default __setstate__(), this does not
             # necessarily save to the instance dictionary (because the
             # instance might contain slots):
@@ -2493,7 +2494,7 @@ def get_ops_with_reflection():
 
     # Conversion to Python functions:
     ops_with_reflection = {}
-    for (op, derivatives) in derivatives_list.items():
+    for (op, derivatives) in six.iteritems(derivatives_list):
         ops_with_reflection[op] = [
             eval("lambda x, y: %s" % expr) for expr in derivatives ]
 
@@ -2616,7 +2617,7 @@ def add_operators_to_AffineScalarFunc():
         }
 
     for (op, derivative) in (
-        simple_numerical_operators_derivatives.items()):
+        six.iteritems(simple_numerical_operators_derivatives)):
 
         attribute_name = "__%s__" % op
 
@@ -2636,7 +2637,7 @@ def add_operators_to_AffineScalarFunc():
     # Final definition of the operators for AffineScalarFunc objects:
 
     # Reversed versions (useful for float*AffineScalarFunc, for instance):
-    for (op, derivatives) in ops_with_reflection.items():
+    for (op, derivatives) in six.iteritems(ops_with_reflection):
         attribute_name = '__%s__' % op
 
         # float objects don't exactly have the same attributes between
