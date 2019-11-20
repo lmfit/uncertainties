@@ -3,12 +3,12 @@
 
 # !! This program must run with all version of Python since 2.3 included.
 
-import sys
 import os
+import sys
 
 min_version = (2, 3)
-error_msg = ("Sorry, this package is for Python %d.%d and higher only."
-             % min_version)
+error_msg = ("Sorry, this package is for Python %d.%d and higher only." %
+             min_version)
 
 try:
     if sys.version_info < min_version:
@@ -46,17 +46,14 @@ setup_options = dict(
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://uncertainties-python-package.readthedocs.io/',
-
     license='''\
 This software can be used under one of the following two licenses: \
 (1) The Revised BSD License. \
 (2) Any other license, as long as it is obtained from the original \
 author.''',
-
     description=('Transparent calculations with uncertainties on the'
                  ' quantities involved (aka error propagation);'
                  ' fast calculation of derivatives'),
-
     long_description='''\
 Overview
 ========
@@ -162,7 +159,7 @@ Main changes:
 
 - 3.1.2: Partial fix for NumPy 1.17 and ``unumpy.ulinalg.pinv()``.
 - 3.1: Variables built through a correlation or covariance matrix, and that
-  have uncertainties that span many orders of magnitude are now 
+  have uncertainties that span many orders of magnitude are now
   calculated more accurately (improved ``correlated_values()`` and
   ``correlated_values_norm()`` functions).
 - 3.0: Massive speedup for some operations involving large numbers of numbers with uncertainty, like ``sum(ufloat(1, 1) for _ in xrange(100000))`` (this is about 5,000 times faster than before).
@@ -296,12 +293,11 @@ Main changes:
 .. _main website: http://uncertainties-python-package.readthedocs.io/
 .. _code updater: http://uncertainties-python-package.readthedocs.io/en/latest/index.html#migration-from-version-1-to-version-2
 .. _formatting: http://uncertainties-python-package.readthedocs.io/en/latest/user_guide.html#printing''',
-
-    keywords=['error propagation', 'uncertainties',
-              'uncertainty calculations',
-              'standard deviation',
-              'derivatives', 'partial derivatives', 'differentiation'],
-
+    keywords=[
+        'error propagation', 'uncertainties', 'uncertainty calculations',
+        'standard deviation', 'derivatives', 'partial derivatives',
+        'differentiation'
+    ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
@@ -342,10 +338,11 @@ Main changes:
     package_dir={'uncertainties': package_dir},
 
     # Files are defined in MANIFEST (which is automatically created by
-    # python setup.py sdist):
-    packages=['uncertainties', 'uncertainties.unumpy',
-              'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes']
-    )
+    # python setup.py sdist bdist_wheel):
+    packages=[
+        'uncertainties', 'uncertainties.unumpy', 'uncertainties.lib1to2',
+        'uncertainties.lib1to2.fixes'
+    ])
 
 # The best available setup() is used (some users do not have
 # setuptools):
@@ -358,7 +355,6 @@ try:
 
         # Allows python setup.py nosetests to do the right thing:
         'use_2to3': True,
-
         'tests_require': ['nose', 'numpy'],
         # Optional dependencies install using:
         # `easy_install uncertainties[optional]`
@@ -385,7 +381,7 @@ except ImportError:
     # distutils.core.setup is not like setuptools: it does not have an
     # option for automatically calling 2to3 if Python 3 is used, so the
     # conversion is done here:
-    if sys.version_info >= (3,):
+    if sys.version_info >= (3, ):
         import subprocess
         subprocess.check_call(["2to3", "-w", "."])
 

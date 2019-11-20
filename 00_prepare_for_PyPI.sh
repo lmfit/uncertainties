@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This script must be run before packaging (python setup.py sdist upload).
+# This script must be run before packaging (twine upload dist/*).
 
 # WARNING: this script erases any uncertainties-py23 and uncertainties-py27
 # found in the current directory.
@@ -33,7 +33,7 @@ mv /tmp/uncertainties uncertainties-py23 && \
 echo "Python 2.3 version imported"
 
 # Packaging:
-python setup.py sdist && \
-echo "Package created.  The package can be uploaded with setup.py sdist upload."
+python setup.py sdist bdist_wheel && \
+echo "Package created.  The package can be uploaded with twine upload dist/*."
 echo "WARNING: current git branch is:"
 git branch | grep '^\*'
