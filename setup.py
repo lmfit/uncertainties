@@ -344,7 +344,9 @@ Main changes:
     # Files are defined in MANIFEST (which is automatically created by
     # python setup.py sdist):
     packages=['uncertainties', 'uncertainties.unumpy',
-              'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes']
+              'uncertainties.lib1to2', 'uncertainties.lib1to2.fixes'],
+  
+    options={"bdist_wheel": {"universal": "1"}},
     )
 
 # The best available setup() is used (some users do not have
@@ -390,5 +392,5 @@ except ImportError:
         subprocess.check_call(["2to3", "-w", "."])
 
 # End of setup definition
-
-setup(**setup_options)
+if __name__ == "__main__":
+    setup(**setup_options)
