@@ -51,7 +51,9 @@ tar -C /tmp -xf /tmp/u.tar
 mv /tmp/uncertainties uncertainties-py23
 echo "Python 2.3 version imported"
 
-# Packaging:
+# Packaging. We include wheels because it makes it easier to install,
+# in some cases (https://github.com/lebigot/uncertainties/pull/108,
+# https://discourse.slicer.org/t/problems-installing-lmfit-python-package/9210/6):
 python setup.py sdist bdist_wheel
 echo "Package created.  The package can be uploaded with twine upload dist/....*"
 echo "where ...* is the new versions."
