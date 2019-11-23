@@ -11,6 +11,12 @@
 # Fail the script at the first failed command:
 set -e 
 
+echo "****************************************************************"
+echo "WARNING: if any commit fails, RESOLVE IT before running this"
+echo "script again. Otherwise conflict marks will be committed by the"
+echo "second run!"
+echo "****************************************************************"
+
 ## Only committed versions are packaged, to help with debugging published code:
 git commit -a
 
@@ -47,7 +53,7 @@ echo "Python 2.3 version imported"
 
 # Packaging:
 python setup.py sdist bdist_wheel
-echo "Package created.  The package can be uploaded with twine upload dist/...,"
-echo "where ... is the new version."
+echo "Package created.  The package can be uploaded with twine upload dist/....*"
+echo "where ...* is the new versions."
 echo "WARNING: current git branch is:"
 git branch | grep '^\*'
