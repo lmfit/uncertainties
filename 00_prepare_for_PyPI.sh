@@ -55,7 +55,7 @@ echo "Python 2.3 version imported"
 # in some cases (https://github.com/lebigot/uncertainties/pull/108,
 # https://discourse.slicer.org/t/problems-installing-lmfit-python-package/9210/6):
 python setup.py sdist bdist_wheel
-echo "Package created.  The package can be uploaded with twine upload dist/....*"
+echo "Package created.  The package can be uploaded with twine upload dist/...*"
 echo "where ...* is the new versions."
 echo "WARNING: current git branch is:"
 git branch | grep '^\*'
