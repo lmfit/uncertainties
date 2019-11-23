@@ -381,7 +381,7 @@ except ImportError:
     # distutils.core.setup is not like setuptools: it does not have an
     # option for automatically calling 2to3 if Python 3 is used, so the
     # conversion is done here:
-    if sys.version_info >= (3, ):
+    if sys.version_info >= (3,):
         import subprocess
         subprocess.check_call(["2to3", "-w", "."])
 
