@@ -1,6 +1,7 @@
 #!/bin/sh
 
-# This script must be run before packaging (twine upload dist/*).
+# This script prepares the package for PyPI. It must be run
+# before uploading it on PyPI.
 
 # WARNING: this script erases any uncertainties-py23 and uncertainties-py27
 # found in the current directory.
@@ -34,6 +35,7 @@ echo "Python 2.3 version imported"
 
 # Packaging:
 python setup.py sdist bdist_wheel && \
-echo "Package created.  The package can be uploaded with twine upload dist/*."
+echo "Package created.  The package can be uploaded with twine upload dist/...,"
+echo "where ... is the new version."
 echo "WARNING: current git branch is:"
 git branch | grep '^\*'
