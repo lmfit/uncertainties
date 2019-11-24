@@ -38,7 +38,7 @@ git checkout release
 ## Getting the Python 2.7+ version:
 
 rm -rf uncertainties-py27
-git archive --output /tmp/u.tar master uncertainties
+git archive --output /tmp/u.tar release uncertainties
 tar -C /tmp -xf /tmp/u.tar
 mv /tmp/uncertainties uncertainties-py27
 echo "Python 2.7+ version imported"

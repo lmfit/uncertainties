@@ -342,7 +342,11 @@ Main changes:
     packages=[
         'uncertainties', 'uncertainties.unumpy', 'uncertainties.lib1to2',
         'uncertainties.lib1to2.fixes'
-    ])
+    ],
+
+    # Wheels are built for both Python 2 and Python 3:
+    options={"bdist_wheel": {"universal": True}}
+    )
 
 # The best available setup() is used (some users do not have
 # setuptools):
