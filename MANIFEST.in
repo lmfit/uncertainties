@@ -2,9 +2,7 @@ include README.rst
 include INSTALL.txt
 include LICENSE.txt
 include setup.py
-prune uncertainties
-recursive-include uncertainties-py23 *.py
-recursive-include uncertainties-py27 *.py
+graft uncertainties
 recursive-include doc Makefile conf.py *.rst make.bat
 graft doc/_templates
 graft doc/_static

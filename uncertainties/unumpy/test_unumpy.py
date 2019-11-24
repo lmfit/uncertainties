@@ -1,12 +1,20 @@
 """
 Tests of the code in uncertainties/unumpy/__init__.py.
 
-These tests can be run through the Nose testing framework.
+These tests can be run through the pytest testing framework.
 
 (c) 2010-2016 by Eric O. LEBIGOT (EOL).
 """
 
+from __future__ import division
 
+import pytest
+# Local modules:
+import uncertainties
+import uncertainties.core as uncert_core
+from uncertainties import test_uncertainties, ufloat, unumpy
+from uncertainties.test_uncertainties import arrays_close, numbers_close
+from uncertainties.unumpy import core
 
 # 3rd-party modules:
 try:
@@ -15,12 +23,7 @@ except ImportError:
     import sys
     sys.exit()  # There is no reason to test the interface to NumPy
 
-# Local modules:
-import uncertainties
-import uncertainties.core as uncert_core
-from uncertainties import ufloat, unumpy, test_uncertainties
-from uncertainties.unumpy import core
-from uncertainties.test_uncertainties import numbers_close, arrays_close
+
 
 def test_numpy():
 
@@ -311,9 +314,9 @@ def test_array_comparisons():
     mat = unumpy.umatrix([1, 2], [1, 4])
     assert numpy.all((mat == [mat[0,0], 4]) == [True, False])
 
+@pytest.mark.filterwarnings("ignore::UserWarning:uncertainties")
 def test_obsolete():
     'Test of obsolete functions'
-
     # The new and old calls should give the same results:
 
     # The unusual syntax is here to protect against automatic code

@@ -3,15 +3,21 @@
 """
 Tests of the code in uncertainties/__init__.py.
 
-These tests can be run through the Nose testing framework.
+These tests can be run through the pytest testing framework.
 
 (c) 2010-2016 by Eric O. LEBIGOT (EOL).
 """
 
-
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 
 # Standard modules
+from builtins import zip
+from builtins import str
+from builtins import map
+from builtins import range
 import copy
 import weakref
 import math
@@ -20,7 +26,7 @@ import random
 import sys
 
 # 3rd-party modules
-# import nose.tools
+# import pytest.tools
 
 # Local modules
 
@@ -287,7 +293,7 @@ def test_value_construction():
 
     try:
         # Obsolete form:
-        x = ufloat((3, -0.1))
+        x = ufloat(3, -0.1)
     except uncert_core.NegativeStdDev:
         pass
 
@@ -337,15 +343,15 @@ def test_ufloat_fromstr():
         ## Pretty-print notation:
 
         # ± sign, global exponent (not pretty-printed):
-        '(3.141±0.001)E+02': (314.1, 0.1),
+        r'(3.141±0.001)E+02': (314.1, 0.1),
         # ± sign, individual exponent:
-        '3.141E+02±0.001e2': (314.1, 0.1),
+        r'3.141E+02±0.001e2': (314.1, 0.1),
 
         # ± sign, times symbol, superscript (= full pretty-print):
         '(3.141 ± 0.001) × 10²': (314.1, 0.1),
 
         # NaN uncertainty:
-        '(3.141±nan)E+02': (314.1, float('nan')),
+        u'(3.141±nan)E+02': (314.1, float('nan')),
         '3.141e+02+/-nan': (314.1, float('nan')),
         '3.4(nan)e10': (3.4e10, float('nan')),
         # NaN value:
@@ -357,7 +363,7 @@ def test_ufloat_fromstr():
         '-3(0.)': (-3, 0)
         }
 
-    for (representation, values) in tests.items():
+    for (representation, values) in list(tests.items()):
 
         # Without tag:
         num = ufloat_fromstr(representation)
@@ -430,7 +436,7 @@ def test_fixed_derivatives_basic_funcs():
     for op in uncert_core.modified_ops_with_reflection:
         check_op(op, 2)
 
-# Additional, more complex checks, for use with the nose unit testing
+# Additional, more complex checks, for use with the pytest unit testing
 # framework.
 
 def test_copy():
@@ -1510,7 +1516,7 @@ def test_PDG_precision():
         9.99e-324: (2, 1e-323)
         }
 
-    for (std_dev, result) in tests.items():
+    for (std_dev, result) in list(tests.items()):
         assert uncert_core.PDG_precision(std_dev) == result
 
 def test_repr():
@@ -1692,10 +1698,10 @@ def test_format():
         (1234.56789, 0.1): {
             'eL': r'\left(1.23457 \pm 0.00010\right) \times 10^{3}',
             'EL': r'\left(1.23457 \pm 0.00010\right) \times 10^{3}',
-            'fL': '1234.57 \pm 0.10',
-            'FL': '1234.57 \pm 0.10',
-            'fL': '1234.57 \pm 0.10',
-            'FL': '1234.57 \pm 0.10',
+            'fL': r'1234.57 \pm 0.10',
+            'FL': r'1234.57 \pm 0.10',
+            'fL': r'1234.57 \pm 0.10',
+            'FL': r'1234.57 \pm 0.10',
             '%L': r'\left(123457 \pm 10\right) \%'
         },
         #
@@ -1714,7 +1720,7 @@ def test_format():
         # instead of 1.4 for Python 3.1. The problem does not appear
         # with 1.2, so 1.2 is used.
         (-1.2e-12, 0): {
-            '12.2gPL': r'  -1.2×10⁻¹²±           0',
+            '12.2gPL': '  -1.2×10⁻¹²±           0',
             # Pure "width" formats are not accepted by the % operator,
             # and only %-compatible formats are accepted, for Python <
             # 2.6:
@@ -1724,7 +1730,7 @@ def test_format():
             # No factored exponent, LaTeX
             '1L': r'-1.2 \times 10^{-12} \pm 0',
             'SL': r'-1.2(0) \times 10^{-12}',
-            'SP': r'-1.2(0)×10⁻¹²'
+            'SP': '-1.2(0)×10⁻¹²'
         },
 
         # Python 3.2 and 3.3 give 1.4e-12*1e+12 = 1.4000000000000001
@@ -1746,8 +1752,8 @@ def test_format():
 
         (3.14e-10, 0.01e-10): {
             # Character (Unicode) strings:
-            'P': '(3.140±0.010)×10⁻¹⁰',  # PDG rules: 2 digits
-            'PL': r'(3.140±0.010)×10⁻¹⁰',  # Pretty-print has higher priority
+            u'P': r'(3.140±0.010)×10⁻¹⁰',  # PDG rules: 2 digits
+            u'PL': r'(3.140±0.010)×10⁻¹⁰',  # Pretty-print has higher priority
             # Truncated non-zero uncertainty:
             '.1e': '(3.1+/-0.0)e-10',
             '.1eS': '3.1(0.0)e-10'
@@ -1814,8 +1820,8 @@ def test_format():
             # Default precision = 6
             'eL': r'\left(1.234568 \pm 0\right) \times 10^{3}',
             'EL': r'\left(1.234568 \pm 0\right) \times 10^{3}',
-            'fL': '1234.567890 \pm 0',
-            'FL': '1234.567890 \pm 0',
+            'fL': r'1234.567890 \pm 0',
+            'FL': r'1234.567890 \pm 0',
             '%L': r'\left(123456.789000 \pm 0\right) \%'
         },
 
@@ -1976,7 +1982,7 @@ def test_format():
         (float('-inf'), float('inf')): {
             'S': '-inf(inf)',
             'LS': '-\infty(\infty)',
-            'L': '-\infty \pm \infty',
+            'L': r'-\infty \pm \infty',
             'LP': '-\infty±\infty',
             # The following is consistent with Python's own
             # formatting, which depends on the version of Python:
@@ -2002,7 +2008,7 @@ def test_format():
         (-float('nan'), float('inf')): {
             'S': 'nan(inf)',
             'LS': '\mathrm{nan}(\infty)',
-            'L': '\mathrm{nan} \pm \infty',
+            'L': r'\mathrm{nan} \pm \infty',
             'LP': '\mathrm{nan}±\infty'
         },
 
@@ -2033,11 +2039,11 @@ def test_format():
     except AttributeError:
         jython_detected = False
 
-    for (values, representations) in tests.items():
+    for (values, representations) in list(tests.items()):
 
         value = ufloat(*values)
 
-        for (format_spec, result) in representations.items():
+        for (format_spec, result) in list(representations.items()):
 
             # print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
 
@@ -2111,8 +2117,8 @@ def test_unicode_format():
 
     x = ufloat(3.14159265358979, 0.25)
 
-    assert isinstance('Résultat = %s' % x.format(''), str)
-    assert isinstance('Résultat = %s' % x.format('P'), str)
+    assert isinstance(u'Résultat = %s' % x.format(''), str)
+    assert isinstance(u'Résultat = %s' % x.format('P'), str)
 
 ###############################################################################
 

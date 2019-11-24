@@ -9,9 +9,10 @@ Implementation of umath.py, with internals.
 # which functions are visible to the user in umath.py through from
 # umath import * and Python shell completion.
 
-  # Many analytical derivatives depend on this
+from __future__ import division  # Many analytical derivatives depend on this
 
 # Standard modules
+from builtins import map
 import math
 import sys
 import itertools
@@ -231,7 +232,7 @@ def wrap_locally_cst_func(func):
         # !! In Python 2.7+, dictionary comprehension: {argname:...}
         kwargs_float = dict(
             (arg_name, uncert_core.nominal_value(value))
-            for (arg_name, value) in kwargs.items())
+            for (arg_name, value) in list(kwargs.items()))
         return func(*args_float, **kwargs_float)
     return wrapped_func
 

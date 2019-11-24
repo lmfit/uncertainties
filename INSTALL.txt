@@ -26,14 +26,14 @@ case, if the Python 3 version is needed instead, the command
 must be run inside the uncertainties/ directory, so as to convert the
 Python 2 version to the Python 3 version.
 
-* The tests programs (test_*.py) are meant to be run through the Nose
+* The tests programs (test_*.py) are meant to be run through the pytest
 testing framework.  This can be achieved for instance with a command
 like
 
-  nosetests -sv uncertainties/
+  pytest -sv uncertainties/
 
 or simply
 
-  nosetests uncertainties/
+  pytest uncertainties/
 
 (for a less verbose output).

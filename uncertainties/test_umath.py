@@ -1,12 +1,13 @@
 """
 Tests of the code in uncertainties.umath.
 
-These tests can be run through the Nose testing framework.
+These tests can be run through the pytest testing framework.
 
 (c) 2010-2016 by Eric O. LEBIGOT (EOL).
 """
 
-
+from __future__ import division
+from __future__ import absolute_import
 
 # Standard modules
 import sys

@@ -210,7 +210,7 @@ is the result of x != 0.
 - The uncertainties package is for Python 2.3 and above.
 
 - This package contains tests.  They can be run either manually or
-automatically with the nose unit testing framework (nosetests).
+automatically with the pytest unit testing framework (pytest).
 
 (c) 2009-2016 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 Please send feature requests, bug reports, or feedback to this address.
@@ -221,11 +221,12 @@ This software is released under a dual license.  (1) The BSD license.
 (2) Any other license, as long as it is obtained from the original
 author.'''
 
+from builtins import map
 from .core import *
 from .core import __all__  # For a correct help(uncertainties)
 
 # Numerical version:
-__version_info__ = (3, 1, 3)
+__version_info__ = (3, 1, 2)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'

@@ -9,9 +9,12 @@ Core functions used by unumpy and some of its submodules.
 # imports one of the submodules in order to make it available to the
 # user.
 
-
+from __future__ import division
 
 # Standard modules:
+from builtins import next
+from builtins import zip
+from builtins import range
 import sys
 import itertools
 import inspect
@@ -384,7 +387,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         for element in array_version.flat:
             # floats, etc. might be present
             if isinstance(element, uncert_core.AffineScalarFunc):
-                variables |= element.derivatives.keys()
+                variables |= set(element.derivatives.keys())
 
         array_nominal = nominal_values(array_version)
         # Function value, then derivatives at array_nominal (the
