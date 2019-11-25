@@ -38,12 +38,13 @@ Some useful links:
 GitHub
 ------
 
-The ``release`` branch is the latest stable release for Python 2.7+ (including Python 3+ through
-``2to3``), while the ``release_python2.3`` branch is the same but for Python 2.3 to
-2.6 (with unit tests only run with Python 2.6). They should pass the tests.
+The ``release`` branch is the latest stable release for Python 3.5+ (including
+Python 2.7 through ``pasteurize``).
 
 
-``master*`` branches in the Github repository are bleeding-edge, and do not necessarily pass the tests. The ``master`` and ``master_python2.3`` are the latest, relatively stable versions (while other ``master*`` branches are more experimental).
+``master*`` branches in the Github repository are bleeding-edge, and do not
+necessarily pass the tests. The ``master`` is the latest, relatively stable
+versions (while other ``master*`` branches are more experimental).
 
 Other branches might be present in the GitHub repository, but they are
 also temporary and represent work in progress that does not necessarily run

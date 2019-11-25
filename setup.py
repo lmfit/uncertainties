@@ -1,17 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# !! This program must run with all version of Python since 2.3 included.
-
 import os
 import sys
 
-min_version = (2, 3)
+PY_VER = sys.version_info
+if PY_VER.major < 3:
+    min_version = (2, 7)
+else:
+    min_version = (3, 5)
+
+
 error_msg = ("Sorry, this package is for Python %d.%d and higher only." %
              min_version)
 
 try:
-    if sys.version_info < min_version:
+    if PY_VER < min_version:
         sys.exit(error_msg)
 except AttributeError:  # sys.version_info was introduced in Python 2.0
     sys.exit(error_msg)
@@ -285,18 +289,8 @@ Main changes:
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.3',
-        'Programming Language :: Python :: 2.4',
-        'Programming Language :: Python :: 2.5',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        # Python 3.1 failed because of a problem with NumPy 1.6.1 (whereas
-        # everything was fine with Python 3.2 and Python 2.7).
-        'Programming Language :: Python :: 3.1',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
@@ -327,7 +321,6 @@ try:
     addtl_setup_options = {
 
         # Allows python setup.py pytest to do the right thing:
-        'use_2to3': True,
         'tests_require': ['pytest', 'numpy'],
         # Optional dependencies install using:
         # `easy_install uncertainties[optional]`
@@ -351,12 +344,10 @@ try:
 except ImportError:
     from distutils.core import setup
 
-    # distutils.core.setup is not like setuptools: it does not have an
-    # option for automatically calling 2to3 if Python 3 is used, so the
-    # conversion is done here:
-    if sys.version_info >= (3, ):
+    # If Python 2 is used, the conversion is done here:
+    if PY_VER.major < 3:
         import subprocess
-        subprocess.check_call(["2to3", "-w", "."])
+        subprocess.check_call(["pasteurize", "-w", "."])
 
 # End of setup definition
 

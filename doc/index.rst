@@ -190,8 +190,8 @@ program with
 by the version of Python for which the package should be installed:
 ``python3``, ``python3.3``, etc.).
 
-For an installation with Python 2.6+ in the *user* Python library
-(no additional access rights needed):
+For an installation in the *user* Python library (no additional access rights
+needed):
 
 .. code-block:: sh
 
@@ -208,15 +208,6 @@ If additional access rights are needed (Unix):
 .. code-block:: sh
 
    sudo python setup.py install
-
-You can also simply **move** the :file:`uncertainties-py*` directory
-that corresponds best to your version of Python to a location that
-Python can import from (directory in which scripts using
-:mod:`uncertainties` are run, etc.); the chosen
-:file:`uncertainties-py*` directory should then be renamed
-:file:`uncertainties`. Python 3 users should then run ``2to3 -w .``
-from inside this directory so as to automatically adapt the code to
-Python 3.
 
 Source code
 -----------
