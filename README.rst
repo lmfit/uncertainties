@@ -2,10 +2,8 @@ uncertainties
 =============
 
 
-.. image:: https://travis-ci.org/lebigot/uncertainties.svg?branch=master
-   :target: https://travis-ci.org/lebigot/uncertainties
-.. image:: https://ci.appveyor.com/api/projects/status/j5238244myqx0a0r?svg=true
-   :target: https://ci.appveyor.com/project/lebigot/uncertainties
+.. image:: https://github.com/benabel/uncertainties>/workflows/CI%20tests/badge.svg
+   :target: https://github.com/benabel/uncertainties/actions?query=workflow%3A%22CI+tests%22
 .. image:: https://codecov.io/gh/lebigot/uncertainties/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/lebigot/uncertainties/
 .. image:: https://readthedocs.org/projects/uncertainties-python-package/badge/?version=latest
