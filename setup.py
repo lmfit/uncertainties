@@ -3,6 +3,7 @@
 
 import os
 import sys
+from setuptools import setup
 
 PY_VER = sys.version_info
 if PY_VER.major < 3:
@@ -27,7 +28,6 @@ setup_options = dict(
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://uncertainties-python-package.readthedocs.io/',
-    install_requires=['future'],
     license='''\
 This software can be used under one of the following two licenses: \
 (1) The Revised BSD License. \
@@ -311,43 +311,32 @@ Main changes:
     packages=[
         'uncertainties', 'uncertainties.unumpy'])
 
-# The best available setup() is used (some users do not have
-# setuptools):
-try:
-    from setuptools import setup
+if PY_VER.major < 3:
+    setup_options["install_requires"] = ['future']
 
-    # Some setuptools-specific options can be added:
-
-    addtl_setup_options = {
-
-        # Allows python setup.py pytest to do the right thing:
-        'tests_require': ['pytest', 'numpy'],
-        # Optional dependencies install using:
-        # `easy_install uncertainties[optional]`
-        'extras_require': {
-            'optional': ['numpy'],
-            'docs': ['sphinx'],
-        }
+# Some setuptools-specific options can be added:
+addtl_setup_options = {
+    # Allows python setup.py test to do the right thing:
+    'tests_require': ['pytest', 'numpy'],
+    # Optional dependencies install using:
+    # `easy_install uncertainties[optional]`
+    'extras_require': {
+        'optional': ['numpy'],
+        'docs': ['sphinx'],
     }
+}
 
-    # easy_install uncertainties[tests] option:
-    addtl_setup_options['extras_require']['tests'] = (
-        addtl_setup_options['tests_require'])
+# easy_install uncertainties[tests] option:
+addtl_setup_options['extras_require']['tests'] = (
+    addtl_setup_options['tests_require'])
 
-    # easy_install uncertainties[all] option: all dependencies are
-    # gathered
-    addtl_setup_options['extras_require']['all'] = set(
-        sum(list(addtl_setup_options['extras_require'].values()), []))
+# easy_install uncertainties[all] option: all dependencies are
+# gathered
+addtl_setup_options['extras_require']['all'] = set(
+    sum(list(addtl_setup_options['extras_require'].values()), []))
 
-    setup_options.update(addtl_setup_options)
+setup_options.update(addtl_setup_options)
 
-except ImportError:
-    from distutils.core import setup
-
-    # If Python 2 is used, the conversion is done here:
-    if PY_VER.major < 3:
-        import subprocess
-        subprocess.check_call(["pasteurize", "-w", "."])
 
 # End of setup definition
 

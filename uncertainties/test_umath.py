@@ -8,8 +8,9 @@ These tests can be run through the pytest testing framework.
 
 from __future__ import division
 from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 
-# Standard modules
 import sys
 import math
 

@@ -12,7 +12,6 @@ Main module for the uncertainties package, with internal functions.
 # Uncertainties can then be calculated by using this local linear
 # approximation of the original function.
 
-from __future__ import division  # Many analytical derivatives depend on this
 from __future__ import unicode_literals
 
 from builtins import str
@@ -20,7 +19,6 @@ from builtins import next
 from builtins import map
 from builtins import zip
 from builtins import range
-from past.builtins import basestring
 from builtins import object
 import sys
 import re
@@ -313,7 +311,7 @@ def partial_derivative(f, arg_ref):
 
     # Which set of function parameter contains the variable to be
     # changed? the positional or the optional keyword arguments?
-    change_kwargs = isinstance(arg_ref, basestring)
+    change_kwargs = isinstance(arg_ref, str) or isinstance(arg_ref, bytes)
 
     def partial_derivative_of_f(*args, **kwargs):
         """
@@ -1009,7 +1007,7 @@ def from_superscript(number_str):
 
     ValueError is raised if the conversion cannot be done.
 
-    number_str -- basestring object.
+    number_str -- string object.
     '''
     return int(str(number_str).translate(FROM_SUPERSCRIPT))
 
