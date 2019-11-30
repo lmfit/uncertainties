@@ -50,7 +50,7 @@ class FixUarrayUmatrix(BaseFix):
         else:
             args = node.children[1]
 
-        if 'args' in results: # Non-tuple argument
+        if 'args' in results:  # Non-tuple argument
 
             # A star will be inserted in from of the single argument:
 
