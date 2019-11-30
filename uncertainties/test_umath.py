@@ -164,7 +164,7 @@ def test_monte_carlo_comparison():
     (nominal_value_samples, covariances_samples) = monte_carlo_calc(1000000)
 
 
-    ## Comparison between both results:
+    # Comparison between both results:
 
     # The covariance matrices must be close:
 

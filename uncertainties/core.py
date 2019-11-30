@@ -115,7 +115,7 @@ def deprecation(message):
 
 ###############################################################################
 
-## Definitions that depend on the availability of NumPy:
+# Definitions that depend on the availability of NumPy:
 
 
 try:
@@ -633,7 +633,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     derivatives_args_index.none_converter = none_converter
 
 
-    ## Wrapped function:
+    # Wrapped function:
 
     #! Setting the doc string after "def f_with...()" does not
     # seem to work.  We define it explicitly:
@@ -675,7 +675,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
         if (not pos_w_uncert) and (not names_w_uncert):
             return f(*args, **kwargs)
 
-        ### Nominal values of the (scalar) arguments:
+        # Nominal values of the (scalar) arguments:
 
         # !! Possible optimization: If pos_w_uncert is empty, there
         # is actually no need to create a mutable version of args and
@@ -684,14 +684,14 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
         # as positional arguments (i.e., pos_w_uncert is not emtpy),
         # so this "optimization" is not implemented here.
 
-        ## Positional arguments:
+        # Positional arguments:
         args_values = list(args)  # Now mutable: modified below
         # Arguments with an uncertainty are converted to their nominal
         # value:
         for index in pos_w_uncert:
             args_values[index] = args[index].nominal_value
 
-        ## Keyword arguments:
+        # Keyword arguments:
 
         # For efficiency reasons, kwargs is not copied. Instead, its
         # values with uncertainty are modified:
@@ -1340,9 +1340,9 @@ def format_num(nom_val_main, error_main, common_exp,
             fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
             fmt_prefix_e = fmt_parts['comma']
 
-        ## print "ANY_EXP_FACTORED", any_exp_factored
-        ## print "ERROR_HAS_EXP", error_has_exp
-        ## print "NOM_HAS_EXP", nom_has_exp
+        # print "ANY_EXP_FACTORED", any_exp_factored
+        # print "ERROR_HAS_EXP", error_has_exp
+        # print "NOM_HAS_EXP", nom_has_exp
 
         ####################
         # Nominal value formatting:
@@ -1715,9 +1715,9 @@ class AffineScalarFunc(object):
 
     ############################################################
 
-    ### Operators: operators applied to AffineScalarFunc and/or
-    ### float-like objects only are supported.  This is why methods
-    ### from float are used for implementing these operators.
+    # Operators: operators applied to AffineScalarFunc and/or
+    # float-like objects only are supported.  This is why methods
+    # from float are used for implementing these operators.
 
     # Operators with no reflection:
 
@@ -1745,8 +1745,8 @@ class AffineScalarFunc(object):
 
     ########################################
 
-    ## Logical operators: warning: the resulting value cannot always
-    ## be differentiated.
+    # Logical operators: warning: the resulting value cannot always
+    # be differentiated.
 
     # The boolean operations are not differentiable everywhere, but
     # almost...
@@ -1837,11 +1837,11 @@ class AffineScalarFunc(object):
         objects) involved.
         """
         #! It would be possible to not allow the user to update the
-        #std dev of Variable objects, in which case AffineScalarFunc
-        #objects could have a pre-calculated or, better, cached
-        #std_dev value (in fact, many intermediate AffineScalarFunc do
-        #not need to have their std_dev calculated: only the final
-        #AffineScalarFunc returned to the user does).
+        # std dev of Variable objects, in which case AffineScalarFunc
+        # objects could have a pre-calculated or, better, cached
+        # std_dev value (in fact, many intermediate AffineScalarFunc do
+        # not need to have their std_dev calculated: only the final
+        # AffineScalarFunc returned to the user does).
         return CallableStdDev(sqrt(sum(
             delta**2 for delta in list(self.error_components().values()))))
 
@@ -2073,8 +2073,8 @@ class AffineScalarFunc(object):
             except ValueError:  # No non-NaN value: NaN±NaN…
                 # No meaningful common exponent can be obtained:
                 pass
-            ## else:
-            ##     print "EXP_REF_VAL", exp_ref_value
+            # else:
+            # print "EXP_REF_VAL", exp_ref_value
 
         # Should the precision be interpreted like for a float, or
         # should the number of significant digits on the uncertainty
@@ -2121,7 +2121,7 @@ class AffineScalarFunc(object):
             # No control of the number of significant digits on the
             # uncertainty.
 
-            ## print "PRECISION NOT BASED ON UNCERTAINTY"
+            # print "PRECISION NOT BASED ON UNCERTAINTY"
 
             # The precision has the same meaning as for floats (it is
             # not the uncertainty that defines the number of digits).
@@ -2181,14 +2181,14 @@ class AffineScalarFunc(object):
                 # The number of significant digits is important for
                 # example for determining the exponent:
 
-                ## print "NUM_SIGNIF_DIGITS", num_signif_digits
+                # print "NUM_SIGNIF_DIGITS", num_signif_digits
 
                 digits_limit = (
                     signif_dgt_to_limit(exp_ref_value, num_signif_digits)
                     if real_values
                     else None)
 
-                ## print "DIGITS_LIMIT", digits_limit
+                # print "DIGITS_LIMIT", digits_limit
 
         #######################################
 
@@ -2278,7 +2278,7 @@ class AffineScalarFunc(object):
             std_dev_mantissa = std_dev
             signif_limit = digits_limit
 
-        ## print "SIGNIF_LIMIT", signif_limit
+        # print "SIGNIF_LIMIT", signif_limit
 
         ########################################
 
@@ -2310,7 +2310,7 @@ class AffineScalarFunc(object):
             prec = max(-signif_limit,
                        1 if pres_type is None and not std_dev
                        else 0)
-        ## print "PREC", prec
+        # print "PREC", prec
 
         ########################################
 
@@ -2632,7 +2632,7 @@ def add_operators_to_AffineScalarFunc():
     # protect the user from unexpected integer result that behave
     # badly with the division.
 
-    ## Operators that return a numerical value:
+    # Operators that return a numerical value:
 
     def _simple_add_deriv(x):
         if x >= 0:

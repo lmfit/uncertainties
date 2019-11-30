@@ -226,7 +226,7 @@ def test_value_construction():
     uncertainty *without a string* (see test_ufloat_fromstr(), for this).
     '''
 
-    ## Simple construction:
+    # Simple construction:
     x = ufloat(3, 0.14)
     assert x.nominal_value == 3
     assert x.std_dev == 0.14
@@ -244,7 +244,7 @@ def test_value_construction():
     assert x.std_dev == 0.14
     assert x.tag == 'pi'
 
-    ## Comparison with the obsolete tuple form:
+    # Comparison with the obsolete tuple form:
 
     # The following tuple is stored in a variable instead of being
     # repeated in the calls below, so that the automatic code update
@@ -291,8 +291,8 @@ def test_value_construction():
     except uncert_core.NegativeStdDev:
         pass
 
-    ## Incorrect forms should not raise any deprecation warning, but
-    ## raise an exception:
+    # Incorrect forms should not raise any deprecation warning, but
+    # raise an exception:
 
     try:
         ufloat(1)  # Form that has never been allowed
@@ -335,7 +335,7 @@ def test_ufloat_fromstr():
         '(3.141+/-0.001)E+02': (314.1, 0.1),
 
 
-        ## Pretty-print notation:
+        # Pretty-print notation:
 
         # ± sign, global exponent (not pretty-printed):
         '(3.141±0.001)E+02': (314.1, 0.1),
@@ -378,7 +378,7 @@ def test_ufloat_fromstr():
         assert numbers_close(num.std_dev, values[1])
         assert num.tag == 'test variable'
 
-        ## Obsolete forms
+        # Obsolete forms
         with pytest.warns(UserWarning):
             num = ufloat(representation)  # Obsolete
             assert numbers_close(num.nominal_value, values[0])
@@ -485,8 +485,8 @@ def test_copy():
 
     assert y in list(y.derivatives.keys())
 
-## Classes for the pickling tests (put at the module level, so that
-## they can be unpickled):
+# Classes for the pickling tests (put at the module level, so that
+# they can be unpickled):
 
 # Subclass without slots:
 
@@ -518,14 +518,14 @@ def test_pickling():
 
     assert x != x_unpickled  # Pickling creates copies
 
-    ## Tests with correlations and AffineScalarFunc objects:
+    # Tests with correlations and AffineScalarFunc objects:
     f = 2*x
     assert isinstance(f, AffineScalarFunc)
     (f_unpickled, x_unpickled2) = pickle.loads(pickle.dumps((f, x)))
     # Correlations must be preserved:
     assert f_unpickled - x_unpickled2 - x_unpickled2 == 0
 
-    ## Tests with subclasses:
+    # Tests with subclasses:
 
     for subclass in (NewVariable_dict, NewVariable_slots_tuple,
                      NewVariable_slots_str):
@@ -852,26 +852,26 @@ def test_wrapped_func_no_args_no_kwargs():
     x = uncert_core.ufloat(1, 0.1)
     y = uncert_core.ufloat(10, 2)
 
-    ### Automatic numerical derivatives:
+    # Automatic numerical derivatives:
 
-    ## Fully automatic numerical derivatives:
+    # Fully automatic numerical derivatives:
     f_wrapped = uncert_core.wrap(f)
     assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
     assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
-    ## Automatic additional derivatives for non-defined derivatives,
-    ## and explicit None derivative:
+    # Automatic additional derivatives for non-defined derivatives,
+    # and explicit None derivative:
     f_wrapped = uncert_core.wrap(f, [None])  # No derivative for y
     assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
     assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
-    ### Explicit derivatives:
+    # Explicit derivatives:
 
-    ## Fully defined derivatives:
+    # Fully defined derivatives:
     f_wrapped = uncert_core.wrap(f, [lambda x, y: 2,
                                      lambda x, y: math.cos(y)])
 
@@ -880,7 +880,7 @@ def test_wrapped_func_no_args_no_kwargs():
     # Call with keyword arguments:
     assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
-    ## Automatic additional derivatives for non-defined derivatives:
+    # Automatic additional derivatives for non-defined derivatives:
     f_wrapped = uncert_core.wrap(f, [lambda x, y: 2])  # No derivative for y
     assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
@@ -910,20 +910,20 @@ def test_wrapped_func_args_no_kwargs():
 
     args = [s, z, s]  # var-positional parameters
 
-    ### Automatic numerical derivatives:
+    # Automatic numerical derivatives:
 
-    ## Fully automatic numerical derivatives:
+    # Fully automatic numerical derivatives:
     f_wrapped = uncert_core.wrap(f)
     assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
-    ## Automatic additional derivatives for non-defined derivatives,
-    ## and explicit None derivative:
+    # Automatic additional derivatives for non-defined derivatives,
+    # and explicit None derivative:
     f_wrapped = uncert_core.wrap(f, [None])  # No derivative for y
     assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
-    ### Explicit derivatives:
+    # Explicit derivatives:
 
-    ## Fully defined derivatives:
+    # Fully defined derivatives:
     f_wrapped = uncert_core.wrap(f, [lambda x, y, *args: 2,
                                      lambda x, y, *args: math.cos(y),
                                      None,
@@ -931,7 +931,7 @@ def test_wrapped_func_args_no_kwargs():
 
     assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
-    ## Automatic additional derivatives for non-defined derivatives:
+    # Automatic additional derivatives for non-defined derivatives:
 
     # No derivative for y:
     f_wrapped = uncert_core.wrap(f, [lambda x, y, *args: 2])
@@ -960,9 +960,9 @@ def test_wrapped_func_no_args_kwargs():
 
     kwargs = {'s': s, 'z': z}  # Arguments not in signature
 
-    ### Automatic numerical derivatives:
+    # Automatic numerical derivatives:
 
-    ## Fully automatic numerical derivatives:
+    # Fully automatic numerical derivatives:
     f_wrapped = uncert_core.wrap(f)
     assert ufloats_close(f_auto_unc(x, y, **kwargs),
                          f_wrapped(x, y, **kwargs))
@@ -971,8 +971,8 @@ def test_wrapped_func_no_args_kwargs():
     assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                          f_wrapped(y=y, x=x, **kwargs))
 
-    ## Automatic additional derivatives for non-defined derivatives,
-    ## and explicit None derivative:
+    # Automatic additional derivatives for non-defined derivatives,
+    # and explicit None derivative:
 
     # No derivative for positional-or-keyword parameter y, no
     # derivative for optional-keyword parameter z:
@@ -1005,9 +1005,9 @@ def test_wrapped_func_no_args_kwargs():
     assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                          f_wrapped(y=y, x=x, **kwargs))
 
-    ### Explicit derivatives:
+    # Explicit derivatives:
 
-    ## Fully defined derivatives:
+    # Fully defined derivatives:
     f_wrapped = uncert_core.wrap(
         f,
         [lambda x, y, **kwargs: 2, lambda x, y, **kwargs: math.cos(y)],
@@ -1019,7 +1019,7 @@ def test_wrapped_func_no_args_kwargs():
     assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                           f_wrapped(y=y, x=x, **kwargs))
 
-    ## Automatic additional derivatives for non-defined derivatives:
+    # Automatic additional derivatives for non-defined derivatives:
 
     # No derivative for y or z:
     f_wrapped = uncert_core.wrap(f, [lambda x, y, **kwargs: 2])
@@ -1055,16 +1055,16 @@ def test_wrapped_func_args_kwargs():
     args = [s, t, s]
     kwargs = {'u': s, 'z': z}  # Arguments not in signature
 
-    ### Automatic numerical derivatives:
+    # Automatic numerical derivatives:
 
-    ## Fully automatic numerical derivatives:
+    # Fully automatic numerical derivatives:
     f_wrapped = uncert_core.wrap(f)
 
     assert ufloats_close(f_auto_unc(x, y, *args, **kwargs),
                           f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
 
-    ## Automatic additional derivatives for non-defined derivatives,
-    ## and explicit None derivative:
+    # Automatic additional derivatives for non-defined derivatives,
+    # and explicit None derivative:
 
     # No derivative for positional-or-keyword parameter y, no
     # derivative for optional-keyword parameter z:
@@ -1086,9 +1086,9 @@ def test_wrapped_func_args_kwargs():
     assert ufloats_close(f_auto_unc(x, y, *args, **kwargs),
                          f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
 
-    ### Explicit derivatives:
+    # Explicit derivatives:
 
-    ## Fully defined derivatives:
+    # Fully defined derivatives:
     f_wrapped = uncert_core.wrap(
         f,
         [lambda x, y, *args, **kwargs: 2,
@@ -1098,7 +1098,7 @@ def test_wrapped_func_args_kwargs():
     assert ufloats_close(f_auto_unc(x, y, *args, **kwargs),
                           f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
 
-    ## Automatic additional derivatives for non-defined derivatives:
+    # Automatic additional derivatives for non-defined derivatives:
 
     # No derivative for y or z:
     f_wrapped = uncert_core.wrap(f, [lambda x, y, *args, **kwargs: 2])
@@ -1343,7 +1343,7 @@ def power_all_cases(op):
     non_int_larger_than_one = ufloat(3.1, 0.01)
     positive_smaller_than_one = ufloat(0.3, 0.01)
 
-    ## negative**integer
+    # negative**integer
 
     result = op(negative, integer)
     assert not isnan(result.derivatives[negative])
@@ -1358,9 +1358,9 @@ def power_all_cases(op):
     assert result.derivatives[negative] == 0
     assert isnan(result.derivatives[zero])
 
-    ## negative**non-integer
+    # negative**non-integer
 
-    ## zero**...
+    # zero**...
 
     result = op(zero, non_int_larger_than_one)
     assert isnan(result.derivatives[zero])
@@ -1383,8 +1383,8 @@ def power_all_cases(op):
     assert result.derivatives[zero] == 0
     assert isnan(result.derivatives[zero2])
 
-    ## positive**...: this is a quite regular case where the value and
-    ## the derivatives are all defined.
+    # positive**...: this is a quite regular case where the value and
+    # the derivatives are all defined.
 
     result = op(positive, positive2)
     assert not isnan(result.derivatives[positive])

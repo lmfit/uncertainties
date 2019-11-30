@@ -125,7 +125,7 @@ def wraps(wrapper,
 # results when differentiated analytically, because of the loss of
 # precision in numerical calculations.
 
-#def log_1arg_der(x):
+# def log_1arg_der(x):
 #    """
 #    Derivative of log(x) (1-argument form).
 #    """
@@ -144,11 +144,11 @@ def log_der0(*args):
 
     # The following version goes about as fast:
 
-    ## A 'try' is used for the most common case because it is fast when no
-    ## exception is raised:
-    #try:
+    # A 'try' is used for the most common case because it is fast when no
+    # exception is raised:
+    # try:
     #    return log_1arg_der(*args)  # Argument number check
-    #except TypeError:
+    # except TypeError:
     #    return 1/args[0]/math.log(args[1])  # 2-argument form
 
 

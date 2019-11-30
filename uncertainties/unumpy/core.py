@@ -454,7 +454,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
 
     return wrapped_func
 
-########## Matrix inverse
+# Matrix inverse
 
 
 def inv_with_derivatives(arr, input_type, derivatives):
@@ -495,7 +495,7 @@ inv.__doc__ = """\
     %s
     """ % numpy.linalg.inv.__doc__
 
-########## Matrix pseudo-inverse
+# Matrix pseudo-inverse
 
 
 def pinv_with_derivatives(arr, input_type, derivatives, rcond):
@@ -580,7 +580,7 @@ pinv = uncert_core.set_doc("""
     %s
     """ % numpy.linalg.pinv.__doc__)(pinv)
 
-########## Matrix class
+# Matrix class
 
 
 class CallableStdDevs(numpy.matrix):
