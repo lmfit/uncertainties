@@ -8,31 +8,20 @@ These tests can be run through the pytest testing framework.
 (c) 2010-2016 by Eric O. LEBIGOT (EOL).
 """
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import division, print_function, unicode_literals
 
-
-# Standard modules
-from builtins import zip
-from builtins import str
-from builtins import map
-from builtins import range
 import copy
-import weakref
 import math
-from math import isnan, isinf
 import random
 import sys
+import weakref
+from builtins import map, range, str, zip
+from math import isinf, isnan
 
-# 3rd-party modules
-# import pytest.tools
-
-# Local modules
-
+import pytest
 import uncertainties.core as uncert_core
-from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr
 from uncertainties import umath
+from uncertainties.core import AffineScalarFunc, ufloat, ufloat_fromstr
 
 # The following information is useful for making sure that the right
 # version of Python is running the tests (for instance with the Travis
@@ -258,31 +247,32 @@ def test_value_construction():
     # does not replace ufloat((3, 0.14)) by ufloat(3, 14): the goal
     # here is to make sure that the obsolete form gives the same
     # result as the new form.
+    
+    with pytest.warns(UserWarning):
+        
+        obsolete_representation = (3, 0.14)
+        x = ufloat(3, 0.14)
+        x2 = ufloat(obsolete_representation)
+        assert x.nominal_value == x2.nominal_value
+        assert x.std_dev == x2.std_dev
+        assert x.tag is None
+        assert x2.tag is None
 
-    representation = (3, 0.14)  # Obsolete representation
+        # With tag as positional argument:
+        x = ufloat(3, 0.14, "pi")
+        x2 = ufloat(obsolete_representation, "pi")
+        assert x.nominal_value == x2.nominal_value
+        assert x.std_dev == x2.std_dev
+        assert x.tag == 'pi'
+        assert x2.tag == 'pi'
 
-    x = ufloat(3, 0.14)
-    x2 = ufloat(representation)  # Obsolete
-    assert x.nominal_value == x2.nominal_value
-    assert x.std_dev == x2.std_dev
-    assert x.tag is None
-    assert x2.tag is None
-
-    # With tag as positional argument:
-    x = ufloat(3, 0.14, "pi")
-    x2 = ufloat(representation, "pi")  # Obsolete
-    assert x.nominal_value == x2.nominal_value
-    assert x.std_dev == x2.std_dev
-    assert x.tag == 'pi'
-    assert x2.tag == 'pi'
-
-    # With tag keyword:
-    x = ufloat(3, 0.14, tag="pi")
-    x2 = ufloat(representation, tag="pi")  # Obsolete
-    assert x.nominal_value == x2.nominal_value
-    assert x.std_dev == x2.std_dev
-    assert x.tag == 'pi'
-    assert x2.tag == 'pi'
+        # With tag keyword:
+        x = ufloat(3, 0.14, tag="pi")
+        x2 = ufloat(obsolete_representation, tag="pi")
+        assert x.nominal_value == x2.nominal_value
+        assert x.std_dev == x2.std_dev
+        assert x.tag == 'pi'
+        assert x2.tag == 'pi'
 
     # Negative standard deviations should be caught in a nice way
     # (with the right exception):
@@ -343,15 +333,15 @@ def test_ufloat_fromstr():
         ## Pretty-print notation:
 
         # ± sign, global exponent (not pretty-printed):
-        r'(3.141±0.001)E+02': (314.1, 0.1),
+        '(3.141±0.001)E+02': (314.1, 0.1),
         # ± sign, individual exponent:
-        r'3.141E+02±0.001e2': (314.1, 0.1),
+        '3.141E+02±0.001e2': (314.1, 0.1),
 
         # ± sign, times symbol, superscript (= full pretty-print):
         '(3.141 ± 0.001) × 10²': (314.1, 0.1),
 
         # NaN uncertainty:
-        u'(3.141±nan)E+02': (314.1, float('nan')),
+        '(3.141±nan)E+02': (314.1, float('nan')),
         '3.141e+02+/-nan': (314.1, float('nan')),
         '3.4(nan)e10': (3.4e10, float('nan')),
         # NaN value:
@@ -384,23 +374,23 @@ def test_ufloat_fromstr():
         assert num.tag == 'test variable'
 
         ## Obsolete forms
+        with pytest.warns(UserWarning):
+            num = ufloat(representation)  # Obsolete
+            assert numbers_close(num.nominal_value, values[0])
+            assert numbers_close(num.std_dev, values[1])
+            assert num.tag is None
 
-        num = ufloat(representation)  # Obsolete
-        assert numbers_close(num.nominal_value, values[0])
-        assert numbers_close(num.std_dev, values[1])
-        assert num.tag is None
+            # Call with a tag list argument:
+            num = ufloat(representation, 'test variable')  # Obsolete
+            assert numbers_close(num.nominal_value, values[0])
+            assert numbers_close(num.std_dev, values[1])
+            assert num.tag == 'test variable'
 
-        # Call with a tag list argument:
-        num = ufloat(representation, 'test variable')  # Obsolete
-        assert numbers_close(num.nominal_value, values[0])
-        assert numbers_close(num.std_dev, values[1])
-        assert num.tag == 'test variable'
-
-        # Call with a tag keyword argument:
-        num = ufloat(representation, tag='test variable')  # Obsolete
-        assert numbers_close(num.nominal_value, values[0])
-        assert numbers_close(num.std_dev, values[1])
-        assert num.tag == 'test variable'
+            # Call with a tag keyword argument:
+            num = ufloat(representation, tag='test variable')  # Obsolete
+            assert numbers_close(num.nominal_value, values[0])
+            assert numbers_close(num.std_dev, values[1])
+            assert num.tag == 'test variable'
 
 ###############################################################################
 
@@ -734,8 +724,9 @@ def test_logic():
     assert bool(x) == True
     assert bool(y) == False
     assert bool(z) == True
-    assert bool(t) == True  # Only infinitseimal neighborhood are used
+    assert bool(t) == True  # Only infinitesimal neighborhood are used
 
+@pytest.mark.filterwarnings("ignore:::uncertainties")
 def test_obsolete():
     'Tests some obsolete creation of number with uncertainties'
     x = ufloat(3, 0.1)
@@ -1741,7 +1732,7 @@ def test_format():
             '15GS': '  -1.2(%s)E-12' % NaN_EFG,
             'SL': r'-1.2(\mathrm{nan}) \times 10^{-12}',  # LaTeX NaN
             # Pretty-print priority, but not for NaN:
-            'PSL': '-1.2(\mathrm{nan})×10⁻¹²',
+            'PSL': r'-1.2(\mathrm{nan})×10⁻¹²',
             'L': r'\left(-1.2 \pm \mathrm{nan}\right) \times 10^{-12}',
             # Uppercase NaN and LaTeX:
             '.1EL': (r'\left(-1.2 \pm \mathrm{%s}\right) \times 10^{-12}'
@@ -1752,8 +1743,8 @@ def test_format():
 
         (3.14e-10, 0.01e-10): {
             # Character (Unicode) strings:
-            u'P': r'(3.140±0.010)×10⁻¹⁰',  # PDG rules: 2 digits
-            u'PL': r'(3.140±0.010)×10⁻¹⁰',  # Pretty-print has higher priority
+            u'P': '(3.140±0.010)×10⁻¹⁰',  # PDG rules: 2 digits
+            u'PL': '(3.140±0.010)×10⁻¹⁰',  # Pretty-print has higher priority
             # Truncated non-zero uncertainty:
             '.1e': '(3.1+/-0.0)e-10',
             '.1eS': '3.1(0.0)e-10'
@@ -1981,9 +1972,9 @@ def test_format():
         # options:
         (float('-inf'), float('inf')): {
             'S': '-inf(inf)',
-            'LS': '-\infty(\infty)',
+            'LS': r'-\infty(\infty)',
             'L': r'-\infty \pm \infty',
-            'LP': '-\infty±\infty',
+            'LP': r'-\infty±\infty',
             # The following is consistent with Python's own
             # formatting, which depends on the version of Python:
             # formatting float("-inf") with format(..., "020") gives
@@ -2007,9 +1998,9 @@ def test_format():
         },
         (-float('nan'), float('inf')): {
             'S': 'nan(inf)',
-            'LS': '\mathrm{nan}(\infty)',
+            'LS': r'\mathrm{nan}(\infty)',
             'L': r'\mathrm{nan} \pm \infty',
-            'LP': '\mathrm{nan}±\infty'
+            'LP': r'\mathrm{nan}±\infty'
         },
 
         # Leading zeroes in the shorthand notation:
