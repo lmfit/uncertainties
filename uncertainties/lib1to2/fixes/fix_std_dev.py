@@ -35,4 +35,3 @@ class FixStdDev(BaseFix):
             # '.std_dev' is followed by a call with no argument: the call
             # is removed:
             node.children[-1].remove()
-

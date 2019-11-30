@@ -11,4 +11,3 @@ from uncertainties.unumpy.core import inv, pinv
 # This module cannot import unumpy because unumpy imports this module.
 
 __all__ = ['inv', 'pinv']
-

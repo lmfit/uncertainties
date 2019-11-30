@@ -201,4 +201,3 @@ else:
             for (orig, new) in tests.items()))
 
         check_all('uarray_umatrix', tests)
-
