@@ -185,7 +185,7 @@ def test_monte_carlo_comparison():
         " the Monte-Carlo simulation and the direct calculation:\n"
         "* Monte-Carlo:\n%s\n* Direct calculation:\n%s"
         % (covariances_samples, covariances_this_module)
-        )
+    )
 
     # The nominal values must be close:
     assert test_uncertainties.numbers_close(
@@ -201,7 +201,7 @@ def test_monte_carlo_comparison():
         % (nominal_value_this_module,
            nominal_value_samples,
            math.sqrt(covariances_samples[2, 2]))
-        )
+    )
 
 
 def test_math_module():

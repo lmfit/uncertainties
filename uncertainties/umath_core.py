@@ -217,7 +217,7 @@ fixed_derivatives = {
     'sqrt': [lambda x: 0.5 / math.sqrt(x)],
     'tan': [lambda x: 1 + math.tan(x)**2],
     'tanh': [lambda x: 1 - math.tanh(x)**2]
-    }
+}
 
 # Many built-in functions in the math module are wrapped with a
 # version which is uncertainty aware:

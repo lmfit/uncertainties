@@ -71,7 +71,7 @@ __all__ = [
     # quantitities with uncertainties:
     'wrap'
 
-    ]
+]
 
 ###############################################################################
 
@@ -625,7 +625,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     none_converter = lambda index: partial_derivative(f, index)
 
     for (index, derivative) in enumerate(
-        derivatives_args_index.returned_elements):
+            derivatives_args_index.returned_elements):
         if derivative is None:
             derivatives_args_index.returned_elements[index] = (
                 none_converter(index))
@@ -1004,7 +1004,7 @@ TO_SUPERSCRIPT = {
     0x37: u'⁷',
     0x38: u'⁸',
     0x39: u'⁹'
-    }
+}
 
 # Inverted TO_SUPERSCRIPT table, for use with unicode.translate():
 #
@@ -1052,7 +1052,7 @@ GROUP_SYMBOLS = {
     # LaTeX math expression $...$ can be broken).
     'latex': (r'\left(', r'\right)'),
     'default': ('(', ')')  # Basic text mode
-    }
+}
 
 
 def format_num(nom_val_main, error_main, common_exp,
@@ -1307,7 +1307,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # to have a zero uncertainty be very explicit):
         error_has_exp = not any_exp_factored and not special_error
 
-         # Like error_has_exp, but only for real number handling
+        # Like error_has_exp, but only for real number handling
         # (there is no special meaning to a zero nominal value):
         nom_has_exp = not any_exp_factored and not isinfinite(nom_val_main)
 
@@ -1379,7 +1379,7 @@ def format_num(nom_val_main, error_main, common_exp,
             # the handling of NaN/inf in the standard deviation:
             if (isinfinite(nom_val_main)
                 # Only some formats have a nicer representation:
-                and fmt_parts['type'] in ('', 'g', 'G')):
+                    and fmt_parts['type'] in ('', 'g', 'G')):
                 # The error can be formatted independently:
                 fmt_suffix_e = (fmt_parts['prec'] or '') + fmt_parts['type']
             else:
@@ -1998,8 +1998,8 @@ class AffineScalarFunc(object):
             # The type can be omitted. Options must not go here:
             (?P<type>[eEfFgG%]??)  # n not supported
             (?P<options>[LSP]*)$''',
-            format_spec,
-            re.VERBOSE)
+                         format_spec,
+                         re.VERBOSE)
 
         # Does the format specification look correct?
         if not match:
@@ -2087,14 +2087,14 @@ class AffineScalarFunc(object):
             # situations where the nominal value and the standard
             # error digits are truncated at the same place):
             (not fmt_prec and len(real_values) == 2)
-             or match.group('uncert_prec'))  # Explicit control
+            or match.group('uncert_prec'))  # Explicit control
             # The number of significant digits of the uncertainty must
             # be meaningful, otherwise the position of the significant
             # digits of the uncertainty does not have a clear
             # meaning. This gives us the *effective* uncertainty
             # control mode:
             and std_dev
-            and not isinfinite(std_dev)):
+                and not isinfinite(std_dev)):
 
             # The number of significant digits on the uncertainty is
             # controlled.
@@ -2524,7 +2524,7 @@ def get_ops_with_reflection():
         'mul': ("y", "x"),
         'sub': ("1.", "-1."),
         'truediv': ("1/y", "-x/y**2")
-        }
+    }
 
     # Conversion to Python functions:
     ops_with_reflection = {}
@@ -2566,10 +2566,10 @@ def get_ops_with_reflection():
     # itself can be calculated:
     for op in ['pow']:
         ops_with_reflection[op] = list(map(nan_if_exception,
-                                      ops_with_reflection[op]))
+                                           ops_with_reflection[op]))
 
         ops_with_reflection['r' + op] = list(map(nan_if_exception,
-                                          ops_with_reflection['r' + op]))
+                                                 ops_with_reflection['r' + op]))
 
     return ops_with_reflection
 
@@ -2618,7 +2618,7 @@ else:
     custom_ops = {
         'pow': no_complex_result(float.__pow__),
         'rpow': no_complex_result(float.__rpow__)
-        }
+    }
 
 
 def add_operators_to_AffineScalarFunc():
@@ -2649,10 +2649,10 @@ def add_operators_to_AffineScalarFunc():
         'neg': lambda x: -1.,
         'pos': lambda x: 1.,
         'trunc': lambda x: 0.
-        }
+    }
 
     for (op, derivative) in (
-        iter(list(simple_numerical_operators_derivatives.items()))):
+            iter(list(simple_numerical_operators_derivatives.items()))):
 
         attribute_name = "__%s__" % op
 
@@ -2915,9 +2915,9 @@ def covariance_matrix(nums_with_uncert):
             derivatives2 = expr2.derivatives  # Optimization
             coefs_expr1.append(sum(
                 ((derivatives1[var] * derivatives2[var] * var._std_dev**2)
-                # var is a variable common to both numbers with
-                # uncertainties:
-                for var in vars1.intersection(derivatives2)),
+                 # var is a variable common to both numbers with
+                 # uncertainties:
+                 for var in vars1.intersection(derivatives2)),
                 # The result is always a float (sum() with no terms
                 # returns an integer):
                 0.))

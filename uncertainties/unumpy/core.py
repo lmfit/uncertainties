@@ -37,7 +37,7 @@ __all__ = [
 
     # Classes:
     'matrix'
-    ]
+]
 
 ###############################################################################
 # Utilities:
@@ -241,7 +241,7 @@ def wrap_array_func(func):
             # Update of the list of variables and associated
             # derivatives, for each element:
             for (derivative_dict, derivative_value) in (
-                list(zip(derivatives.flat, numerical_deriv.flat))):
+                    list(zip(derivatives.flat, numerical_deriv.flat))):
 
                 if derivative_value:
                     derivative_dict[var] = derivative_value
@@ -430,12 +430,12 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         # progressively adding the derivatives with respect to
         # successive variables.
         for (var, deriv_wrt_var) in zip(variables,
-                                                   func_then_derivs):
+                                        func_then_derivs):
 
             # Update of the list of variables and associated
             # derivatives, for each element:
             for (derivative_dict, derivative_value) in zip(
-                derivatives.flat, deriv_wrt_var.flat):
+                    derivatives.flat, deriv_wrt_var.flat):
                 if derivative_value:
                     derivative_dict[var] = derivative_value
 
@@ -698,7 +698,7 @@ def define_vectorized_funcs():
         for function_name in umath_core.many_scalars_to_scalar_funcs]
 
     for (function_name, unumpy_name) in zip(
-        umath_core.many_scalars_to_scalar_funcs, new_func_names):
+            umath_core.many_scalars_to_scalar_funcs, new_func_names):
 
         # ! The newly defined functions (uncertainties.unumpy.cos, etc.)
         # do not behave exactly like their NumPy equivalent (numpy.cos,
@@ -735,7 +735,7 @@ Vectorized version of umath.%s.
 
 Original documentation:
 %s""" % (function_name, func.__doc__),
-                            **otypes))
+                **otypes))
 
         __all__.append(unumpy_name)
 

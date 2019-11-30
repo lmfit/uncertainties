@@ -60,7 +60,7 @@ else:
 
         assert support.reformat(expected) == new, (
             "Refactoring failed: '{}' => '{}' instead of '{}'".format(
-            source, new.strip(), expected))
+                source, new.strip(), expected))
 
         # print 'Checked:', source, '=>', expected
 

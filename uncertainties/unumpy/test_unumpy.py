@@ -141,10 +141,10 @@ def test_inverse():
     # inverse should be the inverses of the diagonal elements of
     # m (because we started with a triangular matrix):
     assert numbers_close(1 / m_nominal_values[0, 0],
-                          m_inv_uncert[0, 0].nominal_value), "Wrong value"
+                         m_inv_uncert[0, 0].nominal_value), "Wrong value"
 
     assert numbers_close(1 / m_nominal_values[1, 1],
-                          m_inv_uncert[1, 1].nominal_value), "Wrong value"
+                         m_inv_uncert[1, 1].nominal_value), "Wrong value"
 
     ####################
 
@@ -160,9 +160,9 @@ def test_inverse():
     # The initial matrix should be recovered, including its
     # derivatives, which define covariances:
     assert numbers_close(m_double_inverse[0, 0].nominal_value,
-                          m[0, 0].nominal_value)
+                         m[0, 0].nominal_value)
     assert numbers_close(m_double_inverse[0, 0].std_dev,
-                          m[0, 0].std_dev)
+                         m[0, 0].std_dev)
 
     assert arrays_close(m_double_inverse, m)
 

@@ -177,8 +177,8 @@ htmlhelp_basename = 'uncertaintiesdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index_TOC', 'uncertaintiesPythonPackage.tex', u'uncertainties Python package Documentation',
-   u'Eric O. LEBIGOT (EOL)', 'manual'),
+    ('index_TOC', 'uncertaintiesPythonPackage.tex', u'uncertainties Python package Documentation',
+     u'Eric O. LEBIGOT (EOL)', 'manual'),
 ]
 
 # latex_engine = "xelatex"  # Not recognized by readthedocs.io as of 2018-04-08

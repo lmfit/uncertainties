@@ -71,9 +71,9 @@ def test_list_pseudo_inverse():
     # the same result on square matrices:
     assert arrays_close(mat.I, unumpy.ulinalg.pinv(mat), 1e-4)
     assert arrays_close(unumpy.ulinalg.inv(mat),
-                          # Support for the optional pinv argument is
-                          # tested:
-                          unumpy.ulinalg.pinv(mat, 1e-15), 1e-4)
+                        # Support for the optional pinv argument is
+                        # tested:
+                        unumpy.ulinalg.pinv(mat, 1e-15), 1e-4)
 
     # Non-square matrices:
     x = ufloat(1, 0.1)
