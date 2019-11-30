@@ -9,6 +9,7 @@ Transforms .std_dev() calls into .std_dev attribute access.
 from lib2to3.fixer_base import BaseFix
 from lib2to3.fixer_util import Name, Assign
 
+
 class FixStdDev(BaseFix):
 
     PATTERN = """

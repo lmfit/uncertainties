@@ -69,6 +69,7 @@ to_std_devs = numpy.vectorize(
     doc=("Return the standard deviation of the numbers with uncertainties"
          " contained in a NumPy array, or zero for other objects."))
 
+
 def unumpy_to_numpy_matrix(arr):
     """
     If arr in a unumpy.matrix, it is converted to a numpy.matrix.
@@ -79,6 +80,7 @@ def unumpy_to_numpy_matrix(arr):
         return arr.view(numpy.matrix)
     else:
         return arr
+
 
 def nominal_values(arr):
     """
@@ -95,6 +97,7 @@ def nominal_values(arr):
     """
 
     return unumpy_to_numpy_matrix(to_nominal_values(arr))
+
 
 def std_devs(arr):
     """
@@ -114,6 +117,7 @@ def std_devs(arr):
 
 ###############################################################################
 
+
 def derivative(u, var):
     """
     Return the derivative of u along var, if u is an
@@ -127,6 +131,7 @@ def derivative(u, var):
             return 0.
     else:
         return 0.
+
 
 def wrap_array_func(func):
     # !!! This function is not used in the code, except in the tests.
@@ -268,6 +273,7 @@ def wrap_array_func(func):
 ###############################################################################
 # Arrays
 
+
 def uarray(nominal_values, std_devs=None):
     """
     Return a NumPy array of numbers with uncertainties
@@ -296,6 +302,7 @@ def uarray(nominal_values, std_devs=None):
 
 ###############################################################################
 
+
 def array_derivative(array_like, var):
     """
     Return the derivative of the given array with respect to the
@@ -315,6 +322,7 @@ def array_derivative(array_like, var):
                            # set the output type of the
                            # array:
                            otypes=[float])(array_like)
+
 
 def func_with_deriv_to_uncert_func(func_with_derivatives):
     # This function is used for instance for the calculation of the
@@ -448,6 +456,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
 
 ########## Matrix inverse
 
+
 def inv_with_derivatives(arr, input_type, derivatives):
     """
     Defines the matrix inverse and its derivatives.
@@ -487,6 +496,7 @@ inv.__doc__ = """\
     """ % numpy.linalg.inv.__doc__
 
 ########## Matrix pseudo-inverse
+
 
 def pinv_with_derivatives(arr, input_type, derivatives, rcond):
     """
@@ -553,6 +563,7 @@ except AttributeError:  # No inspect.signature() before Python 3.3
 
 pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
+
 def pinv(array_like, rcond=pinv_default):
     return pinv_with_uncert(array_like, rcond)
 
@@ -570,6 +581,7 @@ pinv = uncert_core.set_doc("""
     """ % numpy.linalg.pinv.__doc__)(pinv)
 
 ########## Matrix class
+
 
 class CallableStdDevs(numpy.matrix):
     '''
@@ -592,6 +604,7 @@ class CallableStdDevs(numpy.matrix):
         deprecation('the std_devs attribute should not be called'
                     ' anymore: use .std_devs instead of .std_devs().')
         return self
+
 
 class matrix(numpy.matrix):
     # The name of this class is the same as NumPy's, which is why it
@@ -639,6 +652,7 @@ class matrix(numpy.matrix):
     def std_devs(self):
         return CallableStdDevs(std_devs(self))
 
+
 def umatrix(nominal_values, std_devs=None):
     """
     Constructs a matrix that contains numbers with uncertainties.
@@ -657,6 +671,7 @@ def umatrix(nominal_values, std_devs=None):
     return uarray(nominal_values, std_devs).view(matrix)
 
 ###############################################################################
+
 
 def define_vectorized_funcs():
     """

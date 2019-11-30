@@ -20,6 +20,7 @@ except ImportError:
 from uncertainties import unumpy, ufloat
 from uncertainties.unumpy.test_unumpy import arrays_close
 
+
 def test_list_inverse():
     "Test of the inversion of a square matrix"
 

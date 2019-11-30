@@ -75,6 +75,7 @@ __all__ = [
 
 ###############################################################################
 
+
 def set_doc(doc_string):
     """
     Decorator function that sets the docstring to the given text.
@@ -96,6 +97,7 @@ CONSTANT_TYPES = FLOAT_LIKE_TYPES+(complex,)
 ###############################################################################
 
 # Utility for issuing deprecation warnings
+
 
 def deprecation(message):
     '''
@@ -262,8 +264,10 @@ else:
 # Mathematical operations with local approximations (affine scalar
 # functions)
 
+
 class NotUpcast(Exception):
     'Raised when an object cannot be converted to a number with uncertainty'
+
 
 def to_affine_scalar(x):
     """
@@ -298,6 +302,8 @@ STEP_SIZE = sqrt(sys.float_info.epsilon)
 # arg_ref). However, this would either duplicate the code for the
 # numerical differentiation, or require a call, which is probably more
 # expensive in time than the tests done here.
+
+
 def partial_derivative(f, arg_ref):
     """
     Return a function that numerically calculates the partial
@@ -355,6 +361,7 @@ def partial_derivative(f, arg_ref):
 
     return partial_derivative_of_f
 
+
 class NumericalDerivatives(object):
     """
     Convenient access to the partial derivatives of a function,
@@ -374,6 +381,7 @@ class NumericalDerivatives(object):
         Return the n-th numerical derivative of the function.
         """
         return partial_derivative(self._function, n)
+
 
 class IndexableIter(object):
     '''
@@ -430,6 +438,7 @@ class IndexableIter(object):
         return '<%s: [%s...]>' % (
             self.__class__.__name__,
             ', '.join(map(str, self.returned_elements)))
+
 
 def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     """
@@ -818,6 +827,7 @@ def force_aff_func_args(func):
 # as explained in the main documentation, it is possible to give a
 # useful meaning to the comparison operators, in these cases.
 
+
 def eq_on_aff_funcs(self, y_with_uncert):
     """
     __eq__ operator, assuming that both self and y_with_uncert are
@@ -828,6 +838,7 @@ def eq_on_aff_funcs(self, y_with_uncert):
     # equal numerically:
     return not(difference._nominal_value or difference.std_dev)
 
+
 def ne_on_aff_funcs(self, y_with_uncert):
     """
     __ne__ operator, assuming that both self and y_with_uncert are
@@ -836,12 +847,14 @@ def ne_on_aff_funcs(self, y_with_uncert):
 
     return not eq_on_aff_funcs(self, y_with_uncert)
 
+
 def gt_on_aff_funcs(self, y_with_uncert):
     """
     __gt__ operator, assuming that both self and y_with_uncert are
     AffineScalarFunc objects.
     """
     return self._nominal_value > y_with_uncert._nominal_value
+
 
 def ge_on_aff_funcs(self, y_with_uncert):
     """
@@ -852,12 +865,14 @@ def ge_on_aff_funcs(self, y_with_uncert):
     return (gt_on_aff_funcs(self, y_with_uncert)
             or eq_on_aff_funcs(self, y_with_uncert))
 
+
 def lt_on_aff_funcs(self, y_with_uncert):
     """
     __lt__ operator, assuming that both self and y_with_uncert are
     AffineScalarFunc objects.
     """
     return self._nominal_value < y_with_uncert._nominal_value
+
 
 def le_on_aff_funcs(self, y_with_uncert):
     """
@@ -869,6 +884,7 @@ def le_on_aff_funcs(self, y_with_uncert):
             or eq_on_aff_funcs(self, y_with_uncert))
 
 ########################################
+
 
 def first_digit(value):
     '''
@@ -883,6 +899,7 @@ def first_digit(value):
         return int(math.floor(math.log10(abs(value))))
     except ValueError:  # Case of value == 0
         return 0
+
 
 def PDG_precision(std_dev):
     '''
@@ -930,6 +947,7 @@ def PDG_precision(std_dev):
 # used instead of the % formatting operator, if available:
 robust_format = format
 
+
 class CallableStdDev(float):
     '''
     Class for standard deviation results, which used to be
@@ -948,6 +966,7 @@ class CallableStdDev(float):
 # Exponent letter: the keys are the possible main_fmt_type values of
 # format_num():
 EXP_LETTERS = {'f': 'e', 'F': 'E'}
+
 
 def robust_align(orig_str, fill_char, align_option, width):
     '''
@@ -990,6 +1009,7 @@ TO_SUPERSCRIPT = {
 FROM_SUPERSCRIPT = {
     ord(sup): normal for (normal, sup) in list(TO_SUPERSCRIPT.items())}
 
+
 def to_superscript(value):
     '''
     Return a (Unicode) string with the given value as superscript characters.
@@ -1000,6 +1020,7 @@ def to_superscript(value):
     '''
 
     return (u'%d' % value).translate(TO_SUPERSCRIPT)
+
 
 def from_superscript(number_str):
     '''
@@ -1028,6 +1049,7 @@ GROUP_SYMBOLS = {
     'latex': (r'\left(', r'\right)'),
     'default': ('(', ')')  # Basic text mode
     }
+
 
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_pres_type, options):
@@ -1441,6 +1463,7 @@ def format_num(nom_val_main, error_main, common_exp,
 
     return value_str
 
+
 def signif_dgt_to_limit(value, num_signif_d):
     '''
     Return the precision limit necessary to display value with
@@ -1469,6 +1492,7 @@ def signif_dgt_to_limit(value, num_signif_d):
         limit_no_rounding += 1
 
     return limit_no_rounding
+
 
 class LinearCombination(object):
     """
@@ -1568,6 +1592,7 @@ class LinearCombination(object):
 
     def __setstate__(self, state):
         (self.linear_combo,) = state
+
 
 class AffineScalarFunc(object):
     """
@@ -2443,6 +2468,7 @@ UFloat = AffineScalarFunc
 # Exception catching is used so as to not slow down regular
 # operation too much:
 
+
 def nan_if_exception(f):
     '''
     Wrapper around f(x, y) that let f return NaN when f raises one of
@@ -2456,6 +2482,7 @@ def nan_if_exception(f):
             return float('nan')
 
     return wrapped_f
+
 
 def get_ops_with_reflection():
 
@@ -2591,6 +2618,7 @@ else:
         'rpow': no_complex_result(float.__rpow__)
         }
 
+
 def add_operators_to_AffineScalarFunc():
     """
     Adds many operators (__add__, etc.) to the AffineScalarFunc class.
@@ -2679,9 +2707,11 @@ def add_operators_to_AffineScalarFunc():
 
 add_operators_to_AffineScalarFunc()  # Actual addition of class attributes
 
+
 class NegativeStdDev(Exception):
     '''Raise for a negative standard deviation'''
     pass
+
 
 class Variable(AffineScalarFunc):
     """
@@ -2836,6 +2866,7 @@ def nominal_value(x):
     else:
         return x
 
+
 def std_dev(x):
     """
     Return the standard deviation of x if it is a quantity with
@@ -2850,6 +2881,7 @@ def std_dev(x):
         return x.std_dev
     else:
         return 0.
+
 
 def covariance_matrix(nums_with_uncert):
     """
@@ -2953,12 +2985,14 @@ NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(r'''
     (?:[eE]|\s*×\s*10) (?P<exp_value>.*)
     $''', re.VERBOSE).match
 
+
 class NotParenUncert(ValueError):
     '''
     Raised when a string representing an exact number or a number with
     an uncertainty indicated between parentheses was expected but not
     found.
     '''
+
 
 def parse_error_in_parentheses(representation):
     """
@@ -3020,6 +3054,7 @@ def parse_error_in_parentheses(representation):
 # Regexp for catching the two variable parts of -1.2×10⁻¹²:
 PRETTY_PRINT_MATCH = re.compile(r'(.*?)\s*×\s*10(.*)').match
 
+
 def to_float(value_str):
     '''
     Converts a string representing a float to a float.
@@ -3058,6 +3093,8 @@ cannot_parse_ufloat_msg_pat = (
 # The following function is not exposed because it can in effect be
 # obtained by doing x = ufloat_fromstr(representation) and reading
 # x.nominal_value and x.std_dev:
+
+
 def str_to_number_with_uncert(representation):
     """
     Given a string that represents a number with uncertainty, returns the
@@ -3116,6 +3153,7 @@ def str_to_number_with_uncert(representation):
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
 
     return parsed_value
+
 
 def ufloat_fromstr(representation, tag=None):
     """
@@ -3180,6 +3218,7 @@ def ufloat_fromstr(representation, tag=None):
 
     return ufloat(nominal_value, std_dev, tag)
 
+
 def ufloat_obsolete(representation, tag=None):
     '''
     Legacy version of ufloat(). Will eventually be removed.
@@ -3201,6 +3240,8 @@ def ufloat_obsolete(representation, tag=None):
 # new code to use keyword arguments as in ufloat(nominal_value=3,
 # std_dev=0.14), without breaking when the obsolete form is not
 # supported anymore.
+
+
 def ufloat(nominal_value, std_dev=None, tag=None):
     """
     Return a new random variable (Variable object).

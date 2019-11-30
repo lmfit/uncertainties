@@ -82,6 +82,8 @@ non_std_wrapped_funcs = []
 # functions from the math module:
 # This is a copy&paste job from the functools module, changing
 # the default arugment for assigned
+
+
 def wraps(wrapper,
           wrapped,
           assigned=('__doc__',),
@@ -149,17 +151,20 @@ def log_der0(*args):
     #except TypeError:
     #    return 1/args[0]/math.log(args[1])  # 2-argument form
 
+
 def _deriv_copysign(x,y):
     if x >= 0:
         return math.copysign(1, y)
     else:
         return -math.copysign(1, y)
 
+
 def _deriv_fabs(x):
     if x >= 0:
         return 1
     else:
         return -1
+
 
 def _deriv_pow_0(x, y):
     if y == 0:
@@ -168,6 +173,7 @@ def _deriv_pow_0(x, y):
         return y*math.pow(x, y-1)
     else:
         return float('nan')
+
 
 def _deriv_pow_1(x, y):
     if x == 0 and y > 0:
@@ -216,6 +222,7 @@ fixed_derivatives = {
 # version which is uncertainty aware:
 
 this_module = sys.modules[__name__]
+
 
 def wrap_locally_cst_func(func):
     '''
@@ -295,6 +302,8 @@ original_func = math.fsum  # For optimization purposes
 
 # The function below exists so that temporary variables do not
 # pollute the module namespace:
+
+
 def wrapped_fsum():
     """
     Return an uncertainty-aware version of math.fsum, which must
@@ -325,6 +334,7 @@ non_std_wrapped_funcs.append('fsum')
 # ! The arguments have the same names as in the math module
 # documentation, so that the docstrings are consistent with them.
 
+
 @uncert_core.set_doc(math.modf.__doc__)
 def modf(x):
     """
@@ -350,6 +360,7 @@ def modf(x):
         return (frac_part, int_part)
 many_scalars_to_scalar_funcs.append('modf')
 
+
 @uncert_core.set_doc(math.ldexp.__doc__)
 def ldexp(x, i):
     # Another approach would be to add an additional argument to
@@ -373,6 +384,7 @@ def ldexp(x, i):
         # instance]):
         return math.ldexp(x, i)
 many_scalars_to_scalar_funcs.append('ldexp')
+
 
 @uncert_core.set_doc(math.frexp.__doc__)
 def frexp(x):

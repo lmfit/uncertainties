@@ -81,6 +81,7 @@ def test_numpy():
     assert arr.mean(axis=1).shape == (10, 5)
     arr.mean()  # Global mean
 
+
 def test_matrix():
     "Matrices of numbers with uncertainties"
     # Matrix inversion:
@@ -101,6 +102,7 @@ def test_matrix():
     3*m
     m*3
 
+
 def derivatives_close(x, y):
     """
     Returns True iff the AffineScalarFunc objects x and y have
@@ -114,6 +116,7 @@ def derivatives_close(x, y):
 
     return all(numbers_close(x.derivatives[var], y.derivatives[var])
                for var in x.derivatives)
+
 
 def test_inverse():
     "Tests of the matrix inverse"
@@ -182,6 +185,7 @@ def test_inverse():
     # Correlations between m and m_inverse should create a perfect
     # inversion:
     assert arrays_close(m * m_inverse,  numpy.eye(m.shape[0]))
+
 
 def test_wrap_array_func():
     '''
@@ -253,6 +257,7 @@ def test_pseudo_inverse():
     m_pinv_package = core.pinv(m, rcond)
     assert arrays_close(m_pinv_num, m_pinv_package)
 
+
 def test_broadcast_funcs():
     """
     Test of mathematical functions that work with NumPy arrays of
@@ -274,6 +279,7 @@ def test_broadcast_funcs():
     # Test of the __all__ variable:
     assert 'acos' not in unumpy.__all__
 
+
 def test_array_and_matrix_creation():
     "Test of custom array creation"
 
@@ -286,6 +292,7 @@ def test_array_and_matrix_creation():
     mat = unumpy.umatrix([1, 2], [0.1, 0.2])
     assert mat[0,1].nominal_value == 2
     assert mat[0,1].std_dev == 0.2
+
 
 def test_component_extraction():
     "Extracting the nominal values and standard deviations from an array"
@@ -313,6 +320,7 @@ def test_array_comparisons():
     # For matrices, 1D arrays are converted to 2D arrays:
     mat = unumpy.umatrix([1, 2], [1, 4])
     assert numpy.all((mat == [mat[0,0], 4]) == [True, False])
+
 
 @pytest.mark.filterwarnings("ignore::UserWarning:uncertainties")
 def test_obsolete():

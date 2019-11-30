@@ -32,6 +32,7 @@ print("Testing with Python", sys.version)
 
 # Utilities for unit testing
 
+
 def numbers_close(x, y, tolerance=1e-6):
     """
     Returns True if the given floats are close enough.
@@ -59,6 +60,7 @@ def numbers_close(x, y, tolerance=1e-6):
     else:  # Either x or y is zero
         return abs(x or y) < tolerance
 
+
 def ufloats_close(x, y, tolerance=1e-6):
     '''
     Tests if two numbers with uncertainties are close, as random
@@ -72,6 +74,7 @@ def ufloats_close(x, y, tolerance=1e-6):
     diff = x-y
     return (numbers_close(diff.nominal_value, 0, tolerance)
             and numbers_close(diff.std_dev, 0, tolerance))
+
 
 class DerivativesDiffer(Exception):
     pass
@@ -216,6 +219,7 @@ def compare_derivatives(func, numerical_derivatives,
 
 ###############################################################################
 
+
 def test_value_construction():
     '''
     Tests the various means of constructing a constant number with
@@ -296,6 +300,7 @@ def test_value_construction():
         pass
     else:
         raise Exception("An exception should be raised")
+
 
 def test_ufloat_fromstr():
     "Input of numbers with uncertainties as a string"
@@ -395,6 +400,8 @@ def test_ufloat_fromstr():
 ###############################################################################
 
 # Test of correctness of the fixed (usually analytical) derivatives:
+
+
 def test_fixed_derivatives_basic_funcs():
     """
     Pre-calculated derivatives for operations on AffineScalarFunc.
@@ -428,6 +435,7 @@ def test_fixed_derivatives_basic_funcs():
 
 # Additional, more complex checks, for use with the pytest unit testing
 # framework.
+
 
 def test_copy():
     "Standard copy module integration"
@@ -481,16 +489,23 @@ def test_copy():
 ## they can be unpickled):
 
 # Subclass without slots:
+
+
 class NewVariable_dict(uncert_core.Variable):
     pass
 
 # Subclass with slots defined by a tuple:
+
+
 class NewVariable_slots_tuple(uncert_core.Variable):
     __slots__ = ('new_attr',)
 
 # Subclass with slots defined by a string:
+
+
 class NewVariable_slots_str(uncert_core.Variable):
     __slots__ = 'new_attr'
+
 
 def test_pickling():
     "Standard pickle module integration."
@@ -561,6 +576,7 @@ def test_pickling():
     x = uncert_core.LinearCombination({})
     assert pickle.loads(pickle.dumps(x)).linear_combo == {}
 
+
 def test_int_div():
     "Integer division"
     # We perform all operations on floats, because derivatives can
@@ -571,6 +587,7 @@ def test_int_div():
     # in x violates the assumption.  Therefore, the following is
     # correct:
     assert x.std_dev == 0.0
+
 
 def test_comparison_ops():
     "Test of comparison operators"
@@ -726,6 +743,7 @@ def test_logic():
     assert bool(z) == True
     assert bool(t) == True  # Only infinitesimal neighborhood are used
 
+
 @pytest.mark.filterwarnings("ignore:::uncertainties")
 def test_obsolete():
     'Tests some obsolete creation of number with uncertainties'
@@ -735,6 +753,7 @@ def test_obsolete():
 
     x_std_dev = x.std_dev
     assert x_std_dev() == 0.2  # Obsolete call
+
 
 def test_basic_access_to_data():
     "Access to data from Variable and AffineScalarFunc objects."
@@ -786,6 +805,7 @@ def test_basic_access_to_data():
     except ValueError:
         pass  # Normal behavior
 
+
 def test_correlations():
     "Correlations between variables"
 
@@ -813,6 +833,7 @@ def test_no_coercion():
         pass
     else:
         raise Exception("Conversion to float() should fail with TypeError")
+
 
 def test_wrapped_func_no_args_no_kwargs():
     '''
@@ -866,6 +887,7 @@ def test_wrapped_func_no_args_no_kwargs():
     # Call with keyword arguments:
     assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
+
 def test_wrapped_func_args_no_kwargs():
     '''
     Wrap a function that takes only positional-or-keyword and
@@ -914,6 +936,7 @@ def test_wrapped_func_args_no_kwargs():
     # No derivative for y:
     f_wrapped = uncert_core.wrap(f, [lambda x, y, *args: 2])
     assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
+
 
 def test_wrapped_func_no_args_kwargs():
     '''
@@ -1006,6 +1029,7 @@ def test_wrapped_func_no_args_kwargs():
     # Call with keyword arguments:
     assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                           f_wrapped(y=y, x=x, **kwargs))
+
 
 def test_wrapped_func_args_kwargs():
     '''
@@ -1143,6 +1167,7 @@ def test_wrapped_func():
     assert numbers_close(f_wrapped(x, 'string argument', x, x, x).std_dev,
                           (1+2+3+4)*x.std_dev)
 
+
 def test_wrap_with_kwargs():
     '''
     Tests wrap() on functions with keyword arguments.
@@ -1249,6 +1274,7 @@ def test_wrap_with_kwargs():
 
 ###############################################################################
 
+
 def test_access_to_std_dev():
     "Uniform access to the standard deviation"
 
@@ -1264,6 +1290,7 @@ def test_access_to_std_dev():
     assert uncert_core.std_dev(None) == 0
 
 ###############################################################################
+
 
 def test_covariances():
     "Covariance matrix"
@@ -1287,6 +1314,7 @@ def test_power_all_cases():
     '''
 
     power_all_cases(pow)
+
 
 def power_all_cases(op):
     '''
@@ -1413,6 +1441,7 @@ def test_power_special_cases():
     else:
         raise Exception('A proper exception should have been raised')
 
+
 def power_special_cases(op):
     '''
     Checks special cases of the uncertainty power operator op (where
@@ -1469,6 +1498,7 @@ def test_power_wrt_ref():
     '''
     power_wrt_ref(pow, pow)
 
+
 def power_wrt_ref(op, ref_op):
     '''
     Checks special cases of the uncertainty power operator op (where
@@ -1510,6 +1540,7 @@ def test_PDG_precision():
     for (std_dev, result) in list(tests.items()):
         assert uncert_core.PDG_precision(std_dev) == result
 
+
 def test_repr():
     '''Test the representation of numbers with uncertainty.'''
 
@@ -1524,6 +1555,7 @@ def test_repr():
     # Tagging:
     x = ufloat(3, 1, "length")
     assert repr(x) == '< length = 3.0+/-1.0 >'
+
 
 def test_format():
     '''Test the formatting of numbers with uncertainty.'''
@@ -2102,6 +2134,7 @@ def test_format():
                         ' (obtained through format specification %r)'
                         ' are not close enough'
                         % (value, value_back, representation, format_spec))
+
 
 def test_unicode_format():
     '''Test of the unicode formatting of numbers with uncertainties'''

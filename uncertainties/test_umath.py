@@ -24,6 +24,7 @@ from . import test_uncertainties
 ###############################################################################
 # Unit tests
 
+
 def test_fixed_derivatives_math_funcs():
     """
     Comparison between function derivatives and numerical derivatives.
@@ -74,6 +75,7 @@ def test_fixed_derivatives_math_funcs():
         uncert_core.NumericalDerivatives(
             lambda x: exponent_frexp(x)))
 
+
 def test_compound_expression():
     """
     Test equality between different formulas.
@@ -99,6 +101,7 @@ def test_numerical_example():
 
     # Regular calculations should still work:
     assert("%.11f" % umath_core.sin(3) == "0.14112000806")
+
 
 def test_monte_carlo_comparison():
     """
@@ -271,6 +274,7 @@ def test_math_module():
     else:
         raise Exception('%s exception expected' % exception_class.__name__)
 
+
 def test_hypot():
     '''
     Special cases where derivatives cannot be calculated:
@@ -283,6 +287,7 @@ def test_hypot():
     assert test_uncertainties.isnan(result.derivatives[x])
     assert test_uncertainties.isnan(result.derivatives[y])
 
+
 def test_power_all_cases():
     '''
     Test special cases of umath_core.pow().
@@ -293,6 +298,8 @@ def test_power_all_cases():
 # test_uncertainties.py:test_power_special_cases(), but with small
 # differences: the built-in pow() and math.pow() are slightly
 # different:
+
+
 def test_power_special_cases():
     '''
     Checks special cases of umath_core.pow().
@@ -337,6 +344,7 @@ def test_power_special_cases():
         pass
     else:
         raise Exception('%s exception expected' % exception_class.__name__)
+
 
 def test_power_wrt_ref():
     '''
