@@ -47,8 +47,8 @@ def test_list_inverse():
     assert not isinstance(mat_list_inv, unumpy.matrix)
 
     # Individual element check:
-    assert isinstance(mat_list_inv[1,1], float)
-    assert mat_list_inv[1,1] == -1
+    assert isinstance(mat_list_inv[1, 1], float)
+    assert mat_list_inv[1, 1] == -1
 
     x = ufloat(1, 0.1)
     y = ufloat(2, 0.1)
@@ -79,7 +79,7 @@ def test_list_pseudo_inverse():
     x = ufloat(1, 0.1)
     y = ufloat(2, 0.1)
     mat1 = unumpy.matrix([[x, y]])  # "Long" matrix
-    mat2 = unumpy.matrix([[x, y], [1, 3+x], [y, 2*x]])  # "Tall" matrix
+    mat2 = unumpy.matrix([[x, y], [1, 3 + x], [y, 2 * x]])  # "Tall" matrix
 
     # Internal consistency:
     assert arrays_close(mat1.I, unumpy.ulinalg.pinv(mat1, 1e-10))

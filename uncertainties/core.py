@@ -92,7 +92,7 @@ def set_doc(doc_string):
 # CONSTANT_TYPES.  The most common types can be put in front, as this
 # may slightly improve the execution speed.
 FLOAT_LIKE_TYPES = (numbers.Number,)
-CONSTANT_TYPES = FLOAT_LIKE_TYPES+(complex,)
+CONSTANT_TYPES = FLOAT_LIKE_TYPES + (complex,)
 
 ###############################################################################
 
@@ -157,7 +157,7 @@ else:
         covariance_mat -- full covariance matrix of the returned numbers with
         uncertainties. For example, the first element of this matrix is the
         variance of the first number with uncertainty. This matrix must be a
-        NumPy array-like (list of lists, NumPy array, etc.). 
+        NumPy array-like (list of lists, NumPy array, etc.).
 
         tags -- if 'tags' is not None, it must list the tag of each new
         independent variable.
@@ -165,7 +165,7 @@ else:
 
         # !!! It would in principle be possible to handle 0 variance
         # variables by first selecting the sub-matrix that does not contain
-        # such variables (with the help of numpy.ix_()), and creating 
+        # such variables (with the help of numpy.ix_()), and creating
         # them separately.
 
         std_devs = numpy.sqrt(numpy.diag(covariance_mat))
@@ -177,13 +177,13 @@ else:
         # by dividing by standard deviations. We thus use specific
         # normalization values, with no null value:
         norm_vector = std_devs.copy()
-        norm_vector[norm_vector==0] = 1
+        norm_vector[norm_vector == 0] = 1
 
         return correlated_values_norm(
             # !! The following zip() is a bit suboptimal: correlated_values()
             # separates back the nominal values and the standard deviations:
             list(zip(nom_values, std_devs)),
-            covariance_mat/norm_vector/norm_vector[:,numpy.newaxis],
+            covariance_mat / norm_vector / norm_vector[:, numpy.newaxis],
             tags)
 
     __all__.append('correlated_values')
@@ -246,7 +246,7 @@ else:
 
         # The coordinates of each new uncertainty as a function of the
         # new variables must include the variable scale (standard deviation):
-        transform *= std_devs[:, numpy.newaxis] 
+        transform *= std_devs[:, numpy.newaxis]
 
         # Representation of the initial correlated values:
         values_funcs = tuple(
@@ -338,7 +338,7 @@ def partial_derivative(f, arg_ref):
 
         # The step is relative to the parameter being varied, so that
         # shifting it does not suffer from finite precision limitations:
-        step = STEP_SIZE*abs(args_with_var[arg_ref])
+        step = STEP_SIZE * abs(args_with_var[arg_ref])
         if not step:
             # Arbitrary, but "small" with respect to 1:
             step = STEP_SIZE
@@ -350,14 +350,14 @@ def partial_derivative(f, arg_ref):
         else:
             shifted_f_plus = f(*args_with_var, **kwargs)
 
-        args_with_var[arg_ref] -= 2*step  # Optimization: only 1 list copy
+        args_with_var[arg_ref] -= 2 * step  # Optimization: only 1 list copy
 
         if change_kwargs:
             shifted_f_minus = f(*args, **args_with_var)
         else:
             shifted_f_minus = f(*args_with_var, **kwargs)
 
-        return (shifted_f_plus - shifted_f_minus)/2/step
+        return (shifted_f_plus - shifted_f_minus) / 2 / step
 
     return partial_derivative_of_f
 
@@ -423,7 +423,7 @@ class IndexableIter(object):
 
         except IndexError:  # Element not yet cached
 
-            for pos in range(len(returned_elements), index+1):
+            for pos in range(len(returned_elements), index + 1):
 
                 value = next(self.iterable)
 
@@ -926,10 +926,10 @@ def PDG_precision(std_dev):
     # range for very small and very big floats is generally different.
     if exponent >= 0:
         # The -2 here means "take two additional digits":
-        (exponent, factor) = (exponent-2, 1)
+        (exponent, factor) = (exponent - 2, 1)
     else:
-        (exponent, factor) = (exponent+1, 1000)
-    digits = int(std_dev/10.**exponent*factor)  # int rounds towards zero
+        (exponent, factor) = (exponent + 1, 1000)
+    digits = int(std_dev / 10.**exponent * factor)  # int rounds towards zero
 
     # Rules:
     if digits <= 354:
@@ -939,7 +939,7 @@ def PDG_precision(std_dev):
     else:
         # The parentheses matter, for very small or very large
         # std_dev:
-        return (2, 10.**exponent*(1000/factor))
+        return (2, 10.**exponent * (1000 / factor))
 
 # Definition of a basic (format specification only, no full-feature
 # format string) formatting function that works whatever the version
@@ -958,7 +958,7 @@ class CallableStdDev(float):
     # This class is a float. It must be set to the standard deviation
     # upon construction.
 
-    def __call__ (self):
+    def __call__(self):
         deprecation('the std_dev attribute should not be called'
                     ' anymore: use .std_dev instead of .std_dev().')
         return self
@@ -984,7 +984,7 @@ def robust_align(orig_str, fill_char, align_option, width):
     # print "ALIGNING", repr(orig_str), "WITH", fill_char+align_option,
     # print "WIDTH", width
 
-    return format(orig_str, fill_char+align_option+width)
+    return format(orig_str, fill_char + align_option + width)
 
 # Maps some Unicode code points ("-", "+", and digits) to their
 # superscript version:
@@ -1140,7 +1140,7 @@ def format_num(nom_val_main, error_main, common_exp,
     elif print_type == 'default':
         # Case of e or E. The same convention as Python 2.7
         # to 3.3 is used for the display of the exponent:
-        exp_str = EXP_LETTERS[main_pres_type]+'%+03d' % common_exp
+        exp_str = EXP_LETTERS[main_pres_type] + '%+03d' % common_exp
     else:
         exp_str = EXP_PRINT[print_type](common_exp)
 
@@ -1169,7 +1169,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # exponent is taken care of by common_exp, so it is
         # formatted without an exponent (otherwise, the exponent
         # would have to be handled for the LaTeX option):
-        fmt_suffix_n = (fmt_parts['prec'] or '')+fmt_parts['type']
+        fmt_suffix_n = (fmt_parts['prec'] or '') + fmt_parts['type']
     else:
         fmt_suffix_n = '.%d%s' % (prec, main_pres_type)
 
@@ -1222,7 +1222,7 @@ def format_num(nom_val_main, error_main, common_exp,
                     # The round is important because 566.99999999 can
                     # first be obtained when 567 is wanted (%d prints the
                     # integer part, not the rounded value):
-                    uncert_str = '%d' % round(uncert*10.**prec)
+                    uncert_str = '%d' % round(uncert * 10.**prec)
                 else:
                     # The decimal point indicates a truncated float
                     # (this is easy to do, in this case, since
@@ -1254,12 +1254,12 @@ def format_num(nom_val_main, error_main, common_exp,
         else:
             # Any 'zero' part should not do anything: it is not
             # included
-            fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
+            fmt_prefix_n = fmt_parts['sign'] + fmt_parts['comma']
 
         # print "FMT_PREFIX_N", fmt_prefix_n
         # print "FMT_SUFFIX_N", fmt_suffix_n
 
-        nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
+        nom_val_str = robust_format(nom_val_main, fmt_prefix_n + fmt_suffix_n)
 
         ##########
         # Overriding of nom_val_str for LaTeX,; possibly based on the
@@ -1275,7 +1275,7 @@ def format_num(nom_val_main, error_main, common_exp,
                 # case (robust_format(...))?
                 nom_val_str = r'%s\infty' % ('-' if nom_val_main < 0 else '')
 
-        value_str = nom_val_str+value_end
+        value_str = nom_val_str + value_end
 
         # Global width, if any:
 
@@ -1320,7 +1320,7 @@ def format_num(nom_val_main, error_main, common_exp,
 
                 # Remaining (minimum) width after including the
                 # exponent:
-                remaining_width = max(width-len(exp_str), 0)
+                remaining_width = max(width - len(exp_str), 0)
 
                 fmt_prefix_n = '%s%s%d%s' % (
                     fmt_parts['sign'], fmt_parts['zero'],
@@ -1333,11 +1333,11 @@ def format_num(nom_val_main, error_main, common_exp,
                     fmt_parts['comma'])
 
             else:
-                fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
+                fmt_prefix_n = fmt_parts['sign'] + fmt_parts['comma']
                 fmt_prefix_e = fmt_parts['comma']
 
         else:  # Global width
-            fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
+            fmt_prefix_n = fmt_parts['sign'] + fmt_parts['comma']
             fmt_prefix_e = fmt_parts['comma']
 
         # print "ANY_EXP_FACTORED", any_exp_factored
@@ -1356,7 +1356,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # print "FMT_PREFIX_N", fmt_prefix_n
         # print "FMT_SUFFIX_N", fmt_suffix_n
 
-        nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
+        nom_val_str = robust_format(nom_val_main, fmt_prefix_n + fmt_suffix_n)
 
         # print "NOM_VAL_STR", nom_val_str
 
@@ -1379,13 +1379,13 @@ def format_num(nom_val_main, error_main, common_exp,
                 # Only some formats have a nicer representation:
                 and fmt_parts['type'] in ('', 'g', 'G')):
                 # The error can be formatted independently:
-                fmt_suffix_e = (fmt_parts['prec'] or '')+fmt_parts['type']
+                fmt_suffix_e = (fmt_parts['prec'] or '') + fmt_parts['type']
             else:
                 fmt_suffix_e = '.%d%s' % (prec, main_pres_type)
         else:
             fmt_suffix_e = '.0%s' % main_pres_type
 
-        error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
+        error_str = robust_format(error_main, fmt_prefix_e + fmt_suffix_e)
 
         ##########
         # Overriding of nom_val_str and error_str for LaTeX:
@@ -1475,7 +1475,7 @@ def signif_dgt_to_limit(value, num_signif_d):
 
     fst_digit = first_digit(value)
 
-    limit_no_rounding = fst_digit-num_signif_d+1
+    limit_no_rounding = fst_digit - num_signif_d + 1
 
     # The number of significant digits of the uncertainty, when
     # rounded at this limit_no_rounding level, can be too large by 1
@@ -1575,12 +1575,12 @@ class LinearCombination(object):
 
             if main_expr.expanded():
                 for (var, factor) in list(main_expr.linear_combo.items()):
-                    derivatives[var] += main_factor*factor
+                    derivatives[var] += main_factor * factor
 
             else:  # Non-expanded form
                 for (factor, expr) in main_expr.linear_combo:
                     # The main_factor is applied to expr:
-                    self.linear_combo.append((main_factor*factor, expr))
+                    self.linear_combo.append((main_factor * factor, expr))
 
             # print "DERIV", derivatives
 
@@ -1821,7 +1821,7 @@ class AffineScalarFunc(object):
                 # convention of this module?
                 error_components[variable] = 0
             else:
-                error_components[variable] = abs(derivative*variable._std_dev)
+                error_components[variable] = abs(derivative * variable._std_dev)
 
         return error_components
 
@@ -2084,7 +2084,7 @@ class AffineScalarFunc(object):
             # uncertainty controlled (if useful, i.e. only in
             # situations where the nominal value and the standard
             # error digits are truncated at the same place):
-            (not fmt_prec and len(real_values)==2)
+            (not fmt_prec and len(real_values) == 2)
              or match.group('uncert_prec'))  # Explicit control
             # The number of significant digits of the uncertainty must
             # be meaningful, otherwise the position of the significant
@@ -2156,7 +2156,7 @@ class AffineScalarFunc(object):
                     # digit before the decimal point, which is not
                     # included in the definition of the precision with
                     # the e/E format type):
-                    num_signif_digits = prec+1
+                    num_signif_digits = prec + 1
 
                 else:  # Presentation type in None, g, G
 
@@ -2244,7 +2244,7 @@ class AffineScalarFunc(object):
 
                 # The number of significant digits of the reference value
                 # rounded at digits_limit is exponent-digits_limit+1:
-                if -4 <= common_exp < common_exp-digits_limit+1:
+                if -4 <= common_exp < common_exp - digits_limit + 1:
                     use_exp = False
                 else:
                     use_exp = True
@@ -2265,8 +2265,8 @@ class AffineScalarFunc(object):
             # Not 10.**(-common_exp), for limit values of common_exp:
             factor = 10.**common_exp
 
-            nom_val_mantissa = nom_val/factor
-            std_dev_mantissa = std_dev/factor
+            nom_val_mantissa = nom_val / factor
+            std_dev_mantissa = std_dev / factor
             # Limit for the last digit of the mantissas:
             signif_limit = digits_limit - common_exp
 
@@ -2528,9 +2528,9 @@ def get_ops_with_reflection():
     ops_with_reflection = {}
     for (op, derivatives) in list(derivatives_list.items()):
         ops_with_reflection[op] = [
-            eval("lambda x, y: %s" % expr) for expr in derivatives ]
+            eval("lambda x, y: %s" % expr) for expr in derivatives]
 
-        ops_with_reflection["r"+op] = [
+        ops_with_reflection["r" + op] = [
             eval("lambda y, x: %s" % expr) for expr in reversed(derivatives)]
 
 
@@ -2547,7 +2547,7 @@ def get_ops_with_reflection():
         if y == 0:
             return 0.
         elif x != 0 or y % 1 == 0:
-            return y*x**(y-1)
+            return y * x**(y - 1)
         else:
             return float('nan')
 
@@ -2555,7 +2555,7 @@ def get_ops_with_reflection():
         if x == 0 and y > 0:
             return 0.
         else:
-            return log(x)*x**y
+            return log(x) * x**y
 
     ops_with_reflection['pow'] = [pow_deriv_0, pow_deriv_1]
     ops_with_reflection['rpow'] = [lambda y, x: pow_deriv_1(x, y),
@@ -2567,8 +2567,8 @@ def get_ops_with_reflection():
         ops_with_reflection[op] = list(map(nan_if_exception,
                                       ops_with_reflection[op]))
 
-        ops_with_reflection['r'+op] = list(map(nan_if_exception,
-                                          ops_with_reflection['r'+op]))
+        ops_with_reflection['r' + op] = list(map(nan_if_exception,
+                                          ops_with_reflection['r' + op]))
 
     return ops_with_reflection
 
@@ -2911,7 +2911,7 @@ def covariance_matrix(nums_with_uncert):
         for expr2 in nums_with_uncert[:i1]:
             derivatives2 = expr2.derivatives  # Optimization
             coefs_expr1.append(sum(
-                ((derivatives1[var]*derivatives2[var]*var._std_dev**2)
+                ((derivatives1[var] * derivatives2[var] * var._std_dev**2)
                 # var is a variable common to both numbers with
                 # uncertainties:
                 for var in vars1.intersection(derivatives2)),
@@ -2924,7 +2924,7 @@ def covariance_matrix(nums_with_uncert):
     # We symmetrize the matrix:
     for (i, covariance_coefs) in enumerate(covariance_matrix):
         covariance_coefs.extend([covariance_matrix[j][i]
-                                 for j in range(i+1, len(covariance_matrix))])
+                                 for j in range(i + 1, len(covariance_matrix))])
 
     return covariance_matrix
 
@@ -2943,7 +2943,7 @@ else:
 
         std_devs = numpy.sqrt(cov_mat.diagonal())
 
-        return cov_mat/std_devs/std_devs[numpy.newaxis].T
+        return cov_mat / std_devs / std_devs[numpy.newaxis].T
 
     __all__.append('correlation_matrix')
 
@@ -3024,7 +3024,7 @@ def parse_error_in_parentheses(representation):
         factor = 1
 
     # Nominal value:
-    value = float((sign or '')+main)*factor
+    value = float((sign or '') + main) * factor
 
     if uncert is None:
         # No uncertainty was found: an uncertainty of 1 on the last
@@ -3042,9 +3042,9 @@ def parse_error_in_parentheses(representation):
         if main_dec is None:
             num_digits_after_period = 0
         else:
-            num_digits_after_period = len(main_dec)-1
+            num_digits_after_period = len(main_dec) - 1
 
-        uncert_value = int(uncert_int)/10.**num_digits_after_period
+        uncert_value = int(uncert_int) / 10.**num_digits_after_period
 
     # We apply the exponent to the uncertainty as well:
     uncert_value *= factor
@@ -3077,7 +3077,7 @@ def to_float(value_str):
     match = PRETTY_PRINT_MATCH(value_str)
     if match:
         try:
-            return float(match.group(1))*10.**from_superscript(match.group(2))
+            return float(match.group(1)) * 10.**from_superscript(match.group(2))
         except ValueError:
             raise ValueError('Mantissa or exponent incorrect in pretty-print'
                              ' form %s' % value_str)
@@ -3140,8 +3140,8 @@ def str_to_number_with_uncert(representation):
         try:
             # Simple form 1234.45+/-1.2 or 1234.45±1.2, or 1.23e-10+/-1e-23
             # or -1.2×10⁻¹²±1e23:
-            parsed_value = (to_float(nom_value)*factor,
-                            to_float(uncert)*factor)
+            parsed_value = (to_float(nom_value) * factor,
+                            to_float(uncert) * factor)
         except ValueError:
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
 

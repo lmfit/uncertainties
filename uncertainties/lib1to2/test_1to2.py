@@ -69,7 +69,7 @@ else:
         Takes a fixer name (module from fixes) and a mapping that maps
         code using the obsolete syntax into updated code, and checks
         whether the code is correctly updated.
-        '''    
+        '''
 
         refactorer = support.get_refactorer(
             fixer_pkg='lib1to2', fixers=[fixer])
@@ -123,7 +123,7 @@ else:
             # Simple expressions that cannot be transformed automatically:
             'ufloat(str_repr, tag="var")': 'ufloat(str_repr, tag="var")',
             'ufloat(*tuple_repr, tag="var")': 'ufloat(*tuple_repr, tag="var")',
-            'ufloat(*t[0, 0])': 'ufloat(*t[0, 0])',        
+            'ufloat(*t[0, 0])': 'ufloat(*t[0, 0])',
 
             # Strings:
             'ufloat("-1.23(3.4)")': 'ufloat_fromstr("-1.23(3.4)")',
@@ -148,7 +148,7 @@ else:
         # Exponentiation test:
         tests.update(dict(
             # !! Dictionary comprehension usable with Python 2.7+
-            (orig+'**2', new+'**2')
+            (orig + '**2', new + '**2')
             for (orig, new) in tests.items()))
 
         # Exponent test:
@@ -188,7 +188,7 @@ else:
         # Exponentiation test:
         tests.update(dict(
             # !! Dictionary comprehension usable with Python 2.7+
-            (orig+'**2', new+'**2')
+            (orig + '**2', new + '**2')
             for (orig, new) in tests.items()))
 
         # Test for space consistency:

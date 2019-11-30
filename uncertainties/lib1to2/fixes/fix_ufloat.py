@@ -76,7 +76,7 @@ class FixUfloat(BaseFix):
             new_func_name = 'ufloat_fromstr'
 
             # New arguments:
-            new_args=[results['string'].clone()]
+            new_args = [results['string'].clone()]
 
         else:  # Tuple as first argument
 
@@ -88,7 +88,7 @@ class FixUfloat(BaseFix):
 
         # Handling of the second argument (call with a tag):
         if 'tag' in results:
-            new_args.extend([Comma(), results['tag'].clone()])            
+            new_args.extend([Comma(), results['tag'].clone()])
 
         if 'object' in results:  # If dotted access: unc.ufloat()
             func_name = node.children[1].children[1]

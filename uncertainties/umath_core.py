@@ -138,9 +138,9 @@ def log_der0(*args):
     Works whether 1 or 2 arguments are given.
     """
     if len(args) == 1:
-        return 1/args[0]
+        return 1 / args[0]
     else:
-        return 1/args[0]/math.log(args[1])  # 2-argument form
+        return 1 / args[0] / math.log(args[1])  # 2-argument form
 
     # The following version goes about as fast:
 
@@ -152,7 +152,7 @@ def log_der0(*args):
     #    return 1/args[0]/math.log(args[1])  # 2-argument form
 
 
-def _deriv_copysign(x,y):
+def _deriv_copysign(x, y):
     if x >= 0:
         return math.copysign(1, y)
     else:
@@ -170,7 +170,7 @@ def _deriv_pow_0(x, y):
     if y == 0:
         return  0.
     elif x != 0 or y % 1 == 0:
-        return y*math.pow(x, y-1)
+        return y * math.pow(x, y - 1)
     else:
         return float('nan')
 
@@ -181,41 +181,41 @@ def _deriv_pow_1(x, y):
     else:
         return math.log(x) * math.pow(x, y)
 
-erf_coef = 2/math.sqrt(math.pi)  # Optimization for erf()
+erf_coef = 2 / math.sqrt(math.pi)  # Optimization for erf()
 
 fixed_derivatives = {
     # In alphabetical order, here:
-    'acos': [lambda x: -1/math.sqrt(1-x**2)],
-    'acosh': [lambda x: 1/math.sqrt(x**2-1)],
-    'asin': [lambda x: 1/math.sqrt(1-x**2)],
-    'asinh': [lambda x: 1/math.sqrt(1+x**2)],
-    'atan': [lambda x: 1/(1+x**2)],
-    'atan2': [lambda y, x: x/(x**2+y**2),  # Correct for x == 0
-              lambda y, x: -y/(x**2+y**2)],  # Correct for x == 0
-    'atanh': [lambda x: 1/(1-x**2)],
+    'acos': [lambda x: -1 / math.sqrt(1 - x**2)],
+    'acosh': [lambda x: 1 / math.sqrt(x**2 - 1)],
+    'asin': [lambda x: 1 / math.sqrt(1 - x**2)],
+    'asinh': [lambda x: 1 / math.sqrt(1 + x**2)],
+    'atan': [lambda x: 1 / (1 + x**2)],
+    'atan2': [lambda y, x: x / (x**2 + y**2),  # Correct for x == 0
+              lambda y, x: -y / (x**2 + y**2)],  # Correct for x == 0
+    'atanh': [lambda x: 1 / (1 - x**2)],
     'copysign': [_deriv_copysign,
                  lambda x, y: 0],
     'cos': [lambda x: -math.sin(x)],
     'cosh': [math.sinh],
     'degrees': [lambda x: math.degrees(1)],
-    'erf': [lambda x: math.exp(-x**2)*erf_coef],
-    'erfc': [lambda x: -math.exp(-x**2)*erf_coef],
+    'erf': [lambda x: math.exp(-x**2) * erf_coef],
+    'erfc': [lambda x: -math.exp(-x**2) * erf_coef],
     'exp': [math.exp],
     'expm1': [math.exp],
     'fabs': [_deriv_fabs],
-    'hypot': [lambda x, y: x/math.hypot(x, y),
-              lambda x, y: y/math.hypot(x, y)],
+    'hypot': [lambda x, y: x / math.hypot(x, y),
+              lambda x, y: y / math.hypot(x, y)],
     'log': [log_der0,
-            lambda x, y: -math.log(x, y)/y/math.log(y)],
-    'log10': [lambda x: 1/x/math.log(10)],
-    'log1p': [lambda x: 1/(1+x)],
+            lambda x, y: -math.log(x, y) / y / math.log(y)],
+    'log10': [lambda x: 1 / x / math.log(10)],
+    'log1p': [lambda x: 1 / (1 + x)],
     'pow': [_deriv_pow_0, _deriv_pow_1],
     'radians': [lambda x: math.radians(1)],
     'sin': [math.cos],
     'sinh': [math.cosh],
-    'sqrt': [lambda x: 0.5/math.sqrt(x)],
-    'tan': [lambda x: 1+math.tan(x)**2],
-    'tanh': [lambda x: 1-math.tanh(x)**2]
+    'sqrt': [lambda x: 0.5 / math.sqrt(x)],
+    'tan': [lambda x: 1 + math.tan(x)**2],
+    'tanh': [lambda x: 1 - math.tanh(x)**2]
     }
 
 # Many built-in functions in the math module are wrapped with a

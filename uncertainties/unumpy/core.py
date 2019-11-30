@@ -220,7 +220,7 @@ def wrap_array_func(func):
             # for the evaluation of the derivative, though: we set the
             # minimum variable shift.
 
-            shift_var = max(var._std_dev/1e5, 1e-8*abs(var._nominal_value))
+            shift_var = max(var._std_dev / 1e5, 1e-8 * abs(var._nominal_value))
             # An exceptional case is that of var being exactly zero.
             # In this case, an arbitrary shift is used for the
             # numerical calculation of the derivative.  The resulting
@@ -231,12 +231,12 @@ def wrap_array_func(func):
                 shift_var = 1e-8
 
             # Shift of all the elements of arr when var changes by shift_var:
-            shift_arr = array_derivative(arr, var)*shift_var
+            shift_arr = array_derivative(arr, var) * shift_var
 
             # Origin value of array arr when var is shifted by shift_var:
             shifted_arr_values = arr_nominal_value + shift_arr
             func_shifted = func(shifted_arr_values, *args, **kwargs)
-            numerical_deriv = (func_shifted-func_nominal_value)/shift_var
+            numerical_deriv = (func_shifted - func_nominal_value) / shift_var
 
             # Update of the list of variables and associated
             # derivatives, for each element:
@@ -529,26 +529,26 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
     # http://mathoverflow.net/questions/25778/analytical-formula-for-numerical-derivative-of-the-matrix-pseudo-inverse
 
     # Shortcuts.  All the following factors should be numpy.matrix objects:
-    PA = arr*inverse_mat
-    AP = inverse_mat*arr
-    factor21 = inverse_mat*inverse_mat.H
-    factor22 = numpy.eye(arr.shape[0])-PA
-    factor31 = numpy.eye(arr.shape[1])-AP
-    factor32 = inverse_mat.H*inverse_mat
+    PA = arr * inverse_mat
+    AP = inverse_mat * arr
+    factor21 = inverse_mat * inverse_mat.H
+    factor22 = numpy.eye(arr.shape[0]) - PA
+    factor31 = numpy.eye(arr.shape[1]) - AP
+    factor32 = inverse_mat.H * inverse_mat
 
     # Successive derivatives of the inverse:
     for derivative in derivatives:
         derivative_mat = numpy.asmatrix(derivative)
-        term1 = -inverse_mat*derivative_mat*inverse_mat
+        term1 = -inverse_mat * derivative_mat * inverse_mat
         derivative_mat_H = derivative_mat.H
-        term2 = factor21*derivative_mat_H*factor22
-        term3 = factor31*derivative_mat_H*factor32
-        yield term1+term2+term3
+        term2 = factor21 * derivative_mat_H * factor22
+        term3 = factor31 * derivative_mat_H * factor32
+        yield term1 + term2 + term3
 
 # Default rcond argument for the generalization of numpy.linalg.pinv:
 #
 # Most common modern case first:
-try: 
+try:
     pinv_default = (
         inspect.signature(numpy.linalg.pinv).parameters["rcond"].default)
 except AttributeError:  # No inspect.signature() before Python 3.3
@@ -600,7 +600,7 @@ class CallableStdDevs(numpy.matrix):
         matrix.__class__ = cls
         return matrix
 
-    def __call__ (self):
+    def __call__(self):
         deprecation('the std_devs attribute should not be called'
                     ' anymore: use .std_devs instead of .std_devs().')
         return self
@@ -685,7 +685,7 @@ def define_vectorized_funcs():
     # NumPy does not always use the same function names as the math
     # module:
     func_name_translations = dict([
-        (f_name, 'arc'+f_name[1:])
+        (f_name, 'arc' + f_name[1:])
         for f_name in ['acos', 'acosh', 'asin', 'atan', 'atan2', 'atanh']])
 
     new_func_names = [

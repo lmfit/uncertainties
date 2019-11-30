@@ -37,15 +37,15 @@ def test_numpy():
 
     # NumPy arrays can be multiplied by Variable objects,
     # whatever the order of the operands:
-    prod1 = arr*num
-    prod2 = num*arr
+    prod1 = arr * num
+    prod2 = num * arr
     # Additional check:
     assert (prod1 == prod2).all()
 
     # Operations with arrays work (they are first handled by NumPy,
     # then by this module):
-    prod1*prod2  # This should be calculable
-    assert not (prod1-prod2).any()  # All elements must be 0
+    prod1 * prod2  # This should be calculable
+    assert not (prod1 - prod2).any()  # All elements must be 0
 
     # Comparisons work too:
 
@@ -54,7 +54,7 @@ def test_numpy():
     # Comparisons with Variable objects:
     assert len(arr[arr > ufloat(1.5, 0.1)]) == 1
 
-    assert len(prod1[prod1 < prod1*prod2]) == 2
+    assert len(prod1[prod1 < prod1 * prod2]) == 2
 
     # The following can be calculated (special NumPy abs() function):
     numpy.abs(arr + ufloat(-1, 0.1))
@@ -76,7 +76,7 @@ def test_numpy():
     # Calculation of the mean, global and with a specific axis:
 
     arr_floats = numpy.random.random((10, 3, 5))
-    arr = unumpy.uarray(arr_floats, arr_floats/100)
+    arr = unumpy.uarray(arr_floats, arr_floats / 100)
     assert arr.mean(axis=0).shape == (3, 5)
     assert arr.mean(axis=1).shape == (10, 5)
     arr.mean()  # Global mean
@@ -99,8 +99,8 @@ def test_matrix():
     assert type(m[0, 0]) == uncert_core.Variable
 
     # Test of scalar multiplication, both sides:
-    3*m
-    m*3
+    3 * m
+    m * 3
 
 
 def derivatives_close(x, y):
@@ -142,10 +142,10 @@ def test_inverse():
     # Checks of the numerical values: the diagonal elements of the
     # inverse should be the inverses of the diagonal elements of
     # m (because we started with a triangular matrix):
-    assert numbers_close(1/m_nominal_values[0, 0],
+    assert numbers_close(1 / m_nominal_values[0, 0],
                           m_inv_uncert[0, 0].nominal_value), "Wrong value"
 
-    assert numbers_close(1/m_nominal_values[1, 1],
+    assert numbers_close(1 / m_nominal_values[1, 1],
                           m_inv_uncert[1, 1].nominal_value), "Wrong value"
 
 
@@ -154,7 +154,7 @@ def test_inverse():
     # Checks of the covariances between elements:
     x = ufloat(10, 1)
     m = unumpy.matrix([[x, x],
-                       [0, 3+2*x]])
+                       [0, 3 + 2 * x]])
 
     m_inverse = m.I
 
@@ -196,7 +196,7 @@ def test_wrap_array_func():
     # Function that works with numbers with uncertainties in mat (if
     # mat is an uncertainties.unumpy.matrix):
     def f_unc(mat, *args, **kwargs):
-        return mat.I + args[0]*kwargs['factor']
+        return mat.I + args[0] * kwargs['factor']
 
     # Test with optional arguments and keyword arguments:
     def f(mat, *args, **kwargs):
@@ -265,7 +265,7 @@ def test_broadcast_funcs():
     """
 
     x = ufloat(0.2, 0.1)
-    arr = numpy.array([x, 2*x])
+    arr = numpy.array([x, 2 * x])
     assert unumpy.cos(arr)[1] == uncertainties.umath.cos(arr[1])
 
     # Some functions do not bear the same name in the math module and
@@ -290,8 +290,8 @@ def test_array_and_matrix_creation():
 
     # Same thing for matrices:
     mat = unumpy.umatrix([1, 2], [0.1, 0.2])
-    assert mat[0,1].nominal_value == 2
-    assert mat[0,1].std_dev == 0.2
+    assert mat[0, 1].nominal_value == 2
+    assert mat[0, 1].std_dev == 0.2
 
 
 def test_component_extraction():
@@ -319,7 +319,7 @@ def test_array_comparisons():
 
     # For matrices, 1D arrays are converted to 2D arrays:
     mat = unumpy.umatrix([1, 2], [1, 4])
-    assert numpy.all((mat == [mat[0,0], 4]) == [True, False])
+    assert numpy.all((mat == [mat[0, 0], 4]) == [True, False])
 
 
 @pytest.mark.filterwarnings("ignore::UserWarning:uncertainties")

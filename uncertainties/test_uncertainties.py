@@ -55,7 +55,7 @@ def numbers_close(x, y, tolerance=1e-6):
             return isnan(y)
         else:
             # Symmetric form of the test:
-            return 2*abs(x-y)/(abs(x)+abs(y)) < tolerance
+            return 2 * abs(x - y) / (abs(x) + abs(y)) < tolerance
 
     else:  # Either x or y is zero
         return abs(x or y) < tolerance
@@ -71,7 +71,7 @@ def ufloats_close(x, y, tolerance=1e-6):
     standard deviation of the difference between the numbers.
     '''
 
-    diff = x-y
+    diff = x - y
     return (numbers_close(diff.nominal_value, 0, tolerance)
             and numbers_close(diff.std_dev, 0, tolerance))
 
@@ -125,7 +125,7 @@ def compare_derivatives(func, numerical_derivatives,
                     # certain functions from failing even though num_args
                     # is their correct number of arguments
                     # (e.g. math.ldexp(x, i), where i must be an integer)
-                    func(*(1,)*num_args)
+                    func(*(1,) * num_args)
                 except TypeError:
                     pass  # Not the right number of arguments
                 else:  # No error
@@ -155,7 +155,7 @@ def compare_derivatives(func, numerical_derivatives,
                         args.append(random.choice(list(range(-10, 10))))
                     else:
                         args.append(
-                            uncert_core.Variable(random.random()*4-2, 0))
+                            uncert_core.Variable(random.random() * 4 - 2, 0))
 
                 # 'args', but as scalar values:
                 args_scalar = [uncert_core.nominal_value(v)
@@ -453,7 +453,7 @@ def test_copy():
     assert x != z
 
     # Copy tests on expressions:
-    t = x + 2*z
+    t = x + 2 * z
     # t depends on x:
     assert x in t.derivatives
 
@@ -519,7 +519,7 @@ def test_pickling():
     assert x != x_unpickled  # Pickling creates copies
 
     # Tests with correlations and AffineScalarFunc objects:
-    f = 2*x
+    f = 2 * x
     assert isinstance(f, AffineScalarFunc)
     (f_unpickled, x_unpickled2) = pickle.loads(pickle.dumps((f, x)))
     # Correlations must be preserved:
@@ -581,7 +581,7 @@ def test_int_div():
     "Integer division"
     # We perform all operations on floats, because derivatives can
     # otherwise be meaningless:
-    x = ufloat(3.9, 2)//2
+    x = ufloat(3.9, 2) // 2
     assert x.nominal_value == 1.
     # All errors are supposed to be small, so the ufloat()
     # in x violates the assumption.  Therefore, the following is
@@ -623,10 +623,10 @@ def test_comparison_ops():
     assert x == x + 0
     # Comparaison between 2 _different_ AffineScalarFunc objects
     # representing the same value:
-    assert x/2 == x/2
+    assert x / 2 == x / 2
     # With uncorrelated result that have the same behavior (value and
     # standard error):
-    assert 2*ufloat(1, 0.1) != ufloat(2, 0.2)
+    assert 2 * ufloat(1, 0.1) != ufloat(2, 0.2)
     # Comparaison between 2 _different_ Variable objects
     # that are uncorrelated:
     assert x != ufloat(3, 0.1)
@@ -635,7 +635,7 @@ def test_comparison_ops():
 
     # Comparison to other types should work:
     assert x != None  # Not comparable
-    assert x-x == 0  # Comparable, even though the types are different
+    assert x - x == 0  # Comparable, even though the types are different
     assert x != [1, 2]
 
 
@@ -668,7 +668,7 @@ def test_comparison_ops():
             infinitesimal interval withing its uncertainty.  The case
             of a zero uncertainty is special.
             """
-            return ((random.random()-0.5) * min(var.std_dev, 1e-5)
+            return ((random.random() - 0.5) * min(var.std_dev, 1e-5)
                     + var.nominal_value)
 
         # All operations are tested:
@@ -771,7 +771,7 @@ def test_basic_access_to_data():
 
     # Details on the sources of error:
     a = ufloat(-1, 0.001)
-    y = 2*x + 3*x + 2 + a
+    y = 2 * x + 3 * x + 2 + a
     error_sources = y.error_components()
     assert len(error_sources) == 2  # 'a' and 'x'
     assert error_sources[x] == 0.05
@@ -786,7 +786,7 @@ def test_basic_access_to_data():
 
     # Calculated values with uncertainties should not have a settable
     # standard deviation:
-    y = 2*x
+    y = 2 * x
     try:
         y.std_dev = 1
     except AttributeError:
@@ -796,7 +796,7 @@ def test_basic_access_to_data():
             "std_dev should not be settable for calculated results")
 
     # Calculation of deviations in units of the standard deviations:
-    assert 10/x.std_dev == x.std_score(10 + x.nominal_value)
+    assert 10 / x.std_dev == x.std_score(10 + x.nominal_value)
 
     # "In units of the standard deviation" is not always meaningful:
     x.std_dev = 0
@@ -811,10 +811,10 @@ def test_correlations():
 
     a = ufloat(1, 0)
     x = ufloat(4, 0.1)
-    y = x*2 + a
+    y = x * 2 + a
     # Correlations cancel "naive" additions of uncertainties:
     assert y.std_dev != 0
-    normally_zero = y - (x*2 + 1)
+    normally_zero = y - (x * 2 + 1)
     assert normally_zero.nominal_value == 0
     assert normally_zero.std_dev == 0
 
@@ -841,7 +841,7 @@ def test_wrapped_func_no_args_no_kwargs():
     '''
 
     def f_auto_unc(x, y):
-        return 2*x+umath.sin(y)
+        return 2 * x + umath.sin(y)
 
     # Like f_auto_unc, but does not accept numbers with uncertainties:
     def f(x, y):
@@ -895,7 +895,7 @@ def test_wrapped_func_args_no_kwargs():
     '''
 
     def f_auto_unc(x, y, *args):
-        return 2*x+umath.sin(y)+3*args[1]
+        return 2 * x + umath.sin(y) + 3 * args[1]
 
     # Like f_auto_unc, but does not accept numbers with uncertainties:
     def f(x, y, *args):
@@ -945,7 +945,7 @@ def test_wrapped_func_no_args_kwargs():
     '''
 
     def f_auto_unc(x, y, **kwargs):
-        return 2*x+umath.sin(y)+3*kwargs['z']
+        return 2 * x + umath.sin(y) + 3 * kwargs['z']
 
     # Like f_auto_unc, but does not accept numbers with uncertainties:
     def f(x, y, **kwargs):
@@ -1038,12 +1038,12 @@ def test_wrapped_func_args_kwargs():
     '''
 
     def f_auto_unc(x, y, *args, **kwargs):
-        return 2*x+umath.sin(y)+4*args[1]+3*kwargs['z']
+        return 2 * x + umath.sin(y) + 4 * args[1] + 3 * kwargs['z']
 
     # Like f_auto_unc, but does not accept numbers with uncertainties:
     def f(x, y, *args, **kwargs):
         assert not any(isinstance(value, uncert_core.UFloat)
-                       for value in [x, y]+list(args)+list(kwargs.values()))
+                       for value in [x, y] + list(args) + list(kwargs.values()))
         return f_auto_unc(x, y, *args, **kwargs)
 
     x = uncert_core.ufloat(1, 0.1)
@@ -1155,7 +1155,7 @@ def test_wrapped_func():
     ########################################
     # Non-numerical arguments, and  explicit and implicit derivatives:
     def f(x, y, z, t, u):
-        return x+2*z+3*t+4*u
+        return x + 2 * z + 3 * t + 4 * u
 
     f_wrapped = uncert_core.wrap(
         f, [lambda *args: 1, None, lambda *args:2, None])  # No deriv. for u
@@ -1165,7 +1165,7 @@ def test_wrapped_func():
     x = uncert_core.ufloat(10, 1)
 
     assert numbers_close(f_wrapped(x, 'string argument', x, x, x).std_dev,
-                          (1+2+3+4)*x.std_dev)
+                          (1 + 2 + 3 + 4) * x.std_dev)
 
 
 def test_wrap_with_kwargs():
@@ -1180,14 +1180,14 @@ def test_wrap_with_kwargs():
     # Version of f() that automatically works with numbers with
     # uncertainties:
     def f_auto_unc(x, y, *args, **kwargs):
-        return x + umath.sin(y) + 2*args[0] + 3*kwargs['t']
+        return x + umath.sin(y) + 2 * args[0] + 3 * kwargs['t']
 
     # We also add keyword arguments in the function which is wrapped:
     def f(x, y, *args, **kwargs):
         # We make sure that f is not called directly with a number with
         # uncertainty:
 
-        for value in [x, y]+list(args)+list(kwargs.values()):
+        for value in [x, y] + list(args) + list(kwargs.values()):
             assert not isinstance(value, uncert_core.UFloat)
 
         return f_auto_unc(x, y, *args, **kwargs)
@@ -1279,7 +1279,7 @@ def test_access_to_std_dev():
     "Uniform access to the standard deviation"
 
     x = ufloat(1, 0.1)
-    y = 2*x
+    y = 2 * x
 
     # std_dev for Variable and AffineScalarFunc objects:
     assert uncert_core.std_dev(x) == x.std_dev
@@ -1296,8 +1296,8 @@ def test_covariances():
     "Covariance matrix"
 
     x = ufloat(1, 0.1)
-    y = -2*x+10
-    z = -3*x
+    y = -2 * x + 10
+    z = -3 * x
     covs = uncert_core.covariance_matrix([x, y, z])
     # Diagonal elements are simple:
     assert numbers_close(covs[0][0], 0.01)
@@ -1371,7 +1371,7 @@ def power_all_cases(op):
     assert result.derivatives[zero] == 1
     assert result.derivatives[one] == 0
 
-    result = op(zero, 2*one)
+    result = op(zero, 2 * one)
     assert result.derivatives[zero] == 0
     assert result.derivatives[one] == 0
 
@@ -1857,7 +1857,7 @@ def test_format():
             # not have a magnitude):
             'g': '(1+/-0)e+06'
         },
-        (1e6+10, 0): {
+        (1e6 + 10, 0): {
             # A default precision of 6 is used because the uncertainty
             # cannot be used for defining a default precision (it does
             # not have a magnitude):
@@ -2026,7 +2026,7 @@ def test_format():
             # code. It is thus best to mimic the native behavior of
             # none type formatting (even if it does not look so good
             # in Python 2.6).
-            '020S': format(float("-inf"), '015')+'(inf)'
+            '020S': format(float("-inf"), '015') + '(inf)'
         },
         (-float('nan'), float('inf')): {
             'S': 'nan(inf)',
@@ -2242,7 +2242,7 @@ else:
         # the new variable u2 to be defined through an integer nominal
         # value:
         u2, = uncert_core.correlated_values([1], cov)
-        expr = 2*u2  # Calculations with u2 should be possible, like with u
+        expr = 2 * u2  # Calculations with u2 should be possible, like with u
 
         ####################
 
@@ -2250,7 +2250,7 @@ else:
 
         x = ufloat(1, 0.1)
         y = ufloat(2, 0.3)
-        z = -3*x+y
+        z = -3 * x + y
 
         covs = uncert_core.covariance_matrix([x, y, z])
 
@@ -2276,7 +2276,7 @@ else:
             numpy.array(uncert_core.covariance_matrix([x_new, y_new, z_new])))
 
         assert arrays_close(
-            numpy.array([z_new]), numpy.array([-3*x_new+y_new]))
+            numpy.array([z_new]), numpy.array([-3 * x_new + y_new]))
 
         ####################
 
@@ -2284,7 +2284,7 @@ else:
 
         u = ufloat(1, 0.05)
         v = ufloat(10, 0.1)
-        sum_value = u+2*v
+        sum_value = u + 2 * v
 
         # Covariance matrices:
         cov_matrix = uncert_core.covariance_matrix([u, v, sum_value])
@@ -2301,13 +2301,13 @@ else:
         assert arrays_close(numpy.array([v]), numpy.array([v2]))
         assert arrays_close(numpy.array([sum_value]), numpy.array([sum2]))
         assert arrays_close(numpy.array([0]),
-                            numpy.array([sum2-(u2+2*v2)]))
+                            numpy.array([sum2 - (u2 + 2 * v2)]))
 
 
         # Spot checks of the correlation matrix:
         corr_matrix = uncert_core.correlation_matrix([u, v, sum_value])
-        assert numbers_close(corr_matrix[0,0], 1)
-        assert numbers_close(corr_matrix[1,2], 2*v.std_dev/sum_value.std_dev)
+        assert numbers_close(corr_matrix[0, 0], 1)
+        assert numbers_close(corr_matrix[1, 2], 2 * v.std_dev / sum_value.std_dev)
 
         ####################
 
@@ -2318,15 +2318,15 @@ else:
         cov[0, 1] = cov[1, 0] = 0.9e-70
         cov[[0, 1], 2] = -3e-34
         cov[2, [0, 1]] = -3e-34
-        variables = uncert_core.correlated_values([0]*3, cov)
+        variables = uncert_core.correlated_values([0] * 3, cov)
 
         # Since the numbers are very small, we need to compare them
         # in a stricter way, that handles the case of a 0 variance
         # in `variables`:
         assert numbers_close(
-                1e66*cov[0,0], 1e66*variables[0].s**2, tolerance=1e-5)
+                1e66 * cov[0, 0], 1e66 * variables[0].s**2, tolerance=1e-5)
         assert numbers_close(
-                1e66*cov[1,1], 1e66*variables[1].s**2, tolerance=1e-5)
+                1e66 * cov[1, 1], 1e66 * variables[1].s**2, tolerance=1e-5)
 
         ####################
 
@@ -2342,7 +2342,7 @@ else:
             variables, nom_values, cov.diagonal()):
 
             assert numbers_close(variable.n, nom_value)
-            assert numbers_close(variable.s**2, variance) 
+            assert numbers_close(variable.s**2, variance)
 
         assert arrays_close(
             cov,
@@ -2358,18 +2358,18 @@ else:
 
         x = ufloat(1, 0.1)
         y = ufloat(2, 0.3)
-        z = -3*x+y
+        z = -3 * x + y
 
         cov_mat = uncert_core.covariance_matrix([x, y, z])
 
         std_devs = numpy.sqrt(numpy.array(cov_mat).diagonal())
 
-        corr_mat = cov_mat/std_devs/std_devs[numpy.newaxis].T
+        corr_mat = cov_mat / std_devs / std_devs[numpy.newaxis].T
 
         # We make sure that the correlation matrix is indeed diagonal:
-        assert (corr_mat-corr_mat.T).max() <= 1e-15
+        assert (corr_mat - corr_mat.T).max() <= 1e-15
         # We make sure that there are indeed ones on the diagonal:
-        assert (corr_mat.diagonal()-1).max() <= 1e-15
+        assert (corr_mat.diagonal() - 1).max() <= 1e-15
 
         # We try to recover the correlated variables through the
         # correlation matrix (not through the covariance matrix):
@@ -2388,7 +2388,7 @@ else:
         assert arrays_close(numpy.array([z]), numpy.array([z2]))
 
         # Partial correlation test:
-        assert arrays_close(numpy.array([0]), numpy.array([z2-(-3*x2+y2)]))
+        assert arrays_close(numpy.array([0]), numpy.array([z2 - (-3 * x2 + y2)]))
 
         # Test of the full covariance matrix:
         assert arrays_close(

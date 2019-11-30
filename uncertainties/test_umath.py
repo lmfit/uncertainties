@@ -84,7 +84,7 @@ def test_compound_expression():
     x = ufloat(3, 0.1)
 
     # Prone to numerical errors (but not much more than floats):
-    assert umath_core.tan(x) == umath_core.sin(x)/umath_core.cos(x)
+    assert umath_core.tan(x) == umath_core.sin(x) / umath_core.cos(x)
 
 
 def test_numerical_example():
