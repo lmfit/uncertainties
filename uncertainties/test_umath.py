@@ -335,7 +335,7 @@ def test_power_special_cases():
         raise Exception('%s exception expected' % exception_class.__name__)
 
     try:
-        result = umath_core.pow(negative, positive)
+        umath_core.pow(negative, positive)
     except exception_class:  # Assumed: same exception as for pow(0, negative)
         # The reason why it should also fail in Python 3 is that the
         # result of Python 3 is a complex number, which uncertainties

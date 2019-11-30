@@ -181,7 +181,7 @@ def test_inverse():
 
     # Correlations between m and m_inverse should create a perfect
     # inversion:
-    assert arrays_close(m * m_inverse,  numpy.eye(m.shape[0]))
+    assert arrays_close(m * m_inverse, numpy.eye(m.shape[0]))
 
 
 def test_wrap_array_func():

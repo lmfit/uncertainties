@@ -168,7 +168,7 @@ def _deriv_fabs(x):
 
 def _deriv_pow_0(x, y):
     if y == 0:
-        return  0.
+        return 0.
     elif x != 0 or y % 1 == 0:
         return y * math.pow(x, y - 1)
     else:
@@ -314,8 +314,8 @@ def wrapped_fsum():
 
     # The fsum function is flattened, in order to use the
     # wrap() wrapper:
-
-    flat_fsum = lambda *args: original_func(args)
+    def flat_fsum(*args):
+        return original_func(args)
 
     flat_fsum_wrap = uncert_core.wrap(
         flat_fsum, itertools.repeat(lambda *args: 1))

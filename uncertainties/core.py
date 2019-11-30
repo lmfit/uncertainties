@@ -28,7 +28,8 @@ from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
 try:
     from math import isinfinite  # !! Python 3.2+
 except ImportError:
-    def isinfinite(x): return isinf(x) or isnan(x)
+    def isinfinite(x):
+        return isinf(x) or isnan(x)
 
 import copy
 import warnings
@@ -621,8 +622,8 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
     # converted to the corresponding numerical differentiation
     # function (instead of doing this over and over later every time a
     # None derivative is found):
-
-    none_converter = lambda index: partial_derivative(f, index)
+    def none_converter(index):
+        return partial_derivative(f, index)
 
     for (index, derivative) in enumerate(
             derivatives_args_index.returned_elements):
@@ -2801,7 +2802,7 @@ class Variable(AffineScalarFunc):
     # The following method is overridden so that we can represent the tag:
     def __repr__(self):
 
-        num_repr  = super(Variable, self).__repr__()
+        num_repr = super(Variable, self).__repr__()
 
         if self.tag is None:
             return num_repr
@@ -3296,7 +3297,7 @@ def ufloat(nominal_value, std_dev=None, tag=None):
 
         try:
             final_ufloat = ufloat_obsolete(nominal_value, tag_arg)
-        except:  # The input is incorrect, not obsolete
+        except Exception:  # The input is incorrect, not obsolete
             raise
         else:
             # Obsolete, two-argument call:

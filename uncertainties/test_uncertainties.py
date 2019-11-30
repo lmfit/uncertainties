@@ -296,7 +296,7 @@ def test_value_construction():
 
     try:
         ufloat(1)  # Form that has never been allowed
-    except:
+    except Exception:
         pass
     else:
         raise Exception("An exception should be raised")
@@ -592,8 +592,6 @@ def test_int_div():
 def test_comparison_ops():
     "Test of comparison operators"
 
-    import random
-
     # Operations on quantities equivalent to Python numbers must still
     # be correct:
     a = ufloat(-3, 0)
@@ -634,7 +632,7 @@ def test_comparison_ops():
     assert x != ufloat(3, 0.2)
 
     # Comparison to other types should work:
-    assert x != None  # Not comparable
+    assert x is not None  # Not comparable
     assert x - x == 0  # Comparable, even though the types are different
     assert x != [1, 2]
 
@@ -658,8 +656,6 @@ def test_comparison_ops():
         This test is stochastic: it may, exceptionally, fail for
         correctly implemented comparison operators.
         """
-
-        import random
 
         def random_float(var):
             """
@@ -737,10 +733,10 @@ def test_logic():
     z = ufloat(0, 0.1)
     t = ufloat(-1, 2)
 
-    assert bool(x) == True
-    assert bool(y) == False
-    assert bool(z) == True
-    assert bool(t) == True  # Only infinitesimal neighborhood are used
+    assert bool(x)
+    assert not(bool(y))
+    assert bool(z)
+    assert bool(t)  # Only infinitesimal neighborhood are used
 
 
 @pytest.mark.filterwarnings("ignore:::uncertainties")
@@ -2260,7 +2256,7 @@ else:
         (x_new, y_new, z_new) = uncert_core.correlated_values(
             [x.nominal_value, y.nominal_value, z.nominal_value],
             covs,
-            tags = ['x', 'y', 'z'])
+            tags=['x', 'y', 'z'])
 
         # Even the uncertainties should be correctly reconstructed:
         assert arrays_close(numpy.array((x, y, z)),
