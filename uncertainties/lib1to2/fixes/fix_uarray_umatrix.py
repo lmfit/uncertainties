@@ -42,7 +42,7 @@ class FixUarrayUmatrix(BaseFix):
 
     # Same pattern, for umatrix():
     PATTERN = '{}|{}'.format(PATTERN, PATTERN.replace('uarray', 'umatrix'))
-    
+
     def transform(self, node, results):
 
         if 'object' in results:  # If dotted access: unc.uarray()
@@ -53,7 +53,7 @@ class FixUarrayUmatrix(BaseFix):
         if 'args' in results: # Non-tuple argument
 
             # A star will be inserted in from of the single argument:
-            
+
             # ! The following keeps spaces in front of the argument,
             # if any (but this is safer than adding forcefully a star
             # in front of the value of the argument: the argument can
@@ -69,12 +69,12 @@ class FixUarrayUmatrix(BaseFix):
 
             # Single argument (in position 1):
             new_args = [String('*'), args.children[1].clone()]
-            
+
         else:  # Tuple argument
 
             # New arguments:
             new_args = [results['arg0'].clone(),
                         Comma(), results['arg1'].clone()]
-            
+
         # Argument list update:
         args.replace(ArgList(new_args))

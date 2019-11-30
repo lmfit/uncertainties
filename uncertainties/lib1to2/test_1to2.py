@@ -21,14 +21,14 @@ import os
 
 
 if sys.version_info < (2, 7) or "TRAVIS" in os.environ or "APPVEYOR" in os.environ:
-    
+
     # This package uses lib2to3, which requires Python 2.6+.
-    
+
     # lib2to3.tests.support is missing from 2.7.3 Travis Python packages.
 
     # !!  Nosetests for Python 2.6 also fails (it looks like it tries
     # to run tests via lib2to3/tests/test_refactor.py):
-    
+
     pass
 
 else:
@@ -63,7 +63,7 @@ else:
             source, new.strip(), expected))
 
         # print 'Checked:', source, '=>', expected
-        
+
     def check_all(fixer, tests):
         '''
         Takes a fixer name (module from fixes) and a mapping that maps
@@ -165,7 +165,7 @@ else:
         uarray(nominal_values, std_devs). Also performs the same tests
         on umatrix().
         '''
-        
+
         tests = {
             'uarray((arange(3), std_devs))': 'uarray(arange(3), std_devs)',
             'uarray(tuple_arg)': 'uarray(*tuple_arg)',
@@ -184,7 +184,7 @@ else:
             (orig.replace('uarray', 'un.uarray'),
              new.replace('uarray', 'un.uarray'))
             for (orig, new) in tests.items()))
-                             
+
         # Exponentiation test:
         tests.update(dict(
             # !! Dictionary comprehension usable with Python 2.7+
@@ -199,6 +199,6 @@ else:
             (orig.replace('uarray', 'umatrix'),
              new.replace('uarray', 'umatrix'))
             for (orig, new) in tests.items()))
-        
+
         check_all('uarray_umatrix', tests)
 

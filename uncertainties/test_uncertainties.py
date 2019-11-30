@@ -247,9 +247,9 @@ def test_value_construction():
     # does not replace ufloat((3, 0.14)) by ufloat(3, 14): the goal
     # here is to make sure that the obsolete form gives the same
     # result as the new form.
-    
+
     with pytest.warns(UserWarning):
-        
+
         obsolete_representation = (3, 0.14)
         x = ufloat(3, 0.14)
         x2 = ufloat(obsolete_representation)
@@ -2153,7 +2153,7 @@ else:
             if not numbers_close(elmt1.std_dev,
                                  elmt2.std_dev, precision):
                 return False
-        
+
         return True
 
 
@@ -2307,10 +2307,10 @@ else:
 
         for (variable, nom_value, variance) in zip(
             variables, nom_values, cov.diagonal()):
-            
+
             assert numbers_close(variable.n, nom_value)
             assert numbers_close(variable.s**2, variance) 
-        
+
         assert arrays_close(
             cov,
             numpy.array(uncert_core.covariance_matrix(variables)))

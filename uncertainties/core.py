@@ -165,7 +165,7 @@ else:
         # variables by first selecting the sub-matrix that does not contain
         # such variables (with the help of numpy.ix_()), and creating 
         # them separately.
-        
+
         std_devs = numpy.sqrt(numpy.diag(covariance_mat))
 
         # For numerical stability reasons, we go through the correlation
@@ -245,7 +245,7 @@ else:
         # The coordinates of each new uncertainty as a function of the
         # new variables must include the variable scale (standard deviation):
         transform *= std_devs[:, numpy.newaxis] 
-        
+
         # Representation of the initial correlated values:
         values_funcs = tuple(
             AffineScalarFunc(
@@ -3073,7 +3073,7 @@ def str_to_number_with_uncert(representation):
     """
 
     match = NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH(representation)
-    
+
     # The representation is simplified, but the global factor is
     # calculated:
 

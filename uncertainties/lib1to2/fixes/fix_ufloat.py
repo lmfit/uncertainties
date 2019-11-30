@@ -66,13 +66,13 @@ class FixUfloat(BaseFix):
         """.format(tuple_call=tuple_call,
                    tuple_any_call=tuple_any_call)
 
-    
+
     def transform(self, node, results):
-        
+
         # Handling of the first argument:
-        
+
         if 'string' in results:  # String as first argument
-            
+
             new_func_name = 'ufloat_fromstr'
 
             # New arguments:
@@ -81,7 +81,7 @@ class FixUfloat(BaseFix):
         else:  # Tuple as first argument
 
             new_func_name = 'ufloat'
-            
+
             # New arguments:
             new_args = [results['arg0'].clone(),
                         Comma(), results['arg1'].clone()]
@@ -96,10 +96,10 @@ class FixUfloat(BaseFix):
         else:
             func_name = node.children[0]
             args = node.children[1]
-            
+
         # Function name update:
         func_name.value = new_func_name
         #! func_name.changed()  # Necessary when only .value is changed
-        
+
         # Argument list update:
         args.replace(ArgList(new_args))
