@@ -47,6 +47,7 @@ def test_fixed_derivatives_math_funcs():
     # modf(): returns a tuple:
     def frac_part_modf(x):
         return umath_core.modf(x)[0]
+
     def int_part_modf(x):
         return umath_core.modf(x)[1]
 
@@ -63,6 +64,7 @@ def test_fixed_derivatives_math_funcs():
     # frexp(): returns a tuple:
     def mantissa_frexp(x):
         return umath_core.frexp(x)[0]
+
     def exponent_frexp(x):
         return umath_core.frexp(x)[1]
 
@@ -162,7 +164,6 @@ def test_monte_carlo_comparison():
         return (numpy.median(function_samples), cov_mat)
 
     (nominal_value_samples, covariances_samples) = monte_carlo_calc(1000000)
-
 
     # Comparison between both results:
 

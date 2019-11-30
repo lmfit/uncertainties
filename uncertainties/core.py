@@ -88,6 +88,7 @@ def set_doc(doc_string):
         return func
     return set_doc_string
 
+
 # Some types known to not depend on Variable objects are put in
 # CONSTANT_TYPES.  The most common types can be put in front, as this
 # may slightly improve the execution speed.
@@ -290,6 +291,7 @@ def to_affine_scalar(x):
     # Case of lists, etc.
     raise NotUpcast("%s cannot be converted to a number with"
                     " uncertainty" % type(x))
+
 
 # Step constant for numerical derivatives in
 # partial_derivative(). Value chosen to as to get better numerical
@@ -561,7 +563,6 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
         # arguments in *args:
         itertools.chain(derivatives_args, itertools.repeat(None)))
 
-
     # Derivatives for keyword arguments (includes var-keyword
     # parameters **kwargs, but also var-or-keyword parameters, and
     # keyword-only parameters (Python 3):
@@ -631,7 +632,6 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
     # Future None values are also automatically converted:
     derivatives_args_index.none_converter = none_converter
-
 
     # Wrapped function:
 
@@ -941,6 +941,7 @@ def PDG_precision(std_dev):
         # std_dev:
         return (2, 10.**exponent * (1000 / factor))
 
+
 # Definition of a basic (format specification only, no full-feature
 # format string) formatting function that works whatever the version
 # of Python. This function exists so that the more capable format() is
@@ -962,6 +963,7 @@ class CallableStdDev(float):
         deprecation('the std_dev attribute should not be called'
                     ' anymore: use .std_dev instead of .std_dev().')
         return self
+
 
 # Exponent letter: the keys are the possible main_fmt_type values of
 # format_num():
@@ -985,6 +987,7 @@ def robust_align(orig_str, fill_char, align_option, width):
     # print "WIDTH", width
 
     return format(orig_str, fill_char + align_option + width)
+
 
 # Maps some Unicode code points ("-", "+", and digits) to their
 # superscript version:
@@ -1031,6 +1034,7 @@ def from_superscript(number_str):
     number_str -- string object.
     '''
     return int(str(number_str).translate(FROM_SUPERSCRIPT))
+
 
 # Function that transforms an exponent produced by format_num() into
 # the corresponding string notation (for non-default modes):
@@ -1173,7 +1177,6 @@ def format_num(nom_val_main, error_main, common_exp,
     else:
         fmt_suffix_n = '.%d%s' % (prec, main_pres_type)
 
-
     # print "FMT_SUFFIX_N", fmt_suffix_n
 
     ####################
@@ -1182,7 +1185,6 @@ def format_num(nom_val_main, error_main, common_exp,
     # sign, no global width applied).
 
     # Error formatting:
-
 
     if 'S' in options:  # Shorthand notation:
 
@@ -2450,6 +2452,7 @@ class AffineScalarFunc(object):
             # instance might contain slots):
             setattr(self, name, value)
 
+
 # Nicer name, for users: isinstance(ufloat(...), UFloat) is
 # True. Also: isinstance(..., UFloat) is the test for "is this a
 # number with uncertainties from the uncertainties package?":
@@ -2485,7 +2488,6 @@ def nan_if_exception(f):
 
 
 def get_ops_with_reflection():
-
     """
     Return operators with a reflection, along with their derivatives
     (for float operands).
@@ -2533,7 +2535,6 @@ def get_ops_with_reflection():
         ops_with_reflection["r" + op] = [
             eval("lambda y, x: %s" % expr) for expr in reversed(derivatives)]
 
-
     # The derivatives of pow() are more complicated:
 
     # The case x**y is constant one the line x = 0 and in y = 0;
@@ -2571,6 +2572,7 @@ def get_ops_with_reflection():
                                           ops_with_reflection['r' + op]))
 
     return ops_with_reflection
+
 
 # Operators that have a reflection, along with their derivatives:
 ops_with_reflection = get_ops_with_reflection()
@@ -2704,6 +2706,7 @@ def add_operators_to_AffineScalarFunc():
                             % (self.__class__, coercion_type))
 
         setattr(AffineScalarFunc, '__%s__' % coercion_type, raise_error)
+
 
 add_operators_to_AffineScalarFunc()  # Actual addition of class attributes
 
@@ -2928,6 +2931,7 @@ def covariance_matrix(nums_with_uncert):
 
     return covariance_matrix
 
+
 try:
     import numpy
 except ImportError:
@@ -3050,6 +3054,7 @@ def parse_error_in_parentheses(representation):
     uncert_value *= factor
 
     return (value, uncert_value)
+
 
 # Regexp for catching the two variable parts of -1.2×10⁻¹²:
 PRETTY_PRINT_MATCH = re.compile(r'(.*?)\s*×\s*10(.*)').match

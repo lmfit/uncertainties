@@ -66,7 +66,6 @@ class FixUfloat(BaseFix):
         """.format(tuple_call=tuple_call,
                    tuple_any_call=tuple_any_call)
 
-
     def transform(self, node, results):
 
         # Handling of the first argument:

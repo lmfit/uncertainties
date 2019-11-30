@@ -24,9 +24,7 @@ except ImportError:
     sys.exit()  # There is no reason to test the interface to NumPy
 
 
-
 def test_numpy():
-
     """
     Interaction with NumPy, including matrix inversion,
     correlated_values, and calculation of the mean.
@@ -148,7 +146,6 @@ def test_inverse():
     assert numbers_close(1 / m_nominal_values[1, 1],
                           m_inv_uncert[1, 1].nominal_value), "Wrong value"
 
-
     ####################
 
     # Checks of the covariances between elements:
@@ -204,7 +201,6 @@ def test_wrap_array_func():
         # numbers:
         assert not any(isinstance(v, uncert_core.UFloat) for v in mat.flat)
         return f_unc(mat, *args, **kwargs)
-
 
     # Wrapped function:
     f_wrapped = core.wrap_array_func(f)

@@ -80,7 +80,6 @@ else:
     def test_fix_std_dev():
         'Tests the transformation of std_dev() into std_dev.'
 
-
         tests = {
             'x.std_dev()': 'x.std_dev',
             'y.std_dev();  unc.std_dev(z)': 'y.std_dev;  unc.std_dev(z)',

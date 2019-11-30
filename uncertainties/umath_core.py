@@ -181,6 +181,7 @@ def _deriv_pow_1(x, y):
     else:
         return math.log(x) * math.pow(x, y)
 
+
 erf_coef = 2 / math.sqrt(math.pi)  # Optimization for erf()
 
 fixed_derivatives = {
@@ -242,6 +243,7 @@ def wrap_locally_cst_func(func):
             for (arg_name, value) in list(kwargs.items()))
         return func(*args_float, **kwargs_float)
     return wrapped_func
+
 
 # for (name, attr) in vars(math).items():
 for name in dir(math):
@@ -321,6 +323,7 @@ def wrapped_fsum():
     return wraps(lambda arg_list: flat_fsum_wrap(*arg_list),
                  original_func)
 
+
 # !!!!!!!! Documented?
 fsum = wrapped_fsum()
 non_std_wrapped_funcs.append('fsum')
@@ -358,6 +361,8 @@ def modf(x):
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
         return (frac_part, int_part)
+
+
 many_scalars_to_scalar_funcs.append('modf')
 
 
@@ -383,6 +388,8 @@ def ldexp(x, i):
         # value of x coerced to a difference type [int->float, for
         # instance]):
         return math.ldexp(x, i)
+
+
 many_scalars_to_scalar_funcs.append('ldexp')
 
 
@@ -415,6 +422,8 @@ def frexp(x):
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
         return math.frexp(x)
+
+
 non_std_wrapped_funcs.append('frexp')
 
 ###############################################################################

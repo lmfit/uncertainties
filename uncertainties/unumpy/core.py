@@ -481,6 +481,7 @@ def inv_with_derivatives(arr, input_type, derivatives):
         derivative_mat = numpy.asmatrix(derivative)
         yield -inverse_mat * derivative_mat * inverse_mat
 
+
 inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
 inv.__doc__ = """\
     Version of numpy.linalg.inv that works with array-like objects
@@ -545,6 +546,7 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
         term3 = factor31 * derivative_mat_H * factor32
         yield term1 + term2 + term3
 
+
 # Default rcond argument for the generalization of numpy.linalg.pinv:
 #
 # Most common modern case first:
@@ -566,6 +568,7 @@ pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
 def pinv(array_like, rcond=pinv_default):
     return pinv_with_uncert(array_like, rcond)
+
 
 pinv = uncert_core.set_doc("""
     Version of numpy.linalg.pinv that works with array-like objects
@@ -631,7 +634,6 @@ class matrix(numpy.matrix):
         return (inv if m == n else pinv)(self)
 
     I = numpy.matrix.I.getter(getI)
-
 
     # !!! The following function is not in the official documentation
     # of the module. Maybe this is because arrays with uncertainties
@@ -735,7 +737,7 @@ Original documentation:
 %s""" % (function_name, func.__doc__),
                             **otypes))
 
-
         __all__.append(unumpy_name)
+
 
 define_vectorized_funcs()

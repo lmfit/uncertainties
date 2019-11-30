@@ -638,7 +638,6 @@ def test_comparison_ops():
     assert x - x == 0  # Comparable, even though the types are different
     assert x != [1, 2]
 
-
     ####################
 
     # Checks of the semantics of logical operations: they return True
@@ -1128,7 +1127,6 @@ def test_wrapped_func():
 
     f_wrapped = uncert_core.wrap(f)
 
-
     my_list = [1, 2, 3]
 
     ########################################
@@ -1193,7 +1191,6 @@ def test_wrap_with_kwargs():
         return f_auto_unc(x, y, *args, **kwargs)
 
     f_wrapped = uncert_core.wrap(f)
-
 
     x = ufloat(1, 0.1)
     y = ufloat(10, 0.11)
@@ -2146,6 +2143,7 @@ def test_unicode_format():
 
 ###############################################################################
 
+
 # The tests below require NumPy, which is an optional package:
 try:
     import numpy
@@ -2188,7 +2186,6 @@ else:
                 return False
 
         return True
-
 
     def test_numpy_comparison():
         "Comparison with a NumPy array."
@@ -2302,7 +2299,6 @@ else:
         assert arrays_close(numpy.array([sum_value]), numpy.array([sum2]))
         assert arrays_close(numpy.array([0]),
                             numpy.array([sum2 - (u2 + 2 * v2)]))
-
 
         # Spot checks of the correlation matrix:
         corr_matrix = uncert_core.correlation_matrix([u, v, sum_value])
