@@ -71,7 +71,8 @@ author.''',
     # Files are defined in MANIFEST (which is automatically created by
     # python setup.py sdist bdist_wheel):
     packages=[
-        'uncertainties', 'uncertainties.unumpy'])
+        'uncertainties', 'uncertainties.unumpy', 'uncertainties.lib1to2',
+        'uncertainties.lib1to2.fixes'])
 
 if PY_VER.major < 3:
     setup_options["install_requires"] = ['future']
