@@ -157,7 +157,7 @@ Version history
 
 Main changes:
 
-- 3.1.2: Partial fix for NumPy 1.17 and ``unumpy.ulinalg.pinv()``.
+- 3.1.2: Fix for NumPy 1.17 and ``unumpy.ulinalg.pinv()``.
 - 3.1: Variables built through a correlation or covariance matrix, and that
   have uncertainties that span many orders of magnitude are now
   calculated more accurately (improved ``correlated_values()`` and
