@@ -2,7 +2,7 @@
 uncertainties
 =============
 
-.. image:: https://github.com/lebigot/uncertainties>/workflows/CI%20tests/badge.svg
+.. image:: https://github.com/lebigot/uncertainties/workflows/CI%20tests/badge.svg
    :target: https://github.com/lebigot/uncertainties/actions?query=workflow%3A%22CI+tests%22
 .. image:: https://codecov.io/gh/lebigot/uncertainties/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/lebigot/uncertainties/
@@ -19,7 +19,7 @@ The ``uncertainties`` package **takes the pain and complexity out** of
 uncertainty calculations.
 
 ``uncertainties`` allows **calculations** such as (2 +/- 0.1)\ *2 = 4
-+/-0.2 to beperformed transparently*\ \*. Much more complex mathematical
++/-0.2 to be performed transparently. Much more complex mathematical
 expressions involving numbers with uncertainties can also be evaluated
 directly.
 
@@ -115,8 +115,11 @@ Installation instructions are available on the `main web
 site <http://uncertainties-python-package.readthedocs.io/en/latest/index.html#installation-and-download>`__
 for this package.
 
-GitHub
-======
+Developer notes
+===============
+
+Github
+------
 
 The ``release`` branch is the latest stable release for Python 3.5+
 (including Python 2.7 using ``future``).
@@ -129,6 +132,32 @@ experimental).
 Other branches might be present in the GitHub repository, but they are
 also temporary and represent work in progress that does not necessarily
 run properly yet.
+
+Running the tests
+-----------------
+
+Tests are run using `pytest`.
+
+.. code:: bash
+    pytest
+
+To run tests over different python versions, just use tox.
+
+.. code:: bash
+    tox
+
+Upload to pypi
+--------------
+
+After running the tests, tox creates wheels packages in the dist folder,
+you can upload the wheels to pypi with `twine`:
+
+.. code:: bash
+    tox
+    twine upload dist/*
+
+
+
 
 Contact
 =======
