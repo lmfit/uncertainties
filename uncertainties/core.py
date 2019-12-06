@@ -981,8 +981,16 @@ TO_SUPERSCRIPT = {
 # Inverted TO_SUPERSCRIPT table, for use with unicode.translate():
 #
 #! Python 2.7+ can use a dictionary comprehension instead:
-FROM_SUPERSCRIPT = {
-    ord(sup): normal for (normal, sup) in TO_SUPERSCRIPT.items()}
+if sys.version_info > (3, 0):
+    # all strings are unicode strings.
+    FROM_SUPERSCRIPT = {ord(sup): normal
+                        for (normal, sup) in TO_SUPERSCRIPT.items()}
+else:
+    # we need to decode the utf-8 strings first, before ord can find
+    # the code point for us.
+    FROM_SUPERSCRIPT = {ord(unicode(sup, 'utf-8')): normal
+                        for (normal, sup) in TO_SUPERSCRIPT.items()}
+
 
 def to_superscript(value):
     '''
