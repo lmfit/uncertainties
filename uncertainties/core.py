@@ -1011,7 +1011,10 @@ def from_superscript(number_str):
 
     number_str -- basestring object.
     '''
-    return int(str(number_str).translate(FROM_SUPERSCRIPT))
+    if sys.version > (3, 0):
+        return int(str(number_str).translate(FROM_SUPERSCRIPT))
+    else:
+        return int(unicode(str(number_str), 'utf-8').translate(FROM_SUPERSCRIPT))
 
 # Function that transforms an exponent produced by format_num() into
 # the corresponding string notation (for non-default modes):

@@ -384,7 +384,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         for element in array_version.flat:
             # floats, etc. might be present
             if isinstance(element, uncert_core.AffineScalarFunc):
-                variables |= element.derivatives.keys()
+                variables |= set(element.derivatives.keys())
 
         array_nominal = nominal_values(array_version)
         # Function value, then derivatives at array_nominal (the
