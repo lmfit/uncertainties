@@ -1069,7 +1069,10 @@ def format_num(nom_val_main, error_main, common_exp,
     and the error, superscript exponents, etc.). "L" is for a LaTeX
     output. Options can be combined. "%" adds a final percent sign,
     and parentheses if the shorthand notation is not used. The P
-    option has priority over the L option (if both are given).
+    option has priority over the L option (if both are given). The "b"
+    option adds enclosing parenthesis with a common factor outside. "B"
+    forces the parenthesis to also enclose the factor, which means that
+    you might get two pairs of parenthesis.
     '''
 
     # print (nom_val_main, error_main, common_exp,
@@ -1427,11 +1430,16 @@ def format_num(nom_val_main, error_main, common_exp,
                 nom_val_str, pm_symbol, error_str,
                 RIGHT_GROUPING,
                 exp_str, percent_str))
+            if 'B' in options:
+                value_str = LEFT_GROUPING + value_str + RIGHT_GROUPING
         else:
             value_str = ''.join([nom_val_str, pm_symbol, error_str])
             if percent_str:
                 value_str = ''.join((
                     LEFT_GROUPING, value_str, RIGHT_GROUPING, percent_str))
+            if 'b' in options or 'B' in options:
+                value_str = ''.join((
+                    LEFT_GROUPING, value_str, RIGHT_GROUPING))
 
     return value_str
 
@@ -1926,6 +1934,9 @@ class AffineScalarFunc(object):
         mode is activated: "±" separates the nominal value from the
         standard deviation, exponents use superscript characters,
         etc. When "L" is present, the output is formatted with LaTeX.
+        The option "b" enforces surrounding brackets, but a common
+        factor will still be outside of the parenthesis. To have
+        a pair of parenthesis enclose everything, use "B".
 
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
@@ -1964,7 +1975,7 @@ class AffineScalarFunc(object):
             (?P<uncert_prec>u?)  # Precision for the uncertainty?
             # The type can be omitted. Options must not go here:
             (?P<type>[eEfFgG%]??)  # n not supported
-            (?P<options>[LSP]*)$''',
+            (?P<options>[LSPbB]*)$''',
             format_spec,
             re.VERBOSE)
 
