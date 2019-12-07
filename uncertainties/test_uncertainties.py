@@ -2039,7 +2039,7 @@ def test_format():
 
         for (format_spec, result) in representations.items():
 
-            print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
+            # print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
 
             # Jython 2.5.2 does not always represent NaN as nan or NAN
             # in the CPython way: for example, '%.2g' % float('nan')
@@ -2084,8 +2084,8 @@ def test_format():
 
                 # The original number and the new one should be consistent
                 # with each other:
-                print(' Checking for consistency: %r ~> %r ~> %r'
-                      % (value, representation, value_back))
+                # print(' Checking for consistency: %r ~> %r ~> %r'
+                #       % (value, representation, value_back))
                 try:
 
                     # The nominal value can be rounded to 0 when the
