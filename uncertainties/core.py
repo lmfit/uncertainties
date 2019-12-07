@@ -976,11 +976,14 @@ TO_SUPERSCRIPT = {
     0x37: '⁷',
     0x38: '⁸',
     0x39: '⁹'
-    }
+}
+if sys.version_info < (3, 0):
+    TO_SUPERSCRIPT = {normal: ord(unicode(sup, 'utf-8'))
+                      for (normal, sup) in TO_SUPERSCRIPT.items()}
 
 # Inverted TO_SUPERSCRIPT table, for use with unicode.translate():
 #
-#! Python 2.7+ can use a dictionary comprehension instead:
+# ! Python 2.7+ can use a dictionary comprehension instead:
 if sys.version_info > (3, 0):
     # all strings are unicode strings.
     FROM_SUPERSCRIPT = {ord(sup): normal
@@ -988,8 +991,9 @@ if sys.version_info > (3, 0):
 else:
     # we need to decode the utf-8 strings first, before ord can find
     # the code point for us.
-    FROM_SUPERSCRIPT = {ord(unicode(sup, 'utf-8')): normal
+    FROM_SUPERSCRIPT = {sup: normal
                         for (normal, sup) in TO_SUPERSCRIPT.items()}
+
 
 
 def to_superscript(value):
@@ -1000,8 +1004,7 @@ def to_superscript(value):
 
     value -- integer.
     '''
-
-    return ('%d' % value).translate(TO_SUPERSCRIPT)
+    return (u'%d' % value).translate(TO_SUPERSCRIPT)
 
 def from_superscript(number_str):
     '''
@@ -1011,7 +1014,8 @@ def from_superscript(number_str):
 
     number_str -- basestring object.
     '''
-    if sys.version > (3, 0):
+    # return int(str(number_str).translate(FROM_SUPERSCRIPT))
+    if sys.version_info > (3, 0):
         return int(str(number_str).translate(FROM_SUPERSCRIPT))
     else:
         return int(unicode(str(number_str), 'utf-8').translate(FROM_SUPERSCRIPT))
@@ -1019,7 +1023,7 @@ def from_superscript(number_str):
 # Function that transforms an exponent produced by format_num() into
 # the corresponding string notation (for non-default modes):
 EXP_PRINT = {
-    'pretty-print': lambda common_exp: '×10%s' % to_superscript(common_exp),
+    'pretty-print': lambda common_exp: u'×10%s' % to_superscript(common_exp),
     'latex': lambda common_exp: r' \times 10^{%d}' % common_exp}
 
 # Symbols used for grouping (typically between parentheses) in format_num():
@@ -1417,7 +1421,7 @@ def format_num(nom_val_main, error_main, common_exp,
         if 'P' in options:
             # Unicode has priority over LaTeX, so that users with a
             # Unicode-compatible LaTeX source can use ±:
-            pm_symbol = '±'
+            pm_symbol = u'±'
         elif 'L' in options:
             pm_symbol = r' \pm '
         else:
@@ -1436,7 +1440,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # percent sign handling because this sign may too need
         # parentheses.
         if any_exp_factored and common_exp is not None:
-            value_str = ''.join((
+            value_str = u''.join((
                 LEFT_GROUPING,
                 nom_val_str, pm_symbol, error_str,
                 RIGHT_GROUPING,
@@ -1444,13 +1448,12 @@ def format_num(nom_val_main, error_main, common_exp,
             if 'B' in options:
                 value_str = LEFT_GROUPING + value_str + RIGHT_GROUPING
         else:
-            value_str = ''.join([nom_val_str, pm_symbol, error_str])
+            value_str = u''.join([nom_val_str, pm_symbol, error_str])
             if percent_str:
-                value_str = ''.join((
+                value_str = u''.join((
                     LEFT_GROUPING, value_str, RIGHT_GROUPING, percent_str))
             if 'b' in options or 'B' in options:
-                value_str = ''.join((
-                    LEFT_GROUPING, value_str, RIGHT_GROUPING))
+                value_str = u''.join((LEFT_GROUPING, value_str, RIGHT_GROUPING))
 
     return value_str
 
@@ -2969,7 +2972,7 @@ NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(r'''
     \(
     (?P<simple_num_with_uncert>.*)
     \)
-    (?:[eE]|\s*×\s*10) (?P<exp_value>.*)
+    (?:[eE]|\s*×\s*10)(?P<exp_value>.*)
     $''', re.VERBOSE).match
 
 class NotParenUncert(ValueError):
@@ -3037,7 +3040,7 @@ def parse_error_in_parentheses(representation):
     return (value, uncert_value)
 
 # Regexp for catching the two variable parts of -1.2×10⁻¹²:
-PRETTY_PRINT_MATCH = re.compile(r'(.*?)\s*×\s*10(.*)').match
+PRETTY_PRINT_MATCH = re.compile('(.*?)\s*×\s*10(.*)').match
 
 def to_float(value_str):
     '''
@@ -3116,7 +3119,6 @@ def str_to_number_with_uncert(representation):
 
     match = re.match(r'(.*)(?:\+/-|±)(.*)', representation)
     if match:
-
         (nom_value, uncert) = match.groups()
 
         try:

@@ -1643,7 +1643,7 @@ def test_format():
             # found in Python 2.7: '{:.1%}'.format(0.0055) is '0.5%'.
             '.1u%': '(42.0+/-0.5)%',
             '.1u%S': '42.0(5)%',
-            '%P': '(42.0±0.5)%'
+            '%P': u'(42.0±0.5)%'
         },
 
         # Particle Data Group automatic convention, including limit cases:
@@ -1714,17 +1714,17 @@ def test_format():
         # instead of 1.4 for Python 3.1. The problem does not appear
         # with 1.2, so 1.2 is used.
         (-1.2e-12, 0): {
-            '12.2gPL': r'  -1.2×10⁻¹²±           0',
+            '12.2gPL': u'  -1.2×10⁻¹²±           0',
             # Pure "width" formats are not accepted by the % operator,
             # and only %-compatible formats are accepted, for Python <
             # 2.6:
             '13S': '  -1.2(0)e-12',
-            '10P': '-1.2×10⁻¹²±         0',
+            '10P': u'-1.2×10⁻¹²±         0',
             'L': r'\left(-1.2 \pm 0\right) \times 10^{-12}',
             # No factored exponent, LaTeX
             '1L': r'-1.2 \times 10^{-12} \pm 0',
             'SL': r'-1.2(0) \times 10^{-12}',
-            'SP': r'-1.2(0)×10⁻¹²'
+            'SP': u'-1.2(0)×10⁻¹²'
         },
 
         # Python 3.2 and 3.3 give 1.4e-12*1e+12 = 1.4000000000000001
@@ -1735,7 +1735,7 @@ def test_format():
             '15GS': '  -1.2(%s)E-12' % NaN_EFG,
             'SL': r'-1.2(\mathrm{nan}) \times 10^{-12}',  # LaTeX NaN
             # Pretty-print priority, but not for NaN:
-            'PSL': '-1.2(\mathrm{nan})×10⁻¹²',
+            'PSL': u'-1.2(\mathrm{nan})×10⁻¹²',
             'L': r'\left(-1.2 \pm \mathrm{nan}\right) \times 10^{-12}',
             # Uppercase NaN and LaTeX:
             '.1EL': (r'\left(-1.2 \pm \mathrm{%s}\right) \times 10^{-12}'
@@ -1746,8 +1746,8 @@ def test_format():
 
         (3.14e-10, 0.01e-10): {
             # Character (Unicode) strings:
-            'P': '(3.140±0.010)×10⁻¹⁰',  # PDG rules: 2 digits
-            'PL': r'(3.140±0.010)×10⁻¹⁰',  # Pretty-print has higher priority
+            'P': u'(3.140±0.010)×10⁻¹⁰',  # PDG rules: 2 digits
+            'PL': u'(3.140±0.010)×10⁻¹⁰',  # Pretty-print has higher priority
             # Truncated non-zero uncertainty:
             '.1e': '(3.1+/-0.0)e-10',
             '.1eS': '3.1(0.0)e-10'
@@ -1977,7 +1977,7 @@ def test_format():
             'S': '-inf(inf)',
             'LS': '-\infty(\infty)',
             'L': '-\infty \pm \infty',
-            'LP': '-\infty±\infty',
+            'LP': u'-\infty±\infty',
             # The following is consistent with Python's own
             # formatting, which depends on the version of Python:
             # formatting float("-inf") with format(..., "020") gives
@@ -2003,7 +2003,7 @@ def test_format():
             'S': 'nan(inf)',
             'LS': '\mathrm{nan}(\infty)',
             'L': '\mathrm{nan} \pm \infty',
-            'LP': '\mathrm{nan}±\infty'
+            'LP': u'\mathrm{nan}±\infty'
         },
 
         # Leading zeroes in the shorthand notation:
@@ -2018,7 +2018,7 @@ def test_format():
 
         tests.update({
             (1234.56789, 0.012): {
-                ',.1uf': '1,234.57+/-0.01'
+                ',.1uf': u'1,234.57+/-0.01'
                 },
 
             (123456.789123, 1234.5678): {
@@ -2039,7 +2039,7 @@ def test_format():
 
         for (format_spec, result) in representations.items():
 
-            # print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
+            print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
 
             # Jython 2.5.2 does not always represent NaN as nan or NAN
             # in the CPython way: for example, '%.2g' % float('nan')
@@ -2054,9 +2054,9 @@ def test_format():
             assert representation == result, (
                 # The representation is used, for terminal that do not
                 # support some characters like ±, and superscripts:
-                'Incorrect representation %r for format %r of %r:'
+                'Incorrect representation %r for format %r of %r (%r):'
                 ' %r expected.'
-                % (representation, format_spec, value, result))
+                % (representation, format_spec, value, values, result))
 
             # An empty format string is like calling str()
             # (http://docs.python.org/2/library/string.html#formatspec):
@@ -2076,10 +2076,16 @@ def test_format():
                 # Specific case:
                 and '=====' not in representation):
 
-                value_back = ufloat_fromstr(representation)
+                try:
+                    value_back = ufloat_fromstr(representation)
+                except ValueError:
+                    print(representation, type(representation))
+                    continue
 
                 # The original number and the new one should be consistent
                 # with each other:
+                print(' Checking for consistency: %r ~> %r ~> %r'
+                      % (value, representation, value_back))
                 try:
 
                     # The nominal value can be rounded to 0 when the
@@ -2111,8 +2117,12 @@ def test_unicode_format():
 
     x = ufloat(3.14159265358979, 0.25)
 
-    assert isinstance('Résultat = %s' % x.format(''), str)
-    assert isinstance('Résultat = %s' % x.format('P'), str)
+    if sys.version_info < (3, 0):
+        assert isinstance(u'Résultat = %s' % x.format(''), unicode)
+        assert isinstance(u'Résultat = %s' % x.format('P'), unicode)
+    else:
+        assert isinstance(u'Résultat = %s' % x.format(''), str)
+        assert isinstance(u'Résultat = %s' % x.format('P'), str)
 
 ###############################################################################
 
