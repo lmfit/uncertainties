@@ -3195,6 +3195,8 @@ def ufloat_fromstr(representation, tag=None):
     the uncertainty signals an absolute uncertainty (instead of an
     uncertainty on the last digits of the nominal value).
     """
+    if representation.startswith('(') and representation.endswith(')'):
+        representation = representation[1:-1]
 
     (nominal_value, std_dev) = str_to_number_with_uncert(
         representation.strip())
