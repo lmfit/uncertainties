@@ -13,6 +13,8 @@ uncertainties
 .. image:: https://img.shields.io/pypi/v/uncertainties.svg
    :target: https://pypi.org/project/uncertainties/
 
+**WARNING**: the ``master`` branch does not seem to be in a working condition, and nor is the Conda package version 3.1.3. It is advisable to use this package through [PyPI](https://pypi.org/project/uncertainties) or [Conda](https://anaconda.org/conda-forge/uncertainties) (package version 3.1.2 only).
+
    
 This is the ``uncertainties`` Python package, which performs **transparent
 calculations with uncertainties** (aka "error propagation"):
