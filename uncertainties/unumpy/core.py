@@ -503,7 +503,7 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
         inverse = inverse.view(numpy.matrix)
     yield inverse
 
-    # It is mathematically convenient to work with matrices:
+    # Numpy arrays will allow matrix multiplication with the @ operator:
     inverse_mat = numpy.asarray(inverse)
 
     # Formula (4.12) from The Differentiation of Pseudo-Inverses and
@@ -515,7 +515,7 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
     # See also
     # http://mathoverflow.net/questions/25778/analytical-formula-for-numerical-derivative-of-the-matrix-pseudo-inverse
 
-    # Shortcuts.  All the following factors should be numpy.matrix objects:
+    # Shortcuts.  The @ operator is used for matrix multiplication of the factors:
     PA = arr@inverse_mat
     AP = inverse_mat@arr
     factor21 = inverse_mat@numpy.transpose(inverse_mat.conj())
