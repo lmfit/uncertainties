@@ -518,16 +518,16 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
     # Shortcuts.  All the following factors should be numpy.matrix objects:
     PA = arr@inverse_mat
     AP = inverse_mat@arr
-    factor21 = inverse_mat@numpy.transpose(inverse_mat)
+    factor21 = inverse_mat@numpy.transpose(inverse_mat.conj())
     factor22 = numpy.eye(arr.shape[0])-PA
     factor31 = numpy.eye(arr.shape[1])-AP
-    factor32 = numpy.transpose(inverse_mat)@inverse_mat
+    factor32 = numpy.transpose(inverse_mat.conj())@inverse_mat
 
     # Successive derivatives of the inverse:
     for derivative in derivatives:
         derivative_mat = numpy.asarray(derivative)
         term1 = -inverse_mat@derivative_mat@inverse_mat
-        derivative_mat_H = numpy.transpose(derivative_mat)
+        derivative_mat_H = numpy.transpose(derivative_mat.conj())
         term2 = factor21@derivative_mat_H@factor22
         term3 = factor31@derivative_mat_H@factor32
         yield term1+term2+term3
