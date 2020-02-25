@@ -68,6 +68,8 @@ def test_numpy():
         # TypeError (see PR #12700 in numpy repository)
         pass
     else:
+        # NOTE: if exp would be added as member method to AffineScalarFunc
+        #       like sqrt already is, this would expectedly work
         raise Exception("numpy.exp unexpectedly worked")
 
     # Calculation of the mean, global and with a specific axis:
@@ -329,3 +331,21 @@ def test_obsolete():
     mat_obs = unumpy.umatrix.__call__(([1, 2], [1, 4]))  # Obsolete call
     mat = unumpy.umatrix([1, 2], [1, 4])
     assert arrays_close(mat_obs, mat)
+    
+def test_numpy_linalg_norm():
+    '''
+    Checks if numpy.linalg.norm method works.
+    '''        
+    a = unumpy.uarray([3,4], [1,1])
+    magnitude = unumpy.nominal_values(numpy.linalg.norm(a))
+    if not(magnitude == 5):
+        raise Exception('numpy.linalg.norm([3,4]) does not return correct result!\n'
+                        'Expected 5, got %f' % magnitude)
+                        
+    if not (numpy.linalg.norm(a) == numpy.sqrt(numpy.sum(numpy.power(a, 2)))):
+        raise Exception('numpy.linalg.norm(%s) does not return correct result!\n'
+                        'Expected %s, got %s' 
+                        % (a, 
+                           numpy.sqrt(numpy.sum(numpy.power(a, 2))),
+                           numpy.linalg.norm(a)))
+    
