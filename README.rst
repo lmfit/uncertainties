@@ -1,7 +1,10 @@
 uncertainties
 =============
 
-
+.. image:: https://img.shields.io/pypi/v/uncertainties.svg
+   :target: https://pypi.org/project/uncertainties/
+.. image:: https://pepy.tech/badge/uncertainties/week
+   :target: https://pepy.tech/badge/uncertainties/week
 .. image:: https://travis-ci.org/lebigot/uncertainties.svg?branch=master
    :target: https://travis-ci.org/lebigot/uncertainties
 .. image:: https://ci.appveyor.com/api/projects/status/j5238244myqx0a0r?svg=true
@@ -10,8 +13,6 @@ uncertainties
    :target: https://codecov.io/gh/lebigot/uncertainties/
 .. image:: https://readthedocs.org/projects/uncertainties-python-package/badge/?version=latest
    :target: http://uncertainties-python-package.readthedocs.io/en/latest/?badge=latest
-.. image:: https://img.shields.io/pypi/v/uncertainties.svg
-   :target: https://pypi.org/project/uncertainties/
 
 **WARNING**: the ``master`` branch do not seem to be in a working condition. It is currently advisable to use this package through `PyPI <https://pypi.org/project/uncertainties>`_ or `Conda <https://anaconda.org/conda-forge/uncertainties>`_ (package version 3.1.2 only).
 
