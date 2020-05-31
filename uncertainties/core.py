@@ -964,18 +964,18 @@ def robust_align(orig_str, fill_char, align_option, width):
 # Maps some Unicode code points ("-", "+", and digits) to their
 # superscript version:
 TO_SUPERSCRIPT = {
-    0x2b: '⁺',
-    0x2d: '⁻',
-    0x30: '⁰',
-    0x31: '¹',
-    0x32: '²',
-    0x33: '³',
-    0x34: '⁴',
-    0x35: '⁵',
-    0x36: '⁶',
-    0x37: '⁷',
-    0x38: '⁸',
-    0x39: '⁹'
+    0x2b: u'⁺',
+    0x2d: u'⁻',
+    0x30: u'⁰',
+    0x31: u'¹',
+    0x32: u'²',
+    0x33: u'³',
+    0x34: u'⁴',
+    0x35: u'⁵',
+    0x36: u'⁶',
+    0x37: u'⁷',
+    0x38: u'⁸',
+    0x39: u'⁹'
     }
 
 # Inverted TO_SUPERSCRIPT table, for use with unicode.translate():
