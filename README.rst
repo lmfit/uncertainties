@@ -14,9 +14,6 @@ uncertainties
 .. image:: https://ci.appveyor.com/api/projects/status/j5238244myqx0a0r?svg=true
    :target: https://ci.appveyor.com/project/lebigot/uncertainties
 
-
-**WARNING**: the ``master`` branch does not seem to be in a working condition. It is currently advisable to use this package through `PyPI <https://pypi.org/project/uncertainties>`_ or `Conda <https://anaconda.org/conda-forge/uncertainties>`_ (package version 3.1.2 only).
-
    
 This is the ``uncertainties`` Python package, which performs **transparent
 calculations with uncertainties** (aka "error propagation"):
