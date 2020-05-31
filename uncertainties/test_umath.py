@@ -7,6 +7,7 @@ These tests can be run through the Nose testing framework.
 """
 
 from __future__ import division
+from __future__ import absolute_import
 
 # Standard modules
 import sys
@@ -17,7 +18,7 @@ from uncertainties import ufloat
 import uncertainties.core as uncert_core
 import uncertainties.umath_core as umath_core
 
-import test_uncertainties
+from . import test_uncertainties
 
 ###############################################################################
 # Unit tests
@@ -244,7 +245,7 @@ def test_math_module():
     # 2.6+, ValueError in Python 2.5,...):
     try:
         math.log(0)
-    except Exception, err_math:  # "as", for Python 2.6+
+    except Exception as err_math:
         # Python 3 does not make exceptions local variables: they are
         # restricted to their except block:
         err_math_args = err_math.args
@@ -252,19 +253,19 @@ def test_math_module():
 
     try:
         umath_core.log(0)
-    except exception_class, err_ufloat:  # "as", for Python 2.6+
+    except exception_class as err_ufloat:
         assert err_math_args == err_ufloat.args
     else:
         raise Exception('%s exception expected' % exception_class.__name__)
     try:
         umath_core.log(ufloat(0, 0))
-    except exception_class, err_ufloat:  # "as", for Python 2.6+
+    except exception_class as err_ufloat:
         assert err_math_args == err_ufloat.args
     else:
         raise Exception('%s exception expected' % exception_class.__name__)
     try:
         umath_core.log(ufloat(0, 1))
-    except exception_class, err_ufloat:  # "as", for Python 2.6+
+    except exception_class as err_ufloat:
         assert err_math_args == err_ufloat.args
     else:
         raise Exception('%s exception expected' % exception_class.__name__)
@@ -309,7 +310,7 @@ def test_power_special_cases():
     # 2.6+, ValueError in Python 2.5,...):
     try:
         math.pow(0, negative.nominal_value)
-    except Exception, err_math:  # "as", for Python 2.6+
+    except Exception as err_math:
         # Python 3 does not make exceptions local variables: they are
         # restricted to their except block:
         err_math_args = err_math.args
@@ -319,7 +320,7 @@ def test_power_special_cases():
 
     try:
         umath_core.pow(ufloat(0, 0.1), negative)
-    except exception_class, err:  # "as err", for Python 2.6+
+    except exception_class as err:  # "as err", for Python 2.6+
         pass
     else:
         raise Exception('%s exception expected' % exception_class.__name__)

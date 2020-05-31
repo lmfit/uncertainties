@@ -9,6 +9,7 @@ These tests can be run through the Nose testing framework.
 """
 
 from __future__ import division
+from __future__ import print_function
 
 
 # Standard modules
@@ -31,7 +32,7 @@ from uncertainties import umath
 # The following information is useful for making sure that the right
 # version of Python is running the tests (for instance with the Travis
 # Continuous Integration system):
-print "Testing with Python", sys.version
+print("Testing with Python", sys.version)
 
 ###############################################################################
 
@@ -185,8 +186,8 @@ def compare_derivatives(func, numerical_derivatives,
                         # This message is useful: the user can see that
                         # tests are really performed (instead of not being
                         # performed, silently):
-                        print "Testing derivative #%d of %s at %s" % (
-                            arg_num, funcname, args_scalar)
+                        print("Testing derivative #%d of %s at %s" % (
+                            arg_num, funcname, args_scalar))
 
                         if not numbers_close(fixed_deriv_value,
                                              num_deriv_value, 1e-4):
@@ -201,13 +202,13 @@ def compare_derivatives(func, numerical_derivatives,
                                     % (arg_num, funcname, args,
                                        fixed_deriv_value, num_deriv_value))
 
-            except ValueError, err:  # Arguments out of range, or of wrong type
+            except ValueError as err:  # Arguments out of range, or of wrong type
                 # Factorial(real) lands here:
                 if str(err).startswith('factorial'):
                     integer_arg_nums = set([0])
                 continue  # We try with different arguments
             # Some arguments might have to be integers, for instance:
-            except TypeError, err:
+            except TypeError as err:
                 if len(integer_arg_nums) == num_args:
                     raise Exception("Incorrect testing procedure: unable to "
                                     "find correct argument values for %s: %s"
@@ -698,7 +699,7 @@ def test_comparison_ops():
             try:
                 assert correct_result == getattr(x, op)(y)
             except AssertionError:
-                print "Sampling results:", sampled_results
+                print("Sampling results:", sampled_results)
                 raise Exception("Semantic value of %s %s (%s) %s not"
                                 " correctly reproduced."
                                 % (x, op, y, correct_result))
