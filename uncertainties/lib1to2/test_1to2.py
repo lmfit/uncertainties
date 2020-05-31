@@ -55,7 +55,7 @@ else:
         source, expected -- strings (typically with Python code).
         """
 
-        new = str(
+        new = unicode(
             refactorer.refactor_string(support.reformat(source), '<string>'))
 
         assert support.reformat(expected) == new, (
@@ -74,7 +74,7 @@ else:
         refactorer = support.get_refactorer(
             fixer_pkg='lib1to2', fixers=[fixer])
 
-        for (input_str, out_str) in list(tests.items()):
+        for (input_str, out_str) in tests.items():
             check_refactor(refactorer, input_str, out_str)
 
     def test_fix_std_dev():
@@ -140,7 +140,7 @@ else:
             # !! Dictionary comprehension usable with Python 2.7+
             (orig.replace('ufloat', 'unc.ufloat'),
              new.replace('ufloat', 'unc.ufloat'))
-            for (orig, new) in tests.items()))
+            for (orig, new) in tests.iteritems()))
 
         # Test for space consistency:
         tests[' t  =  u.ufloat("3")'] = ' t  =  u.ufloat_fromstr("3")'
@@ -149,7 +149,7 @@ else:
         tests.update(dict(
             # !! Dictionary comprehension usable with Python 2.7+
             (orig+'**2', new+'**2')
-            for (orig, new) in tests.items()))
+            for (orig, new) in tests.iteritems()))
 
         # Exponent test:
         tests['2**ufloat("3")'] = '2**ufloat_fromstr("3")'
@@ -183,13 +183,13 @@ else:
             # !! Dictionary comprehension usable with Python 2.7+
             (orig.replace('uarray', 'un.uarray'),
              new.replace('uarray', 'un.uarray'))
-            for (orig, new) in tests.items()))
+            for (orig, new) in tests.iteritems()))
                              
         # Exponentiation test:
         tests.update(dict(
             # !! Dictionary comprehension usable with Python 2.7+
             (orig+'**2', new+'**2')
-            for (orig, new) in tests.items()))
+            for (orig, new) in tests.iteritems()))
 
         # Test for space consistency:
         tests[' t  =  u.uarray(args)'] = ' t  =  u.uarray(*args)'
@@ -198,7 +198,7 @@ else:
         tests.update(dict(
             (orig.replace('uarray', 'umatrix'),
              new.replace('uarray', 'umatrix'))
-            for (orig, new) in tests.items()))
+            for (orig, new) in tests.iteritems()))
         
         check_all('uarray_umatrix', tests)
 

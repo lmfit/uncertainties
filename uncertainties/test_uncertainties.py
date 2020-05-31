@@ -8,7 +8,7 @@ These tests can be run through the Nose testing framework.
 (c) 2010-2016 by Eric O. LEBIGOT (EOL).
 """
 
-
+from __future__ import division
 
 
 # Standard modules
@@ -31,7 +31,7 @@ from uncertainties import umath
 # The following information is useful for making sure that the right
 # version of Python is running the tests (for instance with the Travis
 # Continuous Integration system):
-print("Testing with Python", sys.version)
+print "Testing with Python", sys.version
 
 ###############################################################################
 
@@ -154,7 +154,7 @@ def compare_derivatives(func, numerical_derivatives,
                 args = []
                 for arg_num in range(num_args):
                     if arg_num in integer_arg_nums:
-                        args.append(random.choice(list(range(-10, 10))))
+                        args.append(random.choice(range(-10, 10)))
                     else:
                         args.append(
                             uncert_core.Variable(random.random()*4-2, 0))
@@ -185,8 +185,8 @@ def compare_derivatives(func, numerical_derivatives,
                         # This message is useful: the user can see that
                         # tests are really performed (instead of not being
                         # performed, silently):
-                        print("Testing derivative #%d of %s at %s" % (
-                            arg_num, funcname, args_scalar))
+                        print "Testing derivative #%d of %s at %s" % (
+                            arg_num, funcname, args_scalar)
 
                         if not numbers_close(fixed_deriv_value,
                                              num_deriv_value, 1e-4):
@@ -201,20 +201,20 @@ def compare_derivatives(func, numerical_derivatives,
                                     % (arg_num, funcname, args,
                                        fixed_deriv_value, num_deriv_value))
 
-            except ValueError as err:  # Arguments out of range, or of wrong type
+            except ValueError, err:  # Arguments out of range, or of wrong type
                 # Factorial(real) lands here:
                 if str(err).startswith('factorial'):
                     integer_arg_nums = set([0])
                 continue  # We try with different arguments
             # Some arguments might have to be integers, for instance:
-            except TypeError as err:
+            except TypeError, err:
                 if len(integer_arg_nums) == num_args:
                     raise Exception("Incorrect testing procedure: unable to "
                                     "find correct argument values for %s: %s"
                                     % (funcname, err))
 
                 # Another argument might be forced to be an integer:
-                integer_arg_nums.add(random.choice(list(range(num_args))))
+                integer_arg_nums.add(random.choice(range(num_args)))
             else:
                 # We have found reasonable arguments, and the test passed:
                 break
@@ -337,15 +337,15 @@ def test_ufloat_fromstr():
         ## Pretty-print notation:
 
         # ± sign, global exponent (not pretty-printed):
-        '(3.141±0.001)E+02': (314.1, 0.1),
+        u'(3.141±0.001)E+02': (314.1, 0.1),
         # ± sign, individual exponent:
-        '3.141E+02±0.001e2': (314.1, 0.1),
+        u'3.141E+02±0.001e2': (314.1, 0.1),
 
         # ± sign, times symbol, superscript (= full pretty-print):
-        '(3.141 ± 0.001) × 10²': (314.1, 0.1),
+        u'(3.141 ± 0.001) × 10²': (314.1, 0.1),
 
         # NaN uncertainty:
-        '(3.141±nan)E+02': (314.1, float('nan')),
+        u'(3.141±nan)E+02': (314.1, float('nan')),
         '3.141e+02+/-nan': (314.1, float('nan')),
         '3.4(nan)e10': (3.4e10, float('nan')),
         # NaN value:
@@ -357,7 +357,7 @@ def test_ufloat_fromstr():
         '-3(0.)': (-3, 0)
         }
 
-    for (representation, values) in tests.items():
+    for (representation, values) in tests.iteritems():
 
         # Without tag:
         num = ufloat_fromstr(representation)
@@ -419,7 +419,7 @@ def test_fixed_derivatives_basic_funcs():
             # by definition, to AffineScalarFunc objects: we first map
             # possible scalar arguments (used for calculating
             # derivatives) to AffineScalarFunc objects:
-            lambda *args: func(*list(map(uncert_core.to_affine_scalar, args))))
+            lambda *args: func(*map(uncert_core.to_affine_scalar, args)))
         compare_derivatives(func, numerical_derivatives, [num_args])
 
     # Operators that take 1 value:
@@ -443,7 +443,7 @@ def test_copy():
     y = copy.copy(x)
     assert x != y
     assert not(x == y)
-    assert y in list(y.derivatives.keys())  # y must not copy the dependence on x
+    assert y in y.derivatives.keys()  # y must not copy the dependence on x
 
     z = copy.deepcopy(x)
     assert x != z
@@ -479,7 +479,7 @@ def test_copy():
 
     gc.collect()
 
-    assert y in list(y.derivatives.keys())
+    assert y in y.derivatives.keys()
 
 ## Classes for the pickling tests (put at the module level, so that
 ## they can be unpickled):
@@ -698,7 +698,7 @@ def test_comparison_ops():
             try:
                 assert correct_result == getattr(x, op)(y)
             except AssertionError:
-                print("Sampling results:", sampled_results)
+                print "Sampling results:", sampled_results
                 raise Exception("Semantic value of %s %s (%s) %s not"
                                 " correctly reproduced."
                                 % (x, op, y, correct_result))
@@ -930,7 +930,7 @@ def test_wrapped_func_no_args_kwargs():
     # Like f_auto_unc, but does not accept numbers with uncertainties:
     def f(x, y, **kwargs):
         assert not any(isinstance(value, uncert_core.UFloat)
-                       for value in [x, y] + list(kwargs.values()))
+                       for value in [x, y] + kwargs.values())
         return f_auto_unc(x, y, **kwargs)
 
     x = uncert_core.ufloat(1, 0.1)
@@ -1022,7 +1022,7 @@ def test_wrapped_func_args_kwargs():
     # Like f_auto_unc, but does not accept numbers with uncertainties:
     def f(x, y, *args, **kwargs):
         assert not any(isinstance(value, uncert_core.UFloat)
-                       for value in [x, y]+list(args)+list(kwargs.values()))
+                       for value in [x, y]+list(args)+kwargs.values())
         return f_auto_unc(x, y, *args, **kwargs)
 
     x = uncert_core.ufloat(1, 0.1)
@@ -1165,7 +1165,7 @@ def test_wrap_with_kwargs():
         # We make sure that f is not called directly with a number with
         # uncertainty:
 
-        for value in [x, y]+list(args)+list(kwargs.values()):
+        for value in [x, y]+list(args)+kwargs.values():
             assert not isinstance(value, uncert_core.UFloat)
 
         return f_auto_unc(x, y, *args, **kwargs)
@@ -1510,7 +1510,7 @@ def test_PDG_precision():
         9.99e-324: (2, 1e-323)
         }
 
-    for (std_dev, result) in tests.items():
+    for (std_dev, result) in tests.iteritems():
         assert uncert_core.PDG_precision(std_dev) == result
 
 def test_repr():
@@ -1643,7 +1643,7 @@ def test_format():
             # found in Python 2.7: '{:.1%}'.format(0.0055) is '0.5%'.
             '.1u%': '(42.0+/-0.5)%',
             '.1u%S': '42.0(5)%',
-            '%P': '(42.0±0.5)%'
+            '%P': u'(42.0±0.5)%'
         },
 
         # Particle Data Group automatic convention, including limit cases:
@@ -1714,17 +1714,17 @@ def test_format():
         # instead of 1.4 for Python 3.1. The problem does not appear
         # with 1.2, so 1.2 is used.
         (-1.2e-12, 0): {
-            '12.2gPL': r'  -1.2×10⁻¹²±           0',
+            '12.2gPL': ur'  -1.2×10⁻¹²±           0',
             # Pure "width" formats are not accepted by the % operator,
             # and only %-compatible formats are accepted, for Python <
             # 2.6:
             '13S': '  -1.2(0)e-12',
-            '10P': '-1.2×10⁻¹²±         0',
+            '10P': u'-1.2×10⁻¹²±         0',
             'L': r'\left(-1.2 \pm 0\right) \times 10^{-12}',
             # No factored exponent, LaTeX
             '1L': r'-1.2 \times 10^{-12} \pm 0',
             'SL': r'-1.2(0) \times 10^{-12}',
-            'SP': r'-1.2(0)×10⁻¹²'
+            'SP': ur'-1.2(0)×10⁻¹²'
         },
 
         # Python 3.2 and 3.3 give 1.4e-12*1e+12 = 1.4000000000000001
@@ -1735,7 +1735,7 @@ def test_format():
             '15GS': '  -1.2(%s)E-12' % NaN_EFG,
             'SL': r'-1.2(\mathrm{nan}) \times 10^{-12}',  # LaTeX NaN
             # Pretty-print priority, but not for NaN:
-            'PSL': '-1.2(\mathrm{nan})×10⁻¹²',
+            'PSL': u'-1.2(\mathrm{nan})×10⁻¹²',
             'L': r'\left(-1.2 \pm \mathrm{nan}\right) \times 10^{-12}',
             # Uppercase NaN and LaTeX:
             '.1EL': (r'\left(-1.2 \pm \mathrm{%s}\right) \times 10^{-12}'
@@ -1746,8 +1746,8 @@ def test_format():
 
         (3.14e-10, 0.01e-10): {
             # Character (Unicode) strings:
-            'P': '(3.140±0.010)×10⁻¹⁰',  # PDG rules: 2 digits
-            'PL': r'(3.140±0.010)×10⁻¹⁰',  # Pretty-print has higher priority
+            u'P': u'(3.140±0.010)×10⁻¹⁰',  # PDG rules: 2 digits
+            u'PL': ur'(3.140±0.010)×10⁻¹⁰',  # Pretty-print has higher priority
             # Truncated non-zero uncertainty:
             '.1e': '(3.1+/-0.0)e-10',
             '.1eS': '3.1(0.0)e-10'
@@ -1977,7 +1977,7 @@ def test_format():
             'S': '-inf(inf)',
             'LS': '-\infty(\infty)',
             'L': '-\infty \pm \infty',
-            'LP': '-\infty±\infty',
+            'LP': u'-\infty±\infty',
             # The following is consistent with Python's own
             # formatting, which depends on the version of Python:
             # formatting float("-inf") with format(..., "020") gives
@@ -2003,7 +2003,7 @@ def test_format():
             'S': 'nan(inf)',
             'LS': '\mathrm{nan}(\infty)',
             'L': '\mathrm{nan} \pm \infty',
-            'LP': '\mathrm{nan}±\infty'
+            'LP': u'\mathrm{nan}±\infty'
         },
 
         # Leading zeroes in the shorthand notation:
@@ -2033,11 +2033,11 @@ def test_format():
     except AttributeError:
         jython_detected = False
 
-    for (values, representations) in tests.items():
+    for (values, representations) in tests.iteritems():
 
         value = ufloat(*values)
 
-        for (format_spec, result) in representations.items():
+        for (format_spec, result) in representations.iteritems():
 
             # print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
 
@@ -2111,8 +2111,8 @@ def test_unicode_format():
 
     x = ufloat(3.14159265358979, 0.25)
 
-    assert isinstance('Résultat = %s' % x.format(''), str)
-    assert isinstance('Résultat = %s' % x.format('P'), str)
+    assert isinstance(u'Résultat = %s' % x.format(''), unicode)
+    assert isinstance(u'Résultat = %s' % x.format('P'), unicode)
 
 ###############################################################################
 
@@ -2347,7 +2347,7 @@ else:
         nominal_values = [v.nominal_value for v in (x, y, z)]
         std_devs = [v.std_dev for v in (x, y, z)]
         x2, y2, z2 = uncert_core.correlated_values_norm(
-            list(zip(nominal_values, std_devs)), corr_mat)
+            zip(nominal_values, std_devs), corr_mat)
 
         # arrays_close() is used instead of numbers_close() because
         # it compares uncertainties too:

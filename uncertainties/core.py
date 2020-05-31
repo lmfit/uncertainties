@@ -12,7 +12,7 @@ Main module for the uncertainties package, with internal functions.
 # Uncertainties can then be calculated by using this local linear
 # approximation of the original function.
 
-  # Many analytical derivatives depend on this
+from __future__ import division  # Many analytical derivatives depend on this
 
 import sys
 import re
@@ -174,7 +174,7 @@ else:
         return correlated_values_norm(
             # !! The following zip() is a bit suboptimal: correlated_values()
             # separates back the nominal values and the standard deviations:
-            list(zip(nom_values, std_devs)),
+            zip(nom_values, std_devs),
             covariance_mat/norm_vector/norm_vector[:,numpy.newaxis],
             tags)
 
@@ -244,7 +244,7 @@ else:
         values_funcs = tuple(
             AffineScalarFunc(
                 value,
-                LinearCombination(dict(list(zip(variables, coords)))))
+                LinearCombination(dict(zip(variables, coords))))
             for (coords, value) in zip(transform, nominal_values))
 
         return values_funcs
@@ -305,7 +305,7 @@ def partial_derivative(f, arg_ref):
 
     # Which set of function parameter contains the variable to be
     # changed? the positional or the optional keyword arguments?
-    change_kwargs = isinstance(arg_ref, str)
+    change_kwargs = isinstance(arg_ref, basestring)
 
     def partial_derivative_of_f(*args, **kwargs):
         """
@@ -553,7 +553,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
     derivatives_all_kwargs = {}
 
-    for (name, derivative) in derivatives_kwargs.items():
+    for (name, derivative) in derivatives_kwargs.iteritems():
 
         # Optimization: None keyword-argument derivatives are converted
         # right away to derivatives (instead of doing this every time a
@@ -648,7 +648,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
         pos_w_uncert = [index for (index, value) in enumerate(args)
                         if isinstance(value, AffineScalarFunc)]
-        names_w_uncert = [key for (key, value) in kwargs.items()
+        names_w_uncert = [key for (key, value) in kwargs.iteritems()
                           if isinstance(value, AffineScalarFunc)]
 
         ########################################
@@ -982,7 +982,7 @@ TO_SUPERSCRIPT = {
 #
 #! Python 2.7+ can use a dictionary comprehension instead:
 FROM_SUPERSCRIPT = {
-    ord(sup): normal for (normal, sup) in TO_SUPERSCRIPT.items()}
+    ord(sup): normal for (normal, sup) in TO_SUPERSCRIPT.iteritems()}
 
 def to_superscript(value):
     '''
@@ -993,7 +993,7 @@ def to_superscript(value):
     value -- integer.
     '''
 
-    return ('%d' % value).translate(TO_SUPERSCRIPT)
+    return (u'%d' % value).translate(TO_SUPERSCRIPT)
 
 def from_superscript(number_str):
     '''
@@ -1003,12 +1003,12 @@ def from_superscript(number_str):
 
     number_str -- basestring object.
     '''
-    return int(str(number_str).translate(FROM_SUPERSCRIPT))
+    return int(unicode(number_str).translate(FROM_SUPERSCRIPT))
 
 # Function that transforms an exponent produced by format_num() into
 # the corresponding string notation (for non-default modes):
 EXP_PRINT = {
-    'pretty-print': lambda common_exp: '×10%s' % to_superscript(common_exp),
+    'pretty-print': lambda common_exp: u'×10%s' % to_superscript(common_exp),
     'latex': lambda common_exp: r' \times 10^{%d}' % common_exp}
 
 # Symbols used for grouping (typically between parentheses) in format_num():
@@ -1403,7 +1403,7 @@ def format_num(nom_val_main, error_main, common_exp,
         if 'P' in options:
             # Unicode has priority over LaTeX, so that users with a
             # Unicode-compatible LaTeX source can use ±:
-            pm_symbol = '±'
+            pm_symbol = u'±'
         elif 'L' in options:
             pm_symbol = r' \pm '
         else:
@@ -1544,7 +1544,7 @@ class LinearCombination(object):
             # print "MAINS", main_factor, main_expr
 
             if main_expr.expanded():
-                for (var, factor) in main_expr.linear_combo.items():
+                for (var, factor) in main_expr.linear_combo.iteritems():
                     derivatives[var] += main_factor*factor
 
             else:  # Non-expanded form
@@ -1700,7 +1700,7 @@ class AffineScalarFunc(object):
     # as the result of bool()) don't have a very meaningful
     # uncertainty unless it is zero, this behavior is fine.
 
-    def __bool__(self):
+    def __nonzero__(self):
         """
         Equivalent to self != 0.
         """
@@ -1775,7 +1775,7 @@ class AffineScalarFunc(object):
         # Calculation of the variance:
         error_components = {}
 
-        for (variable, derivative) in self.derivatives.items():
+        for (variable, derivative) in self.derivatives.iteritems():
 
             # print "TYPE", type(variable), type(derivative)
 
@@ -1812,7 +1812,7 @@ class AffineScalarFunc(object):
         #not need to have their std_dev calculated: only the final
         #AffineScalarFunc returned to the user does).
         return CallableStdDev(sqrt(sum(
-            delta**2 for delta in self.error_components().values())))
+            delta**2 for delta in self.error_components().itervalues())))
 
     # Abbreviation (for formulas, etc.):
     s = std_dev
@@ -2413,7 +2413,7 @@ class AffineScalarFunc(object):
         """
         Hook for the pickle module.
         """
-        for (name, value) in data_dict.items():
+        for (name, value) in data_dict.iteritems():
             # Contrary to the default __setstate__(), this does not
             # necessarily save to the instance dictionary (because the
             # instance might contain slots):
@@ -2493,7 +2493,7 @@ def get_ops_with_reflection():
 
     # Conversion to Python functions:
     ops_with_reflection = {}
-    for (op, derivatives) in derivatives_list.items():
+    for (op, derivatives) in derivatives_list.iteritems():
         ops_with_reflection[op] = [
             eval("lambda x, y: %s" % expr) for expr in derivatives ]
 
@@ -2531,11 +2531,11 @@ def get_ops_with_reflection():
     # Undefined derivatives are converted to NaN when the function
     # itself can be calculated:
     for op in ['pow']:
-        ops_with_reflection[op] = list(map(nan_if_exception,
-                                      ops_with_reflection[op]))
+        ops_with_reflection[op] = map(nan_if_exception,
+                                      ops_with_reflection[op])
 
-        ops_with_reflection['r'+op] = list(map(nan_if_exception,
-                                          ops_with_reflection['r'+op]))
+        ops_with_reflection['r'+op] = map(nan_if_exception,
+                                          ops_with_reflection['r'+op])
 
     return ops_with_reflection
 
@@ -2616,7 +2616,7 @@ def add_operators_to_AffineScalarFunc():
         }
 
     for (op, derivative) in (
-        iter(simple_numerical_operators_derivatives.items())):
+        simple_numerical_operators_derivatives.iteritems()):
 
         attribute_name = "__%s__" % op
 
@@ -2636,7 +2636,7 @@ def add_operators_to_AffineScalarFunc():
     # Final definition of the operators for AffineScalarFunc objects:
 
     # Reversed versions (useful for float*AffineScalarFunc, for instance):
-    for (op, derivatives) in ops_with_reflection.items():
+    for (op, derivatives) in ops_with_reflection.iteritems():
         attribute_name = '__%s__' % op
 
         # float objects don't exactly have the same attributes between
@@ -2918,12 +2918,12 @@ else:
 # semantics of some representations (e.g. .1(2.) = .1+/-2, whereas
 # .1(2) = .1+/-0.2), so just getting the numerical value of the part
 # in parentheses would not be sufficient.
-POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = r'((\d*)(\.\d*)?|nan|NAN|inf|INF)'
+POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = ur'((\d*)(\.\d*)?|nan|NAN|inf|INF)'
 
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where
 # the uncertainty is optional (in which case the uncertainty is
 # implicit). The uncertainty can also be nan or NAN:
-NUMBER_WITH_UNCERT_RE_STR = r'''
+NUMBER_WITH_UNCERT_RE_STR = ur'''
     ([+-])?  # Sign
     %s  # Main number
     (?:\(%s\))?  # Optional uncertainty
@@ -2935,12 +2935,12 @@ NUMBER_WITH_UNCERT_RE_STR = r'''
            POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE)
 
 NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
-    "%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).match
+    u"%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).match
 
 # Number with uncertainty with a factored exponent (e.g., of the form
 # (... +/- ...)e10): this is a loose matching, so as to accommodate
 # for multiple formats:
-NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(r'''
+NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(ur'''
     \(
     (?P<simple_num_with_uncert>.*)
     \)
@@ -3012,7 +3012,7 @@ def parse_error_in_parentheses(representation):
     return (value, uncert_value)
 
 # Regexp for catching the two variable parts of -1.2×10⁻¹²:
-PRETTY_PRINT_MATCH = re.compile(r'(.*?)\s*×\s*10(.*)').match
+PRETTY_PRINT_MATCH = re.compile(ur'(.*?)\s*×\s*10(.*)').match
 
 def to_float(value_str):
     '''
@@ -3089,7 +3089,7 @@ def str_to_number_with_uncert(representation):
     else:
         factor = 1  # No global exponential factor
 
-    match = re.match(r'(.*)(?:\+/-|±)(.*)', representation)
+    match = re.match(ur'(.*)(?:\+/-|±)(.*)', representation)
     if match:
 
         (nom_value, uncert) = match.groups()
