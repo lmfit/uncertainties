@@ -2939,12 +2939,17 @@ else:
 # semantics of some representations (e.g. .1(2.) = .1+/-2, whereas
 # .1(2) = .1+/-0.2), so just getting the numerical value of the part
 # in parentheses would not be sufficient.
-POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = ur'((\d*)(\.\d*)?|nan|NAN|inf|INF)'
+#
+# WARNING: the code below relies on this to be a Unicode string (for Python 2):
+POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = u'((\\d*)(\\.\\d*)?|nan|NAN|inf|INF)'
 
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where
 # the uncertainty is optional (in which case the uncertainty is
 # implicit). The uncertainty can also be nan or NAN:
-NUMBER_WITH_UNCERT_RE_STR = ur'''
+#
+# WARNING: in Python 2, the code relies on "… % <unicode string>" returning a
+# Unicode string (even if the template is not Unicode):
+NUMBER_WITH_UNCERT_RE_STR = r'''
     ([+-])?  # Sign
     %s  # Main number
     (?:\(%s\))?  # Optional uncertainty
@@ -2961,7 +2966,7 @@ NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
 # Number with uncertainty with a factored exponent (e.g., of the form
 # (... +/- ...)e10): this is a loose matching, so as to accommodate
 # for multiple formats:
-NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(ur'''
+NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(r'''
     \(
     (?P<simple_num_with_uncert>.*)
     \)
@@ -3039,7 +3044,7 @@ def parse_error_in_parentheses(representation):
     return (value, uncert_value)
 
 # Regexp for catching the two variable parts of -1.2×10⁻¹²:
-PRETTY_PRINT_MATCH = re.compile(ur'(.*?)\s*×\s*10(.*)').match
+PRETTY_PRINT_MATCH = re.compile(r'(.*?)\s*×\s*10(.*)').match
 
 def to_float(value_str):
     '''
@@ -3116,7 +3121,7 @@ def str_to_number_with_uncert(representation):
     else:
         factor = 1  # No global exponential factor
 
-    match = re.match(ur'(.*)(?:\+/-|±)(.*)', representation)
+    match = re.match(r'(.*)(?:\+/-|±)(.*)', representation)
     if match:
 
         (nom_value, uncert) = match.groups()
