@@ -12,8 +12,10 @@ Core functions used by unumpy and some of its submodules.
 from __future__ import division
 
 # Standard modules:
+from builtins import next
+from builtins import zip
+from builtins import range
 import sys
-import itertools
 import inspect
 
 # 3rd-party modules:
@@ -175,7 +177,7 @@ def wrap_array_func(func):
                 # !!!! This forces an evaluation of the
                 # derivatives!? Isn't this very slow, when
                 # working with a large number of arrays?
-                variables |= set(element.derivatives.iterkeys())
+                variables |= element.derivatives.keys()
 
         # If the matrix has no variables, then the function value can be
         # directly returned:
@@ -384,7 +386,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         for element in array_version.flat:
             # floats, etc. might be present
             if isinstance(element, uncert_core.AffineScalarFunc):
-                variables |= element.derivatives.viewkeys()
+                variables |= element.derivatives.keys()
 
         array_nominal = nominal_values(array_version)
         # Function value, then derivatives at array_nominal (the
@@ -408,7 +410,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         # the variables.
         derivatives = (
             numpy.array(
-                [{} for _ in xrange(func_nominal_value.size)], dtype=object)
+                [{} for _ in range(func_nominal_value.size)], dtype=object)
             .reshape(func_nominal_value.shape))
 
         # Memory-efficient approach.  A memory-hungry approach would
@@ -418,12 +420,12 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         # progressively build the matrix of derivatives, by
         # progressively adding the derivatives with respect to
         # successive variables.
-        for (var, deriv_wrt_var) in itertools.izip(variables,
+        for (var, deriv_wrt_var) in zip(variables,
                                                    func_then_derivs):
 
             # Update of the list of variables and associated
             # derivatives, for each element:
-            for (derivative_dict, derivative_value) in itertools.izip(
+            for (derivative_dict, derivative_value) in zip(
                 derivatives.flat, deriv_wrt_var.flat):
                 if derivative_value:
                     derivative_dict[var] = derivative_value
