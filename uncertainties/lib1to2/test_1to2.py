@@ -5,13 +5,14 @@ Unit tests for the uncertainties.lib1to2 code update package.
 
 Meant to be run through nosetests.
 
-(c) 2013 by Eric O. LEBIGOT (EOL).
+(c) 2013-2020 by Eric O. LEBIGOT (EOL).
 '''
 
 # Code inspired by:
 #
 # - lib2to3.tests.test_fixers.py
 
+from builtins import str
 import sys
 import os
 
@@ -55,7 +56,9 @@ else:
         source, expected -- strings (typically with Python code).
         """
 
-        new = unicode(
+        # !! str() is from future's builtins and is only needed for Python 2,
+        # where it is mostly equivalent to unicode():
+        new = str(
             refactorer.refactor_string(support.reformat(source), '<string>'))
 
         assert support.reformat(expected) == new, (
@@ -140,7 +143,7 @@ else:
             # !! Dictionary comprehension usable with Python 2.7+
             (orig.replace('ufloat', 'unc.ufloat'),
              new.replace('ufloat', 'unc.ufloat'))
-            for (orig, new) in tests.iteritems()))
+            for (orig, new) in tests.items()))
 
         # Test for space consistency:
         tests[' t  =  u.ufloat("3")'] = ' t  =  u.ufloat_fromstr("3")'
@@ -149,7 +152,7 @@ else:
         tests.update(dict(
             # !! Dictionary comprehension usable with Python 2.7+
             (orig+'**2', new+'**2')
-            for (orig, new) in tests.iteritems()))
+            for (orig, new) in tests.items()))
 
         # Exponent test:
         tests['2**ufloat("3")'] = '2**ufloat_fromstr("3")'
@@ -183,13 +186,13 @@ else:
             # !! Dictionary comprehension usable with Python 2.7+
             (orig.replace('uarray', 'un.uarray'),
              new.replace('uarray', 'un.uarray'))
-            for (orig, new) in tests.iteritems()))
+            for (orig, new) in tests.items()))
                              
         # Exponentiation test:
         tests.update(dict(
             # !! Dictionary comprehension usable with Python 2.7+
             (orig+'**2', new+'**2')
-            for (orig, new) in tests.iteritems()))
+            for (orig, new) in tests.items()))
 
         # Test for space consistency:
         tests[' t  =  u.uarray(args)'] = ' t  =  u.uarray(*args)'
@@ -198,7 +201,7 @@ else:
         tests.update(dict(
             (orig.replace('uarray', 'umatrix'),
              new.replace('uarray', 'umatrix'))
-            for (orig, new) in tests.iteritems()))
+            for (orig, new) in tests.items()))
         
         check_all('uarray_umatrix', tests)
 
