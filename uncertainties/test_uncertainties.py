@@ -13,6 +13,10 @@ from __future__ import print_function
 
 
 # Standard modules
+from builtins import str
+from builtins import zip
+from builtins import map
+from builtins import range
 import copy
 import weakref
 import math
@@ -358,7 +362,7 @@ def test_ufloat_fromstr():
         '-3(0.)': (-3, 0)
         }
 
-    for (representation, values) in tests.iteritems():
+    for (representation, values) in tests.items():
 
         # Without tag:
         num = ufloat_fromstr(representation)
@@ -480,7 +484,7 @@ def test_copy():
 
     gc.collect()
 
-    assert y in y.derivatives.keys()
+    assert y in list(y.derivatives.keys())
 
 ## Classes for the pickling tests (put at the module level, so that
 ## they can be unpickled):
@@ -931,7 +935,7 @@ def test_wrapped_func_no_args_kwargs():
     # Like f_auto_unc, but does not accept numbers with uncertainties:
     def f(x, y, **kwargs):
         assert not any(isinstance(value, uncert_core.UFloat)
-                       for value in [x, y] + kwargs.values())
+                       for value in [x, y] + list(kwargs.values()))
         return f_auto_unc(x, y, **kwargs)
 
     x = uncert_core.ufloat(1, 0.1)
@@ -1023,7 +1027,7 @@ def test_wrapped_func_args_kwargs():
     # Like f_auto_unc, but does not accept numbers with uncertainties:
     def f(x, y, *args, **kwargs):
         assert not any(isinstance(value, uncert_core.UFloat)
-                       for value in [x, y]+list(args)+kwargs.values())
+                       for value in [x, y]+list(args)+list(kwargs.values()))
         return f_auto_unc(x, y, *args, **kwargs)
 
     x = uncert_core.ufloat(1, 0.1)
@@ -1166,7 +1170,7 @@ def test_wrap_with_kwargs():
         # We make sure that f is not called directly with a number with
         # uncertainty:
 
-        for value in [x, y]+list(args)+kwargs.values():
+        for value in [x, y]+list(args)+list(kwargs.values()):
             assert not isinstance(value, uncert_core.UFloat)
 
         return f_auto_unc(x, y, *args, **kwargs)
@@ -1511,7 +1515,7 @@ def test_PDG_precision():
         9.99e-324: (2, 1e-323)
         }
 
-    for (std_dev, result) in tests.iteritems():
+    for (std_dev, result) in tests.items():
         assert uncert_core.PDG_precision(std_dev) == result
 
 def test_repr():
@@ -2034,11 +2038,11 @@ def test_format():
     except AttributeError:
         jython_detected = False
 
-    for (values, representations) in tests.iteritems():
+    for (values, representations) in tests.items():
 
         value = ufloat(*values)
 
-        for (format_spec, result) in representations.iteritems():
+        for (format_spec, result) in representations.items():
 
             # print "FORMATTING {} WITH '{}'".format(repr(value), format_spec)
 
@@ -2112,8 +2116,8 @@ def test_unicode_format():
 
     x = ufloat(3.14159265358979, 0.25)
 
-    assert isinstance(u'Résultat = %s' % x.format(''), unicode)
-    assert isinstance(u'Résultat = %s' % x.format('P'), unicode)
+    assert isinstance(u'Résultat = %s' % x.format(''), str)
+    assert isinstance(u'Résultat = %s' % x.format('P'), str)
 
 ###############################################################################
 
@@ -2348,7 +2352,7 @@ else:
         nominal_values = [v.nominal_value for v in (x, y, z)]
         std_devs = [v.std_dev for v in (x, y, z)]
         x2, y2, z2 = uncert_core.correlated_values_norm(
-            zip(nominal_values, std_devs), corr_mat)
+            list(zip(nominal_values, std_devs)), corr_mat)
 
         # arrays_close() is used instead of numbers_close() because
         # it compares uncertainties too:
