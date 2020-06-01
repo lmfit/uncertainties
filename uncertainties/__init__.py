@@ -221,6 +221,7 @@ This software is released under a dual license.  (1) The BSD license.
 (2) Any other license, as long as it is obtained from the original
 author.'''
 
+from builtins import map
 from .core import *
 from .core import __all__  # For a correct help(uncertainties)
 
