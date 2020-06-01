@@ -2939,22 +2939,20 @@ else:
 # semantics of some representations (e.g. .1(2.) = .1+/-2, whereas
 # .1(2) = .1+/-0.2), so just getting the numerical value of the part
 # in parentheses would not be sufficient.
-#
-# WARNING: the code below relies on this to be a Unicode string (for Python 2):
-POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = u'((\\d*)(\\.\\d*)?|nan|NAN|inf|INF)'
+POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = r'((\d*)(\.\d*)?|nan|NAN|inf|INF)'
 
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where
 # the uncertainty is optional (in which case the uncertainty is
 # implicit). The uncertainty can also be nan or NAN:
 #
-# WARNING: in Python 2, the code relies on "… % <unicode string>" returning a
-# Unicode string (even if the template is not Unicode):
-NUMBER_WITH_UNCERT_RE_STR = r'''
+# !! WARNING: in Python 2, the code relies on "… % <unicode string>" returning
+# a Unicode string (even if the template is not Unicode):
+NUMBER_WITH_UNCERT_RE_STR = u'''
     ([+-])?  # Sign
     %s  # Main number
-    (?:\(%s\))?  # Optional uncertainty
+    (?:\\(%s\\))?  # Optional uncertainty
     (?:
-        (?:[eE]|\s*×\s*10)
+        (?:[eE]|\\s*×\\s*10)
         (.*)
     )?  # Optional exponent
     ''' % (POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE,
@@ -2966,11 +2964,11 @@ NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
 # Number with uncertainty with a factored exponent (e.g., of the form
 # (... +/- ...)e10): this is a loose matching, so as to accommodate
 # for multiple formats:
-NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(r'''
-    \(
+NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(u'''
+    \\(
     (?P<simple_num_with_uncert>.*)
-    \)
-    (?:[eE]|\s*×\s*10) (?P<exp_value>.*)
+    \\)
+    (?:[eE]|\\s*×\\s*10) (?P<exp_value>.*)
     $''', re.VERBOSE).match
 
 class NotParenUncert(ValueError):
