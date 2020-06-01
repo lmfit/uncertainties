@@ -14,6 +14,13 @@ Main module for the uncertainties package, with internal functions.
 
 from __future__ import division  # Many analytical derivatives depend on this
 
+from builtins import str
+from builtins import next
+from builtins import map
+from builtins import zip
+from builtins import range
+from past.builtins import basestring
+from builtins import object
 import sys
 import re
 import math
@@ -174,7 +181,7 @@ else:
         return correlated_values_norm(
             # !! The following zip() is a bit suboptimal: correlated_values()
             # separates back the nominal values and the standard deviations:
-            zip(nom_values, std_devs),
+            list(zip(nom_values, std_devs)),
             covariance_mat/norm_vector/norm_vector[:,numpy.newaxis],
             tags)
 
@@ -553,7 +560,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
     derivatives_all_kwargs = {}
 
-    for (name, derivative) in derivatives_kwargs.iteritems():
+    for (name, derivative) in derivatives_kwargs.items():
 
         # Optimization: None keyword-argument derivatives are converted
         # right away to derivatives (instead of doing this every time a
@@ -648,7 +655,7 @@ def wrap(f, derivatives_args=[], derivatives_kwargs={}):
 
         pos_w_uncert = [index for (index, value) in enumerate(args)
                         if isinstance(value, AffineScalarFunc)]
-        names_w_uncert = [key for (key, value) in kwargs.iteritems()
+        names_w_uncert = [key for (key, value) in kwargs.items()
                           if isinstance(value, AffineScalarFunc)]
 
         ########################################
@@ -982,7 +989,7 @@ TO_SUPERSCRIPT = {
 #
 #! Python 2.7+ can use a dictionary comprehension instead:
 FROM_SUPERSCRIPT = {
-    ord(sup): normal for (normal, sup) in TO_SUPERSCRIPT.iteritems()}
+    ord(sup): normal for (normal, sup) in TO_SUPERSCRIPT.items()}
 
 def to_superscript(value):
     '''
@@ -995,18 +1002,25 @@ def to_superscript(value):
 
     return (u'%d' % value).translate(TO_SUPERSCRIPT)
 
-def from_superscript(number_str):
+def nrmlze_superscript(number_str):
     '''
-    Converts a string with superscript digits and sign into an integer.
+    Return a string with superscript digits transformed into regular digits.
+
+    Non-superscript digits are not changed before the conversion. Thus, the
+    string can also contain regular digits.
 
     ValueError is raised if the conversion cannot be done.
 
     number_str -- string to be converted (of type str, but also possibly, for 
-    Python 2, unicode).
+    Python 2, unicode, which allows this string to contain superscript digits).
     '''
-    # !! Python 3 doesn't need unicode(), which is only here for giving the
-    # .translate() method to str objects in Python 2:
-    return int(unicode(number_str).translate(FROM_SUPERSCRIPT))
+    # !! Python 3 doesn't need this str(), which is only here for giving the
+    # .translate() method to str objects in Python 2 (this str() comes
+    # from the builtins module of the future package and is therefore
+    # a subclass of unicode, in Python 2):
+    return int(str(number_str).translate(FROM_SUPERSCRIPT))
+
+# !!!!!!!!!!!!!!! THIS IS WHERE I AM IN CHECKING futurize
 
 # Function that transforms an exponent produced by format_num() into
 # the corresponding string notation (for non-default modes):
@@ -1547,7 +1561,7 @@ class LinearCombination(object):
             # print "MAINS", main_factor, main_expr
 
             if main_expr.expanded():
-                for (var, factor) in main_expr.linear_combo.iteritems():
+                for (var, factor) in main_expr.linear_combo.items():
                     derivatives[var] += main_factor*factor
 
             else:  # Non-expanded form
@@ -1703,7 +1717,7 @@ class AffineScalarFunc(object):
     # as the result of bool()) don't have a very meaningful
     # uncertainty unless it is zero, this behavior is fine.
 
-    def __nonzero__(self):
+    def __bool__(self):
         """
         Equivalent to self != 0.
         """
@@ -1778,7 +1792,7 @@ class AffineScalarFunc(object):
         # Calculation of the variance:
         error_components = {}
 
-        for (variable, derivative) in self.derivatives.iteritems():
+        for (variable, derivative) in self.derivatives.items():
 
             # print "TYPE", type(variable), type(derivative)
 
@@ -1815,7 +1829,7 @@ class AffineScalarFunc(object):
         #not need to have their std_dev calculated: only the final
         #AffineScalarFunc returned to the user does).
         return CallableStdDev(sqrt(sum(
-            delta**2 for delta in self.error_components().itervalues())))
+            delta**2 for delta in self.error_components().values())))
 
     # Abbreviation (for formulas, etc.):
     s = std_dev
@@ -2416,7 +2430,7 @@ class AffineScalarFunc(object):
         """
         Hook for the pickle module.
         """
-        for (name, value) in data_dict.iteritems():
+        for (name, value) in data_dict.items():
             # Contrary to the default __setstate__(), this does not
             # necessarily save to the instance dictionary (because the
             # instance might contain slots):
@@ -2457,8 +2471,13 @@ def nan_if_exception(f):
 def get_ops_with_reflection():
 
     """
-    Return operators with a reflection, along with their derivatives
-    (for float operands).
+    Return operators with a reflection, along with their partial derivatives.
+
+    Operators are things like +, /, etc. Those considered here have two
+    arguments and can be called through Python's reflected methods __r…__ (e.g.
+    __radd__).
+
+    See the code for details.
     """
 
     # Operators with a reflection:
@@ -2496,7 +2515,7 @@ def get_ops_with_reflection():
 
     # Conversion to Python functions:
     ops_with_reflection = {}
-    for (op, derivatives) in derivatives_list.iteritems():
+    for (op, derivatives) in derivatives_list.items():
         ops_with_reflection[op] = [
             eval("lambda x, y: %s" % expr) for expr in derivatives ]
 
@@ -2534,11 +2553,10 @@ def get_ops_with_reflection():
     # Undefined derivatives are converted to NaN when the function
     # itself can be calculated:
     for op in ['pow']:
-        ops_with_reflection[op] = map(nan_if_exception,
-                                      ops_with_reflection[op])
-
-        ops_with_reflection['r'+op] = map(nan_if_exception,
-                                          ops_with_reflection['r'+op])
+        ops_with_reflection[op] = [
+            nan_if_exception(func) for func in ops_with_reflection[op]]
+        ops_with_reflection['r'+op] = [
+            nan_if_exception(func) for func in ops_with_reflection['r'+op]]
 
     return ops_with_reflection
 
@@ -2619,7 +2637,7 @@ def add_operators_to_AffineScalarFunc():
         }
 
     for (op, derivative) in (
-        simple_numerical_operators_derivatives.iteritems()):
+        iter(simple_numerical_operators_derivatives.items())):
 
         attribute_name = "__%s__" % op
 
@@ -2639,7 +2657,7 @@ def add_operators_to_AffineScalarFunc():
     # Final definition of the operators for AffineScalarFunc objects:
 
     # Reversed versions (useful for float*AffineScalarFunc, for instance):
-    for (op, derivatives) in ops_with_reflection.iteritems():
+    for (op, derivatives) in ops_with_reflection.items():
         attribute_name = '__%s__' % op
 
         # float objects don't exactly have the same attributes between
@@ -2958,12 +2976,18 @@ class NotParenUncert(ValueError):
     '''
 
 def parse_error_in_parentheses(representation):
+    # !!!! The code seems to handle superscript exponents, but the
+    # docstring doesn't reflect this!?
     """
     Return (value, error) from a string representing a number with
     uncertainty like 12.34(5), 12.34(142), 12.5(3.4), 12.3(4.2)e3, or
     13.4(nan)e10.  If no parenthesis is given, an uncertainty of one
     on the last digit is assumed.
 
+    The digits between parentheses correspond to the same number of digits
+    at the end of the nominal value (the decimal point in the uncertainty
+    is optional). Example: 12.34(142) = 12.34±1.42.
+    
     Raises ValueError if the string cannot be parsed.
     """
 
@@ -2982,7 +3006,7 @@ def parse_error_in_parentheses(representation):
 
     # Global exponent:
     if exponent:
-        factor = 10.**from_superscript(exponent)
+        factor = 10.**nrmlze_superscript(exponent)
     else:
         factor = 1
 
@@ -3039,7 +3063,7 @@ def to_float(value_str):
     match = PRETTY_PRINT_MATCH(value_str)
     if match:
         try:
-            return float(match.group(1))*10.**from_superscript(match.group(2))
+            return float(match.group(1))*10.**nrmlze_superscript(match.group(2))
         except ValueError:
             raise ValueError('Mantissa or exponent incorrect in pretty-print'
                              ' form %s' % value_str)
@@ -3082,7 +3106,7 @@ def str_to_number_with_uncert(representation):
         exp_value_str = match.group('exp_value')
 
         try:
-            exponent = from_superscript(exp_value_str)
+            exponent = nrmlze_superscript(exp_value_str)
         except ValueError:
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
 
