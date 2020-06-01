@@ -1001,8 +1001,11 @@ def from_superscript(number_str):
 
     ValueError is raised if the conversion cannot be done.
 
-    number_str -- basestring object.
+    number_str -- string to be converted (of type str, but also possibly, for 
+    Python 2, unicode).
     '''
+    # !! Python 3 doesn't need unicode(), which is only here for giving the
+    # .translate() method to str objects in Python 2:
     return int(unicode(number_str).translate(FROM_SUPERSCRIPT))
 
 # Function that transforms an exponent produced by format_num() into
