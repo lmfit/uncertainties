@@ -12,6 +12,7 @@ Implementation of umath.py, with internals.
 from __future__ import division  # Many analytical derivatives depend on this
 
 # Standard modules
+from builtins import map
 import math
 import sys
 import itertools
@@ -231,7 +232,7 @@ def wrap_locally_cst_func(func):
         # !! In Python 2.7+, dictionary comprehension: {argname:...}
         kwargs_float = dict(
             (arg_name, uncert_core.nominal_value(value))
-            for (arg_name, value) in kwargs.iteritems())
+            for (arg_name, value) in kwargs.items())
         return func(*args_float, **kwargs_float)
     return wrapped_func
 
