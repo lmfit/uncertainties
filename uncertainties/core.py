@@ -3042,7 +3042,7 @@ def parse_error_in_parentheses(representation):
     return (value, uncert_value)
 
 # Regexp for catching the two variable parts of -1.2×10⁻¹²:
-PRETTY_PRINT_MATCH = re.compile(r'(.*?)\s*×\s*10(.*)').match
+PRETTY_PRINT_MATCH = re.compile(u'(.*?)\\s*×\\s*10(.*)').match
 
 def to_float(value_str):
     '''
@@ -3119,7 +3119,7 @@ def str_to_number_with_uncert(representation):
     else:
         factor = 1  # No global exponential factor
 
-    match = re.match(r'(.*)(?:\+/-|±)(.*)', representation)
+    match = re.match(u'(.*)(?:\\+/-|±)(.*)', representation)
     if match:
 
         (nom_value, uncert) = match.groups()

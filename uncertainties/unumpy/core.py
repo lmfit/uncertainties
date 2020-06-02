@@ -174,10 +174,12 @@ def wrap_array_func(func):
         for element in arr.flat:
             # floats, etc. might be present
             if isinstance(element, uncert_core.AffineScalarFunc):
-                # !!!! This forces an evaluation of the
+                # !!!! The following forces an evaluation of the
                 # derivatives!? Isn't this very slow, when
                 # working with a large number of arrays?
-                variables |= element.derivatives.keys()
+                #
+                # !! set() is only needed for Python 2 compatibility:
+                variables |= set(element.derivatives.keys())
 
         # If the matrix has no variables, then the function value can be
         # directly returned:
