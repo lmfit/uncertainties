@@ -532,7 +532,7 @@ def test_pickling():
         # Unpickling test:
         x.new_attr = 'New attr value'
         x_unpickled = pickle.loads(pickle.dumps(x))
-        # Must exist (From the slots of the parent class):
+        # Must exist (from the slots of the parent class):
         x_unpickled.nominal_value
         x_unpickled.new_attr  # Must exist
 
