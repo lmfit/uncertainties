@@ -2406,7 +2406,7 @@ class AffineScalarFunc(object):
 
             # Slot names can be given in various forms (string,
             # sequence, iterable):
-            if isinstance(slot_names, str):
+            if isinstance(slot_names, basestring):
                 all_slots.add(slot_names)  # Single name
             else:
                 all_slots.update(slot_names)
@@ -2417,7 +2417,7 @@ class AffineScalarFunc(object):
                 # !! It might happen that '__dict__' is itself a slot
                 # name. In this case, its value is saved
                 # again. Alternatively, the loop could be done on
-                # all_slots - set(('__dict__',)):
+                # all_slots - {'__dict__'}:
                 all_attrs[name] = getattr(self, name)
             except AttributeError:
                 pass  # Undefined slot attribute
