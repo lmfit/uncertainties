@@ -357,8 +357,7 @@ try:
 
     addtl_setup_options = {
 
-        # Allows python setup.py nosetests to do the right thing:
-        'use_2to3': True,
+        'install_requires': ['future'],
         'tests_require': ['nose', 'numpy'],
         # Optional dependencies install using:
         # `easy_install uncertainties[optional]`

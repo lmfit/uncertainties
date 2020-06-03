@@ -227,7 +227,8 @@ and `documentation source
 <https://github.com/lebigot/uncertainties/tree/master/doc/>`_ are
 available `on GitHub <https://github.com/lebigot/uncertainties/>`_.
 The :mod:`uncertainties` package is written in pure Python and has no
-external dependency (the `NumPy`_ package is optional).  It contains
+external dependency except for the future_ package
+(the `NumPy`_ package is optional).  It contains
 about 7000 lines of code.  75 % of these lines are documentation
 strings and comments.  The remaining 25 % are split between unit tests
 (15 % of the total) and the calculation code proper (10 % of the
@@ -438,3 +439,4 @@ following options can be chosen:
 .. _soerp: https://pypi.python.org/pypi/soerp
 .. _mcerp: https://pypi.python.org/pypi/mcerp
 .. _Pint: https://pypi.python.org/pypi/Pint/
+.. _future: https://pypi.org/project/future/
