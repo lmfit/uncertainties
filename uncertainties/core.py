@@ -1020,8 +1020,6 @@ def nrmlze_superscript(number_str):
     # a subclass of unicode, in Python 2):
     return int(str(number_str).translate(FROM_SUPERSCRIPT))
 
-# !!!!!!!!!!!!!!! THIS IS WHERE I AM IN CHECKING futurize
-
 # Function that transforms an exponent produced by format_num() into
 # the corresponding string notation (for non-default modes):
 EXP_PRINT = {
