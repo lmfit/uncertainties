@@ -24,7 +24,7 @@ setup_options = dict(
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://uncertainties-python-package.readthedocs.io/',
-    license='Revised BSD License',.
+    license='Revised BSD License',
     description=('Transparent calculations with uncertainties on the'
                  ' quantities involved (aka error propagation);'
                  ' fast calculation of derivatives'),
