@@ -20,7 +20,7 @@ matrix:
       env: DEPS="numpy nose"
     - python: "3.7"
       env: DEPS="numpy nose"
-    - python: "3.7"
+    - python: "3.8"
       env: DEPS="numpy nose"
 
 before_install:
