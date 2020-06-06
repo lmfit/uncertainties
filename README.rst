@@ -45,7 +45,7 @@ necessarily pass the tests. The ``master`` branch is the latest, relatively
 stable versions (while other ``master*`` branches are more experimental).
 
 Other branches might be present in the GitHub repository, but they are
-also temporary and represent work in progress that does not necessarily run
+typically temporary and represent work in progress that does not necessarily run
 properly yet.
 
 License
