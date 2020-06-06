@@ -1,14 +1,14 @@
 uncertainties
 =============
 
+.. image:: https://readthedocs.org/projects/uncertainties-python-package/badge/?version=latest
+   :target: http://uncertainties-python-package.readthedocs.io/en/latest/?badge=latest
 .. image:: https://img.shields.io/pypi/v/uncertainties.svg
    :target: https://pypi.org/project/uncertainties/
 .. image:: https://pepy.tech/badge/uncertainties/week
    :target: https://pepy.tech/badge/uncertainties/week
 .. image:: https://codecov.io/gh/lebigot/uncertainties/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/lebigot/uncertainties/
-.. image:: https://readthedocs.org/projects/uncertainties-python-package/badge/?version=latest
-   :target: http://uncertainties-python-package.readthedocs.io/en/latest/?badge=latest
 .. image:: https://travis-ci.org/lebigot/uncertainties.svg?branch=master
    :target: https://travis-ci.org/lebigot/uncertainties
 .. image:: https://ci.appveyor.com/api/projects/status/j5238244myqx0a0r?svg=true
