@@ -5,9 +5,6 @@
 
 # This script must be run from its directory.
 
-# WARNING: this script erases any uncertainties-py23 and uncertainties-py27
-# found in the current directory.
-
 # Fail the script at the first failed command:
 set -e 
 
@@ -28,28 +25,8 @@ git merge release
 git checkout release
 git merge master
 
-# The Python 2.3-2.5 version should always be up to date:
-git checkout release_python2.3
-git merge release
-
 # Default branch for working on the code:
 git checkout release
-
-## Getting the Python 2.7+ version:
-
-rm -rf uncertainties-py27
-git archive --output /tmp/u.tar release uncertainties
-tar -C /tmp -xf /tmp/u.tar
-mv /tmp/uncertainties uncertainties-py27
-echo "Python 2.7+ version imported"
-
-## Getting the Python 2.3 version:
-
-rm -rf uncertainties-py23
-git archive --output /tmp/u.tar release_python2.3 uncertainties
-tar -C /tmp -xf /tmp/u.tar
-mv /tmp/uncertainties uncertainties-py23
-echo "Python 2.3 version imported"
 
 # Packaging. We include wheels because it makes it easier to install,
 # in some cases (https://github.com/lebigot/uncertainties/pull/108,
