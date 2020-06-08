@@ -175,7 +175,7 @@ def test_monte_carlo_comparison():
     assert numpy.vectorize(test_uncertainties.numbers_close)(
         covariances_this_module,
         covariances_samples,
-        0.05).all(), (
+        0.06).all(), (
         "The covariance matrices do not coincide between"
         " the Monte-Carlo simulation and the direct calculation:\n"
         "* Monte-Carlo:\n%s\n* Direct calculation:\n%s"
