@@ -96,12 +96,14 @@ because a sample from the probability distribution of :data:`x` is always
 equal to itself.  However:
 
 >>> y = ufloat(3.14, 0.01)
->>> x != y
-True
+>>> x == y
+False
 
 since :data:`x` and :data:`y` are independent random variables that
-*almost* always give a different value. Note that this is different
-from the result of ``z = 3.14; t = 3.14; print z != t``, because
+*almost* always give a different value (put differently,
+:data:`x`-:data:`y` is not equal to 0, as it can take many different
+values). Note that this is different
+from the result of ``z = 3.14; t = 3.14; print z == t``, because
 :data:`x` and :data:`y` are *random variables*, not pure numbers.
 
 Similarly,
