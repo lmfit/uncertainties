@@ -493,6 +493,22 @@ formatting options. They can be added at the end of the format string:
   >>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeX
   \left(2.00 \pm 0.10\right) \times 10^{6}
 
+- ``b`` for surrounding **brackets** (common exponent outside)
+
+	>>> print '{:b}'.format(x)
+	(2.00+/-0.10)e-01
+- ``B`` for surrounding **brackets** (common exponent inside)
+
+	>>> print '{:B}'.format(x)
+	((2.0+/-0.10)e-01)
+The ``b`` and ``B`` options can be useful when dealing with units:
+
+  >>> print '{:Pb} m'.format(x)
+	(2.00±0.10)×10⁻¹ m
+
+	>>> print '{:Pb} dm'.format(10 * x)
+	(2.00±0.10) dm
+
 These custom formatting options **can be combined** (when meaningful).
 
 Details
