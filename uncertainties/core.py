@@ -40,7 +40,7 @@ import collections
 
 # The following restricts the local function getargspec() to the common
 # features of inspect.getargspec() and inspect.getfullargspec():
-if sys.version_info < (3,):
+if sys.version_info < (3,):  # !! Could be removed when moving to Python 3 only
     from inspect import getargspec
 else:
     from inspect import getfullargspec as getargspec
