@@ -493,15 +493,14 @@ formatting options. They can be added at the end of the format string:
   >>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeX
   \left(2.00 \pm 0.10\right) \times 10^{6}
 
-- ``p`` is for "intelligently" surrounding with parentheses: it ensures that
-  the x±y part (not an exponent) is surrounded by parentheses (this can for
-  instance be useful so as to explicitly factor physical units, as in (0.200 ±
-  0.010) kg): 
+- ``p`` is for requiring that parentheses be always printed: it ensures that
+  the x±y part (but not an exponent) is surrounded by parentheses. This can for
+  instance be useful so as to explicitly factor physical units:
 
-	>>> print '{:p} kg'.format(x)  # Adds parentheses
+    >>> print '{:p} kg'.format(x)  # Adds parentheses
     (0.200+/-0.010) kg
-    >>> print("{:ep} kg".format(x))  # Exponent: no parentheses added
-    (2.00+/-0.10)e-01 kg
+    >>> print("{:p} kg".format(x*1e7))  # No parentheses added (exponent)
+    (2.00+/-0.10)e+06 kg
 
 These custom formatting options **can be combined** (when meaningful).
 

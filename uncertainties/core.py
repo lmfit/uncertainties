@@ -40,7 +40,7 @@ import collections
 
 # The following restricts the local function getargspec() to the common
 # features of inspect.getargspec() and inspect.getfullargspec():
-if sys.version_info < (3,):
+if sys.version_info < (3,):  # !! Could be removed when moving to Python 3 only
     from inspect import getargspec
 else:
     from inspect import getfullargspec as getargspec
@@ -1079,15 +1079,16 @@ def format_num(nom_val_main, error_main, common_exp,
     string, or "%" are not accepted.
 
     options -- options (as an object that support membership testing,
-    like for instance a string). "S" is for the short-hand notation
+    like for instance a string). "S" is for the shorthand notation
     1.23(1). "P" is for pretty-printing ("±" between the nominal value
     and the error, superscript exponents, etc.). "L" is for a LaTeX
-    output. Options can be combined. "%" adds a final percent sign,
-    and parentheses if the shorthand notation is not used. The P
-    option has priority over the L option (if both are given).
-    The "r" option adds enclosing parenthesis with a common factor
-    outside. "R" forces the parenthesis to also enclose the factor,
-    which means that you might get two pairs of parenthesis.
+    output. Options can be combined. "%" adds a final percent sign, and
+    parentheses if the shorthand notation is not used. The P option has
+    priority over the L option (if both are given).  "p" is for making
+    sure that the x±y part is surrounded by parentheses (no parentheses
+    are added if there is an exponent). This produces outputs like
+    (1.0±0.2) or (1.0±0.2)e7, which can be useful for removing any
+    ambiguity if physical units are added after the printed number.
     '''
 
     # print (nom_val_main, error_main, common_exp,
