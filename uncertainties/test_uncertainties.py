@@ -345,9 +345,13 @@ def test_ufloat_fromstr():
         u'(3.141±0.001)E+02': (314.1, 0.1),
         # ± sign, individual exponent:
         u'3.141E+02±0.001e2': (314.1, 0.1),
-
         # ± sign, times symbol, superscript (= full pretty-print):
         u'(3.141 ± 0.001) × 10²': (314.1, 0.1),
+
+        ## Others
+
+        # Forced parentheses:
+        '(2 +/- 0.1)': (2, 0.1),
 
         # NaN uncertainty:
         u'(3.141±nan)E+02': (314.1, float('nan')),
@@ -363,6 +367,9 @@ def test_ufloat_fromstr():
         }
 
     for (representation, values) in tests.items():
+
+        # We test the fact that surrounding spaces are removed:
+        representation = "  {}  ".format(representation)
 
         # Without tag:
         num = ufloat_fromstr(representation)
@@ -1860,7 +1867,8 @@ def test_format():
             '.6g': '(1.20000+/-0.00000)e-34',
             '13.6g': '  1.20000e-34+/-  0.00000e-34',
             '13.6G': '  1.20000E-34+/-  0.00000E-34',
-            '.6GL': r'\left(1.20000 \pm 0.00000\right) \times 10^{-34}'
+            '.6GL': r'\left(1.20000 \pm 0.00000\right) \times 10^{-34}',
+            '.6GLp': r'\left(1.20000 \pm 0.00000\right) \times 10^{-34}',
         },
 
         (float('nan'), 100): {  # NaN *nominal value*
@@ -1917,9 +1925,11 @@ def test_format():
             '': 'inf+/-123456789.0',  # Similar to '{}'.format(123456789.)
             'g': '(inf+/-1.23457)e+08',  # Similar to '{:g}'.format(123456789.)
             '.1e': '(inf+/-1.2)e+08',
+            '.1ep': '(inf+/-1.2)e+08',
             '.1E': '(%s+/-1.2)E+08' % Inf_EFG,
             '.1ue': '(inf+/-1)e+08',
             '.1ueL': r'\left(\infty \pm 1\right) \times 10^{8}',
+            '.1ueLp': r'\left(\infty \pm 1\right) \times 10^{8}',
             '10.1e': '       inf+/-   1.2e+08',
             '10.1eL': r'    \infty \pm 1.2 \times 10^{8}'
         },
@@ -1928,7 +1938,8 @@ def test_format():
             '.1e': 'inf+/-inf',
             '.1E': '%s+/-%s' % (Inf_EFG, Inf_EFG),
             '.1ue': 'inf+/-inf',
-            'EL': r'\infty \pm \infty'
+            'EL': r'\infty \pm \infty',
+            'ELp': r'\left(\infty \pm \infty\right)',
         },
 
         # Like the tests for +infinity, but for -infinity:
@@ -1970,7 +1981,8 @@ def test_format():
         # digit past the decimal point" for Python floats, but only
         # with a non-zero uncertainty:
         (724.2, 26.4): {
-            '': '724+/-26'
+            '': '724+/-26',
+            'p': '(724+/-26)'
         },
         (724, 0): {
             '': '724.0+/-0'

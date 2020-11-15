@@ -29,7 +29,8 @@ from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
 try:
     from math import isinfinite  # !! Python 3.2+
 except ImportError:
-    def isinfinite(x): return isinf(x) or isnan(x)
+    def isinfinite(x):
+        return isinf(x) or isnan(x)
 
 import copy
 import warnings
@@ -1078,13 +1079,15 @@ def format_num(nom_val_main, error_main, common_exp,
     represented (in the same way as for float). None, the empty
     string, or "%" are not accepted.
 
-    options -- options (as an object that support membership testing,
-    like for instance a string). "S" is for the short-hand notation
-    1.23(1). "P" is for pretty-printing ("±" between the nominal value
-    and the error, superscript exponents, etc.). "L" is for a LaTeX
-    output. Options can be combined. "%" adds a final percent sign,
-    and parentheses if the shorthand notation is not used. The P
-    option has priority over the L option (if both are given).
+    options -- options (as an object that support membership testing, like for
+    instance a string). "P" is for pretty-printing ("±" between the nominal
+    value and the error, superscript exponents, etc.). "L" is for a LaTeX
+    output. "S" is for the shorthand notation 1.23(1). "p" is for making sure
+    that the …±… part is surrounded by parentheses.  "%" adds a final percent
+    sign, and parentheses if the shorthand notation is not used. Options can
+    be combined. The P option has priority over the L option (if both are
+    given). For details, see the documentation for
+    AffineScalarFunction.__format__().
     '''
 
     # print (nom_val_main, error_main, common_exp,
@@ -1436,17 +1439,19 @@ def format_num(nom_val_main, error_main, common_exp,
         # ambiguous notation. This is done in parallel with the
         # percent sign handling because this sign may too need
         # parentheses.
-        if any_exp_factored and common_exp is not None:
+        if any_exp_factored and common_exp is not None:  # Exponent
             value_str = ''.join((
                 LEFT_GROUPING,
                 nom_val_str, pm_symbol, error_str,
                 RIGHT_GROUPING,
                 exp_str, percent_str))
-        else:
+        else:  # No exponent
             value_str = ''.join([nom_val_str, pm_symbol, error_str])
             if percent_str:
                 value_str = ''.join((
                     LEFT_GROUPING, value_str, RIGHT_GROUPING, percent_str))
+            elif 'p' in options:
+                value_str = ''.join((LEFT_GROUPING, value_str, RIGHT_GROUPING))
 
     return value_str
 
@@ -1858,7 +1863,8 @@ class AffineScalarFunc(object):
         return self.format('')
 
     def __format__(self, format_spec):
-        '''Formats a number with uncertainty.
+        '''
+        Formats a number with uncertainty.
 
         The format specification are the same as for format() for
         floats, as defined for Python 2.6+ (restricted to what the %
@@ -1932,16 +1938,23 @@ class AffineScalarFunc(object):
         for example.
 
         Options can be added, at the end of the format
-        specification. Multiple options can be specified.
+        specification. Multiple options can be specified:
 
-        When option "S" is present (like in .1uS), the short-hand
-        notation 1.234(5) is used; if the digits of the uncertainty
-        straddle the decimal point, it uses a fixed-point notation,
-        like in 12.3(4.5). When "P" is present, the pretty-printing
-        mode is activated: "±" separates the nominal value from the
-        standard deviation, exponents use superscript characters,
-        etc. When "L" is present, the output is formatted with LaTeX.
-
+        - When "P" is present, the pretty-printing mode is activated: "±"
+          separates the nominal value from the standard deviation, exponents
+          use superscript characters, etc.
+        - When "S" is present (like in .1uS), the short-hand notation 1.234(5)
+          is used, indicating an uncertainty on the last digits; if the digits
+          of the uncertainty straddle the decimal point, it uses a fixed-point
+          notation, like in 12.3(4.5).
+        - When "L" is present, the output is formatted with LaTeX.
+        - "p" ensures that there are parentheses around the …±… part (no
+          parentheses are added if some are already present, for instance
+          because of an exponent or of a trailing % sign, etc.). This produces
+          outputs like (1.0±0.2) or (1.0±0.2)e7, which can be useful for
+          removing any ambiguity if physical units are added after the printed
+          number.
+    
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
 
@@ -1979,14 +1992,17 @@ class AffineScalarFunc(object):
             (?P<uncert_prec>u?)  # Precision for the uncertainty?
             # The type can be omitted. Options must not go here:
             (?P<type>[eEfFgG%]??)  # n not supported
-            (?P<options>[LSP]*)$''',
+            (?P<options>[PSLp]*)  # uncertainties-specific flags
+            $''',
             format_spec,
             re.VERBOSE)
 
         # Does the format specification look correct?
         if not match:
             raise ValueError(
-                'Format specification %r cannot be used with object of type %r'
+                'Format specification %r cannot be used with object of type'
+                ' %r. Note that uncertainties-specific flags must be put at'
+                ' the end of the format string.'
                 # Sub-classes handled:
                 % (format_spec, self.__class__.__name__))
 
@@ -3092,7 +3108,14 @@ def str_to_number_with_uncert(representation):
     digit is implied.
 
     Raises ValueError if the string cannot be parsed.
+
+    representation -- string with no leading or trailing spaces.
     """
+
+    # The "p" format can add parentheses around the whole printed result: we
+    # remove them:
+    if representation.startswith('(') and representation.endswith(')'):
+        representation = representation[1:-1]
 
     match = NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH(representation)
 
@@ -3150,7 +3173,8 @@ def ufloat_fromstr(representation, tag=None):
 
     Invalid representations raise a ValueError.
 
-    Examples of valid string representations:
+    This function tries to parse back most of the formats that are made
+    available by this module. Examples of valid string representations:
 
         12.3e10+/-5e3
         (-3.1415 +/- 0.0001)e+02  # Factored exponent
@@ -3191,8 +3215,8 @@ def ufloat_fromstr(representation, tag=None):
 
     Surrounding spaces are ignored.
 
-    About the "shorthand" notation: 1.23(3) == 1.23 ± 0.03 but
-    1.23(3.) == 1.23 ± 3.00. Thus, the presence of a decimal point in
+    About the "shorthand" notation: 1.23(3) = 1.23 ± 0.03 but
+    1.23(3.) = 1.23 ± 3.00. Thus, the presence of a decimal point in
     the uncertainty signals an absolute uncertainty (instead of an
     uncertainty on the last digits of the nominal value).
     """
