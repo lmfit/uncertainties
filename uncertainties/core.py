@@ -3204,8 +3204,8 @@ def ufloat_fromstr(representation, tag=None):
 
     Surrounding spaces are ignored.
 
-    About the "shorthand" notation: 1.23(3) == 1.23 ± 0.03 but
-    1.23(3.) == 1.23 ± 3.00. Thus, the presence of a decimal point in
+    About the "shorthand" notation: 1.23(3) = 1.23 ± 0.03 but
+    1.23(3.) = 1.23 ± 3.00. Thus, the presence of a decimal point in
     the uncertainty signals an absolute uncertainty (instead of an
     uncertainty on the last digits of the nominal value).
     """
