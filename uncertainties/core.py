@@ -29,7 +29,8 @@ from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
 try:
     from math import isinfinite  # !! Python 3.2+
 except ImportError:
-    def isinfinite(x): return isinf(x) or isnan(x)
+    def isinfinite(x):
+        return isinf(x) or isnan(x)
 
 import copy
 import warnings
