@@ -1086,9 +1086,9 @@ def format_num(nom_val_main, error_main, common_exp,
     adds a final percent sign, and parentheses if the shorthand notation is not
     used. The P option has priority over the L option (if both are given). "p"
     is for making sure that the …±… part is surrounded by parentheses (no
-    parentheses are added if there is an exponent or a trailing % sign). This
-    produces outputs like (1.0±0.2) or (1.0±0.2)e7, which can be useful for
-    removing any ambiguity if physical units are added after the printed
+    parentheses are added if there is an exponent or a trailing % sign, etc.).
+    This produces outputs like (1.0±0.2) or (1.0±0.2)e7, which can be useful
+    for removing any ambiguity if physical units are added after the printed
     number.
     '''
 
