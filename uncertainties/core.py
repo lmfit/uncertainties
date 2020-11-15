@@ -1079,17 +1079,17 @@ def format_num(nom_val_main, error_main, common_exp,
     represented (in the same way as for float). None, the empty
     string, or "%" are not accepted.
 
-    options -- options (as an object that support membership testing,
-    like for instance a string). "S" is for the shorthand notation
-    1.23(1). "P" is for pretty-printing ("±" between the nominal value
-    and the error, superscript exponents, etc.). "L" is for a LaTeX
-    output. Options can be combined. "%" adds a final percent sign, and
-    parentheses if the shorthand notation is not used. The P option has
-    priority over the L option (if both are given).  "p" is for making
-    sure that the x±y part is surrounded by parentheses (no parentheses
-    are added if there is an exponent). This produces outputs like
-    (1.0±0.2) or (1.0±0.2)e7, which can be useful for removing any
-    ambiguity if physical units are added after the printed number.
+    options -- options (as an object that support membership testing, like for
+    instance a string). "S" is for the shorthand notation 1.23(1). "P" is for
+    pretty-printing ("±" between the nominal value and the error, superscript
+    exponents, etc.). "L" is for a LaTeX output. Options can be combined. "%"
+    adds a final percent sign, and parentheses if the shorthand notation is not
+    used. The P option has priority over the L option (if both are given). "p"
+    is for making sure that the …±… part is surrounded by parentheses (no
+    parentheses are added if there is an exponent or a trailing % sign). This
+    produces outputs like (1.0±0.2) or (1.0±0.2)e7, which can be useful for
+    removing any ambiguity if physical units are added after the printed
+    number.
     '''
 
     # print (nom_val_main, error_main, common_exp,
@@ -3105,7 +3105,14 @@ def str_to_number_with_uncert(representation):
     digit is implied.
 
     Raises ValueError if the string cannot be parsed.
+
+    representation -- string with no leading or trailing spaces.
     """
+
+    # The "p" format can add parentheses around the whole printed result: we
+    # remove them:
+    if representation.startswith('(') and representation.endswith(')'):
+        representation = representation[1:-1]
 
     match = NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH(representation)
 
@@ -3210,8 +3217,6 @@ def ufloat_fromstr(representation, tag=None):
     the uncertainty signals an absolute uncertainty (instead of an
     uncertainty on the last digits of the nominal value).
     """
-    if representation.startswith('(') and representation.endswith(')'):
-        representation = representation[1:-1]
 
     (nominal_value, std_dev) = str_to_number_with_uncert(
         representation.strip())
