@@ -494,8 +494,8 @@ formatting options. They can be added at the end of the format string:
   \left(2.00 \pm 0.10\right) \times 10^{6}
 
 - ``p`` is for requiring that parentheses be always printed around the …±… part
-  (without enclosing any exponent or trailing "%"). This can for instance be
-  useful so as to explicitly factor physical units:
+  (without enclosing any exponent or trailing "%", etc.). This can for instance
+  be useful so as to explicitly factor physical units:
 
     >>> print '{:p} kg'.format(x)  # Adds parentheses
     (0.200+/-0.010) kg
