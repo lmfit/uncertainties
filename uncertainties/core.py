@@ -1999,7 +1999,7 @@ class AffineScalarFunc(object):
             raise ValueError(
                 'Format specification %r cannot be used with object of type'
                 ' %r. Note that uncertainties-specific flags must be put at'
-                'the end of the format string.'
+                ' the end of the format string.'
                 # Sub-classes handled:
                 % (format_spec, self.__class__.__name__))
 
