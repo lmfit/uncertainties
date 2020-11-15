@@ -1441,15 +1441,13 @@ def format_num(nom_val_main, error_main, common_exp,
         # ambiguous notation. This is done in parallel with the
         # percent sign handling because this sign may too need
         # parentheses.
-        if any_exp_factored and common_exp is not None:
+        if any_exp_factored and common_exp is not None:  # Exponent
             value_str = ''.join((
                 LEFT_GROUPING,
                 nom_val_str, pm_symbol, error_str,
                 RIGHT_GROUPING,
                 exp_str, percent_str))
-            if 'R' in options:
-                value_str = LEFT_GROUPING + value_str + RIGHT_GROUPING
-        else:
+        else:  # No exponent
             value_str = ''.join([nom_val_str, pm_symbol, error_str])
             if percent_str:
                 value_str = ''.join((
