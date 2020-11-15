@@ -1452,8 +1452,8 @@ def format_num(nom_val_main, error_main, common_exp,
             if percent_str:
                 value_str = ''.join((
                     LEFT_GROUPING, value_str, RIGHT_GROUPING, percent_str))
-            if 'r' in options or 'R' in options:
-                value_str = u''.join((LEFT_GROUPING, value_str, RIGHT_GROUPING))
+            elif 'p' in options:
+                value_str = ''.join((LEFT_GROUPING, value_str, RIGHT_GROUPING))
 
     return value_str
 
@@ -1989,14 +1989,17 @@ class AffineScalarFunc(object):
             (?P<uncert_prec>u?)  # Precision for the uncertainty?
             # The type can be omitted. Options must not go here:
             (?P<type>[eEfFgG%]??)  # n not supported
-            (?P<options>[LSPrR]*)$''',
+            (?P<options>[PSLp]*)  # uncertainties-specific flags
+            $''',
             format_spec,
             re.VERBOSE)
 
         # Does the format specification look correct?
         if not match:
             raise ValueError(
-                'Format specification %r cannot be used with object of type %r'
+                'Format specification %r cannot be used with object of type'
+                ' %r. Note that uncertainties-specific flags must be at the'
+                ' end of the format string.'
                 # Sub-classes handled:
                 % (format_spec, self.__class__.__name__))
 
