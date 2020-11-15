@@ -3163,7 +3163,8 @@ def ufloat_fromstr(representation, tag=None):
 
     Invalid representations raise a ValueError.
 
-    Examples of valid string representations:
+    This function tries to parse back most of the formats that are made
+    available by this module. Examples of valid string representations:
 
         12.3e10+/-5e3
         (-3.1415 +/- 0.0001)e+02  # Factored exponent
