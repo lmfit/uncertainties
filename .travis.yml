@@ -1,11 +1,11 @@
 # Config file for automatic testing at travis-ci.org
 language: python
-language: python
 # Workaround for being able to use Python 3.7 (2019-03)
 sudo: required
+os: linux
 dist: xenial
 
-matrix:
+jobs:
     include:
     - python: "2.7"
       env: DEPS="numpy nose"
@@ -21,6 +21,8 @@ matrix:
     - python: "3.7"
       env: DEPS="numpy nose"
     - python: "3.8"
+      env: DEPS="numpy nose"
+    - python: "3.9"
       env: DEPS="numpy nose"
 
 before_install:
