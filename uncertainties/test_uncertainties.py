@@ -369,7 +369,7 @@ def test_ufloat_fromstr():
     for (representation, values) in tests.items():
 
         # We test the fact that surrounding spaces are removed:
-        representation = "  {}  ".format(representation)
+        representation = u'  {}  '.format(representation)
 
         # Without tag:
         num = ufloat_fromstr(representation)
