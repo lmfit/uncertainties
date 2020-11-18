@@ -5,8 +5,9 @@
 
 # This script must be run from its directory.
 
-# Fail the script at the first failed command:
-set -e 
+# Fail the script at the first failed command (HOWEVER, maybe when there are
+# no commits to be done during the merges, the commands fail?):
+#set -e 
 
 echo "****************************************************************"
 echo "WARNING: if any commit fails, RESOLVE IT before running this"
