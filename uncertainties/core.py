@@ -1021,10 +1021,14 @@ def nrmlze_superscript(number_str):
     # a subclass of unicode, in Python 2):
     return int(str(number_str).translate(FROM_SUPERSCRIPT))
 
+# 'times'-symbol used for pretty-printing in the EXP_PRINT function below
+PRETTY_PRINT_TIMES = u'×'
+
 # Function that transforms an exponent produced by format_num() into
 # the corresponding string notation (for non-default modes):
 EXP_PRINT = {
-    'pretty-print': lambda common_exp: u'×10%s' % to_superscript(common_exp),
+    'pretty-print': lambda common_exp: u'%s10%s' % (
+        (PRETTY_PRINT_TIMES, to_superscript(common_exp))),
     'latex': lambda common_exp: r' \times 10^{%d}' % common_exp}
 
 # Symbols used for grouping (typically between parentheses) in format_num():
