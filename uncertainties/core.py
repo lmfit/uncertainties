@@ -1025,7 +1025,7 @@ PM_SYMBOL = {'pretty-print': u'±', 'latex': r' \pm ', 'default': '+/-'}
 
 # Multiplication symbol for pretty printing (so that pretty printing can
 # be customized):
-PRETTY_PRINT_TIMES = {'pretty-print': u'×', 'latex': r' \times'}
+PRETTY_PRINT_TIMES = {'pretty-print': u'×', 'latex': r'\times'}
 
 # Function that transforms a numerical exponent produced by format_num() into
 # the corresponding string notation (for non-default modes):
