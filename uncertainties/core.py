@@ -1021,19 +1021,19 @@ def nrmlze_superscript(number_str):
     # a subclass of unicode, in Python 2):
     return int(str(number_str).translate(FROM_SUPERSCRIPT))
 
-PM_SYMBOL = {'pretty-print': u'±', 'latex': r' \pm ', 'default': '+/-'}
+PM_SYMBOLS = {'pretty-print': u'±', 'latex': r' \pm ', 'default': '+/-'}
 
 # Multiplication symbol for pretty printing (so that pretty printing can
 # be customized):
-PRETTY_PRINT_TIMES = {'pretty-print': u'×', 'latex': r'\times'}
+MULT_SYMBOLS = {'pretty-print': u'×', 'latex': r'\times'}
 
 # Function that transforms a numerical exponent produced by format_num() into
 # the corresponding string notation (for non-default modes):
 EXP_PRINT = {
     'pretty-print': lambda common_exp: u'%s10%s' % (
-        PRETTY_PRINT_TIMES['pretty-print'], to_superscript(common_exp)),
+        MULT_SYMBOLS['pretty-print'], to_superscript(common_exp)),
     'latex': lambda common_exp: r' %s 10^{%d}' % (
-        PRETTY_PRINT_TIMES['latex'], common_exp)}
+        MULT_SYMBOLS['latex'], common_exp)}
 
 # Symbols used for grouping (typically between parentheses) in format_num():
 GROUP_SYMBOLS = {
@@ -1055,20 +1055,20 @@ def format_num(nom_val_main, error_main, common_exp,
     Null errors (error_main) are displayed as the integer 0, with
     no decimal point.
 
-    The formatting can be customized globally through the PM_SYMBOL,
-    PRETTY_PRINT_TIMES, GROUP_SYMBOLS and EXP_PRINT dictionaries, which contain
+    The formatting can be customized globally through the PM_SYMBOLS,
+    MULT_SYMBOLS, GROUP_SYMBOLS and EXP_PRINT dictionaries, which contain
     respectively the symbol for ±, for multiplication, for parentheses, and a
     function that maps an exponent to something like "×10²" (using
-    PRETTY_PRINT_TIMES).
+    MULT_SYMBOLS).
 
     Each of these dictionary has (at least) a 'pretty-print' and a 'latex' key,
     that define the symbols to be used for these two output formats (the
-    PM_SYMBOL and GROUP_SYMBOLS also have a 'default' key for the default
+    PM_SYMBOLS and GROUP_SYMBOLS also have a 'default' key for the default
     output format). For example, the defaults for the 'pretty-print' format
     are:
 
-    - PM_SYMBOL['pretty-print'] = '±'
-    - PRETTY_PRINT_TIMES['pretty-print'] = '×'
+    - PM_SYMBOLS['pretty-print'] = '±'
+    - MULT_SYMBOLS['pretty-print'] = '×'
     - GROUP_SYMBOLS['pretty-print'] = ( '(', ')' )
     - EXP_PRINT['pretty-print']: see the source code.
 
@@ -1435,7 +1435,7 @@ def format_num(nom_val_main, error_main, common_exp,
                 fmt_parts['width'])
 
         ####################
-        pm_symbol = PM_SYMBOL[print_type]  # Shortcut
+        pm_symbol = PM_SYMBOLS[print_type]  # Shortcut
 
         ####################
 
