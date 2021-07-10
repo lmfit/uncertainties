@@ -504,6 +504,20 @@ formatting options. They can be added at the end of the format string:
 
 These custom formatting options **can be combined** (when meaningful).
 
+Customization of the pretty print and LaTeX outputs
+---------------------------------------------------
+
+The pretty print and LaTeX outputs themselves can be customized.
+
+For example, the pretty-print representation of numbers with uncertainty can
+display multiplication with a centered dot (⋅) instead of the default symbol
+(×), like in `(2.00±0.10)⋅10⁻¹`; this is easily done through the global setting
+`uncertainties.core.PRETTY_PRINT_TIMES["pretty-print"] = "⋅"`.
+
+Beyond this multiplication symbol, the "±" symbol, the parentheses and the
+exponent can also be customized globally. The details can be found in the
+documentation of `uncertainties.core.format_num()`.
+
 Details
 -------
 
