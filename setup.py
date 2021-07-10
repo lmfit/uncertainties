@@ -20,7 +20,7 @@ except AttributeError:  # sys.version_info was introduced in Python 2.0
 # Common options for distutils/setuptools's setup():
 setup_options = dict(
     name='uncertainties',
-    version='3.1.4',
+    version='3.1.6',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://uncertainties-python-package.readthedocs.io/',
