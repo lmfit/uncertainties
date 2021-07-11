@@ -1,8 +1,9 @@
 uncertainties
 =============
 
-.. image:: https://readthedocs.org/projects/uncertainties-python-package/badge/?version=latest
-   :target: http://uncertainties-python-package.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/uncertainties/badge/?version=latest
+   :target: https://uncertainties.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
 .. image:: https://img.shields.io/pypi/v/uncertainties.svg
    :target: https://pypi.org/project/uncertainties/
 .. image:: https://pepy.tech/badge/uncertainties/week
@@ -32,7 +33,7 @@ This package also automatically calculates derivatives:
     2.0
 
 The main documentation is available at
-http://uncertainties-python-package.readthedocs.io/.
+https://uncertainties.readthedocs.io/.
 
 Git branches
 ------------
