@@ -592,8 +592,8 @@ use the shorthand notation for numbers with uncertainties:
 prints with the shorthand notation: ``Result = 0.20(1)``.
 
 
-Customization of the pretty print and LaTeX outputs
----------------------------------------------------
+Customizing the pretty-print and LaTeX outputs
+----------------------------------------------
 
 The pretty print and LaTeX outputs themselves can be customized.
 
