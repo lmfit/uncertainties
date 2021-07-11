@@ -2143,12 +2143,12 @@ def test_custom_pretty_print_and_latex():
     
     # Customizations:
     for format in ["pretty-print", "latex"]:
-        uncert_core.PM_SYMBOLS[format] = " ± "
-        uncert_core.MULT_SYMBOLS[format] = "⋅"
+        uncert_core.PM_SYMBOLS[format] = u" ± "
+        uncert_core.MULT_SYMBOLS[format] = u"⋅"
         uncert_core.GROUP_SYMBOLS[format] = ( "[", "]" )
 
-    assert "{:P}".format(x) == '[2.00 ± 0.10]⋅10⁻¹¹'
-    assert "{:L}".format(x) == '[2.00 ± 0.10] ⋅ 10^{-11}'
+    assert u"{:P}".format(x) == u'[2.00 ± 0.10]⋅10⁻¹¹'
+    assert u"{:L}".format(x) == u'[2.00 ± 0.10] ⋅ 10^{-11}'
 
     # We restore the defaults:
     for (var, setting) in PREV_CUSTOMIZATIONS.items():
