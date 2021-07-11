@@ -27,7 +27,7 @@ calculations with uncertainties** (aka "error propagation"):
     >>> sin(2*x)  # In a Python shell, "print" is optional
     0.9092974268256817+/-0.08322936730942848
 
-This package also automatically calculates derivatives:
+This package also automatically calculates derivatives of arbitrary functions:
 
     >>> (2*x+1000).derivatives[x]
     2.0
