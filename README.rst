@@ -7,7 +7,7 @@ uncertainties
 .. image:: https://img.shields.io/pypi/v/uncertainties.svg
    :target: https://pypi.org/project/uncertainties/
 .. image:: https://pepy.tech/badge/uncertainties/week
-   :target: https://pepy.tech/badge/uncertainties/week
+   :target: https://pepy.tech/project/uncertainties
 .. image:: https://codecov.io/gh/lebigot/uncertainties/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/lebigot/uncertainties/
 .. image:: https://travis-ci.com/lebigot/uncertainties.svg?branch=master
