@@ -2131,6 +2131,29 @@ def test_unicode_format():
     assert isinstance(u'Résultat = %s' % x.format(''), str)
     assert isinstance(u'Résultat = %s' % x.format('P'), str)
 
+def test_custom_pretty_print_and_latex():
+    '''Test of the pretty-print and LaTeX format customizations'''
+
+    x = ufloat(2, 0.1)*1e-11
+
+    # We will later restore the defaults:
+    PREV_CUSTOMIZATIONS = {
+        var: getattr(uncert_core, var).copy()
+        for var in ['PM_SYMBOLS', 'MULT_SYMBOLS', 'GROUP_SYMBOLS']}
+    
+    # Customizations:
+    for format in ["pretty-print", "latex"]:
+        uncert_core.PM_SYMBOLS[format] = " ± "
+        uncert_core.MULT_SYMBOLS[format] = "⋅"
+        uncert_core.GROUP_SYMBOLS[format] = ( "[", "]" )
+
+    assert "{:P}".format(x) == '[2.00 ± 0.10]⋅10⁻¹¹'
+    assert "{:L}".format(x) == '[2.00 ± 0.10] ⋅ 10^{-11}'
+
+    # We restore the defaults:
+    for (var, setting) in PREV_CUSTOMIZATIONS.items():
+        setattr(uncert_core, var, setting)
+
 ###############################################################################
 
 # The tests below require NumPy, which is an optional package:
