@@ -623,8 +623,11 @@ works with numbers with uncertainties:
 
 >>> wrapped_f = uncertainties.wrap(f)
 
-The new function :func:`wrapped_f` *accepts numbers with uncertainties*
-as arguments *wherever a Python float is used* for :func:`f`.
+The new function :func:`wrapped_f` (optionally) *accepts a number
+with uncertainty* in place of any float argument of :func:`f` (note
+that floats contained instead _inside_ arguments of :fund:`f`, like
+in a list or a NumPy array, _cannot_ be replaced by numbers with
+uncertainties).
 :func:`wrapped_f` returns the same values as :func:`f`, but with
 uncertainties.
 
