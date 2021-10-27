@@ -19,7 +19,6 @@ from builtins import next
 from builtins import map
 from builtins import zip
 from builtins import range
-from past.builtins import basestring
 from builtins import object
 import math
 from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
@@ -45,6 +44,14 @@ if sys.version_info < (3,):  # !! Could be removed when moving to Python 3 only
     from inspect import getargspec
 else:
     from inspect import getfullargspec as getargspec
+
+if sys.version_info < (3,):
+    from past.builtins import basestring
+else:
+    # avoid importing from past in Python 3 since it utilizes the builtin 'imp'
+    # module, which is deprecated as of Python 3.4, see
+    # https://docs.python.org/3/library/imp.html
+    basestring = (str, bytes)
 
 # Attributes that are always exported (some other attributes are
 # exported only if the NumPy module is available...):
