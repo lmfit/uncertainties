@@ -14,17 +14,19 @@ Main module for the uncertainties package, with internal functions.
 
 from __future__ import division  # Many analytical derivatives depend on this
 
-from builtins import str
-from builtins import next
-from builtins import map
-from builtins import zip
-from builtins import range
-from past.builtins import basestring
-from builtins import object
+from builtins import str, next, map, zip, range, object
 import math
 from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
 import re
 import sys
+if sys.version_info < (3,):
+     from past.builtins import basestring
+else:
+     # Avoid importing from past in Python 3 since it utilizes the builtin
+     # 'imp' module, which is deprecated as of Python 3.4, see
+     # https://docs.python.org/3/library/imp.html. The 2to3 tool replaces
+     # basestring with str, so that's what we effectively do here as well:
+     basestring = str
 
 try:
     from math import isinfinite  # !! Python 3.2+
