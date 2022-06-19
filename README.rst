@@ -1,16 +1,17 @@
 uncertainties
 =============
 
-.. image:: https://readthedocs.org/projects/uncertainties-python-package/badge/?version=latest
-   :target: http://uncertainties-python-package.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/uncertainties/badge/?version=latest
+   :target: https://uncertainties.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
 .. image:: https://img.shields.io/pypi/v/uncertainties.svg
    :target: https://pypi.org/project/uncertainties/
 .. image:: https://pepy.tech/badge/uncertainties/week
-   :target: https://pepy.tech/badge/uncertainties/week
+   :target: https://pepy.tech/project/uncertainties
 .. image:: https://codecov.io/gh/lebigot/uncertainties/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/lebigot/uncertainties/
-.. image:: https://travis-ci.org/lebigot/uncertainties.svg?branch=master
-   :target: https://travis-ci.org/lebigot/uncertainties
+.. image:: https://travis-ci.com/lebigot/uncertainties.svg?branch=master
+   :target: https://travis-ci.com/lebigot/uncertainties
 .. image:: https://ci.appveyor.com/api/projects/status/j5238244myqx0a0r?svg=true
    :target: https://ci.appveyor.com/project/lebigot/uncertainties
 
@@ -26,13 +27,13 @@ calculations with uncertainties** (aka "error propagation"):
     >>> sin(2*x)  # In a Python shell, "print" is optional
     0.9092974268256817+/-0.08322936730942848
 
-This package also automatically calculates derivatives:
+This package also **automatically calculates derivatives of arbitrary functions**:
 
     >>> (2*x+1000).derivatives[x]
     2.0
 
 The main documentation is available at
-http://uncertainties-python-package.readthedocs.io/.
+https://uncertainties.readthedocs.io/.
 
 Git branches
 ------------

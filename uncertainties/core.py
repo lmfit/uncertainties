@@ -14,17 +14,19 @@ Main module for the uncertainties package, with internal functions.
 
 from __future__ import division  # Many analytical derivatives depend on this
 
-from builtins import str
-from builtins import next
-from builtins import map
-from builtins import zip
-from builtins import range
-from past.builtins import basestring
-from builtins import object
-import sys
-import re
+from builtins import str, next, map, zip, range, object
 import math
 from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
+import re
+import sys
+if sys.version_info < (3,):
+     from past.builtins import basestring
+else:
+     # Avoid importing from past in Python 3 since it utilizes the builtin
+     # 'imp' module, which is deprecated as of Python 3.4, see
+     # https://docs.python.org/3/library/imp.html. The 2to3 tool replaces
+     # basestring with str, so that's what we effectively do here as well:
+     basestring = str
 
 try:
     from math import isinfinite  # !! Python 3.2+
@@ -1021,11 +1023,19 @@ def nrmlze_superscript(number_str):
     # a subclass of unicode, in Python 2):
     return int(str(number_str).translate(FROM_SUPERSCRIPT))
 
-# Function that transforms an exponent produced by format_num() into
+PM_SYMBOLS = {'pretty-print': u'±', 'latex': r' \pm ', 'default': '+/-'}
+
+# Multiplication symbol for pretty printing (so that pretty printing can
+# be customized):
+MULT_SYMBOLS = {'pretty-print': u'×', 'latex': r'\times'}
+
+# Function that transforms a numerical exponent produced by format_num() into
 # the corresponding string notation (for non-default modes):
 EXP_PRINT = {
-    'pretty-print': lambda common_exp: u'×10%s' % to_superscript(common_exp),
-    'latex': lambda common_exp: r' \times 10^{%d}' % common_exp}
+    'pretty-print': lambda common_exp: u'%s10%s' % (
+        MULT_SYMBOLS['pretty-print'], to_superscript(common_exp)),
+    'latex': lambda common_exp: r' %s 10^{%d}' % (
+        MULT_SYMBOLS['latex'], common_exp)}
 
 # Symbols used for grouping (typically between parentheses) in format_num():
 GROUP_SYMBOLS = {
@@ -1041,21 +1051,30 @@ GROUP_SYMBOLS = {
 
 def format_num(nom_val_main, error_main, common_exp,
                fmt_parts, prec, main_pres_type, options):
-    r'''
+    u'''
     Return a formatted number with uncertainty.
 
     Null errors (error_main) are displayed as the integer 0, with
     no decimal point.
 
-    The formatting can be partially customized globally.  The EXP_PRINT
-    maps non-default modes ("latex", "pretty-print") to a function
-    that transforms a common exponent into a string (of the form
-    "times 10 to the power <exponent>", where "times" can be
-    represented, e.g., as a centered dot instead of the multiplication
-    symbol).  The GROUP_SYMBOLS mapping maps each of these modes to the
-    pair of strings used for grouping expressions (typically
-    parentheses, which can be for instance replaced by "\left(" and
-    "\right(" in LaTeX so as to create a non-breakable group).
+    The formatting can be customized globally through the PM_SYMBOLS,
+    MULT_SYMBOLS, GROUP_SYMBOLS and EXP_PRINT dictionaries, which contain
+    respectively the symbol for ±, for multiplication, for parentheses, and a
+    function that maps an exponent to something like "×10²" (using
+    MULT_SYMBOLS).
+
+    Each of these dictionary has (at least) a 'pretty-print' and a 'latex' key,
+    that define the symbols to be used for these two output formats (the
+    PM_SYMBOLS and GROUP_SYMBOLS also have a 'default' key for the default
+    output format). For example, the defaults for the 'pretty-print' format
+    are:
+
+    - PM_SYMBOLS['pretty-print'] = '±'
+    - MULT_SYMBOLS['pretty-print'] = '×'
+    - GROUP_SYMBOLS['pretty-print'] = ( '(', ')' )
+    - EXP_PRINT['pretty-print']: see the source code.
+
+    Arguments:
 
     nom_val_main, error_main -- nominal value and error, before using
     common_exp (e.g., "1.23e2" would have a main value of 1.23;
@@ -1418,14 +1437,7 @@ def format_num(nom_val_main, error_main, common_exp,
                 fmt_parts['width'])
 
         ####################
-        if 'P' in options:
-            # Unicode has priority over LaTeX, so that users with a
-            # Unicode-compatible LaTeX source can use ±:
-            pm_symbol = u'±'
-        elif 'L' in options:
-            pm_symbol = r' \pm '
-        else:
-            pm_symbol = '+/-'
+        pm_symbol = PM_SYMBOLS[print_type]  # Shortcut
 
         ####################
 

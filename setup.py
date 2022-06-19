@@ -20,7 +20,7 @@ except AttributeError:  # sys.version_info was introduced in Python 2.0
 # Common options for distutils/setuptools's setup():
 setup_options = dict(
     name='uncertainties',
-    version='3.1.5',
+    version='3.1.7',
     author='Eric O. LEBIGOT (EOL)',
     author_email='eric.lebigot@normalesup.org',
     url='http://uncertainties-python-package.readthedocs.io/',
@@ -131,7 +131,8 @@ Version history
 
 Main changes:
 
-- 3.1.5: added a "p" formatting option, that makes sure that there are always
+- 3.1.6: The pretty-print and LaTeX format can now be customized.
+- 3.1.5: Added a "p" formatting option, that makes sure that there are always
   parentheses around the … ± … part of printed numbers.
 - 3.1.4: Python 2.7+ is now required.
 - 3.1.2: Fix for NumPy 1.17 and ``unumpy.ulinalg.pinv()``.

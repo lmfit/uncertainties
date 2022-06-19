@@ -167,6 +167,10 @@ completely **transparently**.
 Access to the uncertainty and to the nominal value
 ==================================================
 
+.. index::
+   pair: nominal value; scalar
+   pair: uncertainty; scalar
+
 The nominal value and the uncertainty (standard deviation) can also be
 accessed independently:
 
@@ -588,9 +592,19 @@ use the shorthand notation for numbers with uncertainties:
 prints with the shorthand notation: ``Result = 0.20(1)``.
 
 
-.. index::
-   pair: nominal value; scalar
-   pair: uncertainty; scalar
+Customizing the pretty-print and LaTeX outputs
+----------------------------------------------
+
+The pretty print and LaTeX outputs themselves can be customized.
+
+For example, the pretty-print representation of numbers with uncertainty can
+display multiplication with a centered dot (⋅) instead of the default symbol
+(×), like in ``(2.00±0.10)⋅10⁻¹``; this is easily done through the global
+setting ``uncertainties.core.MULT_SYMBOLS["pretty-print"] = "⋅"``.
+
+Beyond this multiplication symbol, the "±" symbol, the parentheses and the
+exponent representations can also be customized globally. The details can be
+found in the documentation of :func:`uncertainties.core.format_num`.
 
 Making custom functions accept numbers with uncertainties
 =========================================================
@@ -609,8 +623,11 @@ works with numbers with uncertainties:
 
 >>> wrapped_f = uncertainties.wrap(f)
 
-The new function :func:`wrapped_f` *accepts numbers with uncertainties*
-as arguments *wherever a Python float is used* for :func:`f`.
+The new function :func:`wrapped_f` (optionally) *accepts a number
+with uncertainty* in place of any float *argument* of :func:`f` (note
+that floats contained instead *inside* arguments of :func:`f`, like
+in a list or a NumPy array, *cannot* be replaced by numbers with
+uncertainties).
 :func:`wrapped_f` returns the same values as :func:`f`, but with
 uncertainties.
 

@@ -416,7 +416,7 @@ License
 This software is released under a **dual license**; one of the
 following options can be chosen:
 
-1. The `Revised BSD License`_ (© 2010–2019, Eric O. LEBIGOT [EOL]).
+1. The `Revised BSD License`_ (© 2010–2021, Eric O. LEBIGOT [EOL]).
 2. Any other license, as long as it is obtained from the creator of
    this package.
 
