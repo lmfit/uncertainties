@@ -57,5 +57,5 @@ License <LICENSE.txt>`_.
 
 Voluntary Donations
 -------
-If you find this open-source software useful (in saving you time or helping you produce
-something valuable), please consider donating \$10 or more to help the creator:  `Donate. <https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S>`_ 
+If you find this open-source software useful (e.g. in saving you time or helping you produce
+something valuable), please `consider donating $10 or more to help the creator <https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S>`_.
