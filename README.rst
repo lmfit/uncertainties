@@ -55,7 +55,7 @@ License
 This package and its documentation are released under the `Revised BSD
 License <LICENSE.txt>`_.
 
-Voluntary Donations
--------
+Voluntary donations
+-------------------
 If you find this open-source software useful (e.g. in saving you time or helping you produce
-something valuable), please `consider donating $10 or more to help contribute to the maintenance of the package <https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S>`_.
+something valuable), please consider `donating $10 or more <https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S>`_ to help contribute to the maintenance of the package.
