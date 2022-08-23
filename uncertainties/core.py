@@ -103,7 +103,7 @@ CONSTANT_TYPES = FLOAT_LIKE_TYPES+(complex,)
 
 def deprecation(message):
     '''
-    Warns the user with the given message, by issuing a
+    Warn the user with the given message, by issuing a
     DeprecationWarning.
     '''
 
