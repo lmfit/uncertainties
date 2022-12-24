@@ -337,7 +337,7 @@ try:
             'Source': 'https://github.com/lebigot/uncertainties'
         },
 
-        install_requires=['future'],
+        install_requires=["future; python_version < '3.1'"],
 
         tests_require=['nose', 'numpy'],
         
