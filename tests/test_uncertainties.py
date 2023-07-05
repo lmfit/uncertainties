@@ -1935,3 +1935,21 @@ else:
         assert uarrays_close(
             numpy.array(cov_mat),
             numpy.array(uncert_core.covariance_matrix([x2, y2, z2])))
+
+    def test_hash():
+        '''
+        Tests the invariance that if x==y, then hash(x)==hash(y)
+        '''
+
+        x = ufloat(1.23, 2.34)
+        y = ufloat(1.23, 2.34)
+        # nominal values and std_dev terms are equal, but...
+        assert x.n==y.n and x.s==y.s
+        # ...x and y are independent variables, therefore not equal as uncertain numbers
+        assert x != y
+        assert hash(x) != hash(y)
+
+        # the equation (2x+x)/3 is equal to the variable x, so...
+        assert ((2*x+x)/3)==x
+        # ...hash of the equation and the variable should be equal
+        assert hash((2*x+x)/3)==hash(x)
