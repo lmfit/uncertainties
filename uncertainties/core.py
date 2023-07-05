@@ -1849,6 +1849,10 @@ class AffineScalarFunc(object):
     # Abbreviation (for formulas, etc.):
     s = std_dev
 
+    def __hash__(self):
+        # Placeholder until we figure out how to really make these hashable
+        return id(self)
+
     def __repr__(self):
         # Not putting spaces around "+/-" helps with arrays of
         # Variable, as each value with an uncertainty is a
