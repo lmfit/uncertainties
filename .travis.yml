@@ -24,6 +24,10 @@ jobs:
       env: DEPS="numpy nose"
     - python: "3.9"
       env: DEPS="numpy nose"
+    - python: "3.10"
+      env: DEPS="numpy nose"
+    - python: "3.11"
+      env: DEPS="numpy nose" PYTHONSAFEPATH=1
 
 before_install:
     - pip install setuptools --upgrade
