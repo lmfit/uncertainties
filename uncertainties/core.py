@@ -1851,7 +1851,7 @@ class AffineScalarFunc(object):
 
     def __hash__(self):
         if not self._linear_part.expanded():
-           self.format('')
+           self._linear_part.expand()
         combo = tuple(iter(self._linear_part.linear_combo.items()))
         if len(combo) > 1 or combo[0][1] != 1.0:
            return hash(combo)
