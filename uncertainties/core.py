@@ -2835,11 +2835,14 @@ class Variable(AffineScalarFunc):
         # that as a hash (uniqueness of self), which allows us to also
         # preserve the invariance that x == y implies hash(x) == hash(y)
         if hasattr(self, '_linear_part'):
-             if self in iter(self._linear_part.linear_combo.keys()):
-                  return id(tuple(iter(self._linear_part.linear_combo.keys()))[0])
-             return hash(self._linear_part)
+            if (
+                hasattr(self._linear_part, 'linear_combo')
+                and self in iter(self._linear_part.linear_combo.keys())
+            ):
+                return id(tuple(iter(self._linear_part.linear_combo.keys()))[0])
+            return hash(self._linear_part)
         else:
-             return id(self)
+            return id(self)
 
     def __copy__(self):
         """
