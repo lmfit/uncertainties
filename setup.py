@@ -339,7 +339,7 @@ try:
 
         install_requires=['future'],
 
-        tests_require=['pytest', 'numpy'],
+        tests_require=['nose', 'numpy'],
         
         # Optional dependencies install using:
         # `easy_install uncertainties[optional]`

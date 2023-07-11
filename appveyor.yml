@@ -47,7 +47,7 @@ install:
   - conda init cmd.exe
   - conda info -a
   # Create a conda virtual environement 
-  - "conda create -n uncty-env numpy pytest python=%PYTHON_VERSION%"
+  - "conda create -n uncty-env numpy nose python=%PYTHON_VERSION%"
   - activate uncty-env
 
 
