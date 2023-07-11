@@ -19,10 +19,4 @@ or, if additional access rights are needed (Unix):
 testing framework.  This can be achieved for instance with a command
 like
 
-  nosetests -sv uncertainties/
-
-or simply
-
-  nosetests uncertainties/
-
-(for a less verbose output).
+  pytest uncertainties/
