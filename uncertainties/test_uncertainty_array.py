@@ -217,7 +217,9 @@ def invalid_scalar(data):
     The default should work for most subclasses, but is not guaranteed.
     If the array can hold any item (i.e. object dtype), then use pytest.skip.
     """
-    return object.__new__(object)
+    invalid_scalar = object.__new__(object)
+    invalid_scalar.strip = lambda x: "invalid_scalar"
+    return invalid_scalar
 
 from pandas.tests.extension import base
 

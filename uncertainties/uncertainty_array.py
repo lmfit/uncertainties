@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import numpy
-import pandas
+import pandas as pd
 import pandas.api.extensions
 from pandas.api.types import is_dtype_equal, is_list_like, is_scalar, pandas_dtype
 
@@ -45,7 +45,7 @@ class UncertaintyDtype(pandas.api.extensions.ExtensionDtype):
 
 
 class UncertaintyArray(
-    pandas_backports.OpsMixin, pandas_backports.NDArrayBackedExtensionArray
+    pandas_backports.OpsMixin, pandas.core.arrays._mixins.NDArrayBackedExtensionArray
 ):
     dtype = UncertaintyDtype()
 
@@ -130,6 +130,18 @@ class UncertaintyArray(
         """
         return self._validate_setitem_value(value)
 
+    # def __setitem__(self, index, value):
+    #     if is_list_like(value):
+    #         if len(self._ndarray[index]) != len(value):
+    #             raise ValueError("Length of index must match length of values")
+    #     self._ndarray[index] = self._validate_setitem_value(value)
+
+    def __setitem__(self, index, value):
+        if is_list_like(value) and is_scalar(index):
+                raise ValueError("Length of index must match length of values")
+        super().__setitem__(index, value)
+
+
     def _validate_setitem_value(self, value):
         """
         Convert a value for use in setting a value in the backing numpy array.
@@ -141,6 +153,8 @@ class UncertaintyArray(
         return self._ufloat(value)
     
     def _ufloat(self, value):
+        if pd.isna(value):
+            return self.dtype.na_value
         if not isinstance(value, UFloat):
             return ufloat(value)
         return value
