@@ -224,4 +224,7 @@ def invalid_scalar(data):
 from pandas.tests.extension import base
 
 class TestUncertaintyArray(base.ExtensionTests):
-    pass
+    divmod_exc = None
+    series_scalar_exc = None
+    frame_scalar_exc = None
+    series_array_exc = None

@@ -6,14 +6,25 @@ import pandas.api.extensions
 from pandas.api.types import is_dtype_equal, is_list_like, is_scalar, pandas_dtype
 
 from .core import UFloat, ufloat
-from uncertainties import pandas_backports
 
 import re
 import numpy as np
 from uncertainties import umath
+from pandas.core.arrays.base import ExtensionArray
 
-pandas_release = pandas_backports.pandas_release
+from pandas.core import (
+    algorithms as algos,
+    arraylike,
+    missing,
+    nanops,
+    ops,
+)
 
+from pandas.core.construction import (
+    array as pd_array,
+    ensure_wrapped_if_datetimelike,
+    extract_array,
+)
 @pandas.api.extensions.register_extension_dtype
 class UncertaintyDtype(pandas.api.extensions.ExtensionDtype):
     """
@@ -45,10 +56,10 @@ class UncertaintyDtype(pandas.api.extensions.ExtensionDtype):
 
 
 class UncertaintyArray(
-    pandas_backports.OpsMixin, pandas.core.arrays._mixins.NDArrayBackedExtensionArray
+    pandas.core.arraylike.OpsMixin, pandas.core.arrays._mixins.NDArrayBackedExtensionArray
 ):
     dtype = UncertaintyDtype()
-
+    name = "UncertaintyArray"
     # scalar used to denote NA value inside our self._ndarray, e.g. -1 for
     # Categorical, iNaT for Period. Outside of object dtype, self.isna() should
     # be exactly locations in self._ndarray with _internal_fill_value. See:
@@ -130,12 +141,6 @@ class UncertaintyArray(
         """
         return self._validate_setitem_value(value)
 
-    # def __setitem__(self, index, value):
-    #     if is_list_like(value):
-    #         if len(self._ndarray[index]) != len(value):
-    #             raise ValueError("Length of index must match length of values")
-    #     self._ndarray[index] = self._validate_setitem_value(value)
-
     def __setitem__(self, index, value):
         if is_list_like(value) and is_scalar(index):
                 raise ValueError("Length of index must match length of values")
@@ -159,26 +164,20 @@ class UncertaintyArray(
             return ufloat(value)
         return value
 
-    # def _box_func(self, x):
-    #     # if pandas.isna(x):
-    #     #     return pandas.NaT
-    #     try:
-    #         return x.astype(_NP_BOX_DTYPE).item().date()
-    #     except AttributeError:
-    #         x = numpy.datetime64(
-    #             x, "ns"
-    #         )  # Integers are stored with nanosecond precision.
-    #         return x.astype(_NP_BOX_DTYPE).item().date()
+        
+    def _arith_method(self, other, op):
+        res_name = ops.get_op_result_name(self, other)
 
-    # def astype(self, dtype, copy=True):
-    #     stype = str(dtype)
-    #     if stype.startswith("datetime"):
-    #         if stype == "datetime" or stype == "datetime64":
-    #             dtype = self._ndarray.dtype
-    #         return self._ndarray.astype(dtype, copy=copy)
-    #     elif stype.startswith("<M8"):
-    #         if stype == "<M8":
-    #             dtype = self._ndarray.dtype
-    #         return self._ndarray.astype(dtype, copy=copy)
+        lvalues = self._ndarray
+        rvalues = extract_array(other, extract_numpy=True, extract_range=True)
+        rvalues = ops.maybe_prepare_scalar_for_op(rvalues, lvalues.shape)
+        rvalues = ensure_wrapped_if_datetimelike(rvalues)
+        if isinstance(rvalues, range):
+            rvalues = np.arange(rvalues.start, rvalues.stop, rvalues.step)
 
-    #     return super().astype(dtype, copy=copy)
+        with np.errstate(all="ignore"):
+            result = ops.arithmetic_op(lvalues, rvalues, op)
+
+        return self._from_sequence(result, dtype=self.dtype, copy=False)
+
+    _logical_method = _arith_method
