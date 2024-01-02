@@ -5,7 +5,7 @@ import pandas as pd
 import pandas.api.extensions
 from pandas.api.types import is_dtype_equal, is_list_like, is_scalar, pandas_dtype
 
-from .core import UFloat, ufloat
+from .core import UFloat, ufloat, ufloat_fromstr
 
 import re
 import numpy as np
@@ -31,15 +31,19 @@ class UncertaintyDtype(pandas.api.extensions.ExtensionDtype):
     Extension dtype for uncertainty objects.
     """
 
-    na_value = ufloat(np.nan, np.nan)
+    na_value = pd.NA
     kind = "O"
     names = None
     name = "UncertaintyDtype"
     type = UFloat
     
     @property
-    def _is_numeric(self):
+    def _is_numeric(self) -> bool:
         return True
+
+    @property
+    def _is_boolean(self) -> bool:
+        return False
 
     @classmethod
     def construct_from_string(cls, name: str):
@@ -65,9 +69,27 @@ class UncertaintyDtype(pandas.api.extensions.ExtensionDtype):
         """
 
         return self.name
+def _isna(obj):
+    if isinstance(obj, UFloat):
+        return umath.isnan(obj.nominal_value)
+    return pd.isna(obj)
 
+def _convert_unan_to_pdna(arr):
+    """
+    Convert ufloat nan to pd.NA
+    """
+    return np.array([pd.NA if _isna(x) else x for x in arr], dtype=object)
 
-
+def _ufloat(value):
+    if _isna(value):
+        return pd.NA
+    if not isinstance(value, UFloat):
+        if isinstance(value, tuple):
+            return ufloat(*value)
+        if isinstance(value, str):
+            return ufloat_fromstr(value)
+        return ufloat(value)
+    return value
 
 
 class UncertaintyArray(
@@ -79,7 +101,7 @@ class UncertaintyArray(
     # Categorical, iNaT for Period. Outside of object dtype, self.isna() should
     # be exactly locations in self._ndarray with _internal_fill_value. See:
     # https://github.com/pandas-dev/pandas/blob/main/pandas/core/arrays/_mixins.py
-    _internal_fill_value = ufloat(np.nan, np.nan)
+    _internal_fill_value = pd.NA
 
     def __init__(self, values, dtype=None, copy: bool = False):
         if not (
@@ -90,12 +112,13 @@ class UncertaintyArray(
         elif copy:
             values = values.copy()
 
+        values = _convert_unan_to_pdna(values)
         super().__init__(values=values, dtype=values.dtype)
 
     @classmethod
     def __ndarray(cls, scalars):
         return numpy.array(
-            [ufloat(scalar) if not isinstance(scalar, UFloat) else scalar for scalar in scalars],
+            [_ufloat(scalar) if not isinstance(scalar, UFloat) else scalar for scalar in scalars],
             "object",
         )
 
@@ -117,36 +140,19 @@ class UncertaintyArray(
 
         return super().astype(dtype, copy=copy)
 
-    def _cmp_method(self, other, op):
-        """Compare array values, for use in OpsMixin."""
-
-        if is_scalar(other) and (
-            pandas.isna(other) or isinstance(other, self.dtype.type)
-        ):
-            other = type(self)([other])
-
-        if type(other) is not type(self):
-            return NotImplemented
-
-        oshape = getattr(other, "shape", None)
-        if oshape != self.shape and oshape != (1,) and self.shape != (1,):
-            raise TypeError(
-                "Can't compare arrays with different shapes", self.shape, oshape
-            )
-        return op(self._ndarray, other._ndarray)
 
     def _from_factorized(self, unique, original):
         return self.__class__(unique)
 
     def isna(self):
-        return np.array([umath.isnan(x) for x in self._ndarray], dtype=bool)
+        return np.array([pd.isna(x) for x in self._ndarray], dtype=bool)
 
     def _validate_scalar(self, value):
         """
         Validate and convert a scalar value to datetime64[ns] for storage in
         backing NumPy array.
         """
-        return self._ufloat(value)
+        return _ufloat(value)
 
     def _validate_searchsorted_value(self, value):
         """
@@ -167,17 +173,10 @@ class UncertaintyArray(
         Convert a value for use in setting a value in the backing numpy array.
         """
         if is_list_like(value):
-            _ufloat = self._ufloat
             return [_ufloat(v) for v in value]
 
-        return self._ufloat(value)
+        return _ufloat(value)
     
-    def _ufloat(self, value):
-        if pd.isna(value):
-            return self.dtype.na_value
-        if not isinstance(value, UFloat):
-            return ufloat(value)
-        return value
 
         
     def _arith_method(self, other, op):
@@ -190,22 +189,44 @@ class UncertaintyArray(
         if isinstance(rvalues, range):
             rvalues = np.arange(rvalues.start, rvalues.stop, rvalues.step)
 
+        # pandas thinks a scalar uncertainty is already an array as it has a dtype
+        if op.__name__ == "floordiv" and is_scalar(rvalues):
+            rvalues = np.array(rvalues)
+        
         with np.errstate(all="ignore"):
             result = ops.arithmetic_op(lvalues, rvalues, op)
 
         return self._from_sequence(result, dtype=self.dtype, copy=False)
 
-    _logical_method = _arith_method
+    def _cmp_method(self, other, op):
+        """Compare array values, for use in OpsMixin."""
+        print(1, other)
+        if is_scalar(other):
+            if not isinstance(other, UFloat):
+                other = _ufloat((other, 0))
+            other = type(self)([other])
+        print(2, other)
 
-    def __invert__(self) -> NumpyExtensionArray:
+        if type(other) is not type(self):
+            return NotImplemented
+        print(3, other)
+
+        oshape = getattr(other, "shape", None)
+        if oshape != self.shape and oshape != (1,) and self.shape != (1,):
+            raise TypeError(
+                "Can't compare arrays with different shapes", self.shape, oshape
+            )
+        return op(self._ndarray, other._ndarray)
+
+    def __invert__(self) -> UncertaintyArray:
         return type(self)(~self._ndarray)
 
-    def __neg__(self) -> NumpyExtensionArray:
+    def __neg__(self) -> UncertaintyArray:
         return type(self)(-self._ndarray)
 
-    def __pos__(self) -> NumpyExtensionArray:
+    def __pos__(self) -> UncertaintyArray:
         return type(self)(+self._ndarray)
 
-    def __abs__(self) -> NumpyExtensionArray:
+    def __abs__(self) -> UncertaintyArray:
         return type(self)(abs(self._ndarray))
 
