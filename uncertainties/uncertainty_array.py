@@ -36,6 +36,10 @@ class UncertaintyDtype(pandas.api.extensions.ExtensionDtype):
     names = None
     name = "UncertaintyDtype"
     type = UFloat
+    
+    @property
+    def _is_numeric(self):
+        return True
 
     @classmethod
     def construct_from_string(cls, name: str):
@@ -51,6 +55,17 @@ class UncertaintyDtype(pandas.api.extensions.ExtensionDtype):
 
     def construct_array_type(self):
         return UncertaintyArray
+
+    def __repr__(self):
+        """
+        Return a string representation for this object.
+
+        Invoked by unicode(df) in py2 only. Yields a Unicode String in both
+        py2/py3.
+        """
+
+        return self.name
+
 
 
 
@@ -193,3 +208,4 @@ class UncertaintyArray(
 
     def __abs__(self) -> NumpyExtensionArray:
         return type(self)(abs(self._ndarray))
+
