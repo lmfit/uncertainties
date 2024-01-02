@@ -124,7 +124,7 @@ class UncertaintyArray(
         return self.__class__(unique)
 
     def isna(self):
-        return np.array([umath.isnan(x) for x in self._ndarray])
+        return np.array([umath.isnan(x) for x in self._ndarray], dtype=bool)
 
     def _validate_scalar(self, value):
         """
@@ -181,3 +181,15 @@ class UncertaintyArray(
         return self._from_sequence(result, dtype=self.dtype, copy=False)
 
     _logical_method = _arith_method
+
+    def __invert__(self) -> NumpyExtensionArray:
+        return type(self)(~self._ndarray)
+
+    def __neg__(self) -> NumpyExtensionArray:
+        return type(self)(-self._ndarray)
+
+    def __pos__(self) -> NumpyExtensionArray:
+        return type(self)(+self._ndarray)
+
+    def __abs__(self) -> NumpyExtensionArray:
+        return type(self)(abs(self._ndarray))

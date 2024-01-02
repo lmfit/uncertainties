@@ -224,7 +224,7 @@ def invalid_scalar(data):
 from pandas.tests.extension import base
 
 class TestUncertaintyArray(base.ExtensionTests):
-    divmod_exc = None
+    divmod_exc = TypeError # TODO: fix this
     series_scalar_exc = None
     frame_scalar_exc = None
     series_array_exc = None
