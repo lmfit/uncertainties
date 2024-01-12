@@ -18,8 +18,8 @@ import sys
 import itertools
 
 # Local modules
-import uncertainties.core as uncert_core
-from uncertainties.core import (to_affine_scalar, AffineScalarFunc,
+import uncertainties.core.core as uncert_core
+from uncertainties.core.core import (to_affine_scalar, AffineScalarFunc,
                                 LinearCombination)
 
 ###############################################################################

@@ -24,8 +24,8 @@ from numpy.core import numeric
 
 # Local modules:
 import uncertainties.umath_core as umath_core
-import uncertainties.core as uncert_core
-from uncertainties.core import deprecation
+import uncertainties.core.core as uncert_core
+from uncertainties.core.compat import deprecation
 
 __all__ = [
     # Factory functions:
