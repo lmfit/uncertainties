@@ -1,4 +1,5 @@
 import numbers
+import warnings
 
 # Some types known to not depend on Variable objects are put in
 # CONSTANT_TYPES.  The most common types can be put in front, as this

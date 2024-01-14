@@ -1,4 +1,5 @@
 import re
+from . formatting import nrmlze_superscript
 
 ###############################################################################
 # Parsing of values with uncertainties:
