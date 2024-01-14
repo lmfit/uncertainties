@@ -42,7 +42,7 @@ else:
 from . compat import (deprecation, FLOAT_LIKE_TYPES, CONSTANT_TYPES, CallableStdDev,
 )
 from . util import (set_doc, covariance_matrix, partial_derivative,
-NumericalDerivatives, IndexableIter, nominal_value, std_dev, basestring,
+NumericalDerivatives, IndexableIter, basestring,
 )
 from . formatting import (first_digit, PDG_precision, format_num, signif_dgt_to_limit
 )
@@ -1886,6 +1886,40 @@ class Variable(AffineScalarFunc):
 
         return self.__copy__()
 
+
+###############################################################################
+
+# Utilities
+
+def nominal_value(x):
+    """
+    Return the nominal value of x if it is a quantity with
+    uncertainty (i.e., an AffineScalarFunc object); otherwise, returns
+    x unchanged.
+
+    This utility function is useful for transforming a series of
+    numbers, when only some of them generally carry an uncertainty.
+    """
+
+    if isinstance(x, AffineScalarFunc):
+        return x.nominal_value
+    else:
+        return x
+
+def std_dev(x):
+    """
+    Return the standard deviation of x if it is a quantity with
+    uncertainty (i.e., an AffineScalarFunc object); otherwise, returns
+    the float 0.
+
+    This utility function is useful for transforming a series of
+    numbers, when only some of them generally carry an uncertainty.
+    """
+
+    if isinstance(x, AffineScalarFunc):
+        return x.std_dev
+    else:
+        return 0.
 def ufloat_fromstr(representation, tag=None):
     """
     Return a new random variable (Variable object) from a string.
