@@ -29,8 +29,8 @@ import sys
 
 # Local modules
 
-import uncertainties.core as uncert_core
-from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr
+import uncertainties.core.core as uncert_core
+from uncertainties.core.core import ufloat, AffineScalarFunc, ufloat_fromstr
 from uncertainties import umath
 
 # The following information is useful for making sure that the right
