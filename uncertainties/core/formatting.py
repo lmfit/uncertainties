@@ -6,6 +6,7 @@ try:
 except ImportError:
     def isinfinite(x):
         return isinf(x) or isnan(x)
+import re
 
 def first_digit(value):
     '''
