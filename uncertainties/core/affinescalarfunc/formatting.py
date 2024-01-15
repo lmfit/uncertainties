@@ -1,5 +1,5 @@
 import math
-from . util import set_doc
+from .. util import set_doc
 from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
 try:
     from math import isinfinite  # !! Python 3.2+

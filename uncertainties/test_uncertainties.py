@@ -30,7 +30,7 @@ import sys
 # Local modules
 
 import uncertainties.core.core as uncert_core
-import uncertainties.core.formatting as uncert_format
+import uncertainties.core.affinescalarfunc.formatting as uncert_format
 from uncertainties.core.core import ufloat, AffineScalarFunc, ufloat_fromstr
 from uncertainties import umath
 
@@ -436,11 +436,26 @@ def test_fixed_derivatives_basic_funcs():
         compare_derivatives(func, numerical_derivatives, [num_args])
 
     # Operators that take 1 value:
-    for op in uncert_core.modified_operators:
+    for op in ['abs', 'neg', 'pos', 'trunc']:
         check_op(op, 1)
 
     # Operators that take 2 values:
-    for op in uncert_core.modified_ops_with_reflection:
+    for op in [
+            'add',
+            'radd',
+            'floordiv',
+            'rfloordiv',
+            'mod',
+            'rmod',
+            'mul',
+            'rmul',
+            'sub',
+            'rsub',
+            'truediv',
+            'rtruediv',
+            'pow',
+            'rpow'
+            ]:     
         check_op(op, 2)
 
 # Additional, more complex checks, for use with the nose unit testing
@@ -1524,7 +1539,7 @@ def test_PDG_precision():
         }
 
     for (std_dev, result) in tests.items():
-        assert uncert_core.PDG_precision(std_dev) == result
+        assert uncert_format.PDG_precision(std_dev) == result
 
 def test_repr():
     '''Test the representation of numbers with uncertainty.'''
