@@ -300,7 +300,7 @@ class AffineScalarFuncOps(AffineScalarFuncBase):
         performance hit: wrapping a function that actually accepts numbers
         with uncertainty is likely to make it slower.
         """
-
+        
         derivatives_args_index = IndexableIter(
             # Automatic addition of numerical derivatives in case the
             # supplied derivatives_args is shorter than the number of
@@ -397,7 +397,7 @@ class AffineScalarFuncOps(AffineScalarFuncBase):
         Original documentation:
         %s""" % (f.__name__, f.__doc__))
         def f_with_affine_output(*args, **kwargs):
-
+            
             ########################################
             # The involved random variables must first be gathered, so
             # that they can be independently updated.
@@ -456,7 +456,7 @@ class AffineScalarFuncOps(AffineScalarFuncBase):
                 kwargs[name] = value_with_uncert.nominal_value
 
             f_nominal_value = f(*args_values, **kwargs)
-
+        
             # If the value is not a float, then this code cannot provide
             # the result, as it returns a UFloat, which represents a
             # random real variable. This happens for instance when
@@ -464,6 +464,8 @@ class AffineScalarFuncOps(AffineScalarFuncBase):
             # AffineScalarFunc.__mul__ operator, obtained through wrap(),
             # returns a NumPy array, not a float:
             if not isinstance(f_nominal_value, FLOAT_LIKE_TYPES):
+                print(args, kwargs)
+                print("467", f_nominal_value, type(f_nominal_value))
                 return NotImplemented
 
             ########################################
@@ -517,7 +519,7 @@ class AffineScalarFuncOps(AffineScalarFuncBase):
 
         Original documentation:
         %s""" % (f.__name__, f.__doc__))(f_with_affine_output)
-
+        
         # It is easier to work with f_with_affine_output, which represents
         # a wrapped version of 'f', when it bears the same name as 'f':
         # ! __name__ is read-only, in Python 2.3:
