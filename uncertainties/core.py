@@ -1790,6 +1790,17 @@ class AffineScalarFunc(object):
 
     ########################################
 
+    def __hash__(self):
+        """
+        Calculates the hash for any AffineScalarFunc object.
+        
+        Returns:
+            int: The hash of this object
+        """
+
+        ids = [id(d) for d in self.derivatives.keys()]
+        return hash((self._nominal_value, self._linear_part, tuple(ids)))
+
     # Uncertainties handling:
 
     def error_components(self):
