@@ -5,7 +5,7 @@ import sys
 from math import isnan
 
 import uncertainties.core as uncert_core
-from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr
+from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr, LinearCombination
 from uncertainties import umath
 from helpers import (power_special_cases, power_all_cases, power_wrt_ref,numbers_close,
     ufloats_close, compare_derivatives, uarrays_close)
@@ -1941,15 +1941,34 @@ else:
         Tests the invariance that if x==y, then hash(x)==hash(y)
         '''
 
-        x = ufloat(1.23, 2.34)
-        y = ufloat(1.23, 2.34)
+        a = ufloat(1.23, 2.34)
+        b = ufloat(1.23, 2.34)
+
         # nominal values and std_dev terms are equal, but...
-        assert x.n==y.n and x.s==y.s
+        assert a.n==b.n and a.s==b.s
         # ...x and y are independent variables, therefore not equal as uncertain numbers
+        assert a != b
+        assert hash(a) != hash(b)
+
+        # order of calculation should be irrelevant
+        assert a + b == b + a
+        assert hash(a + b) == hash(b + a)
+
+        # the equation (2x+x)/3 is equal to the variable x, so...
+        assert ((2*a+a)/3)==a
+        # ...hash of the equation and the variable should be equal
+        assert hash((2*a+a)/3)==hash(a)
+
+        c = ufloat(1.23, 2.34)
+
+        # the values of the linear combination entries matter
+        x = AffineScalarFunc(1, LinearCombination({a:1, b:2, c:1}))
+        y = AffineScalarFunc(1, LinearCombination({a:1, b:2, c:2}))
         assert x != y
         assert hash(x) != hash(y)
 
-        # the equation (2x+x)/3 is equal to the variable x, so...
-        assert ((2*x+x)/3)==x
-        # ...hash of the equation and the variable should be equal
-        assert hash((2*x+x)/3)==hash(x)
+        # the order of linear combination values matter and should not lead to the same hash
+        x = AffineScalarFunc(1, LinearCombination({a:1, b:2}))
+        y = AffineScalarFunc(1, LinearCombination({a:2, b:1}))
+        assert x != y
+        assert hash(x) != hash(y)
