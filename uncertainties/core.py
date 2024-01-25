@@ -1790,16 +1790,18 @@ class AffineScalarFunc(object):
 
     ########################################
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Calculates the hash for any AffineScalarFunc object.
+        The hash is calculated from the nominal_value, and the derivatives.
         
         Returns:
             int: The hash of this object
         """
 
         ids = [id(d) for d in self.derivatives.keys()]
-        return hash((self._nominal_value, self._linear_part, tuple(ids)))
+        values_hash = tuple(self.derivatives.values())
+        return hash((self._nominal_value, tuple(ids), values_hash))
 
     # Uncertainties handling:
 
@@ -1859,15 +1861,6 @@ class AffineScalarFunc(object):
 
     # Abbreviation (for formulas, etc.):
     s = std_dev
-
-    def __hash__(self):
-        if not self._linear_part.expanded():
-           self._linear_part.expand()
-        combo = tuple(iter(self._linear_part.linear_combo.items()))
-        if len(combo) > 1 or combo[0][1] != 1.0:
-           return hash(combo)
-        # The unique value that comes from a unique variable (which it also hashes to)
-        return id(combo[0][0])
 
     def __repr__(self):
         # Not putting spaces around "+/-" helps with arrays of
@@ -2820,6 +2813,22 @@ class Variable(AffineScalarFunc):
 
         self._std_dev = CallableStdDev(std_dev)
 
+    def __hash__(self) -> int:
+        """
+        Calculates the hash for any Variable object.
+        This simply calls the __hash__ method of `AffineScalarFunc` in most cases.
+        During initialization, the `_linear_part` and `_nominal_value` attributes does not exist.
+        Because of that, the id returned in case this method is called during initialization.
+        
+        Returns:
+            int: The hash of this object
+        """
+
+        if hasattr(self, '_linear_part') and hasattr(self, '_nominal_value'):
+            return super().__hash__()
+        else:
+            return id(self)
+
     # Support for legacy method:
     def set_std_dev(self, value):  # Obsolete
         deprecation('instead of set_std_dev(), please use'
@@ -2835,25 +2844,6 @@ class Variable(AffineScalarFunc):
             return num_repr
         else:
             return "< %s = %s >" % (self.tag, num_repr)
-
-    def __hash__(self):
-        # All Variable objects are by definition independent
-        # variables, so they never compare equal; therefore, their
-        # id() are allowed to differ
-        # (http://docs.python.org/reference/datamodel.html#object.__hash__):
-
-        # Also, since the _linear_part of a variable is based on self, we can use
-        # that as a hash (uniqueness of self), which allows us to also
-        # preserve the invariance that x == y implies hash(x) == hash(y)
-        if hasattr(self, '_linear_part'):
-            if (
-                hasattr(self._linear_part, 'linear_combo')
-                and self in iter(self._linear_part.linear_combo.keys())
-            ):
-                return id(tuple(iter(self._linear_part.linear_combo.keys()))[0])
-            return hash(self._linear_part)
-        else:
-            return id(self)
 
     def __copy__(self):
         """
