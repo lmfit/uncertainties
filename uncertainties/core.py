@@ -1860,6 +1860,15 @@ class AffineScalarFunc(object):
     # Abbreviation (for formulas, etc.):
     s = std_dev
 
+    def __hash__(self):
+        if not self._linear_part.expanded():
+           self._linear_part.expand()
+        combo = tuple(iter(self._linear_part.linear_combo.items()))
+        if len(combo) > 1 or combo[0][1] != 1.0:
+           return hash(combo)
+        # The unique value that comes from a unique variable (which it also hashes to)
+        return id(combo[0][0])
+
     def __repr__(self):
         # Not putting spaces around "+/-" helps with arrays of
         # Variable, as each value with an uncertainty is a
@@ -2832,7 +2841,19 @@ class Variable(AffineScalarFunc):
         # variables, so they never compare equal; therefore, their
         # id() are allowed to differ
         # (http://docs.python.org/reference/datamodel.html#object.__hash__):
-        return id(self)
+
+        # Also, since the _linear_part of a variable is based on self, we can use
+        # that as a hash (uniqueness of self), which allows us to also
+        # preserve the invariance that x == y implies hash(x) == hash(y)
+        if hasattr(self, '_linear_part'):
+            if (
+                hasattr(self._linear_part, 'linear_combo')
+                and self in iter(self._linear_part.linear_combo.keys())
+            ):
+                return id(tuple(iter(self._linear_part.linear_combo.keys()))[0])
+            return hash(self._linear_part)
+        else:
+            return id(self)
 
     def __copy__(self):
         """
