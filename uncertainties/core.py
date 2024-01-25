@@ -1790,7 +1790,7 @@ class AffineScalarFunc(object):
 
     ########################################
 
-    def __hash__(self) -> int:
+    def __hash__(self):
         """
         Calculates the hash for any AffineScalarFunc object.
         The hash is calculated from the nominal_value, and the derivatives.
@@ -2813,7 +2813,7 @@ class Variable(AffineScalarFunc):
 
         self._std_dev = CallableStdDev(std_dev)
 
-    def __hash__(self) -> int:
+    def __hash__(self):
         """
         Calculates the hash for any Variable object.
         This simply calls the __hash__ method of `AffineScalarFunc` in most cases.
