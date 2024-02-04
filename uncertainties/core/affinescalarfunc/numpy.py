@@ -13,6 +13,8 @@ ufunc_derivatives = {
     }
 
 def is_upcast_type(t):
+    # This can be used to allow downstream modules to overide operations; see pint
+    # TODO add upcast_type list or dict to a public interface
     return False
 
 def implements(numpy_func_string, func_type):
@@ -35,6 +37,21 @@ def implements(numpy_func_string, func_type):
 HANDLED_FUNCTIONS = {}
 HANDLED_UFUNCS = {}
 
+
+def apply_func_elementwise(func, inputs, kwargs, result_dtype="object"):
+    if isinstance(inputs[0], np.ndarray):
+        result = np.empty_like(inputs[0], dtype=result_dtype)
+        for index, x in np.ndenumerate(inputs[0]):
+            inputs_ = [x if i == 0 else inputs[i] for i in range(len(inputs))]
+            result[index] = func(*inputs_, **kwargs)
+    elif isinstance(inputs[1], np.ndarray):
+        result = np.empty_like(inputs[1], dtype=result_dtype)
+        for index, x in np.ndenumerate(inputs[1]):
+            inputs_ = [x if i == 1 else inputs[i] for i in range(len(inputs))]
+            result[index] = func(*inputs_, **kwargs)
+    else:
+        result = func(*inputs, **kwargs)
+    return result
 
 def numpy_wrap(func_type, func, args, kwargs, types):
     """Return the result from a NumPy function/ufunc as wrapped by uncertainties."""
@@ -75,25 +92,72 @@ class UFloatNumpy(object):
 
     def __array_function__(self, func, types, args, kwargs):
         return numpy_wrap("function", func, args, kwargs, types)
+  
+    # original code for _add_numpy_ufuncs. may be helpful for writing a generic wraps
+    # this can be deleted:
+    # @classmethod
+    # def _add_numpy_ufuncs(cls):
+    #     def implement_ufunc(func_str, derivatives):
+    #         func = getattr(np, func_str)
+    #         @implements(func_str, "ufunc")
+    #         def implementation(*inputs, **kwargs):
+    #             if isinstance(inputs[0], np.ndarray):
+    #                 result = np.empty_like(inputs[0], dtype=object)
+    #                 for index, x in np.ndenumerate(inputs[0]):
+    #                     inputs_ = (x if i == 0 else inputs[i] for i in range(len(inputs)))
+    #                     result[index] = cls.wrap(func, derivatives)(*inputs_, **kwargs)
+    #             elif isinstance(inputs[1], np.ndarray):
+    #                 result = np.empty_like(inputs[1], dtype=object)
+    #                 for index, x in np.ndenumerate(inputs[1]):
+    #                     inputs_ = (x if i == 1 else inputs[i] for i in range(len(inputs)))
+    #                     result[index] = cls.wrap(func, derivatives)(*inputs_, **kwargs)
+    #             else:
+    #                 result = cls.wrap(func, derivatives)(*inputs, **kwargs)
+    #             return result
+            
+    #         return implementation
 
+    #     for func_str, derivatives in ufunc_derivatives.items():
+    #         implement_ufunc(func_str, derivatives)
+
+    
     @classmethod
     def _add_numpy_ufuncs(cls):
-
         def implement_ufunc(func_str, derivatives):
             func = getattr(np, func_str)
-
             @implements(func_str, "ufunc")
             def implementation(*inputs, **kwargs):
-                if isinstance(inputs[1], np.ndarray):
-                    result = np.empty_like(inputs[1], dtype=object)
-                    for index, x in np.ndenumerate(inputs[1]):
-                        inputs_ = (x if i == 1 else inputs[i] for i in range(len(inputs)))
-                        result[index] = cls.wrap(func, derivatives)(*inputs_, **kwargs)
-                else:
-                    result = cls.wrap(func, derivatives)(*inputs, **kwargs)
-                return result
-            
+                return apply_func_elementwise(
+                    cls.wrap(func, derivatives), inputs, kwargs)
             return implementation
 
         for func_str, derivatives in ufunc_derivatives.items():
             implement_ufunc(func_str, derivatives)
+
+    @classmethod
+    def _add_numpy_comparative_ufuncs(cls):
+        def implement_ufunc(func_str, dunder):
+            func = getattr(np, func_str)
+            @implements(func_str, "ufunc")
+            def implementation(*inputs, **kwargs):
+                if isinstance(inputs[0], cls):
+                    func = getattr(inputs[0], dunder)
+                    inputs_ = [inputs[1]]
+                elif isinstance(inputs[1], cls):
+                    func = getattr(inputs[1],  '__r' + dunder[2:])
+                    inputs_ = [inputs[0]]
+                
+                return apply_func_elementwise(func, inputs_, kwargs, result_dtype=bool)
+            
+            return implementation
+
+        ufunc_comparatives = {
+            'equal': '__eq__',
+            'not_equal': '__ne__',
+            'less': '__lt__',
+            'less_equal': '__le__',
+            'greater': '__gt__',
+            'greater_equal': '__ge__',
+        }
+        for func_str, dunder in ufunc_comparatives.items():
+            implement_ufunc(func_str, dunder)

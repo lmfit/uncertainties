@@ -81,6 +81,24 @@ def le_on_aff_funcs(self, y_with_uncert):
     return (lt_on_aff_funcs(self, y_with_uncert)
             or eq_on_aff_funcs(self, y_with_uncert))
 
+def req_on_aff_funcs(self, y_with_uncert):
+    return eq_on_aff_funcs(y_with_uncert, self)
+
+def rne_on_aff_funcs(self, y_with_uncert):
+    return ne_on_aff_funcs(y_with_uncert, self)
+
+def rgt_on_aff_funcs(self, y_with_uncert):
+    return gt_on_aff_funcs(y_with_uncert, self)
+
+def rge_on_aff_funcs(self, y_with_uncert):
+    return ge_on_aff_funcs(y_with_uncert, self)
+
+def rlt_on_aff_funcs(self, y_with_uncert):
+    return lt_on_aff_funcs(y_with_uncert, self)
+
+def rle_on_aff_funcs(self, y_with_uncert):
+    return le_on_aff_funcs(y_with_uncert, self)
+
 
 class AffineScalarFuncOps(AffineScalarFuncBase):
 
@@ -185,6 +203,13 @@ class AffineScalarFuncOps(AffineScalarFuncBase):
         cls.__lt__ = cls.force_aff_func_args(cls, lt_on_aff_funcs)
         cls.__le__ = cls.force_aff_func_args(cls, le_on_aff_funcs)
 
+        cls.__req__ = cls.force_aff_func_args(cls, req_on_aff_funcs)
+        cls.__rne__ = cls.force_aff_func_args(cls, rne_on_aff_funcs)
+        cls.__rgt__ = cls.force_aff_func_args(cls, rgt_on_aff_funcs)
+        cls.__rge__ = cls.force_aff_func_args(cls, rge_on_aff_funcs)
+        cls.__rlt__ = cls.force_aff_func_args(cls, rlt_on_aff_funcs)
+        cls.__rle__ = cls.force_aff_func_args(cls, rle_on_aff_funcs)
+        
     @classmethod
     def wrap(cls, f, derivatives_args=[], derivatives_kwargs={}):
         """
