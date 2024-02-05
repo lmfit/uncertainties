@@ -10,13 +10,11 @@ uncertainties
    :target: https://pepy.tech/project/uncertainties
 .. image:: https://codecov.io/gh/lebigot/uncertainties/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/lebigot/uncertainties/
-.. image:: https://travis-ci.com/lebigot/uncertainties.svg?branch=master
-   :target: https://travis-ci.com/lebigot/uncertainties
-.. image:: https://ci.appveyor.com/api/projects/status/j5238244myqx0a0r?svg=true
-   :target: https://ci.appveyor.com/project/lebigot/uncertainties
+.. image:: https://img.shields.io/github/actions/workflow/status/lmfit/uncertainties/python-package.yml?logo=github%20actions
+   :target: https://github.com/lmfit/uncertainties/blob/main/.github/workflows/python-package.yml
 
 **Call for maintainers**: if you want this project to keep living and are ready to maintain it (pull requests management, issue resolution…), please contact me! I am ready to share my knowledge of the code logic by participating in discussions (notably around pull requests and issues).
-   
+
 This is the ``uncertainties`` Python package, which performs **transparent
 calculations with uncertainties** (aka "error propagation"):
 
