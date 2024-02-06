@@ -23,7 +23,7 @@ calculations with uncertainties** (aka "error propagation"):
     >>> from uncertainties import ufloat
     >>> from uncertainties.umath import *  # sin(), etc.
     >>> x = ufloat(1, 0.1)  # x = 1+/-0.1
-    >>> print 2*x
+    >>> print(2*x)
     2.00+/-0.20
     >>> sin(2*x)  # In a Python shell, "print" is optional
     0.9092974268256817+/-0.08322936730942848
