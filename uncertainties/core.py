@@ -1790,6 +1790,19 @@ class AffineScalarFunc(object):
 
     ########################################
 
+    def __hash__(self):
+        """
+        Calculates the hash for any AffineScalarFunc object.
+        The hash is calculated from the nominal_value, and the derivatives.
+        
+        Returns:
+            int: The hash of this object
+        """
+
+        ids = [id(d) for d in self.derivatives.keys()]
+        values_hash = tuple(self.derivatives.values())
+        return hash((self._nominal_value, tuple(ids), values_hash))
+
     # Uncertainties handling:
 
     def error_components(self):
@@ -2800,6 +2813,22 @@ class Variable(AffineScalarFunc):
 
         self._std_dev = CallableStdDev(std_dev)
 
+    def __hash__(self):
+        """
+        Calculates the hash for any Variable object.
+        This simply calls the __hash__ method of `AffineScalarFunc` in most cases.
+        During initialization, the `_linear_part` and `_nominal_value` attributes does not exist.
+        Because of that, the id returned in case this method is called during initialization.
+        
+        Returns:
+            int: The hash of this object
+        """
+
+        if hasattr(self, '_linear_part') and hasattr(self, '_nominal_value'):
+            return super().__hash__()
+        else:
+            return id(self)
+
     # Support for legacy method:
     def set_std_dev(self, value):  # Obsolete
         deprecation('instead of set_std_dev(), please use'
@@ -2815,13 +2844,6 @@ class Variable(AffineScalarFunc):
             return num_repr
         else:
             return "< %s = %s >" % (self.tag, num_repr)
-
-    def __hash__(self):
-        # All Variable objects are by definition independent
-        # variables, so they never compare equal; therefore, their
-        # id() are allowed to differ
-        # (http://docs.python.org/reference/datamodel.html#object.__hash__):
-        return id(self)
 
     def __copy__(self):
         """
