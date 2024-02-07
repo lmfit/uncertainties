@@ -47,7 +47,7 @@ install:
   - conda init cmd.exe
   - conda info -a
   # Create a conda virtual environement 
-  - "conda create -n uncty-env numpy nose python=%PYTHON_VERSION%"
+  - "conda create -n uncty-env future numpy nose python=%PYTHON_VERSION%"
   - activate uncty-env
 
 
@@ -56,4 +56,5 @@ test_script:
   - "cd C:\\projects\\uncertainties"
   - activate uncty-env # Activate the virtual environment
   - python setup.py egg_info
-  - python setup.py nosetests -sv
+  # Try to work around nose-1.3.7 not working with modern setuptools (> Python 3.5)
+  - nosetests -sv uncertainties/
