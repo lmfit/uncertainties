@@ -29,8 +29,9 @@ import sys
 
 # Local modules
 
-import uncertainties.core as uncert_core
-from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr
+import uncertainties.core.core as uncert_core
+import uncertainties.core.affinescalarfunc.formatting as uncert_format
+from uncertainties.core.core import ufloat, AffineScalarFunc, ufloat_fromstr
 from uncertainties import umath
 
 # The following information is useful for making sure that the right
@@ -435,11 +436,26 @@ def test_fixed_derivatives_basic_funcs():
         compare_derivatives(func, numerical_derivatives, [num_args])
 
     # Operators that take 1 value:
-    for op in uncert_core.modified_operators:
+    for op in ['abs', 'neg', 'pos', 'trunc']:
         check_op(op, 1)
 
     # Operators that take 2 values:
-    for op in uncert_core.modified_ops_with_reflection:
+    for op in [
+            'add',
+            'radd',
+            'floordiv',
+            'rfloordiv',
+            'mod',
+            'rmod',
+            'mul',
+            'rmul',
+            'sub',
+            'rsub',
+            'truediv',
+            'rtruediv',
+            'pow',
+            'rpow'
+            ]:     
         check_op(op, 2)
 
 # Additional, more complex checks, for use with the nose unit testing
@@ -1523,7 +1539,7 @@ def test_PDG_precision():
         }
 
     for (std_dev, result) in tests.items():
-        assert uncert_core.PDG_precision(std_dev) == result
+        assert uncert_format.PDG_precision(std_dev) == result
 
 def test_repr():
     '''Test the representation of numbers with uncertainty.'''
@@ -2138,21 +2154,21 @@ def test_custom_pretty_print_and_latex():
 
     # We will later restore the defaults:
     PREV_CUSTOMIZATIONS = {
-        var: getattr(uncert_core, var).copy()
+        var: getattr(uncert_format, var).copy()
         for var in ['PM_SYMBOLS', 'MULT_SYMBOLS', 'GROUP_SYMBOLS']}
     
     # Customizations:
     for format in ["pretty-print", "latex"]:
-        uncert_core.PM_SYMBOLS[format] = u" ± "
-        uncert_core.MULT_SYMBOLS[format] = u"⋅"
-        uncert_core.GROUP_SYMBOLS[format] = ( "[", "]" )
+        uncert_format.PM_SYMBOLS[format] = u" ± "
+        uncert_format.MULT_SYMBOLS[format] = u"⋅"
+        uncert_format.GROUP_SYMBOLS[format] = ( "[", "]" )
 
     assert u"{:P}".format(x) == u'[2.00 ± 0.10]⋅10⁻¹¹'
     assert u"{:L}".format(x) == u'[2.00 ± 0.10] ⋅ 10^{-11}'
 
     # We restore the defaults:
     for (var, setting) in PREV_CUSTOMIZATIONS.items():
-        setattr(uncert_core, var, setting)
+        setattr(uncert_format, var, setting)
 
 ###############################################################################
 
