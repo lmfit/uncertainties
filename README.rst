@@ -59,4 +59,15 @@ License <LICENSE.txt>`_.
 Voluntary donations
 -------------------
 If you find this open-source software useful (e.g. in saving you time or helping you produce
-something valuable), please consider `donating $10 or more <https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S>`_ to help contribute to the maintenance of the package.
+something valuable), please consider `donating $10 or more <https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S>`_.
+
+History
+-------
+
+..
+   Note from Eric Lebigot: I would like the origin of the package to
+   remain documented for its whole life. Thanks!
+
+This package was created back around 2009 by `Eric O. LEBIGOT <https://github.com/lebigot>`_.
+
+Ownership of the package was taken over by the `lmfit GitHub organization <https://github.com/lmfit>`_ in 2024.
