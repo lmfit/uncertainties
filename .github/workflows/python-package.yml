@@ -7,7 +7,7 @@ on:
   push:
     branches: [ "master" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "lmfit:master" ]
 
 jobs:
   build:
@@ -40,4 +40,4 @@ jobs:
 #        files: coverage.xml
 #        fail_ci_if_error: true
 #        verbose: true
-# 
+#
