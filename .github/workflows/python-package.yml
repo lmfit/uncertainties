@@ -6,7 +6,7 @@ name: Python package
 on:
   push:
     branches: [ "master" ]
-  pull_request_target:
+  pull_request:
     branches: [ "master" ]
 
 jobs:
