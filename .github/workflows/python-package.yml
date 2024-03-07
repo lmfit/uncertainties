@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-
+    name: Tests
     strategy:
       fail-fast: false
       matrix:
@@ -41,3 +41,21 @@ jobs:
 #        files: coverage.xml
 #        fail_ci_if_error: true
 #        verbose: true
+#
+  results:
+    # This step aggregates the results from all the tests and allows us to
+    # require only this single job to pass for a PR to be merged rather than
+    # requiring each job in the matrix separately.
+    # See https://github.com/orgs/community/discussions/26822?sort=old#discussioncomment-8285141
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    name: Final Results
+    needs: [build]
+    steps:
+      - run: exit 1
+        if: >-
+          ${{
+               contains(needs.*.result, 'failure')
+            || contains(needs.*.result, 'cancelled')
+            || contains(needs.*.result, 'skipped')
+          }}
