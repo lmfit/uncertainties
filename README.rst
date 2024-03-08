@@ -11,7 +11,7 @@ uncertainties
 .. image:: https://codecov.io/gh/lebigot/uncertainties/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/lebigot/uncertainties/
 .. image:: https://img.shields.io/github/actions/workflow/status/lmfit/uncertainties/python-package.yml?logo=github%20actions
-   :target: https://github.com/lmfit/uncertainties/blob/main/.github/workflows/python-package.yml
+   :target: https://github.com/lmfit/uncertainties/blob/master/.github/workflows/python-package.yml
 
 **Call for maintainers**: if you want this project to keep living and are ready to maintain it (pull requests management, issue resolution…), please contact me! I am ready to share my knowledge of the code logic by participating in discussions (notably around pull requests and issues).
 
