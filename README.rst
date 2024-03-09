@@ -10,20 +10,18 @@ uncertainties
    :target: https://pepy.tech/project/uncertainties
 .. image:: https://codecov.io/gh/lebigot/uncertainties/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/lebigot/uncertainties/
-.. image:: https://travis-ci.com/lebigot/uncertainties.svg?branch=master
-   :target: https://travis-ci.com/lebigot/uncertainties
-.. image:: https://ci.appveyor.com/api/projects/status/j5238244myqx0a0r?svg=true
-   :target: https://ci.appveyor.com/project/lebigot/uncertainties
+.. image:: https://img.shields.io/github/actions/workflow/status/lmfit/uncertainties/python-package.yml?logo=github%20actions
+   :target: https://github.com/lmfit/uncertainties/blob/main/.github/workflows/python-package.yml
 
 **Call for maintainers**: if you want this project to keep living and are ready to maintain it (pull requests management, issue resolution…), please contact me! I am ready to share my knowledge of the code logic by participating in discussions (notably around pull requests and issues).
-   
+
 This is the ``uncertainties`` Python package, which performs **transparent
 calculations with uncertainties** (aka "error propagation"):
 
     >>> from uncertainties import ufloat
     >>> from uncertainties.umath import *  # sin(), etc.
     >>> x = ufloat(1, 0.1)  # x = 1+/-0.1
-    >>> print 2*x
+    >>> print(2*x)
     2.00+/-0.20
     >>> sin(2*x)  # In a Python shell, "print" is optional
     0.9092974268256817+/-0.08322936730942848
@@ -59,4 +57,15 @@ License <LICENSE.txt>`_.
 Voluntary donations
 -------------------
 If you find this open-source software useful (e.g. in saving you time or helping you produce
-something valuable), please consider `donating $10 or more <https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S>`_ to help contribute to the maintenance of the package.
+something valuable), please consider `donating $10 or more <https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S>`_.
+
+History
+-------
+
+..
+   Note from Eric Lebigot: I would like the origin of the package to
+   remain documented for its whole life. Thanks!
+
+This package was created back around 2009 by `Eric O. LEBIGOT <https://github.com/lebigot>`_.
+
+Ownership of the package was taken over by the `lmfit GitHub organization <https://github.com/lmfit>`_ in 2024.
