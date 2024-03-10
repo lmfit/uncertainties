@@ -1,21 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# !! This program must run with all version of Python since 2.3 included.
-
 import os
 import sys
-
-# setuptools has python_requires, but distutils doesn't, so we test the
-# Python version manually:
-min_version = (2, 7)
-error_msg = ("Sorry, this package is for Python %d.%d and higher only." %
-             min_version)
-try:
-    if sys.version_info < min_version:
-        sys.exit(error_msg)
-except AttributeError:  # sys.version_info was introduced in Python 2.0
-    sys.exit(error_msg)
 
 # Common options for distutils/setuptools's setup():
 setup_options = dict(
@@ -280,19 +267,12 @@ Main changes:
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        # Python 3.1 failed because of a problem with NumPy 1.6.1 (whereas
-        # everything was fine with Python 3.2 and Python 2.7).
-        'Programming Language :: Python :: 3.1',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Programming Language :: Python :: Implementation :: Jython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Education',

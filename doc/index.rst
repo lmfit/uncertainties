@@ -107,6 +107,15 @@ gives access to many of the documentation strings included in the code.
 Installation and download
 =========================
 
+Supported Python versions
+-------------------------
+
+The :mod:`uncertainties` package supports all versions of Python supported by
+the upstream Python_ project.  As of early 2024, that means versions 3.8
+through 3.12.  It may be possible to support earlier versions if there is user
+demand.  Versions of the :mod:`uncertainties` package up through 3.1.7
+supported Python 2.7 through Python 3.12.
+
 Important note
 --------------
 
