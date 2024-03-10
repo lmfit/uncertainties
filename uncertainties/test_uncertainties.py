@@ -1559,61 +1559,61 @@ def test_format():
     # uncert_core.GROUP_SYMBOLS and uncert_core.EXP_PRINT: this
     # way, problems in the customization themselves are caught.
 
-    tests = {  # (Nominal value, uncertainty): {format: result,...}
+    tests = [  # (Nominal value, uncertainty): {format: result,...}
 
         # Usual float formatting, and individual widths, etc.:
-        (3.1415, 0.0001): {
+        ((3.1415, 0.0001), {
             '*^+7.2f': '*+3.14*+/-*0.00**',
             '+07.2f': '+003.14+/-0000.00',  # 0 fill
             '>10f': '  3.141500+/-  0.000100',  # Width and align
             '11.3e': '  3.142e+00+/-  0.000e+00',  # Duplicated exponent
             '0.4e': '3.1415e+00+/-0.0000e+00'  # Forced double exponent
-        },
+        }),
 
         # Full generalization of float formatting:
-        (3.1415, 0.0001): {
+        ((3.1415, 0.0001), {
             '+09.2uf': '+03.14150+/-000.00010',
             # Alignment is not available with the % formatting
             # operator of Python < 2.6:
             '*^+9.2uf': '+3.14150*+/-*0.00010*',
             '>9f': '  3.14150+/-  0.00010'  # Width and align
-        },
+        }),
 
         # Number of digits of the uncertainty fixed:
-        (123.456789, 0.00123): {
+        ((123.456789, 0.00123), {
             '.1uf': '123.457+/-0.001',
             '.2uf': '123.4568+/-0.0012',
             '.3uf': '123.45679+/-0.00123',
             '.2ue': '(1.234568+/-0.000012)e+02'
-        },
+        }),
         # Sign handling:
-        (-123.456789, 0.00123): {
+        ((-123.456789, 0.00123), {
             '.1uf': '-123.457+/-0.001',
             '.2uf': '-123.4568+/-0.0012',
             '.3uf': '-123.45679+/-0.00123',
             '.2ue': '(-1.234568+/-0.000012)e+02'
-        },
+        }),
         # Uncertainty larger than the nominal value:
-        (12.3, 456.78): {
+        ((12.3, 456.78), {
             '': '12+/-457',
             '.1uf': '12+/-457',
             '.4uf': '12.3+/-456.8'
-        },
+        }),
         # ... Same thing, but with an exponent:
-        (12.3, 456.78): {
+        ((12.3, 456.78), {
             '.1ue': '(0+/-5)e+02',
             '.4ue': '(0.123+/-4.568)e+02',
             '.4ueS': '0.123(4.568)e+02'
-        },
+        }),
 
-        (23456.789123, 1234.56789123): {
+        ((23456.789123, 1234.56789123), {
             '.6gS': '23456.8(1234.6)'
-        },
+        }),
 
         # Test of the various float formats: the nominal value should
         # have a similar representation as if it were directly
         # represented as a float:
-        (1234567.89, 0.1): {
+        ((1234567.89, 0.1), {
             '.0e': '(1+/-0)e+06',
             'e': '(1.23456789+/-0.00000010)e+06',
             'E': '(1.23456789+/-0.00000010)E+06',
@@ -1622,21 +1622,21 @@ def test_format():
             'g': '1234567.89+/-0.10',
             'G': '1234567.89+/-0.10',
             '%': '(123456789+/-10)%'
-        },
-        (1234567.89, 4.3): {
+        }),
+        ((1234567.89, 4.3), {
             'g': '1234568+/-4'
-        },
-        (1234567.89, 43): {  # Case where g triggers the exponent notation
+        }),
+        ((1234567.89, 43), {  # Case where g triggers the exponent notation
             'g': '(1.23457+/-0.00004)e+06',
             'G': '(1.23457+/-0.00004)E+06'
-        },
+        }),
 
 
-        (3.1415, 0.0001): {
+        ((3.1415, 0.0001), {
             '+09.2uf': '+03.14150+/-000.00010'
-            },
+            }),
 
-        (1234.56789, 0.1): {
+        ((1234.56789, 0.1), {
             '.0f': '(1234+/-0.)',  # Approximate error indicated with "."
             'e': '(1.23456+/-0.00010)e+03',
             'E': '(1.23456+/-0.00010)E+03',
@@ -1645,10 +1645,10 @@ def test_format():
             'f': '1234.57+/-0.10',
             'F': '1234.57+/-0.10',
             '%': '123457+/-10%'
-        },
+        }),
 
         # Percent notation:
-        (0.42, 0.0055): {
+        ((0.42, 0.0055), {
             # Because '%' does 0.0055*100, the value
             # 0.5499999999999999 is obtained, which rounds to 0.5. The
             # original rounded value is 0.006. The same behavior is
@@ -1656,52 +1656,52 @@ def test_format():
             '.1u%': '(42.0+/-0.5)%',
             '.1u%S': '42.0(5)%',
             '%P': u'(42.0±0.5)%'
-        },
+        }),
 
         # Particle Data Group automatic convention, including limit cases:
-        (1.2345678, 0.354): {'': '1.23+/-0.35'},
-        (1.2345678, 0.3549): {'': '1.23+/-0.35'},
-        (1.2345678, 0.355): {'': '1.2+/-0.4'},
-        (1.5678, 0.355): {'': '1.6+/-0.4'},
-        (1.2345678, 0.09499): {'': '1.23+/-0.09'},
-        (1.2345678, 0.095): {'': '1.23+/-0.10'},
+        ((1.2345678, 0.354), {'': '1.23+/-0.35'}),
+        ((1.2345678, 0.3549), {'': '1.23+/-0.35'}),
+        ((1.2345678, 0.355), {'': '1.2+/-0.4'}),
+        ((1.5678, 0.355), {'': '1.6+/-0.4'}),
+        ((1.2345678, 0.09499), {'': '1.23+/-0.09'}),
+        ((1.2345678, 0.095), {'': '1.23+/-0.10'}),
 
         # Automatic extension of the uncertainty up to the decimal
         # point:
-        (1000, 123): {
+        ((1000, 123), {
             '.1uf': '1000+/-123',
             # The nominal value has 1 <= mantissa < 10. The precision
             # is the number of significant digits of the uncertainty:
             '.1ue': '(1.0+/-0.1)e+03'
-        },
+        }),
 
         # Spectroscopic notation:
-        (-1.23, 3.4): {
+        ((-1.23, 3.4), {
             'S': '-1.2(3.4)',
             '.2ufS': '-1.2(3.4)',
             '.3ufS': '-1.23(3.40)',
-        },
-        (-123.456, 0.123): {
+        }),
+        ((-123.456, 0.123), {
             'S': '-123.46(12)',
             '.1ufS': '-123.5(1)',
             '.2ufS': '-123.46(12)',
             '.3ufS': '-123.456(123)',
-        },
-        (-123.456, 0.567): {
+        }),
+        ((-123.456, 0.567), {
             'S': '-123.5(6)',
             '.1ufS': '-123.5(6)',
             '.2ufS': '-123.46(57)',
             '.3ufS': '-123.456(567)',
-        },
-        (-123.456, 0.004): {
+        }),
+        ((-123.456, 0.004), {
             # The decimal point shows that the uncertainty is not
             # exact:
             '.2fS': '-123.46(0.00)'
-        },
+        }),
 
         # LaTeX notation:
         #
-        (1234.56789, 0.1): {
+        ((1234.56789, 0.1), {
             'eL': r'\left(1.23457 \pm 0.00010\right) \times 10^{3}',
             'EL': r'\left(1.23457 \pm 0.00010\right) \times 10^{3}',
             'fL': '1234.57 \pm 0.10',
@@ -1709,15 +1709,15 @@ def test_format():
             'fL': '1234.57 \pm 0.10',
             'FL': '1234.57 \pm 0.10',
             '%L': r'\left(123457 \pm 10\right) \%'
-        },
+        }),
         #
         # ... combined with the spectroscopic notation:
-        (-1.23, 3.4): {
+        ((-1.23, 3.4), {
             'SL': '-1.2(3.4)',
             'LS': '-1.2(3.4)',
             '.2ufSL': '-1.2(3.4)',
             '.2ufLS': '-1.2(3.4)'
-        },
+        }),
 
         # Special cases for the uncertainty (0, nan) and format
         # strings (extension S, L, U,..., global width, etc.).
@@ -1725,7 +1725,7 @@ def test_format():
         # Python 3.2 and 3.3 give 1.4e-12*1e+12 = 1.4000000000000001
         # instead of 1.4 for Python 3.1. The problem does not appear
         # with 1.2, so 1.2 is used.
-        (-1.2e-12, 0): {
+        ((-1.2e-12, 0), {
             '12.2gPL': u'  -1.2×10⁻¹²±           0',
             # Pure "width" formats are not accepted by the % operator,
             # and only %-compatible formats are accepted, for Python <
@@ -1737,12 +1737,12 @@ def test_format():
             '1L': r'-1.2 \times 10^{-12} \pm 0',
             'SL': r'-1.2(0) \times 10^{-12}',
             'SP': u'-1.2(0)×10⁻¹²'
-        },
+        }),
 
         # Python 3.2 and 3.3 give 1.4e-12*1e+12 = 1.4000000000000001
         # instead of 1.4 for Python 3.1. The problem does not appear
         # with 1.2, so 1.2 is used.
-        (-1.2e-12, float('nan')): {
+        ((-1.2e-12, float('nan')), {
             '.2uG': '(-1.2+/-%s)E-12' % NaN_EFG,  # u ignored, format used
             '15GS': '  -1.2(%s)E-12' % NaN_EFG,
             'SL': r'-1.2(\mathrm{nan}) \times 10^{-12}',  # LaTeX NaN
@@ -1754,19 +1754,19 @@ def test_format():
                      % NaN_EFG),
             '10': '  -1.2e-12+/-       nan',
             '15S': '  -1.2(nan)e-12'
-        },
+        }),
 
-        (3.14e-10, 0.01e-10): {
+        ((3.14e-10, 0.01e-10), {
             # Character (Unicode) strings:
             u'P': u'(3.140±0.010)×10⁻¹⁰',  # PDG rules: 2 digits
             u'PL': u'(3.140±0.010)×10⁻¹⁰',  # Pretty-print has higher priority
             # Truncated non-zero uncertainty:
             '.1e': '(3.1+/-0.0)e-10',
             '.1eS': '3.1(0.0)e-10'
-        },
+        }),
 
         # Some special cases:
-        (1, float('nan')): {
+        ((1, float('nan')), {
             'g': '1+/-nan',
             'G': '1+/-%s' % NaN_EFG,
             '%': '(100.000000+/-nan)%',  # The % format type is like f
@@ -1788,20 +1788,20 @@ def test_format():
             # '{:+05}'.format(float('nan')) and format(1.) (which
             # differs from format(1)!):
             '+05': '+01.0+/-00nan'
-        },
+        }),
 
-        (9.9, 0.1): {
+        ((9.9, 0.1), {
             '.1ue': '(9.9+/-0.1)e+00',
             '.0fS': '10(0.)'
-        },
-        (9.99, 0.1): {
+        }),
+        ((9.99, 0.1), {
              # The precision has an effect on the exponent, like for
              # floats:
             '.2ue': '(9.99+/-0.10)e+00',  # Same exponent as for 9.99 alone
             '.1ue': '(1.00+/-0.01)e+01'  # Same exponent as for 9.99 alone
-        },
+        }),
         # 0 uncertainty: nominal value displayed like a float:
-        (1.2345, 0): {
+        ((1.2345, 0), {
             '.2ue': '(1.23+/-0)e+00',
             '1.2ue': '1.23e+00+/-0',  # No factored exponent
             '.2uf': '1.23+/-0',
@@ -1809,18 +1809,18 @@ def test_format():
             '.2fS': '1.23(0)',
             'g': '1.2345+/-0',
             '': '1.2345+/-0'
-        },
+        }),
 
         # Alignment and filling characters (supported in Python 2.6+):
-        (3.1415e10, 0): {
+        ((3.1415e10, 0), {
             '<15': '31415000000.0  +/-0              ',
             '<20S': '31415000000.0(0)    ',
             # Trying to trip the format parsing with a fill character
             # which is an alignment character:
             '=>15': '==31415000000.0+/-==============0'
-        },
+        }),
 
-        (1234.56789, 0): {
+        ((1234.56789, 0), {
             '1.2ue': '1.23e+03+/-0',  # u ignored
             '1.2e': '1.23e+03+/-0',
             # Default precision = 6
@@ -1829,65 +1829,65 @@ def test_format():
             'fL': '1234.567890 \pm 0',
             'FL': '1234.567890 \pm 0',
             '%L': r'\left(123456.789000 \pm 0\right) \%'
-        },
+        }),
 
-        (1e5, 0): {
+        ((1e5, 0), {
             'g': '100000+/-0'
-        },
-        (1e6, 0): {
+        }),
+        ((1e6, 0), {
             # A default precision of 6 is used because the uncertainty
             # cannot be used for defining a default precision (it does
             # not have a magnitude):
             'g': '(1+/-0)e+06'
-        },
-        (1e6+10, 0): {
+        }),
+        ((1e6+10, 0), {
             # A default precision of 6 is used because the uncertainty
             # cannot be used for defining a default precision (it does
             # not have a magnitude):
             'g': '(1.00001+/-0)e+06'
-        },
+        }),
         # Rounding of the uncertainty that "changes" the number of
         # significant digits:
-        (1, 0.994): {
+        ((1, 0.994), {
             '.3uf': '1.000+/-0.994',
             '.2uf': '1.00+/-0.99',
             '.1uf': '1+/-1'  # Discontinuity in the number of digits
-        },
-        (12.3, 2.3): {
+        }),
+        ((12.3, 2.3), {
             '.2ufS': '12.3(2.3)'  # Decimal point on the uncertainty
-        },
-        (12.3, 2.3): {
+        }),
+        ((12.3, 2.3), {
             '.1ufS': '12(2)'  # No decimal point on the uncertainty
-        },
-        (0, 0): {  # Make defining the first significant digit problematic
+        }),
+        ((0, 0), {  # Make defining the first significant digit problematic
             '.1f': '0.0+/-0',  # Simple float formatting
             'g': '0+/-0'
-        },
-        (1.2e-34, 5e-67): {
+        }),
+        ((1.2e-34, 5e-67), {
             '.6g': '(1.20000+/-0.00000)e-34',
             '13.6g': '  1.20000e-34+/-  0.00000e-34',
             '13.6G': '  1.20000E-34+/-  0.00000E-34',
             '.6GL': r'\left(1.20000 \pm 0.00000\right) \times 10^{-34}',
             '.6GLp': r'\left(1.20000 \pm 0.00000\right) \times 10^{-34}',
-        },
+        }),
 
-        (float('nan'), 100): {  # NaN *nominal value*
+        ((float('nan'), 100), {  # NaN *nominal value*
             '': 'nan+/-100.0',  # Like '{}'.format(100.)
             'g': 'nan+/-100',  # Like '{:g}'.format(100.)
             '.1e': '(nan+/-1.0)e+02',  # Similar to 1±nan
             '.1E': '(%s+/-1.0)E+02' % NaN_EFG,
             '.1ue': '(nan+/-1)e+02',
             '10.1e': '       nan+/-   1.0e+02'
-        },
-        (float('nan'), 1e8): {  # NaN *nominal value*
+        }),
+        ((float('nan'), 1e8), {  # NaN *nominal value*
             '': 'nan+/-100000000.0',  # Like '{}'.format(1e8)
             'g': '(nan+/-1)e+08',  # Like '{:g}'.format(1e8)
             '.1e': '(nan+/-1.0)e+08',
             '.1E': '(%s+/-1.0)E+08' % NaN_EFG,
             '.1ue': '(nan+/-1)e+08',
             '10.1e': '       nan+/-   1.0e+08'  # 'nane+08' would be strange
-        },
-        (float('nan'), 123456789): {  # NaN *nominal value*
+        }),
+        ((float('nan'), 123456789), {  # NaN *nominal value*
             '': 'nan+/-123456789.0',  # Similar to '{}'.format(123456789.)
             'g': '(nan+/-1.23457)e+08',  # Similar to '{:g}'.format(123456789.)
             '.1e': '(nan+/-1.2)e+08',
@@ -1896,32 +1896,32 @@ def test_format():
             '.1ueL': r'\left(\mathrm{nan} \pm 1\right) \times 10^{8}',
             '10.1e': '       nan+/-   1.2e+08',
             '10.1eL': r'\mathrm{nan} \pm 1.2 \times 10^{8}'
-        },
-        (float('nan'), float('nan')): {  # *Double* NaN
+        }),
+        ((float('nan'), float('nan')), {  # *Double* NaN
             '': 'nan+/-nan',
             '.1e': 'nan+/-nan',
             '.1E': '%s+/-%s' % (NaN_EFG, NaN_EFG),
             '.1ue': 'nan+/-nan',
             'EL': r'\mathrm{%s} \pm \mathrm{%s}' % (NaN_EFG, NaN_EFG)
-        },
+        }),
 
-        (float('inf'), 100): {  # Inf *nominal value*
+        ((float('inf'), 100), {  # Inf *nominal value*
             '': 'inf+/-100.0',  # Like '{}'.format(100.)
             'g': 'inf+/-100',  # Like '{:g}'.format(100.)
             '.1e': '(inf+/-1.0)e+02',  # Similar to 1±inf
             '.1E': '(%s+/-1.0)E+02' % Inf_EFG,
             '.1ue': '(inf+/-1)e+02',
             '10.1e': '       inf+/-   1.0e+02'
-        },
-        (float('inf'), 1e8): {  # Inf *nominal value*
+        }),
+        ((float('inf'), 1e8), {  # Inf *nominal value*
             '': 'inf+/-100000000.0',  # Like '{}'.format(1e8)
             'g': '(inf+/-1)e+08',  # Like '{:g}'.format(1e8)
             '.1e': '(inf+/-1.0)e+08',
             '.1E': '(%s+/-1.0)E+08' % Inf_EFG,
             '.1ue': '(inf+/-1)e+08',
             '10.1e': '       inf+/-   1.0e+08'  # 'infe+08' would be strange
-        },
-        (float('inf'), 123456789): {  # Inf *nominal value*
+        }),
+        ((float('inf'), 123456789), {  # Inf *nominal value*
             '': 'inf+/-123456789.0',  # Similar to '{}'.format(123456789.)
             'g': '(inf+/-1.23457)e+08',  # Similar to '{:g}'.format(123456789.)
             '.1e': '(inf+/-1.2)e+08',
@@ -1932,34 +1932,34 @@ def test_format():
             '.1ueLp': r'\left(\infty \pm 1\right) \times 10^{8}',
             '10.1e': '       inf+/-   1.2e+08',
             '10.1eL': r'    \infty \pm 1.2 \times 10^{8}'
-        },
-        (float('inf'), float('inf')): {  # *Double* Inf
+        }),
+        ((float('inf'), float('inf')), {  # *Double* Inf
             '': 'inf+/-inf',
             '.1e': 'inf+/-inf',
             '.1E': '%s+/-%s' % (Inf_EFG, Inf_EFG),
             '.1ue': 'inf+/-inf',
             'EL': r'\infty \pm \infty',
             'ELp': r'\left(\infty \pm \infty\right)',
-        },
+        }),
 
         # Like the tests for +infinity, but for -infinity:
-        (float('-inf'), 100): {  # Inf *nominal value*
+        ((float('-inf'), 100), {  # Inf *nominal value*
             '': '-inf+/-100.0',  # Like '{}'.format(100.)
             'g': '-inf+/-100',  # Like '{:g}'.format(100.)
             '.1e': '(-inf+/-1.0)e+02',  # Similar to 1±inf
             '.1E': '(-%s+/-1.0)E+02' % Inf_EFG,
             '.1ue': '(-inf+/-1)e+02',
             '10.1e': '      -inf+/-   1.0e+02'
-        },
-        (float('-inf'), 1e8): {  # Inf *nominal value*
+        }),
+        ((float('-inf'), 1e8), {  # Inf *nominal value*
             '': '-inf+/-100000000.0',  # Like '{}'.format(1e8)
             'g': '(-inf+/-1)e+08',  # Like '{:g}'.format(1e8)
             '.1e': '(-inf+/-1.0)e+08',
             '.1E': '(-%s+/-1.0)E+08' % Inf_EFG,
             '.1ue': '(-inf+/-1)e+08',
             '10.1e': '      -inf+/-   1.0e+08'  # 'infe+08' would be strange
-        },
-        (float('-inf'), 123456789): {  # Inf *nominal value*
+        }),
+        ((float('-inf'), 123456789), {  # Inf *nominal value*
             '': '-inf+/-123456789.0',  # Similar to '{}'.format(123456789.)
             'g': '(-inf+/-1.23457)e+08',  # Similar to '{:g}'.format(123456789.)
             '.1e': '(-inf+/-1.2)e+08',
@@ -1968,29 +1968,29 @@ def test_format():
             '.1ueL': r'\left(-\infty \pm 1\right) \times 10^{8}',
             '10.1e': '      -inf+/-   1.2e+08',
             '10.1eL': r'   -\infty \pm 1.2 \times 10^{8}'
-        },
-        (float('-inf'), float('inf')): {  # *Double* Inf
+        }),
+        ((float('-inf'), float('inf')), {  # *Double* Inf
             '': '-inf+/-inf',
             '.1e': '-inf+/-inf',
             '.1E': '-%s+/-%s' % (Inf_EFG, Inf_EFG),
             '.1ue': '-inf+/-inf',
             'EL': r'-\infty \pm \infty'
-        },
+        }),
 
         # The Particle Data Group convention trumps the "at least one
         # digit past the decimal point" for Python floats, but only
         # with a non-zero uncertainty:
-        (724.2, 26.4): {
+        ((724.2, 26.4), {
             '': '724+/-26',
             'p': '(724+/-26)'
-        },
-        (724, 0): {
+        }),
+        ((724, 0), {
             '': '724.0+/-0'
-        },
+        }),
 
         # More NaN and infinity, in particular with LaTeX and various
         # options:
-        (float('-inf'), float('inf')): {
+        ((float('-inf'), float('inf')), {
             'S': '-inf(inf)',
             'LS': '-\infty(\infty)',
             'L': '-\infty \pm \infty',
@@ -2015,34 +2015,34 @@ def test_format():
             # none type formatting (even if it does not look so good
             # in Python 2.6).
             '020S': format(float("-inf"), '015')+'(inf)'
-        },
-        (-float('nan'), float('inf')): {
+        }),
+        ((-float('nan'), float('inf')), {
             'S': 'nan(inf)',
             'LS': '\mathrm{nan}(\infty)',
             'L': '\mathrm{nan} \pm \infty',
             'LP': u'\mathrm{nan}±\infty'
-        },
+        }),
 
         # Leading zeroes in the shorthand notation:
-        (-2, 3): {
+        ((-2, 3), {
             "020S": "-000000000002.0(3.0)"
-        }
+        })
 
-    }
+    ]
 
     # ',' format option: introduced in Python 2.7
     if sys.version_info >= (2, 7):
 
-        tests.update({
-            (1234.56789, 0.012): {
+        tests += [
+            ((1234.56789, 0.012), {
                 ',.1uf': '1,234.57+/-0.01'
-                },
+                }),
 
-            (123456.789123, 1234.5678): {
+            ((123456.789123, 1234.5678), {
                 ',f': '123,457+/-1,235',  # Particle Data Group convention
                 ',.4f': '123,456.7891+/-1,234.5678'
                 }
-        })
+             )]
 
     # True if we can detect that the Jython interpreter is running this code:
     try:
@@ -2050,7 +2050,7 @@ def test_format():
     except AttributeError:
         jython_detected = False
 
-    for (values, representations) in tests.items():
+    for (values, representations) in tests:
 
         value = ufloat(*values)
 
