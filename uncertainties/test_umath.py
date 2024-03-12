@@ -15,7 +15,7 @@ import math
 
 # Local modules:
 from uncertainties import ufloat
-import uncertainties.core as uncert_core
+import uncertainties.core.core as uncert_core
 import uncertainties.umath_core as umath_core
 
 from . import test_uncertainties
