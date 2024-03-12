@@ -110,11 +110,13 @@ Installation and download
 Supported Python versions
 -------------------------
 
-The :mod:`uncertainties` package supports all versions of Python supported by
-the upstream Python_ project.  As of early 2024, that means versions 3.8
-through 3.12.  It may be possible to support earlier versions if there is user
-demand.  Versions of the :mod:`uncertainties` package up through 3.1.7
-supported Python 2.7 through Python 3.12.
+The :mod:`uncertainties` package supports Python versions 3.8 and higher.
+Earlier versions of Python are not tested. :mod:`uncertainties` may still
+be compatible with them. Patches to restore compatibility with earlier versions
+of Python may be considered if they do not compromise performance or
+maintainability for the supported versions of Python.  Versions of the
+:mod:`uncertainties` package up through 3.1.7 supported Python 2.7 through
+Python 3.12.
 
 Important note
 --------------
