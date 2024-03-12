@@ -212,6 +212,8 @@ fixed_derivatives = {
     'tanh': [lambda x: 1-math.tanh(x)**2]
     }
 
+make_an_attribute_of = ['sqrt']
+
 # Many built-in functions in the math module are wrapped with a
 # version which is uncertainty aware:
 
@@ -262,6 +264,8 @@ for name in dir(math):
 
     # !! The same effect could be achieved with globals()[...] = ...
     setattr(this_module, name, wraps(wrapped_func, func))
+    if name in make_an_attribute_of:
+        setattr(AffineScalarFunc, name, wraps(wrapped_func, func))
 
     many_scalars_to_scalar_funcs.append(name)
 

@@ -342,3 +342,21 @@ def test_power_wrt_ref():
     Checks special cases of the umath_core.pow() power operator.
     '''
     test_uncertainties.power_wrt_ref(umath_core.pow, math.pow)
+    
+def test_numpy_sqrt():
+    '''
+    Checks if numpys sqrt method works due to AffineScalarFunc having basic math
+    functions as members.
+    '''
+    try:
+        import numpy
+    except ImportError:
+        import warnings
+        warnings.warn("Test not performed because NumPy is not available")
+        return
+        
+    a = ufloat(0.3, 0.01)
+    if not(numpy.sqrt(a) == umath_core.sqrt(a)):
+        raise Exception('Numpy sqrt (%s) and math sqrt (%s) do not match!' 
+                        % (numpy.sqrt(a), math.sqrt(a)))
+                        
