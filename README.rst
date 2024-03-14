@@ -8,8 +8,8 @@ uncertainties
    :target: https://pypi.org/project/uncertainties/
 .. image:: https://pepy.tech/badge/uncertainties/week
    :target: https://pepy.tech/project/uncertainties
-.. image:: https://codecov.io/gh/lebigot/uncertainties/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/lebigot/uncertainties/
+.. image:: https://codecov.io/gh/lmfit/uncertainties/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/lmfit/uncertainties/
 .. image:: https://img.shields.io/github/actions/workflow/status/lmfit/uncertainties/python-package.yml?logo=github%20actions
    :target: https://github.com/lmfit/uncertainties/blob/main/.github/workflows/python-package.yml
 
