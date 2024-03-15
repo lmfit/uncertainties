@@ -33,15 +33,11 @@ jobs:
     - name: Test source code and docs
       run: |
         pytest --cov . --cov-report xml
-#    - name: Upload coverage reports to Codecov
-#      uses: codecov/codecov-action@v3
-#      with:
-#        token: ${{ secrets.CODECOV_TOKEN }}
-#        flags: ${{ matrix.python-version }}
-#        files: coverage.xml
-#        fail_ci_if_error: true
-#        verbose: true
-#
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: lmfit/uncertainties
   results:
     # This step aggregates the results from all the tests and allows us to
     # require only this single job to pass for a PR to be merged rather than
