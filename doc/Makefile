@@ -10,8 +10,21 @@ PAPER         =
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d _build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+PDFFILE = uncertaintiesPythonPackage.pdf
 
 .PHONY: help clean html dirhtml pickle json htmlhelp qthelp latex changes linkcheck doctest
+
+# The HTML needs pdf because it contains a link to the PDF version:
+html:
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
+	@echo
+	@echo "Build finished. The HTML pages are in _build/html."
+
+htmlpdf: pdf
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
+	-cp _build/latex/$(PDFFILE) _build/html/$(PDFFILE)
+	@echo
+	@echo "Build finished. The HTML pages are in _build/html."
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -32,11 +45,6 @@ clean:
 pdf: latex
 	(cd _build/latex; $(MAKE) all-pdf)
 
-# The HTML needs pdf because it contains a link to the PDF version:
-html: pdf
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
-	@echo
-	@echo "Build finished. The HTML pages are in _build/html."
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) _build/dirhtml
