@@ -18,6 +18,7 @@ from builtins import str, next, map, zip, range, object
 import math
 from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
 import re
+import locale as lc
 import sys
 if sys.version_info < (3,):
      from past.builtins import basestring
@@ -159,7 +160,7 @@ else:
         covariance_mat -- full covariance matrix of the returned numbers with
         uncertainties. For example, the first element of this matrix is the
         variance of the first number with uncertainty. This matrix must be a
-        NumPy array-like (list of lists, NumPy array, etc.). 
+        NumPy array-like (list of lists, NumPy array, etc.).
 
         tags -- if 'tags' is not None, it must list the tag of each new
         independent variable.
@@ -167,9 +168,9 @@ else:
 
         # !!! It would in principle be possible to handle 0 variance
         # variables by first selecting the sub-matrix that does not contain
-        # such variables (with the help of numpy.ix_()), and creating 
+        # such variables (with the help of numpy.ix_()), and creating
         # them separately.
-        
+
         std_devs = numpy.sqrt(numpy.diag(covariance_mat))
 
         # For numerical stability reasons, we go through the correlation
@@ -248,8 +249,8 @@ else:
 
         # The coordinates of each new uncertainty as a function of the
         # new variables must include the variable scale (standard deviation):
-        transform *= std_devs[:, numpy.newaxis] 
-        
+        transform *= std_devs[:, numpy.newaxis]
+
         # Representation of the initial correlated values:
         values_funcs = tuple(
             AffineScalarFunc(
@@ -1014,7 +1015,7 @@ def nrmlze_superscript(number_str):
 
     ValueError is raised if the conversion cannot be done.
 
-    number_str -- string to be converted (of type str, but also possibly, for 
+    number_str -- string to be converted (of type str, but also possibly, for
     Python 2, unicode, which allows this string to contain superscript digits).
     '''
     # !! Python 3 doesn't need this str(), which is only here for giving the
@@ -1966,7 +1967,7 @@ class AffineScalarFunc(object):
           outputs like (1.0±0.2) or (1.0±0.2)e7, which can be useful for
           removing any ambiguity if physical units are added after the printed
           number.
-    
+
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
 
@@ -2965,7 +2966,7 @@ else:
 # semantics of some representations (e.g. .1(2.) = .1+/-2, whereas
 # .1(2) = .1+/-0.2), so just getting the numerical value of the part
 # in parentheses would not be sufficient.
-POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = r'((\d*)(\.\d*)?|nan|NAN|inf|INF)'
+POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = r'((\d*)([,\.]\d*)?|nan|NAN|inf|INF)'
 
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where
 # the uncertainty is optional (in which case the uncertainty is
@@ -3016,7 +3017,7 @@ def parse_error_in_parentheses(representation):
     The digits between parentheses correspond to the same number of digits
     at the end of the nominal value (the decimal point in the uncertainty
     is optional). Example: 12.34(142) = 12.34±1.42.
-    
+
     Raises ValueError if the string cannot be parsed.
     """
 
@@ -3040,7 +3041,7 @@ def parse_error_in_parentheses(representation):
         factor = 1
 
     # Nominal value:
-    value = float((sign or '')+main)*factor
+    value = lc.atof((sign or '')+main)*factor
 
     if uncert is None:
         # No uncertainty was found: an uncertainty of 1 on the last
@@ -3049,7 +3050,7 @@ def parse_error_in_parentheses(representation):
 
     # Do we have a fully explicit uncertainty?
     if uncert_dec is not None or uncert in {'nan', 'NAN', 'inf', 'INF'}:
-        uncert_value = float(uncert)
+        uncert_value = lc.atof(uncert)
     else:
         # uncert_int represents an uncertainty on the last digits:
 
@@ -3084,7 +3085,7 @@ def to_float(value_str):
     '''
 
     try:
-        return float(value_str)
+        return lc.atof(value_str)
     except ValueError:
         pass
 
@@ -3092,7 +3093,7 @@ def to_float(value_str):
     match = PRETTY_PRINT_MATCH(value_str)
     if match:
         try:
-            return float(match.group(1))*10.**nrmlze_superscript(match.group(2))
+            return lc.atof(match.group(1))*10.**nrmlze_superscript(match.group(2))
         except ValueError:
             raise ValueError('Mantissa or exponent incorrect in pretty-print'
                              ' form %s' % value_str)
