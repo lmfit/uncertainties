@@ -31,6 +31,7 @@ import sys
 
 import uncertainties.core as uncert_core
 from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr
+from uncertainties import formatting
 from uncertainties import umath
 
 # The following information is useful for making sure that the right
@@ -1523,7 +1524,7 @@ def test_PDG_precision():
         }
 
     for (std_dev, result) in tests.items():
-        assert uncert_core.PDG_precision(std_dev) == result
+        assert formatting.PDG_precision(std_dev) == result
 
 def test_repr():
     '''Test the representation of numbers with uncertainty.'''
@@ -2138,14 +2139,14 @@ def test_custom_pretty_print_and_latex():
 
     # We will later restore the defaults:
     PREV_CUSTOMIZATIONS = {
-        var: getattr(uncert_core, var).copy()
+        var: getattr(formatting, var).copy()
         for var in ['PM_SYMBOLS', 'MULT_SYMBOLS', 'GROUP_SYMBOLS']}
-    
+
     # Customizations:
     for format in ["pretty-print", "latex"]:
-        uncert_core.PM_SYMBOLS[format] = u" ± "
-        uncert_core.MULT_SYMBOLS[format] = u"⋅"
-        uncert_core.GROUP_SYMBOLS[format] = ( "[", "]" )
+        formatting.PM_SYMBOLS[format] = u" ± "
+        formatting.MULT_SYMBOLS[format] = u"⋅"
+        formatting.GROUP_SYMBOLS[format] = ( "[", "]" )
 
     assert u"{:P}".format(x) == u'[2.00 ± 0.10]⋅10⁻¹¹'
     assert u"{:L}".format(x) == u'[2.00 ± 0.10] ⋅ 10^{-11}'
@@ -2196,7 +2197,7 @@ else:
             if not numbers_close(elmt1.std_dev,
                                  elmt2.std_dev, precision):
                 return False
-        
+
         return True
 
 
@@ -2350,10 +2351,10 @@ else:
 
         for (variable, nom_value, variance) in zip(
             variables, nom_values, cov.diagonal()):
-            
+
             assert numbers_close(variable.n, nom_value)
-            assert numbers_close(variable.s**2, variance) 
-        
+            assert numbers_close(variable.s**2, variance)
+
         assert arrays_close(
             cov,
             numpy.array(uncert_core.covariance_matrix(variables)))
