@@ -116,7 +116,6 @@ def deprecation(message):
                   % message, stacklevel=3)
 
 ###############################################################################
-
 ## Definitions that depend on the availability of NumPy:
 
 
@@ -933,21 +932,6 @@ def PDG_precision(std_dev):
 # of Python. This function exists so that the more capable format() is
 # used instead of the % formatting operator, if available:
 robust_format = format
-
-class CallableStdDev(float):
-    '''
-    Class for standard deviation results, which used to be
-    callable. Provided for compatibility with old code. Issues an
-    obsolescence warning upon call.
-    '''
-
-    # This class is a float. It must be set to the standard deviation
-    # upon construction.
-
-    def __call__ (self):
-        deprecation('the std_dev attribute should not be called'
-                    ' anymore: use .std_dev instead of .std_dev().')
-        return self
 
 # Exponent letter: the keys are the possible main_fmt_type values of
 # format_num():
@@ -1843,7 +1827,7 @@ class AffineScalarFunc(object):
         #std_dev value (in fact, many intermediate AffineScalarFunc do
         #not need to have their std_dev calculated: only the final
         #AffineScalarFunc returned to the user does).
-        return CallableStdDev(sqrt(sum(
+        return float(sqrt(sum(
             delta**2 for delta in self.error_components().values())))
 
     # Abbreviation (for formulas, etc.):
@@ -2798,13 +2782,7 @@ class Variable(AffineScalarFunc):
         if std_dev < 0 and not isinfinite(std_dev):
             raise NegativeStdDev("The standard deviation cannot be negative")
 
-        self._std_dev = CallableStdDev(std_dev)
-
-    # Support for legacy method:
-    def set_std_dev(self, value):  # Obsolete
-        deprecation('instead of set_std_dev(), please use'
-                    ' .std_dev = ...')
-        self.std_dev = value
+        self._std_dev = float(std_dev)
 
     # The following method is overridden so that we can represent the tag:
     def __repr__(self):
@@ -3263,20 +3241,8 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     """
     Return a new random variable (Variable object).
 
-    The only non-obsolete use is:
-
     - ufloat(nominal_value, std_dev),
     - ufloat(nominal_value, std_dev, tag=...).
-
-    Other input parameters are temporarily supported:
-
-    - ufloat((nominal_value, std_dev)),
-    - ufloat((nominal_value, std_dev), tag),
-    - ufloat(str_representation),
-    - ufloat(str_representation, tag).
-
-    Valid string representations str_representation are listed in
-    the documentation for ufloat_fromstr().
 
     nominal_value -- nominal value of the random variable. It is more
     meaningful to use a value close to the central value or to the
@@ -3292,28 +3258,4 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     error_components() method).
     """
 
-    try:
-        # Standard case:
-        return Variable(nominal_value, std_dev, tag=tag)
-    # Exception types raised by, respectively: tuple or string that
-    # can be converted through float() (case of a number with no
-    # uncertainty), and string that cannot be converted through
-    # float():
-    except (TypeError, ValueError):
-
-        if tag is not None:
-            tag_arg = tag  # tag keyword used:
-        else:
-            tag_arg = std_dev  # 2 positional arguments form
-
-        try:
-            final_ufloat = ufloat_obsolete(nominal_value, tag_arg)
-        except:  # The input is incorrect, not obsolete
-            raise
-        else:
-            # Obsolete, two-argument call:
-            deprecation(
-                'either use ufloat(nominal_value, std_dev),'
-                ' ufloat(nominal_value, std_dev, tag), or the'
-                ' ufloat_fromstr() function, for string representations.')
-            return final_ufloat
+    return Variable(nominal_value, std_dev, tag=tag)
