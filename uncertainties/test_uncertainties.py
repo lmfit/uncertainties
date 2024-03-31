@@ -18,7 +18,6 @@ from builtins import zip
 from builtins import map
 from builtins import range
 import copy
-import weakref
 import math
 from math import isnan, isinf
 import random
