@@ -10,7 +10,6 @@ from __future__ import division
 from __future__ import absolute_import
 
 # Standard modules
-import sys
 import math
 
 # Local modules:
@@ -22,6 +21,7 @@ from . import test_uncertainties
 
 ###############################################################################
 # Unit tests
+
 
 def test_fixed_derivatives_math_funcs():
     """
@@ -45,6 +45,7 @@ def test_fixed_derivatives_math_funcs():
     # modf(): returns a tuple:
     def frac_part_modf(x):
         return umath_core.modf(x)[0]
+
     def int_part_modf(x):
         return umath_core.modf(x)[1]
 
@@ -61,6 +62,7 @@ def test_fixed_derivatives_math_funcs():
     # frexp(): returns a tuple:
     def mantissa_frexp(x):
         return umath_core.frexp(x)[0]
+
     def exponent_frexp(x):
         return umath_core.frexp(x)[1]
 
@@ -72,6 +74,7 @@ def test_fixed_derivatives_math_funcs():
         exponent_frexp,
         uncert_core.NumericalDerivatives(
             lambda x: exponent_frexp(x)))
+
 
 def test_compound_expression():
     """
@@ -97,7 +100,8 @@ def test_numerical_example():
             == "0.001593 +/- 0.010000")
 
     # Regular calculations should still work:
-    assert("%.11f" % umath_core.sin(3) == "0.14112000806")
+    assert ("%.11f" % umath_core.sin(3) == "0.14112000806")
+
 
 def test_monte_carlo_comparison():
     """
@@ -159,8 +163,7 @@ def test_monte_carlo_comparison():
 
     (nominal_value_samples, covariances_samples) = monte_carlo_calc(1000000)
 
-
-    ## Comparison between both results:
+    # Comparison between both results:
 
     # The covariance matrices must be close:
 
@@ -180,7 +183,7 @@ def test_monte_carlo_comparison():
         " the Monte-Carlo simulation and the direct calculation:\n"
         "* Monte-Carlo:\n%s\n* Direct calculation:\n%s"
         % (covariances_samples, covariances_this_module)
-        )
+    )
 
     # The nominal values must be close:
     assert test_uncertainties.numbers_close(
@@ -196,7 +199,7 @@ def test_monte_carlo_comparison():
         % (nominal_value_this_module,
            nominal_value_samples,
            math.sqrt(covariances_samples[2, 2]))
-        )
+    )
 
 
 def test_math_module():
@@ -270,6 +273,7 @@ def test_math_module():
     else:
         raise Exception('%s exception expected' % exception_class.__name__)
 
+
 def test_hypot():
     '''
     Special cases where derivatives cannot be calculated:
@@ -282,6 +286,7 @@ def test_hypot():
     assert test_uncertainties.isnan(result.derivatives[x])
     assert test_uncertainties.isnan(result.derivatives[y])
 
+
 def test_power_all_cases():
     '''
     Test special cases of umath_core.pow().
@@ -292,6 +297,8 @@ def test_power_all_cases():
 # test_uncertainties.py:test_power_special_cases(), but with small
 # differences: the built-in pow() and math.pow() are slightly
 # different:
+
+
 def test_power_special_cases():
     '''
     Checks special cases of umath_core.pow().
@@ -336,6 +343,7 @@ def test_power_special_cases():
         pass
     else:
         raise Exception('%s exception expected' % exception_class.__name__)
+
 
 def test_power_wrt_ref():
     '''

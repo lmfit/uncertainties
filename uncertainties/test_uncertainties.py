@@ -18,7 +18,6 @@ from builtins import zip
 from builtins import map
 from builtins import range
 import copy
-import weakref
 import math
 from math import isnan, isinf
 import random
@@ -41,6 +40,7 @@ print("Testing with Python", sys.version)
 ###############################################################################
 
 # Utilities for unit testing
+
 
 def numbers_close(x, y, tolerance=1e-6):
     """
@@ -69,6 +69,7 @@ def numbers_close(x, y, tolerance=1e-6):
     else:  # Either x or y is zero
         return abs(x or y) < tolerance
 
+
 def ufloats_close(x, y, tolerance=1e-6):
     '''
     Tests if two numbers with uncertainties are close, as random
@@ -83,12 +84,13 @@ def ufloats_close(x, y, tolerance=1e-6):
     return (numbers_close(diff.nominal_value, 0, tolerance)
             and numbers_close(diff.std_dev, 0, tolerance))
 
+
 class DerivativesDiffer(Exception):
     pass
 
 
 def compare_derivatives(func, numerical_derivatives,
-                         num_args_list=None):
+                        num_args_list=None):
     """
     Checks the derivatives of a function 'func' (as returned by the
     wrap() wrapper), by comparing them to the
@@ -117,7 +119,7 @@ def compare_derivatives(func, numerical_derivatives,
         num_args_table = {
             'atanh': [1],
             'log': [1, 2]  # Both numbers of arguments are tested
-            }
+        }
         if funcname in num_args_table:
             num_args_list = num_args_table[funcname]
         else:
@@ -177,7 +179,7 @@ def compare_derivatives(func, numerical_derivatives,
 
                     # We compare all derivatives:
                     for (arg_num, (arg, numerical_deriv)) in (
-                        enumerate(zip(args, numerical_derivatives))):
+                            enumerate(zip(args, numerical_derivatives))):
 
                         # Some arguments might not be differentiable:
                         if isinstance(arg, int):
@@ -226,13 +228,14 @@ def compare_derivatives(func, numerical_derivatives,
 
 ###############################################################################
 
+
 def test_value_construction():
     '''
     Tests the various means of constructing a constant number with
     uncertainty *without a string* (see test_ufloat_fromstr(), for this).
     '''
 
-    ## Simple construction:
+    # Simple construction:
     x = ufloat(3, 0.14)
     assert x.nominal_value == 3
     assert x.std_dev == 0.14
@@ -250,7 +253,7 @@ def test_value_construction():
     assert x.std_dev == 0.14
     assert x.tag == 'pi'
 
-    ## Comparison with the obsolete tuple form:
+    # Comparison with the obsolete tuple form:
 
     # The following tuple is stored in a variable instead of being
     # repeated in the calls below, so that the automatic code update
@@ -296,8 +299,8 @@ def test_value_construction():
     except uncert_core.NegativeStdDev:
         pass
 
-    ## Incorrect forms should not raise any deprecation warning, but
-    ## raise an exception:
+    # Incorrect forms should not raise any deprecation warning, but
+    # raise an exception:
 
     try:
         ufloat(1)  # Form that has never been allowed
@@ -305,6 +308,7 @@ def test_value_construction():
         pass
     else:
         raise Exception("An exception should be raised")
+
 
 def test_ufloat_fromstr():
     "Input of numbers with uncertainties as a string"
@@ -339,7 +343,7 @@ def test_ufloat_fromstr():
         '(3.141+/-0.001)E+02': (314.1, 0.1),
 
 
-        ## Pretty-print notation:
+        # Pretty-print notation:
 
         # ± sign, global exponent (not pretty-printed):
         u'(3.141±0.001)E+02': (314.1, 0.1),
@@ -348,7 +352,7 @@ def test_ufloat_fromstr():
         # ± sign, times symbol, superscript (= full pretty-print):
         u'(3.141 ± 0.001) × 10²': (314.1, 0.1),
 
-        ## Others
+        # Others
 
         # Forced parentheses:
         '(2 +/- 0.1)': (2, 0.1),
@@ -364,7 +368,7 @@ def test_ufloat_fromstr():
         '(-3.1415e-10 +/- 1e-4)e+200': (-3.1415e190, 1e196),
         # Special float representation:
         '-3(0.)': (-3, 0)
-        }
+    }
 
     for (representation, values) in tests.items():
 
@@ -389,7 +393,7 @@ def test_ufloat_fromstr():
         assert numbers_close(num.std_dev, values[1])
         assert num.tag == 'test variable'
 
-        ## Obsolete forms
+        # Obsolete forms
 
         num = ufloat(representation)  # Obsolete
         assert numbers_close(num.nominal_value, values[0])
@@ -411,6 +415,8 @@ def test_ufloat_fromstr():
 ###############################################################################
 
 # Test of correctness of the fixed (usually analytical) derivatives:
+
+
 def test_fixed_derivatives_basic_funcs():
     """
     Pre-calculated derivatives for operations on AffineScalarFunc.
@@ -445,6 +451,7 @@ def test_fixed_derivatives_basic_funcs():
 # Additional, more complex checks, for use with the nose unit testing
 # framework.
 
+
 def test_copy():
     "Standard copy module integration"
     import gc
@@ -454,7 +461,7 @@ def test_copy():
 
     y = copy.copy(x)
     assert x != y
-    assert not(x == y)
+    assert not (x == y)
     assert y in y.derivatives.keys()  # y must not copy the dependence on x
 
     z = copy.deepcopy(x)
@@ -493,20 +500,27 @@ def test_copy():
 
     assert y in list(y.derivatives.keys())
 
-## Classes for the pickling tests (put at the module level, so that
-## they can be unpickled):
+# Classes for the pickling tests (put at the module level, so that
+# they can be unpickled):
 
 # Subclass without slots:
+
+
 class NewVariable_dict(uncert_core.Variable):
     pass
 
 # Subclass with slots defined by a tuple:
+
+
 class NewVariable_slots_tuple(uncert_core.Variable):
     __slots__ = ('new_attr',)
 
 # Subclass with slots defined by a string:
+
+
 class NewVariable_slots_str(uncert_core.Variable):
     __slots__ = 'new_attr'
+
 
 def test_pickling():
     "Standard pickle module integration."
@@ -519,14 +533,14 @@ def test_pickling():
 
     assert x != x_unpickled  # Pickling creates copies
 
-    ## Tests with correlations and AffineScalarFunc objects:
+    # Tests with correlations and AffineScalarFunc objects:
     f = 2*x
     assert isinstance(f, AffineScalarFunc)
     (f_unpickled, x_unpickled2) = pickle.loads(pickle.dumps((f, x)))
     # Correlations must be preserved:
     assert f_unpickled - x_unpickled2 - x_unpickled2 == 0
 
-    ## Tests with subclasses:
+    # Tests with subclasses:
 
     for subclass in (NewVariable_dict, NewVariable_slots_tuple,
                      NewVariable_slots_str):
@@ -577,6 +591,7 @@ def test_pickling():
     x = uncert_core.LinearCombination({})
     assert pickle.loads(pickle.dumps(x)).linear_combo == {}
 
+
 def test_int_div():
     "Integer division"
     # We perform all operations on floats, because derivatives can
@@ -587,6 +602,7 @@ def test_int_div():
     # in x violates the assumption.  Therefore, the following is
     # correct:
     assert x.std_dev == 0.0
+
 
 def test_comparison_ops():
     "Test of comparison operators"
@@ -614,8 +630,8 @@ def test_comparison_ops():
     assert x > 1
 
     # The limit case is not obvious:
-    assert not(x >= 3)
-    assert not(x < 3)
+    assert not (x >= 3)
+    assert not (x < 3)
 
     assert x == x
     # Comparaison between Variable and AffineScalarFunc:
@@ -636,7 +652,6 @@ def test_comparison_ops():
     assert x != None  # Not comparable
     assert x-x == 0  # Comparable, even though the types are different
     assert x != [1, 2]
-
 
     ####################
 
@@ -672,7 +687,7 @@ def test_comparison_ops():
 
         # All operations are tested:
         for op in ["__%s__" % name
-                   for name in('ne', 'eq', 'lt', 'le', 'gt', 'ge')]:
+                   for name in ('ne', 'eq', 'lt', 'le', 'gt', 'ge')]:
 
             try:
                 float_func = getattr(float, op)
@@ -687,7 +702,8 @@ def test_comparison_ops():
             # the starting value for the final result
             # (correct_result):
 
-            sampled_results.append(float_func(x.nominal_value, y.nominal_value))
+            sampled_results.append(float_func(
+                x.nominal_value, y.nominal_value))
 
             for check_num in range(50):  # Many points checked
                 sampled_results.append(float_func(random_float(x),
@@ -742,6 +758,7 @@ def test_logic():
     assert bool(z) == True
     assert bool(t) == True  # Only infinitseimal neighborhood are used
 
+
 def test_obsolete():
     'Tests some obsolete creation of number with uncertainties'
     x = ufloat(3, 0.1)
@@ -750,6 +767,7 @@ def test_obsolete():
 
     x_std_dev = x.std_dev
     assert x_std_dev() == 0.2  # Obsolete call
+
 
 def test_basic_access_to_data():
     "Access to data from Variable and AffineScalarFunc objects."
@@ -801,6 +819,7 @@ def test_basic_access_to_data():
     except ValueError:
         pass  # Normal behavior
 
+
 def test_correlations():
     "Correlations between variables"
 
@@ -829,6 +848,7 @@ def test_no_coercion():
     else:
         raise Exception("Conversion to float() should fail with TypeError")
 
+
 def test_wrapped_func_no_args_no_kwargs():
     '''
     Wrap a function that takes only positional-or-keyword parameters.
@@ -846,26 +866,26 @@ def test_wrapped_func_no_args_no_kwargs():
     x = uncert_core.ufloat(1, 0.1)
     y = uncert_core.ufloat(10, 2)
 
-    ### Automatic numerical derivatives:
+    # Automatic numerical derivatives:
 
-    ## Fully automatic numerical derivatives:
+    # Fully automatic numerical derivatives:
     f_wrapped = uncert_core.wrap(f)
     assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
     assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
-    ## Automatic additional derivatives for non-defined derivatives,
-    ## and explicit None derivative:
+    # Automatic additional derivatives for non-defined derivatives,
+    # and explicit None derivative:
     f_wrapped = uncert_core.wrap(f, [None])  # No derivative for y
     assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
     assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
-    ### Explicit derivatives:
+    # Explicit derivatives:
 
-    ## Fully defined derivatives:
+    # Fully defined derivatives:
     f_wrapped = uncert_core.wrap(f, [lambda x, y: 2,
                                      lambda x, y: math.cos(y)])
 
@@ -874,12 +894,13 @@ def test_wrapped_func_no_args_no_kwargs():
     # Call with keyword arguments:
     assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
-    ## Automatic additional derivatives for non-defined derivatives:
+    # Automatic additional derivatives for non-defined derivatives:
     f_wrapped = uncert_core.wrap(f, [lambda x, y: 2])  # No derivative for y
     assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
     assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+
 
 def test_wrapped_func_args_no_kwargs():
     '''
@@ -903,20 +924,20 @@ def test_wrapped_func_args_no_kwargs():
 
     args = [s, z, s]  # var-positional parameters
 
-    ### Automatic numerical derivatives:
+    # Automatic numerical derivatives:
 
-    ## Fully automatic numerical derivatives:
+    # Fully automatic numerical derivatives:
     f_wrapped = uncert_core.wrap(f)
     assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
-    ## Automatic additional derivatives for non-defined derivatives,
-    ## and explicit None derivative:
+    # Automatic additional derivatives for non-defined derivatives,
+    # and explicit None derivative:
     f_wrapped = uncert_core.wrap(f, [None])  # No derivative for y
     assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
-    ### Explicit derivatives:
+    # Explicit derivatives:
 
-    ## Fully defined derivatives:
+    # Fully defined derivatives:
     f_wrapped = uncert_core.wrap(f, [lambda x, y, *args: 2,
                                      lambda x, y, *args: math.cos(y),
                                      None,
@@ -924,11 +945,12 @@ def test_wrapped_func_args_no_kwargs():
 
     assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
-    ## Automatic additional derivatives for non-defined derivatives:
+    # Automatic additional derivatives for non-defined derivatives:
 
     # No derivative for y:
     f_wrapped = uncert_core.wrap(f, [lambda x, y, *args: 2])
     assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
+
 
 def test_wrapped_func_no_args_kwargs():
     '''
@@ -952,9 +974,9 @@ def test_wrapped_func_no_args_kwargs():
 
     kwargs = {'s': s, 'z': z}  # Arguments not in signature
 
-    ### Automatic numerical derivatives:
+    # Automatic numerical derivatives:
 
-    ## Fully automatic numerical derivatives:
+    # Fully automatic numerical derivatives:
     f_wrapped = uncert_core.wrap(f)
     assert ufloats_close(f_auto_unc(x, y, **kwargs),
                          f_wrapped(x, y, **kwargs))
@@ -963,8 +985,8 @@ def test_wrapped_func_no_args_kwargs():
     assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                          f_wrapped(y=y, x=x, **kwargs))
 
-    ## Automatic additional derivatives for non-defined derivatives,
-    ## and explicit None derivative:
+    # Automatic additional derivatives for non-defined derivatives,
+    # and explicit None derivative:
 
     # No derivative for positional-or-keyword parameter y, no
     # derivative for optional-keyword parameter z:
@@ -997,30 +1019,31 @@ def test_wrapped_func_no_args_kwargs():
     assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
                          f_wrapped(y=y, x=x, **kwargs))
 
-    ### Explicit derivatives:
+    # Explicit derivatives:
 
-    ## Fully defined derivatives:
+    # Fully defined derivatives:
     f_wrapped = uncert_core.wrap(
         f,
         [lambda x, y, **kwargs: 2, lambda x, y, **kwargs: math.cos(y)],
         {'z:': lambda x, y, **kwargs: 3})
 
     assert ufloats_close(f_auto_unc(x, y, **kwargs),
-                          f_wrapped(x, y, **kwargs))
+                         f_wrapped(x, y, **kwargs))
     # Call with keyword arguments:
     assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
-                          f_wrapped(y=y, x=x, **kwargs))
+                         f_wrapped(y=y, x=x, **kwargs))
 
-    ## Automatic additional derivatives for non-defined derivatives:
+    # Automatic additional derivatives for non-defined derivatives:
 
     # No derivative for y or z:
     f_wrapped = uncert_core.wrap(f, [lambda x, y, **kwargs: 2])
     assert ufloats_close(f_auto_unc(x, y, **kwargs),
-                          f_wrapped(x, y, **kwargs))
+                         f_wrapped(x, y, **kwargs))
 
     # Call with keyword arguments:
     assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs),
-                          f_wrapped(y=y, x=x, **kwargs))
+                         f_wrapped(y=y, x=x, **kwargs))
+
 
 def test_wrapped_func_args_kwargs():
     '''
@@ -1046,16 +1069,16 @@ def test_wrapped_func_args_kwargs():
     args = [s, t, s]
     kwargs = {'u': s, 'z': z}  # Arguments not in signature
 
-    ### Automatic numerical derivatives:
+    # Automatic numerical derivatives:
 
-    ## Fully automatic numerical derivatives:
+    # Fully automatic numerical derivatives:
     f_wrapped = uncert_core.wrap(f)
 
     assert ufloats_close(f_auto_unc(x, y, *args, **kwargs),
-                          f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
+                         f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
 
-    ## Automatic additional derivatives for non-defined derivatives,
-    ## and explicit None derivative:
+    # Automatic additional derivatives for non-defined derivatives,
+    # and explicit None derivative:
 
     # No derivative for positional-or-keyword parameter y, no
     # derivative for optional-keyword parameter z:
@@ -1077,9 +1100,9 @@ def test_wrapped_func_args_kwargs():
     assert ufloats_close(f_auto_unc(x, y, *args, **kwargs),
                          f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
 
-    ### Explicit derivatives:
+    # Explicit derivatives:
 
-    ## Fully defined derivatives:
+    # Fully defined derivatives:
     f_wrapped = uncert_core.wrap(
         f,
         [lambda x, y, *args, **kwargs: 2,
@@ -1087,9 +1110,9 @@ def test_wrapped_func_args_kwargs():
         {'z:': lambda x, y, *args, **kwargs: 3})
 
     assert ufloats_close(f_auto_unc(x, y, *args, **kwargs),
-                          f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
+                         f_wrapped(x, y, *args, **kwargs), tolerance=1e-5)
 
-    ## Automatic additional derivatives for non-defined derivatives:
+    # Automatic additional derivatives for non-defined derivatives:
 
     # No derivative for y or z:
     f_wrapped = uncert_core.wrap(f, [lambda x, y, *args, **kwargs: 2])
@@ -1119,7 +1142,6 @@ def test_wrapped_func():
 
     f_wrapped = uncert_core.wrap(f)
 
-
     my_list = [1, 2, 3]
 
     ########################################
@@ -1138,10 +1160,10 @@ def test_wrapped_func():
     # The random variables must be the same (full correlation):
 
     assert ufloats_close(f_wrapped(angle, *[1, angle]),
-                          f_auto_unc(angle, *[1, angle]))
+                         f_auto_unc(angle, *[1, angle]))
 
     assert ufloats_close(f_wrapped(angle, *[list_value, angle]),
-                          f_auto_unc(angle, *[list_value, angle]))
+                         f_auto_unc(angle, *[list_value, angle]))
 
     ########################################
     # Non-numerical arguments, and  explicit and implicit derivatives:
@@ -1156,7 +1178,8 @@ def test_wrapped_func():
     x = uncert_core.ufloat(10, 1)
 
     assert numbers_close(f_wrapped(x, 'string argument', x, x, x).std_dev,
-                          (1+2+3+4)*x.std_dev)
+                         (1+2+3+4)*x.std_dev)
+
 
 def test_wrap_with_kwargs():
     '''
@@ -1184,14 +1207,13 @@ def test_wrap_with_kwargs():
 
     f_wrapped = uncert_core.wrap(f)
 
-
     x = ufloat(1, 0.1)
     y = ufloat(10, 0.11)
     z = ufloat(100, 0.111)
     t = ufloat(0.1, 0.1111)
 
     assert ufloats_close(f_wrapped(x, y, z, t=t),
-                          f_auto_unc(x, y, z, t=t), tolerance=1e-5)
+                         f_auto_unc(x, y, z, t=t), tolerance=1e-5)
 
     ########################################
 
@@ -1264,6 +1286,7 @@ def test_wrap_with_kwargs():
 
 ###############################################################################
 
+
 def test_access_to_std_dev():
     "Uniform access to the standard deviation"
 
@@ -1279,6 +1302,7 @@ def test_access_to_std_dev():
     assert uncert_core.std_dev(None) == 0
 
 ###############################################################################
+
 
 def test_covariances():
     "Covariance matrix"
@@ -1302,6 +1326,7 @@ def test_power_all_cases():
     '''
 
     power_all_cases(pow)
+
 
 def power_all_cases(op):
     '''
@@ -1330,7 +1355,7 @@ def power_all_cases(op):
     non_int_larger_than_one = ufloat(3.1, 0.01)
     positive_smaller_than_one = ufloat(0.3, 0.01)
 
-    ## negative**integer
+    # negative**integer
 
     result = op(negative, integer)
     assert not isnan(result.derivatives[negative])
@@ -1345,9 +1370,9 @@ def power_all_cases(op):
     assert result.derivatives[negative] == 0
     assert isnan(result.derivatives[zero])
 
-    ## negative**non-integer
+    # negative**non-integer
 
-    ## zero**...
+    # zero**...
 
     result = op(zero, non_int_larger_than_one)
     assert isnan(result.derivatives[zero])
@@ -1370,8 +1395,8 @@ def power_all_cases(op):
     assert result.derivatives[zero] == 0
     assert isnan(result.derivatives[zero2])
 
-    ## positive**...: this is a quite regular case where the value and
-    ## the derivatives are all defined.
+    # positive**...: this is a quite regular case where the value and
+    # the derivatives are all defined.
 
     result = op(positive, positive2)
     assert not isnan(result.derivatives[positive])
@@ -1427,6 +1452,7 @@ def test_power_special_cases():
         pass
     else:
         raise Exception('A proper exception should have been raised')
+
 
 def power_special_cases(op):
     '''
@@ -1484,6 +1510,7 @@ def test_power_wrt_ref():
     '''
     power_wrt_ref(pow, pow)
 
+
 def power_wrt_ref(op, ref_op):
     '''
     Checks special cases of the uncertainty power operator op (where
@@ -1520,10 +1547,11 @@ def test_PDG_precision():
         1.3e-323: (2, 1.3e-323),
         5e-324: (1, 5e-324),
         9.99e-324: (2, 1e-323)
-        }
+    }
 
     for (std_dev, result) in tests.items():
         assert uncert_core.PDG_precision(std_dev) == result
+
 
 def test_repr():
     '''Test the representation of numbers with uncertainty.'''
@@ -1539,6 +1567,7 @@ def test_repr():
     # Tagging:
     x = ufloat(3, 1, "length")
     assert repr(x) == '< length = 3.0+/-1.0 >'
+
 
 def test_format():
     '''Test the formatting of numbers with uncertainty.'''
@@ -1634,7 +1663,7 @@ def test_format():
 
         (3.1415, 0.0001): {
             '+09.2uf': '+03.14150+/-000.00010'
-            },
+        },
 
         (1234.56789, 0.1): {
             '.0f': '(1234+/-0.)',  # Approximate error indicated with "."
@@ -1795,8 +1824,8 @@ def test_format():
             '.0fS': '10(0.)'
         },
         (9.99, 0.1): {
-             # The precision has an effect on the exponent, like for
-             # floats:
+            # The precision has an effect on the exponent, like for
+            # floats:
             '.2ue': '(9.99+/-0.10)e+00',  # Same exponent as for 9.99 alone
             '.1ue': '(1.00+/-0.01)e+01'  # Same exponent as for 9.99 alone
         },
@@ -1961,7 +1990,8 @@ def test_format():
         },
         (float('-inf'), 123456789): {  # Inf *nominal value*
             '': '-inf+/-123456789.0',  # Similar to '{}'.format(123456789.)
-            'g': '(-inf+/-1.23457)e+08',  # Similar to '{:g}'.format(123456789.)
+            # Similar to '{:g}'.format(123456789.)
+            'g': '(-inf+/-1.23457)e+08',
             '.1e': '(-inf+/-1.2)e+08',
             '.1E': '(-%s+/-1.2)E+08' % Inf_EFG,
             '.1ue': '(-inf+/-1)e+08',
@@ -2036,12 +2066,12 @@ def test_format():
         tests.update({
             (1234.56789, 0.012): {
                 ',.1uf': '1,234.57+/-0.01'
-                },
+            },
 
             (123456.789123, 1234.5678): {
                 ',f': '123,457+/-1,235',  # Particle Data Group convention
                 ',.4f': '123,456.7891+/-1,234.5678'
-                }
+            }
         })
 
     # True if we can detect that the Jython interpreter is running this code:
@@ -2091,7 +2121,7 @@ def test_format():
                 # "0inf"
                 and '0inf' not in representation.lower()
                 # Specific case:
-                and '=====' not in representation):
+                    and '=====' not in representation):
 
                 value_back = ufloat_fromstr(representation)
 
@@ -2106,7 +2136,7 @@ def test_format():
                     # so this should not cause an error:
                     if value_back.nominal_value:
                         assert numbers_close(value.nominal_value,
-                                              value_back.nominal_value, 2.4e-1)
+                                             value_back.nominal_value, 2.4e-1)
 
                     # If the uncertainty is zero, then the relative
                     # change can be large:
@@ -2123,6 +2153,7 @@ def test_format():
                         ' are not close enough'
                         % (value, value_back, representation, format_spec))
 
+
 def test_unicode_format():
     '''Test of the unicode formatting of numbers with uncertainties'''
 
@@ -2130,6 +2161,7 @@ def test_unicode_format():
 
     assert isinstance(u'Résultat = %s' % x.format(''), str)
     assert isinstance(u'Résultat = %s' % x.format('P'), str)
+
 
 def test_custom_pretty_print_and_latex():
     '''Test of the pretty-print and LaTeX format customizations'''
@@ -2140,12 +2172,12 @@ def test_custom_pretty_print_and_latex():
     PREV_CUSTOMIZATIONS = {
         var: getattr(uncert_core, var).copy()
         for var in ['PM_SYMBOLS', 'MULT_SYMBOLS', 'GROUP_SYMBOLS']}
-    
+
     # Customizations:
     for format in ["pretty-print", "latex"]:
         uncert_core.PM_SYMBOLS[format] = u" ± "
         uncert_core.MULT_SYMBOLS[format] = u"⋅"
-        uncert_core.GROUP_SYMBOLS[format] = ( "[", "]" )
+        uncert_core.GROUP_SYMBOLS[format] = ("[", "]")
 
     assert u"{:P}".format(x) == u'[2.00 ± 0.10]⋅10⁻¹¹'
     assert u"{:L}".format(x) == u'[2.00 ± 0.10] ⋅ 10^{-11}'
@@ -2155,6 +2187,7 @@ def test_custom_pretty_print_and_latex():
         setattr(uncert_core, var, setting)
 
 ###############################################################################
+
 
 # The tests below require NumPy, which is an optional package:
 try:
@@ -2196,9 +2229,8 @@ else:
             if not numbers_close(elmt1.std_dev,
                                  elmt2.std_dev, precision):
                 return False
-        
-        return True
 
+        return True
 
     def test_numpy_comparison():
         "Comparison with a NumPy array."
@@ -2274,11 +2306,11 @@ else:
         (x_new, y_new, z_new) = uncert_core.correlated_values(
             [x.nominal_value, y.nominal_value, z.nominal_value],
             covs,
-            tags = ['x', 'y', 'z'])
+            tags=['x', 'y', 'z'])
 
         # Even the uncertainties should be correctly reconstructed:
         assert arrays_close(numpy.array((x, y, z)),
-                              numpy.array((x_new, y_new, z_new)))
+                            numpy.array((x_new, y_new, z_new)))
 
         # ... and the covariances too:
         assert arrays_close(
@@ -2313,11 +2345,10 @@ else:
         assert arrays_close(numpy.array([0]),
                             numpy.array([sum2-(u2+2*v2)]))
 
-
         # Spot checks of the correlation matrix:
         corr_matrix = uncert_core.correlation_matrix([u, v, sum_value])
-        assert numbers_close(corr_matrix[0,0], 1)
-        assert numbers_close(corr_matrix[1,2], 2*v.std_dev/sum_value.std_dev)
+        assert numbers_close(corr_matrix[0, 0], 1)
+        assert numbers_close(corr_matrix[1, 2], 2*v.std_dev/sum_value.std_dev)
 
         ####################
 
@@ -2334,9 +2365,9 @@ else:
         # in a stricter way, that handles the case of a 0 variance
         # in `variables`:
         assert numbers_close(
-                1e66*cov[0,0], 1e66*variables[0].s**2, tolerance=1e-5)
+            1e66*cov[0, 0], 1e66*variables[0].s**2, tolerance=1e-5)
         assert numbers_close(
-                1e66*cov[1,1], 1e66*variables[1].s**2, tolerance=1e-5)
+            1e66*cov[1, 1], 1e66*variables[1].s**2, tolerance=1e-5)
 
         ####################
 
@@ -2349,11 +2380,11 @@ else:
         variables = uncert_core.correlated_values(nom_values, cov)
 
         for (variable, nom_value, variance) in zip(
-            variables, nom_values, cov.diagonal()):
-            
+                variables, nom_values, cov.diagonal()):
+
             assert numbers_close(variable.n, nom_value)
-            assert numbers_close(variable.s**2, variance) 
-        
+            assert numbers_close(variable.s**2, variance)
+
         assert arrays_close(
             cov,
             numpy.array(uncert_core.covariance_matrix(variables)))
