@@ -7,7 +7,7 @@ import uncertainties.core as uncert_core
 import uncertainties.umath_core as umath_core
 
 from uncertainties.testing import compare_derivatives, numbers_close
-from test_uncertainties import power_special_cases, power_all_cases, power_wrt_ref
+from helpers import power_special_cases, power_all_cases, power_wrt_ref
 ###############################################################################
 # Unit tests
 
