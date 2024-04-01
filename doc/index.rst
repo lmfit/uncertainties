@@ -247,49 +247,6 @@ total).  :mod:`uncertainties` is thus a **lightweight, portable
 package** with abundant documentation and tests.
 
 
-Migration from version 1 to version 2
-=====================================
-
-Some **incompatible changes** were introduced in version 2 of
-:mod:`uncertainties` (see the `version history`_). While the version 2
-line will support the version 1 syntax for some time, it is
-recommended to **update existing programs** as soon as possible. This
-can be made easier through the provided **automatic updater**.
-
-The automatic updater works like Python's `2to3
-<http://docs.python.org/2/library/2to3.html>`_ updater. It can be run
-(in a Unix or DOS shell) with:
-
-.. code-block:: sh
-
-   python -m uncertainties.1to2
-
-For example, updating a single Python program can be done with
-
-.. code-block:: sh
-
-   python -m uncertainties.1to2 -w example.py
-
-All the Python programs contained under a directory ``Programs``
-(including in nested sub-directories) can be automatically updated
-with
-
-.. code-block:: sh
-
-   python -m uncertainties.1to2 -w Programs
-
-Backups are automatically created, unless the ``-n`` option is given.
-
-Some **manual adjustments** might be necessary after running the
-updater (incorrectly modified lines, untouched obsolete syntax).
-
-While the updater creates backup copies by default, it is generally
-useful to **first create a backup** of the modified directory, or
-alternatively to use some `version control
-<http://en.wikipedia.org/wiki/Version_control_system>`_
-system. Reviewing the modifications with a `file comparison tool
-<http://en.wikipedia.org/wiki/File_comparison>`_ might also be useful.
-
 What others say
 ===============
 
