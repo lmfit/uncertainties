@@ -173,8 +173,6 @@ def test_fixed_derivatives_basic_funcs():
     for op in uncert_core.modified_ops_with_reflection:
         check_op(op, 2)
 
-# Additional, more complex checks, for use with the nose unit testing
-# framework.
 
 def test_copy():
     "Standard copy module integration"
