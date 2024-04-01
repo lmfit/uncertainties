@@ -18,9 +18,10 @@ except ImportError:
 # Local modules:
 import uncertainties
 import uncertainties.core as uncert_core
-from uncertainties import ufloat, unumpy, test_uncertainties
+from uncertainties import ufloat, unumpy
+from uncertainties.tests import test_uncertainties
 from uncertainties.unumpy import core
-from uncertainties.test_uncertainties import numbers_close, arrays_close
+from uncertainties.tests.test_uncertainties import numbers_close, arrays_close
 
 def test_numpy():
 

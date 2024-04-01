@@ -18,7 +18,7 @@ from uncertainties import ufloat
 import uncertainties.core as uncert_core
 import uncertainties.umath_core as umath_core
 
-from . import test_uncertainties
+from uncertainties.tests import test_uncertainties
 
 ###############################################################################
 # Unit tests
