@@ -1,11 +1,3 @@
-"""
-Tests for uncertainties.unumpy.ulinalg.
-
-These tests can be run through the Nose testing framework.
-
-(c) 2010-2016 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
-"""
-
 # Some tests are already performed in test_unumpy (unumpy contains a
 # matrix inversion, for instance).  They are not repeated here.
 
@@ -18,7 +10,7 @@ except ImportError:
     sys.exit()  # There is no reason to test the interface to NumPy
 
 from uncertainties import unumpy, ufloat
-from uncertainties.tests.test_unumpy import arrays_close
+from uncertainties.testing import arrays_close
 
 def test_list_inverse():
     "Test of the inversion of a square matrix"

@@ -1,25 +1,13 @@
-"""
-Tests of the code in uncertainties.umath.
-
-These tests can be run through the Nose testing framework.
-
-(c) 2010-2016 by Eric O. LEBIGOT (EOL).
-"""
-
-from __future__ import division
-from __future__ import absolute_import
-
-# Standard modules
 import sys
 import math
+from math import isnan, isinf
 
-# Local modules:
 from uncertainties import ufloat
 import uncertainties.core as uncert_core
 import uncertainties.umath_core as umath_core
 
-from uncertainties.tests import test_uncertainties
-
+from uncertainties.testing import compare_derivatives, numbers_close
+from test_uncertainties import power_special_cases, power_all_cases, power_wrt_ref
 ###############################################################################
 # Unit tests
 
@@ -31,13 +19,12 @@ def test_fixed_derivatives_math_funcs():
     """
 
     for name in umath_core.many_scalars_to_scalar_funcs:
-        # print "Checking %s..." % name
         func = getattr(umath_core, name)
         # Numerical derivatives of func: the nominal value of func() results
         # is used as the underlying function:
         numerical_derivatives = uncert_core.NumericalDerivatives(
             lambda *args: func(*args))
-        test_uncertainties.compare_derivatives(func, numerical_derivatives)
+        compare_derivatives(func, numerical_derivatives)
 
     # Functions that are not in umath_core.many_scalars_to_scalar_funcs:
 
@@ -48,11 +35,11 @@ def test_fixed_derivatives_math_funcs():
     def int_part_modf(x):
         return umath_core.modf(x)[1]
 
-    test_uncertainties.compare_derivatives(
+    compare_derivatives(
         frac_part_modf,
         uncert_core.NumericalDerivatives(
             lambda x: frac_part_modf(x)))
-    test_uncertainties.compare_derivatives(
+    compare_derivatives(
         int_part_modf,
         uncert_core.NumericalDerivatives(
             lambda x: int_part_modf(x)))
@@ -64,11 +51,11 @@ def test_fixed_derivatives_math_funcs():
     def exponent_frexp(x):
         return umath_core.frexp(x)[1]
 
-    test_uncertainties.compare_derivatives(
+    compare_derivatives(
         mantissa_frexp,
         uncert_core.NumericalDerivatives(
             lambda x: mantissa_frexp(x)))
-    test_uncertainties.compare_derivatives(
+    compare_derivatives(
         exponent_frexp,
         uncert_core.NumericalDerivatives(
             lambda x: exponent_frexp(x)))
@@ -172,7 +159,7 @@ def test_monte_carlo_comparison():
     # or assert_array_max_ulp. This is relevant for all vectorized
     # occurrences of numbers_close.
 
-    assert numpy.vectorize(test_uncertainties.numbers_close)(
+    assert numpy.vectorize(numbers_close)(
         covariances_this_module,
         covariances_samples,
         0.06).all(), (
@@ -183,7 +170,7 @@ def test_monte_carlo_comparison():
         )
 
     # The nominal values must be close:
-    assert test_uncertainties.numbers_close(
+    assert numbers_close(
         nominal_value_this_module,
         nominal_value_samples,
         # The scale of the comparison depends on the standard
@@ -279,14 +266,14 @@ def test_hypot():
     # Derivatives that cannot be calculated simply return NaN, with no
     # exception being raised, normally:
     result = umath_core.hypot(x, y)
-    assert test_uncertainties.isnan(result.derivatives[x])
-    assert test_uncertainties.isnan(result.derivatives[y])
+    assert isnan(result.derivatives[x])
+    assert isnan(result.derivatives[y])
 
 def test_power_all_cases():
     '''
     Test special cases of umath_core.pow().
     '''
-    test_uncertainties.power_all_cases(umath_core.pow)
+    power_all_cases(umath_core.pow)
 
 # test_power_special_cases() is similar to
 # test_uncertainties.py:test_power_special_cases(), but with small
@@ -297,7 +284,7 @@ def test_power_special_cases():
     Checks special cases of umath_core.pow().
     '''
 
-    test_uncertainties.power_special_cases(umath_core.pow)
+    power_special_cases(umath_core.pow)
 
     # We want the same behavior for numbers with uncertainties and for
     # math.pow() at their nominal values.
@@ -341,4 +328,4 @@ def test_power_wrt_ref():
     '''
     Checks special cases of the umath_core.pow() power operator.
     '''
-    test_uncertainties.power_wrt_ref(umath_core.pow, math.pow)
+    power_wrt_ref(umath_core.pow, math.pow)

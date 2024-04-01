@@ -1,27 +1,14 @@
-"""
-Tests of the code in uncertainties/unumpy/__init__.py.
-
-These tests can be run through the Nose testing framework.
-
-(c) 2010-2016 by Eric O. LEBIGOT (EOL).
-"""
-
-from __future__ import division
-
-# 3rd-party modules:
 try:
     import numpy
 except ImportError:
     import sys
     sys.exit()  # There is no reason to test the interface to NumPy
 
-# Local modules:
 import uncertainties
 import uncertainties.core as uncert_core
 from uncertainties import ufloat, unumpy
-from uncertainties.tests import test_uncertainties
 from uncertainties.unumpy import core
-from uncertainties.tests.test_uncertainties import numbers_close, arrays_close
+from uncertainties.testing import numbers_close, arrays_close
 
 def test_numpy():
 
