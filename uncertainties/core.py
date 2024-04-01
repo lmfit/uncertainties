@@ -98,24 +98,6 @@ FLOAT_LIKE_TYPES = (numbers.Number,)
 CONSTANT_TYPES = FLOAT_LIKE_TYPES+(complex,)
 
 ###############################################################################
-
-# Utility for issuing deprecation warnings
-
-def deprecation(message):
-    '''
-    Warn the user with the given message, by issuing a
-    DeprecationWarning.
-    '''
-
-    # stacklevel = 3 points to the original user call (not to the
-    # function from this module that called deprecation()).
-    # DeprecationWarning is ignored by default: not used.
-
-    warnings.warn('Obsolete: %s Code can be automatically updated with'
-                  ' python -m uncertainties.1to2 -w ProgramDirectory.'
-                  % message, stacklevel=3)
-
-###############################################################################
 ## Definitions that depend on the availability of NumPy:
 
 
