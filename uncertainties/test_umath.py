@@ -10,7 +10,6 @@ from __future__ import division
 from __future__ import absolute_import
 
 # Standard modules
-import sys
 import math
 
 # Local modules:
