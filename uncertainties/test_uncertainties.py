@@ -250,49 +250,10 @@ def test_value_construction():
     assert x.std_dev == 0.14
     assert x.tag == 'pi'
 
-    ## Comparison with the obsolete tuple form:
-
-    # The following tuple is stored in a variable instead of being
-    # repeated in the calls below, so that the automatic code update
-    # does not replace ufloat((3, 0.14)) by ufloat(3, 14): the goal
-    # here is to make sure that the obsolete form gives the same
-    # result as the new form.
-
-    representation = (3, 0.14)  # Obsolete representation
-
-    x = ufloat(3, 0.14)
-    x2 = ufloat(representation)  # Obsolete
-    assert x.nominal_value == x2.nominal_value
-    assert x.std_dev == x2.std_dev
-    assert x.tag is None
-    assert x2.tag is None
-
-    # With tag as positional argument:
-    x = ufloat(3, 0.14, "pi")
-    x2 = ufloat(representation, "pi")  # Obsolete
-    assert x.nominal_value == x2.nominal_value
-    assert x.std_dev == x2.std_dev
-    assert x.tag == 'pi'
-    assert x2.tag == 'pi'
-
-    # With tag keyword:
-    x = ufloat(3, 0.14, tag="pi")
-    x2 = ufloat(representation, tag="pi")  # Obsolete
-    assert x.nominal_value == x2.nominal_value
-    assert x.std_dev == x2.std_dev
-    assert x.tag == 'pi'
-    assert x2.tag == 'pi'
-
     # Negative standard deviations should be caught in a nice way
     # (with the right exception):
     try:
         x = ufloat(3, -0.1)
-    except uncert_core.NegativeStdDev:
-        pass
-
-    try:
-        # Obsolete form:
-        x = ufloat((3, -0.1))
     except uncert_core.NegativeStdDev:
         pass
 
@@ -385,25 +346,6 @@ def test_ufloat_fromstr():
 
         # With a tag as keyword argument:
         num = ufloat_fromstr(representation, tag='test variable')
-        assert numbers_close(num.nominal_value, values[0])
-        assert numbers_close(num.std_dev, values[1])
-        assert num.tag == 'test variable'
-
-        ## Obsolete forms
-
-        num = ufloat(representation)  # Obsolete
-        assert numbers_close(num.nominal_value, values[0])
-        assert numbers_close(num.std_dev, values[1])
-        assert num.tag is None
-
-        # Call with a tag list argument:
-        num = ufloat(representation, 'test variable')  # Obsolete
-        assert numbers_close(num.nominal_value, values[0])
-        assert numbers_close(num.std_dev, values[1])
-        assert num.tag == 'test variable'
-
-        # Call with a tag keyword argument:
-        num = ufloat(representation, tag='test variable')  # Obsolete
         assert numbers_close(num.nominal_value, values[0])
         assert numbers_close(num.std_dev, values[1])
         assert num.tag == 'test variable'
@@ -742,14 +684,6 @@ def test_logic():
     assert bool(z) == True
     assert bool(t) == True  # Only infinitseimal neighborhood are used
 
-def test_obsolete():
-    'Tests some obsolete creation of number with uncertainties'
-    x = ufloat(3, 0.1)
-    # Obsolete function, protected against automatic modification:
-    x.set_std_dev.__call__(0.2)  # Obsolete
-
-    x_std_dev = x.std_dev
-    assert x_std_dev() == 0.2  # Obsolete call
 
 def test_basic_access_to_data():
     "Access to data from Variable and AffineScalarFunc objects."
