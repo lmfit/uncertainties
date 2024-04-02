@@ -8,7 +8,7 @@ import uncertainties.core as uncert_core
 from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr
 from uncertainties import umath
 from uncertainties.testing import numbers_close, ufloats_close, compare_derivatives, arrays_close
-from helpers import power_special_cases, power_all_cases, power_wrt_ref
+from tests.helpers import power_special_cases, power_all_cases, power_wrt_ref
 
 
 def test_value_construction():
