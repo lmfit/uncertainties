@@ -1,0 +1,17 @@
+codecov:
+  token: <need to add token>
+  comment:
+    after_n_builds: 9
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 2.0%
+        informational: true
+    patch:
+      default:
+        target: auto
+        threshold: 20%
+        informational: true
