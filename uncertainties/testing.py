@@ -200,7 +200,7 @@ except ImportError:
     pass
 else:
 
-    def arrays_close(m1, m2, precision=1e-4):
+    def uarrays_close(m1, m2, precision=1e-4):
         """
         Returns True iff m1 and m2 are almost equal, where elements
         can be either floats or AffineScalarFunc objects.
