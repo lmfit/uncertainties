@@ -1,5 +1,5 @@
 codecov:
-  token: <need to add token>
+  token: c2f0ce36-17ad-4668-bb1b-f1b72dedf3fc
   comment:
     after_n_builds: 9
 
