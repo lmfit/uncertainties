@@ -7,7 +7,7 @@ from math import isnan, isinf
 import uncertainties.core as uncert_core
 from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr
 from uncertainties import umath
-from uncertainties.testing import numbers_close, ufloats_close, compare_derivatives, arrays_close
+from uncertainties.testing import numbers_close, ufloats_close, compare_derivatives, uarrays_close
 from helpers import power_special_cases, power_all_cases, power_wrt_ref
 
 
@@ -1796,7 +1796,7 @@ else:
         covs = uncert_core.covariance_matrix([x, y, z])
 
         # Test of the diagonal covariance elements:
-        assert arrays_close(
+        assert uarrays_close(
             numpy.array([v.std_dev**2 for v in (x, y, z)]),
             numpy.array(covs).diagonal())
 
@@ -1808,15 +1808,15 @@ else:
             tags = ['x', 'y', 'z'])
 
         # Even the uncertainties should be correctly reconstructed:
-        assert arrays_close(numpy.array((x, y, z)),
+        assert uarrays_close(numpy.array((x, y, z)),
                               numpy.array((x_new, y_new, z_new)))
 
         # ... and the covariances too:
-        assert arrays_close(
+        assert uarrays_close(
             numpy.array(covs),
             numpy.array(uncert_core.covariance_matrix([x_new, y_new, z_new])))
 
-        assert arrays_close(
+        assert uarrays_close(
             numpy.array([z_new]), numpy.array([-3*x_new+y_new]))
 
         ####################
@@ -1836,12 +1836,12 @@ else:
             [x.nominal_value for x in [u, v, sum_value]],
             cov_matrix)
 
-        # arrays_close() is used instead of numbers_close() because
+        # uarrays_close() is used instead of numbers_close() because
         # it compares uncertainties too:
-        assert arrays_close(numpy.array([u]), numpy.array([u2]))
-        assert arrays_close(numpy.array([v]), numpy.array([v2]))
-        assert arrays_close(numpy.array([sum_value]), numpy.array([sum2]))
-        assert arrays_close(numpy.array([0]),
+        assert uarrays_close(numpy.array([u]), numpy.array([u2]))
+        assert uarrays_close(numpy.array([v]), numpy.array([v2]))
+        assert uarrays_close(numpy.array([sum_value]), numpy.array([sum2]))
+        assert uarrays_close(numpy.array([0]),
                             numpy.array([sum2-(u2+2*v2)]))
 
 
@@ -1885,7 +1885,7 @@ else:
             assert numbers_close(variable.n, nom_value)
             assert numbers_close(variable.s**2, variance) 
         
-        assert arrays_close(
+        assert uarrays_close(
             cov,
             numpy.array(uncert_core.covariance_matrix(variables)))
 
@@ -1920,18 +1920,18 @@ else:
         x2, y2, z2 = uncert_core.correlated_values_norm(
             list(zip(nominal_values, std_devs)), corr_mat)
 
-        # arrays_close() is used instead of numbers_close() because
+        # uarrays_close() is used instead of numbers_close() because
         # it compares uncertainties too:
 
         # Test of individual variables:
-        assert arrays_close(numpy.array([x]), numpy.array([x2]))
-        assert arrays_close(numpy.array([y]), numpy.array([y2]))
-        assert arrays_close(numpy.array([z]), numpy.array([z2]))
+        assert uarrays_close(numpy.array([x]), numpy.array([x2]))
+        assert uarrays_close(numpy.array([y]), numpy.array([y2]))
+        assert uarrays_close(numpy.array([z]), numpy.array([z2]))
 
         # Partial correlation test:
-        assert arrays_close(numpy.array([0]), numpy.array([z2-(-3*x2+y2)]))
+        assert uarrays_close(numpy.array([0]), numpy.array([z2-(-3*x2+y2)]))
 
         # Test of the full covariance matrix:
-        assert arrays_close(
+        assert uarrays_close(
             numpy.array(cov_mat),
             numpy.array(uncert_core.covariance_matrix([x2, y2, z2])))

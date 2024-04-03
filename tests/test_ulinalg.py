@@ -10,7 +10,7 @@ except ImportError:
     sys.exit()  # There is no reason to test the interface to NumPy
 
 from uncertainties import unumpy, ufloat
-from uncertainties.testing import uuarrays_close
+from uncertainties.testing import uarrays_close
 
 def test_list_inverse():
     "Test of the inversion of a square matrix"
