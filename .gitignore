@@ -12,6 +12,7 @@ uncertainties.egg-info/
 .cache
 # vim temporary files
 .*.swp
-.vscode
+# For Visual Studio Code
+.vscode/
 
 coverage.xml
