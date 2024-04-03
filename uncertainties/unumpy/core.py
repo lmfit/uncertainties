@@ -25,7 +25,6 @@ from numpy.core import numeric
 # Local modules:
 import uncertainties.umath_core as umath_core
 import uncertainties.core as uncert_core
-from uncertainties.core import deprecation
 
 __all__ = [
     # Factory functions:
@@ -285,8 +284,7 @@ def uarray(nominal_values, std_devs=None):
     """
 
     if std_devs is None:  # Obsolete, single tuple argument call
-        deprecation('uarray() should now be called with two arguments.')
-        (nominal_values, std_devs) = nominal_values
+        raise TypeError('uarray() should be called with two arguments.')
 
     return (numpy.vectorize(
         # ! Looking up uncert_core.Variable beforehand through
@@ -573,28 +571,6 @@ pinv = uncert_core.set_doc("""
 
 ########## Matrix class
 
-class CallableStdDevs(numpy.matrix):
-    '''
-    Class for standard deviation results, which used to be
-    callable. Provided for compatibility with old code. Issues an
-    obsolescence warning upon call.
-
-    New objects must be created by passing an existing
-    '''
-
-    def __new__(cls, matrix):
-        # The following prevents a copy of the original matrix, which
-        # could be expensive, and is unnecessary (the CallableStdDevs
-        # is just a wrapping around the original matrix, which can be
-        # modified):
-        matrix.__class__ = cls
-        return matrix
-
-    def __call__ (self):
-        deprecation('the std_devs attribute should not be called'
-                    ' anymore: use .std_devs instead of .std_devs().')
-        return self
-
 class matrix(numpy.matrix):
     # The name of this class is the same as NumPy's, which is why it
     # does not follow PEP 8.
@@ -639,7 +615,7 @@ class matrix(numpy.matrix):
     # the first ones to have such methods?
     @property
     def std_devs(self):
-        return CallableStdDevs(std_devs(self))
+        return numpy.matrix(std_devs(self))
 
 def umatrix(nominal_values, std_devs=None):
     """
@@ -653,8 +629,7 @@ def umatrix(nominal_values, std_devs=None):
     """
 
     if std_devs is None:  # Obsolete, single tuple argument call
-        deprecation('umatrix() should now be called with two arguments.')
-        (nominal_values, std_devs) = nominal_values
+        raise TypeError('umatrix() should be called with two arguments.')
 
     return uarray(nominal_values, std_devs).view(matrix)
 
