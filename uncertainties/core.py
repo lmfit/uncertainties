@@ -2742,7 +2742,7 @@ class Variable(AffineScalarFunc):
         # differentiable functions: for instance, Variable(3, 0.1)/2
         # has a nominal value of 3/2 = 1, but a "shifted" value
         # of 3.1/2 = 1.55.
-        value = float(value)
+        self._nominal_value = float(value)
 
         # If the variable changes by dx, then the value of the affine
         # function that gives its value changes by 1*dx:
@@ -2752,7 +2752,7 @@ class Variable(AffineScalarFunc):
         # takes much more memory.  Thus, this implementation chooses
         # more cycles and a smaller memory footprint instead of no
         # cycles and a larger memory footprint.
-        super(Variable, self).__init__(value, LinearCombination({self: 1.}))
+        super(Variable, self).__init__(self._nominal_value, LinearCombination({self: 1.}))
 
         self.std_dev = std_dev  # Assignment through a Python property
 
@@ -2789,8 +2789,11 @@ class Variable(AffineScalarFunc):
         Returns:
             int: The hash of this object
         """
+        # Otherwise, pickles loads does not work
+        if not hasattr(self, "_nominal_value"):
+            self._nominal_value = None
 
-        return hash(id(self))
+        return hash((self._nominal_value, (id(self),), (1.,)))
 
     # The following method is overridden so that we can represent the tag:
     def __repr__(self):
