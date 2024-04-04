@@ -8,7 +8,7 @@ import uncertainties
 import uncertainties.core as uncert_core
 from uncertainties import ufloat, unumpy
 from uncertainties.unumpy import core
-from uncertainties.testing import numbers_close, uarrays_close
+from helpers import numbers_close, uarrays_close
 
 def test_numpy():
 

@@ -1,8 +1,6 @@
 # Some tests are already performed in test_unumpy (unumpy contains a
 # matrix inversion, for instance).  They are not repeated here.
 
-from __future__ import division
-
 try:
     import numpy
 except ImportError:
@@ -10,7 +8,7 @@ except ImportError:
     sys.exit()  # There is no reason to test the interface to NumPy
 
 from uncertainties import unumpy, ufloat
-from uncertainties.testing import uarrays_close
+from helpers import uarrays_close
 
 def test_list_inverse():
     "Test of the inversion of a square matrix"
