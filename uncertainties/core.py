@@ -1765,9 +1765,9 @@ class AffineScalarFunc(object):
             int: The hash of this object
         """
 
-        ids = [id(d) for d in self.derivatives.keys()]
-        values_hash = tuple(self.derivatives.values())
-        return hash((self._nominal_value, tuple(ids), values_hash))
+        items = sorted(self.derivatives.items(), key= lambda x: id(x[0]))
+        ids, values = zip(*map(lambda item: (id(item[0]), item[1]), items))
+        return hash((self._nominal_value, tuple(ids), tuple(values)))
 
     # Uncertainties handling:
 
@@ -2790,10 +2790,7 @@ class Variable(AffineScalarFunc):
             int: The hash of this object
         """
 
-        if hasattr(self, '_linear_part') and hasattr(self, '_nominal_value'):
-            return super().__hash__()
-        else:
-            return id(self)
+        return hash(id(self))
 
     # The following method is overridden so that we can represent the tag:
     def __repr__(self):
