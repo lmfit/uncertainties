@@ -1502,6 +1502,16 @@ class LinearCombination(object):
         """
         return bool(self.linear_combo)
 
+    def copy(self):
+        """Shallow copy of the LinearCombination object.
+
+        Returns:
+            LinearCombination: Copy of the object.
+        """
+        cpy = LinearCombination.__new__(LinearCombination)
+        cpy.linear_combo = self.linear_combo.copy()
+        return cpy
+
     def expanded(self):
         """
         Return True if and only if the linear combination is expanded.
@@ -1765,9 +1775,8 @@ class AffineScalarFunc(object):
             int: The hash of this object
         """
 
-        items = sorted(self.derivatives.items(), key= lambda x: id(x[0]))
-        ids, values = zip(*map(lambda item: (id(item[0]), item[1]), items))
-        return hash((self._nominal_value, tuple(ids), tuple(values)))
+        derivatives = sorted([(id(key), value) for key, value in self.derivatives.items()])
+        return hash((self._nominal_value, tuple(derivatives)))
 
     # Uncertainties handling:
 
@@ -2435,11 +2444,28 @@ class AffineScalarFunc(object):
         """
         Hook for the pickle module.
         """
+
+        LINEAR_PART_NAME = "_linear_part"
+        try:
+            linear_part: LinearCombination = data_dict.pop(LINEAR_PART_NAME)
+        except KeyError:
+            linear_part = None
+
         for (name, value) in data_dict.items():
             # Contrary to the default __setstate__(), this does not
             # necessarily save to the instance dictionary (because the
             # instance might contain slots):
             setattr(self, name, value)
+
+        if linear_part is not None:
+            try:
+                self_derivative = linear_part.linear_combo.pop(None)
+            except:
+                pass
+            else:
+                linear_part.linear_combo[self] = self_derivative
+                
+            setattr(self, LINEAR_PART_NAME, linear_part)
 
 # Nicer name, for users: isinstance(ufloat(...), UFloat) is
 # True. Also: isinstance(..., UFloat) is the test for "is this a
@@ -2790,10 +2816,8 @@ class Variable(AffineScalarFunc):
             int: The hash of this object
         """
         # Otherwise, pickles loads does not work
-        if not hasattr(self, "_nominal_value"):
-            self._nominal_value = None
 
-        return hash((self._nominal_value, (id(self),), (1.,)))
+        return hash((self._nominal_value, ((id(self), 1.),)))
 
     # The following method is overridden so that we can represent the tag:
     def __repr__(self):
