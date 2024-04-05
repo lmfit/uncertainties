@@ -2445,27 +2445,11 @@ class AffineScalarFunc(object):
         Hook for the pickle module.
         """
 
-        LINEAR_PART_NAME = "_linear_part"
-        try:
-            linear_part: LinearCombination = data_dict.pop(LINEAR_PART_NAME)
-        except KeyError:
-            linear_part = None
-
         for (name, value) in data_dict.items():
             # Contrary to the default __setstate__(), this does not
             # necessarily save to the instance dictionary (because the
             # instance might contain slots):
             setattr(self, name, value)
-
-        if linear_part is not None:
-            try:
-                self_derivative = linear_part.linear_combo.pop(None)
-            except:
-                pass
-            else:
-                linear_part.linear_combo[self] = self_derivative
-                
-            setattr(self, LINEAR_PART_NAME, linear_part)
 
 # Nicer name, for users: isinstance(ufloat(...), UFloat) is
 # True. Also: isinstance(..., UFloat) is the test for "is this a
@@ -2862,6 +2846,34 @@ class Variable(AffineScalarFunc):
         # Reference: http://www.doughellmann.com/PyMOTW/copy/index.html
 
         return self.__copy__()
+
+    def __getstate__(self):
+        """
+        Hook for the pickle module.
+
+        Same as for the AffineScalarFunction but remove the linear part,
+        since it only contains a self reference.
+        This would lead to problems when unpickling the linear part.
+        """
+                
+        LINEAR_PART_NAME = "_linear_part"
+        state = super().__getstate__()
+
+        if LINEAR_PART_NAME in state:
+            del state[LINEAR_PART_NAME]
+
+        return state
+
+    def __setstate__(self, state):
+        """
+        Hook for the pickle module.
+
+        Same as for AffineScalarFunction, but manually set the linear part.
+        This one is removed when pickling Variable objects.
+        """
+
+        super().__setstate__(state)
+        self._linear_part = LinearCombination({self: 1.})
 
 
 ###############################################################################
