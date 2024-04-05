@@ -1,4 +1,3 @@
-import weakref
 import random
 from math import isnan, isinf
 
