@@ -57,3 +57,6 @@ Changelog = "https://github.com/lmfit/uncertainties/blob/master/CHANGES.rst"
 
 [project.optional-dependencies]
 optional = ["numpy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
