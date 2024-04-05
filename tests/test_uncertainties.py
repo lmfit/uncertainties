@@ -2,7 +2,7 @@
 import copy
 import math
 import sys
-from math import isnan, isinf
+from math import isnan
 
 import uncertainties.core as uncert_core
 from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr

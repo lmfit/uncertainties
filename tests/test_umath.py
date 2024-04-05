@@ -1,4 +1,3 @@
-import sys
 import math
 from math import isnan, isinf
 
