@@ -18,9 +18,9 @@ from builtins import zip
 from builtins import map
 from builtins import range
 import copy
-import weakref
 import math
 from math import isnan, isinf
+from uncertainties.umath import cos
 import random
 import sys
 
@@ -2375,3 +2375,11 @@ else:
         y = AffineScalarFunc(1, LinearCombination({a:2, b:1}))
         assert x != y
         assert hash(x) != hash(y)
+
+        # test for a derivative with value 0
+        a = ufloat(0, 0.1)
+        b = ufloat(1, 0.1)
+        x = 2 * b
+        y = 2 * b * cos(a)
+        x == y
+        hash(x) == hash(y)

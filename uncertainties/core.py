@@ -1775,7 +1775,9 @@ class AffineScalarFunc(object):
             int: The hash of this object
         """
 
-        derivatives = sorted([(id(key), value) for key, value in self.derivatives.items()])
+        # derivatives which are zero must be filtered out, because the variable is insensitive to errors in those correlations.
+        # the derivatives must be sorted, because the hash depends on the order, but the equality of variables does not.
+        derivatives = sorted([(id(key), value) for key, value in self.derivatives.items() if value != 0])
         return hash((self._nominal_value, tuple(derivatives)))
 
     # Uncertainties handling:
@@ -2791,16 +2793,17 @@ class Variable(AffineScalarFunc):
 
     def __hash__(self):
         """
-        Calculates the hash for any Variable object.
-        This simply calls the __hash__ method of `AffineScalarFunc` in most cases.
-        During initialization, the `_linear_part` and `_nominal_value` attributes does not exist.
-        Because of that, the id returned in case this method is called during initialization.
+        Calculates the hash for any `Variable` object.
+        The implementation is the same as for `AffineScalarFunc`.
+        But this method sets the `_linear_part` manually.
+        It is set to a single entry with a self reference as key and 1.0 as value.
         
         Returns:
             int: The hash of this object
         """
-        # Otherwise, pickles loads does not work
 
+        # The manual implementation of the _linear_part is necessary, because pickle would not work otherwise.
+        # That is because of the self reference inside the _linear_part.
         return hash((self._nominal_value, ((id(self), 1.),)))
 
     # The following method is overridden so that we can represent the tag:
