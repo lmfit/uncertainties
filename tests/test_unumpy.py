@@ -1,26 +1,14 @@
-"""
-Tests of the code in uncertainties/unumpy/__init__.py.
-
-These tests can be run through the Nose testing framework.
-
-(c) 2010-2016 by Eric O. LEBIGOT (EOL).
-"""
-
-from __future__ import division
-
-# 3rd-party modules:
 try:
     import numpy
 except ImportError:
     import sys
     sys.exit()  # There is no reason to test the interface to NumPy
 
-# Local modules:
 import uncertainties
 import uncertainties.core as uncert_core
-from uncertainties import ufloat, unumpy, test_uncertainties
+from uncertainties import ufloat, unumpy
 from uncertainties.unumpy import core
-from uncertainties.test_uncertainties import numbers_close, arrays_close
+from helpers import numbers_close, uarrays_close
 
 def test_numpy():
 
@@ -161,7 +149,7 @@ def test_inverse():
     assert numbers_close(m_double_inverse[0, 0].std_dev,
                           m[0, 0].std_dev)
 
-    assert arrays_close(m_double_inverse, m)
+    assert uarrays_close(m_double_inverse, m)
 
     # Partial test:
     assert derivatives_close(m_double_inverse[0, 0], m[0, 0])
@@ -178,7 +166,7 @@ def test_inverse():
 
     # Correlations between m and m_inverse should create a perfect
     # inversion:
-    assert arrays_close(m * m_inverse,  numpy.eye(m.shape[0]))
+    assert uarrays_close(m * m_inverse,  numpy.eye(m.shape[0]))
 
 def test_wrap_array_func():
     '''
@@ -213,7 +201,7 @@ def test_wrap_array_func():
     m_f_wrapped = f_wrapped(m, 2, factor=10)
     m_f_unc = f_unc(m, 2, factor=10)
 
-    assert arrays_close(m_f_wrapped, m_f_unc)
+    assert uarrays_close(m_f_wrapped, m_f_unc)
 
 
 def test_pseudo_inverse():
@@ -233,7 +221,7 @@ def test_pseudo_inverse():
     rcond = 1e-8  # Test of the second argument to pinv()
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core.pinv(m, rcond)
-    assert arrays_close(m_pinv_num, m_pinv_package)
+    assert uarrays_close(m_pinv_num, m_pinv_package)
 
     ##########
     # Example with a non-full rank rectangular matrix:
@@ -241,14 +229,14 @@ def test_pseudo_inverse():
     m = unumpy.matrix([vector, vector])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core.pinv(m, rcond)
-    assert arrays_close(m_pinv_num, m_pinv_package)
+    assert uarrays_close(m_pinv_num, m_pinv_package)
 
     ##########
     # Example with a non-full-rank square matrix:
     m = unumpy.matrix([[ufloat(10, 1), 0], [3, 0]])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core.pinv(m, rcond)
-    assert arrays_close(m_pinv_num, m_pinv_package)
+    assert uarrays_close(m_pinv_num, m_pinv_package)
 
 def test_broadcast_funcs():
     """
