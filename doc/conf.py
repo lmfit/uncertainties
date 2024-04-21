@@ -27,7 +27,7 @@ import uncertainties
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = []
+extensions = ['sphinx.ext.autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -39,7 +39,7 @@ source_suffix = '.rst'
 #source_encoding = 'utf-8'
 
 # The master toctree document.
-master_doc = 'index_TOC'
+master_doc = 'index'
 
 # General information about the project.
 project = u'uncertainties Python package'
@@ -96,6 +96,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
+html_theme = 'bizstyle'
 html_theme = 'sphinxdoc'
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -136,7 +137,7 @@ html_static_path = ['_static']
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
+html_sidebars = {'index': ['indexsidebar.html',  'searchbox.html']}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -177,7 +178,7 @@ htmlhelp_basename = 'uncertaintiesdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index_TOC', 'uncertaintiesPythonPackage.tex', u'uncertainties Python package Documentation',
+  ('index', 'uncertaintiesPythonPackage.tex', u'uncertainties Python package Documentation',
    u'Eric O. LEBIGOT (EOL)', 'manual'),
 ]
 
