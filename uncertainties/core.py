@@ -140,7 +140,7 @@ else:
         covariance_mat -- full covariance matrix of the returned numbers with
         uncertainties. For example, the first element of this matrix is the
         variance of the first number with uncertainty. This matrix must be a
-        NumPy array-like (list of lists, NumPy array, etc.). 
+        NumPy array-like (list of lists, NumPy array, etc.).
 
         tags -- if 'tags' is not None, it must list the tag of each new
         independent variable.
@@ -148,9 +148,9 @@ else:
 
         # !!! It would in principle be possible to handle 0 variance
         # variables by first selecting the sub-matrix that does not contain
-        # such variables (with the help of numpy.ix_()), and creating 
+        # such variables (with the help of numpy.ix_()), and creating
         # them separately.
-        
+
         std_devs = numpy.sqrt(numpy.diag(covariance_mat))
 
         # For numerical stability reasons, we go through the correlation
@@ -229,8 +229,8 @@ else:
 
         # The coordinates of each new uncertainty as a function of the
         # new variables must include the variable scale (standard deviation):
-        transform *= std_devs[:, numpy.newaxis] 
-        
+        transform *= std_devs[:, numpy.newaxis]
+
         # Representation of the initial correlated values:
         values_funcs = tuple(
             AffineScalarFunc(
@@ -980,7 +980,7 @@ def nrmlze_superscript(number_str):
 
     ValueError is raised if the conversion cannot be done.
 
-    number_str -- string to be converted (of type str, but also possibly, for 
+    number_str -- string to be converted (of type str, but also possibly, for
     Python 2, unicode, which allows this string to contain superscript digits).
     '''
     # !! Python 3 doesn't need this str(), which is only here for giving the
@@ -1932,7 +1932,7 @@ class AffineScalarFunc(object):
           outputs like (1.0±0.2) or (1.0±0.2)e7, which can be useful for
           removing any ambiguity if physical units are added after the printed
           number.
-    
+
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
 
@@ -2976,7 +2976,7 @@ def parse_error_in_parentheses(representation):
     The digits between parentheses correspond to the same number of digits
     at the end of the nominal value (the decimal point in the uncertainty
     is optional). Example: 12.34(142) = 12.34±1.42.
-    
+
     Raises ValueError if the string cannot be parsed.
     """
 
@@ -3136,108 +3136,79 @@ def str_to_number_with_uncert(representation):
 
 def ufloat_fromstr(representation, tag=None):
     """
-    Return a new random variable (Variable object) from a string.
+    Create an uncertainties Variable from a string representation.
+    Several representation formats are supported.
 
-    Strings 'representation' of the form '12.345+/-0.015',
-    '12.345(15)', '12.3' or u'1.2±0.1' (Unicode string) are recognized
-    (see more complete list below).  In the last case, an uncertainty
-    of +/-1 is assigned to the last digit.
+    Arguments:
+    ----------
+    representation: string
+        string representation of a value with uncertainty
+    tag:   string or `None`
+        optional tag for tracing and organizing Variables ['None']
 
-    Invalid representations raise a ValueError.
+    Returns:
+    --------
+    uncertainties Variable.
 
-    This function tries to parse back most of the formats that are made
-    available by this module. Examples of valid string representations:
+    Notes:
+    --------
+    1. Invalid representations raise a ValueError.
 
-        12.3e10+/-5e3
-        (-3.1415 +/- 0.0001)e+02  # Factored exponent
+    2. Using the form "nominal(std)" where "std" is an integer creates
+       a Variable with "std" giving the least significant digit(s).
+       That is, "1.25(3)" is the same as `ufloat(1.25, 0.03)`,
+       while "1.25(3.)" is the same as `ufloat(1.25, 3.)`
 
-        # Pretty-print notation (only with a unicode string):
-        12.3e10 ± 5e3  # ± symbol
-        (12.3 ± 5.0) × 10⁻¹²  # Times symbol, superscript
-        12.3 ± 5e3  # Mixed notation (± symbol, but e exponent)
+    Examples:
+    -----------
 
-        # Double-exponent values:
-        (-3.1415 +/- 1e-4)e+200
-        (1e-20 +/- 3)e100
+    >>> x = ufloat_fromsstr("12.58+/-0.23")  # = ufloat(12.58, 0.23)
+    >>> x = ufloat_fromsstr("12.58 ± 0.23")  # = ufloat(12.58, 0.23)
+    >>> x = ufloat_fromsstr("3.85e5 +/- 2.3e4")  # = ufloat(3.8e5, 2.3e4)
+    >>> x = ufloat_fromsstr("(38.5 +/- 2.3)e4")  # = ufloat(3.8e5, 2.3e4)
 
-        0.29
-        31.
-        -31.
-        31
-        -3.1e10
+    >>> x = ufloat_fromsstr("72.1(2.2)")  # = ufloat(72.1, 2.2)
+    >>> x = ufloat_fromsstr("72.15(4)")  # = ufloat(72.15, 0.04)
+    >>> x = ufloat_fromstr("680(41)e-3")  # = ufloat(0.68, 0.041)
+    >>> x = ufloat_fromstr("23.2")  # = ufloat(23.2, 0.1)
+    >>> x = ufloat_fromstr("23.29")  # = ufloat(23.29, 0.01)
 
-        -1.23(3.4)
-        -1.34(5)
-        1(6)
-        3(4.2)
-        -9(2)
-        1234567(1.2)
-        12.345(15)
-        -12.3456(78)e-6
-        12.3(0.4)e-5
-        169.0(7)
-        169.1(15)
-        .123(4)
-        .1(.4)
-
-        # NaN uncertainties:
-        12.3(nan)
-        12.3(NAN)
-        3±nan
-
-    Surrounding spaces are ignored.
-
-    About the "shorthand" notation: 1.23(3) = 1.23 ± 0.03 but
-    1.23(3.) = 1.23 ± 3.00. Thus, the presence of a decimal point in
-    the uncertainty signals an absolute uncertainty (instead of an
-    uncertainty on the last digits of the nominal value).
+    >>> x = ufloat_fromstr("680.3(nan)") # = ufloat(680.3, numpy.nan)
     """
+    (nom, std) = str_to_number_with_uncert(representation.strip())
+    return ufloat(nom, std, tag)
 
-    (nominal_value, std_dev) = str_to_number_with_uncert(
-        representation.strip())
 
-    return ufloat(nominal_value, std_dev, tag)
-
-def ufloat_obsolete(representation, tag=None):
-    '''
-    Legacy version of ufloat(). Will eventually be removed.
-
-    representation -- either a (nominal_value, std_dev) tuple, or a
-    string representation of a number with uncertainty, in a format
-    recognized by ufloat_fromstr().
-    '''
-
-    if isinstance(representation, tuple):
-        return ufloat(representation[0], representation[1], tag)
-    else:
-        return ufloat_fromstr(representation, tag)
-
-# The arguments are named for the new version, instead of bearing
-# names that are closer to their obsolete use (e.g., std_dev could be
-# instead std_dev_or_tag, since it can be the tag, in the obsolete
-# ufloat((3, 0.14), "pi") form). This has the advantage of allowing
-# new code to use keyword arguments as in ufloat(nominal_value=3,
-# std_dev=0.14), without breaking when the obsolete form is not
-# supported anymore.
 def ufloat(nominal_value, std_dev=None, tag=None):
     """
-    Return a new random variable (Variable object).
+    Create an uncertainties Variable
 
-    - ufloat(nominal_value, std_dev),
-    - ufloat(nominal_value, std_dev, tag=...).
+    Arguments:
+    ----------
+    nominal_value: float
+        nominal value of Variable
+    std_dev:   float or `None`
+        standard error of Variable, or `None` if not available [`None`]
+    tag:   string or `None`
+        optional tag for tracing and organizing Variables ['None']
 
-    nominal_value -- nominal value of the random variable. It is more
-    meaningful to use a value close to the central value or to the
-    mean. This value is propagated by mathematical operations as if it
-    was a float.
+    Returns:
+    --------
+    uncertainties Variable
 
-    std_dev -- standard deviation of the random variable. The standard
-    deviation must be convertible to a positive float, or be NaN.
+    Examples
+    ----------
+    >>> a = ufloat(5, 0.2)
+    >>> b = ufloat(1000, 30, tag='kilo')
 
-    tag -- optional string tag for the variable.  Variables don't have
-    to have distinct tags.  Tags are useful for tracing what values
-    (and errors) enter in a given result (through the
-    error_components() method).
+
+    Notes:
+    --------
+    1. `nominal_value` is typically interpreted as `mean` or `central value`
+    2. `std_dev` is typically interpreted as `standard deviation` or the
+        1-sigma level uncertainty.
+    3. The returned Variable will have attributes `nominal_value`, `std_dev`,
+       and `tag` which match the input values.
     """
 
     return Variable(nominal_value, std_dev, tag=tag)
