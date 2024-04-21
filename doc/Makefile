@@ -10,11 +10,10 @@ PAPER         =
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d _build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
-PDFFILE = uncertaintiesPythonPackage.pdf
+PDFFILE = uncertainties.pdf
 
-.PHONY: help clean html dirhtml pickle json htmlhelp qthelp latex changes linkcheck doctest
+.PHONY:  help clean html dirhtml pickle json htmlhelp qthelp latex changes linkcheck doctest
 
-# The HTML needs pdf because it contains a link to the PDF version:
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
 	@echo
@@ -24,6 +23,7 @@ htmlpdf: pdf
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
 	-cp _build/latex/$(PDFFILE) _build/html/$(PDFFILE)
 	@echo
+	-cd _build && ln -s html uncertainties_doc && zip -pur uncertainties_doc.zip uncertainties_doc/* && mv uncertainties_doc.zip html
 	@echo "Build finished. The HTML pages are in _build/html."
 
 help:

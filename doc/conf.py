@@ -164,7 +164,7 @@ html_show_sourcelink = False
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'uncertaintiesdoc'
+htmlhelp_basename = 'uncertainties'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -178,7 +178,7 @@ htmlhelp_basename = 'uncertaintiesdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'uncertaintiesPythonPackage.tex', u'uncertainties Python package Documentation',
+  ('index', 'uncertainties.tex', u'uncertainties Python package Documentation',
    u'Eric O. LEBIGOT (EOL)', 'manual'),
 ]
 
