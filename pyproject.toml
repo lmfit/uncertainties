@@ -14,7 +14,7 @@ description = """\
     fast calculation of derivatives').\
     """
 readme = "README.rst"
-requires-python = ">=3.1"
+requires-python = ">=3.8"
 keywords = [
     "error propagation", "uncertainties", "uncertainty calculations",
     "standard deviation", "derivatives", "partial derivatives",
@@ -49,6 +49,10 @@ classifiers = [
 ]
 dependencies = []
 
+[tool.setuptools.packages.find]
+include = ["uncertainties"]
+exclude = ["doc", "test"]
+
 [project.urls]
 Documentation = "http://uncertainties-python-package.readthedocs.io/"
 Repository = "https://github.com/lmfit/uncertainties"
@@ -56,7 +60,10 @@ Issues = "https://github.com/lmfit/uncertainties/issues"
 Changelog = "https://github.com/lmfit/uncertainties/blob/master/CHANGES.rst"
 
 [project.optional-dependencies]
-optional = ["numpy"]
+arrays = ["numpy"]
+test = ["pytest", "pytest_cov"]
+doc = ["sphinx"]
+all = ["uncertainties[doc,test,arrays]"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
