@@ -6,44 +6,43 @@ User Guide
 ==========
 
 
-Basic setup
+Basic usage
 ===========
 
-Basic mathematical operations involving numbers with uncertainties
-only require a simple import:
+Basic mathematical operations involving numbers with uncertainties requires
+importing the :func:`ufloat` function which creates numbers with uncertainties:
 
 >>> from uncertainties import ufloat
 
-The :func:`ufloat` function creates numbers with uncertainties. Existing
-calculation code can usually run with no or little modification and
-automatically produce results with uncertainties.
+The :mod:`uncertainties` module contains sub-modules for :ref:`advanced
+mathematical functions <advanced math operations>`, and :doc:`arrays and
+matrices <numpy_guide>`, which can be accessed with
 
-.. The "import uncertainties" is put here because some examples requires
-   uncertainties to have been imported (and not only ufloat).
-
-The :mod:`uncertainties` module contains other features, which can be
-made accessible through
-
->>> import uncertainties
-
-The :mod:`uncertainties` package also contains sub-modules for
-:ref:`advanced mathematical functions <advanced math operations>`, and
-:doc:`arrays and matrices <numpy_guide>`.
+>>> import uncertainties as un
 
 .. index::
    pair: number with uncertainty; creation
 
-Creating numbers with uncertainties
-===================================
+Creating Variables: numbers with uncertainties
+================================================
 
-Numbers with uncertainties can be input either numerically, or through
-one of many string representations, so that files containing numbers
-with uncertainties can easily be parsed.  Thus, x = 0.20±0.01 can be
-expressed in many convenient ways, including:
+.. module:: uncertainties
 
->>> x = ufloat(0.20, 0.01)  # x = 0.20+/-0.01
+To create a Variable - a number with uncertainties - use the :func:`ufloat`
+function, which takes a nominal value (which can be interpreted as the most
+likely value, or the mean or central value of the distribution of values), a
+standard error (the standard deviation or :math:`1-\sigma` uncertainty), and an
+optional tag:
+
+>>> x = ufloat(2.7, 0.01)  # x = 2.7+/-0.01
+>>> y = ufloat(4.5,  1.2, tag='y_variable')  # x = 4..5+/-1.2
+
+uncertainties Variables can also be created from one of many
+string representations.  The following forms will all create Variables with the
+same value:
 
 >>> from uncertainties import ufloat_fromstr
+>>> x = ufloat(0.2, 0.01)
 >>> x = ufloat_fromstr("0.20+/-0.01")
 >>> x = ufloat_fromstr("(2+/-0.1)e-01")  # Factored exponent
 >>> x = ufloat_fromstr("0.20(1)")  # Short-hand notation
@@ -51,12 +50,10 @@ expressed in many convenient ways, including:
 >>> x = ufloat_fromstr(u"0.20±0.01")  # Pretty-print form
 >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
 
-Each number created this way is an **independent (random) variable**
-(for details, see the :ref:`Technical Guide <math_def_num_uncert>`).
 
-More information can be obtained with ``pydoc uncertainties.ufloat``
-and ``pydoc uncertainties.ufloat_fromstr`` ("20(1)×10\ :sup:`-2`\ " is
-also recognized, etc.).
+.. autofunction:: ufloat
+
+.. autofunction:: ufloat_fromstr
 
 
 Basic math
@@ -64,8 +61,9 @@ Basic math
 
 Calculations can be performed directly, as with regular real numbers:
 
+>>> x = ufloat(0.2, 0.01)
 >>> square = x**2
->>> print square
+>>> print(square)
 0.040+/-0.004
 
 
@@ -121,7 +119,7 @@ matrices:
 >>> arr = numpy.array([ufloat(1, 0.01), ufloat(2, 0.1)])
 >>> 2*arr
 [2.0+/-0.02 4.0+/-0.2]
->>> print arr.sum()
+>>> print(arr.sum())
 3.00+/-0.10
 
 Thus, usual operations on NumPy arrays can be performed transparently
@@ -143,7 +141,7 @@ calculation. For example, when :data:`x` is the number with
 uncertainty defined above,
 
 >>> square = x**2
->>> print square
+>>> print(square)
 0.040+/-0.004
 >>> square - x*x
 0.0+/-0
@@ -174,16 +172,13 @@ Access to the uncertainty and to the nominal value
 The nominal value and the uncertainty (standard deviation) can also be
 accessed independently:
 
->>> print square
+>>> print(square)
 0.040+/-0.004
->>> print square.nominal_value
+>>> print(square.nominal_value)
 0.04
->>> print square.n  # Abbreviation
-0.04
->>> print square.std_dev
+>>> print(square.std_dev)
 0.004
->>> print square.s  # Abbreviation
-0.004
+
 
 Access to the individual sources of uncertainty
 ===============================================
@@ -205,7 +200,7 @@ when the variables are **tagged**:
 >>> sum_value
 21.0+/-0.223606797749979
 >>> for (var, error) in sum_value.error_components().items():
-...     print "{}: {}".format(var.tag, error)
+...     print("{}: {}".format(var.tag, error))
 ...
 u variable: 0.1
 v variable: 0.2
@@ -238,7 +233,7 @@ Comparison operators
 
 Comparison operators behave in a natural way:
 
->>> print x
+>>> print(x)
 0.200+/-0.010
 >>> y = x + 0.0001
 >>> y
@@ -254,9 +249,9 @@ standard deviation are generally different:
 
 >>> y = ufloat(1, 0.1)
 >>> z = ufloat(1, 0.1)
->>> print y
+>>> print(y)
 1.00+/-0.10
->>> print z
+>>> print(z)
 1.00+/-0.10
 >>> y == y
 True
@@ -367,7 +362,7 @@ Example:
 
 >>> (u3, v3, sum3) = uncertainties.correlated_values_norm(
 ...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)], corr_matrix)
->>> print u3
+>>> print(u3)
 1.00+/-0.10
 
 The three returned numbers with uncertainties have the correct
@@ -390,7 +385,7 @@ Printing
 
 Numbers with uncertainties can be printed conveniently:
 
->>> print x
+>>> print(x)
 0.200+/-0.010
 
 The resulting form can generally be parsed back with
@@ -409,7 +404,7 @@ Standard formats
 More **control over the format** can be obtained (in Python 2.6+)
 through the usual :func:`format` method of strings:
 
->>> print 'Result = {:10.2f}'.format(x)
+>>> print('Result = {:10.2f}'.format(x))
 Result =       0.20+/-      0.01
 
 (Python 2.6 requires ``'{0:10.2f}'`` instead, with the usual explicit
@@ -439,13 +434,13 @@ uncertainty** by adding the precision modifier ``u`` after the
 precision (and before any valid float format type like ``f``, ``e``,
 the empty format type, etc.):
 
->>> print '1 significant digit on the uncertainty: {:.1u}'.format(x)
+>>> print('1 significant digit on the uncertainty: {:.1u}'.format(x))
 1 significant digit on the uncertainty: 0.20+/-0.01
->>> print '3 significant digits on the uncertainty: {:.3u}'.format(x)
+>>> print('3 significant digits on the uncertainty: {:.3u}'.format(x))
 3 significant digits on the uncertainty: 0.2000+/-0.0100
->>> print '1 significant digit, exponent notation: {:.1ue}'.format(x)
+>>> print('1 significant digit, exponent notation: {:.1ue}'.format(x))
 1 significant digit, exponent notation: (2.0+/-0.1)e-01
->>> print '1 significant digit, percentage: {:.1u%}'.format(x)
+>>> print('1 significant digit, percentage: {:.1u%}'.format(x))
 1 significant digit, percentage: (20+/-1)%
 
 When :mod:`uncertainties` must **choose the number of significant
@@ -457,9 +452,9 @@ convenient for reading numbers with uncertainties, and at the same
 time prevent the uncertainty from being displayed with too few
 digits):
 
->>> print 'Automatic number of digits on the uncertainty: {}'.format(x)
+>>> print('Automatic number of digits on the uncertainty: {}'.format(x))
 Automatic number of digits on the uncertainty: 0.200+/-0.010
->>> print x
+>>> print(x0
 0.200+/-0.010
 
 Custom options
@@ -472,9 +467,9 @@ formatting options. They can be added at the end of the format string:
 
 - ``P`` for **pretty-printing**:
 
-  >>> print '{:.2e}'.format(x)
+  >>> print('{:.2e}'.format(x))
   (2.00+/-0.10)e-01
-  >>> print u'{:.2eP}'.format(x)
+  >>> print(u'{:.2eP}'.format(x))
   (2.00±0.10)×10⁻¹
 
   The pretty-printing mode thus uses "±", "×" and superscript
@@ -484,7 +479,7 @@ formatting options. They can be added at the end of the format string:
 
 - ``S`` for the **shorthand notation**:
 
-  >>> print '{:+.1uS}'.format(x)  # Sign, 1 digit for the uncertainty, shorthand
+  >>> print('{:+.1uS}'.format(x))  # Sign, 1 digit for the uncertainty, shorthand
   +0.20(1)
 
   In this notation, the digits in parentheses represent the
@@ -494,14 +489,14 @@ formatting options. They can be added at the end of the format string:
 
   >>> print x*1e7
   (2.00+/-0.10)e+06
-  >>> print '{:L}'.format(x*1e7)  # Automatic exponent form, LaTeX
+  >>> print('{:L}'.format(x*1e7))  # Automatic exponent form, LaTeX
   \left(2.00 \pm 0.10\right) \times 10^{6}
 
 - ``p`` is for requiring that parentheses be always printed around the …±… part
   (without enclosing any exponent or trailing "%", etc.). This can for instance
   be useful so as to explicitly factor physical units:
 
-    >>> print '{:p} kg'.format(x)  # Adds parentheses
+    >>> print('{:p} kg'.format(x))  # Adds parentheses
     (0.200+/-0.010) kg
     >>> print("{:p} kg".format(x*1e7))  # No parentheses added (exponent)
     (2.00+/-0.10)e+06 kg
@@ -518,12 +513,12 @@ needed for the larger of the nominal value (in absolute value) and the
 uncertainty (the rule is the same as for floats). The exponent is
 generally **factored**, for increased legibility:
 
->>> print x*1e7
+>>> print(x*1e7)
 (2.00+/-0.10)e+06
 
 When a *format width* is used, the common exponent is not factored:
 
->>> print 'Result = {:10.1e}'.format(x*1e-10)
+>>> print('Result = {:10.1e}'.format(x*1e-10))
 Result =    2.0e-11+/-   0.1e-11
 
 (Using a (minimal) width of 1 is thus a way of forcing exponents to not
@@ -537,24 +532,24 @@ the common exponent.
 An uncertainty which is *exactly* **zero** is always formatted as an
 integer:
 
->>> print ufloat(3.1415, 0)
+>>> print(ufloat(3.1415, 0))
 3.1415+/-0
->>> print ufloat(3.1415e10, 0)
+>>> print(ufloat(3.1415e10, 0))
 (3.1415+/-0)e+10
->>> print ufloat(3.1415, 0.0005)
+>>> print(ufloat(3.1415, 0.0005))
 3.1415+/-0.0005
->>> print '{:.2f}'.format(ufloat(3.14, 0.001))
+>>> print('{:.2f}'.format(ufloat(3.14, 0.001)))
 3.14+/-0.00
->>> print '{:.2f}'.format(ufloat(3.14, 0.00))
+>>> print('{:.2f}'.format(ufloat(3.14, 0.00)))
 3.14+/-0
 
 **All the digits** of a number with uncertainty are given in its
 representation:
 
 >>> y = ufloat(1.23456789012345, 0.123456789)
->>> print y
+>>> print(y)
 1.23+/-0.12
->>> print repr(y)
+>>> print(repr(y))
 1.23456789012345+/-0.123456789
 >>> y
 1.23456789012345+/-0.123456789
@@ -587,7 +582,7 @@ use the shorthand notation for numbers with uncertainties:
 
    frmtr = ShorthandFormatter()
 
-   print frmtr.format("Result = {0:.1u}", x)  # 1-digit uncertainty
+   print(frmtr.format("Result = {0:.1u}", x))  # 1-digit uncertainty
 
 prints with the shorthand notation: ``Result = 0.20(1)``.
 
@@ -674,9 +669,9 @@ access the **nominal value and uncertainty of all numbers in a uniform
 manner**.  This is what the :func:`nominal_value` and
 :func:`std_dev` functions do:
 
->>> print uncertainties.nominal_value(x)
+>>> print(uncertainties.nominal_value(x))
 0.2
->>> print uncertainties.std_dev(x)
+>>> print(uncertainties.std_dev(x))
 0.01
 >>> uncertainties.nominal_value(3)
 3
