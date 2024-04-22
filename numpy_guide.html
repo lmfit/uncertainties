@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Uncertainties in arrays &#8212; uncertainties Python package 3.1.7 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css?v=d59dc883" />
+    <script src="_static/documentation_options.js?v=169b9561"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Technical Guide" href="tech_guide.html" />
+    <link rel="prev" title="User Guide" href="user_guide.html" /> 
+  </head><body>
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px  15px">
+  <font size=+2>
+    <a href="index.html">   
+      <img src="_static/logo.png" height=75 border="0"   alt="uncertainties logo"/>
+    </a>
+  </font>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tech_guide.html" title="Technical Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="user_guide.html" title="User Guide"
+             accesskey="P">previous</a> |</li>
+<li>[<a href="index.html">Uncertainties</a></li>
+<li>[<a href="install.html">Installation and Credits</a></li>
+<li>|<a href="user_guide.html">User Guide</a></li>
+<li>|<a href="#">Uncertainties with Numpy Arrays</a></li>
+<li>|<a href="tech_guide.html">Technical Guide</a>]</li> &nbsp;
+&nbsp;
+&nbsp; &nbsp;
+
+        <li class="nav-item nav-item-this"><a href="">Uncertainties in arrays</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="uncertainties-in-arrays">
+<h1>Uncertainties in arrays<a class="headerlink" href="#uncertainties-in-arrays" title="Link to this heading">¶</a></h1>
+<section id="the-unumpy-package">
+<span id="index-0"></span><h2>The unumpy package<a class="headerlink" href="#the-unumpy-package" title="Link to this heading">¶</a></h2>
+<p>This package contains:</p>
+<p>1. utilities that help with the <strong>creation and manipulation</strong> of
+<a class="reference external" href="http://numpy.scipy.org/">NumPy</a> arrays and matrices of numbers with uncertainties;</p>
+<p>2. <strong>generalizations</strong> of multiple NumPy functions so that they also
+work with arrays that contain numbers with uncertainties.</p>
+<p>While <a class="reference internal" href="user_guide.html#simple-array-use"><span class="std std-ref">basic operations on arrays</span></a> that
+contain numbers with uncertainties can be performed without it, the
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">unumpy</span></code> package is useful for more advanced uses.</p>
+<p>Operations on arrays (including their cosine, etc.)  can thus be
+performed transparently.</p>
+<p>These features can be made available with</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">uncertainties</span> <span class="kn">import</span> <span class="n">unumpy</span>
+</pre></div>
+</div>
+<section id="creation-and-manipulation-of-arrays-and-matrices">
+<h3>Creation and manipulation of arrays and matrices<a class="headerlink" href="#creation-and-manipulation-of-arrays-and-matrices" title="Link to this heading">¶</a></h3>
+<section id="arrays">
+<span id="index-1"></span><h4>Arrays<a class="headerlink" href="#arrays" title="Link to this heading">¶</a></h4>
+<p>Arrays of numbers with uncertainties can be built from values and
+uncertainties:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">unumpy</span><span class="o">.</span><span class="n">uarray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.002</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">arr</span>
+<span class="go">[1.0+/-0.01 2.0+/-0.002]</span>
+</pre></div>
+</div>
+<p>NumPy arrays of numbers with uncertainties can also be built directly
+through NumPy, thanks to NumPy’s support of arrays of arbitrary objects:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ufloat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.002</span><span class="p">)])</span>
+</pre></div>
+</div>
+</section>
+<section id="matrices">
+<span id="index-2"></span><h4>Matrices<a class="headerlink" href="#matrices" title="Link to this heading">¶</a></h4>
+<p>Matrices of numbers with uncertainties are best created in one of
+two ways.  The first way is similar to using <code class="xref py py-func docutils literal notranslate"><span class="pre">uarray()</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mat</span> <span class="o">=</span> <span class="n">unumpy</span><span class="o">.</span><span class="n">umatrix</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.002</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Matrices can also be built by converting arrays of numbers with
+uncertainties into matrices through the <code class="xref py py-class docutils literal notranslate"><span class="pre">unumpy.matrix</span></code> class:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mat</span> <span class="o">=</span> <span class="n">unumpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">unumpy.matrix</span></code> objects behave like <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.matrix</span></code>
+objects of numbers with uncertainties, but with better support for
+some operations (such as matrix inversion).  For instance, regular
+NumPy matrices cannot be inverted, if they contain numbers with
+uncertainties (i.e., <code class="docutils literal notranslate"><span class="pre">numpy.matrix([[ufloat(…),</span> <span class="pre">…]]).I</span></code> does not
+work).  This is why the <code class="xref py py-class docutils literal notranslate"><span class="pre">unumpy.matrix</span></code> class is provided: both
+the inverse and the pseudo-inverse of a matrix can be calculated in
+the usual way: if <code class="xref py py-data docutils literal notranslate"><span class="pre">mat</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">unumpy.matrix</span></code>,</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">mat</span><span class="o">.</span><span class="n">I</span>
+</pre></div>
+</div>
+<p>does calculate the inverse or pseudo-inverse of <code class="xref py py-data docutils literal notranslate"><span class="pre">mat</span></code> with
+uncertainties.</p>
+</section>
+<section id="uncertainties-and-nominal-values">
+<span id="index-3"></span><h4>Uncertainties and nominal values<a class="headerlink" href="#uncertainties-and-nominal-values" title="Link to this heading">¶</a></h4>
+<p>Nominal values and uncertainties in arrays (and matrices) can be
+directly accessed (through functions that work on pure float arrays
+too):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unumpy</span><span class="o">.</span><span class="n">nominal_values</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="go">array([ 1.,  2.])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unumpy</span><span class="o">.</span><span class="n">std_devs</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+<span class="go">matrix([[ 0.1  ,  0.002]])</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="mathematical-functions">
+<span id="index-4"></span><h3>Mathematical functions<a class="headerlink" href="#mathematical-functions" title="Link to this heading">¶</a></h3>
+<p>This module defines uncertainty-aware mathematical functions that
+generalize those from <code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties.umath</span></code> so that they work on
+NumPy arrays of numbers with uncertainties instead of just scalars:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">unumpy</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>  <span class="c1"># Cosine of each array element</span>
+</pre></div>
+</div>
+<p>NumPy’s function names are used, and not those from the <code class="xref py py-mod docutils literal notranslate"><span class="pre">math</span></code>
+module (for instance, <code class="xref py py-func docutils literal notranslate"><span class="pre">unumpy.arccos()</span></code> is defined, like in NumPy,
+and is not named <code class="xref py py-func docutils literal notranslate"><span class="pre">acos()</span></code> like in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">math</span></code> module).</p>
+<p>The definition of the mathematical quantities calculated by these
+functions is available in the documentation for
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties.umath</span></code> (which is accessible through <code class="xref py py-func docutils literal notranslate"><span class="pre">help()</span></code>
+or <code class="docutils literal notranslate"><span class="pre">pydoc</span></code>).</p>
+<section id="nan-testing-and-nan-aware-operations">
+<span id="index-5"></span><h4>NaN testing and NaN-aware operations<a class="headerlink" href="#nan-testing-and-nan-aware-operations" title="Link to this heading">¶</a></h4>
+<p>One particular function pertains to NaN testing: <code class="docutils literal notranslate"><span class="pre">unumpy.isnan()</span></code>. It
+returns true for each NaN <em>nominal value</em> (and false otherwise).</p>
+<p>Since NaN±1 is <em>not</em> (the scalar) NaN, functions like
+<code class="docutils literal notranslate"><span class="pre">numpy.nanmean()</span></code> do not skip such values. This is where
+<code class="docutils literal notranslate"><span class="pre">unumpy.isnan()</span></code> is useful, as it can be used for masking out numbers
+with a NaN nominal value:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nan</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">nan</span><span class="p">,</span> <span class="n">uncertainties</span><span class="o">.</span><span class="n">ufloat</span><span class="p">(</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">uncertainties</span><span class="o">.</span><span class="n">ufloat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nan</span><span class="p">),</span> <span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span>
+<span class="go">array([nan, nan+/-1.0, 1.0+/-nan, 2], dtype=object)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[</span><span class="o">~</span><span class="n">unumpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">arr</span><span class="p">)]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="go">1.5+/-nan</span>
+</pre></div>
+</div>
+<p>or equivalently, by using masked arrays:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">masked_arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">unumpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">masked_arr</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="go">1.5+/-nan</span>
+</pre></div>
+</div>
+<p>In this case the uncertainty is NaN as it should be, because one of
+the numbers does have an undefined uncertainty, which makes the final
+uncertainty undefined (but the average is well defined). In general,
+uncertainties are not NaN and one obtains the mean of the non-NaN
+values.</p>
+</section>
+</section>
+</section>
+<section id="storing-arrays-in-text-format">
+<span id="index-7"></span><span id="index-6"></span><h2>Storing arrays in text format<a class="headerlink" href="#storing-arrays-in-text-format" title="Link to this heading">¶</a></h2>
+<p>Arrays of numbers with uncertainties can be directly <a class="reference internal" href="tech_guide.html#pickling"><span class="std std-ref">pickled</span></a>, saved to file and read from a file. Pickling has the
+advantage of preserving correlations between errors.</p>
+<p>Storing instead arrays in <strong>text format</strong> loses correlations between
+errors but has the advantage of being both computer- and
+human-readable. This can be done through NumPy’s <code class="xref py py-func docutils literal notranslate"><span class="pre">savetxt()</span></code> and
+<code class="xref py py-func docutils literal notranslate"><span class="pre">loadtxt()</span></code>.</p>
+<p>Writing the array to file can be done by asking NumPy to use the
+<em>representation</em> of numbers with uncertainties (instead of the default
+float conversion):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">numpy</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="s1">&#39;arr.txt&#39;</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%r</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This produces a file <cite>arr.txt</cite> that contains a text representation of
+the array:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">1.0</span><span class="o">+/-</span><span class="mf">0.01</span>
+<span class="mf">2.0</span><span class="o">+/-</span><span class="mf">0.002</span>
+</pre></div>
+</div>
+<p>The file can then be read back by instructing NumPy to convert all the
+columns with <a class="reference internal" href="user_guide.html#uncertainties.ufloat_fromstr" title="uncertainties.ufloat_fromstr"><code class="xref py py-func docutils literal notranslate"><span class="pre">uncertainties.ufloat_fromstr()</span></code></a>. The number
+<code class="xref py py-data docutils literal notranslate"><span class="pre">num_cols</span></code> of columns in the input file (1, in our example) must
+be determined in advance, because NumPy requires a converter for each
+column separately. For Python 2:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">converters</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_cols</span><span class="p">),</span> <span class="n">uncertainties</span><span class="o">.</span><span class="n">ufloat_fromstr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For Python 3, since <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.loadtxt()</span></code> passes bytes to converters,
+they must first be converted into a string:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">converters</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span>
+<span class="go">        range(num_cols),</span>
+<span class="go">        lambda col_bytes: uncertainties.ufloat_fromstr(col_bytes.decode(&quot;latin1&quot;)))</span>
+</pre></div>
+</div>
+<p>(Latin 1 appears to in fact be the encoding used in
+<code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.savetxt()</span></code> [as of NumPy 1.12]. This encoding seems
+to be the one hardcoded in <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.compat.asbytes()</span></code>.)</p>
+<p>The array can then be loaded:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">&#39;arr.txt&#39;</span><span class="p">,</span> <span class="n">converters</span><span class="o">=</span><span class="n">converters</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="additional-array-functions-unumpy-ulinalg">
+<span id="index-8"></span><h2>Additional array functions: unumpy.ulinalg<a class="headerlink" href="#additional-array-functions-unumpy-ulinalg" title="Link to this heading">¶</a></h2>
+<p>The <code class="xref py py-mod docutils literal notranslate"><span class="pre">unumpy.ulinalg</span></code> module contains more uncertainty-aware
+functions for arrays that contain numbers with uncertainties.</p>
+<p>It currently offers generalizations of two functions from
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy.linalg</span></code> that work on arrays (or matrices) that contain
+numbers with uncertainties, the <strong>matrix inverse and pseudo-inverse</strong>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unumpy</span><span class="o">.</span><span class="n">ulinalg</span><span class="o">.</span><span class="n">inv</span><span class="p">([[</span><span class="n">ufloat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)]])</span>
+<span class="go">array([[0.5+/-0.025]], dtype=object)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unumpy</span><span class="o">.</span><span class="n">ulinalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+<span class="go">matrix([[0.2+/-0.0012419339757],</span>
+<span class="go">        [0.4+/-0.00161789987329]], dtype=object)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Uncertainties in arrays</a><ul>
+<li><a class="reference internal" href="#the-unumpy-package">The unumpy package</a><ul>
+<li><a class="reference internal" href="#creation-and-manipulation-of-arrays-and-matrices">Creation and manipulation of arrays and matrices</a><ul>
+<li><a class="reference internal" href="#arrays">Arrays</a></li>
+<li><a class="reference internal" href="#matrices">Matrices</a></li>
+<li><a class="reference internal" href="#uncertainties-and-nominal-values">Uncertainties and nominal values</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mathematical-functions">Mathematical functions</a><ul>
+<li><a class="reference internal" href="#nan-testing-and-nan-aware-operations">NaN testing and NaN-aware operations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#storing-arrays-in-text-format">Storing arrays in text format</a></li>
+<li><a class="reference internal" href="#additional-array-functions-unumpy-ulinalg">Additional array functions: unumpy.ulinalg</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="user_guide.html"
+                          title="previous chapter">User Guide</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="tech_guide.html"
+                          title="next chapter">Technical Guide</a></p>
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tech_guide.html" title="Technical Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="user_guide.html" title="User Guide"
+             >previous</a> |</li>
+<li>[<a href="index.html">Uncertainties</a></li>
+<li>[<a href="install.html">Installation and Credits</a></li>
+<li>|<a href="user_guide.html">User Guide</a></li>
+<li>|<a href="#">Uncertainties with Numpy Arrays</a></li>
+<li>|<a href="tech_guide.html">Technical Guide</a>]</li> &nbsp;
+&nbsp;
+&nbsp; &nbsp;
+
+        <li class="nav-item nav-item-this"><a href="">Uncertainties in arrays</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2010–2024, Eric O. LEBIGOT (EOL).
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

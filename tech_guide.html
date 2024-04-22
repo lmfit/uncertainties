@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Technical Guide &#8212; uncertainties Python package 3.1.7 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css?v=d59dc883" />
+    <script src="_static/documentation_options.js?v=169b9561"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Uncertainties in arrays" href="numpy_guide.html" /> 
+  </head><body>
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px  15px">
+  <font size=+2>
+    <a href="index.html">   
+      <img src="_static/logo.png" height=75 border="0"   alt="uncertainties logo"/>
+    </a>
+  </font>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="numpy_guide.html" title="Uncertainties in arrays"
+             accesskey="P">previous</a> |</li>
+<li>[<a href="index.html">Uncertainties</a></li>
+<li>[<a href="install.html">Installation and Credits</a></li>
+<li>|<a href="user_guide.html">User Guide</a></li>
+<li>|<a href="numpy_guide.html">Uncertainties with Numpy Arrays</a></li>
+<li>|<a href="#">Technical Guide</a>]</li> &nbsp;
+&nbsp;
+&nbsp; &nbsp;
+
+        <li class="nav-item nav-item-this"><a href="">Technical Guide</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="technical-guide">
+<span id="index-0"></span><h1>Technical Guide<a class="headerlink" href="#technical-guide" title="Link to this heading">¶</a></h1>
+<section id="testing-whether-an-object-is-a-number-with-uncertainty">
+<h2>Testing whether an object is a number with uncertainty<a class="headerlink" href="#testing-whether-an-object-is-a-number-with-uncertainty" title="Link to this heading">¶</a></h2>
+<p>The recommended way of testing whether <code class="xref py py-data docutils literal notranslate"><span class="pre">value</span></code> carries an
+uncertainty handled by this module is by checking whether
+<code class="xref py py-data docutils literal notranslate"><span class="pre">value</span></code> is an instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">UFloat</span></code>, through
+<code class="docutils literal notranslate"><span class="pre">isinstance(value,</span> <span class="pre">uncertainties.UFloat)</span></code>.</p>
+</section>
+<section id="pickling">
+<span id="index-3"></span><span id="index-2"></span><span id="index-1"></span><span id="id1"></span><h2>Pickling<a class="headerlink" href="#pickling" title="Link to this heading">¶</a></h2>
+<p>The quantities with uncertainties created by the <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a>
+package can be <a class="reference external" href="http://docs.python.org/library/pickle.html">pickled</a>
+(they can be stored in a file, for instance).</p>
+<p>If multiple variables are pickled together (including when pickling
+<a class="reference internal" href="numpy_guide.html"><span class="doc">NumPy arrays</span></a>), their correlations are preserved:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>  <span class="c1"># Pickling to a string</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>  <span class="c1"># Unpickling into new variables</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">x2</span>
+<span class="go">0.0+/-0</span>
+</pre></div>
+</div>
+<p>The final result is exactly zero because the unpickled variables <code class="xref py py-data docutils literal notranslate"><span class="pre">x2</span></code>
+and <code class="xref py py-data docutils literal notranslate"><span class="pre">y2</span></code> are completely correlated.</p>
+<p>However, <strong>unpickling necessarily creates new variables that bear no
+relationship with the original variables</strong> (in fact, the pickled
+representation can be stored in a file and read from another program
+after the program that did the pickling is finished: the unpickled
+variables cannot be correlated to variables that can disappear).  Thus</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">-</span> <span class="n">x2</span>
+<span class="go">0.0+/-0.14142135623730953</span>
+</pre></div>
+</div>
+<p>which shows that the original variable <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> and the new variable <code class="xref py py-data docutils literal notranslate"><span class="pre">x2</span></code>
+are completely uncorrelated.</p>
+</section>
+<section id="comparison-operators">
+<span id="index-4"></span><span id="id2"></span><h2>Comparison operators<a class="headerlink" href="#comparison-operators" title="Link to this heading">¶</a></h2>
+<p>Comparison operations (&gt;, ==, etc.) on numbers with uncertainties have
+a <strong>pragmatic semantics</strong>, in this package: numbers with uncertainties
+can be used wherever Python numbers are used, most of the time with a
+result identical to the one that would be obtained with their nominal
+value only.  This allows code that runs with pure numbers to also work
+with numbers with uncertainties.</p>
+<p id="index-5">The <strong>boolean value</strong> (<code class="docutils literal notranslate"><span class="pre">bool(x)</span></code>, <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">x</span> <span class="pre">…</span></code>) of a number with
+uncertainty <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> is defined as the result of <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">!=</span> <span class="pre">0</span></code>, as usual.</p>
+<p>However, since the objects defined in this module represent
+probability distributions and not pure numbers, comparison operators
+are interpreted in a specific way.</p>
+<p>The result of a comparison operation is defined so as to be
+essentially consistent with the requirement that uncertainties be
+small: the <strong>value of a comparison operation</strong> is True only if the
+operation yields True for all <em>infinitesimal</em> variations of its random
+variables around their nominal values, <em>except</em>, possibly, for an
+<em>infinitely small number</em> of cases.</p>
+<p>Example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">3.14</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">==</span> <span class="n">x</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>because a sample from the probability distribution of <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> is always
+equal to itself.  However:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">3.14</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>since <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">y</span></code> are independent random variables that
+<em>almost</em> always give a different value (put differently,
+<code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code>-<code class="xref py py-data docutils literal notranslate"><span class="pre">y</span></code> is not equal to 0, as it can take many different
+values). Note that this is different
+from the result of <code class="docutils literal notranslate"><span class="pre">z</span> <span class="pre">=</span> <span class="pre">3.14;</span> <span class="pre">t</span> <span class="pre">=</span> <span class="pre">3.14;</span> <span class="pre">print</span> <span class="pre">z</span> <span class="pre">==</span> <span class="pre">t</span></code>, because
+<code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">y</span></code> are <em>random variables</em>, not pure numbers.</p>
+<p>Similarly,</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">3.14</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">3.00</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>because <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> is supposed to have a probability distribution largely
+contained in the 3.14±~0.01 interval, while <code class="xref py py-data docutils literal notranslate"><span class="pre">y</span></code> is supposed to be
+well in the 3.00±~0.01 one: random samples of <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">y</span></code> will
+most of the time be such that the sample from <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> is larger than the
+sample from <code class="xref py py-data docutils literal notranslate"><span class="pre">y</span></code>.  Therefore, it is natural to consider that for all
+practical purposes, <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">&gt;</span> <span class="pre">y</span></code>.</p>
+<p>Since comparison operations are subject to the same constraints as
+other operations, as required by the <a class="reference internal" href="#linear-method"><span class="std std-ref">linear approximation</span></a> method, their result should be essentially <em>constant</em>
+over the regions of highest probability of their variables (this is
+the equivalent of the linearity of a real function, for boolean
+values).  Thus, it is not meaningful to compare the following two
+independent variables, whose probability distributions overlap:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">3.0001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In fact the function (x, y) → (x &gt; y) is not even continuous over the
+region where x and y are concentrated, which violates the assumption
+of approximate linearity made in this package on operations involving
+numbers with uncertainties.  Comparing such numbers therefore returns
+a boolean result whose meaning is undefined.</p>
+<p>However, values with largely overlapping probability distributions can
+sometimes be compared unambiguously:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
+<span class="go">3.0+/-1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="mf">0.0002</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span>
+<span class="go">3.0002+/-1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">x</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>In fact, correlations guarantee that <code class="xref py py-data docutils literal notranslate"><span class="pre">y</span></code> is always larger than
+<code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code>: <code class="docutils literal notranslate"><span class="pre">y-x</span></code> correctly satisfies the assumption of linearity,
+since it is a constant “random” function (with value 0.0002, even
+though <code class="xref py py-data docutils literal notranslate"><span class="pre">y</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> are random). Thus, it is indeed true
+that <code class="xref py py-data docutils literal notranslate"><span class="pre">y</span></code> &gt; <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code>.</p>
+</section>
+<section id="linear-propagation-of-uncertainties">
+<span id="linear-method"></span><span id="index-6"></span><h2>Linear propagation of uncertainties<a class="headerlink" href="#linear-propagation-of-uncertainties" title="Link to this heading">¶</a></h2>
+<section id="constraints-on-the-uncertainties">
+<h3>Constraints on the uncertainties<a class="headerlink" href="#constraints-on-the-uncertainties" title="Link to this heading">¶</a></h3>
+<p>This package calculates the standard deviation of mathematical
+expressions through the linear approximation of <a class="reference external" href="http://en.wikipedia.org/wiki/Error_propagation">error propagation
+theory</a>.</p>
+<p>The standard deviations and nominal values calculated by this package
+are thus meaningful approximations as long as <strong>uncertainties are
+“small”</strong>. A more precise version of this constraint is that the final
+calculated functions must have <strong>precise linear expansions in the region
+where the probability distribution of their variables is the largest</strong>.
+Mathematically, this means that the linear terms of the final calculated
+functions around the nominal values of their variables should be much
+larger than the remaining higher-order terms over the region of
+significant probability (because such higher-order contributions are
+neglected).</p>
+<p>For example, calculating <code class="docutils literal notranslate"><span class="pre">x*10</span></code> with <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> = 5±3 gives a
+<em>perfect result</em> since the calculated function is linear. So does
+<code class="docutils literal notranslate"><span class="pre">umath.atan(umath.tan(x))</span></code> for <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> = 0±1, since only the
+<em>final</em> function counts (not an intermediate function like
+<code class="xref py py-func docutils literal notranslate"><span class="pre">tan()</span></code>).</p>
+<p>Another example is <code class="docutils literal notranslate"><span class="pre">sin(0+/-0.01)</span></code>, for which <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a>
+yields a meaningful standard deviation since the sine is quite linear
+over 0±0.01.  However, <code class="docutils literal notranslate"><span class="pre">cos(0+/-0.01)</span></code>, yields an approximate
+standard deviation of 0 because it is parabolic around 0 instead of
+linear; this might not be precise enough for all applications.</p>
+<p><strong>More precise uncertainty estimates</strong> can be obtained, if necessary,
+with the <a class="reference external" href="https://pypi.python.org/pypi/soerp">soerp</a> and <a class="reference external" href="https://pypi.python.org/pypi/mcerp">mcerp</a> packages. The <a class="reference external" href="https://pypi.python.org/pypi/soerp">soerp</a> package performs
+<em>second-order</em> error propagation: this is still quite fast, but the
+standard deviation of higher-order functions like f(x) = x<sup>3</sup>
+for x = 0±0.1 is calculated as being exactly zero (as with
+<a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a>). The <a class="reference external" href="https://pypi.python.org/pypi/mcerp">mcerp</a> package performs Monte-Carlo
+calculations, and can in principle yield very precise results, but
+calculations are much slower than with approximation schemes.</p>
+</section>
+<section id="nan-uncertainty">
+<span id="index-7"></span><h3>NaN uncertainty<a class="headerlink" href="#nan-uncertainty" title="Link to this heading">¶</a></h3>
+<p>If linear <a class="reference external" href="http://en.wikipedia.org/wiki/Error_propagation">error propagation theory</a> cannot be applied, the functions
+defined by <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> internally use a <a class="reference external" href="http://en.wikipedia.org/wiki/Not_a_number">not-a-number value</a> (<code class="docutils literal notranslate"><span class="pre">nan</span></code>) for the
+derivative.</p>
+<p>As a consequence, it is possible for uncertainties to be <code class="docutils literal notranslate"><span class="pre">nan</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">umath</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ufloat</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="go">0.0+/-nan</span>
+</pre></div>
+</div>
+<p>This indicates that <strong>the derivative required by linear error
+propagation theory is not defined</strong> (a Monte-Carlo calculation of the
+resulting random variable is more adapted to this specific case).</p>
+<p>However, even in this case where the derivative at the nominal value
+is infinite, the <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> package <strong>correctly handles
+perfectly precise numbers</strong>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">umath</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ufloat</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="go">0.0+/-0</span>
+</pre></div>
+</div>
+<p>is thus the correct result, despite the fact that the derivative of
+the square root is not defined in zero.</p>
+</section>
+</section>
+<section id="mathematical-definition-of-numbers-with-uncertainties">
+<span id="math-def-num-uncert"></span><h2>Mathematical definition of numbers with uncertainties<a class="headerlink" href="#mathematical-definition-of-numbers-with-uncertainties" title="Link to this heading">¶</a></h2>
+<p id="index-9"><span id="index-8"></span>Mathematically, <strong>numbers with uncertainties</strong> are, in this package,
+<strong>probability distributions</strong>.  They are <em>not restricted</em> to normal
+(Gaussian) distributions and can be <strong>any distribution</strong>.  These
+probability distributions are reduced to two numbers: a nominal value
+and an uncertainty.</p>
+<p>Thus, both independent variables (<code class="xref py py-class docutils literal notranslate"><span class="pre">Variable</span></code> objects) and the
+result of mathematical operations (<code class="xref py py-class docutils literal notranslate"><span class="pre">AffineScalarFunc</span></code> objects)
+contain these two values (respectively in their <code class="xref py py-attr docutils literal notranslate"><span class="pre">nominal_value</span></code>
+and <code class="xref py py-attr docutils literal notranslate"><span class="pre">std_dev</span></code> attributes).</p>
+<p id="index-10">The <strong>uncertainty</strong> of a number with uncertainty is simply defined in
+this package as the <strong>standard deviation</strong> of the underlying probability
+distribution.</p>
+<p>The numbers with uncertainties manipulated by this package are assumed
+to have a probability distribution mostly contained around their
+nominal value, in an interval of about the size of their standard
+deviation.  This should cover most practical cases.</p>
+<p id="index-11">A good choice of <strong>nominal value</strong> for a number with uncertainty is thus
+the median of its probability distribution, the location of highest
+probability, or the average value.</p>
+<p>Probability distributions (random variables and calculation results)
+are printed as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nominal</span> <span class="n">value</span> <span class="o">+/-</span> <span class="n">standard</span> <span class="n">deviation</span>
+</pre></div>
+</div>
+<p>but this does not imply any property on the nominal value (beyond the
+fact that the nominal value is normally inside the region of high
+probability density), or that the probability distribution of the
+result is symmetrical (this is rarely strictly the case).</p>
+</section>
+<section id="differentiation-method">
+<span id="id3"></span><h2>Differentiation method<a class="headerlink" href="#differentiation-method" title="Link to this heading">¶</a></h2>
+<p>The <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> package automatically calculates the
+derivatives required by linear error propagation theory.</p>
+<p>Almost all the derivatives of the fundamental functions provided by
+<a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> are obtained through analytical formulas (the
+few mathematical functions that are instead differentiated through
+numerical approximation are listed in <code class="docutils literal notranslate"><span class="pre">umath_core.num_deriv_funcs</span></code>).</p>
+<p>The derivatives of mathematical <em>expressions</em> are evaluated through a
+fast and precise method: <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> transparently implements
+<a class="reference external" href="http://en.wikipedia.org/wiki/Automatic_differentiation">automatic differentiation</a> with reverse accumulation. This method
+essentially consists in keeping track of the value of derivatives, and
+in automatically applying the <a class="reference external" href="http://en.wikipedia.org/wiki/Chain_rule">chain rule</a>. Automatic differentiation
+is faster than symbolic differentiation and more precise than
+numerical differentiation.</p>
+<p>The derivatives of any expression can be obtained with
+<a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> in a simple way, as demonstrated in the <a class="reference internal" href="user_guide.html#derivatives"><span class="std std-ref">User
+Guide</span></a>.</p>
+</section>
+<section id="tracking-of-random-variables">
+<span id="variable-tracking"></span><h2>Tracking of random variables<a class="headerlink" href="#tracking-of-random-variables" title="Link to this heading">¶</a></h2>
+<p>This package keeps track of all the random variables a quantity
+depends on, which allows one to perform transparent calculations that
+yield correct uncertainties.  For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">poly</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">a</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">poly</span>
+<span class="go">46.0+/-0.4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">poly</span> <span class="o">-</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
+<span class="go">42+/-0</span>
+</pre></div>
+</div>
+<p>Even though <code class="docutils literal notranslate"><span class="pre">x*x</span></code> has a non-zero uncertainty, the result has a zero
+uncertainty, because it is equal to <code class="xref py py-data docutils literal notranslate"><span class="pre">a</span></code>.</p>
+<p>If the variable <code class="xref py py-data docutils literal notranslate"><span class="pre">a</span></code> above is modified, the value of <code class="xref py py-data docutils literal notranslate"><span class="pre">poly</span></code>
+is not modified, as is usual in Python:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">123</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">poly</span>
+<span class="go">46.0+/-0.4  # Still equal to x**2 + 42, not x**2 + 123</span>
+</pre></div>
+</div>
+<p>Random variables can, on the other hand, have their uncertainty
+updated on the fly, because quantities with uncertainties (like
+<code class="xref py py-data docutils literal notranslate"><span class="pre">poly</span></code>) keep track of them:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">std_dev</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">poly</span>
+<span class="go">46+/-0  # Zero uncertainty, now</span>
+</pre></div>
+</div>
+<p>As usual, Python keeps track of objects as long as they are used.
+Thus, redefining the value of <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> does not change the fact that
+<code class="xref py py-data docutils literal notranslate"><span class="pre">poly</span></code> depends on the quantity with uncertainty previously stored
+in <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">poly</span>
+<span class="go">46+/-0  # Unchanged</span>
+</pre></div>
+</div>
+<p>These mechanisms make quantities with uncertainties behave mostly like
+regular numbers, while providing a fully transparent way of handling
+correlations between quantities.</p>
+</section>
+<section id="python-classes-for-variables-and-functions-with-uncertainty">
+<span id="classes"></span><span id="index-13"></span><span id="index-12"></span><h2>Python classes for variables and functions with uncertainty<a class="headerlink" href="#python-classes-for-variables-and-functions-with-uncertainty" title="Link to this heading">¶</a></h2>
+<p>Numbers with uncertainties are represented through two different
+classes:</p>
+<ol class="arabic simple">
+<li><p>a class for independent random variables (<code class="xref py py-class docutils literal notranslate"><span class="pre">Variable</span></code>, which
+inherits from <code class="xref py py-class docutils literal notranslate"><span class="pre">UFloat</span></code>),</p></li>
+<li><p>a class for functions that depend on independent variables
+(<code class="xref py py-class docutils literal notranslate"><span class="pre">AffineScalarFunc</span></code>, aliased as <code class="xref py py-class docutils literal notranslate"><span class="pre">UFloat</span></code>).</p></li>
+</ol>
+<p>Documentation for these classes is available in their Python
+docstring, which can for instance displayed through <a class="reference external" href="http://docs.python.org/library/pydoc.html">pydoc</a>.</p>
+<p>The factory function <code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat()</span></code> creates variables and thus returns
+a <code class="xref py py-class docutils literal notranslate"><span class="pre">Variable</span></code> object:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">&lt;class &#39;uncertainties.Variable&#39;&gt;</span>
+</pre></div>
+</div>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">Variable</span></code> objects can be used as if they were regular Python
+numbers (the summation, etc. of these objects is defined).</p>
+<p>Mathematical expressions involving numbers with uncertainties
+generally return <code class="xref py py-class docutils literal notranslate"><span class="pre">AffineScalarFunc</span></code> objects, because they
+represent mathematical functions and not simple variables; these
+objects store all the variables they depend on:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">umath</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="go">&lt;class &#39;uncertainties.AffineScalarFunc&#39;&gt;</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Technical Guide</a><ul>
+<li><a class="reference internal" href="#testing-whether-an-object-is-a-number-with-uncertainty">Testing whether an object is a number with uncertainty</a></li>
+<li><a class="reference internal" href="#pickling">Pickling</a></li>
+<li><a class="reference internal" href="#comparison-operators">Comparison operators</a></li>
+<li><a class="reference internal" href="#linear-propagation-of-uncertainties">Linear propagation of uncertainties</a><ul>
+<li><a class="reference internal" href="#constraints-on-the-uncertainties">Constraints on the uncertainties</a></li>
+<li><a class="reference internal" href="#nan-uncertainty">NaN uncertainty</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mathematical-definition-of-numbers-with-uncertainties">Mathematical definition of numbers with uncertainties</a></li>
+<li><a class="reference internal" href="#differentiation-method">Differentiation method</a></li>
+<li><a class="reference internal" href="#tracking-of-random-variables">Tracking of random variables</a></li>
+<li><a class="reference internal" href="#python-classes-for-variables-and-functions-with-uncertainty">Python classes for variables and functions with uncertainty</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="numpy_guide.html"
+                          title="previous chapter">Uncertainties in arrays</a></p>
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="numpy_guide.html" title="Uncertainties in arrays"
+             >previous</a> |</li>
+<li>[<a href="index.html">Uncertainties</a></li>
+<li>[<a href="install.html">Installation and Credits</a></li>
+<li>|<a href="user_guide.html">User Guide</a></li>
+<li>|<a href="numpy_guide.html">Uncertainties with Numpy Arrays</a></li>
+<li>|<a href="#">Technical Guide</a>]</li> &nbsp;
+&nbsp;
+&nbsp; &nbsp;
+
+        <li class="nav-item nav-item-this"><a href="">Technical Guide</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2010–2024, Eric O. LEBIGOT (EOL).
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

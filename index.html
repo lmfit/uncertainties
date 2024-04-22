@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="The uncertainties Python package" name="description" />
+<meta content="error propagation, uncertainties, error calculations, Python, calculator, library, package" name="keywords" />
+
+    <title>Table of Contents &#8212; uncertainties Python package 3.1.7 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css?v=d59dc883" />
+    <script src="_static/documentation_options.js?v=169b9561"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation and Credits" href="install.html" /> 
+  </head><body>
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px  15px">
+  <font size=+2>
+    <a href="#">   
+      <img src="_static/logo.png" height=75 border="0"   alt="uncertainties logo"/>
+    </a>
+  </font>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation and Credits"
+             accesskey="N">next</a> |</li>
+<li>[<a href="#">Uncertainties</a></li>
+<li>[<a href="install.html">Installation and Credits</a></li>
+<li>|<a href="user_guide.html">User Guide</a></li>
+<li>|<a href="numpy_guide.html">Uncertainties with Numpy Arrays</a></li>
+<li>|<a href="tech_guide.html">Technical Guide</a>]</li> &nbsp;
+&nbsp;
+&nbsp; &nbsp;
+
+        <li class="nav-item nav-item-this"><a href="">Table of Contents</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>The <a class="reference external" href="http://pypi.python.org/pypi/uncertainties/">uncertainties package</a> is an open source Python library for doing
+calculations on numbers that have uncertainties (like 3.14±0.01) that are
+common in many scientific fields.  The calcualtions done with this package will
+propagate the uncertainties to the result.
+The <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> package takes the pain and
+complexity out of uncertainty calculations and error propagation.  Here is a
+quick taste of how to use <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">uncertainties</span> <span class="kn">import</span> <span class="n">ufloat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>   <span class="c1"># x = 2+/-0.1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span>   <span class="c1"># y = 3+/-0.2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="go">4.00+/-0.20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">)</span>
+<span class="go">5.00+/-0.22</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">)</span>
+<span class="go">6.0+/-0.5</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> library calculates uncertainties using linear <a class="reference external" href="http://en.wikipedia.org/wiki/Propagation_of_uncertainty">error
+propagation theory</a> by automatically <a class="reference internal" href="user_guide.html#derivatives"><span class="std std-ref">calculating derivatives</span></a> and analytically propagating these.  Correlations between
+variables are automatically handled.  This library can also yield the
+derivatives of any expression with respect to the variables that have uncertain
+values.  For other approaches, see <a class="reference external" href="https://pypi.python.org/pypi/soerp">soerp</a> (using higher-order terms) and <a class="reference external" href="https://pypi.python.org/pypi/mcer">mcerp</a>
+(using a Monte-Carlo approach).</p>
+<p>The <a class="reference external" href="https://github.com/lmfit/uncertainties/">source code</a> for the uncertainties package is licensed under the <a class="reference external" href="http://opensource.org/licenses/BSD-3-Clause">Revised
+BSD License</a>.  This dcoumentation is licensed under the <a class="reference external" href="https://creativecommons.org/licenses/by-sa/3.0">CC-SA-3 License</a>.</p>
+<section id="table-of-contents">
+<h1>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation and Credits</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#download-and-installation">Download and Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#souce-code-and-development-version">Souce code and Development Version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#getting-help">Getting Help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#credits">Credits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#how-to-cite-this-package">How to cite this package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#acknowledgments">Acknowledgments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#license">License</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#basic-usage">Basic usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#module-uncertainties">Creating Variables: numbers with uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#basic-math">Basic math</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#mathematical-operations">Mathematical operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#arrays-of-numbers-with-uncertainties">Arrays of numbers with uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#automatic-correlations">Automatic correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#access-to-the-uncertainty-and-to-the-nominal-value">Access to the uncertainty and to the nominal value</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#access-to-the-individual-sources-of-uncertainty">Access to the individual sources of uncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#comparison-operators">Comparison operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#covariance-and-correlation-matrices">Covariance and correlation matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#correlated-variables">Correlated variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#printing">Printing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#making-custom-functions-accept-numbers-with-uncertainties">Making custom functions accept numbers with uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#miscellaneous-utilities">Miscellaneous utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#derivatives">Derivatives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#additional-information">Additional information</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="numpy_guide.html">Uncertainties in arrays</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="numpy_guide.html#the-unumpy-package">The unumpy package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numpy_guide.html#storing-arrays-in-text-format">Storing arrays in text format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numpy_guide.html#additional-array-functions-unumpy-ulinalg">Additional array functions: unumpy.ulinalg</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tech_guide.html">Technical Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#testing-whether-an-object-is-a-number-with-uncertainty">Testing whether an object is a number with uncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#pickling">Pickling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#comparison-operators">Comparison operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#linear-propagation-of-uncertainties">Linear propagation of uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#mathematical-definition-of-numbers-with-uncertainties">Mathematical definition of numbers with uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#differentiation-method">Differentiation method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#tracking-of-random-variables">Tracking of random variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#python-classes-for-variables-and-functions-with-uncertainty">Python classes for variables and functions with uncertainty</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3> Get <tt>uncertainties</tt></h3>
+<p>Current version: <b>3.1.7</b></p>
+
+<p>
+  Installation: <br>
+<tt> pip install uncertainties</tt>
+
+<p>
+  Development Version:</br>
+  <a  href="https://github.com/lmfit/uncertainties/">Github</a>
+</p>
+
+
+ <h3>Offline Documentation</h3>
+
+<p>
+  <a href="uncertainties.pdf">uncertainties.pdf</a>
+  <br>
+  <a href="uncertainties_doc.zip">Zipped HTML and PDF</a>
+</p>
+  
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation and Credits"
+             >next</a> |</li>
+<li>[<a href="#">Uncertainties</a></li>
+<li>[<a href="install.html">Installation and Credits</a></li>
+<li>|<a href="user_guide.html">User Guide</a></li>
+<li>|<a href="numpy_guide.html">Uncertainties with Numpy Arrays</a></li>
+<li>|<a href="tech_guide.html">Technical Guide</a>]</li> &nbsp;
+&nbsp;
+&nbsp; &nbsp;
+
+        <li class="nav-item nav-item-this"><a href="">Table of Contents</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2010–2024, Eric O. LEBIGOT (EOL).
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>
