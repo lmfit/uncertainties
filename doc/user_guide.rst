@@ -28,28 +28,37 @@ Creating Variables: numbers with uncertainties
 
 .. module:: uncertainties
 
-To create a Variable - a number with uncertainties - use the :func:`ufloat`
-function, which takes a nominal value (which can be interpreted as the most
+To create a number with uncertainties or *Variable*, use the :func:`ufloat`
+function, which takes a *nominal value* ( (which can be interpreted as the most
 likely value, or the mean or central value of the distribution of values), a
-standard error (the standard deviation or :math:`1-\sigma` uncertainty), and an
-optional tag:
+*standard error* ( (the standard deviation or :math:`1-\sigma` uncertainty), and
+an optional *tag*:
 
->>> x = ufloat(2.7, 0.01)  # x = 2.7+/-0.01
->>> y = ufloat(4.5,  1.2, tag='y_variable')  # x = 4..5+/-1.2
+   >>> x = ufloat(2.7, 0.01)  # x = 2.7+/-0.01
+   >>> y = ufloat(4.5,  1.2, tag='y_variable')  # x = 4..5+/-1.2
+
+.. index::
+   pair: nominal value; scalar
+   pair: uncertainty; scalar
+
+You can access the nominal value and standard deviation for any Variable with
+the `nominal_value` and `std_dev` attributes:
+
+   >>> print(x.nominal_value,  x.std_dev)
+   2.7 0.01
 
 uncertainties Variables can also be created from one of many
 string representations.  The following forms will all create Variables with the
 same value:
 
->>> from uncertainties import ufloat_fromstr
->>> x = ufloat(0.2, 0.01)
->>> x = ufloat_fromstr("0.20+/-0.01")
->>> x = ufloat_fromstr("(2+/-0.1)e-01")  # Factored exponent
->>> x = ufloat_fromstr("0.20(1)")  # Short-hand notation
->>> x = ufloat_fromstr("20(1)e-2")  # Exponent notation
->>> x = ufloat_fromstr(u"0.20±0.01")  # Pretty-print form
->>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
-
+   >>> from uncertainties import ufloat_fromstr
+   >>> x = ufloat(0.2, 0.01)
+   >>> x = ufloat_fromstr("0.20+/-0.01")
+   >>> x = ufloat_fromstr("(2+/-0.1)e-01")  # Factored exponent
+   >>> x = ufloat_fromstr("0.20(1)")  # Short-hand notation
+   >>> x = ufloat_fromstr("20(1)e-2")  # Exponent notation
+   >>> x = ufloat_fromstr(u"0.20±0.01")  # Pretty-print form
+   >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
 
 .. autofunction:: ufloat
 
@@ -61,12 +70,43 @@ Basic math
 
 Calculations can be performed directly, as with regular real numbers:
 
->>> x = ufloat(0.2, 0.01)
->>> square = x**2
->>> print(square)
-0.040+/-0.004
+   >>> t = ufloat(0.2, 0.01)
+   >>> square = t**2
+   >>> print(square)
+   0.040+/-0.004
 
 
+When adding two Variables, the uncertainty in the result is the quadrature sum
+(square-root of the sum of squares) of the uncertaities of the two Variables:
+
+   >>> x = ufloat(20, 4)
+   >>> y = ufloat(12, 3)
+   >>> print(x+y)
+   32.0+/-5.0
+
+We can check that error propagation when adding two independent variables:
+
+  >>> from math import sqrt
+  >>> (x+y).std_dev == sqrt(x.std_dev**2 + y.std_dev**2)
+  True
+
+But note that adding a Variable to itself does not add its uncertaintes in
+quadrature, but ae simply scaled:
+
+   >>> print(x+x)
+   40.0+/-8.0
+   >>> print(3*x)
+   60.0+/-12.0
+
+Multiplying two independent Variables will properly propagate those
+uncertainties too:
+
+  >>> print(x*y)
+  240.0+/-76.83749084919418
+  >>> (x*y).std_dev == (x*y).nominal_value *  sqrt((x.std_dev/x.nominal_value)**2 + (y.std_dev/y.nominal_value)**2 ) 
+  True
+
+  
 .. index:: mathematical operation; on a scalar, umath
 
 .. _advanced math operations:
@@ -75,19 +115,25 @@ Mathematical operations
 =======================
 
 Besides being able to apply basic mathematical operations to numbers
-with uncertainty, this package provides generalizations of **most of
-the functions from the standard** :mod:`math` **module**.  These
+with uncertainty, this package provides generalized versions of 40 of the
+the functions from the standard :mod:`math` *module*.  These
 mathematical functions are found in the :mod:`uncertainties.umath`
 module:
 
->>> from uncertainties.umath import *  # Imports sin(), etc.
->>> sin(x**2)
-0.03998933418663417+/-0.003996800426643912
+   >>> from uncertainties.umath import sin, cos, pow
+   >>> sin(x**2)
+   0.03998933418663417+/-0.003996800426643912
 
-The list of available mathematical functions can be obtained with the
-``pydoc uncertainties.umath`` command.
+The functions in the :mod:`uncertainties.umath` module include:
 
-.. index::
+    'acos', 'acosh', 'asin', 'asinh', 'atan', 'atan2', 'atanh',
+    'ceil', 'copysign', 'cos', 'cosh', 'degrees', 'erf', 'erfc',
+    'exp', 'expm1', 'fabs', 'factorial', 'floor', 'fmod',
+    'frexp', 'fsum', 'gamma', 'hypot', 'isinf', 'isnan',
+    'ldexp', 'lgamma', 'log', 'log10', 'log1p', 'modf',
+    'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'trunc'
+
+ .. index::
    pair: testing (scalar); NaN
 
 NaN testing
@@ -161,23 +207,6 @@ operations, the result is calculated by taking into account all the
 correlations between the quantities involved.  All of this is done
 completely **transparently**.
 
-
-Access to the uncertainty and to the nominal value
-==================================================
-
-.. index::
-   pair: nominal value; scalar
-   pair: uncertainty; scalar
-
-The nominal value and the uncertainty (standard deviation) can also be
-accessed independently:
-
->>> print(square)
-0.040+/-0.004
->>> print(square.nominal_value)
-0.04
->>> print(square.std_dev)
-0.004
 
 
 Access to the individual sources of uncertainty

@@ -3,6 +3,9 @@
    :keywords: error propagation, uncertainties, error calculations, Python,
               calculator, library, package
 
+Uncertainties
+=================
+
 The `uncertainties package`_ is an open source Python library for doing
 calculations on numbers that have uncertainties (like 3.14±0.01) that are
 common in many scientific fields.  The calcualtions done with this package will
@@ -32,11 +35,11 @@ values.  For other approaches, see soerp_ (using higher-order terms) and mcerp_
 The `source code`_ for the uncertainties package is licensed under the `Revised
 BSD License`_.  This dcoumentation is licensed under the `CC-SA-3 License`_.
 
-.. _uncertainties package: http://pypi.python.org/pypi/uncertainties/
-.. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
+.. _uncertainties package: https://pypi.python.org/pypi/uncertainties/
+.. _error propagation theory: https://en.wikipedia.org/wiki/Propagation_of_uncertainty
 .. _soerp: https://pypi.python.org/pypi/soerp
 .. _mcerp: https://pypi.python.org/pypi/mcer
-.. _Revised BSD License: http://opensource.org/licenses/BSD-3-Clause
+.. _Revised BSD License: https://opensource.org/licenses/BSD-3-Clause
 .. _CC-SA-3 License: https://creativecommons.org/licenses/by-sa/3.0
 .. _source code:   https://github.com/lmfit/uncertainties/
 .. _version history: https://pypi.python.org/pypi/uncertainties#version-history
