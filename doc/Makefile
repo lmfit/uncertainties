@@ -14,16 +14,16 @@ PDFFILE = uncertainties.pdf
 
 .PHONY:  all html help clean latex pdf
 
+html:
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
+	@echo
+	@echo "Build finished. The HTML pages are in _build/html."
+
 all: html pdf
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
 	-cp _build/latex/$(PDFFILE) _build/html/.
 	@echo
 	-cd _build && ln -s html uncertainties_doc && zip -pur uncertainties_doc.zip uncertainties_doc/* && mv uncertainties_doc.zip html
-	@echo "Build finished. The HTML pages are in _build/html."
-
-html:
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
-	@echo
 	@echo "Build finished. The HTML pages are in _build/html."
 
 help:
