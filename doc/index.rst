@@ -9,7 +9,7 @@ Uncertainties
 The `uncertainties package`_ is an open source Python library for doing
 calculations on numbers that have uncertainties (like 3.14±0.01) that are
 common in many scientific fields.  The calcualtions done with this package will
-propagate the uncertainties to the result.
+propagate the uncertainties to the result of mathematical calculations.
 The :mod:`uncertainties` package takes the pain and
 complexity out of uncertainty calculations and error propagation.  Here is a
 quick taste of how to use :mod:`uncertainties`:
@@ -26,8 +26,8 @@ quick taste of how to use :mod:`uncertainties`:
 
 The :mod:`uncertainties` library calculates uncertainties using linear `error
 propagation theory`_ by automatically :ref:`calculating derivatives
-<derivatives>` and analytically propagating these.  Correlations between
-variables are automatically handled.  This library can also yield the
+<derivatives>` and analytically propagating these to the results.  Correlations
+between variables are automatically handled.  This library can also yield the
 derivatives of any expression with respect to the variables that have uncertain
 values.  For other approaches, see soerp_ (using higher-order terms) and mcerp_
 (using a Monte-Carlo approach).
@@ -57,5 +57,5 @@ Table of Contents
    install
    user_guide
    numpy_guide
+   formatting
    tech_guide
-
