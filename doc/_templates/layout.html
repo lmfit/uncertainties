@@ -2,9 +2,10 @@
 
 {% block rootrellink %}
 <li>[<a href="{{ pathto('index') }}">Uncertainties</a></li>
-<li>[<a href="{{ pathto('install') }}">Installation and Credits</a></li>
+<li>[<a href="{{ pathto('install') }}">Installation & Credits</a></li>
 <li>|<a href="{{ pathto('user_guide') }}">User Guide</a></li>
-<li>|<a href="{{ pathto('numpy_guide') }}">Uncertainties with Numpy Arrays</a></li>
+<li>|<a href="{{ pathto('Formatting') }}">Formatting Values</a></li>
+<li>|<a href="{{ pathto('numpy_guide') }}"> Numpy Arrays</a></li>
 <li>|<a href="{{ pathto('tech_guide') }}">Technical Guide</a>]</li> &nbsp;
 &nbsp;
 &nbsp; &nbsp;
@@ -13,12 +14,10 @@
 {% block relbar1 %}
 <div style="background-color: white; text-align: left; padding: 10px 10px 15px  15px">
   <font size=+2>
-    <a href="{{ pathto('index') }}">   
+    <a href="{{ pathto('index') }}">
       <img src="{{pathto("_static/logo.png", 1) }}" height=75 border="0"   alt="uncertainties logo"/>
     </a>
   </font>
 </div>
 {{ super() }}
 {% endblock %}
-
-
