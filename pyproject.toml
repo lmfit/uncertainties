@@ -62,7 +62,7 @@ Changelog = "https://github.com/lmfit/uncertainties/blob/master/CHANGES.rst"
 [project.optional-dependencies]
 arrays = ["numpy"]
 test = ["pytest", "pytest_cov"]
-doc = ["sphinx"]
+doc = ["sphinx", "sphinx-copybutton"]
 all = ["uncertainties[doc,test,arrays]"]
 
 [tool.pytest.ini_options]
