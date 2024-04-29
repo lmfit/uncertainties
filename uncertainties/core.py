@@ -70,6 +70,7 @@ __all__ = [
     # Variable subclass), but possibly manipulated by external code
     # ['derivatives()' method, etc.].
     'UFloat',
+    'Variable',
 
     # Wrapper for allowing non-pure-Python function to handle
     # quantitities with uncertainties:
@@ -2692,12 +2693,10 @@ class NegativeStdDev(Exception):
 
 class Variable(AffineScalarFunc):
     """
-    Representation of a float-like scalar random variable, along with
-    its uncertainty.
+    Representation of a float-like scalar Variable with its uncertainty.
 
-    Objects are meant to represent variables that are independent from
-    each other (correlations are handled through the AffineScalarFunc
-    class).
+    Variablees are independent from each other, but correlations between them
+    are handled through the AffineScalarFunc class.
     """
 
     # To save memory in large arrays:
