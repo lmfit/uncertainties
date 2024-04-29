@@ -10,9 +10,11 @@ Basic usage
 ===========
 
 Basic mathematical operations involving numbers with uncertainties requires
-importing the :func:`ufloat` function which creates numbers with uncertainties:
+importing the :func:`ufloat` function which creates a :class:`Variable`:
+numbet with both a nominal value and an uncertainty.
 
      >>> from uncertainties import ufloat
+     >>> x = ufloat(2.7, 0.01)   #  a Variable with a value 2.7+/-0.01
 
 The :mod:`uncertainties` module contains sub-modules for :ref:`advanced
 mathematical functions <advanced math operations>`, and :doc:`arrays and
@@ -25,8 +27,6 @@ matrices <numpy_guide>`, which can be accessed with::
 
 Creating Variables: numbers with uncertainties
 ================================================
-
-.. module:: uncertainties
 
 To create a number with uncertainties or *Variable*, use the :func:`ufloat`
 function, which takes a *nominal value* ( (which can be interpreted as the most
@@ -61,21 +61,25 @@ same value:
 >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
 
 
-The :func:`ufloat` and :func:`ufloat_fromstr` functions
-----------------------------------------------------------------
+:func:`ufloat`, :func:`ufloat_fromstr`, and :class:`Variable`
+--------------------------------------------------------------------------
 
-The most common and important functions for creating uncertain variables are
-:func:`ufloat` and :func:`ufloat_fromstr`.
+
+.. module:: uncertainties
+
+The most common and important functions for creating uncertain
+:class:`Variables` are :func:`ufloat` and :func:`ufloat_fromstr`.
 
 .. autofunction:: ufloat
 
 .. autofunction:: ufloat_fromstr
 
+.. autoclass:: Variable
 
 Basic math with uncertain Variables
 =========================================
 
-:mod:`uncertainties` Variables can be used in basic mathematical calculations
+:class:`Variables` can be used in basic mathematical calculations
 ('+', '-', '*', '/', '**') as with other Python numbers and variables.
 
 >>> t = ufloat(0.2, 0.01)
@@ -100,6 +104,15 @@ We can check that error propagation when adding two independent variables:
 >>> (x+y).std_dev == sqrt(x.std_dev**2 + y.std_dev**2)
 True
 
+
+Multiplying two Variables will properly propagate those
+uncertainties too:
+
+>>> print(x*y)
+240.0+/-76.83749084919418
+>>> (x*y).std_dev == (x*y).nominal_value *  sqrt((x.std_dev/x.nominal_value)**2 + (y.std_dev/y.nominal_value)**2 )
+True
+
 But note that adding a Variable to itself does not add its uncertaintes in
 quadrature, but are simply scaled:
 
@@ -108,13 +121,23 @@ quadrature, but are simply scaled:
 >>> print(3*x + 10)
 70.0+/-12.0
 
-Multiplying two independent Variables will properly propagate those
-uncertainties too:
 
->>> print(x*y)
-240.0+/-76.83749084919418
->>> (x*y).std_dev == (x*y).nominal_value *  sqrt((x.std_dev/x.nominal_value)**2 + (y.std_dev/y.nominal_value)**2 )
-True
+It is important to understand that calculations done with Variable know about
+the correlation between the Variables.   Variables created with :func:`ufloat`
+(and  :func:`ufloat_fromstr`) are completely uncorrelated with each other, but
+are known to be completely correlated with themselves.  This means that
+
+
+>>> x = ufloat(5, 0.5)
+>>> y = ufloat(5, 0.5)
+>>> x - y
+0.0+/-0.7071067811865476
+>>> x - x
+0.0+/-0
+
+For two *different* Variables, uncorrelated uncertainties will be propagated.
+But when doing a calculation with a single Variable, the uncertainties are
+correlated, and calculations will reflect that.
 
 
 .. index:: mathematical operation; on a scalar, umath
@@ -124,11 +147,10 @@ True
 Mathematical operations with uncertain Variables
 =====================================================
 
-Besides being able to apply basic mathematical operations to numbers
-with uncertainty, this package provides generalized versions of 40 of the
-the functions from the standard :mod:`math` *module*.  These
-mathematical functions are found in the :mod:`uncertainties.umath`
-module:
+Besides being able to apply basic mathematical operations to uncertaintties
+Variables, this package provides generalized versions of 40 of the the
+functions from the standard :mod:`math` *module*.  These mathematical functions
+are found in the :mod:`uncertainties.umath` module:
 
     >>> from uncertainties.umath import sin, exp, sqrt
     >>> x   = ufloat(0.2, 0.01)
@@ -151,15 +173,83 @@ The functions in the :mod:`uncertainties.umath` module include:
     'ldexp', 'lgamma', 'log', 'log10', 'log1p', 'modf',
     'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'trunc'
 
+
+Comparison operators
+====================
+
+Comparison operators ('==', '!=', '>', '<', '>=', and '<=') for for values with
+uncertainties are somewhat complicated, and need special atention.  As we
+hinted at above, and will explore in more detai below and in the
+:ref:`Technical Guide <comparison_operators>`, this relates to the correlation
+between variables with
+
+
+
+Equality and inequality comparisons
+------------------------------------
+
+>>> x = ufloat(5, 0.5)
+>>> y = ufloat(5, 0.5)
+>>> x == x
+True
+>>> x == y
+False
+
+While it may seem like this based on identity, note that
+
+>>> x == (1.0*x)
+True
+>>> x is (1.0*x)
+False
+
+In order for the resuls of two calculations with uncertainties to be considered
+equal, but the nomimal value *and* the uncertainty must have the same value.
+
+
+Comparisons of magnitude
+------------------------------------
+
+>>> print(x)
+0.200+/-0.010
+>>> y = x + 0.0001
+>>> y
+0.2001+/-0.01
+>>> y > x
+True
+>>> y > 0
+True
+
+One important concept to keep in mind is that :func:`ufloat` creates a
+random variable, so that two numbers with the same nominal value and
+standard deviation are generally different:
+
+>>> y = ufloat(1, 0.1)
+>>> z = ufloat(1, 0.1)
+>>> print(y)
+1.00+/-0.10
+>>> print(z)
+1.00+/-0.10
+>>> y == y
+True
+>>> y == z
+False
+
+In physical terms, two rods of the same nominal length and uncertainty
+on their length are generally of different sizes: :data:`y` is different
+from :data:`z`.
+
+
+
  .. index::
    pair: testing (scalar); NaN
 
-NaN testing
------------
 
-NaN values can appear in a number with uncertainty. Care must be
-taken with such values, as values like NaN±1, 1±NaN and NaN±NaN are by
-definition *not* NaN, which is a float.
+NaNs testing
+====================
+
+Uncertainty Variables that contain NaN values can appear in a number with
+uncertainty. Care must be taken with such values, as values like NaN±1, 1±NaN
+and NaN±NaN are by definition *not* NaN, which is a float.
 
 Testing whether a number with uncertainty has a **NaN nominal value** can
 be done with the provided function ``uncertainties.umath.isnan()``,
@@ -257,43 +347,6 @@ these two errors, since the variables from
 
 .. index:: comparison operators
 
-Comparison operators
-====================
-
-Comparison operators behave in a natural way:
-
->>> print(x)
-0.200+/-0.010
->>> y = x + 0.0001
->>> y
-0.2001+/-0.01
->>> y > x
-True
->>> y > 0
-True
-
-One important concept to keep in mind is that :func:`ufloat` creates a
-random variable, so that two numbers with the same nominal value and
-standard deviation are generally different:
-
->>> y = ufloat(1, 0.1)
->>> z = ufloat(1, 0.1)
->>> print(y)
-1.00+/-0.10
->>> print(z)
-1.00+/-0.10
->>> y == y
-True
->>> y == z
-False
-
-In physical terms, two rods of the same nominal length and uncertainty
-on their length are generally of different sizes: :data:`y` is different
-from :data:`z`.
-
-More detailed information on the semantics of comparison operators for
-numbers with uncertainties can be found in the :ref:`Technical Guide
-<comparison_operators>`.
 
 .. index:: covariance matrix
 
