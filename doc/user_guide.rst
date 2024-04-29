@@ -177,7 +177,7 @@ The functions in the :mod:`uncertainties.umath` module include:
 Comparison operators
 ====================
 
-Comparison operators ('==', '!=', '>', '<', '>=', and '<=') for for values with
+Comparison operators ('==', '!=', '>', '<', '>=', and '<=') for values with
 uncertainties are somewhat complicated, and need special atention.  As we
 hinted at above, and will explore in more detai below and in the
 :ref:`Technical Guide <comparison_operators>`, this relates to the correlation
@@ -203,61 +203,62 @@ True
 False
 
 In order for the resuls of two calculations with uncertainties to be considered
-equal, but the nomimal value *and* the uncertainty must have the same value.
+equal, the nomimal value *and* the uncertainty must have the same value.
 
 
 Comparisons of magnitude
 ------------------------------------
 
->>> print(x)
-0.200+/-0.010
->>> y = x + 0.0001
->>> y
-0.2001+/-0.01
->>> y > x
-True
->>> y > 0
+The concept of comparing the magnitude of values with uncertainties is a bit
+complicated.  That is, a Variable with a value of 25 +/- 10 might be greater
+than a Varitable with a value of 24 +/- 8 most of the time, but *sometimes* it
+might be less than it.   The :mod:`uncertainties` package takes the simple
+approach of comparing.  That is
+
+>>> a = ufloat(25, 10)
+>>> b = ufloat(24, 8)
+>>> a > b
 True
 
-One important concept to keep in mind is that :func:`ufloat` creates a
-random variable, so that two numbers with the same nominal value and
-standard deviation are generally different:
+Note that cobining this comparison and the above discussion of `==` and `!=`
+can lead to a result that maybe somewhat surpring:
 
->>> y = ufloat(1, 0.1)
->>> z = ufloat(1, 0.1)
->>> print(y)
-1.00+/-0.10
->>> print(z)
-1.00+/-0.10
->>> y == y
-True
->>> y == z
+
+>>> a = ufloat(25, 10)
+>>> b = ufloat(25, 8)
+>>> a >= b
 False
+>>> a > b
+False
+>>> a == b
+False
+>>> a.nominal_value >= b.nominal_value
+True
 
-In physical terms, two rods of the same nominal length and uncertainty
-on their length are generally of different sizes: :data:`y` is different
-from :data:`z`.
-
+That is, since `a` is neither greeater than `b` (nomal value only) nor equal to
+`b`, it cannot be greater than or equal to `b`.
 
 
  .. index::
    pair: testing (scalar); NaN
 
 
-NaNs testing
-====================
+Handling NaNs and infinities
+===============================
 
-Uncertainty Variables that contain NaN values can appear in a number with
-uncertainty. Care must be taken with such values, as values like NaN±1, 1±NaN
-and NaN±NaN are by definition *not* NaN, which is a float.
+NaN values can appear in either the nominal value or uncertainty of a
+Variable.  As is always the case, care must be exercised when handling NaN
+values.
 
-Testing whether a number with uncertainty has a **NaN nominal value** can
-be done with the provided function ``uncertainties.umath.isnan()``,
-which generalizes the standard ``math.isnan()``.
+While :func:`math.isnan` and :func:`numpy.isnan` will raise `TypeError`
+exceptions for uncertainties Variables (because an uncertainties Variable is
+not a float), the function :func:`umath.isnan` will return whether the nominal
+value of a Variable is NaN.  Similarly, :func:`umath.isinf` will return whether
+the nominal value of a Variable is infinite.
 
-Checking whether the *uncertainty* of ``x`` is NaN can be done directly
-with the standard function: ``math.isnan(x.std_dev)`` (or equivalently
-``math.isnan(x.s)``).
+To check whether the uncertainty is NaN or Inf, use one of :func:`math.isnan`,
+:func:`math.isinf`, :func:`nupmy.isnan`, or , :func:`nupmy.isinf` on the
+``std_dev`` attribute.
 
 
 .. index:: arrays; simple use, matrices; simple use
