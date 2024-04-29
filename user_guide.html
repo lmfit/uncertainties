@@ -5,27 +5,140 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>User Guide &#8212; uncertainties Python package 3.1.7 documentation</title>
+    <title>User Guide &#8212; uncertainties</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css?v=d59dc883" />
+    <link rel="stylesheet" type="text/css" href="_static/pydoctheme.css?v=bb723527" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link id="pygments_dark_css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css" href="_static/pygments_dark.css?v=b20cc3f5" />
+    
     <script src="_static/documentation_options.js?v=169b9561"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
     <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Uncertainties in arrays" href="numpy_guide.html" />
-    <link rel="prev" title="Installation and Credits" href="install.html" /> 
-  </head><body>
+    <link rel="prev" title="Installation and Credits" href="install.html" /><link rel="stylesheet" href="_static/pydoctheme_dark.css" media="(prefers-color-scheme: dark)" id="pydoctheme_dark_css">
+    <link rel="shortcut icon" type="image/png" href="_static/py.svg" />
+            <script type="text/javascript" src="_static/copybutton.js"></script>
+            <script type="text/javascript" src="_static/menu.js"></script>
+            <script type="text/javascript" src="_static/search-focus.js"></script>
+            <script type="text/javascript" src="_static/themetoggle.js"></script> 
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <nav class="nav-content" role="navigation">
+        <label for="menuToggler" class="toggler__label">
+            <span></span>
+        </label>
+        <span class="nav-items-wrapper">
+            <a href="https://www.python.org/" class="nav-logo">
+                <img src="_static/py.svg" alt="Python logo"/>
+            </a>
+            <span class="version_switcher_placeholder"></span>
+            <form role="search" class="search" action="search.html" method="get">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                    <path fill-rule="nonzero" fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+                </svg>
+                <input placeholder="Quick search" aria-label="Quick search" type="search" name="q" />
+                <input type="submit" value="Go"/>
+            </form>
+        </span>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+            
+<label class="theme-selector-label">
+    Theme
+    <select class="theme-selector" oninput="activateTheme(this.value)">
+        <option value="auto" selected>Auto</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+    </select>
+</label>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">User Guide</a><ul>
+<li><a class="reference internal" href="#basic-usage">Basic usage</a></li>
+<li><a class="reference internal" href="#creating-variables-numbers-with-uncertainties">Creating Variables: numbers with uncertainties</a><ul>
+<li><a class="reference internal" href="#module-uncertainties"><code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat_fromstr()</span></code>, and <code class="xref py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a><ul>
+<li><a class="reference internal" href="#uncertainties.ufloat"><code class="docutils literal notranslate"><span class="pre">ufloat()</span></code></a></li>
+<li><a class="reference internal" href="#uncertainties.ufloat_fromstr"><code class="docutils literal notranslate"><span class="pre">ufloat_fromstr()</span></code></a></li>
+<li><a class="reference internal" href="#uncertainties.Variable"><code class="docutils literal notranslate"><span class="pre">Variable</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#basic-math-with-uncertain-variables">Basic math with uncertain Variables</a></li>
+<li><a class="reference internal" href="#mathematical-operations-with-uncertain-variables">Mathematical operations with uncertain Variables</a></li>
+<li><a class="reference internal" href="#comparison-operators">Comparison operators</a><ul>
+<li><a class="reference internal" href="#equality-and-inequality-comparisons">Equality and inequality comparisons</a></li>
+<li><a class="reference internal" href="#comparisons-of-magnitude">Comparisons of magnitude</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#handling-nans-and-infinities">Handling NaNs and infinities</a></li>
+<li><a class="reference internal" href="#automatic-correlations">Automatic correlations</a></li>
+<li><a class="reference internal" href="#access-to-the-individual-sources-of-uncertainty">Access to the individual sources of uncertainty</a></li>
+<li><a class="reference internal" href="#covariance-and-correlation-matrices">Covariance and correlation matrices</a><ul>
+<li><a class="reference internal" href="#covariance-matrix">Covariance matrix</a></li>
+<li><a class="reference internal" href="#correlation-matrix">Correlation matrix</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#correlated-variables">Correlated variables</a><ul>
+<li><a class="reference internal" href="#use-of-a-covariance-matrix">Use of a covariance matrix</a></li>
+<li><a class="reference internal" href="#use-of-a-correlation-matrix">Use of a correlation matrix</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#making-custom-functions-accept-numbers-with-uncertainties">Making custom functions accept numbers with uncertainties</a></li>
+<li><a class="reference internal" href="#miscellaneous-utilities">Miscellaneous utilities</a></li>
+<li><a class="reference internal" href="#derivatives">Derivatives</a></li>
+<li><a class="reference internal" href="#additional-information">Additional information</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="install.html"
+                          title="previous chapter">Installation and Credits</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="numpy_guide.html"
+                          title="next chapter">Uncertainties in arrays</a></p>
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </nav>
+    </div>
+</div>
+
 <div style="background-color: white; text-align: left; padding: 10px 10px 15px  15px">
   <font size=+2>
-    <a href="index.html">   
+    <a href="index.html">
       <img src="_static/logo.png" height=75 border="0"   alt="uncertainties logo"/>
     </a>
   </font>
 </div>
-
+  
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -42,16 +155,38 @@
           <a href="install.html" title="Installation and Credits"
              accesskey="P">previous</a> |</li>
 <li>[<a href="index.html">Uncertainties</a></li>
-<li>[<a href="install.html">Installation and Credits</a></li>
+<li>[<a href="install.html">Installation & Credits</a></li>
 <li>|<a href="#">User Guide</a></li>
-<li>|<a href="numpy_guide.html">Uncertainties with Numpy Arrays</a></li>
+<li>|<a href="Formatting.html">Formatting Values</a></li>
+<li>|<a href="numpy_guide.html"> Numpy Arrays</a></li>
 <li>|<a href="tech_guide.html">Technical Guide</a>]</li> &nbsp;
 &nbsp;
 &nbsp; &nbsp;
 
-        <li class="nav-item nav-item-this"><a href="">User Guide</a></li> 
-      </ul>
+        <li class="nav-item nav-item-this"><a href="">User Guide</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="search.html" method="get">
+          <input placeholder="Quick search" aria-label="Quick search" type="search" name="q" id="search-box" />
+          <input type="submit" value="Go" />
+        </form>
     </div>
+                     |
+                </li>
+            <li class="right">
+<label class="theme-selector-label">
+    Theme
+    <select class="theme-selector" oninput="activateTheme(this.value)">
+        <option value="auto" selected>Auto</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+    </select>
+</label> |</li>
+            
+      </ul>
+    </div>  
   
 
     <div class="document">
@@ -64,26 +199,34 @@
 <section id="basic-usage">
 <h2>Basic usage<a class="headerlink" href="#basic-usage" title="Link to this heading">¶</a></h2>
 <p>Basic mathematical operations involving numbers with uncertainties requires
-importing the <code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat()</span></code> function which creates numbers with uncertainties:</p>
+importing the <code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat()</span></code> function which creates a <code class="xref py py-class docutils literal notranslate"><span class="pre">Variable</span></code>:
+numbet with both a nominal value and an uncertainty.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">uncertainties</span> <span class="kn">import</span> <span class="n">ufloat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">2.7</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>   <span class="c1">#  a Variable with a value 2.7+/-0.01</span>
 </pre></div>
 </div>
 <p>The <a class="reference internal" href="#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> module contains sub-modules for <a class="reference internal" href="#advanced-math-operations"><span class="std std-ref">advanced
 mathematical functions</span></a>, and <a class="reference internal" href="numpy_guide.html"><span class="doc">arrays and
-matrices</span></a>, which can be accessed with</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">uncertainties</span> <span class="k">as</span> <span class="nn">un</span>
+matrices</span></a>, which can be accessed with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">uncertainties</span>
 </pre></div>
 </div>
 </section>
-<section id="module-uncertainties">
-<span id="creating-variables-numbers-with-uncertainties"></span><span id="index-1"></span><h2>Creating Variables: numbers with uncertainties<a class="headerlink" href="#module-uncertainties" title="Link to this heading">¶</a></h2>
-<p>To create a Variable - a number with uncertainties - use the <a class="reference internal" href="#uncertainties.ufloat" title="uncertainties.ufloat"><code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat()</span></code></a>
-function, which takes a nominal value (which can be interpreted as the most
+<section id="creating-variables-numbers-with-uncertainties">
+<span id="index-1"></span><h2>Creating Variables: numbers with uncertainties<a class="headerlink" href="#creating-variables-numbers-with-uncertainties" title="Link to this heading">¶</a></h2>
+<p>To create a number with uncertainties or <em>Variable</em>, use the <code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat()</span></code>
+function, which takes a <em>nominal value</em> ( (which can be interpreted as the most
 likely value, or the mean or central value of the distribution of values), a
-standard error (the standard deviation or <span class="math notranslate nohighlight">\(1-\sigma\)</span> uncertainty), and an
-optional tag:</p>
+<em>standard error</em> ( (the standard deviation or <span class="math notranslate nohighlight">\(1-\sigma\)</span> uncertainty), and
+an optional <em>tag</em>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">2.7</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>  <span class="c1"># x = 2.7+/-0.01</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">4.5</span><span class="p">,</span>  <span class="mf">1.2</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s1">&#39;y_variable&#39;</span><span class="p">)</span>  <span class="c1"># x = 4..5+/-1.2</span>
+</pre></div>
+</div>
+<p id="index-2">You can access the nominal value and standard deviation for any Variable with
+the <cite>nominal_value</cite> and <cite>std_dev</cite> attributes:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">nominal_value</span><span class="p">,</span>  <span class="n">x</span><span class="o">.</span><span class="n">std_dev</span><span class="p">)</span>
+<span class="go">2.7 0.01</span>
 </pre></div>
 </div>
 <p>uncertainties Variables can also be created from one of many
@@ -99,12 +242,16 @@ same value:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat_fromstr</span><span class="p">(</span><span class="s2">&quot;0.20&quot;</span><span class="p">)</span>  <span class="c1"># Automatic uncertainty of +/-1 on last digit</span>
 </pre></div>
 </div>
+<section id="module-uncertainties">
+<span id="ufloat-ufloat-fromstr-and-variable"></span><h3><code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat_fromstr()</span></code>, and <code class="xref py py-class docutils literal notranslate"><span class="pre">Variable</span></code><a class="headerlink" href="#module-uncertainties" title="Link to this heading">¶</a></h3>
+<p>The most common and important functions for creating uncertain
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Variables</span></code> are <a class="reference internal" href="#uncertainties.ufloat" title="uncertainties.ufloat"><code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat()</span></code></a> and <a class="reference internal" href="#uncertainties.ufloat_fromstr" title="uncertainties.ufloat_fromstr"><code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat_fromstr()</span></code></a>.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="uncertainties.ufloat">
 <span class="sig-prename descclassname"><span class="pre">uncertainties.</span></span><span class="sig-name descname"><span class="pre">ufloat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nominal_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_dev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#uncertainties.ufloat" title="Link to this definition">¶</a></dt>
 <dd><p>Create an uncertainties Variable</p>
 <section id="arguments">
-<h3>Arguments:<a class="headerlink" href="#arguments" title="Link to this heading">¶</a></h3>
+<h4>Arguments:<a class="headerlink" href="#arguments" title="Link to this heading">¶</a></h4>
 <dl class="simple">
 <dt>nominal_value: float</dt><dd><p>nominal value of Variable</p>
 </dd>
@@ -115,18 +262,18 @@ same value:</p>
 </dl>
 </section>
 <section id="returns">
-<h3>Returns:<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h3>
+<h4>Returns:<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h4>
 <p>uncertainties Variable</p>
 </section>
 <section id="examples">
-<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h3>
+<h4>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h4>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s1">&#39;kilo&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="notes">
-<h3>Notes:<a class="headerlink" href="#notes" title="Link to this heading">¶</a></h3>
+<h4>Notes:<a class="headerlink" href="#notes" title="Link to this heading">¶</a></h4>
 <ol class="arabic simple">
 <li><p><cite>nominal_value</cite> is typically interpreted as <cite>mean</cite> or <cite>central value</cite></p></li>
 <li><dl class="simple">
@@ -146,7 +293,7 @@ and <cite>tag</cite> which match the input values.</p></li>
 <dd><p>Create an uncertainties Variable from a string representation.
 Several representation formats are supported.</p>
 <section id="id2">
-<h3>Arguments:<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<h4>Arguments:<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h4>
 <dl class="simple">
 <dt>representation: string</dt><dd><p>string representation of a value with uncertainty</p>
 </dd>
@@ -155,11 +302,11 @@ Several representation formats are supported.</p>
 </dl>
 </section>
 <section id="id3">
-<h3>Returns:<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<h4>Returns:<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h4>
 <p>uncertainties Variable.</p>
 </section>
 <section id="id4">
-<h3>Notes:<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<h4>Notes:<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h4>
 <ol class="arabic simple">
 <li><p>Invalid representations raise a ValueError.</p></li>
 <li><p>Using the form “nominal(std)” where “std” is an integer creates
@@ -169,7 +316,7 @@ while “1.25(3.)” is the same as <cite>ufloat(1.25, 3.)</cite></p></li>
 </ol>
 </section>
 <section id="id5">
-<h3>Examples:<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<h4>Examples:<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h4>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat_fromsstr</span><span class="p">(</span><span class="s2">&quot;12.58+/-0.23&quot;</span><span class="p">)</span>  <span class="c1"># = ufloat(12.58, 0.23)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat_fromsstr</span><span class="p">(</span><span class="s2">&quot;12.58 ± 0.23&quot;</span><span class="p">)</span>  <span class="c1"># = ufloat(12.58, 0.23)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat_fromsstr</span><span class="p">(</span><span class="s2">&quot;3.85e5 +/- 2.3e4&quot;</span><span class="p">)</span>  <span class="c1"># = ufloat(3.8e5, 2.3e4)</span>
@@ -189,62 +336,179 @@ while “1.25(3.)” is the same as <cite>ufloat(1.25, 3.)</cite></p></li>
 </section>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="uncertainties.Variable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">uncertainties.</span></span><span class="sig-name descname"><span class="pre">Variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_dev</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#uncertainties.Variable" title="Link to this definition">¶</a></dt>
+<dd><p>Representation of a float-like scalar Variable with its uncertainty.</p>
+<p>Variablees are independent from each other, but correlations between them
+are handled through the AffineScalarFunc class.</p>
+</dd></dl>
+
 </section>
-<section id="basic-math">
-<h2>Basic math<a class="headerlink" href="#basic-math" title="Link to this heading">¶</a></h2>
-<p>Calculations can be performed directly, as with regular real numbers:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">square</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span>
+</section>
+<section id="basic-math-with-uncertain-variables">
+<h2>Basic math with uncertain Variables<a class="headerlink" href="#basic-math-with-uncertain-variables" title="Link to this heading">¶</a></h2>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">Variables</span></code> can be used in basic mathematical calculations
+(‘+’, ‘-’, ‘*’, ‘/’, ‘**’) as with other Python numbers and variables.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">double</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">t</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">double</span><span class="p">)</span>
+<span class="go">0.4+/-0.02</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">square</span> <span class="o">=</span> <span class="n">t</span><span class="o">**</span><span class="mi">2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">square</span><span class="p">)</span>
 <span class="go">0.040+/-0.004</span>
 </pre></div>
 </div>
+<p>When adding two Variables, the uncertainty in the result is the quadrature sum
+(square-root of the sum of squares) of the uncertaities of the two Variables:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">)</span>
+<span class="go">32.0+/-5.0</span>
+</pre></div>
+</div>
+<p>We can check that error propagation when adding two independent variables:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">std_dev</span> <span class="o">==</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">std_dev</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">.</span><span class="n">std_dev</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Multiplying two Variables will properly propagate those
+uncertainties too:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">)</span>
+<span class="go">240.0+/-76.83749084919418</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">std_dev</span> <span class="o">==</span> <span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">nominal_value</span> <span class="o">*</span>  <span class="n">sqrt</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">std_dev</span><span class="o">/</span><span class="n">x</span><span class="o">.</span><span class="n">nominal_value</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">std_dev</span><span class="o">/</span><span class="n">y</span><span class="o">.</span><span class="n">nominal_value</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>But note that adding a Variable to itself does not add its uncertaintes in
+quadrature, but are simply scaled:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">x</span><span class="p">)</span>
+<span class="go">40.0+/-8.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span>
+<span class="go">70.0+/-12.0</span>
+</pre></div>
+</div>
+<p>It is important to understand that calculations done with Variable know about
+the correlation between the Variables.   Variables created with <a class="reference internal" href="#uncertainties.ufloat" title="uncertainties.ufloat"><code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat()</span></code></a>
+(and  <a class="reference internal" href="#uncertainties.ufloat_fromstr" title="uncertainties.ufloat_fromstr"><code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat_fromstr()</span></code></a>) are completely uncorrelated with each other, but
+are known to be completely correlated with themselves.  This means that</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span>
+<span class="go">0.0+/-0.7071067811865476</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">-</span> <span class="n">x</span>
+<span class="go">0.0+/-0</span>
+</pre></div>
+</div>
+<p>For two <em>different</em> Variables, uncorrelated uncertainties will be propagated.
+But when doing a calculation with a single Variable, the uncertainties are
+correlated, and calculations will reflect that.</p>
 </section>
-<section id="mathematical-operations">
-<span id="advanced-math-operations"></span><span id="index-2"></span><h2>Mathematical operations<a class="headerlink" href="#mathematical-operations" title="Link to this heading">¶</a></h2>
-<p>Besides being able to apply basic mathematical operations to numbers
-with uncertainty, this package provides generalizations of <strong>most of
-the functions from the standard</strong> <code class="xref py py-mod docutils literal notranslate"><span class="pre">math</span></code> <strong>module</strong>.  These
-mathematical functions are found in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties.umath</span></code>
-module:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">uncertainties.umath</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># Imports sin(), etc.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<section id="mathematical-operations-with-uncertain-variables">
+<span id="advanced-math-operations"></span><span id="index-3"></span><h2>Mathematical operations with uncertain Variables<a class="headerlink" href="#mathematical-operations-with-uncertain-variables" title="Link to this heading">¶</a></h2>
+<p>Besides being able to apply basic mathematical operations to uncertaintties
+Variables, this package provides generalized versions of 40 of the the
+functions from the standard <code class="xref py py-mod docutils literal notranslate"><span class="pre">math</span></code> <em>module</em>.  These mathematical functions
+are found in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties.umath</span></code> module:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">uncertainties.umath</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">sqrt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>   <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">0.19866933079506122+/-0.009800665778412416</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
 <span class="go">0.03998933418663417+/-0.003996800426643912</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="o">/</span><span class="mf">3.0</span><span class="p">)</span>
+<span class="go">0.9355069850316178+/-0.003118356616772059</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sqrt</span><span class="p">(</span><span class="mi">230</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">7.0+/-0.16428571428571428</span>
 </pre></div>
 </div>
-<p>The list of available mathematical functions can be obtained with the
-<code class="docutils literal notranslate"><span class="pre">pydoc</span> <span class="pre">uncertainties.umath</span></code> command.</p>
-<section id="nan-testing">
-<span id="index-3"></span><h3>NaN testing<a class="headerlink" href="#nan-testing" title="Link to this heading">¶</a></h3>
-<p>NaN values can appear in a number with uncertainty. Care must be
-taken with such values, as values like NaN±1, 1±NaN and NaN±NaN are by
-definition <em>not</em> NaN, which is a float.</p>
-<p>Testing whether a number with uncertainty has a <strong>NaN nominal value</strong> can
-be done with the provided function <code class="docutils literal notranslate"><span class="pre">uncertainties.umath.isnan()</span></code>,
-which generalizes the standard <code class="docutils literal notranslate"><span class="pre">math.isnan()</span></code>.</p>
-<p>Checking whether the <em>uncertainty</em> of <code class="docutils literal notranslate"><span class="pre">x</span></code> is NaN can be done directly
-with the standard function: <code class="docutils literal notranslate"><span class="pre">math.isnan(x.std_dev)</span></code> (or equivalently
-<code class="docutils literal notranslate"><span class="pre">math.isnan(x.s)</span></code>).</p>
+<p>The functions in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties.umath</span></code> module include:</p>
+<blockquote>
+<div><p>‘acos’, ‘acosh’, ‘asin’, ‘asinh’, ‘atan’, ‘atan2’, ‘atanh’,
+‘ceil’, ‘copysign’, ‘cos’, ‘cosh’, ‘degrees’, ‘erf’, ‘erfc’,
+‘exp’, ‘expm1’, ‘fabs’, ‘factorial’, ‘floor’, ‘fmod’,
+‘frexp’, ‘fsum’, ‘gamma’, ‘hypot’, ‘isinf’, ‘isnan’,
+‘ldexp’, ‘lgamma’, ‘log’, ‘log10’, ‘log1p’, ‘modf’,
+‘pow’, ‘radians’, ‘sin’, ‘sinh’, ‘sqrt’, ‘tan’, ‘tanh’, ‘trunc’</p>
+</div></blockquote>
 </section>
-</section>
-<section id="arrays-of-numbers-with-uncertainties">
-<span id="simple-array-use"></span><span id="index-4"></span><h2>Arrays of numbers with uncertainties<a class="headerlink" href="#arrays-of-numbers-with-uncertainties" title="Link to this heading">¶</a></h2>
-<p>It is possible to put numbers with uncertainties in <a class="reference external" href="http://numpy.scipy.org/">NumPy</a> arrays and
-matrices:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ufloat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">),</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="mi">2</span><span class="o">*</span><span class="n">arr</span>
-<span class="go">[2.0+/-0.02 4.0+/-0.2]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
-<span class="go">3.00+/-0.10</span>
+<section id="comparison-operators">
+<h2>Comparison operators<a class="headerlink" href="#comparison-operators" title="Link to this heading">¶</a></h2>
+<p>Comparison operators (‘==’, ‘!=’, ‘&gt;’, ‘&lt;’, ‘&gt;=’, and ‘&lt;=’) for values with
+uncertainties are somewhat complicated, and need special atention.  As we
+hinted at above, and will explore in more detai below and in the
+<a class="reference internal" href="tech_guide.html#comparison-operators"><span class="std std-ref">Technical Guide</span></a>, this relates to the correlation
+between variables with</p>
+<section id="equality-and-inequality-comparisons">
+<h3>Equality and inequality comparisons<a class="headerlink" href="#equality-and-inequality-comparisons" title="Link to this heading">¶</a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">==</span> <span class="n">x</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span>
+<span class="go">False</span>
 </pre></div>
 </div>
-<p>Thus, usual operations on NumPy arrays can be performed transparently
-even when these arrays contain numbers with uncertainties.</p>
-<p><a class="reference internal" href="numpy_guide.html"><span class="doc">More complex operations on NumPy arrays and matrices</span></a> can be
-performed through the dedicated <code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties.unumpy</span></code> module.</p>
+<p>While it may seem like this based on identity, note that</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">==</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="ow">is</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>In order for the resuls of two calculations with uncertainties to be considered
+equal, the nomimal value <em>and</em> the uncertainty must have the same value.</p>
+</section>
+<section id="comparisons-of-magnitude">
+<h3>Comparisons of magnitude<a class="headerlink" href="#comparisons-of-magnitude" title="Link to this heading">¶</a></h3>
+<p>The concept of comparing the magnitude of values with uncertainties is a bit
+complicated.  That is, a Variable with a value of 25 +/- 10 might be greater
+than a Varitable with a value of 24 +/- 8 most of the time, but <em>sometimes</em> it
+might be less than it.   The <a class="reference internal" href="#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> package takes the simple
+approach of comparing.  That is</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Note that cobining this comparison and the above discussion of <cite>==</cite> and <cite>!=</cite>
+can lead to a result that maybe somewhat surpring:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">&gt;=</span> <span class="n">b</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">==</span> <span class="n">b</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">nominal_value</span> <span class="o">&gt;=</span> <span class="n">b</span><span class="o">.</span><span class="n">nominal_value</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>That is, since <cite>a</cite> is neither greeater than <cite>b</cite> (nomal value only) nor equal to
+<cite>b</cite>, it cannot be greater than or equal to <cite>b</cite>.</p>
+<blockquote>
+<div></div></blockquote>
+</section>
+</section>
+<section id="handling-nans-and-infinities">
+<span id="index-4"></span><h2>Handling NaNs and infinities<a class="headerlink" href="#handling-nans-and-infinities" title="Link to this heading">¶</a></h2>
+<p>NaN values can appear in either the nominal value or uncertainty of a
+Variable.  As is always the case, care must be exercised when handling NaN
+values.</p>
+<p>While <code class="xref py py-func docutils literal notranslate"><span class="pre">math.isnan()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.isnan()</span></code> will raise <cite>TypeError</cite>
+exceptions for uncertainties Variables (because an uncertainties Variable is
+not a float), the function <code class="xref py py-func docutils literal notranslate"><span class="pre">umath.isnan()</span></code> will return whether the nominal
+value of a Variable is NaN.  Similarly, <code class="xref py py-func docutils literal notranslate"><span class="pre">umath.isinf()</span></code> will return whether
+the nominal value of a Variable is infinite.</p>
+<p>To check whether the uncertainty is NaN or Inf, use one of <code class="xref py py-func docutils literal notranslate"><span class="pre">math.isnan()</span></code>,
+<code class="xref py py-func docutils literal notranslate"><span class="pre">math.isinf()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">nupmy.isnan()</span></code>, or , <code class="xref py py-func docutils literal notranslate"><span class="pre">nupmy.isinf()</span></code> on the
+<code class="docutils literal notranslate"><span class="pre">std_dev</span></code> attribute.</p>
 </section>
 <section id="automatic-correlations">
-<span id="index-5"></span><h2>Automatic correlations<a class="headerlink" href="#automatic-correlations" title="Link to this heading">¶</a></h2>
+<span id="index-6"></span><span id="simple-array-use"></span><span id="index-5"></span><h2>Automatic correlations<a class="headerlink" href="#automatic-correlations" title="Link to this heading">¶</a></h2>
 <p>Correlations between variables are <strong>automatically handled</strong> whatever
 the number of variables involved, and whatever the complexity of the
 calculation. For example, when <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> is the number with
@@ -268,20 +532,7 @@ performed in as many steps as necessary, exactly as with simple
 floats.  When various quantities are combined through mathematical
 operations, the result is calculated by taking into account all the
 correlations between the quantities involved.  All of this is done
-completely <strong>transparently</strong>.</p>
-</section>
-<section id="access-to-the-uncertainty-and-to-the-nominal-value">
-<h2>Access to the uncertainty and to the nominal value<a class="headerlink" href="#access-to-the-uncertainty-and-to-the-nominal-value" title="Link to this heading">¶</a></h2>
-<p id="index-6">The nominal value and the uncertainty (standard deviation) can also be
-accessed independently:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">square</span><span class="p">)</span>
-<span class="go">0.040+/-0.004</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">square</span><span class="o">.</span><span class="n">nominal_value</span><span class="p">)</span>
-<span class="go">0.04</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">square</span><span class="o">.</span><span class="n">std_dev</span><span class="p">)</span>
-<span class="go">0.004</span>
-</pre></div>
-</div>
+transparently.</p>
 </section>
 <section id="access-to-the-individual-sources-of-uncertainty">
 <h2>Access to the individual sources of uncertainty<a class="headerlink" href="#access-to-the-individual-sources-of-uncertainty" title="Link to this heading">¶</a></h2>
@@ -325,43 +576,8 @@ the total uncertainty of <code class="xref py py-data docutils literal notransla
 these two errors, since the variables from
 <code class="xref py py-func docutils literal notranslate"><span class="pre">result.error_components()</span></code> are independent.</p>
 </section>
-<section id="comparison-operators">
-<span id="index-7"></span><h2>Comparison operators<a class="headerlink" href="#comparison-operators" title="Link to this heading">¶</a></h2>
-<p>Comparison operators behave in a natural way:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="go">0.200+/-0.010</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="mf">0.0001</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span>
-<span class="go">0.2001+/-0.01</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">x</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">&gt;</span> <span class="mi">0</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-<p>One important concept to keep in mind is that <a class="reference internal" href="#uncertainties.ufloat" title="uncertainties.ufloat"><code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat()</span></code></a> creates a
-random variable, so that two numbers with the same nominal value and
-standard deviation are generally different:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-<span class="go">1.00+/-0.10</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
-<span class="go">1.00+/-0.10</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">==</span> <span class="n">y</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">==</span> <span class="n">z</span>
-<span class="go">False</span>
-</pre></div>
-</div>
-<p>In physical terms, two rods of the same nominal length and uncertainty
-on their length are generally of different sizes: <code class="xref py py-data docutils literal notranslate"><span class="pre">y</span></code> is different
-from <code class="xref py py-data docutils literal notranslate"><span class="pre">z</span></code>.</p>
-<p>More detailed information on the semantics of comparison operators for
-numbers with uncertainties can be found in the <a class="reference internal" href="tech_guide.html#comparison-operators"><span class="std std-ref">Technical Guide</span></a>.</p>
-</section>
 <section id="covariance-and-correlation-matrices">
-<span id="index-8"></span><h2>Covariance and correlation matrices<a class="headerlink" href="#covariance-and-correlation-matrices" title="Link to this heading">¶</a></h2>
+<span id="index-8"></span><span id="index-7"></span><h2>Covariance and correlation matrices<a class="headerlink" href="#covariance-and-correlation-matrices" title="Link to this heading">¶</a></h2>
 <section id="covariance-matrix">
 <h3>Covariance matrix<a class="headerlink" href="#covariance-matrix" title="Link to this heading">¶</a></h3>
 <p>The covariance matrix between various variables or calculated
@@ -453,201 +669,8 @@ uncertainties and correlations (<code class="xref py py-data docutils literal no
 through <code class="xref py py-func docutils literal notranslate"><span class="pre">correlation_matrix()</span></code>).</p>
 </section>
 </section>
-<section id="printing">
-<span id="index-11"></span><span id="index-10"></span><h2>Printing<a class="headerlink" href="#printing" title="Link to this heading">¶</a></h2>
-<p>Numbers with uncertainties can be printed conveniently:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="go">0.200+/-0.010</span>
-</pre></div>
-</div>
-<p>The resulting form can generally be parsed back with
-<a class="reference internal" href="#uncertainties.ufloat_fromstr" title="uncertainties.ufloat_fromstr"><code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat_fromstr()</span></code></a> (except for the LaTeX form).</p>
-<p>The nominal value and the uncertainty always have the <strong>same
-precision</strong>: this makes it easier to compare them.</p>
-<section id="standard-formats">
-<h3>Standard formats<a class="headerlink" href="#standard-formats" title="Link to this heading">¶</a></h3>
-<p>More <strong>control over the format</strong> can be obtained (in Python 2.6+)
-through the usual <code class="xref py py-func docutils literal notranslate"><span class="pre">format()</span></code> method of strings:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Result = </span><span class="si">{:10.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-<span class="go">Result =       0.20+/-      0.01</span>
-</pre></div>
-</div>
-<p>(Python 2.6 requires <code class="docutils literal notranslate"><span class="pre">'{0:10.2f}'</span></code> instead, with the usual explicit
-index. In Python 2.5 and earlier versions, <code class="xref py py-func docutils literal notranslate"><span class="pre">str.format()</span></code> is not
-available, but one can use the <code class="xref py py-func docutils literal notranslate"><span class="pre">format()</span></code> method of numbers with
-uncertainties instead: <code class="docutils literal notranslate"><span class="pre">'Result</span> <span class="pre">=</span> <span class="pre">%s'</span> <span class="pre">%</span> <span class="pre">x.format('10.2f')</span></code>.)</p>
-<p><strong>All the float format specifications</strong> are accepted, except those
-with the <code class="docutils literal notranslate"><span class="pre">n</span></code> format type. In particular, a fill character, an
-alignment option, a sign or zero option, a width, or the <code class="docutils literal notranslate"><span class="pre">%</span></code> format
-type are all supported.</p>
-<p>The usual <strong>float formats with a precision</strong> retain their original
-meaning (e.g. <code class="docutils literal notranslate"><span class="pre">.2e</span></code> uses two digits after the decimal point): code
-that works with floats produces similar results when running with
-numbers with uncertainties.</p>
-</section>
-<section id="precision-control">
-<h3>Precision control<a class="headerlink" href="#precision-control" title="Link to this heading">¶</a></h3>
-<p>It is possible to <strong>control the number of significant digits of the
-uncertainty</strong> by adding the precision modifier <code class="docutils literal notranslate"><span class="pre">u</span></code> after the
-precision (and before any valid float format type like <code class="docutils literal notranslate"><span class="pre">f</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>,
-the empty format type, etc.):</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1 significant digit on the uncertainty: {:.1u}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-<span class="go">1 significant digit on the uncertainty: 0.20+/-0.01</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3 significant digits on the uncertainty: {:.3u}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-<span class="go">3 significant digits on the uncertainty: 0.2000+/-0.0100</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1 significant digit, exponent notation: {:.1ue}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-<span class="go">1 significant digit, exponent notation: (2.0+/-0.1)e-01</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1 significant digit, percentage: {:.1u%}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-<span class="go">1 significant digit, percentage: (20+/-1)%</span>
-</pre></div>
-</div>
-<p>When <a class="reference internal" href="#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> must <strong>choose the number of significant
-digits on the uncertainty</strong>, it uses the <a class="reference external" href="http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf">Particle
-Data Group</a> rounding
-rules (these rules keep the number of digits small, which is
-convenient for reading numbers with uncertainties, and at the same
-time prevent the uncertainty from being displayed with too few
-digits):</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Automatic number of digits on the uncertainty: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-<span class="go">Automatic number of digits on the uncertainty: 0.200+/-0.010</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x0</span>
-<span class="go">0.200+/-0.010</span>
-</pre></div>
-</div>
-</section>
-<section id="custom-options">
-<h3>Custom options<a class="headerlink" href="#custom-options" title="Link to this heading">¶</a></h3>
-<p><a class="reference internal" href="#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> provides even more flexibility through custom
-formatting options. They can be added at the end of the format string:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">P</span></code> for <strong>pretty-printing</strong>:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:.2e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-<span class="go">(2.00+/-0.10)e-01</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;{:.2eP}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-<span class="go">(2.00±0.10)×10⁻¹</span>
-</pre></div>
-</div>
-<p>The pretty-printing mode thus uses “±”, “×” and superscript
-exponents. Note that the pretty-printing mode implies using
-<strong>Unicode format strings</strong> (<code class="docutils literal notranslate"><span class="pre">u'…'</span></code> in Python 2, but simply <code class="docutils literal notranslate"><span class="pre">'…'</span></code>
-in Python 3).</p>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">S</span></code> for the <strong>shorthand notation</strong>:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;{:+.1uS}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># Sign, 1 digit for the uncertainty, shorthand</span>
-<span class="go">+0.20(1)</span>
-</pre></div>
-</div>
-<p>In this notation, the digits in parentheses represent the
-uncertainty on the last digits of the nominal value.</p>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">L</span></code> for a <strong>LaTeX</strong> output:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="mf">1e7</span>
-<span class="go">(2.00+/-0.10)e+06</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;{:L}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="mf">1e7</span><span class="p">))</span>  <span class="c1"># Automatic exponent form, LaTeX</span>
-<span class="go">\left(2.00 \pm 0.10\right) \times 10^{6}</span>
-</pre></div>
-</div>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">p</span></code> is for requiring that parentheses be always printed around the …±… part
-(without enclosing any exponent or trailing “%”, etc.). This can for instance
-be useful so as to explicitly factor physical units:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;{:p} kg&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># Adds parentheses</span>
-<span class="go">(0.200+/-0.010) kg</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;{:p} kg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="mf">1e7</span><span class="p">))</span>  <span class="c1"># No parentheses added (exponent)</span>
-<span class="go">(2.00+/-0.10)e+06 kg</span>
-</pre></div>
-</div>
-</li>
-</ul>
-<p>These custom formatting options <strong>can be combined</strong> (when meaningful).</p>
-</section>
-<section id="details">
-<h3>Details<a class="headerlink" href="#details" title="Link to this heading">¶</a></h3>
-<p>A <strong>common exponent</strong> is automatically calculated if an exponent is
-needed for the larger of the nominal value (in absolute value) and the
-uncertainty (the rule is the same as for floats). The exponent is
-generally <strong>factored</strong>, for increased legibility:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="mf">1e7</span><span class="p">)</span>
-<span class="go">(2.00+/-0.10)e+06</span>
-</pre></div>
-</div>
-<p>When a <em>format width</em> is used, the common exponent is not factored:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Result = </span><span class="si">{:10.1e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="mf">1e-10</span><span class="p">))</span>
-<span class="go">Result =    2.0e-11+/-   0.1e-11</span>
-</pre></div>
-</div>
-<p>(Using a (minimal) width of 1 is thus a way of forcing exponents to not
-be factored.) Thanks to this feature, each part (nominal value and
-standard deviation) is correctly aligned across multiple lines, while the
-relative magnitude of the error can still be readily estimated thanks to
-the common exponent.</p>
-<p>An uncertainty which is <em>exactly</em> <strong>zero</strong> is always formatted as an
-integer:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ufloat</span><span class="p">(</span><span class="mf">3.1415</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-<span class="go">3.1415+/-0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ufloat</span><span class="p">(</span><span class="mf">3.1415e10</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-<span class="go">(3.1415+/-0)e+10</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ufloat</span><span class="p">(</span><span class="mf">3.1415</span><span class="p">,</span> <span class="mf">0.0005</span><span class="p">))</span>
-<span class="go">3.1415+/-0.0005</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ufloat</span><span class="p">(</span><span class="mf">3.14</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)))</span>
-<span class="go">3.14+/-0.00</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ufloat</span><span class="p">(</span><span class="mf">3.14</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">)))</span>
-<span class="go">3.14+/-0</span>
-</pre></div>
-</div>
-<p><strong>All the digits</strong> of a number with uncertainty are given in its
-representation:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">1.23456789012345</span><span class="p">,</span> <span class="mf">0.123456789</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-<span class="go">1.23+/-0.12</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
-<span class="go">1.23456789012345+/-0.123456789</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span>
-<span class="go">1.23456789012345+/-0.123456789</span>
-</pre></div>
-</div>
-<p><strong>More information</strong> on formatting can be obtained with <code class="docutils literal notranslate"><span class="pre">pydoc</span>
-<span class="pre">uncertainties.UFloat.__format__</span></code> (customization of the LaTeX output,
-etc.).</p>
-</section>
-<section id="global-formatting">
-<h3>Global formatting<a class="headerlink" href="#global-formatting" title="Link to this heading">¶</a></h3>
-<p>It is sometimes useful to have a <strong>consistent formatting</strong> across
-multiple parts of a program. Python’s <a class="reference external" href="http://docs.python.org/2/library/string.html#string-formatting">string.Formatter class</a>
-allows one to do just that. Here is how it can be used to consistently
-use the shorthand notation for numbers with uncertainties:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ShorthandFormatter</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">Formatter</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">format_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">format_spec</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">uncertainties</span><span class="o">.</span><span class="n">UFloat</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">format_spec</span><span class="o">+</span><span class="s1">&#39;S&#39;</span><span class="p">)</span>  <span class="c1"># Shorthand option added</span>
-        <span class="c1"># Special formatting for other types can be added here (floats, etc.)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Usual formatting:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ShorthandFormatter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">format_field</span><span class="p">(</span>
-                <span class="n">value</span><span class="p">,</span> <span class="n">format_spec</span><span class="p">)</span>
-
-<span class="n">frmtr</span> <span class="o">=</span> <span class="n">ShorthandFormatter</span><span class="p">()</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">frmtr</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;Result = {0:.1u}&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>  <span class="c1"># 1-digit uncertainty</span>
-</pre></div>
-</div>
-<p>prints with the shorthand notation: <code class="docutils literal notranslate"><span class="pre">Result</span> <span class="pre">=</span> <span class="pre">0.20(1)</span></code>.</p>
-</section>
-<section id="customizing-the-pretty-print-and-latex-outputs">
-<h3>Customizing the pretty-print and LaTeX outputs<a class="headerlink" href="#customizing-the-pretty-print-and-latex-outputs" title="Link to this heading">¶</a></h3>
-<p>The pretty print and LaTeX outputs themselves can be customized.</p>
-<p>For example, the pretty-print representation of numbers with uncertainty can
-display multiplication with a centered dot (⋅) instead of the default symbol
-(×), like in <code class="docutils literal notranslate"><span class="pre">(2.00±0.10)⋅10⁻¹</span></code>; this is easily done through the global
-setting <code class="docutils literal notranslate"><span class="pre">uncertainties.core.MULT_SYMBOLS[&quot;pretty-print&quot;]</span> <span class="pre">=</span> <span class="pre">&quot;⋅&quot;</span></code>.</p>
-<p>Beyond this multiplication symbol, the “±” symbol, the parentheses and the
-exponent representations can also be customized globally. The details can be
-found in the documentation of <code class="xref py py-func docutils literal notranslate"><span class="pre">uncertainties.core.format_num()</span></code>.</p>
-</section>
-</section>
 <section id="making-custom-functions-accept-numbers-with-uncertainties">
-<h2>Making custom functions accept numbers with uncertainties<a class="headerlink" href="#making-custom-functions-accept-numbers-with-uncertainties" title="Link to this heading">¶</a></h2>
+<span id="index-10"></span><h2>Making custom functions accept numbers with uncertainties<a class="headerlink" href="#making-custom-functions-accept-numbers-with-uncertainties" title="Link to this heading">¶</a></h2>
 <p>This package allows <strong>code which is not meant to be used with numbers
 with uncertainties to handle them anyway</strong>. This is for instance
 useful when calling external functions (which are out of the user’s
@@ -678,7 +701,7 @@ shell function).</p>
 </section>
 <section id="miscellaneous-utilities">
 <h2>Miscellaneous utilities<a class="headerlink" href="#miscellaneous-utilities" title="Link to this heading">¶</a></h2>
-<p id="index-12">It is sometimes useful to modify the error on certain parameters so as
+<p id="index-11">It is sometimes useful to modify the error on certain parameters so as
 to study its impact on a final result.  With this package, the
 <strong>uncertainty of a variable can be changed</strong> on the fly:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sum_value</span> <span class="o">=</span> <span class="n">u</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">v</span>
@@ -694,7 +717,7 @@ to study its impact on a final result.  With this package, the
 <p>The relevant concept is that <code class="xref py py-data docutils literal notranslate"><span class="pre">sum_value</span></code> does depend on the
 variables <code class="xref py py-data docutils literal notranslate"><span class="pre">u</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">v</span></code>: the <a class="reference internal" href="#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> package keeps
 track of this fact, as detailed in the <a class="reference internal" href="tech_guide.html#variable-tracking"><span class="std std-ref">Technical Guide</span></a>, and uncertainties can thus be updated at any time.</p>
-<p id="index-13">When manipulating ensembles of numbers, <em>some</em> of which contain
+<p id="index-12">When manipulating ensembles of numbers, <em>some</em> of which contain
 uncertainties while others are simple floats, it can be useful to
 access the <strong>nominal value and uncertainty of all numbers in a uniform
 manner</strong>.  This is what the <code class="xref py py-func docutils literal notranslate"><span class="pre">nominal_value()</span></code> and
@@ -719,7 +742,7 @@ uncertainty: with <code class="xref py py-data docutils literal notranslate"><sp
 </div>
 </section>
 <section id="derivatives">
-<span id="index-14"></span><span id="id6"></span><h2>Derivatives<a class="headerlink" href="#derivatives" title="Link to this heading">¶</a></h2>
+<span id="index-13"></span><span id="id6"></span><h2>Derivatives<a class="headerlink" href="#derivatives" title="Link to this heading">¶</a></h2>
 <p>Since the application of <a class="reference internal" href="tech_guide.html#linear-method"><span class="std std-ref">linear error propagation theory</span></a> involves the calculation of <strong>derivatives</strong>, this
 package automatically performs such calculations; users can thus
 easily get the derivative of an expression with respect to any of its
@@ -757,21 +780,25 @@ information are given in the
     <ul>
 <li><a class="reference internal" href="#">User Guide</a><ul>
 <li><a class="reference internal" href="#basic-usage">Basic usage</a></li>
-<li><a class="reference internal" href="#module-uncertainties">Creating Variables: numbers with uncertainties</a><ul>
+<li><a class="reference internal" href="#creating-variables-numbers-with-uncertainties">Creating Variables: numbers with uncertainties</a><ul>
+<li><a class="reference internal" href="#module-uncertainties"><code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat_fromstr()</span></code>, and <code class="xref py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a><ul>
 <li><a class="reference internal" href="#uncertainties.ufloat"><code class="docutils literal notranslate"><span class="pre">ufloat()</span></code></a></li>
 <li><a class="reference internal" href="#uncertainties.ufloat_fromstr"><code class="docutils literal notranslate"><span class="pre">ufloat_fromstr()</span></code></a></li>
+<li><a class="reference internal" href="#uncertainties.Variable"><code class="docutils literal notranslate"><span class="pre">Variable</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#basic-math">Basic math</a></li>
-<li><a class="reference internal" href="#mathematical-operations">Mathematical operations</a><ul>
-<li><a class="reference internal" href="#nan-testing">NaN testing</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#arrays-of-numbers-with-uncertainties">Arrays of numbers with uncertainties</a></li>
+<li><a class="reference internal" href="#basic-math-with-uncertain-variables">Basic math with uncertain Variables</a></li>
+<li><a class="reference internal" href="#mathematical-operations-with-uncertain-variables">Mathematical operations with uncertain Variables</a></li>
+<li><a class="reference internal" href="#comparison-operators">Comparison operators</a><ul>
+<li><a class="reference internal" href="#equality-and-inequality-comparisons">Equality and inequality comparisons</a></li>
+<li><a class="reference internal" href="#comparisons-of-magnitude">Comparisons of magnitude</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#handling-nans-and-infinities">Handling NaNs and infinities</a></li>
 <li><a class="reference internal" href="#automatic-correlations">Automatic correlations</a></li>
-<li><a class="reference internal" href="#access-to-the-uncertainty-and-to-the-nominal-value">Access to the uncertainty and to the nominal value</a></li>
 <li><a class="reference internal" href="#access-to-the-individual-sources-of-uncertainty">Access to the individual sources of uncertainty</a></li>
-<li><a class="reference internal" href="#comparison-operators">Comparison operators</a></li>
 <li><a class="reference internal" href="#covariance-and-correlation-matrices">Covariance and correlation matrices</a><ul>
 <li><a class="reference internal" href="#covariance-matrix">Covariance matrix</a></li>
 <li><a class="reference internal" href="#correlation-matrix">Correlation matrix</a></li>
@@ -780,15 +807,6 @@ information are given in the
 <li><a class="reference internal" href="#correlated-variables">Correlated variables</a><ul>
 <li><a class="reference internal" href="#use-of-a-covariance-matrix">Use of a covariance matrix</a></li>
 <li><a class="reference internal" href="#use-of-a-correlation-matrix">Use of a correlation matrix</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#printing">Printing</a><ul>
-<li><a class="reference internal" href="#standard-formats">Standard formats</a></li>
-<li><a class="reference internal" href="#precision-control">Precision control</a></li>
-<li><a class="reference internal" href="#custom-options">Custom options</a></li>
-<li><a class="reference internal" href="#details">Details</a></li>
-<li><a class="reference internal" href="#global-formatting">Global formatting</a></li>
-<li><a class="reference internal" href="#customizing-the-pretty-print-and-latex-outputs">Customizing the pretty-print and LaTeX outputs</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#making-custom-functions-accept-numbers-with-uncertainties">Making custom functions accept numbers with uncertainties</a></li>
@@ -823,7 +841,7 @@ information are given in the
         </div>
       </div>
       <div class="clearer"></div>
-    </div>
+    </div>  
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -840,19 +858,60 @@ information are given in the
           <a href="install.html" title="Installation and Credits"
              >previous</a> |</li>
 <li>[<a href="index.html">Uncertainties</a></li>
-<li>[<a href="install.html">Installation and Credits</a></li>
+<li>[<a href="install.html">Installation & Credits</a></li>
 <li>|<a href="#">User Guide</a></li>
-<li>|<a href="numpy_guide.html">Uncertainties with Numpy Arrays</a></li>
+<li>|<a href="Formatting.html">Formatting Values</a></li>
+<li>|<a href="numpy_guide.html"> Numpy Arrays</a></li>
 <li>|<a href="tech_guide.html">Technical Guide</a>]</li> &nbsp;
 &nbsp;
 &nbsp; &nbsp;
 
-        <li class="nav-item nav-item-this"><a href="">User Guide</a></li> 
+        <li class="nav-item nav-item-this"><a href="">User Guide</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="search.html" method="get">
+          <input placeholder="Quick search" aria-label="Quick search" type="search" name="q" id="search-box" />
+          <input type="submit" value="Go" />
+        </form>
+    </div>
+                     |
+                </li>
+            <li class="right">
+<label class="theme-selector-label">
+    Theme
+    <select class="theme-selector" oninput="activateTheme(this.value)">
+        <option value="auto" selected>Auto</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+    </select>
+</label> |</li>
+            
       </ul>
+    </div>  
+    <div class="footer">
+    &copy; 
+    Copyright
+     2010–2024, Eric O. LEBIGOT (EOL).
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    
+    
+    <br />
+
+    The Python Software Foundation is a non-profit corporation.
+<a href="https://www.python.org/psf/donations/">Please donate.</a>
+<br />
+    <br />
+    
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2010–2024, Eric O. LEBIGOT (EOL).
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
-    </div>
+
   </body>
 </html>

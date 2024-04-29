@@ -6,22 +6,24 @@
 Installation and Credits
 ====================================
 
-Download and Installation 
+Download and Installation
 =========================
 
 The :mod:`uncertainties` package supports Python versions 3.8 and higher.
 Earlier versions of Python are not tested, but may still work.  Development
 version of Python (currently, 3.13) are likely to work, but are not regularly
-tested.  To install :mod:`uncertainties`, use:
+tested.
+
+To install :mod:`uncertainties`, use:
 
 .. code-block:: sh
-                
+
     pip install uncertainties
 
 You can upgrade from an older version of :mod:`uncertainties` with:
 
 .. code-block:: sh
-                
+
   pip install --upgrade uncertainties
 
 
@@ -31,20 +33,23 @@ maintain packages for :mod:`uncertainties`, so that you may also be able to
 install using something like
 
 .. code-block:: sh
-                
+
    conda install -c conda-forge uncertainties
 
 .. code-block:: sh
-                
+
   sudo port install py**-uncertainties
 
+or
+
 .. code-block:: sh
-                
+
   sudo apt get python-uncertainties
 
-In general, using `pip` is recommended.
+depending on your platform and installation of Python.  For all installations
+of Python, using `pip` should work and is therefore recommended.
 
- 
+
 Souce code and Development Version
 ==================================
 
@@ -53,8 +58,8 @@ Souce code and Development Version
 .. _NumPy: http://numpy.scipy.org/
 
 You can `download`_ the latest source package archive from the Python Package
-Index (PyPI) and unpack it, or from the `GitHub releases`_ page.  This can be
-unpacked using `unzip`, `tar xf` , or other similar utilites, and then
+Index (PyPI) and unpack it, or from the `GitHub releases`_ page.  This package
+can be unpacked using `unzip`, `tar xf` , or other similar utilites, and then
 installeed with
 
 .. code-block:: sh
@@ -67,19 +72,18 @@ To work with the development version, use `git` to fork or clone the code:
 
    git clone git@github.com:lmfit/uncertainties.git
 
-   
 The :mod:`uncertainties` package is written in pure Python and has no external
 dependencies.  If available (and recommended), the `NumPy`_ package can be
 used.  Running the test suite requires `pytest` and `pytest_cov`, and building
 these docs requires `sphinx`.  To install these optional packages, use one of:
- 
+
 .. code-block:: sh
-                
+
     pip install ".[arrays]"    # to install numpy
     pip install ".[test]"      # to enable running the tests
     pip install ".[doc]"       # to enable building the docs
     pip install ".[all]"       # to enable all of these options
-    
+
 Getting Help
 =================
 
@@ -87,8 +91,8 @@ Getting Help
 .. _GitHub Issues: https://github.com/lmfit/uncertainties/issues
 .. _lmfit GitHub organization: https://github.com/lmfit/
 
-If you have questions about e :mod:`uncertainties` or run into trouble, use the
-`GitHub Discussions`_ page.   For bug reports, use the `GitHub Issues`_ pages.
+If you have questions about :mod:`uncertainties` or run into trouble, use the
+`GitHub Discussions`_ page.  For bug reports, use the `GitHub Issues`_ pages.
 
 
 Credits
@@ -104,8 +108,8 @@ maintenance team include `Andrew G Savage <https://github.com/andrewgsavage>`_,
 `Justin Gerber <https://github.com/jagerber48>`_,
 `Eric O Legibot <https://github.com/lebigot>`_,
 `Matt Newville <https://github.com/newville>`_,
-and `Will Shanks <https://github.com/wshanks>`_.  Contributions are welcome.
-
+and `Will Shanks <https://github.com/wshanks>`_.  Contributions and suggestions
+for development are welcome.
 
 
 How to cite this package
@@ -144,7 +148,6 @@ and also to Gabi Davar and Pierre Raybaut for including it in
 `Python(x,y)`_ and to Christoph Gohlke for including it in his Base
 distribution of `scientific Python packages`_ for Windows.
 
-
 .. index:: license
 
 License
@@ -154,5 +157,3 @@ License
 
 This software is released under the  `Revised BSD License`_ (© 2010–2024,
 Eric O. LEBIGOT [EOL]).
-
-

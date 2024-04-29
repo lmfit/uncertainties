@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Formatting Variables with uncertainties &#8212; uncertainties</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/pydoctheme.css?v=bb723527" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link id="pygments_dark_css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css" href="_static/pygments_dark.css?v=b20cc3f5" />
+    
+    <script src="_static/documentation_options.js?v=169b9561"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Technical Guide" href="tech_guide.html" />
+    <link rel="prev" title="Uncertainties in arrays" href="numpy_guide.html" /><link rel="stylesheet" href="_static/pydoctheme_dark.css" media="(prefers-color-scheme: dark)" id="pydoctheme_dark_css">
+    <link rel="shortcut icon" type="image/png" href="_static/py.svg" />
+            <script type="text/javascript" src="_static/copybutton.js"></script>
+            <script type="text/javascript" src="_static/menu.js"></script>
+            <script type="text/javascript" src="_static/search-focus.js"></script>
+            <script type="text/javascript" src="_static/themetoggle.js"></script> 
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <nav class="nav-content" role="navigation">
+        <label for="menuToggler" class="toggler__label">
+            <span></span>
+        </label>
+        <span class="nav-items-wrapper">
+            <a href="https://www.python.org/" class="nav-logo">
+                <img src="_static/py.svg" alt="Python logo"/>
+            </a>
+            <span class="version_switcher_placeholder"></span>
+            <form role="search" class="search" action="search.html" method="get">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                    <path fill-rule="nonzero" fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+                </svg>
+                <input placeholder="Quick search" aria-label="Quick search" type="search" name="q" />
+                <input type="submit" value="Go"/>
+            </form>
+        </span>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+            
+<label class="theme-selector-label">
+    Theme
+    <select class="theme-selector" oninput="activateTheme(this.value)">
+        <option value="auto" selected>Auto</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+    </select>
+</label>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Formatting Variables with uncertainties</a><ul>
+<li><a class="reference internal" href="#printing">Printing</a><ul>
+<li><a class="reference internal" href="#standard-formats">Standard formats</a></li>
+<li><a class="reference internal" href="#precision-control">Precision control</a></li>
+<li><a class="reference internal" href="#custom-options">Custom options</a></li>
+<li><a class="reference internal" href="#details">Details</a></li>
+<li><a class="reference internal" href="#global-formatting">Global formatting</a></li>
+<li><a class="reference internal" href="#customizing-the-pretty-print-and-latex-outputs">Customizing the pretty-print and LaTeX outputs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="numpy_guide.html"
+                          title="previous chapter">Uncertainties in arrays</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="tech_guide.html"
+                          title="next chapter">Technical Guide</a></p>
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </nav>
+    </div>
+</div>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px  15px">
+  <font size=+2>
+    <a href="index.html">
+      <img src="_static/logo.png" height=75 border="0"   alt="uncertainties logo"/>
+    </a>
+  </font>
+</div>
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tech_guide.html" title="Technical Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="numpy_guide.html" title="Uncertainties in arrays"
+             accesskey="P">previous</a> |</li>
+<li>[<a href="index.html">Uncertainties</a></li>
+<li>[<a href="install.html">Installation & Credits</a></li>
+<li>|<a href="user_guide.html">User Guide</a></li>
+<li>|<a href="Formatting.html">Formatting Values</a></li>
+<li>|<a href="numpy_guide.html"> Numpy Arrays</a></li>
+<li>|<a href="tech_guide.html">Technical Guide</a>]</li> &nbsp;
+&nbsp;
+&nbsp; &nbsp;
+
+        <li class="nav-item nav-item-this"><a href="">Formatting Variables with uncertainties</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="search.html" method="get">
+          <input placeholder="Quick search" aria-label="Quick search" type="search" name="q" id="search-box" />
+          <input type="submit" value="Go" />
+        </form>
+    </div>
+                     |
+                </li>
+            <li class="right">
+<label class="theme-selector-label">
+    Theme
+    <select class="theme-selector" oninput="activateTheme(this.value)">
+        <option value="auto" selected>Auto</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+    </select>
+</label> |</li>
+            
+      </ul>
+    </div>  
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="formatting-variables-with-uncertainties">
+<span id="formatting-guide"></span><span id="index-0"></span><h1>Formatting Variables with uncertainties<a class="headerlink" href="#formatting-variables-with-uncertainties" title="Link to this heading">¶</a></h1>
+<section id="printing">
+<span id="index-1"></span><h2>Printing<a class="headerlink" href="#printing" title="Link to this heading">¶</a></h2>
+<p>Numbers with uncertainties can be printed conveniently:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">0.200+/-0.010</span>
+</pre></div>
+</div>
+<p>The resulting form can generally be parsed back with
+<code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat_fromstr()</span></code> (except for the LaTeX form).</p>
+<p>The nominal value and the uncertainty always have the <strong>same
+precision</strong>: this makes it easier to compare them.</p>
+<section id="standard-formats">
+<h3>Standard formats<a class="headerlink" href="#standard-formats" title="Link to this heading">¶</a></h3>
+<p>More <strong>control over the format</strong> can be obtained (in Python 2.6+)
+through the usual <code class="xref py py-func docutils literal notranslate"><span class="pre">format()</span></code> method of strings:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Result = </span><span class="si">{:10.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="go">Result =       0.20+/-      0.01</span>
+</pre></div>
+</div>
+<p>(Python 2.6 requires <code class="docutils literal notranslate"><span class="pre">'{0:10.2f}'</span></code> instead, with the usual explicit
+index. In Python 2.5 and earlier versions, <code class="xref py py-func docutils literal notranslate"><span class="pre">str.format()</span></code> is not
+available, but one can use the <code class="xref py py-func docutils literal notranslate"><span class="pre">format()</span></code> method of numbers with
+uncertainties instead: <code class="docutils literal notranslate"><span class="pre">'Result</span> <span class="pre">=</span> <span class="pre">%s'</span> <span class="pre">%</span> <span class="pre">x.format('10.2f')</span></code>.)</p>
+<p><strong>All the float format specifications</strong> are accepted, except those
+with the <code class="docutils literal notranslate"><span class="pre">n</span></code> format type. In particular, a fill character, an
+alignment option, a sign or zero option, a width, or the <code class="docutils literal notranslate"><span class="pre">%</span></code> format
+type are all supported.</p>
+<p>The usual <strong>float formats with a precision</strong> retain their original
+meaning (e.g. <code class="docutils literal notranslate"><span class="pre">.2e</span></code> uses two digits after the decimal point): code
+that works with floats produces similar results when running with
+numbers with uncertainties.</p>
+</section>
+<section id="precision-control">
+<h3>Precision control<a class="headerlink" href="#precision-control" title="Link to this heading">¶</a></h3>
+<p>It is possible to <strong>control the number of significant digits of the
+uncertainty</strong> by adding the precision modifier <code class="docutils literal notranslate"><span class="pre">u</span></code> after the
+precision (and before any valid float format type like <code class="docutils literal notranslate"><span class="pre">f</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>,
+the empty format type, etc.):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1 significant digit on the uncertainty: {:.1u}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="go">1 significant digit on the uncertainty: 0.20+/-0.01</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3 significant digits on the uncertainty: {:.3u}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="go">3 significant digits on the uncertainty: 0.2000+/-0.0100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1 significant digit, exponent notation: {:.1ue}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="go">1 significant digit, exponent notation: (2.0+/-0.1)e-01</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1 significant digit, percentage: {:.1u%}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="go">1 significant digit, percentage: (20+/-1)%</span>
+</pre></div>
+</div>
+<p>When <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> must <strong>choose the number of significant
+digits on the uncertainty</strong>, it uses the <a class="reference external" href="http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf">Particle
+Data Group</a> rounding
+rules (these rules keep the number of digits small, which is
+convenient for reading numbers with uncertainties, and at the same
+time prevent the uncertainty from being displayed with too few
+digits):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Automatic number of digits on the uncertainty: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="go">Automatic number of digits on the uncertainty: 0.200+/-0.010</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x0</span>
+<span class="go">0.200+/-0.010</span>
+</pre></div>
+</div>
+</section>
+<section id="custom-options">
+<h3>Custom options<a class="headerlink" href="#custom-options" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> provides even more flexibility through custom
+formatting options. They can be added at the end of the format string:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">P</span></code> for <strong>pretty-printing</strong>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:.2e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="go">(2.00+/-0.10)e-01</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;{:.2eP}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="go">(2.00±0.10)×10⁻¹</span>
+</pre></div>
+</div>
+<p>The pretty-printing mode thus uses “±”, “×” and superscript
+exponents. Note that the pretty-printing mode implies using
+<strong>Unicode format strings</strong> (<code class="docutils literal notranslate"><span class="pre">u'…'</span></code> in Python 2, but simply <code class="docutils literal notranslate"><span class="pre">'…'</span></code>
+in Python 3).</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">S</span></code> for the <strong>shorthand notation</strong>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;{:+.1uS}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># Sign, 1 digit for the uncertainty, shorthand</span>
+<span class="go">+0.20(1)</span>
+</pre></div>
+</div>
+<p>In this notation, the digits in parentheses represent the
+uncertainty on the last digits of the nominal value.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">L</span></code> for a <strong>LaTeX</strong> output:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="mf">1e7</span>
+<span class="go">(2.00+/-0.10)e+06</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;{:L}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="mf">1e7</span><span class="p">))</span>  <span class="c1"># Automatic exponent form, LaTeX</span>
+<span class="go">\left(2.00 \pm 0.10\right) \times 10^{6}</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p</span></code> is for requiring that parentheses be always printed around the …±… part
+(without enclosing any exponent or trailing “%”, etc.). This can for instance
+be useful so as to explicitly factor physical units:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;{:p} kg&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># Adds parentheses</span>
+<span class="go">(0.200+/-0.010) kg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;{:p} kg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="mf">1e7</span><span class="p">))</span>  <span class="c1"># No parentheses added (exponent)</span>
+<span class="go">(2.00+/-0.10)e+06 kg</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>These custom formatting options <strong>can be combined</strong> (when meaningful).</p>
+</section>
+<section id="details">
+<h3>Details<a class="headerlink" href="#details" title="Link to this heading">¶</a></h3>
+<p>A <strong>common exponent</strong> is automatically calculated if an exponent is
+needed for the larger of the nominal value (in absolute value) and the
+uncertainty (the rule is the same as for floats). The exponent is
+generally <strong>factored</strong>, for increased legibility:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="mf">1e7</span><span class="p">)</span>
+<span class="go">(2.00+/-0.10)e+06</span>
+</pre></div>
+</div>
+<p>When a <em>format width</em> is used, the common exponent is not factored:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Result = </span><span class="si">{:10.1e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="mf">1e-10</span><span class="p">))</span>
+<span class="go">Result =    2.0e-11+/-   0.1e-11</span>
+</pre></div>
+</div>
+<p>(Using a (minimal) width of 1 is thus a way of forcing exponents to not
+be factored.) Thanks to this feature, each part (nominal value and
+standard deviation) is correctly aligned across multiple lines, while the
+relative magnitude of the error can still be readily estimated thanks to
+the common exponent.</p>
+<p>An uncertainty which is <em>exactly</em> <strong>zero</strong> is always formatted as an
+integer:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ufloat</span><span class="p">(</span><span class="mf">3.1415</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="go">3.1415+/-0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ufloat</span><span class="p">(</span><span class="mf">3.1415e10</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="go">(3.1415+/-0)e+10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ufloat</span><span class="p">(</span><span class="mf">3.1415</span><span class="p">,</span> <span class="mf">0.0005</span><span class="p">))</span>
+<span class="go">3.1415+/-0.0005</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ufloat</span><span class="p">(</span><span class="mf">3.14</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)))</span>
+<span class="go">3.14+/-0.00</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ufloat</span><span class="p">(</span><span class="mf">3.14</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">)))</span>
+<span class="go">3.14+/-0</span>
+</pre></div>
+</div>
+<p><strong>All the digits</strong> of a number with uncertainty are given in its
+representation:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">1.23456789012345</span><span class="p">,</span> <span class="mf">0.123456789</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="go">1.23+/-0.12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+<span class="go">1.23456789012345+/-0.123456789</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span>
+<span class="go">1.23456789012345+/-0.123456789</span>
+</pre></div>
+</div>
+<p><strong>More information</strong> on formatting can be obtained with <code class="docutils literal notranslate"><span class="pre">pydoc</span>
+<span class="pre">uncertainties.UFloat.__format__</span></code> (customization of the LaTeX output,
+etc.).</p>
+</section>
+<section id="global-formatting">
+<h3>Global formatting<a class="headerlink" href="#global-formatting" title="Link to this heading">¶</a></h3>
+<p>It is sometimes useful to have a <strong>consistent formatting</strong> across
+multiple parts of a program. Python’s <a class="reference external" href="http://docs.python.org/2/library/string.html#string-formatting">string.Formatter class</a>
+allows one to do just that. Here is how it can be used to consistently
+use the shorthand notation for numbers with uncertainties:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ShorthandFormatter</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">Formatter</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">format_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">format_spec</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">uncertainties</span><span class="o">.</span><span class="n">UFloat</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">format_spec</span><span class="o">+</span><span class="s1">&#39;S&#39;</span><span class="p">)</span>  <span class="c1"># Shorthand option added</span>
+        <span class="c1"># Special formatting for other types can be added here (floats, etc.)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Usual formatting:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ShorthandFormatter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">format_field</span><span class="p">(</span>
+                <span class="n">value</span><span class="p">,</span> <span class="n">format_spec</span><span class="p">)</span>
+
+<span class="n">frmtr</span> <span class="o">=</span> <span class="n">ShorthandFormatter</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">frmtr</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;Result = {0:.1u}&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>  <span class="c1"># 1-digit uncertainty</span>
+</pre></div>
+</div>
+<p>prints with the shorthand notation: <code class="docutils literal notranslate"><span class="pre">Result</span> <span class="pre">=</span> <span class="pre">0.20(1)</span></code>.</p>
+</section>
+<section id="customizing-the-pretty-print-and-latex-outputs">
+<h3>Customizing the pretty-print and LaTeX outputs<a class="headerlink" href="#customizing-the-pretty-print-and-latex-outputs" title="Link to this heading">¶</a></h3>
+<p>The pretty print and LaTeX outputs themselves can be customized.</p>
+<p>For example, the pretty-print representation of numbers with uncertainty can
+display multiplication with a centered dot (⋅) instead of the default symbol
+(×), like in <code class="docutils literal notranslate"><span class="pre">(2.00±0.10)⋅10⁻¹</span></code>; this is easily done through the global
+setting <code class="docutils literal notranslate"><span class="pre">uncertainties.core.MULT_SYMBOLS[&quot;pretty-print&quot;]</span> <span class="pre">=</span> <span class="pre">&quot;⋅&quot;</span></code>.</p>
+<p>Beyond this multiplication symbol, the “±” symbol, the parentheses and the
+exponent representations can also be customized globally. The details can be
+found in the documentation of <code class="xref py py-func docutils literal notranslate"><span class="pre">uncertainties.core.format_num()</span></code>.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Formatting Variables with uncertainties</a><ul>
+<li><a class="reference internal" href="#printing">Printing</a><ul>
+<li><a class="reference internal" href="#standard-formats">Standard formats</a></li>
+<li><a class="reference internal" href="#precision-control">Precision control</a></li>
+<li><a class="reference internal" href="#custom-options">Custom options</a></li>
+<li><a class="reference internal" href="#details">Details</a></li>
+<li><a class="reference internal" href="#global-formatting">Global formatting</a></li>
+<li><a class="reference internal" href="#customizing-the-pretty-print-and-latex-outputs">Customizing the pretty-print and LaTeX outputs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="numpy_guide.html"
+                          title="previous chapter">Uncertainties in arrays</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="tech_guide.html"
+                          title="next chapter">Technical Guide</a></p>
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tech_guide.html" title="Technical Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="numpy_guide.html" title="Uncertainties in arrays"
+             >previous</a> |</li>
+<li>[<a href="index.html">Uncertainties</a></li>
+<li>[<a href="install.html">Installation & Credits</a></li>
+<li>|<a href="user_guide.html">User Guide</a></li>
+<li>|<a href="Formatting.html">Formatting Values</a></li>
+<li>|<a href="numpy_guide.html"> Numpy Arrays</a></li>
+<li>|<a href="tech_guide.html">Technical Guide</a>]</li> &nbsp;
+&nbsp;
+&nbsp; &nbsp;
+
+        <li class="nav-item nav-item-this"><a href="">Formatting Variables with uncertainties</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="search.html" method="get">
+          <input placeholder="Quick search" aria-label="Quick search" type="search" name="q" id="search-box" />
+          <input type="submit" value="Go" />
+        </form>
+    </div>
+                     |
+                </li>
+            <li class="right">
+<label class="theme-selector-label">
+    Theme
+    <select class="theme-selector" oninput="activateTheme(this.value)">
+        <option value="auto" selected>Auto</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+    </select>
+</label> |</li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; 
+    Copyright
+     2010–2024, Eric O. LEBIGOT (EOL).
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    
+    
+    <br />
+
+    The Python Software Foundation is a non-profit corporation.
+<a href="https://www.python.org/psf/donations/">Please donate.</a>
+<br />
+    <br />
+    
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+
+  </body>
+</html>
