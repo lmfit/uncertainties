@@ -1,13 +1,37 @@
 .. index: NumPy support
 
 =======================
-Uncertainties in arrays
+Uncertainties and numpy arrays
 =======================
 
 .. index:: unumpy
+.. index:: arrays; simple use, matrices; simple use
+
+.. _simple_array_use:
+
+Arrays of uncertainties Variables
+====================================
+
+It is possible to put uncertainties Variable  in NumPy_ arrays and
+matrices:
+
+>>> arr = numpy.array([ufloat(1, 0.01), ufloat(2, 0.1)])
+>>> 2*arr
+[2.0+/-0.02 4.0+/-0.2]
+>>> print arr.sum()
+3.00+/-0.10
+
+Many common operations on NumPy arrays can be performed transparently
+even when these arrays contain numbers with uncertainties.
+
 
 The unumpy package
 ==================
+
+
+While :ref:`basic operations on arrays <simple_array_use>` that
+contain numbers with uncertainties can be performed without it, the
+:mod:`unumpy` package is useful for more advanced uses.
 
 This package contains:
 
@@ -17,9 +41,6 @@ NumPy_ arrays and matrices of numbers with uncertainties;
 2. **generalizations** of multiple NumPy functions so that they also
 work with arrays that contain numbers with uncertainties.
 
-While :ref:`basic operations on arrays <simple_array_use>` that
-contain numbers with uncertainties can be performed without it, the
-:mod:`unumpy` package is useful for more advanced uses.
 
 Operations on arrays (including their cosine, etc.)  can thus be
 performed transparently.
