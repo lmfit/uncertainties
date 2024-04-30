@@ -22,7 +22,7 @@
     <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Uncertainties in arrays" href="numpy_guide.html" />
+    <link rel="next" title="Uncertainties and numpy arrays" href="numpy_guide.html" />
     <link rel="prev" title="Installation and Credits" href="install.html" /><link rel="stylesheet" href="_static/pydoctheme_dark.css" media="(prefers-color-scheme: dark)" id="pydoctheme_dark_css">
     <link rel="shortcut icon" type="image/png" href="_static/py.svg" />
             <script type="text/javascript" src="_static/copybutton.js"></script>
@@ -115,7 +115,7 @@
   <div>
     <h4>Next topic</h4>
     <p class="topless"><a href="numpy_guide.html"
-                          title="next chapter">Uncertainties in arrays</a></p>
+                          title="next chapter">Uncertainties and numpy arrays</a></p>
   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
@@ -149,7 +149,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="numpy_guide.html" title="Uncertainties in arrays"
+          <a href="numpy_guide.html" title="Uncertainties and numpy arrays"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="install.html" title="Installation and Credits"
@@ -157,9 +157,9 @@
 <li>[<a href="index.html">Uncertainties</a></li>
 <li>[<a href="install.html">Installation & Credits</a></li>
 <li>|<a href="#">User Guide</a></li>
-<li>|<a href="Formatting.html">Formatting Values</a></li>
+<li>|<a href="formatting.html">Formatting</a></li>
 <li>|<a href="numpy_guide.html"> Numpy Arrays</a></li>
-<li>|<a href="tech_guide.html">Technical Guide</a>]</li> &nbsp;
+<li>|<a href="tech_guide.html">Advanced</a>]</li> &nbsp;
 &nbsp;
 &nbsp; &nbsp;
 
@@ -348,7 +348,7 @@ are handled through the AffineScalarFunc class.</p>
 </section>
 <section id="basic-math-with-uncertain-variables">
 <h2>Basic math with uncertain Variables<a class="headerlink" href="#basic-math-with-uncertain-variables" title="Link to this heading">¶</a></h2>
-<p><code class="xref py py-class docutils literal notranslate"><span class="pre">Variables</span></code> can be used in basic mathematical calculations
+<p>:class:<a href="#id6"><span class="problematic" id="id7">`</span></a>Variable`s can be used in basic mathematical calculations
 (‘+’, ‘-’, ‘*’, ‘/’, ‘**’) as with other Python numbers and variables.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">double</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">t</span>
@@ -435,13 +435,15 @@ are found in the <code class="xref py py-mod docutils literal notranslate"><span
 </section>
 <section id="comparison-operators">
 <h2>Comparison operators<a class="headerlink" href="#comparison-operators" title="Link to this heading">¶</a></h2>
-<p>Comparison operators (‘==’, ‘!=’, ‘&gt;’, ‘&lt;’, ‘&gt;=’, and ‘&lt;=’) for values with
+<p>Comparison operators (‘==’, ‘!=’, ‘&gt;’, ‘&lt;’, ‘&gt;=’, and ‘&lt;=’) for Variables with
 uncertainties are somewhat complicated, and need special atention.  As we
 hinted at above, and will explore in more detai below and in the
 <a class="reference internal" href="tech_guide.html#comparison-operators"><span class="std std-ref">Technical Guide</span></a>, this relates to the correlation
-between variables with</p>
+between Variables.</p>
 <section id="equality-and-inequality-comparisons">
 <h3>Equality and inequality comparisons<a class="headerlink" href="#equality-and-inequality-comparisons" title="Link to this heading">¶</a></h3>
+<p>If we compare the equality of two Variables with the same nominal value and
+uncertainty, we see</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">==</span> <span class="n">x</span>
@@ -450,7 +452,9 @@ between variables with</p>
 <span class="go">False</span>
 </pre></div>
 </div>
-<p>While it may seem like this based on identity, note that</p>
+<p>The difference here is that although the two Python objects have the same
+nominal value and uncertainty, these are indepedent, uncorrelated values.  It
+is not exactly true that the difference is based on identity, note that</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">==</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="ow">is</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
@@ -458,7 +462,16 @@ between variables with</p>
 </pre></div>
 </div>
 <p>In order for the resuls of two calculations with uncertainties to be considered
-equal, the nomimal value <em>and</em> the uncertainty must have the same value.</p>
+equal, the <a class="reference internal" href="#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> package does not test whether the nomimal value
+and the uncertainty have the same value.  Instead it checks whether the
+difference of the two calculations has a nominal value of 0 <em>and</em> an
+uncertainty of 0.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">x</span> <span class="o">-</span><span class="n">x</span><span class="p">)</span>
+<span class="go">0.0+/-0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">x</span> <span class="o">-</span><span class="n">y</span><span class="p">)</span>
+<span class="go">0.0+/-0.7071067811865476</span>
+</pre></div>
+</div>
 </section>
 <section id="comparisons-of-magnitude">
 <h3>Comparisons of magnitude<a class="headerlink" href="#comparisons-of-magnitude" title="Link to this heading">¶</a></h3>
@@ -508,7 +521,7 @@ the nominal value of a Variable is infinite.</p>
 <code class="docutils literal notranslate"><span class="pre">std_dev</span></code> attribute.</p>
 </section>
 <section id="automatic-correlations">
-<span id="index-6"></span><span id="simple-array-use"></span><span id="index-5"></span><h2>Automatic correlations<a class="headerlink" href="#automatic-correlations" title="Link to this heading">¶</a></h2>
+<span id="index-5"></span><h2>Automatic correlations<a class="headerlink" href="#automatic-correlations" title="Link to this heading">¶</a></h2>
 <p>Correlations between variables are <strong>automatically handled</strong> whatever
 the number of variables involved, and whatever the complexity of the
 calculation. For example, when <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> is the number with
@@ -577,7 +590,7 @@ these two errors, since the variables from
 <code class="xref py py-func docutils literal notranslate"><span class="pre">result.error_components()</span></code> are independent.</p>
 </section>
 <section id="covariance-and-correlation-matrices">
-<span id="index-8"></span><span id="index-7"></span><h2>Covariance and correlation matrices<a class="headerlink" href="#covariance-and-correlation-matrices" title="Link to this heading">¶</a></h2>
+<span id="index-7"></span><span id="index-6"></span><h2>Covariance and correlation matrices<a class="headerlink" href="#covariance-and-correlation-matrices" title="Link to this heading">¶</a></h2>
 <section id="covariance-matrix">
 <h3>Covariance matrix<a class="headerlink" href="#covariance-matrix" title="Link to this heading">¶</a></h3>
 <p>The covariance matrix between various variables or calculated
@@ -616,7 +629,7 @@ obtained as well:</p>
 </section>
 </section>
 <section id="correlated-variables">
-<span id="index-9"></span><h2>Correlated variables<a class="headerlink" href="#correlated-variables" title="Link to this heading">¶</a></h2>
+<span id="index-8"></span><h2>Correlated variables<a class="headerlink" href="#correlated-variables" title="Link to this heading">¶</a></h2>
 <p>Reciprocally, <strong>correlated variables can be created</strong> transparently,
 provided that the <a class="reference external" href="http://numpy.scipy.org/">NumPy</a> package is available.</p>
 <section id="use-of-a-covariance-matrix">
@@ -670,7 +683,7 @@ through <code class="xref py py-func docutils literal notranslate"><span class="
 </section>
 </section>
 <section id="making-custom-functions-accept-numbers-with-uncertainties">
-<span id="index-10"></span><h2>Making custom functions accept numbers with uncertainties<a class="headerlink" href="#making-custom-functions-accept-numbers-with-uncertainties" title="Link to this heading">¶</a></h2>
+<span id="index-9"></span><h2>Making custom functions accept numbers with uncertainties<a class="headerlink" href="#making-custom-functions-accept-numbers-with-uncertainties" title="Link to this heading">¶</a></h2>
 <p>This package allows <strong>code which is not meant to be used with numbers
 with uncertainties to handle them anyway</strong>. This is for instance
 useful when calling external functions (which are out of the user’s
@@ -701,7 +714,7 @@ shell function).</p>
 </section>
 <section id="miscellaneous-utilities">
 <h2>Miscellaneous utilities<a class="headerlink" href="#miscellaneous-utilities" title="Link to this heading">¶</a></h2>
-<p id="index-11">It is sometimes useful to modify the error on certain parameters so as
+<p id="index-10">It is sometimes useful to modify the error on certain parameters so as
 to study its impact on a final result.  With this package, the
 <strong>uncertainty of a variable can be changed</strong> on the fly:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sum_value</span> <span class="o">=</span> <span class="n">u</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">v</span>
@@ -717,7 +730,7 @@ to study its impact on a final result.  With this package, the
 <p>The relevant concept is that <code class="xref py py-data docutils literal notranslate"><span class="pre">sum_value</span></code> does depend on the
 variables <code class="xref py py-data docutils literal notranslate"><span class="pre">u</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">v</span></code>: the <a class="reference internal" href="#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> package keeps
 track of this fact, as detailed in the <a class="reference internal" href="tech_guide.html#variable-tracking"><span class="std std-ref">Technical Guide</span></a>, and uncertainties can thus be updated at any time.</p>
-<p id="index-12">When manipulating ensembles of numbers, <em>some</em> of which contain
+<p id="index-11">When manipulating ensembles of numbers, <em>some</em> of which contain
 uncertainties while others are simple floats, it can be useful to
 access the <strong>nominal value and uncertainty of all numbers in a uniform
 manner</strong>.  This is what the <code class="xref py py-func docutils literal notranslate"><span class="pre">nominal_value()</span></code> and
@@ -742,7 +755,7 @@ uncertainty: with <code class="xref py py-data docutils literal notranslate"><sp
 </div>
 </section>
 <section id="derivatives">
-<span id="index-13"></span><span id="id6"></span><h2>Derivatives<a class="headerlink" href="#derivatives" title="Link to this heading">¶</a></h2>
+<span id="index-12"></span><span id="id8"></span><h2>Derivatives<a class="headerlink" href="#derivatives" title="Link to this heading">¶</a></h2>
 <p>Since the application of <a class="reference internal" href="tech_guide.html#linear-method"><span class="std std-ref">linear error propagation theory</span></a> involves the calculation of <strong>derivatives</strong>, this
 package automatically performs such calculations; users can thus
 easily get the derivative of an expression with respect to any of its
@@ -761,7 +774,7 @@ variables:</p>
 <section id="additional-information">
 <h2>Additional information<a class="headerlink" href="#additional-information" title="Link to this heading">¶</a></h2>
 <p>The capabilities of the <a class="reference internal" href="#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> package in terms of array
-handling are detailed in <a class="reference internal" href="numpy_guide.html"><span class="doc">Uncertainties in arrays</span></a>.</p>
+handling are detailed in <a class="reference internal" href="numpy_guide.html"><span class="doc">Uncertainties and numpy arrays</span></a>.</p>
 <p>Details about the theory behind this package and implementation
 information are given in the
 <a class="reference internal" href="tech_guide.html"><span class="doc">Technical Guide</span></a>.</p>
@@ -826,7 +839,7 @@ information are given in the
   <div>
     <h4>Next topic</h4>
     <p class="topless"><a href="numpy_guide.html"
-                          title="next chapter">Uncertainties in arrays</a></p>
+                          title="next chapter">Uncertainties and numpy arrays</a></p>
   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
@@ -852,7 +865,7 @@ information are given in the
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="numpy_guide.html" title="Uncertainties in arrays"
+          <a href="numpy_guide.html" title="Uncertainties and numpy arrays"
              >next</a> |</li>
         <li class="right" >
           <a href="install.html" title="Installation and Credits"
@@ -860,9 +873,9 @@ information are given in the
 <li>[<a href="index.html">Uncertainties</a></li>
 <li>[<a href="install.html">Installation & Credits</a></li>
 <li>|<a href="#">User Guide</a></li>
-<li>|<a href="Formatting.html">Formatting Values</a></li>
+<li>|<a href="formatting.html">Formatting</a></li>
 <li>|<a href="numpy_guide.html"> Numpy Arrays</a></li>
-<li>|<a href="tech_guide.html">Technical Guide</a>]</li> &nbsp;
+<li>|<a href="tech_guide.html">Advanced</a>]</li> &nbsp;
 &nbsp;
 &nbsp; &nbsp;
 

@@ -79,7 +79,7 @@ The most common and important functions for creating uncertain
 Basic math with uncertain Variables
 =========================================
 
-:class:`Variables` can be used in basic mathematical calculations
+:class:`Variable`s can be used in basic mathematical calculations
 ('+', '-', '*', '/', '**') as with other Python numbers and variables.
 
 >>> t = ufloat(0.2, 0.01)
@@ -177,16 +177,19 @@ The functions in the :mod:`uncertainties.umath` module include:
 Comparison operators
 ====================
 
-Comparison operators ('==', '!=', '>', '<', '>=', and '<=') for values with
+Comparison operators ('==', '!=', '>', '<', '>=', and '<=') for Variables with
 uncertainties are somewhat complicated, and need special atention.  As we
 hinted at above, and will explore in more detai below and in the
 :ref:`Technical Guide <comparison_operators>`, this relates to the correlation
-between variables with
+between Variables.
 
 
 
 Equality and inequality comparisons
 ------------------------------------
+
+If we compare the equality of two Variables with the same nominal value and
+uncertainty, we see
 
 >>> x = ufloat(5, 0.5)
 >>> y = ufloat(5, 0.5)
@@ -195,7 +198,9 @@ True
 >>> x == y
 False
 
-While it may seem like this based on identity, note that
+The difference here is that although the two Python objects have the same
+nominal value and uncertainty, these are indepedent, uncorrelated values.  It
+is not exactly true that the difference is based on identity, note that
 
 >>> x == (1.0*x)
 True
@@ -203,7 +208,15 @@ True
 False
 
 In order for the resuls of two calculations with uncertainties to be considered
-equal, the nomimal value *and* the uncertainty must have the same value.
+equal, the :mod:`uncertainties` package does not test whether the nomimal value
+and the uncertainty have the same value.  Instead it checks whether the
+difference of the two calculations has a nominal value of 0 *and* an
+uncertainty of 0.
+
+>>> (x -x)
+0.0+/-0
+>>> (x -y)
+0.0+/-0.7071067811865476
 
 
 Comparisons of magnitude
@@ -259,11 +272,6 @@ the nominal value of a Variable is infinite.
 To check whether the uncertainty is NaN or Inf, use one of :func:`math.isnan`,
 :func:`math.isinf`, :func:`nupmy.isnan`, or , :func:`nupmy.isinf` on the
 ``std_dev`` attribute.
-
-
-.. index:: arrays; simple use, matrices; simple use
-
-.. _simple_array_use:
 
 
 .. index:: correlations; detailed example
