@@ -38,10 +38,6 @@ through the usual :func:`format` method of strings:
 >>> print('Result = {:10.2f}'.format(x))
 Result =       0.20+/-      0.01
 
-(Python 2.6 requires ``'{0:10.2f}'`` instead, with the usual explicit
-index. In Python 2.5 and earlier versions, :func:`str.format` is not
-available, but one can use the :func:`format` method of numbers with
-uncertainties instead: ``'Result = %s' % x.format('10.2f')``.)
 
 .. Legacy formats and base syntax of the format specification:
 
@@ -85,7 +81,7 @@ digits):
 
 >>> print('Automatic number of digits on the uncertainty: {}'.format(x))
 Automatic number of digits on the uncertainty: 0.200+/-0.010
->>> print(x0
+>>> print(x)
 0.200+/-0.010
 
 Custom options
@@ -104,9 +100,7 @@ formatting options. They can be added at the end of the format string:
   (2.00±0.10)×10⁻¹
 
   The pretty-printing mode thus uses "±", "×" and superscript
-  exponents. Note that the pretty-printing mode implies using
-  **Unicode format strings** (``u'…'`` in Python 2, but simply ``'…'``
-  in Python 3).
+  exponents.
 
 - ``S`` for the **shorthand notation**:
 
@@ -185,16 +179,13 @@ representation:
 >>> y
 1.23456789012345+/-0.123456789
 
-**More information** on formatting can be obtained with ``pydoc
-uncertainties.UFloat.__format__`` (customization of the LaTeX output,
-etc.).
 
 Global formatting
 -----------------
 
 It is sometimes useful to have a **consistent formatting** across
 multiple parts of a program. Python's `string.Formatter class
-<http://docs.python.org/2/library/string.html#string-formatting>`_
+<https://docs.python.org/3/library/string.html#custom-string-formatting>`_
 allows one to do just that. Here is how it can be used to consistently
 use the shorthand notation for numbers with uncertainties:
 

@@ -21,7 +21,7 @@
     <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Technical Guide" href="tech_guide.html" />
+    <link rel="next" title="Advanced Topics" href="tech_guide.html" />
     <link rel="prev" title="Uncertainties and numpy arrays" href="numpy_guide.html" /><link rel="stylesheet" href="_static/pydoctheme_dark.css" media="(prefers-color-scheme: dark)" id="pydoctheme_dark_css">
     <link rel="shortcut icon" type="image/png" href="_static/py.svg" />
             <script type="text/javascript" src="_static/copybutton.js"></script>
@@ -89,7 +89,7 @@
   <div>
     <h4>Next topic</h4>
     <p class="topless"><a href="tech_guide.html"
-                          title="next chapter">Technical Guide</a></p>
+                          title="next chapter">Advanced Topics</a></p>
   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
@@ -123,17 +123,17 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="tech_guide.html" title="Technical Guide"
+          <a href="tech_guide.html" title="Advanced Topics"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="numpy_guide.html" title="Uncertainties and numpy arrays"
              accesskey="P">previous</a> |</li>
-<li>[<a href="index.html">Uncertainties</a></li>
+<li>[<a href="index.html">Home</a></li>
 <li>[<a href="install.html">Installation & Credits</a></li>
 <li>|<a href="user_guide.html">User Guide</a></li>
 <li>|<a href="#">Formatting</a></li>
 <li>|<a href="numpy_guide.html"> Numpy Arrays</a></li>
-<li>|<a href="tech_guide.html">Advanced</a>]</li> &nbsp;
+<li>|<a href="tech_guide.html">Advanced Topics</a>]</li> &nbsp;
 &nbsp;
 &nbsp; &nbsp;
 
@@ -189,10 +189,6 @@ through the usual <code class="xref py py-func docutils literal notranslate"><sp
 <span class="go">Result =       0.20+/-      0.01</span>
 </pre></div>
 </div>
-<p>(Python 2.6 requires <code class="docutils literal notranslate"><span class="pre">'{0:10.2f}'</span></code> instead, with the usual explicit
-index. In Python 2.5 and earlier versions, <code class="xref py py-func docutils literal notranslate"><span class="pre">str.format()</span></code> is not
-available, but one can use the <code class="xref py py-func docutils literal notranslate"><span class="pre">format()</span></code> method of numbers with
-uncertainties instead: <code class="docutils literal notranslate"><span class="pre">'Result</span> <span class="pre">=</span> <span class="pre">%s'</span> <span class="pre">%</span> <span class="pre">x.format('10.2f')</span></code>.)</p>
 <p><strong>All the float format specifications</strong> are accepted, except those
 with the <code class="docutils literal notranslate"><span class="pre">n</span></code> format type. In particular, a fill character, an
 alignment option, a sign or zero option, a width, or the <code class="docutils literal notranslate"><span class="pre">%</span></code> format
@@ -218,7 +214,7 @@ the empty format type, etc.):</p>
 <span class="go">1 significant digit, percentage: (20+/-1)%</span>
 </pre></div>
 </div>
-<p>When <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> must <strong>choose the number of significant
+<p>When <a class="reference internal" href="tech_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> must <strong>choose the number of significant
 digits on the uncertainty</strong>, it uses the <a class="reference external" href="http://PDG.lbl.gov/2010/reviews/rpp2010-rev-rpp-intro.pdf">Particle
 Data Group</a> rounding
 rules (these rules keep the number of digits small, which is
@@ -227,14 +223,14 @@ time prevent the uncertainty from being displayed with too few
 digits):</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Automatic number of digits on the uncertainty: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 <span class="go">Automatic number of digits on the uncertainty: 0.200+/-0.010</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 <span class="go">0.200+/-0.010</span>
 </pre></div>
 </div>
 </section>
 <section id="custom-options">
 <h3>Custom options<a class="headerlink" href="#custom-options" title="Link to this heading">¶</a></h3>
-<p><a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> provides even more flexibility through custom
+<p><a class="reference internal" href="tech_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> provides even more flexibility through custom
 formatting options. They can be added at the end of the format string:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">P</span></code> for <strong>pretty-printing</strong>:</p>
@@ -245,9 +241,7 @@ formatting options. They can be added at the end of the format string:</p>
 </pre></div>
 </div>
 <p>The pretty-printing mode thus uses “±”, “×” and superscript
-exponents. Note that the pretty-printing mode implies using
-<strong>Unicode format strings</strong> (<code class="docutils literal notranslate"><span class="pre">u'…'</span></code> in Python 2, but simply <code class="docutils literal notranslate"><span class="pre">'…'</span></code>
-in Python 3).</p>
+exponents.</p>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">S</span></code> for the <strong>shorthand notation</strong>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;{:+.1uS}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># Sign, 1 digit for the uncertainty, shorthand</span>
@@ -323,14 +317,11 @@ representation:</p>
 <span class="go">1.23456789012345+/-0.123456789</span>
 </pre></div>
 </div>
-<p><strong>More information</strong> on formatting can be obtained with <code class="docutils literal notranslate"><span class="pre">pydoc</span>
-<span class="pre">uncertainties.UFloat.__format__</span></code> (customization of the LaTeX output,
-etc.).</p>
 </section>
 <section id="global-formatting">
 <h3>Global formatting<a class="headerlink" href="#global-formatting" title="Link to this heading">¶</a></h3>
 <p>It is sometimes useful to have a <strong>consistent formatting</strong> across
-multiple parts of a program. Python’s <a class="reference external" href="http://docs.python.org/2/library/string.html#string-formatting">string.Formatter class</a>
+multiple parts of a program. Python’s <a class="reference external" href="https://docs.python.org/3/library/string.html#custom-string-formatting">string.Formatter class</a>
 allows one to do just that. Here is how it can be used to consistently
 use the shorthand notation for numbers with uncertainties:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ShorthandFormatter</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">Formatter</span><span class="p">):</span>
@@ -398,7 +389,7 @@ found in the documentation of <code class="xref py py-func docutils literal notr
   <div>
     <h4>Next topic</h4>
     <p class="topless"><a href="tech_guide.html"
-                          title="next chapter">Technical Guide</a></p>
+                          title="next chapter">Advanced Topics</a></p>
   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
@@ -424,17 +415,17 @@ found in the documentation of <code class="xref py py-func docutils literal notr
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="tech_guide.html" title="Technical Guide"
+          <a href="tech_guide.html" title="Advanced Topics"
              >next</a> |</li>
         <li class="right" >
           <a href="numpy_guide.html" title="Uncertainties and numpy arrays"
              >previous</a> |</li>
-<li>[<a href="index.html">Uncertainties</a></li>
+<li>[<a href="index.html">Home</a></li>
 <li>[<a href="install.html">Installation & Credits</a></li>
 <li>|<a href="user_guide.html">User Guide</a></li>
 <li>|<a href="#">Formatting</a></li>
 <li>|<a href="numpy_guide.html"> Numpy Arrays</a></li>
-<li>|<a href="tech_guide.html">Advanced</a>]</li> &nbsp;
+<li>|<a href="tech_guide.html">Advanced Topics</a>]</li> &nbsp;
 &nbsp;
 &nbsp; &nbsp;
 

@@ -11,16 +11,14 @@ Basic usage
 
 Basic mathematical operations involving numbers with uncertainties requires
 importing the :func:`ufloat` function which creates a :class:`Variable`:
-numbet with both a nominal value and an uncertainty.
+number with both a nominal value and an uncertainty.
 
      >>> from uncertainties import ufloat
      >>> x = ufloat(2.7, 0.01)   #  a Variable with a value 2.7+/-0.01
 
 The :mod:`uncertainties` module contains sub-modules for :ref:`advanced
 mathematical functions <advanced math operations>`, and :doc:`arrays and
-matrices <numpy_guide>`, which can be accessed with::
-
- >>> import uncertainties
+matrices <numpy_guide>`, which can be accessed as well.
 
 .. index::
    pair: number with uncertainty; creation
@@ -47,9 +45,16 @@ the `nominal_value` and `std_dev` attributes:
 >>> print(x.nominal_value,  x.std_dev)
 2.7 0.01
 
-uncertainties Variables can also be created from one of many
-string representations.  The following forms will all create Variables with the
-same value:
+
+Because these are fairly long to type, for convenience,  `nominal_value` can be
+abbreviated as `n` and `std_dev` as `s`:
+
+>>> print(x.n,  x.s)
+2.7 0.01
+
+uncertainties Variables can also be created from one of many string
+representations.  The following forms will all create Variables with the same
+value:
 
 >>> from uncertainties import ufloat_fromstr
 >>> x = ufloat(0.2, 0.01)
@@ -60,27 +65,15 @@ same value:
 >>> x = ufloat_fromstr(u"0.20±0.01")  # Pretty-print form
 >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
 
-
-:func:`ufloat`, :func:`ufloat_fromstr`, and :class:`Variable`
---------------------------------------------------------------------------
-
-
-.. module:: uncertainties
-
-The most common and important functions for creating uncertain
-:class:`Variables` are :func:`ufloat` and :func:`ufloat_fromstr`.
-
-.. autofunction:: ufloat
-
-.. autofunction:: ufloat_fromstr
-
-.. autoclass:: Variable
+More details on the :func:`ufloat` and :func:`ufloat_from_str` can be found in
+:ref:`api_funcs`.
 
 Basic math with uncertain Variables
 =========================================
 
-:class:`Variable`s can be used in basic mathematical calculations
-('+', '-', '*', '/', '**') as with other Python numbers and variables.
+Uncertainties variables created in :func:`ufloat` or :func:`ufloat_fromstr` can
+be used in basic mathematical calculations ('+', '-', '*', '/', '**') as with
+other Python numbers and variables.
 
 >>> t = ufloat(0.2, 0.01)
 >>> double = 2.0*t
@@ -91,17 +84,18 @@ Basic math with uncertain Variables
 0.040+/-0.004
 
 When adding two Variables, the uncertainty in the result is the quadrature sum
-(square-root of the sum of squares) of the uncertaities of the two Variables:
+(square-root of the sum of squares) of the uncertainties of the two Variables:
 
 >>> x = ufloat(20, 4)
 >>> y = ufloat(12, 3)
 >>> print(x+y)
 32.0+/-5.0
 
-We can check that error propagation when adding two independent variables:
+We can check that error propagation when adding two independent variables
+(using the abbreviation `.s` for the standard error):
 
 >>> from math import sqrt
->>> (x+y).std_dev == sqrt(x.std_dev**2 + y.std_dev**2)
+>>> (x+y).s == sqrt(x.s**2 + y.s**2)
 True
 
 
@@ -110,10 +104,10 @@ uncertainties too:
 
 >>> print(x*y)
 240.0+/-76.83749084919418
->>> (x*y).std_dev == (x*y).nominal_value *  sqrt((x.std_dev/x.nominal_value)**2 + (y.std_dev/y.nominal_value)**2 )
+>>> (x*y).s == (x*y).n *  sqrt((x.s/x.n)**2 + (y.s/y.n)**2 )
 True
 
-But note that adding a Variable to itself does not add its uncertaintes in
+But note that adding a Variable to itself does not add its uncertainties in
 quadrature, but are simply scaled:
 
 >>> print(x+x)
@@ -147,7 +141,7 @@ correlated, and calculations will reflect that.
 Mathematical operations with uncertain Variables
 =====================================================
 
-Besides being able to apply basic mathematical operations to uncertaintties
+Besides being able to apply basic mathematical operations to uncertainties
 Variables, this package provides generalized versions of 40 of the the
 functions from the standard :mod:`math` *module*.  These mathematical functions
 are found in the :mod:`uncertainties.umath` module:
@@ -178,8 +172,8 @@ Comparison operators
 ====================
 
 Comparison operators ('==', '!=', '>', '<', '>=', and '<=') for Variables with
-uncertainties are somewhat complicated, and need special atention.  As we
-hinted at above, and will explore in more detai below and in the
+uncertainties are somewhat complicated, and need special attention.  As we
+hinted at above, and will explore in more detail below and in the
 :ref:`Technical Guide <comparison_operators>`, this relates to the correlation
 between Variables.
 
@@ -199,7 +193,7 @@ True
 False
 
 The difference here is that although the two Python objects have the same
-nominal value and uncertainty, these are indepedent, uncorrelated values.  It
+nominal value and uncertainty, these are independent, uncorrelated values.  It
 is not exactly true that the difference is based on identity, note that
 
 >>> x == (1.0*x)
@@ -207,8 +201,8 @@ True
 >>> x is (1.0*x)
 False
 
-In order for the resuls of two calculations with uncertainties to be considered
-equal, the :mod:`uncertainties` package does not test whether the nomimal value
+In order for the result of two calculations with uncertainties to be considered
+equal, the :mod:`uncertainties` package does not test whether the nominal value
 and the uncertainty have the same value.  Instead it checks whether the
 difference of the two calculations has a nominal value of 0 *and* an
 uncertainty of 0.
@@ -224,7 +218,7 @@ Comparisons of magnitude
 
 The concept of comparing the magnitude of values with uncertainties is a bit
 complicated.  That is, a Variable with a value of 25 +/- 10 might be greater
-than a Varitable with a value of 24 +/- 8 most of the time, but *sometimes* it
+than a Variable with a value of 24 +/- 8 most of the time, but *sometimes* it
 might be less than it.   The :mod:`uncertainties` package takes the simple
 approach of comparing.  That is
 
@@ -233,8 +227,8 @@ approach of comparing.  That is
 >>> a > b
 True
 
-Note that cobining this comparison and the above discussion of `==` and `!=`
-can lead to a result that maybe somewhat surpring:
+Note that combining this comparison and the above discussion of `==` and `!=`
+can lead to a result that maybe somewhat surprising:
 
 
 >>> a = ufloat(25, 10)
@@ -248,7 +242,7 @@ False
 >>> a.nominal_value >= b.nominal_value
 True
 
-That is, since `a` is neither greeater than `b` (nomal value only) nor equal to
+That is, since `a` is neither greater than `b` (nominal value only) nor equal to
 `b`, it cannot be greater than or equal to `b`.
 
 
@@ -496,9 +490,6 @@ result are automatically calculated numerically. **Analytical
 uncertainty calculations can be performed** if derivatives are
 provided to :func:`wrap`.
 
-More details are available in the documentation string of :func:`wrap`
-(accessible through the ``pydoc`` command, or Python's :func:`help`
-shell function).
 
 Miscellaneous utilities
 =======================

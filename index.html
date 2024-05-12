@@ -117,12 +117,12 @@
         <li class="right" >
           <a href="install.html" title="Installation and Credits"
              accesskey="N">next</a> |</li>
-<li>[<a href="#">Uncertainties</a></li>
+<li>[<a href="#">Home</a></li>
 <li>[<a href="install.html">Installation & Credits</a></li>
 <li>|<a href="user_guide.html">User Guide</a></li>
 <li>|<a href="formatting.html">Formatting</a></li>
 <li>|<a href="numpy_guide.html"> Numpy Arrays</a></li>
-<li>|<a href="tech_guide.html">Advanced</a>]</li> &nbsp;
+<li>|<a href="tech_guide.html">Advanced Topics</a>]</li> &nbsp;
 &nbsp;
 &nbsp; &nbsp;
 
@@ -163,9 +163,9 @@
 calculations on numbers that have uncertainties (like 3.14±0.01) that are
 common in many scientific fields.  The calcualtions done with this package will
 propagate the uncertainties to the result of mathematical calculations.
-The <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> package takes the pain and
+The <a class="reference internal" href="tech_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> package takes the pain and
 complexity out of uncertainty calculations and error propagation.  Here is a
-quick taste of how to use <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a>:</p>
+quick taste of how to use <a class="reference internal" href="tech_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">uncertainties</span> <span class="kn">import</span> <span class="n">ufloat</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>   <span class="c1"># x = 2+/-0.1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span>   <span class="c1"># y = 3+/-0.2</span>
@@ -177,7 +177,7 @@ quick taste of how to use <a class="reference internal" href="user_guide.html#mo
 <span class="go">6.0+/-0.5</span>
 </pre></div>
 </div>
-<p>The <a class="reference internal" href="user_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> library calculates uncertainties using linear <a class="reference external" href="https://en.wikipedia.org/wiki/Propagation_of_uncertainty">error
+<p>The <a class="reference internal" href="tech_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> library calculates uncertainties using linear <a class="reference external" href="https://en.wikipedia.org/wiki/Propagation_of_uncertainty">error
 propagation theory</a> by automatically <a class="reference internal" href="user_guide.html#derivatives"><span class="std std-ref">calculating derivatives</span></a> and analytically propagating these to the results.  Correlations
 between variables are automatically handled.  This library can also yield the
 derivatives of any expression with respect to the variables that have uncertain
@@ -228,15 +228,9 @@ BSD License</a>.  This dcoumentation is licensed under the <a class="reference e
 <li class="toctree-l2"><a class="reference internal" href="formatting.html#printing">Printing</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tech_guide.html">Technical Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#testing-whether-an-object-is-a-number-with-uncertainty">Testing whether an object is a number with uncertainty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#pickling">Pickling</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#comparison-operators">Comparison operators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#linear-propagation-of-uncertainties">Linear propagation of uncertainties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#mathematical-definition-of-numbers-with-uncertainties">Mathematical definition of numbers with uncertainties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#differentiation-method">Differentiation method</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#tracking-of-random-variables">Tracking of random variables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#python-classes-for-variables-and-functions-with-uncertainty">Python classes for variables and functions with uncertainty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tech_guide.html">Advanced Topics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#module-uncertainties">API: Application Programming Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tech_guide.html#special-technical-topics">Special Technical Topics</a></li>
 </ul>
 </li>
 </ul>
@@ -295,12 +289,12 @@ BSD License</a>.  This dcoumentation is licensed under the <a class="reference e
         <li class="right" >
           <a href="install.html" title="Installation and Credits"
              >next</a> |</li>
-<li>[<a href="#">Uncertainties</a></li>
+<li>[<a href="#">Home</a></li>
 <li>[<a href="install.html">Installation & Credits</a></li>
 <li>|<a href="user_guide.html">User Guide</a></li>
 <li>|<a href="formatting.html">Formatting</a></li>
 <li>|<a href="numpy_guide.html"> Numpy Arrays</a></li>
-<li>|<a href="tech_guide.html">Advanced</a>]</li> &nbsp;
+<li>|<a href="tech_guide.html">Advanced Topics</a>]</li> &nbsp;
 &nbsp;
 &nbsp; &nbsp;
 
