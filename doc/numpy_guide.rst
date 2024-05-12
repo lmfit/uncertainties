@@ -1,8 +1,8 @@
 .. index: NumPy support
 
-=======================
+===============================
 Uncertainties and numpy arrays
-=======================
+===============================
 
 .. index:: unumpy
 .. index:: arrays; simple use, matrices; simple use
@@ -139,9 +139,7 @@ module (for instance, :func:`unumpy.arccos` is defined, like in NumPy,
 and is not named :func:`acos` like in the :mod:`math` module).
 
 The definition of the mathematical quantities calculated by these
-functions is available in the documentation for
-:mod:`uncertainties.umath` (which is accessible through :func:`help`
-or ``pydoc``).
+functions is available in the documentation for  :mod:`uncertainties.umath`.
 
 .. index::
    pair: testing and operations (in arrays); NaN
