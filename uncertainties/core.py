@@ -417,121 +417,51 @@ class IndexableIter(object):
             self.__class__.__name__,
             ', '.join(map(str, self.returned_elements)))
 
-def wrap(f, derivatives_args=[], derivatives_kwargs={}):
+def wrap(f, derivatives_args=None, derivatives_kwargs=None):
+    """Wrap a function f into one that accepts Variables.
+
+    The function f must return a float or integer value.  The returned
+    wrapped function will return values with both uncertainties and
+    correlations, but can be used as a drop-in replacement for the
+    original function.
+
+    Arguments:
+    ----------
+    derivatives_args: list or iterable
+           list or tupleof derivative functionss or None with respect to
+           the positional arguments of `f`.  See Note 1.
+    derivatives_kwargs: dictionary
+           dict of derivative functionss or None with respect to the
+           keyword arguments of `f`.  See Note 1.
+
+    Notes:
+    -------
+    1.  Each function must be the partial derivative of f with respect to the
+        corresponding positional parameters, and must have the same signature
+        as ``f``. `derivative_args` hold derivitative functions for positional
+        arguments (include `*varargs`), while  `derivative_kwargs` holds
+        derivitative functions for keyword arguments (include `**kwargs`). If an
+        entry is `None` or not supplied, and if the argument value isa numeric
+        Variable, a numerical derivative will be used. Non-numeric are ignored.
+    2.  If derivatives are meaningless or the function is not function is not
+        differentiable, the derivative funcion should return NaN for values
+        for which the the function is not differentiable.
+
+    Example:
+    --------
+    To wrap `sin`, one could do
+       >>> from uncertainties import wrap, umath
+       >>> import math
+       >>> usin_a = wrap(math.sin)   # uses numerical derivative
+       >>> usin_b = wrap(math.sin, [math.cos])  # use analytic derivative
+       >>> usin_c = umath.sin        # builtin, same as usin_2
+
+    These will all give the same result.
     """
-    Wraps a function f into a function that also accepts numbers with
-    uncertainties (UFloat objects); the wrapped function returns the
-    value of f with the correct uncertainty and correlations. The
-    wrapped function is intended to be used as a drop-in replacement
-    for the original function: they can be called in the exact same
-    way, the only difference being that numbers with uncertainties can
-    be given to the wrapped function where f accepts float arguments.
-
-    Doing so may be necessary when function f cannot be expressed
-    analytically (with uncertainties-compatible operators and
-    functions like +, *, umath.sin(), etc.).
-
-    f must return a float-like (i.e. a float, an int, etc., not a
-    list, etc.), unless when called with no number with
-    uncertainty. This is because the wrapped function generally
-    returns numbers with uncertainties: they represent a probability
-    distribution over the real numbers.
-
-    If the wrapped function is called with no argument that has an
-    uncertainty, the value of f is returned.
-
-    Parameters: the derivatives_* parameters can be used for defining
-    some of the partial derivatives of f. All the (non-None)
-    derivatives must have the same signature as f.
-
-    derivatives_args --
-
-        Iterable that, when iterated over, returns either derivatives
-        (functions) or None. derivatives_args can in particular be a
-        simple sequence (list or tuple) that gives the derivatives of
-        the first positional parameters of f.
-
-        Each function must be the partial derivative of f with respect
-        to the corresponding positional parameters.  These functions
-        take the same arguments as f.
-
-        The positional parameters of a function are usually
-        positional-or-keyword parameters like in the call func(a,
-        b=None). However, they also include var-positional parameters
-        given through the func(a, b, *args) *args syntax. In the last
-        example, derivatives_args can be an iterable that returns the
-        derivative with respect to a, b and then to each optional
-        argument in args.
-
-        A value of None (instead of a function) obtained when
-        iterating over derivatives_args is automatically replaced by
-        the relevant numerical derivative. This derivative is not used
-        if the corresponding argument is not a number with
-        uncertainty. A None value can therefore be used for non-scalar
-        arguments of f (like string arguments).
-
-        If the derivatives_args iterable yields fewer derivatives than
-        needed, wrap() automatically sets the remaining unspecified
-        derivatives to None (i.e. to the automatic numerical
-        calculation of derivatives).
-
-        An indefinite number of derivatives can be specified by having
-        derivatives_args be an infinite iterator; this can for
-        instance be used for specifying the derivatives of functions
-        with a undefined number of argument (like sum(), whose partial
-        derivatives all return 1).
-
-    derivatives_kwargs --
-
-        Dictionary that maps keyword parameters to their derivatives,
-        or None (as in derivatives_args).
-
-        Keyword parameters are defined as being those of kwargs when f
-        has a signature of the form f(..., **kwargs). In Python 3,
-        these keyword parameters also include keyword-only parameters.
-
-        Non-mapped keyword parameters are replaced automatically by
-        None: the wrapped function will use, if necessary, numerical
-        differentiation for these parameters (as with
-        derivatives_args).
-
-        Note that this dictionary only maps keyword *parameters* from
-        the *signature* of f. The way the wrapped function is called
-        is immaterial: for example, if f has signature f(a, b=None),
-        then derivatives_kwargs should be the empty dictionary, even
-        if the wrapped f can be called a wrapped_f(a=123, b=42).
-
-    Example (for illustration purposes only, as
-    uncertainties.umath.sin() runs faster than the examples that
-    follow): wrap(math.sin) is a sine function that can be applied to
-    numbers with uncertainties.  Its derivative will be calculated
-    numerically.  wrap(math.sin, [None]) would have produced the same
-    result.  wrap(math.sin, [math.cos]) is the same function, but with
-    an analytically defined derivative.
-
-    Numerically calculated derivatives are meaningless when the
-    function is not differentiable (e.g., math.hypot(x, y) in (x, y) =
-    (0, 0), and sqrt(x) in x = 0). The corresponding uncertainties are
-    either meaningless (case of hypot) or raise an exception when
-    calculated (case of sqrt). In such cases, it is recommended (but
-    not mandatory) to supply instead a derivative function that
-    returns NaN where the function is not differentiable. This
-    function can still numerically calculate the derivative where
-    defined, for instance by using the
-    uncertainties.core.partial_derivative() function.
-
-    The correctness of the supplied analytical derivatives an be
-    tested by setting them to None instead and comparing the
-    analytical and the numerical differentiation results.
-
-    Note on efficiency: the wrapped function assumes that f cannot
-    accept numbers with uncertainties as arguments. If f actually does
-    handle some arguments even when they have an uncertainty, the
-    wrapped function ignores this fact, which might lead to a
-    performance hit: wrapping a function that actually accepts numbers
-    with uncertainty is likely to make it slower.
-    """
-
+    if derivatives_args is None:
+        derivatives_args = []
+    if derivatives_kwargs is None:
+        derivatives_kwargs = {}
     derivatives_args_index = IndexableIter(
         # Automatic addition of numerical derivatives in case the
         # supplied derivatives_args is shorter than the number of
@@ -2695,7 +2625,7 @@ class Variable(AffineScalarFunc):
     """
     Representation of a float-like scalar Variable with its uncertainty.
 
-    Variablees are independent from each other, but correlations between them
+    Variables are independent from each other, but correlations between them
     are handled through the AffineScalarFunc class.
     """
 
