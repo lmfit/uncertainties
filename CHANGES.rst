@@ -97,7 +97,7 @@ Main changes:
 - 1.5.2: ``float_u``, ``array_u`` and ``matrix_u`` renamed ``ufloat``,
   ``uarray`` and ``umatrix``, for ease of typing.
 - 1.5:  Added functions ``nominal_value`` and ``std_dev``, and
-  modules ``unumpy`` (additional support for NumPy_ arrays and
+  modules ``unumpy`` (additional support for NumPy arrays and
   matrices) and ``unumpy.ulinalg`` (generalization of some
   functions from ``numpy.linalg``).
   Memory footprint of arrays of numbers with uncertainties
@@ -108,7 +108,7 @@ Main changes:
   ``unumpy.matrix_u``, with the added benefit of a shorter name.
 - 1.4.5: Added support for the standard ``pickle`` module.
 - 1.4.2: Added support for the standard ``copy`` module.
-- 1.4: Added utilities for manipulating NumPy_ arrays of numbers with
+- 1.4: Added utilities for manipulating NumPy arrays of numbers with
   uncertainties (``array_u``, ``nominal_values`` and ``std_devs``).
 - 1.3: Numbers with uncertainties are now constructed with
   ``num_with_uncert()``, which replaces ``NumberWithUncert()``.  This
@@ -136,4 +136,3 @@ Main changes:
 .. _PEP 8: http://www.python.org/dev/peps/pep-0008/
 .. _code updater: http://uncertainties-python-package.readthedocs.io/en/latest/index.html#migration-from-version-1-to-version-2
 .. _formatting: http://uncertainties-python-package.readthedocs.io/en/latest/user_guide.html#printing
-
