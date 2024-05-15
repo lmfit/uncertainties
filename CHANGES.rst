@@ -2,7 +2,7 @@ Version history
 ===============
 
 Main changes:
-
+- 3.2.0: Python 2 code removed. Python 3.8+ supported officially. Earlier versions may also work. Transitioned to pyproject.toml. Updated documentation. 
 - 3.1.6: The pretty-print and LaTeX format can now be customized.
 - 3.1.5: Added a "p" formatting option, that makes sure that there are always
   parentheses around the … ± … part of printed numbers.
