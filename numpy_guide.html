@@ -310,13 +310,12 @@ values.</p>
 <span id="index-8"></span><span id="index-7"></span><h2>Storing arrays in text format<a class="headerlink" href="#storing-arrays-in-text-format" title="Link to this heading">¶</a></h2>
 <p>Arrays of numbers with uncertainties can be directly <a class="reference internal" href="tech_guide.html#pickling"><span class="std std-ref">pickled</span></a>, saved to file and read from a file. Pickling has the
 advantage of preserving correlations between errors.</p>
-<p>Storing instead arrays in <strong>text format</strong> loses correlations between
-errors but has the advantage of being both computer- and
-human-readable. This can be done through NumPy’s <code class="xref py py-func docutils literal notranslate"><span class="pre">savetxt()</span></code> and
-<code class="xref py py-func docutils literal notranslate"><span class="pre">loadtxt()</span></code>.</p>
+<p>Storing arrays in <strong>text format</strong> loses correlations between errors but has the
+advantage of being both computer- and human-readable. This can be done through
+NumPy’s <code class="xref py py-func docutils literal notranslate"><span class="pre">savetxt()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">loadtxt()</span></code>.</p>
 <p>Writing the array to file can be done by asking NumPy to use the
-<em>representation</em> of numbers with uncertainties (instead of the default
-float conversion):</p>
+<em>representation</em> of numbers with uncertainties (instead of the default float
+conversion):</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">numpy</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="s1">&#39;arr.txt&#39;</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%r</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -326,26 +325,18 @@ the array:</p>
 <span class="mf">2.0</span><span class="o">+/-</span><span class="mf">0.002</span>
 </pre></div>
 </div>
-<p>The file can then be read back by instructing NumPy to convert all the
-columns with <a class="reference internal" href="tech_guide.html#uncertainties.ufloat_fromstr" title="uncertainties.ufloat_fromstr"><code class="xref py py-func docutils literal notranslate"><span class="pre">uncertainties.ufloat_fromstr()</span></code></a>. The number
-<code class="xref py py-data docutils literal notranslate"><span class="pre">num_cols</span></code> of columns in the input file (1, in our example) must
-be determined in advance, because NumPy requires a converter for each
-column separately. For Python 2:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">converters</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_cols</span><span class="p">),</span> <span class="n">uncertainties</span><span class="o">.</span><span class="n">ufloat_fromstr</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>For Python 3, since <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.loadtxt()</span></code> passes bytes to converters,
-they must first be converted into a string:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">converters</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span>
-<span class="go">        range(num_cols),</span>
-<span class="go">        lambda col_bytes: uncertainties.ufloat_fromstr(col_bytes.decode(&quot;latin1&quot;)))</span>
-</pre></div>
-</div>
-<p>(Latin 1 appears to in fact be the encoding used in
-<code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.savetxt()</span></code> [as of NumPy 1.12]. This encoding seems
-to be the one hardcoded in <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.compat.asbytes()</span></code>.)</p>
-<p>The array can then be loaded:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">&#39;arr.txt&#39;</span><span class="p">,</span> <span class="n">converters</span><span class="o">=</span><span class="n">converters</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+<p>The file can then be read back by instructing NumPy with <code class="xref py py-meth docutils literal notranslate"><span class="pre">numpy.loadtxt()</span></code>,
+but for object arrays, this requires a converter function for each column
+separately.  We can use func:<cite>uncertainties.ufloat_fromstr</cite>, but
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">numpy.loadtxt()</span></code> passes bytes to converters, they must first be converted
+into a string.  In addition the number of maximum number of columns must be
+known.  An example of using all of this to unpack the data saved with
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">numpy.savetxt()</span></code> would be:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">uncertainties</span> <span class="kn">import</span> <span class="n">ufloat_fromstr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_cols</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">converters</span> <span class="o">=</span> <span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">dat</span><span class="p">:</span> <span class="n">ufloat_fromstr</span><span class="p">(</span><span class="n">dat</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+<span class="go">....                              for col in range(max_cols)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">&#39;arr.txt&#39;</span><span class="p">,</span> <span class="n">converters</span><span class="o">=</span><span class="n">converters</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

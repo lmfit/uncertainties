@@ -184,14 +184,13 @@ Arrays of numbers with uncertainties can be directly :ref:`pickled
 <pickling>`, saved to file and read from a file. Pickling has the
 advantage of preserving correlations between errors.
 
-Storing instead arrays in **text format** loses correlations between
-errors but has the advantage of being both computer- and
-human-readable. This can be done through NumPy's :func:`savetxt` and
-:func:`loadtxt`.
+Storing arrays in **text format** loses correlations between errors but has the
+advantage of being both computer- and human-readable. This can be done through
+NumPy's :func:`savetxt` and :func:`loadtxt`.
 
 Writing the array to file can be done by asking NumPy to use the
-*representation* of numbers with uncertainties (instead of the default
-float conversion):
+*representation* of numbers with uncertainties (instead of the default float
+conversion):
 
 >>> numpy.savetxt('arr.txt', arr, fmt='%r')
 
@@ -201,27 +200,18 @@ the array::
   1.0+/-0.01
   2.0+/-0.002
 
-The file can then be read back by instructing NumPy to convert all the
-columns with :func:`uncertainties.ufloat_fromstr`. The number
-:data:`num_cols` of columns in the input file (1, in our example) must
-be determined in advance, because NumPy requires a converter for each
-column separately. For Python 2:
+The file can then be read back by instructing NumPy with :meth:`numpy.loadtxt`,
+but for object arrays, this requires a converter function for each column
+separately.  We can use func:`uncertainties.ufloat_fromstr`, but
+:meth:`numpy.loadtxt` passes bytes to converters, they must first be converted
+into a string.  In addition the number of maximum number of columns must be
+known.  An example of using all of this to unpack the data saved with
+:meth:`numpy.savetxt` would be:
 
->>> converters = dict.fromkeys(range(num_cols), uncertainties.ufloat_fromstr)
-
-For Python 3, since :func:`numpy.loadtxt` passes bytes to converters,
-they must first be converted into a string:
-
->>> converters = dict.fromkeys(
-        range(num_cols),
-        lambda col_bytes: uncertainties.ufloat_fromstr(col_bytes.decode("latin1")))
-
-(Latin 1 appears to in fact be the encoding used in
-:func:`numpy.savetxt` [as of NumPy 1.12]. This encoding seems
-to be the one hardcoded in :func:`numpy.compat.asbytes`.)
-
-The array can then be loaded:
-
+>>> from uncertainties import ufloat_fromstr
+>>> max_cols = 1
+>>> converters = {col: lambda dat: ufloat_fromstr(dat.decode("utf-8"))
+....                              for col in range(max_cols)}
 >>> arr = numpy.loadtxt('arr.txt', converters=converters, dtype=object)
 
 .. index:: linear algebra; additional functions, ulinalg
