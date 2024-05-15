@@ -357,7 +357,7 @@ If the variable :data:`a` above is modified, the value of :data:`poly`
 is not modified, as is usual in Python:
 
 >>> a = 123
->>> print poly
+>>> print(poly)
 46.0+/-0.4  # Still equal to x**2 + 42, not x**2 + 123
 
 Random variables can, on the other hand, have their uncertainty
@@ -365,7 +365,7 @@ updated on the fly, because quantities with uncertainties (like
 :data:`poly`) keep track of them:
 
 >>> x.std_dev = 0
->>> print poly
+>>> print(poly)
 46+/-0  # Zero uncertainty, now
 
 As usual, Python keeps track of objects as long as they are used.
@@ -374,7 +374,7 @@ Thus, redefining the value of :data:`x` does not change the fact that
 in :data:`x`:
 
 >>> x = 10000
->>> print poly
+>>> print(poly)
 46+/-0  # Unchanged
 
 These mechanisms make quantities with uncertainties behave mostly like

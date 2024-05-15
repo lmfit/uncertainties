@@ -28,7 +28,7 @@ You can upgrade from an older version of :mod:`uncertainties` with:
 
 
 Other packaging systems such as `Anaconda <https://www.anaconda.com>`_,
-`MacPorts <http://www.macports.org/>`_, or Linux package managrer may also
+`MacPorts <http://www.macports.org/>`_, or Linux package manager may also
 maintain packages for :mod:`uncertainties`, so that you may also be able to
 install using something like
 
@@ -50,8 +50,8 @@ depending on your platform and installation of Python.  For all installations
 of Python, using `pip` should work and is therefore recommended.
 
 
-Souce code and Development Version
-==================================
+Source code and Development Version
+=====================================
 
 .. _download:  https://pypi.python.org/pypi/uncertainties/#files
 .. _GitHub releases: https://github.com/lmfit/uncertainties/releases
@@ -59,8 +59,8 @@ Souce code and Development Version
 
 You can `download`_ the latest source package archive from the Python Package
 Index (PyPI) and unpack it, or from the `GitHub releases`_ page.  This package
-can be unpacked using `unzip`, `tar xf` , or other similar utilites, and then
-installeed with
+can be unpacked using `unzip`, `tar xf` , or other similar utilities, and then
+installed with
 
 .. code-block:: sh
 
@@ -103,7 +103,7 @@ Credits
 The :mod:`uncertainties` package was written and developed by `Eric O. LEBIGOT
 (EOL)`_.  EOL also maintained the package until 2024, when the GitHub project
 was moved to the `lmfit GitHub organization`_ to allow more sustainable
-development and maintenance.  Currentt members of the devlopment and
+development and maintenance.  Current members of the devlopment and
 maintenance team include `Andrew G Savage <https://github.com/andrewgsavage>`_,
 `Justin Gerber <https://github.com/jagerber48>`_,
 `Eric O Legibot <https://github.com/lebigot>`_,

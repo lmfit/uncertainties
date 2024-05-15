@@ -8,7 +8,7 @@ Uncertainties
 
 The `uncertainties package`_ is an open source Python library for doing
 calculations on numbers that have uncertainties (like 3.14±0.01) that are
-common in many scientific fields.  The calcualtions done with this package will
+common in many scientific fields.  The calculations done with this package will
 propagate the uncertainties to the result of mathematical calculations.
 The :mod:`uncertainties` package takes the pain and
 complexity out of uncertainty calculations and error propagation.  Here is a
@@ -33,7 +33,7 @@ values.  For other approaches, see soerp_ (using higher-order terms) and mcerp_
 (using a Monte-Carlo approach).
 
 The `source code`_ for the uncertainties package is licensed under the `Revised
-BSD License`_.  This dcoumentation is licensed under the `CC-SA-3 License`_.
+BSD License`_.  This documentation is licensed under the `CC-SA-3 License`_.
 
 .. _uncertainties package: https://pypi.python.org/pypi/uncertainties/
 .. _error propagation theory: https://en.wikipedia.org/wiki/Propagation_of_uncertainty

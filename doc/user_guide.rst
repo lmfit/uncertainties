@@ -27,9 +27,9 @@ Creating Variables: numbers with uncertainties
 ================================================
 
 To create a number with uncertainties or *Variable*, use the :func:`ufloat`
-function, which takes a *nominal value* ( (which can be interpreted as the most
+function, which takes a *nominal value* (which can be interpreted as the most
 likely value, or the mean or central value of the distribution of values), a
-*standard error* ( (the standard deviation or :math:`1-\sigma` uncertainty), and
+*standard error* (the standard deviation or :math:`1-\sigma` uncertainty), and
 an optional *tag*:
 
 >>> x = ufloat(2.7, 0.01)  # x = 2.7+/-0.01
@@ -220,7 +220,7 @@ The concept of comparing the magnitude of values with uncertainties is a bit
 complicated.  That is, a Variable with a value of 25 +/- 10 might be greater
 than a Variable with a value of 24 +/- 8 most of the time, but *sometimes* it
 might be less than it.   The :mod:`uncertainties` package takes the simple
-approach of comparing.  That is
+approach of comparing nominal values.  That is
 
 >>> a = ufloat(25, 10)
 >>> b = ufloat(24, 8)

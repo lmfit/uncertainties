@@ -66,7 +66,7 @@ Arrays of numbers with uncertainties can be built from values and
 uncertainties:
 
 >>> arr = unumpy.uarray([1, 2], [0.01, 0.002])
->>> print arr
+>>> print(arr)
 [1.0+/-0.01 2.0+/-0.002]
 
 NumPy arrays of numbers with uncertainties can also be built directly
@@ -100,7 +100,7 @@ work).  This is why the :class:`unumpy.matrix` class is provided: both
 the inverse and the pseudo-inverse of a matrix can be calculated in
 the usual way: if :data:`mat` is a :class:`unumpy.matrix`,
 
->>> print mat.I
+>>> print(mat.I)
 
 does calculate the inverse or pseudo-inverse of :data:`mat` with
 uncertainties.
@@ -132,7 +132,7 @@ This module defines uncertainty-aware mathematical functions that
 generalize those from :mod:`uncertainties.umath` so that they work on
 NumPy arrays of numbers with uncertainties instead of just scalars:
 
->>> print unumpy.cos(arr)  # Cosine of each array element
+>>> print(unumpy.cos(arr))  # Cosine of each array element
 
 NumPy's function names are used, and not those from the :mod:`math`
 module (for instance, :func:`unumpy.arccos` is defined, like in NumPy,
