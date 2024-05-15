@@ -70,6 +70,7 @@ __all__ = [
     # Variable subclass), but possibly manipulated by external code
     # ['derivatives()' method, etc.].
     'UFloat',
+    'Variable',
 
     # Wrapper for allowing non-pure-Python function to handle
     # quantitities with uncertainties:
@@ -140,7 +141,7 @@ else:
         covariance_mat -- full covariance matrix of the returned numbers with
         uncertainties. For example, the first element of this matrix is the
         variance of the first number with uncertainty. This matrix must be a
-        NumPy array-like (list of lists, NumPy array, etc.). 
+        NumPy array-like (list of lists, NumPy array, etc.).
 
         tags -- if 'tags' is not None, it must list the tag of each new
         independent variable.
@@ -148,9 +149,9 @@ else:
 
         # !!! It would in principle be possible to handle 0 variance
         # variables by first selecting the sub-matrix that does not contain
-        # such variables (with the help of numpy.ix_()), and creating 
+        # such variables (with the help of numpy.ix_()), and creating
         # them separately.
-        
+
         std_devs = numpy.sqrt(numpy.diag(covariance_mat))
 
         # For numerical stability reasons, we go through the correlation
@@ -229,8 +230,8 @@ else:
 
         # The coordinates of each new uncertainty as a function of the
         # new variables must include the variable scale (standard deviation):
-        transform *= std_devs[:, numpy.newaxis] 
-        
+        transform *= std_devs[:, numpy.newaxis]
+
         # Representation of the initial correlated values:
         values_funcs = tuple(
             AffineScalarFunc(
@@ -416,121 +417,51 @@ class IndexableIter(object):
             self.__class__.__name__,
             ', '.join(map(str, self.returned_elements)))
 
-def wrap(f, derivatives_args=[], derivatives_kwargs={}):
+def wrap(f, derivatives_args=None, derivatives_kwargs=None):
+    """Wrap a function f into one that accepts Variables.
+
+    The function f must return a float or integer value.  The returned
+    wrapped function will return values with both uncertainties and
+    correlations, but can be used as a drop-in replacement for the
+    original function.
+
+    Arguments:
+    ----------
+    derivatives_args: list or iterable
+           list or tupleof derivative functionss or None with respect to
+           the positional arguments of `f`.  See Note 1.
+    derivatives_kwargs: dictionary
+           dict of derivative functionss or None with respect to the
+           keyword arguments of `f`.  See Note 1.
+
+    Notes:
+    -------
+    1.  Each function must be the partial derivative of f with respect to the
+        corresponding positional parameters, and must have the same signature
+        as ``f``. `derivative_args` hold derivitative functions for positional
+        arguments (include `*varargs`), while  `derivative_kwargs` holds
+        derivitative functions for keyword arguments (include `**kwargs`). If an
+        entry is `None` or not supplied, and if the argument value isa numeric
+        Variable, a numerical derivative will be used. Non-numeric are ignored.
+    2.  If derivatives are meaningless or the function is not function is not
+        differentiable, the derivative funcion should return NaN for values
+        for which the the function is not differentiable.
+
+    Example:
+    --------
+    To wrap `sin`, one could do
+       >>> from uncertainties import wrap, umath
+       >>> import math
+       >>> usin_a = wrap(math.sin)   # uses numerical derivative
+       >>> usin_b = wrap(math.sin, [math.cos])  # use analytic derivative
+       >>> usin_c = umath.sin        # builtin, same as usin_2
+
+    These will all give the same result.
     """
-    Wraps a function f into a function that also accepts numbers with
-    uncertainties (UFloat objects); the wrapped function returns the
-    value of f with the correct uncertainty and correlations. The
-    wrapped function is intended to be used as a drop-in replacement
-    for the original function: they can be called in the exact same
-    way, the only difference being that numbers with uncertainties can
-    be given to the wrapped function where f accepts float arguments.
-
-    Doing so may be necessary when function f cannot be expressed
-    analytically (with uncertainties-compatible operators and
-    functions like +, *, umath.sin(), etc.).
-
-    f must return a float-like (i.e. a float, an int, etc., not a
-    list, etc.), unless when called with no number with
-    uncertainty. This is because the wrapped function generally
-    returns numbers with uncertainties: they represent a probability
-    distribution over the real numbers.
-
-    If the wrapped function is called with no argument that has an
-    uncertainty, the value of f is returned.
-
-    Parameters: the derivatives_* parameters can be used for defining
-    some of the partial derivatives of f. All the (non-None)
-    derivatives must have the same signature as f.
-
-    derivatives_args --
-
-        Iterable that, when iterated over, returns either derivatives
-        (functions) or None. derivatives_args can in particular be a
-        simple sequence (list or tuple) that gives the derivatives of
-        the first positional parameters of f.
-
-        Each function must be the partial derivative of f with respect
-        to the corresponding positional parameters.  These functions
-        take the same arguments as f.
-
-        The positional parameters of a function are usually
-        positional-or-keyword parameters like in the call func(a,
-        b=None). However, they also include var-positional parameters
-        given through the func(a, b, *args) *args syntax. In the last
-        example, derivatives_args can be an iterable that returns the
-        derivative with respect to a, b and then to each optional
-        argument in args.
-
-        A value of None (instead of a function) obtained when
-        iterating over derivatives_args is automatically replaced by
-        the relevant numerical derivative. This derivative is not used
-        if the corresponding argument is not a number with
-        uncertainty. A None value can therefore be used for non-scalar
-        arguments of f (like string arguments).
-
-        If the derivatives_args iterable yields fewer derivatives than
-        needed, wrap() automatically sets the remaining unspecified
-        derivatives to None (i.e. to the automatic numerical
-        calculation of derivatives).
-
-        An indefinite number of derivatives can be specified by having
-        derivatives_args be an infinite iterator; this can for
-        instance be used for specifying the derivatives of functions
-        with a undefined number of argument (like sum(), whose partial
-        derivatives all return 1).
-
-    derivatives_kwargs --
-
-        Dictionary that maps keyword parameters to their derivatives,
-        or None (as in derivatives_args).
-
-        Keyword parameters are defined as being those of kwargs when f
-        has a signature of the form f(..., **kwargs). In Python 3,
-        these keyword parameters also include keyword-only parameters.
-
-        Non-mapped keyword parameters are replaced automatically by
-        None: the wrapped function will use, if necessary, numerical
-        differentiation for these parameters (as with
-        derivatives_args).
-
-        Note that this dictionary only maps keyword *parameters* from
-        the *signature* of f. The way the wrapped function is called
-        is immaterial: for example, if f has signature f(a, b=None),
-        then derivatives_kwargs should be the empty dictionary, even
-        if the wrapped f can be called a wrapped_f(a=123, b=42).
-
-    Example (for illustration purposes only, as
-    uncertainties.umath.sin() runs faster than the examples that
-    follow): wrap(math.sin) is a sine function that can be applied to
-    numbers with uncertainties.  Its derivative will be calculated
-    numerically.  wrap(math.sin, [None]) would have produced the same
-    result.  wrap(math.sin, [math.cos]) is the same function, but with
-    an analytically defined derivative.
-
-    Numerically calculated derivatives are meaningless when the
-    function is not differentiable (e.g., math.hypot(x, y) in (x, y) =
-    (0, 0), and sqrt(x) in x = 0). The corresponding uncertainties are
-    either meaningless (case of hypot) or raise an exception when
-    calculated (case of sqrt). In such cases, it is recommended (but
-    not mandatory) to supply instead a derivative function that
-    returns NaN where the function is not differentiable. This
-    function can still numerically calculate the derivative where
-    defined, for instance by using the
-    uncertainties.core.partial_derivative() function.
-
-    The correctness of the supplied analytical derivatives an be
-    tested by setting them to None instead and comparing the
-    analytical and the numerical differentiation results.
-
-    Note on efficiency: the wrapped function assumes that f cannot
-    accept numbers with uncertainties as arguments. If f actually does
-    handle some arguments even when they have an uncertainty, the
-    wrapped function ignores this fact, which might lead to a
-    performance hit: wrapping a function that actually accepts numbers
-    with uncertainty is likely to make it slower.
-    """
-
+    if derivatives_args is None:
+        derivatives_args = []
+    if derivatives_kwargs is None:
+        derivatives_kwargs = {}
     derivatives_args_index = IndexableIter(
         # Automatic addition of numerical derivatives in case the
         # supplied derivatives_args is shorter than the number of
@@ -980,7 +911,7 @@ def nrmlze_superscript(number_str):
 
     ValueError is raised if the conversion cannot be done.
 
-    number_str -- string to be converted (of type str, but also possibly, for 
+    number_str -- string to be converted (of type str, but also possibly, for
     Python 2, unicode, which allows this string to contain superscript digits).
     '''
     # !! Python 3 doesn't need this str(), which is only here for giving the
@@ -1932,7 +1863,7 @@ class AffineScalarFunc(object):
           outputs like (1.0±0.2) or (1.0±0.2)e7, which can be useful for
           removing any ambiguity if physical units are added after the printed
           number.
-    
+
         An uncertainty which is exactly zero is represented as the
         integer 0 (i.e. with no decimal point).
 
@@ -2692,12 +2623,10 @@ class NegativeStdDev(Exception):
 
 class Variable(AffineScalarFunc):
     """
-    Representation of a float-like scalar random variable, along with
-    its uncertainty.
+    Representation of a float-like scalar Variable with its uncertainty.
 
-    Objects are meant to represent variables that are independent from
-    each other (correlations are handled through the AffineScalarFunc
-    class).
+    Variables are independent from each other, but correlations between them
+    are handled through the AffineScalarFunc class.
     """
 
     # To save memory in large arrays:
@@ -2976,7 +2905,7 @@ def parse_error_in_parentheses(representation):
     The digits between parentheses correspond to the same number of digits
     at the end of the nominal value (the decimal point in the uncertainty
     is optional). Example: 12.34(142) = 12.34±1.42.
-    
+
     Raises ValueError if the string cannot be parsed.
     """
 
@@ -3136,108 +3065,79 @@ def str_to_number_with_uncert(representation):
 
 def ufloat_fromstr(representation, tag=None):
     """
-    Return a new random variable (Variable object) from a string.
+    Create an uncertainties Variable from a string representation.
+    Several representation formats are supported.
 
-    Strings 'representation' of the form '12.345+/-0.015',
-    '12.345(15)', '12.3' or u'1.2±0.1' (Unicode string) are recognized
-    (see more complete list below).  In the last case, an uncertainty
-    of +/-1 is assigned to the last digit.
+    Arguments:
+    ----------
+    representation: string
+        string representation of a value with uncertainty
+    tag:   string or `None`
+        optional tag for tracing and organizing Variables ['None']
 
-    Invalid representations raise a ValueError.
+    Returns:
+    --------
+    uncertainties Variable.
 
-    This function tries to parse back most of the formats that are made
-    available by this module. Examples of valid string representations:
+    Notes:
+    --------
+    1. Invalid representations raise a ValueError.
 
-        12.3e10+/-5e3
-        (-3.1415 +/- 0.0001)e+02  # Factored exponent
+    2. Using the form "nominal(std)" where "std" is an integer creates
+       a Variable with "std" giving the least significant digit(s).
+       That is, "1.25(3)" is the same as `ufloat(1.25, 0.03)`,
+       while "1.25(3.)" is the same as `ufloat(1.25, 3.)`
 
-        # Pretty-print notation (only with a unicode string):
-        12.3e10 ± 5e3  # ± symbol
-        (12.3 ± 5.0) × 10⁻¹²  # Times symbol, superscript
-        12.3 ± 5e3  # Mixed notation (± symbol, but e exponent)
+    Examples:
+    -----------
 
-        # Double-exponent values:
-        (-3.1415 +/- 1e-4)e+200
-        (1e-20 +/- 3)e100
+    >>> x = ufloat_fromsstr("12.58+/-0.23")  # = ufloat(12.58, 0.23)
+    >>> x = ufloat_fromsstr("12.58 ± 0.23")  # = ufloat(12.58, 0.23)
+    >>> x = ufloat_fromsstr("3.85e5 +/- 2.3e4")  # = ufloat(3.8e5, 2.3e4)
+    >>> x = ufloat_fromsstr("(38.5 +/- 2.3)e4")  # = ufloat(3.8e5, 2.3e4)
 
-        0.29
-        31.
-        -31.
-        31
-        -3.1e10
+    >>> x = ufloat_fromsstr("72.1(2.2)")  # = ufloat(72.1, 2.2)
+    >>> x = ufloat_fromsstr("72.15(4)")  # = ufloat(72.15, 0.04)
+    >>> x = ufloat_fromstr("680(41)e-3")  # = ufloat(0.68, 0.041)
+    >>> x = ufloat_fromstr("23.2")  # = ufloat(23.2, 0.1)
+    >>> x = ufloat_fromstr("23.29")  # = ufloat(23.29, 0.01)
 
-        -1.23(3.4)
-        -1.34(5)
-        1(6)
-        3(4.2)
-        -9(2)
-        1234567(1.2)
-        12.345(15)
-        -12.3456(78)e-6
-        12.3(0.4)e-5
-        169.0(7)
-        169.1(15)
-        .123(4)
-        .1(.4)
-
-        # NaN uncertainties:
-        12.3(nan)
-        12.3(NAN)
-        3±nan
-
-    Surrounding spaces are ignored.
-
-    About the "shorthand" notation: 1.23(3) = 1.23 ± 0.03 but
-    1.23(3.) = 1.23 ± 3.00. Thus, the presence of a decimal point in
-    the uncertainty signals an absolute uncertainty (instead of an
-    uncertainty on the last digits of the nominal value).
+    >>> x = ufloat_fromstr("680.3(nan)") # = ufloat(680.3, numpy.nan)
     """
+    (nom, std) = str_to_number_with_uncert(representation.strip())
+    return ufloat(nom, std, tag)
 
-    (nominal_value, std_dev) = str_to_number_with_uncert(
-        representation.strip())
 
-    return ufloat(nominal_value, std_dev, tag)
-
-def ufloat_obsolete(representation, tag=None):
-    '''
-    Legacy version of ufloat(). Will eventually be removed.
-
-    representation -- either a (nominal_value, std_dev) tuple, or a
-    string representation of a number with uncertainty, in a format
-    recognized by ufloat_fromstr().
-    '''
-
-    if isinstance(representation, tuple):
-        return ufloat(representation[0], representation[1], tag)
-    else:
-        return ufloat_fromstr(representation, tag)
-
-# The arguments are named for the new version, instead of bearing
-# names that are closer to their obsolete use (e.g., std_dev could be
-# instead std_dev_or_tag, since it can be the tag, in the obsolete
-# ufloat((3, 0.14), "pi") form). This has the advantage of allowing
-# new code to use keyword arguments as in ufloat(nominal_value=3,
-# std_dev=0.14), without breaking when the obsolete form is not
-# supported anymore.
 def ufloat(nominal_value, std_dev=None, tag=None):
     """
-    Return a new random variable (Variable object).
+    Create an uncertainties Variable
 
-    - ufloat(nominal_value, std_dev),
-    - ufloat(nominal_value, std_dev, tag=...).
+    Arguments:
+    ----------
+    nominal_value: float
+        nominal value of Variable
+    std_dev:   float or `None`
+        standard error of Variable, or `None` if not available [`None`]
+    tag:   string or `None`
+        optional tag for tracing and organizing Variables ['None']
 
-    nominal_value -- nominal value of the random variable. It is more
-    meaningful to use a value close to the central value or to the
-    mean. This value is propagated by mathematical operations as if it
-    was a float.
+    Returns:
+    --------
+    uncertainties Variable
 
-    std_dev -- standard deviation of the random variable. The standard
-    deviation must be convertible to a positive float, or be NaN.
+    Examples
+    ----------
+    >>> a = ufloat(5, 0.2)
+    >>> b = ufloat(1000, 30, tag='kilo')
 
-    tag -- optional string tag for the variable.  Variables don't have
-    to have distinct tags.  Tags are useful for tracing what values
-    (and errors) enter in a given result (through the
-    error_components() method).
+
+    Notes:
+    --------
+    1. `nominal_value` is typically interpreted as `mean` or `central value`
+    2. `std_dev` is typically interpreted as `standard deviation` or the
+        1-sigma level uncertainty.
+    3. The returned Variable will have attributes `nominal_value`, `std_dev`,
+       and `tag` which match the input values.
     """
 
     return Variable(nominal_value, std_dev, tag=tag)

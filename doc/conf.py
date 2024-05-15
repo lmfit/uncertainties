@@ -27,7 +27,7 @@ import uncertainties
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = []
+extensions = ['sphinx.ext.autodoc', 'sphinx_copybutton']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -39,11 +39,11 @@ source_suffix = '.rst'
 #source_encoding = 'utf-8'
 
 # The master toctree document.
-master_doc = 'index_TOC'
+master_doc = 'index'
 
 # General information about the project.
-project = u'uncertainties Python package'
-copyright = u'2010–%d, Eric O. LEBIGOT (EOL)' % date.today().year
+project = u'uncertainties'
+copyright = f'2010–{date.today().year}, Eric O. LEBIGOT (EOL)'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -96,7 +96,11 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'sphinxdoc'
+# html_theme = 'sphinxdoc'
+html_theme = 'bizstyle'
+# html_theme = 'cloud'
+html_theme = 'python_docs_theme'
+# html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -108,7 +112,7 @@ html_theme = 'sphinxdoc'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-#html_title = None
+html_title = "uncertainties"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
@@ -120,7 +124,7 @@ html_theme = 'sphinxdoc'
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = 'favicon.ico'
+html_favicon = '_static/favicon.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -136,7 +140,7 @@ html_static_path = ['_static']
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
+html_sidebars = {'index': ['indexsidebar.html',  'searchbox.html']}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -163,7 +167,7 @@ html_show_sourcelink = False
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'uncertaintiesdoc'
+htmlhelp_basename = 'uncertainties'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -177,7 +181,7 @@ htmlhelp_basename = 'uncertaintiesdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index_TOC', 'uncertaintiesPythonPackage.tex', u'uncertainties Python package Documentation',
+  ('index', 'uncertainties.tex', u'uncertainties Python package Documentation',
    u'Eric O. LEBIGOT (EOL)', 'manual'),
 ]
 
