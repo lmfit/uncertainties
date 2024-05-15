@@ -579,7 +579,7 @@ uncertainty, because it is equal to <code class="xref py py-data docutils liter
 <p>If the variable <code class="xref py py-data docutils literal notranslate"><span class="pre">a</span></code> above is modified, the value of <code class="xref py py-data docutils literal notranslate"><span class="pre">poly</span></code>
 is not modified, as is usual in Python:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">123</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">poly</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
 <span class="go">46.0+/-0.4  # Still equal to x**2 + 42, not x**2 + 123</span>
 </pre></div>
 </div>
@@ -587,7 +587,7 @@ is not modified, as is usual in Python:</p>
 updated on the fly, because quantities with uncertainties (like
 <code class="xref py py-data docutils literal notranslate"><span class="pre">poly</span></code>) keep track of them:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">std_dev</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">poly</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
 <span class="go">46+/-0  # Zero uncertainty, now</span>
 </pre></div>
 </div>
@@ -596,7 +596,7 @@ Thus, redefining the value of <code class="xref py py-data docutils literal notr
 <code class="xref py py-data docutils literal notranslate"><span class="pre">poly</span></code> depends on the quantity with uncertainty previously stored
 in <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">10000</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">poly</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
 <span class="go">46+/-0  # Unchanged</span>
 </pre></div>
 </div>

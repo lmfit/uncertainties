@@ -252,7 +252,7 @@ exponents.</p>
 uncertainty on the last digits of the nominal value.</p>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">L</span></code> for a <strong>LaTeX</strong> output:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">x</span><span class="o">*</span><span class="mf">1e7</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="mf">1e7</span><span class="p">)</span>
 <span class="go">(2.00+/-0.10)e+06</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;{:L}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="mf">1e7</span><span class="p">))</span>  <span class="c1"># Automatic exponent form, LaTeX</span>
 <span class="go">\left(2.00 \pm 0.10\right) \times 10^{6}</span>

@@ -112,7 +112,7 @@ formatting options. They can be added at the end of the format string:
 
 - ``L`` for a **LaTeX** output:
 
-  >>> print x*1e7
+  >>> print(x*1e7)
   (2.00+/-0.10)e+06
   >>> print('{:L}'.format(x*1e7))  # Automatic exponent form, LaTeX
   \left(2.00 \pm 0.10\right) \times 10^{6}

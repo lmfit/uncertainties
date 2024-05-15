@@ -214,7 +214,7 @@ performed transparently.</p>
 <p>Arrays of numbers with uncertainties can be built from values and
 uncertainties:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">unumpy</span><span class="o">.</span><span class="n">uarray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.002</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">arr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
 <span class="go">[1.0+/-0.01 2.0+/-0.002]</span>
 </pre></div>
 </div>
@@ -244,7 +244,7 @@ uncertainties (i.e., <code class="docutils literal notranslate"><span class="pre
 work).  This is why the <code class="xref py py-class docutils literal notranslate"><span class="pre">unumpy.matrix</span></code> class is provided: both
 the inverse and the pseudo-inverse of a matrix can be calculated in
 the usual way: if <code class="xref py py-data docutils literal notranslate"><span class="pre">mat</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">unumpy.matrix</span></code>,</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">mat</span><span class="o">.</span><span class="n">I</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>does calculate the inverse or pseudo-inverse of <code class="xref py py-data docutils literal notranslate"><span class="pre">mat</span></code> with
@@ -268,7 +268,7 @@ too):</p>
 <p>This module defines uncertainty-aware mathematical functions that
 generalize those from <code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties.umath</span></code> so that they work on
 NumPy arrays of numbers with uncertainties instead of just scalars:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">unumpy</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>  <span class="c1"># Cosine of each array element</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">unumpy</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>  <span class="c1"># Cosine of each array element</span>
 </pre></div>
 </div>
 <p>NumPy’s function names are used, and not those from the <code class="xref py py-mod docutils literal notranslate"><span class="pre">math</span></code>

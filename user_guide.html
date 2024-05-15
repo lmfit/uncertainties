@@ -204,9 +204,9 @@ matrices</span></a>, which can be accessed as well.</p>
 <section id="creating-variables-numbers-with-uncertainties">
 <span id="index-1"></span><h2>Creating Variables: numbers with uncertainties<a class="headerlink" href="#creating-variables-numbers-with-uncertainties" title="Link to this heading">¶</a></h2>
 <p>To create a number with uncertainties or <em>Variable</em>, use the <code class="xref py py-func docutils literal notranslate"><span class="pre">ufloat()</span></code>
-function, which takes a <em>nominal value</em> ( (which can be interpreted as the most
+function, which takes a <em>nominal value</em> (which can be interpreted as the most
 likely value, or the mean or central value of the distribution of values), a
-<em>standard error</em> ( (the standard deviation or <span class="math notranslate nohighlight">\(1-\sigma\)</span> uncertainty), and
+<em>standard error</em> (the standard deviation or <span class="math notranslate nohighlight">\(1-\sigma\)</span> uncertainty), and
 an optional <em>tag</em>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">2.7</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>  <span class="c1"># x = 2.7+/-0.01</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mf">4.5</span><span class="p">,</span>  <span class="mf">1.2</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s1">&#39;y_variable&#39;</span><span class="p">)</span>  <span class="c1"># x = 4..5+/-1.2</span>
@@ -375,7 +375,7 @@ uncertainty of 0.</p>
 complicated.  That is, a Variable with a value of 25 +/- 10 might be greater
 than a Variable with a value of 24 +/- 8 most of the time, but <em>sometimes</em> it
 might be less than it.   The <a class="reference internal" href="tech_guide.html#module-uncertainties" title="uncertainties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">uncertainties</span></code></a> package takes the simple
-approach of comparing.  That is</p>
+approach of comparing nominal values.  That is</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span>
