@@ -251,9 +251,11 @@ def test_broadcast_funcs():
     # Some functions do not bear the same name in the math module and
     # in NumPy (acos instead of arccos, etc.):
     assert unumpy.arccos(arr)[1] == uncertainties.umath.acos(arr[1])
-    # The acos() function should not exist in unumpy because it does
-    # not exist in numpy:
-    assert not hasattr(numpy, 'acos')
+
+    # The acos() function should not exist in unumpy because the function
+    # should have been renamed to arccos(). Starting with numpy 2 numpy.acos()
+    # is an alias to numpy.arccos(). If similar aliases are added to unumpy,
+    # the following tests can be removed.
     assert not hasattr(unumpy, 'acos')
 
     # Test of the __all__ variable:
