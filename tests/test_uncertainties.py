@@ -1272,10 +1272,10 @@ def test_format():
         (1234.56789, 0.1): {
             'eL': r'\left(1.23457 \pm 0.00010\right) \times 10^{3}',
             'EL': r'\left(1.23457 \pm 0.00010\right) \times 10^{3}',
-            'fL': '1234.57 \pm 0.10',
-            'FL': '1234.57 \pm 0.10',
-            'fL': '1234.57 \pm 0.10',
-            'FL': '1234.57 \pm 0.10',
+            'fL': r'1234.57 \pm 0.10',
+            'FL': r'1234.57 \pm 0.10',
+            'fL': r'1234.57 \pm 0.10',
+            'FL': r'1234.57 \pm 0.10',
             '%L': r'\left(123457 \pm 10\right) \%'
         },
         #
@@ -1315,7 +1315,7 @@ def test_format():
             '15GS': '  -1.2(%s)E-12' % NaN_EFG,
             'SL': r'-1.2(\mathrm{nan}) \times 10^{-12}',  # LaTeX NaN
             # Pretty-print priority, but not for NaN:
-            'PSL': u'-1.2(\mathrm{nan})×10⁻¹²',
+            'PSL': r'-1.2(\mathrm{nan})×10⁻¹²',
             'L': r'\left(-1.2 \pm \mathrm{nan}\right) \times 10^{-12}',
             # Uppercase NaN and LaTeX:
             '.1EL': (r'\left(-1.2 \pm \mathrm{%s}\right) \times 10^{-12}'
@@ -1394,8 +1394,8 @@ def test_format():
             # Default precision = 6
             'eL': r'\left(1.234568 \pm 0\right) \times 10^{3}',
             'EL': r'\left(1.234568 \pm 0\right) \times 10^{3}',
-            'fL': '1234.567890 \pm 0',
-            'FL': '1234.567890 \pm 0',
+            'fL': r'1234.567890 \pm 0',
+            'FL': r'1234.567890 \pm 0',
             '%L': r'\left(123456.789000 \pm 0\right) \%'
         },
 
@@ -1560,9 +1560,9 @@ def test_format():
         # options:
         (float('-inf'), float('inf')): {
             'S': '-inf(inf)',
-            'LS': '-\infty(\infty)',
-            'L': '-\infty \pm \infty',
-            'LP': u'-\infty±\infty',
+            'LS': r'-\infty(\infty)',
+            'L': r'-\infty \pm \infty',
+            'LP': r'-\infty±\infty',
             # The following is consistent with Python's own
             # formatting, which depends on the version of Python:
             # formatting float("-inf") with format(..., "020") gives
@@ -1586,9 +1586,9 @@ def test_format():
         },
         (-float('nan'), float('inf')): {
             'S': 'nan(inf)',
-            'LS': '\mathrm{nan}(\infty)',
-            'L': '\mathrm{nan} \pm \infty',
-            'LP': u'\mathrm{nan}±\infty'
+            'LS': r'\mathrm{nan}(\infty)',
+            'L': r'\mathrm{nan} \pm \infty',
+            'LP': r'\mathrm{nan}±\infty'
         },
 
         # Leading zeroes in the shorthand notation:
