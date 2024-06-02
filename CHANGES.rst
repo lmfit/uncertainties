@@ -1,8 +1,35 @@
-Version history
-===============
+Change Log
+===================
+
+3.2.0   2024-June-02
+-----------------------
+
+Version 3.2.0 is the first release of Uncertainties in nearly two years and the
+first minor release in over five years. It marks the beginning of an effort to
+refresh and update the project with a new and expanded team of maintainers.
+
+* Main Changes
+
+  - Moved code development to lmfit organization, with 4 maintainers.
+  - Update documentation.
+  - Drop future dependency. Uncertainties now has no external dependencies when
+     not using Numpy integration (Drop official support for Python versions before 3.8 #200).
+  - Drop support for Python versions before 3.8, including Python 2 (Drop official support for Python versions before 3.8 #200)
+  - remove 1to2 and deprecations (remove 1to2 and depreciations #214)
+
+* Developer related changes
+
+  - Moved from setup.py to pyproject.toml (Transition from setup.py to pyproject.toml #199)
+  - Move tests to tests folder (Move tests to tests folder #216)
+  - Update unumpy test to be compatible with numpy 2
+  - Mark docstrings with backslashes as raw strings in tests (Mark docstrings with backslashes as raw strings #226)
+
+
+
+Older Version history
+------------------------
 
 Main changes:
-- 3.2.0: Python 2 code removed. Python 3.8+ supported officially. Earlier versions may also work. Transitioned to pyproject.toml. Updated documentation. 
 - 3.1.6: The pretty-print and LaTeX format can now be customized.
 - 3.1.5: Added a "p" formatting option, that makes sure that there are always
   parentheses around the … ± … part of printed numbers.
