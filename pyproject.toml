@@ -50,7 +50,7 @@ classifiers = [
 dependencies = []
 
 [tool.setuptools.packages.find]
-include = ["uncertainties"]
+include = ["uncertainties", "uncertainties.unumpy"]
 exclude = ["doc", "test"]
 
 [project.urls]
