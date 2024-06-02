@@ -212,21 +212,21 @@ is the result of x != 0.
 - This package contains tests.  They can be run either manually or
 automatically with the nose unit testing framework (nosetests).
 
-(c) 2009-2016 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
-Please send feature requests, bug reports, or feedback to this address.
+(c) 2009-2024 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 
-Please support future development by donating $10 or more through PayPal!
+Please use the Github project at  https://github.com/lmfit/uncertainties
+for bug reports, feature requests, or feedback.
 
-This software is released under a dual license.  (1) The BSD license.
-(2) Any other license, as long as it is obtained from the original
-author.'''
+
+This software is released under the BSD license.
+'''
 
 from builtins import map
 from .core import *
 from .core import __all__  # For a correct help(uncertainties)
 
 # Numerical version:
-__version_info__ = (3, 1, 7)
+__version_info__ = (3, 2, 0)
 __version__ = '.'.join(map(str, __version_info__))
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
