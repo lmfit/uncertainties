@@ -66,4 +66,5 @@ doc = ["sphinx", "sphinx-copybutton", "python-docs-theme"]
 all = ["uncertainties[doc,test,arrays]"]
 
 [tool.pytest.ini_options]
+# import-mode = "importlib"
 testpaths = ["tests"]
