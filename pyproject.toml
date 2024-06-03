@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "uncertainties"
-version = "3.1.7"
+version = "3.2.0"
 authors = [
     {name = "Eric O. LEBIGOT (EOL)", email = "eric.lebigot@normalesup.org"},
 ]
@@ -50,7 +50,7 @@ classifiers = [
 dependencies = []
 
 [tool.setuptools.packages.find]
-include = ["uncertainties"]
+include = ["uncertainties", "uncertainties.unumpy"]
 exclude = ["doc", "test"]
 
 [project.urls]
