@@ -6,6 +6,7 @@ from math import isnan
 
 import uncertainties.core as uncert_core
 from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr
+from uncertainties import formatting
 from uncertainties import umath
 from helpers import (power_special_cases, power_all_cases, power_wrt_ref,numbers_close,
     ufloats_close, compare_derivatives, uarrays_close)
@@ -1091,7 +1092,7 @@ def test_PDG_precision():
         }
 
     for (std_dev, result) in tests.items():
-        assert uncert_core.PDG_precision(std_dev) == result
+        assert formatting.PDG_precision(std_dev) == result
 
 def test_repr():
     '''Test the representation of numbers with uncertainty.'''
@@ -1706,21 +1707,21 @@ def test_custom_pretty_print_and_latex():
 
     # We will later restore the defaults:
     PREV_CUSTOMIZATIONS = {
-        var: getattr(uncert_core, var).copy()
+        var: getattr(formatting, var).copy()
         for var in ['PM_SYMBOLS', 'MULT_SYMBOLS', 'GROUP_SYMBOLS']}
     
     # Customizations:
     for format in ["pretty-print", "latex"]:
-        uncert_core.PM_SYMBOLS[format] = u" ± "
-        uncert_core.MULT_SYMBOLS[format] = u"⋅"
-        uncert_core.GROUP_SYMBOLS[format] = ( "[", "]" )
+        formatting.PM_SYMBOLS[format] = u" ± "
+        formatting.MULT_SYMBOLS[format] = u"⋅"
+        formatting.GROUP_SYMBOLS[format] = ( "[", "]" )
 
     assert u"{:P}".format(x) == u'[2.00 ± 0.10]⋅10⁻¹¹'
     assert u"{:L}".format(x) == u'[2.00 ± 0.10] ⋅ 10^{-11}'
 
     # We restore the defaults:
     for (var, setting) in PREV_CUSTOMIZATIONS.items():
-        setattr(uncert_core, var, setting)
+        setattr(formatting, var, setting)
 
 ###############################################################################
 
