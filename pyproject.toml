@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=64", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -49,9 +49,10 @@ classifiers = [
 ]
 dependencies = []
 
-[tool.setuptools.packages.find]
-include = ["uncertainties", "uncertainties.unumpy"]
-exclude = ["doc", "test"]
+[tool.setuptools]
+packages = ["uncertainties", "uncertainties.unumpy"]
+
+[tool.setuptools_scm]
 
 [project.urls]
 Documentation = "http://uncertainties-python-package.readthedocs.io/"
