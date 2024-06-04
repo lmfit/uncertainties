@@ -49,9 +49,8 @@ classifiers = [
 ]
 dependencies = []
 
-[tool.setuptools.packages.find]
-include = ["uncertainties", "uncertainties.unumpy"]
-exclude = ["doc", "test"]
+[tool.setuptools]
+packages = ["uncertainties", "uncertainties.unumpy"]
 
 [project.urls]
 Documentation = "http://uncertainties-python-package.readthedocs.io/"
