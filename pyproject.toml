@@ -55,7 +55,7 @@ packages = ["uncertainties", "uncertainties.unumpy"]
 [tool.setuptools_scm]
 
 [project.urls]
-Documentation = "http://uncertainties.readthedocs.io/"
+Documentation = "https://uncertainties.readthedocs.io/"
 Repository = "https://github.com/lmfit/uncertainties"
 Issues = "https://github.com/lmfit/uncertainties/issues"
 Changelog = "https://github.com/lmfit/uncertainties/blob/master/CHANGES.rst"
