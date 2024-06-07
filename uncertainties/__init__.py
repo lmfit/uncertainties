@@ -177,7 +177,7 @@ an approximate standard deviation of 0 (because the cosine is not well
 approximated by a line around 0), which might not be precise enough
 for all applications.
 
-- Comparison operations (>, ==, etc.) on numbers with uncertainties
+- Comparison operations (``>``, ``==``, etc.) on numbers with uncertainties
 have a pragmatic semantics, in this package: numbers with
 uncertainties can be used wherever Python numbers are used, most of
 the time with a result identical to the one that would be obtained
@@ -185,7 +185,7 @@ with their nominal value only.  However, since the objects defined in
 this module represent probability distributions and not pure numbers,
 comparison operator are interpreted in a specific way.
 
-The result of a comparison operation ("==", ">", etc.) is defined so as
+The result of a comparison operation (``==``, ``>``, etc.) is defined so as
 to be essentially consistent with the requirement that uncertainties
 be small: the value of a comparison operation is True only if the
 operation yields True for all infinitesimal variations of its random
@@ -204,7 +204,7 @@ is not such that x == y, since x and y are independent random
 variables that almost never give the same value.  However, x == x
 still holds.
 
-The boolean value (bool(x), "if x...") of a number with uncertainty x
+The boolean value (bool(x), ``if x...``) of a number with uncertainty x
 is the result of x != 0.
 
 - The uncertainties package is for Python 2.3 and above.
