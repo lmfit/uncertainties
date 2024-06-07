@@ -28,8 +28,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -e .
-        python -m pip install pytest pytest-cov numpy
+        python -m pip install .[arrays,test]
     - name: Test source code and docs
       run: |
         pytest --cov . --cov-report xml
