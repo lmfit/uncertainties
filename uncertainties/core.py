@@ -36,7 +36,16 @@ import collections
 from uncertainties.formatting import format_ufloat, nrmlze_superscript
 from uncertainties.parsing import str_to_number_with_uncert
 from . import ops
-from uncertainties.ops import _wrap, IndexableIter, nan_if_exception, partial_derivative, set_doc, CONSTANT_TYPES, modified_operators, modified_ops_with_reflection
+from uncertainties.ops import (
+    _wrap,
+    IndexableIter,
+    nan_if_exception,
+    partial_derivative,
+    set_doc,
+    CONSTANT_TYPES,
+    modified_operators,
+    modified_ops_with_reflection
+)
 
 # Attributes that are always exported (some other attributes are
 # exported only if the NumPy module is available...):
@@ -67,10 +76,6 @@ __all__ = [
     'wrap'
 
     ]
-
-###############################################################################
-
-
 
 ###############################################################################
 ## Definitions that depend on the availability of NumPy:
@@ -215,35 +220,6 @@ else:
 
 ###############################################################################
 
-# Mathematical operations with local approximations (affine scalar
-# functions)
-
-class NotUpcast(Exception):
-    'Raised when an object cannot be converted to a number with uncertainty'
-
-def to_affine_scalar(x):
-    """
-    Transforms x into a constant affine scalar function
-    (AffineScalarFunc), unless it is already an AffineScalarFunc (in
-    which case x is returned unchanged).
-
-    Raises an exception unless x belongs to some specific classes of
-    objects that are known not to depend on AffineScalarFunc objects
-    (which then cannot be considered as constants).
-    """
-
-    if isinstance(x, AffineScalarFunc):
-        return x
-
-    if isinstance(x, CONSTANT_TYPES):
-        # No variable => no derivative:
-        return AffineScalarFunc(x, LinearCombination({}))
-
-    # Case of lists, etc.
-    raise NotUpcast("%s cannot be converted to a number with"
-                    " uncertainty" % type(x))
-
-
 class NumericalDerivatives(object):
     """
     Convenient access to the partial derivatives of a function,
@@ -264,102 +240,6 @@ class NumericalDerivatives(object):
         """
         return partial_derivative(self._function, n)
 
-def force_aff_func_args(func):
-    """
-    Takes an operator op(x, y) and wraps it.
-
-    The constructed operator returns func(x, to_affine_scalar(y)) if y
-    can be upcast with to_affine_scalar(); otherwise, it returns
-    NotImplemented.
-
-    Thus, func() is only called on two AffineScalarFunc objects, if
-    its first argument is an AffineScalarFunc.
-    """
-
-    def op_on_upcast_args(x, y):
-        """
-        Return %s(self, to_affine_scalar(y)) if y can be upcast
-        through to_affine_scalar.  Otherwise returns NotImplemented.
-        """ % func.__name__
-
-        try:
-            y_with_uncert = to_affine_scalar(y)
-        except NotUpcast:
-            # This module does not know how to handle the comparison:
-            # (example: y is a NumPy array, in which case the NumPy
-            # array will decide that func() should be applied
-            # element-wise between x and all the elements of y):
-            return NotImplemented
-        else:
-            return func(x, y_with_uncert)
-
-    return op_on_upcast_args
-
-########################################
-
-# Definition of boolean operators, that assume that self and
-# y_with_uncert are AffineScalarFunc.
-
-# The fact that uncertainties must be small is used, here: the
-# comparison functions are supposed to be constant for most values of
-# the random variables.
-
-# Even though uncertainties are supposed to be small, comparisons
-# between 3+/-0.1 and 3.0 are handled correctly (even though x == 3.0 is
-# not a constant function in the 3+/-0.1 interval).  The comparison
-# between x and x is handled too, when x has an uncertainty.  In fact,
-# as explained in the main documentation, it is possible to give a
-# useful meaning to the comparison operators, in these cases.
-
-def eq_on_aff_funcs(self, y_with_uncert):
-    """
-    __eq__ operator, assuming that both self and y_with_uncert are
-    AffineScalarFunc objects.
-    """
-    difference = self - y_with_uncert
-    # Only an exact zero difference means that self and y are
-    # equal numerically:
-    return not(difference._nominal_value or difference.std_dev)
-
-def ne_on_aff_funcs(self, y_with_uncert):
-    """
-    __ne__ operator, assuming that both self and y_with_uncert are
-    AffineScalarFunc objects.
-    """
-
-    return not eq_on_aff_funcs(self, y_with_uncert)
-
-def gt_on_aff_funcs(self, y_with_uncert):
-    """
-    __gt__ operator, assuming that both self and y_with_uncert are
-    AffineScalarFunc objects.
-    """
-    return self._nominal_value > y_with_uncert._nominal_value
-
-def ge_on_aff_funcs(self, y_with_uncert):
-    """
-    __ge__ operator, assuming that both self and y_with_uncert are
-    AffineScalarFunc objects.
-    """
-
-    return (gt_on_aff_funcs(self, y_with_uncert)
-            or eq_on_aff_funcs(self, y_with_uncert))
-
-def lt_on_aff_funcs(self, y_with_uncert):
-    """
-    __lt__ operator, assuming that both self and y_with_uncert are
-    AffineScalarFunc objects.
-    """
-    return self._nominal_value < y_with_uncert._nominal_value
-
-def le_on_aff_funcs(self, y_with_uncert):
-    """
-    __le__ operator, assuming that both self and y_with_uncert are
-    AffineScalarFunc objects.
-    """
-
-    return (lt_on_aff_funcs(self, y_with_uncert)
-            or eq_on_aff_funcs(self, y_with_uncert))
 
 ########################################
 class LinearCombination(object):
@@ -582,80 +462,6 @@ class AffineScalarFunc(object):
 
         return self._linear_part.linear_combo
 
-    ############################################################
-
-    ### Operators: operators applied to AffineScalarFunc and/or
-    ### float-like objects only are supported.  This is why methods
-    ### from float are used for implementing these operators.
-
-    # Operators with no reflection:
-
-    ########################################
-
-    # __nonzero__() is supposed to return a boolean value (it is used
-    # by bool()).  It is for instance used for converting the result
-    # of comparison operators to a boolean, in sorted().  If we want
-    # to be able to sort AffineScalarFunc objects, __nonzero__ cannot
-    # return a AffineScalarFunc object.  Since boolean results (such
-    # as the result of bool()) don't have a very meaningful
-    # uncertainty unless it is zero, this behavior is fine.
-
-    def __bool__(self):
-        """
-        Equivalent to self != 0.
-        """
-        #! This might not be relevant for AffineScalarFunc objects
-        # that contain values in a linear space which does not convert
-        # the float 0 into the null vector (see the __eq__ function:
-        # __nonzero__ works fine if subtracting the 0 float from a
-        # vector of the linear space works as if 0 were the null
-        # vector of that space):
-        return self != 0.  # Uses the AffineScalarFunc.__ne__ function
-
-    ########################################
-
-    ## Logical operators: warning: the resulting value cannot always
-    ## be differentiated.
-
-    # The boolean operations are not differentiable everywhere, but
-    # almost...
-
-    # (1) I can rely on the assumption that the user only has "small"
-    # errors on variables, as this is used in the calculation of the
-    # standard deviation (which performs linear approximations):
-
-    # (2) However, this assumption is not relevant for some
-    # operations, and does not have to hold, in some cases.  This
-    # comes from the fact that logical operations (e.g. __eq__(x,y))
-    # are not differentiable for many usual cases.  For instance, it
-    # is desirable to have x == x for x = n+/-e, whatever the size of e.
-    # Furthermore, n+/-e != n+/-e', if e != e', whatever the size of e or
-    # e'.
-
-    # (3) The result of logical operators does not have to be a
-    # function with derivatives, as these derivatives are either 0 or
-    # don't exist (i.e., the user should probably not rely on
-    # derivatives for his code).
-
-    # !! In Python 2.7+, it may be possible to use functools.total_ordering.
-
-    # __eq__ is used in "if data in [None, ()]", for instance.  It is
-    # therefore important to be able to handle this case too, which is
-    # taken care of when force_aff_func_args(eq_on_aff_funcs)
-    # returns NotImplemented.
-    __eq__ = force_aff_func_args(eq_on_aff_funcs)
-
-    __ne__ = force_aff_func_args(ne_on_aff_funcs)
-    __gt__ = force_aff_func_args(gt_on_aff_funcs)
-
-    # __ge__ is not the opposite of __lt__ because these operators do
-    # not always yield a boolean (for instance, 0 <= numpy.arange(10)
-    # yields an array).
-    __ge__ = force_aff_func_args(ge_on_aff_funcs)
-
-    __lt__ = force_aff_func_args(lt_on_aff_funcs)
-    __le__ = force_aff_func_args(le_on_aff_funcs)
-
     ########################################
 
     # Uncertainties handling:
@@ -852,6 +658,10 @@ class AffineScalarFunc(object):
             # instance might contain slots):
             setattr(self, name, value)
 
+ops.add_arithmetic_ops(AffineScalarFunc)
+ops.add_comparative_ops(AffineScalarFunc) 
+to_affine_scalar = AffineScalarFunc._to_affine_scalar
+
 # Nicer name, for users: isinstance(ufloat(...), UFloat) is
 # True. Also: isinstance(..., UFloat) is the test for "is this a
 # number with uncertainties from the uncertainties package?":
@@ -860,8 +670,6 @@ UFloat = AffineScalarFunc
 def wrap(*args, **kwargs):
     return _wrap(AffineScalarFunc, *args, **kwargs)
 ###############################################################################
-
-ops.add_operators(AffineScalarFunc)  # Actual addition of class attributes
 
 class NegativeStdDev(Exception):
     '''Raise for a negative standard deviation'''
