@@ -97,24 +97,29 @@ Main features
 Installation or upgrade
 -----------------------
 
-Installation instructions are available on the `main web site
-<http://uncertainties-python-package.readthedocs.io/en/latest/index.html#installation-and-download>`_
-for this package.
+To install `uncertainties`, use::
 
+     pip install uncertainties
+
+To upgrade from an older version, use::
+
+     pip install --upgrade uncertainties
+
+Further details are in the `on-line documentation
+<https://uncertainties.readthedocs.io/en/latest/install.html>`_.
 
 
 Git branches
 ------------
 
-The ``release`` branch is the latest stable release. It should pass the tests.
+The GitHub ``master`` branch is the latest development version. It should
+represent a stable pre-release and should pass the tests, but will be more
+experimental.  Tagged releases will be available on GitHub, and correspond to
+the releases to PyPI.  The GitHub ``gh-pages`` branch will contain a stable
+version of the documentation that can be viewed at
+<https://lmfit.github.io/uncertainties/`_.  Other Github branches should be
+treated as unstable and in-progress development branches.
 
-``master*`` branches in the Github repository are bleeding-edge, and do not
-necessarily pass the tests. The ``master`` branch is the latest, relatively
-stable versions (while other ``master*`` branches are more experimental).
-
-Other branches might be present in the GitHub repository, but they are
-typically temporary and represent work in progress that does not necessarily run
-properly yet.
 
 License
 -------
@@ -138,8 +143,7 @@ This package was created back around 2009 by `Eric O. LEBIGOT <https://github.co
 
 Ownership of the package was taken over by the `lmfit GitHub organization <https://github.com/lmfit>`_ in 2024.
 
-.. _Python: http://docs.python.org/tutorial/interpreter.html
-.. _IPython: http://ipython.readthedocs.io/en/stable/
-.. _math: http://docs.python.org/library/math.html
-.. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
-.. _main website: http://uncertainties-python-package.readthedocs.io/
+.. _IPython: https://ipython.readthedocs.io/en/stable/
+.. _math: https://docs.python.org/library/math.html
+.. _error propagation theory: https://en.wikipedia.org/wiki/Propagation_of_uncertainty
+.. _main website: https://uncertainties.readthedocs.io/

@@ -72,8 +72,8 @@ Basic math with uncertain Variables
 =========================================
 
 Uncertainties variables created in :func:`ufloat` or :func:`ufloat_fromstr` can
-be used in basic mathematical calculations ('+', '-', '*', '/', '**') as with
-other Python numbers and variables.
+be used in basic mathematical calculations (``+``, ``-``, ``*``, ``/``, ``**``)
+as with other Python numbers and variables.
 
 >>> t = ufloat(0.2, 0.01)
 >>> double = 2.0*t
@@ -160,18 +160,18 @@ are found in the :mod:`uncertainties.umath` module:
 
 The functions in the :mod:`uncertainties.umath` module include:
 
-    'acos', 'acosh', 'asin', 'asinh', 'atan', 'atan2', 'atanh',
-    'ceil', 'copysign', 'cos', 'cosh', 'degrees', 'erf', 'erfc',
-    'exp', 'expm1', 'fabs', 'factorial', 'floor', 'fmod',
-    'frexp', 'fsum', 'gamma', 'hypot', 'isinf', 'isnan',
-    'ldexp', 'lgamma', 'log', 'log10', 'log1p', 'modf',
-    'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'trunc'
+    ``acos``, ``acosh``, ``asin``, ``asinh``, ``atan``, ``atan2``, ``atanh``,
+    ``ceil``, ``copysign``, ``cos``, ``cosh``, ``degrees``, ``erf``, ``erfc``,
+    ``exp``, ``expm1``, ``fabs``, ``factorial``, ``floor``, ``fmod``,
+    ``frexp``, ``fsum``, ``gamma``, ``hypot``, ``isinf``, ``isnan``,
+    ``ldexp``, ``lgamma``, ``log``, ``log10``, ``log1p``, ``modf``,
+    ``pow``, ``radians``, ``sin``, ``sinh``, ``sqrt``, ``tan``, ``tanh``, ``trunc``
 
 
 Comparison operators
 ====================
 
-Comparison operators ('==', '!=', '>', '<', '>=', and '<=') for Variables with
+Comparison operators (``==``, ``!=``, ``>``, ``<``, ``>=``, and ``<=``) for Variables with
 uncertainties are somewhat complicated, and need special attention.  As we
 hinted at above, and will explore in more detail below and in the
 :ref:`Technical Guide <comparison_operators>`, this relates to the correlation
