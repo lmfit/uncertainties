@@ -18,6 +18,7 @@ from builtins import str, next, map, zip, range, object
 import math
 from math import sqrt, log, isnan, isinf  # Optimization: no attribute look-up
 import re
+import locale as lc
 import sys
 if sys.version_info < (3,):
      from past.builtins import basestring
@@ -2854,7 +2855,7 @@ else:
 # semantics of some representations (e.g. .1(2.) = .1+/-2, whereas
 # .1(2) = .1+/-0.2), so just getting the numerical value of the part
 # in parentheses would not be sufficient.
-POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = r'((\d*)(\.\d*)?|nan|NAN|inf|INF)'
+POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = r'((\d*)([,\.]\d*)?|nan|NAN|inf|INF)'
 
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where
 # the uncertainty is optional (in which case the uncertainty is
@@ -2929,7 +2930,7 @@ def parse_error_in_parentheses(representation):
         factor = 1
 
     # Nominal value:
-    value = float((sign or '')+main)*factor
+    value = lc.atof((sign or '')+main)*factor
 
     if uncert is None:
         # No uncertainty was found: an uncertainty of 1 on the last
@@ -2938,7 +2939,7 @@ def parse_error_in_parentheses(representation):
 
     # Do we have a fully explicit uncertainty?
     if uncert_dec is not None or uncert in {'nan', 'NAN', 'inf', 'INF'}:
-        uncert_value = float(uncert)
+        uncert_value = lc.atof(uncert)
     else:
         # uncert_int represents an uncertainty on the last digits:
 
@@ -2973,7 +2974,7 @@ def to_float(value_str):
     '''
 
     try:
-        return float(value_str)
+        return lc.atof(value_str)
     except ValueError:
         pass
 
@@ -2981,7 +2982,7 @@ def to_float(value_str):
     match = PRETTY_PRINT_MATCH(value_str)
     if match:
         try:
-            return float(match.group(1))*10.**nrmlze_superscript(match.group(2))
+            return lc.atof(match.group(1))*10.**nrmlze_superscript(match.group(2))
         except ValueError:
             raise ValueError('Mantissa or exponent incorrect in pretty-print'
                              ' form %s' % value_str)
