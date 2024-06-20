@@ -465,12 +465,12 @@ def inv_with_derivatives(arr, input_type, derivatives):
     yield inverse
 
     # It is mathematically convenient to work with matrices:
-    inverse_mat = numpy.asmatrix(inverse)
+    inverse_mat = numpy.asarray(inverse)
 
     # Successive derivatives of the inverse:
     for derivative in derivatives:
-        derivative_mat = numpy.asmatrix(derivative)
-        yield -inverse_mat * derivative_mat * inverse_mat
+        derivative_mat = numpy.asarray(derivative)
+        yield -inverse_mat @ derivative_mat @ inverse_mat
 
 inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
 inv.__doc__ = """\
@@ -506,8 +506,8 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
         inverse = inverse.view(numpy.matrix)
     yield inverse
 
-    # It is mathematically convenient to work with matrices:
-    inverse_mat = numpy.asmatrix(inverse)
+    # Numpy arrays will allow matrix multiplication with the @ operator:
+    inverse_mat = numpy.asarray(inverse)
 
     # Formula (4.12) from The Differentiation of Pseudo-Inverses and
     # Nonlinear Least Squares Problems Whose Variables
@@ -518,21 +518,21 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
     # See also
     # http://mathoverflow.net/questions/25778/analytical-formula-for-numerical-derivative-of-the-matrix-pseudo-inverse
 
-    # Shortcuts.  All the following factors should be numpy.matrix objects:
-    PA = arr*inverse_mat
-    AP = inverse_mat*arr
-    factor21 = inverse_mat*inverse_mat.H
+    # Shortcuts.  The @ operator is used for matrix multiplication of the factors:
+    PA = arr@inverse_mat
+    AP = inverse_mat@arr
+    factor21 = inverse_mat@numpy.transpose(inverse_mat.conj())
     factor22 = numpy.eye(arr.shape[0])-PA
     factor31 = numpy.eye(arr.shape[1])-AP
-    factor32 = inverse_mat.H*inverse_mat
+    factor32 = numpy.transpose(inverse_mat.conj())@inverse_mat
 
     # Successive derivatives of the inverse:
     for derivative in derivatives:
-        derivative_mat = numpy.asmatrix(derivative)
-        term1 = -inverse_mat*derivative_mat*inverse_mat
-        derivative_mat_H = derivative_mat.H
-        term2 = factor21*derivative_mat_H*factor22
-        term3 = factor31*derivative_mat_H*factor32
+        derivative_mat = numpy.asarray(derivative)
+        term1 = -inverse_mat@derivative_mat@inverse_mat
+        derivative_mat_H = numpy.transpose(derivative_mat.conj())
+        term2 = factor21@derivative_mat_H@factor22
+        term3 = factor31@derivative_mat_H@factor32
         yield term1+term2+term3
 
 # Default rcond argument for the generalization of numpy.linalg.pinv:
