@@ -20,7 +20,6 @@ import inspect
 
 # 3rd-party modules:
 import numpy
-from numpy.core import numeric
 
 # Local modules:
 import uncertainties.umath_core as umath_core
@@ -585,10 +584,10 @@ class matrix(numpy.matrix):
         # scalar and of a matrix containing objects (when the
         # arguments are given in this order).  We go around this
         # limitation:
-        if numeric.isscalar(other):
-            return numeric.dot(self, other)
+        if numpy.isscalar(other):
+            return numpy.dot(self, other)
         else:
-            return numeric.dot(other, self)  # The order is important
+            return numpy.dot(other, self)  # The order is important
 
     def getI(self):
         """Matrix inverse or pseudo-inverse."""
