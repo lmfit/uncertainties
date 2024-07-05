@@ -33,7 +33,7 @@ import inspect
 import numbers
 import collections
 
-from uncertainties.formatting import format_ufloat, nrmlze_superscript
+from uncertainties.formatting import format_ufloat, nrmlze_superscript, MULT_SYMBOLS 
 from uncertainties.parsing import str_to_number_with_uncert
 from . import ops
 from uncertainties.ops import (
