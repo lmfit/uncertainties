@@ -32,7 +32,7 @@ jobs:
     - name: Test source code and docs
       run: |
         cd tests
-        python -m pytest --cov=uncertainties --cov-report=xml
+        python -m pytest --cov=uncertainties --cov=. --cov-report=xml --cov-report=term
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
