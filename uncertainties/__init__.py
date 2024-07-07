@@ -221,12 +221,11 @@ for bug reports, feature requests, or feedback.
 This software is released under the BSD license.
 '''
 
-from builtins import map
 from .core import *
 from .core import __all__  # For a correct help(uncertainties)
 
-# Numerical version:
-__version_info__ = (3, 2, 1)
-__version__ = '.'.join(map(str, __version_info__))
+from .version import __version__, __version_tuple__
+# for backward compatibility
+__version_info__ = __version_tuple__
 
 __author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
