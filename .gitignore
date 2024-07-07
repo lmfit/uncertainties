@@ -1,4 +1,4 @@
-uncertainties-py23/
+uncertainties/version.py
 *.pyc
 build
 doc/_build

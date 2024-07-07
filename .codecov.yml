@@ -4,14 +4,12 @@ codecov:
     after_n_builds: 9
 
 coverage:
+  precision: 2
+  round: down
+  range: "90...100"
   status:
     project:
       default:
         target: auto
         threshold: 2.0%
-        informational: true
-    patch:
-      default:
-        target: auto
-        threshold: 20%
         informational: true
