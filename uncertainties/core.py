@@ -1433,6 +1433,16 @@ class LinearCombination(object):
         """
         return bool(self.linear_combo)
 
+    def copy(self):
+        """Shallow copy of the LinearCombination object.
+
+        Returns:
+            LinearCombination: Copy of the object.
+        """
+        cpy = LinearCombination.__new__(LinearCombination)
+        cpy.linear_combo = self.linear_combo.copy()
+        return cpy
+
     def expanded(self):
         """
         Return True if and only if the linear combination is expanded.
@@ -1686,6 +1696,20 @@ class AffineScalarFunc(object):
     __le__ = force_aff_func_args(le_on_aff_funcs)
 
     ########################################
+
+    def __hash__(self):
+        """
+        Calculates the hash for any AffineScalarFunc object.
+        The hash is calculated from the nominal_value, and the derivatives.
+        
+        Returns:
+            int: The hash of this object
+        """
+
+        # derivatives which are zero must be filtered out, because the variable is insensitive to errors in those correlations.
+        # the derivatives must be sorted, because the hash depends on the order, but the equality of variables does not.
+        derivatives = sorted([(id(key), value) for key, value in self.derivatives.items() if value != 0])
+        return hash((self._nominal_value, tuple(derivatives)))
 
     # Uncertainties handling:
 
@@ -2353,6 +2377,7 @@ class AffineScalarFunc(object):
         """
         Hook for the pickle module.
         """
+
         for (name, value) in data_dict.items():
             # Contrary to the default __setstate__(), this does not
             # necessarily save to the instance dictionary (because the
@@ -2658,7 +2683,7 @@ class Variable(AffineScalarFunc):
         # differentiable functions: for instance, Variable(3, 0.1)/2
         # has a nominal value of 3/2 = 1, but a "shifted" value
         # of 3.1/2 = 1.55.
-        value = float(value)
+        self._nominal_value = float(value)
 
         # If the variable changes by dx, then the value of the affine
         # function that gives its value changes by 1*dx:
@@ -2668,7 +2693,7 @@ class Variable(AffineScalarFunc):
         # takes much more memory.  Thus, this implementation chooses
         # more cycles and a smaller memory footprint instead of no
         # cycles and a larger memory footprint.
-        super(Variable, self).__init__(value, LinearCombination({self: 1.}))
+        super(Variable, self).__init__(self._nominal_value, LinearCombination({self: 1.}))
 
         self.std_dev = std_dev  # Assignment through a Python property
 
@@ -2695,6 +2720,27 @@ class Variable(AffineScalarFunc):
 
         self._std_dev = float(std_dev)
 
+    def __hash__(self):
+        """
+        Calculates the hash for any `Variable` object.
+        The implementation is the same as for `AffineScalarFunc`.
+        But this method sets the `_linear_part` manually.
+        It is set to a single entry with a self reference as key and 1.0 as value.
+        
+        Returns:
+            int: The hash of this object
+        """
+
+        # The manual implementation of the _linear_part is necessary, because pickle would not work otherwise.
+        # That is because of the self reference inside the _linear_part.
+        return hash((self._nominal_value, ((id(self), 1.),)))
+
+    # Support for legacy method:
+    def set_std_dev(self, value):  # Obsolete
+        deprecation('instead of set_std_dev(), please use'
+                    ' .std_dev = ...')
+        self.std_dev = value
+
     # The following method is overridden so that we can represent the tag:
     def __repr__(self):
 
@@ -2704,13 +2750,6 @@ class Variable(AffineScalarFunc):
             return num_repr
         else:
             return "< %s = %s >" % (self.tag, num_repr)
-
-    def __hash__(self):
-        # All Variable objects are by definition independent
-        # variables, so they never compare equal; therefore, their
-        # id() are allowed to differ
-        # (http://docs.python.org/reference/datamodel.html#object.__hash__):
-        return id(self)
 
     def __copy__(self):
         """
@@ -2745,6 +2784,34 @@ class Variable(AffineScalarFunc):
         # Reference: http://www.doughellmann.com/PyMOTW/copy/index.html
 
         return self.__copy__()
+
+    def __getstate__(self):
+        """
+        Hook for the pickle module.
+
+        Same as for the AffineScalarFunction but remove the linear part,
+        since it only contains a self reference.
+        This would lead to problems when unpickling the linear part.
+        """
+                
+        LINEAR_PART_NAME = "_linear_part"
+        state = super().__getstate__()
+
+        if LINEAR_PART_NAME in state:
+            del state[LINEAR_PART_NAME]
+
+        return state
+
+    def __setstate__(self, state):
+        """
+        Hook for the pickle module.
+
+        Same as for AffineScalarFunction, but manually set the linear part.
+        This one is removed when pickling Variable objects.
+        """
+
+        super().__setstate__(state)
+        self._linear_part = LinearCombination({self: 1.})
 
 
 ###############################################################################
