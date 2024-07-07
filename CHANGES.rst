@@ -1,6 +1,28 @@
 Change Log
 ===================
 
+3.2.2   2024-July-08
+-----------------------
+
+Fixes:
+
+ - fix support for Numpy 2.0 (#245).  Note: `uncertainties.unumpy` still
+    provides `umatrix` based on `numpy.matrix`.  With `numpy.matrix`
+    discouraged, `umatrix` is too, and will be dropped in a  future release.
+ - fix automated running and reporting of code coverage with tests (#246)
+ - use `setuptools-scm` for setting version number from git tag  (#247)
+
+ 3.2.1   2024-June-08
+-----------------------
+
+Fixes for build, deployment, and docs
+
+ - Use explicit package list to make sure unumpy is included (#232)
+ - Use setuptools-scm to make sure all files are in the source distribution (#235)
+ - updates to configuration for and links to readthedocs documentation. (#239)
+ - use double backticks more uniformly in docs. (#240)
+ - fixes to README.rst to allow it to render (needed for PyPI upload) (#243)
+
 3.2.0   2024-June-02
 -----------------------
 
