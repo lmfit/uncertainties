@@ -2,9 +2,14 @@
 requires = ["setuptools>=64", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools_scm]
+write_to = "uncertainties/version.py"
+version_scheme = "post-release"
+
+
 [project]
 name = "uncertainties"
-version = "3.2.1"
+dynamic = ["version"]
 authors = [
     {name = "Eric O. LEBIGOT (EOL)", email = "eric.lebigot@normalesup.org"},
 ]
@@ -48,7 +53,6 @@ dependencies = []
 [tool.setuptools]
 packages = ["uncertainties", "uncertainties.unumpy"]
 
-[tool.setuptools_scm]
 
 [project.urls]
 Documentation = "https://uncertainties.readthedocs.io/"
