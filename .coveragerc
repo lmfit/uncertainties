@@ -1,0 +1,2 @@
+[run]
+omit = uncertainties_pandas/testsuite/*
