@@ -41,6 +41,8 @@ import inspect
 import numbers
 import collections
 
+from .ufloatnumpy import UFloatNumpy
+
 # The following restricts the local function getargspec() to the common
 # features of inspect.getargspec() and inspect.getfullargspec():
 if sys.version_info < (3,):  # !! Could be removed when moving to Python 3 only
@@ -1492,7 +1494,7 @@ class LinearCombination(object):
     def __setstate__(self, state):
         (self.linear_combo,) = state
 
-class AffineScalarFunc(object):
+class AffineScalarFunc(UFloatNumpy):
     """
     Affine functions that support basic mathematical operations
     (addition, etc.).  Such functions can for instance be used for
@@ -2616,6 +2618,10 @@ def add_operators_to_AffineScalarFunc():
         setattr(AffineScalarFunc, '__%s__' % coercion_type, raise_error)
 
 add_operators_to_AffineScalarFunc()  # Actual addition of class attributes
+AffineScalarFunc._to_affine_scalar = to_affine_scalar
+AffineScalarFunc._add_numpy_arithmetic_ufuncs()
+AffineScalarFunc._add_numpy_comparative_ufuncs()
+AffineScalarFunc.wrap = wrap
 
 class NegativeStdDev(Exception):
     '''Raise for a negative standard deviation'''
