@@ -33,7 +33,7 @@ import inspect
 import numbers
 import collections
 
-from uncertainties.formatting import format_ufloat, nrmlze_superscript, MULT_SYMBOLS 
+from uncertainties.formatting import format_ufloat, nrmlze_superscript, MULT_SYMBOLS, format_num
 from uncertainties.parsing import str_to_number_with_uncert
 from . import ops
 from uncertainties.ops import (
@@ -548,9 +548,11 @@ class AffineScalarFunc(object):
         # (http://docs.python.org/2/library/string.html#format-specification-mini-language):
         return self.format('')
 
+    @set_doc(format_ufloat.__doc__)
     def __format__(self, format_spec):
         return format_ufloat(self, format_spec)
     
+    @set_doc(format_num.__doc__)
     def format(self, format_spec):
         return format_ufloat(self, format_spec)
     
