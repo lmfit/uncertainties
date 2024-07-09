@@ -552,7 +552,15 @@ class AffineScalarFunc(object):
     def __format__(self, format_spec):
         return format_ufloat(self, format_spec)
     
-    @set_doc(format_num.__doc__)
+
+    @set_doc("""
+        Return the same result as self.__format__(format_spec), or
+        equivalently as the format(self, format_spec) of Python 2.6+.
+
+        This method is meant to be used for formatting numbers with
+        uncertainties in Python < 2.6, with '... %s ...' %
+        num.format('.2e').
+        """)
     def format(self, format_spec):
         return format_ufloat(self, format_spec)
     
