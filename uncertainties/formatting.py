@@ -1,12 +1,8 @@
-from math import isinf, isnan
+from math import isinf, isnan, isfinite
 import math
 import re
 import warnings
 
-
-def isinfinite(x):
-    # TODO: Usages of this function should be replaced with not math.isfinite.
-    return isinf(x) or isnan(x)
 
 def first_digit(value):
     '''
@@ -287,7 +283,7 @@ def format_num(nom_val_main, error_main, common_exp,
 
     # Only true if the error should not have an exponent (has priority
     # over common_exp):
-    special_error = not error_main or isinfinite(error_main)
+    special_error = not error_main or not isfinite(error_main)
 
     # Nicer representation of the main nominal part, with no trailing
     # zeros, when the error does not have a defined number of
@@ -435,7 +431,7 @@ def format_num(nom_val_main, error_main, common_exp,
 
          # Like error_has_exp, but only for real number handling
         # (there is no special meaning to a zero nominal value):
-        nom_has_exp = not any_exp_factored and not isinfinite(nom_val_main)
+        nom_has_exp = not any_exp_factored and isfinite(nom_val_main)
 
         # Prefix for the parts:
         if fmt_parts['width']:  # Individual widths
@@ -503,7 +499,7 @@ def format_num(nom_val_main, error_main, common_exp,
         if error_main:
             # The handling of NaN/inf in the nominal value identical to
             # the handling of NaN/inf in the standard deviation:
-            if (isinfinite(nom_val_main)
+            if (not isfinite(nom_val_main)
                 # Only some formats have a nicer representation:
                 and fmt_parts['type'] in ('', 'g', 'G')):
                 # The error can be formatted independently:
@@ -809,7 +805,7 @@ def format_ufloat(ufloat_to_format, format_spec):
     # Non-real values (nominal value or standard deviation) must
     # be handled in a specific way:
     real_values = [value for value in [abs(nom_val), std_dev]
-                   if not isinfinite(value)]
+                   if  isfinite(value)]
 
     # Calculation of digits_limit, which defines the precision of
     # the nominal value and of the standard deviation (it can be
@@ -846,7 +842,7 @@ def format_ufloat(ufloat_to_format, format_spec):
         # meaning. This gives us the *effective* uncertainty
         # control mode:
         and std_dev
-        and not isinfinite(std_dev)):
+        and  isfinite(std_dev)):
 
         # The number of significant digits on the uncertainty is
         # controlled.

@@ -667,8 +667,48 @@ to_affine_scalar = AffineScalarFunc._to_affine_scalar
 # number with uncertainties from the uncertainties package?":
 UFloat = AffineScalarFunc
 
-def wrap(*args, **kwargs):
-    return _wrap(AffineScalarFunc, *args, **kwargs)
+def wrap(f, derivatives_args=None, derivatives_kwargs=None):
+    """Wrap a function f into one that accepts Variables.
+
+    The function f must return a float or integer value.  The returned
+    wrapped function will return values with both uncertainties and
+    correlations, but can be used as a drop-in replacement for the
+    original function.
+
+    Arguments:
+    ----------
+    derivatives_args: list or iterable
+           list or tupleof derivative functionss or None with respect to
+           the positional arguments of `f`.  See Note 1.
+    derivatives_kwargs: dictionary
+           dict of derivative functionss or None with respect to the
+           keyword arguments of `f`.  See Note 1.
+
+    Notes:
+    -------
+    1.  Each function must be the partial derivative of f with respect to the
+        corresponding positional parameters, and must have the same signature
+        as ``f``. `derivative_args` hold derivitative functions for positional
+        arguments (include `*varargs`), while  `derivative_kwargs` holds
+        derivitative functions for keyword arguments (include `**kwargs`). If an
+        entry is `None` or not supplied, and if the argument value isa numeric
+        Variable, a numerical derivative will be used. Non-numeric are ignored.
+    2.  If derivatives are meaningless or the function is not function is not
+        differentiable, the derivative funcion should return NaN for values
+        for which the the function is not differentiable.
+
+    Example:
+    --------
+    To wrap `sin`, one could do
+       >>> from uncertainties import wrap, umath
+       >>> import math
+       >>> usin_a = wrap(math.sin)   # uses numerical derivative
+       >>> usin_b = wrap(math.sin, [math.cos])  # use analytic derivative
+       >>> usin_c = umath.sin        # builtin, same as usin_2
+
+    These will all give the same result.
+    """
+    return _wrap(AffineScalarFunc, f, derivatives_args=derivatives_args, derivatives_kwargs=derivatives_kwargs)
 ###############################################################################
 
 class NegativeStdDev(Exception):
