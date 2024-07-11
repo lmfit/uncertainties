@@ -1,7 +1,7 @@
 #!! Whenever the documentation below is updated, setup.py should be
 # checked for consistency.
 
-'''
+"""
 Calculations with full error propagation for quantities with uncertainties.
 Derivatives can also be calculated.
 
@@ -219,13 +219,14 @@ for bug reports, feature requests, or feedback.
 
 
 This software is released under the BSD license.
-'''
+"""
 
-from .core import *
-from .core import __all__  # For a correct help(uncertainties)
+from .core import *  # noqa
+from .core import __all__  # noqa For a correct help(uncertainties)
 
-from .version import __version__, __version_tuple__
+from .version import __version__, __version_tuple__  # noqa
+
 # for backward compatibility
 __version_info__ = __version_tuple__
 
-__author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
+__author__ = "Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>"

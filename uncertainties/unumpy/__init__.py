@@ -70,11 +70,11 @@ author."""
 
 # Local modules:
 
-from .core import *
-from . import ulinalg  # Local sub-module
+from .core import *  # noqa
+from . import ulinalg  # noqa Local sub-module
 
 # __all__ is set so that pydoc shows all important functions:
-__all__ = core.__all__
+__all__ = core.__all__  # noqa
 # "import numpy" makes numpy.linalg available.  This behavior is
 # copied here, for maximum compatibility:
-__all__.append('ulinalg')
+__all__.append("ulinalg")

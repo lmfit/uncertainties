@@ -27,14 +27,14 @@ import uncertainties.core as uncert_core
 
 __all__ = [
     # Factory functions:
-    'uarray', 'umatrix',
-
+    "uarray",
+    "umatrix",
     # Utilities:
-    'nominal_values', 'std_devs',
-
+    "nominal_values",
+    "std_devs",
     # Classes:
-    'matrix'
-    ]
+    "matrix",
+]
 
 ###############################################################################
 # Utilities:
@@ -57,14 +57,21 @@ __all__ = [
 to_nominal_values = numpy.vectorize(
     uncert_core.nominal_value,
     otypes=[float],  # Because vectorize() has side effects (dtype setting)
-    doc=("Return the nominal value of the numbers with uncertainties contained"
-         " in a NumPy (or unumpy) array (this includes matrices)."))
+    doc=(
+        "Return the nominal value of the numbers with uncertainties contained"
+        " in a NumPy (or unumpy) array (this includes matrices)."
+    ),
+)
 
 to_std_devs = numpy.vectorize(
     uncert_core.std_dev,
     otypes=[float],  # Because vectorize() has side effects (dtype setting)
-    doc=("Return the standard deviation of the numbers with uncertainties"
-         " contained in a NumPy array, or zero for other objects."))
+    doc=(
+        "Return the standard deviation of the numbers with uncertainties"
+        " contained in a NumPy array, or zero for other objects."
+    ),
+)
+
 
 def unumpy_to_numpy_matrix(arr):
     """
@@ -76,6 +83,7 @@ def unumpy_to_numpy_matrix(arr):
         return arr.view(numpy.matrix)
     else:
         return arr
+
 
 def nominal_values(arr):
     """
@@ -93,6 +101,7 @@ def nominal_values(arr):
 
     return unumpy_to_numpy_matrix(to_nominal_values(arr))
 
+
 def std_devs(arr):
     """
     Return the standard deviations of the numbers in NumPy array arr.
@@ -109,7 +118,9 @@ def std_devs(arr):
 
     return unumpy_to_numpy_matrix(to_std_devs(arr))
 
+
 ###############################################################################
+
 
 def derivative(u, var):
     """
@@ -121,9 +132,10 @@ def derivative(u, var):
         try:
             return u.derivatives[var]
         except KeyError:
-            return 0.
+            return 0.0
     else:
-        return 0.
+        return 0.0
+
 
 def wrap_array_func(func):
     # !!! This function is not used in the code, except in the tests.
@@ -148,7 +160,8 @@ def wrap_array_func(func):
     and which returns a NumPy array.
     """
 
-    @uncert_core.set_doc("""\
+    @uncert_core.set_doc(
+        """\
     Version of %s(...) that works even when its first argument is a NumPy
     array that contains numbers with uncertainties.
 
@@ -158,7 +171,9 @@ def wrap_array_func(func):
     uncert_core.Variable objects will be incorrect.
 
     Original documentation:
-    %s""" % (func.__name__, func.__doc__))
+    %s"""
+        % (func.__name__, func.__doc__)
+    )
     def wrapped_func(arr, *args, **kwargs):
         # Nominal value:
         arr_nominal_value = nominal_values(arr)
@@ -191,7 +206,6 @@ def wrap_array_func(func):
         # in the case of the pseudo-inverse).
         derivatives = numpy.vectorize(lambda _: {})(func_nominal_value)
         for var in variables:
-
             # A basic assumption of this package is that the user
             # guarantees that uncertainties cover a zone where
             # evaluated functions are linear enough.  Thus, numerical
@@ -214,7 +228,7 @@ def wrap_array_func(func):
             # for the evaluation of the derivative, though: we set the
             # minimum variable shift.
 
-            shift_var = max(var._std_dev/1e5, 1e-8*abs(var._nominal_value))
+            shift_var = max(var._std_dev / 1e5, 1e-8 * abs(var._nominal_value))
             # An exceptional case is that of var being exactly zero.
             # In this case, an arbitrary shift is used for the
             # numerical calculation of the derivative.  The resulting
@@ -225,27 +239,29 @@ def wrap_array_func(func):
                 shift_var = 1e-8
 
             # Shift of all the elements of arr when var changes by shift_var:
-            shift_arr = array_derivative(arr, var)*shift_var
+            shift_arr = array_derivative(arr, var) * shift_var
 
             # Origin value of array arr when var is shifted by shift_var:
             shifted_arr_values = arr_nominal_value + shift_arr
             func_shifted = func(shifted_arr_values, *args, **kwargs)
-            numerical_deriv = (func_shifted-func_nominal_value)/shift_var
+            numerical_deriv = (func_shifted - func_nominal_value) / shift_var
 
             # Update of the list of variables and associated
             # derivatives, for each element:
-            for (derivative_dict, derivative_value) in (
-                zip(derivatives.flat, numerical_deriv.flat)):
-
+            for derivative_dict, derivative_value in zip(
+                derivatives.flat, numerical_deriv.flat
+            ):
                 if derivative_value:
                     derivative_dict[var] = derivative_value
 
         # numbers with uncertainties are built from the result:
         return numpy.vectorize(uncert_core.AffineScalarFunc)(
             func_nominal_value,
-            numpy.vectorize(uncert_core.LinearCombination)(derivatives))
+            numpy.vectorize(uncert_core.LinearCombination)(derivatives),
+        )
 
-    wrapped_func = uncert_core.set_doc("""\
+    wrapped_func = uncert_core.set_doc(
+        """\
     Version of %s(...) that works even when its first argument is a NumPy
     array that contains numbers with uncertainties.
 
@@ -255,7 +271,9 @@ def wrap_array_func(func):
     uncert_core.Variable objects will be incorrect.
 
     Original documentation:
-    %s""" % (func.__name__, func.__doc__))(wrapped_func)
+    %s"""
+        % (func.__name__, func.__doc__)
+    )(wrapped_func)
 
     # It is easier to work with wrapped_func, which represents a
     # wrapped version of 'func', when it bears the same name as
@@ -264,8 +282,10 @@ def wrap_array_func(func):
 
     return wrapped_func
 
+
 ###############################################################################
 # Arrays
+
 
 def uarray(nominal_values, std_devs=None):
     """
@@ -283,16 +303,19 @@ def uarray(nominal_values, std_devs=None):
     """
 
     if std_devs is None:  # Obsolete, single tuple argument call
-        raise TypeError('uarray() should be called with two arguments.')
+        raise TypeError("uarray() should be called with two arguments.")
 
-    return (numpy.vectorize(
+    return numpy.vectorize(
         # ! Looking up uncert_core.Variable beforehand through
         # '_Variable = uncert_core.Variable' does not result in a
         # significant speed up:
-        lambda v, s: uncert_core.Variable(v, s), otypes=[object])
-        (nominal_values, std_devs))
+        lambda v, s: uncert_core.Variable(v, s),
+        otypes=[object],
+    )(nominal_values, std_devs)
+
 
 ###############################################################################
+
 
 def array_derivative(array_like, var):
     """
@@ -307,12 +330,15 @@ def array_derivative(array_like, var):
 
     var -- Variable object.
     """
-    return numpy.vectorize(lambda u: derivative(u, var),
-                           # The type is set because an
-                           # integer derivative should not
-                           # set the output type of the
-                           # array:
-                           otypes=[float])(array_like)
+    return numpy.vectorize(
+        lambda u: derivative(u, var),
+        # The type is set because an
+        # integer derivative should not
+        # set the output type of the
+        # array:
+        otypes=[float],
+    )(array_like)
+
 
 def func_with_deriv_to_uncert_func(func_with_derivatives):
     # This function is used for instance for the calculation of the
@@ -396,7 +422,9 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
             array_nominal,
             type(array_like),
             (array_derivative(array_version, var) for var in variables),
-            *args, **kwargs)
+            *args,
+            **kwargs,
+        )
 
         func_nominal_value = next(func_then_derivs)
 
@@ -408,10 +436,9 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
 
         # Calculation of the derivatives of the result with respect to
         # the variables.
-        derivatives = (
-            numpy.array(
-                [{} for _ in range(func_nominal_value.size)], dtype=object)
-            .reshape(func_nominal_value.shape))
+        derivatives = numpy.array(
+            [{} for _ in range(func_nominal_value.size)], dtype=object
+        ).reshape(func_nominal_value.shape)
 
         # Memory-efficient approach.  A memory-hungry approach would
         # be to calculate the matrix derivatives will respect to all
@@ -420,13 +447,12 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         # progressively build the matrix of derivatives, by
         # progressively adding the derivatives with respect to
         # successive variables.
-        for (var, deriv_wrt_var) in zip(variables,
-                                                   func_then_derivs):
-
+        for var, deriv_wrt_var in zip(variables, func_then_derivs):
             # Update of the list of variables and associated
             # derivatives, for each element:
-            for (derivative_dict, derivative_value) in zip(
-                derivatives.flat, deriv_wrt_var.flat):
+            for derivative_dict, derivative_value in zip(
+                derivatives.flat, deriv_wrt_var.flat
+            ):
                 if derivative_value:
                     derivative_dict[var] = derivative_value
 
@@ -434,7 +460,8 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
         # result:
         result = numpy.vectorize(uncert_core.AffineScalarFunc)(
             func_nominal_value,
-            numpy.vectorize(uncert_core.LinearCombination)(derivatives))
+            numpy.vectorize(uncert_core.LinearCombination)(derivatives),
+        )
 
         # NumPy matrices that contain numbers with uncertainties are
         # better as unumpy matrices:
@@ -445,7 +472,9 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
 
     return wrapped_func
 
+
 ########## Matrix inverse
+
 
 def inv_with_derivatives(arr, input_type, derivatives):
     """
@@ -471,8 +500,10 @@ def inv_with_derivatives(arr, input_type, derivatives):
         derivative_mat = numpy.asmatrix(derivative)
         yield -inverse_mat * derivative_mat * inverse_mat
 
+
 inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
-inv.__doc__ = """\
+inv.__doc__ = (
+    """\
     Version of numpy.linalg.inv that works with array-like objects
     that contain numbers with uncertainties.
 
@@ -483,9 +514,12 @@ inv.__doc__ = """\
 
     Original documentation:
     %s
-    """ % numpy.linalg.inv.__doc__
+    """
+    % numpy.linalg.inv.__doc__
+)
 
 ########## Matrix pseudo-inverse
+
 
 def pinv_with_derivatives(arr, input_type, derivatives, rcond):
     """
@@ -518,28 +552,28 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
     # http://mathoverflow.net/questions/25778/analytical-formula-for-numerical-derivative-of-the-matrix-pseudo-inverse
 
     # Shortcuts.  All the following factors should be numpy.matrix objects:
-    PA = arr*inverse_mat
-    AP = inverse_mat*arr
-    factor21 = inverse_mat*inverse_mat.H
-    factor22 = numpy.eye(arr.shape[0])-PA
-    factor31 = numpy.eye(arr.shape[1])-AP
-    factor32 = inverse_mat.H*inverse_mat
+    PA = arr * inverse_mat
+    AP = inverse_mat * arr
+    factor21 = inverse_mat * inverse_mat.H
+    factor22 = numpy.eye(arr.shape[0]) - PA
+    factor31 = numpy.eye(arr.shape[1]) - AP
+    factor32 = inverse_mat.H * inverse_mat
 
     # Successive derivatives of the inverse:
     for derivative in derivatives:
         derivative_mat = numpy.asmatrix(derivative)
-        term1 = -inverse_mat*derivative_mat*inverse_mat
+        term1 = -inverse_mat * derivative_mat * inverse_mat
         derivative_mat_H = derivative_mat.H
-        term2 = factor21*derivative_mat_H*factor22
-        term3 = factor31*derivative_mat_H*factor32
-        yield term1+term2+term3
+        term2 = factor21 * derivative_mat_H * factor22
+        term3 = factor31 * derivative_mat_H * factor32
+        yield term1 + term2 + term3
+
 
 # Default rcond argument for the generalization of numpy.linalg.pinv:
 #
 # Most common modern case first:
-try: 
-    pinv_default = (
-        inspect.signature(numpy.linalg.pinv).parameters["rcond"].default)
+try:
+    pinv_default = inspect.signature(numpy.linalg.pinv).parameters["rcond"].default
 except AttributeError:  # No inspect.signature() before Python 3.3
     try:
         # In numpy 1.17+, pinv is wrapped using a decorator which unfortunately
@@ -552,10 +586,13 @@ except AttributeError:  # No inspect.signature() before Python 3.3
 
 pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
 
+
 def pinv(array_like, rcond=pinv_default):
     return pinv_with_uncert(array_like, rcond)
 
-pinv = uncert_core.set_doc("""
+
+pinv = uncert_core.set_doc(
+    """
     Version of numpy.linalg.pinv that works with array-like objects
     that contain numbers with uncertainties.
 
@@ -566,9 +603,12 @@ pinv = uncert_core.set_doc("""
 
     Original documentation:
     %s
-    """ % numpy.linalg.pinv.__doc__)(pinv)
+    """
+    % numpy.linalg.pinv.__doc__
+)(pinv)
 
 ########## Matrix class
+
 
 class matrix(numpy.matrix):
     # The name of this class is the same as NumPy's, which is why it
@@ -594,8 +634,7 @@ class matrix(numpy.matrix):
         m, n = self.shape
         return (inv if m == n else pinv)(self)
 
-    I = numpy.matrix.I.getter(getI)
-
+    I = numpy.matrix.I.getter(getI)  # noqa
 
     # !!! The following function is not in the official documentation
     # of the module. Maybe this is because arrays with uncertainties
@@ -616,6 +655,7 @@ class matrix(numpy.matrix):
     def std_devs(self):
         return numpy.matrix(std_devs(self))
 
+
 def umatrix(nominal_values, std_devs=None):
     """
     Constructs a matrix that contains numbers with uncertainties.
@@ -628,11 +668,13 @@ def umatrix(nominal_values, std_devs=None):
     """
 
     if std_devs is None:  # Obsolete, single tuple argument call
-        raise TypeError('umatrix() should be called with two arguments.')
+        raise TypeError("umatrix() should be called with two arguments.")
 
     return uarray(nominal_values, std_devs).view(matrix)
 
+
 ###############################################################################
+
 
 def define_vectorized_funcs():
     """
@@ -645,20 +687,24 @@ def define_vectorized_funcs():
     this_module = sys.modules[__name__]
     # NumPy does not always use the same function names as the math
     # module:
-    func_name_translations = dict([
-        (f_name, 'arc'+f_name[1:])
-        for f_name in ['acos', 'acosh', 'asin', 'atan', 'atan2', 'atanh']])
+    func_name_translations = dict(
+        [
+            (f_name, "arc" + f_name[1:])
+            for f_name in ["acos", "acosh", "asin", "atan", "atan2", "atanh"]
+        ]
+    )
 
     new_func_names = [
         func_name_translations.get(function_name, function_name)
         # The functions from umath_core.non_std_wrapped_funcs
         # (available from umath) are normally not in
         # NumPy, so they are not included here:
-        for function_name in umath_core.many_scalars_to_scalar_funcs]
+        for function_name in umath_core.many_scalars_to_scalar_funcs
+    ]
 
-    for (function_name, unumpy_name) in zip(
-        umath_core.many_scalars_to_scalar_funcs, new_func_names):
-
+    for function_name, unumpy_name in zip(
+        umath_core.many_scalars_to_scalar_funcs, new_func_names
+    ):
         # ! The newly defined functions (uncertainties.unumpy.cos, etc.)
         # do not behave exactly like their NumPy equivalent (numpy.cos,
         # etc.): cos(0) gives an array() and not a
@@ -673,7 +719,8 @@ def define_vectorized_funcs():
             # return an array with a boolean data type (instead of
             # object), which allows the result to be used with NumPy's
             # boolean indexing.
-            {} if function_name in umath_core.locally_cst_funcs
+            {}
+            if function_name in umath_core.locally_cst_funcs
             # If by any chance a function returns, in a particular
             # case, an integer instead of a number with uncertainty,
             # side-effects in vectorize() would fix the resulting
@@ -681,22 +728,28 @@ def define_vectorized_funcs():
             # vectorize(), at least in NumPy around 2010 maybe,
             # decided about the output data type by looking at the
             # type of first element only).
-            else {'otypes': [object]})
+            else {"otypes": [object]}
+        )
 
         setattr(
-            this_module, unumpy_name,
+            this_module,
+            unumpy_name,
             #!!!! For umath_core.locally_cst_funcs, would it make sense
             # to optimize this by using instead the equivalent (? see
             # above) vectorized NumPy function on the nominal values?
-            numpy.vectorize(func,
-                            doc="""\
+            numpy.vectorize(
+                func,
+                doc="""\
 Vectorized version of umath.%s.
 
 Original documentation:
-%s""" % (function_name, func.__doc__),
-                            **otypes))
-
+%s"""
+                % (function_name, func.__doc__),
+                **otypes,
+            ),
+        )
 
         __all__.append(unumpy_name)
+
 
 define_vectorized_funcs()
