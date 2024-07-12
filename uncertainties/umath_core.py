@@ -19,8 +19,7 @@ import itertools
 
 # Local modules
 import uncertainties.core as uncert_core
-from uncertainties.core import (to_affine_scalar, AffineScalarFunc,
-                                LinearCombination)
+from uncertainties.core import to_affine_scalar, AffineScalarFunc, LinearCombination
 
 ###############################################################################
 
@@ -59,7 +58,7 @@ many_scalars_to_scalar_funcs = []
 # Functions with numerical derivatives:
 #
 # !! Python2.7+: {..., ...}
-num_deriv_funcs = set(['fmod', 'gamma', 'lgamma'])
+num_deriv_funcs = set(["fmod", "gamma", "lgamma"])
 
 # Functions are by definition locally constant (on real
 # numbers): their value does not depend on the uncertainty (because
@@ -71,21 +70,19 @@ num_deriv_funcs = set(['fmod', 'gamma', 'lgamma'])
 # comparisons (==, >, etc.).
 #
 # !! Python 2.7+: {..., ...}
-locally_cst_funcs = set(['ceil', 'floor', 'isinf', 'isnan', 'trunc'])
+locally_cst_funcs = set(["ceil", "floor", "isinf", "isnan", "trunc"])
 
 # Functions that do not belong in many_scalars_to_scalar_funcs, but
 # that have a version that handles uncertainties. These functions are
 # also not in numpy (see unumpy/core.py).
 non_std_wrapped_funcs = []
 
+
 # Function that copies the relevant attributes from generalized
 # functions from the math module:
 # This is a copy&paste job from the functools module, changing
 # the default arugment for assigned
-def wraps(wrapper,
-          wrapped,
-          assigned=('__doc__',),
-          updated=('__dict__',)):
+def wraps(wrapper, wrapped, assigned=("__doc__",), updated=("__dict__",)):
     """Update a wrapper function to look like the wrapped function.
 
     wrapper -- function to be updated
@@ -123,11 +120,12 @@ def wraps(wrapper,
 # results when differentiated analytically, because of the loss of
 # precision in numerical calculations.
 
-#def log_1arg_der(x):
+# def log_1arg_der(x):
 #    """
 #    Derivative of log(x) (1-argument form).
 #    """
 #    return 1/x
+
 
 def log_der0(*args):
     """
@@ -136,24 +134,26 @@ def log_der0(*args):
     Works whether 1 or 2 arguments are given.
     """
     if len(args) == 1:
-        return 1/args[0]
+        return 1 / args[0]
     else:
-        return 1/args[0]/math.log(args[1])  # 2-argument form
+        return 1 / args[0] / math.log(args[1])  # 2-argument form
 
     # The following version goes about as fast:
 
     ## A 'try' is used for the most common case because it is fast when no
     ## exception is raised:
-    #try:
+    # try:
     #    return log_1arg_der(*args)  # Argument number check
-    #except TypeError:
+    # except TypeError:
     #    return 1/args[0]/math.log(args[1])  # 2-argument form
 
-def _deriv_copysign(x,y):
+
+def _deriv_copysign(x, y):
     if x >= 0:
         return math.copysign(1, y)
     else:
         return -math.copysign(1, y)
+
 
 def _deriv_fabs(x):
     if x >= 0:
@@ -161,64 +161,67 @@ def _deriv_fabs(x):
     else:
         return -1
 
+
 def _deriv_pow_0(x, y):
     if y == 0:
-        return  0.
+        return 0.0
     elif x != 0 or y % 1 == 0:
-        return y*math.pow(x, y-1)
+        return y * math.pow(x, y - 1)
     else:
-        return float('nan')
+        return float("nan")
+
 
 def _deriv_pow_1(x, y):
     if x == 0 and y > 0:
-        return 0.
+        return 0.0
     else:
         return math.log(x) * math.pow(x, y)
 
-erf_coef = 2/math.sqrt(math.pi)  # Optimization for erf()
+
+erf_coef = 2 / math.sqrt(math.pi)  # Optimization for erf()
 
 fixed_derivatives = {
     # In alphabetical order, here:
-    'acos': [lambda x: -1/math.sqrt(1-x**2)],
-    'acosh': [lambda x: 1/math.sqrt(x**2-1)],
-    'asin': [lambda x: 1/math.sqrt(1-x**2)],
-    'asinh': [lambda x: 1/math.sqrt(1+x**2)],
-    'atan': [lambda x: 1/(1+x**2)],
-    'atan2': [lambda y, x: x/(x**2+y**2),  # Correct for x == 0
-              lambda y, x: -y/(x**2+y**2)],  # Correct for x == 0
-    'atanh': [lambda x: 1/(1-x**2)],
-    'copysign': [_deriv_copysign,
-                 lambda x, y: 0],
-    'cos': [lambda x: -math.sin(x)],
-    'cosh': [math.sinh],
-    'degrees': [lambda x: math.degrees(1)],
-    'erf': [lambda x: math.exp(-x**2)*erf_coef],
-    'erfc': [lambda x: -math.exp(-x**2)*erf_coef],
-    'exp': [math.exp],
-    'expm1': [math.exp],
-    'fabs': [_deriv_fabs],
-    'hypot': [lambda x, y: x/math.hypot(x, y),
-              lambda x, y: y/math.hypot(x, y)],
-    'log': [log_der0,
-            lambda x, y: -math.log(x, y)/y/math.log(y)],
-    'log10': [lambda x: 1/x/math.log(10)],
-    'log1p': [lambda x: 1/(1+x)],
-    'pow': [_deriv_pow_0, _deriv_pow_1],
-    'radians': [lambda x: math.radians(1)],
-    'sin': [math.cos],
-    'sinh': [math.cosh],
-    'sqrt': [lambda x: 0.5/math.sqrt(x)],
-    'tan': [lambda x: 1+math.tan(x)**2],
-    'tanh': [lambda x: 1-math.tanh(x)**2]
-    }
+    "acos": [lambda x: -1 / math.sqrt(1 - x**2)],
+    "acosh": [lambda x: 1 / math.sqrt(x**2 - 1)],
+    "asin": [lambda x: 1 / math.sqrt(1 - x**2)],
+    "asinh": [lambda x: 1 / math.sqrt(1 + x**2)],
+    "atan": [lambda x: 1 / (1 + x**2)],
+    "atan2": [
+        lambda y, x: x / (x**2 + y**2),  # Correct for x == 0
+        lambda y, x: -y / (x**2 + y**2),
+    ],  # Correct for x == 0
+    "atanh": [lambda x: 1 / (1 - x**2)],
+    "copysign": [_deriv_copysign, lambda x, y: 0],
+    "cos": [lambda x: -math.sin(x)],
+    "cosh": [math.sinh],
+    "degrees": [lambda x: math.degrees(1)],
+    "erf": [lambda x: math.exp(-(x**2)) * erf_coef],
+    "erfc": [lambda x: -math.exp(-(x**2)) * erf_coef],
+    "exp": [math.exp],
+    "expm1": [math.exp],
+    "fabs": [_deriv_fabs],
+    "hypot": [lambda x, y: x / math.hypot(x, y), lambda x, y: y / math.hypot(x, y)],
+    "log": [log_der0, lambda x, y: -math.log(x, y) / y / math.log(y)],
+    "log10": [lambda x: 1 / x / math.log(10)],
+    "log1p": [lambda x: 1 / (1 + x)],
+    "pow": [_deriv_pow_0, _deriv_pow_1],
+    "radians": [lambda x: math.radians(1)],
+    "sin": [math.cos],
+    "sinh": [math.cosh],
+    "sqrt": [lambda x: 0.5 / math.sqrt(x)],
+    "tan": [lambda x: 1 + math.tan(x) ** 2],
+    "tanh": [lambda x: 1 - math.tanh(x) ** 2],
+}
 
 # Many built-in functions in the math module are wrapped with a
 # version which is uncertainty aware:
 
 this_module = sys.modules[__name__]
 
+
 def wrap_locally_cst_func(func):
-    '''
+    """
     Return a function that returns the same arguments as func, but
     after converting any AffineScalarFunc object to its nominal value.
 
@@ -226,19 +229,22 @@ def wrap_locally_cst_func(func):
     constant: the uncertainties should have no role in the result
     (since they are supposed to keep the function linear and hence,
     here, constant).
-    '''
+    """
+
     def wrapped_func(*args, **kwargs):
         args_float = map(uncert_core.nominal_value, args)
         # !! In Python 2.7+, dictionary comprehension: {argname:...}
         kwargs_float = dict(
             (arg_name, uncert_core.nominal_value(value))
-            for (arg_name, value) in kwargs.items())
+            for (arg_name, value) in kwargs.items()
+        )
         return func(*args_float, **kwargs_float)
+
     return wrapped_func
+
 
 # for (name, attr) in vars(math).items():
 for name in dir(math):
-
     if name in fixed_derivatives:  # Priority to functions in fixed_derivatives
         derivatives = fixed_derivatives[name]
     elif name in num_deriv_funcs:
@@ -258,7 +264,8 @@ for name in dir(math):
         # that cannot be calculated indicates a non-defined derivative
         # (the derivatives in fixed_derivatives must be written this way):
         wrapped_func = uncert_core.wrap(
-            func, map(uncert_core.nan_if_exception, derivatives))
+            func, map(uncert_core.nan_if_exception, derivatives)
+        )
 
     # !! The same effect could be achieved with globals()[...] = ...
     setattr(this_module, name, wraps(wrapped_func, func))
@@ -286,12 +293,13 @@ for name in dir(math):
 
 # For drop-in compatibility with the math module:
 factorial = math.factorial
-non_std_wrapped_funcs.append('factorial')
+non_std_wrapped_funcs.append("factorial")
 
 
 # We wrap math.fsum
 
 original_func = math.fsum  # For optimization purposes
+
 
 # The function below exists so that temporary variables do not
 # pollute the module namespace:
@@ -304,17 +312,16 @@ def wrapped_fsum():
     # The fsum function is flattened, in order to use the
     # wrap() wrapper:
 
-    flat_fsum = lambda *args: original_func(args)
+    flat_fsum = lambda *args: original_func(args)  # noqa
 
-    flat_fsum_wrap = uncert_core.wrap(
-        flat_fsum, itertools.repeat(lambda *args: 1))
+    flat_fsum_wrap = uncert_core.wrap(flat_fsum, itertools.repeat(lambda *args: 1))
 
-    return wraps(lambda arg_list: flat_fsum_wrap(*arg_list),
-                 original_func)
+    return wraps(lambda arg_list: flat_fsum_wrap(*arg_list), original_func)
+
 
 # !!!!!!!! Documented?
 fsum = wrapped_fsum()
-non_std_wrapped_funcs.append('fsum')
+non_std_wrapped_funcs.append("fsum")
 
 ##########
 
@@ -324,6 +331,7 @@ non_std_wrapped_funcs.append('fsum')
 
 # ! The arguments have the same names as in the math module
 # documentation, so that the docstrings are consistent with them.
+
 
 @uncert_core.set_doc(math.modf.__doc__)
 def modf(x):
@@ -348,7 +356,10 @@ def modf(x):
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
         return (frac_part, int_part)
-many_scalars_to_scalar_funcs.append('modf')
+
+
+many_scalars_to_scalar_funcs.append("modf")
+
 
 @uncert_core.set_doc(math.ldexp.__doc__)
 def ldexp(x, i):
@@ -361,7 +372,8 @@ def ldexp(x, i):
     if aff_func._linear_part:
         return AffineScalarFunc(
             math.ldexp(aff_func.nominal_value, i),
-            LinearCombination([(2**i, aff_func._linear_part)]))
+            LinearCombination([(2**i, aff_func._linear_part)]),
+        )
     else:
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
@@ -372,7 +384,10 @@ def ldexp(x, i):
         # value of x coerced to a difference type [int->float, for
         # instance]):
         return math.ldexp(x, i)
-many_scalars_to_scalar_funcs.append('ldexp')
+
+
+many_scalars_to_scalar_funcs.append("ldexp")
+
 
 @uncert_core.set_doc(math.frexp.__doc__)
 def frexp(x):
@@ -395,15 +410,19 @@ def frexp(x):
                 # With frexp(x) = (m, e), x = m*2**e, so m = x*2**-e
                 # and therefore dm/dx = 2**-e (as e in an integer that
                 # does not vary when x changes):
-                LinearCombination([2**-exponent, aff_func._linear_part])),
+                LinearCombination([2**-exponent, aff_func._linear_part]),
+            ),
             # The exponent is an integer and is supposed to be
             # continuous (errors must be small):
-            exponent)
+            exponent,
+        )
     else:
         # This function was not called with an AffineScalarFunc
         # argument: there is no need to return numbers with uncertainties:
         return math.frexp(x)
-non_std_wrapped_funcs.append('frexp')
+
+
+non_std_wrapped_funcs.append("frexp")
 
 ###############################################################################
 # Exported functions:

@@ -1,25 +1,25 @@
 from math import isinf, isnan, isfinite
 import math
 import re
-import warnings
 
 
 def first_digit(value):
-    '''
+    """
     Return the first digit position of the given value, as an integer.
 
     0 is the digit just before the decimal point. Digits to the right
     of the decimal point have a negative position.
 
     Return 0 for a null value.
-    '''
+    """
     try:
         return int(math.floor(math.log10(abs(value))))
     except ValueError:  # Case of value == 0
         return 0
 
+
 def PDG_precision(std_dev):
-    '''
+    """
     Return the number of significant digits to be used for the given
     standard deviation, according to the rounding rules of the
     Particle Data Group (2010)
@@ -27,7 +27,7 @@ def PDG_precision(std_dev):
 
     Also returns the effective standard deviation to be used for
     display.
-    '''
+    """
 
     exponent = first_digit(std_dev)
 
@@ -43,10 +43,10 @@ def PDG_precision(std_dev):
     # range for very small and very big floats is generally different.
     if exponent >= 0:
         # The -2 here means "take two additional digits":
-        (exponent, factor) = (exponent-2, 1)
+        (exponent, factor) = (exponent - 2, 1)
     else:
-        (exponent, factor) = (exponent+1, 1000)
-    digits = int(std_dev/10.**exponent*factor)  # int rounds towards zero
+        (exponent, factor) = (exponent + 1, 1000)
+    digits = int(std_dev / 10.0**exponent * factor)  # int rounds towards zero
 
     # Rules:
     if digits <= 354:
@@ -56,7 +56,8 @@ def PDG_precision(std_dev):
     else:
         # The parentheses matter, for very small or very large
         # std_dev:
-        return (2, 10.**exponent*(1000/factor))
+        return (2, 10.0**exponent * (1000 / factor))
+
 
 # Definition of a basic (format specification only, no full-feature
 # format string) formatting function that works whatever the version
@@ -66,10 +67,11 @@ robust_format = format
 
 # Exponent letter: the keys are the possible main_fmt_type values of
 # format_num():
-EXP_LETTERS = {'f': 'e', 'F': 'E'}
+EXP_LETTERS = {"f": "e", "F": "E"}
+
 
 def robust_align(orig_str, fill_char, align_option, width):
-    '''
+    """
     Aligns the given string with the given fill character.
 
     orig_str -- string to be aligned (str or unicode object).
@@ -79,49 +81,51 @@ def robust_align(orig_str, fill_char, align_option, width):
     align_option -- as accepted by format().
 
     wdith -- string that contains the width.
-    '''
+    """
 
     # print "ALIGNING", repr(orig_str), "WITH", fill_char+align_option,
     # print "WIDTH", width
 
-    return format(orig_str, fill_char+align_option+width)
+    return format(orig_str, fill_char + align_option + width)
+
 
 # Maps some Unicode code points ("-", "+", and digits) to their
 # superscript version:
 TO_SUPERSCRIPT = {
-    0x2b: u'⁺',
-    0x2d: u'⁻',
-    0x30: u'⁰',
-    0x31: u'¹',
-    0x32: u'²',
-    0x33: u'³',
-    0x34: u'⁴',
-    0x35: u'⁵',
-    0x36: u'⁶',
-    0x37: u'⁷',
-    0x38: u'⁸',
-    0x39: u'⁹'
-    }
+    0x2B: "⁺",
+    0x2D: "⁻",
+    0x30: "⁰",
+    0x31: "¹",
+    0x32: "²",
+    0x33: "³",
+    0x34: "⁴",
+    0x35: "⁵",
+    0x36: "⁶",
+    0x37: "⁷",
+    0x38: "⁸",
+    0x39: "⁹",
+}
 
 # Inverted TO_SUPERSCRIPT table, for use with unicode.translate():
 #
 #! Python 2.7+ can use a dictionary comprehension instead:
-FROM_SUPERSCRIPT = {
-    ord(sup): normal for (normal, sup) in TO_SUPERSCRIPT.items()}
+FROM_SUPERSCRIPT = {ord(sup): normal for (normal, sup) in TO_SUPERSCRIPT.items()}
+
 
 def to_superscript(value):
-    '''
+    """
     Return a (Unicode) string with the given value as superscript characters.
 
     The value is formatted with the %d %-operator format.
 
     value -- integer.
-    '''
+    """
 
-    return (u'%d' % value).translate(TO_SUPERSCRIPT)
+    return ("%d" % value).translate(TO_SUPERSCRIPT)
+
 
 def nrmlze_superscript(number_str):
-    '''
+    """
     Return a string with superscript digits transformed into regular digits.
 
     Non-superscript digits are not changed before the conversion. Thus, the
@@ -131,42 +135,45 @@ def nrmlze_superscript(number_str):
 
     number_str -- string to be converted (of type str, but also possibly, for
     Python 2, unicode, which allows this string to contain superscript digits).
-    '''
+    """
     # !! Python 3 doesn't need this str(), which is only here for giving the
     # .translate() method to str objects in Python 2 (this str() comes
     # from the builtins module of the future package and is therefore
     # a subclass of unicode, in Python 2):
     return int(str(number_str).translate(FROM_SUPERSCRIPT))
 
-PM_SYMBOLS = {'pretty-print': u'±', 'latex': r' \pm ', 'default': '+/-'}
+
+PM_SYMBOLS = {"pretty-print": "±", "latex": r" \pm ", "default": "+/-"}
 
 # Multiplication symbol for pretty printing (so that pretty printing can
 # be customized):
-MULT_SYMBOLS = {'pretty-print': u'×', 'latex': r'\times'}
+MULT_SYMBOLS = {"pretty-print": "×", "latex": r"\times"}
 
 # Function that transforms a numerical exponent produced by format_num() into
 # the corresponding string notation (for non-default modes):
 EXP_PRINT = {
-    'pretty-print': lambda common_exp: u'%s10%s' % (
-        MULT_SYMBOLS['pretty-print'], to_superscript(common_exp)),
-    'latex': lambda common_exp: r' %s 10^{%d}' % (
-        MULT_SYMBOLS['latex'], common_exp)}
+    "pretty-print": lambda common_exp: "%s10%s"
+    % (MULT_SYMBOLS["pretty-print"], to_superscript(common_exp)),
+    "latex": lambda common_exp: r" %s 10^{%d}" % (MULT_SYMBOLS["latex"], common_exp),
+}
 
 # Symbols used for grouping (typically between parentheses) in format_num():
 GROUP_SYMBOLS = {
-    'pretty-print': ('(', ')'),
+    "pretty-print": ("(", ")"),
     # Because of possibly exponents inside the parentheses (case of a
     # specified field width), it is better to use auto-adjusting
     # parentheses. This has the side effect of making the part between
     # the parentheses non-breakable (the text inside parentheses in a
     # LaTeX math expression $...$ can be broken).
-    'latex': (r'\left(', r'\right)'),
-    'default': ('(', ')')  # Basic text mode
-    }
+    "latex": (r"\left(", r"\right)"),
+    "default": ("(", ")"),  # Basic text mode
+}
 
-def format_num(nom_val_main, error_main, common_exp,
-               fmt_parts, prec, main_pres_type, options):
-    u'''
+
+def format_num(
+    nom_val_main, error_main, common_exp, fmt_parts, prec, main_pres_type, options
+):
+    """
     Return a formatted number with uncertainty.
 
     Null errors (error_main) are displayed as the integer 0, with
@@ -222,7 +229,7 @@ def format_num(nom_val_main, error_main, common_exp,
     be combined. The P option has priority over the L option (if both are
     given). For details, see the documentation for
     AffineScalarFunction.__format__().
-    '''
+    """
 
     # print (nom_val_main, error_main, common_exp,
     #        fmt_parts, prec, main_pres_type, options)
@@ -251,33 +258,33 @@ def format_num(nom_val_main, error_main, common_exp,
     # the LaTeX mode. This setting does not apply to everything: for
     # example, NaN is formatted as \mathrm{nan} (or NAN) if the LaTeX
     # mode is required.
-    if 'P' in options:
-        print_type = 'pretty-print'
-    elif 'L' in options:
-        print_type = 'latex'
+    if "P" in options:
+        print_type = "pretty-print"
+    elif "L" in options:
+        print_type = "latex"
     else:
-        print_type = 'default'
+        print_type = "default"
 
     # Exponent part:
     if common_exp is None:
-        exp_str = ''
-    elif print_type == 'default':
+        exp_str = ""
+    elif print_type == "default":
         # Case of e or E. The same convention as Python 2.7
         # to 3.3 is used for the display of the exponent:
-        exp_str = EXP_LETTERS[main_pres_type]+'%+03d' % common_exp
+        exp_str = EXP_LETTERS[main_pres_type] + "%+03d" % common_exp
     else:
         exp_str = EXP_PRINT[print_type](common_exp)
 
     # Possible % sign:
-    percent_str = ''
-    if '%' in options:
-        if 'L' in options:
+    percent_str = ""
+    if "%" in options:
+        if "L" in options:
             # % is a special character, in LaTeX: it must be escaped.
             #
             # Using '\\' in the code instead of r'\' so as not to
             # confuse emacs's syntax highlighting:
-            percent_str += ' \\'
-        percent_str += '%'
+            percent_str += " \\"
+        percent_str += "%"
 
     ####################
 
@@ -288,15 +295,14 @@ def format_num(nom_val_main, error_main, common_exp,
     # Nicer representation of the main nominal part, with no trailing
     # zeros, when the error does not have a defined number of
     # significant digits:
-    if special_error and fmt_parts['type'] in ('', 'g', 'G'):
+    if special_error and fmt_parts["type"] in ("", "g", "G"):
         # The main part is between 1 and 10 because any possible
         # exponent is taken care of by common_exp, so it is
         # formatted without an exponent (otherwise, the exponent
         # would have to be handled for the LaTeX option):
-        fmt_suffix_n = (fmt_parts['prec'] or '')+fmt_parts['type']
+        fmt_suffix_n = (fmt_parts["prec"] or "") + fmt_parts["type"]
     else:
-        fmt_suffix_n = '.%d%s' % (prec, main_pres_type)
-
+        fmt_suffix_n = ".%d%s" % (prec, main_pres_type)
 
     # print "FMT_SUFFIX_N", fmt_suffix_n
 
@@ -307,25 +313,22 @@ def format_num(nom_val_main, error_main, common_exp,
 
     # Error formatting:
 
-
-    if 'S' in options:  # Shorthand notation:
-
+    if "S" in options:  # Shorthand notation:
         # Calculation of the uncertainty part, uncert_str:
 
         if error_main == 0:
             # The error is exactly zero
-            uncert_str = '0'
+            uncert_str = "0"
         elif isnan(error_main):
             uncert_str = robust_format(error_main, main_pres_type)
-            if 'L' in options:
-                uncert_str = r'\mathrm{%s}' % uncert_str
+            if "L" in options:
+                uncert_str = r"\mathrm{%s}" % uncert_str
         elif isinf(error_main):
-            if 'L' in options:
-                uncert_str = r'\infty'
+            if "L" in options:
+                uncert_str = r"\infty"
             else:
                 uncert_str = robust_format(error_main, main_pres_type)
         else:  #  Error with a meaningful first digit (not 0, and real number)
-
             uncert = round(error_main, prec)
 
             # The representation uncert_str of the uncertainty (which will
@@ -339,24 +342,24 @@ def format_num(nom_val_main, error_main, common_exp,
             if first_digit(uncert) >= 0 and prec > 0:
                 # This case includes a zero rounded error with digits
                 # after the decimal point:
-                uncert_str = '%.*f' % (prec, uncert)
+                uncert_str = "%.*f" % (prec, uncert)
 
             else:
                 if uncert:
                     # The round is important because 566.99999999 can
                     # first be obtained when 567 is wanted (%d prints the
                     # integer part, not the rounded value):
-                    uncert_str = '%d' % round(uncert*10.**prec)
+                    uncert_str = "%d" % round(uncert * 10.0**prec)
                 else:
                     # The decimal point indicates a truncated float
                     # (this is easy to do, in this case, since
                     # fmt_prefix_e is ignored):
-                    uncert_str = '0.'
+                    uncert_str = "0."
 
         # End of the final number representation (width and alignment
         # not included). This string is important for the handling of
         # the width:
-        value_end = '(%s)%s%s' % (uncert_str, exp_str, percent_str)
+        value_end = "(%s)%s%s" % (uncert_str, exp_str, percent_str)
         any_exp_factored = True  # Single exponent in the output
 
         ##########
@@ -365,60 +368,62 @@ def format_num(nom_val_main, error_main, common_exp,
         # Calculation of fmt_prefix_n (prefix for the format of the
         # main part of the nominal value):
 
-        if fmt_parts['zero'] and fmt_parts['width']:
-
+        if fmt_parts["zero"] and fmt_parts["width"]:
             # Padding with zeros must be done on the nominal value alone:
 
             # Remaining width (for the nominal value):
-            nom_val_width = max(int(fmt_parts['width']) - len(value_end), 0)
-            fmt_prefix_n = '%s%s%d%s' % (
-                fmt_parts['sign'], fmt_parts['zero'], nom_val_width,
-                fmt_parts['comma'])
+            nom_val_width = max(int(fmt_parts["width"]) - len(value_end), 0)
+            fmt_prefix_n = "%s%s%d%s" % (
+                fmt_parts["sign"],
+                fmt_parts["zero"],
+                nom_val_width,
+                fmt_parts["comma"],
+            )
 
         else:
             # Any 'zero' part should not do anything: it is not
             # included
-            fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
+            fmt_prefix_n = fmt_parts["sign"] + fmt_parts["comma"]
 
         # print "FMT_PREFIX_N", fmt_prefix_n
         # print "FMT_SUFFIX_N", fmt_suffix_n
 
-        nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
+        nom_val_str = robust_format(nom_val_main, fmt_prefix_n + fmt_suffix_n)
 
         ##########
         # Overriding of nom_val_str for LaTeX,; possibly based on the
         # existing value (for NaN vs nan):
-        if 'L' in options:
-
+        if "L" in options:
             if isnan(nom_val_main):
-                nom_val_str = r'\mathrm{%s}' % nom_val_str
+                nom_val_str = r"\mathrm{%s}" % nom_val_str
             elif isinf(nom_val_main):
                 # !! It is wasteful, in this case, to replace
                 # nom_val_str: could this be avoided while avoiding to
                 # duplicate the formula for nom_val_str for the common
                 # case (robust_format(...))?
-                nom_val_str = r'%s\infty' % ('-' if nom_val_main < 0 else '')
+                nom_val_str = r"%s\infty" % ("-" if nom_val_main < 0 else "")
 
-        value_str = nom_val_str+value_end
+        value_str = nom_val_str + value_end
 
         # Global width, if any:
 
-        if fmt_parts['width']:  # An individual alignment is needed:
-
+        if fmt_parts["width"]:  # An individual alignment is needed:
             # Default alignment, for numbers: to the right (if no
             # alignment is specified, a string is aligned to the
             # left):
             value_str = robust_align(
-                value_str, fmt_parts['fill'], fmt_parts['align'] or '>',
-                fmt_parts['width'])
+                value_str,
+                fmt_parts["fill"],
+                fmt_parts["align"] or ">",
+                fmt_parts["width"],
+            )
 
     else:  # +/- notation:
-
         # The common exponent is factored or not, depending on the
         # width. This gives nice columns for the nominal values and
         # the errors (no shift due to a varying exponent), when a need
         # is given:
-        any_exp_factored = not fmt_parts['width']
+        any_exp_factored = not fmt_parts["width"]
 
         # True when the error part has any exponent directly attached
         # (case of an individual exponent for both the nominal value
@@ -429,40 +434,41 @@ def format_num(nom_val_main, error_main, common_exp,
         # to have a zero uncertainty be very explicit):
         error_has_exp = not any_exp_factored and not special_error
 
-         # Like error_has_exp, but only for real number handling
+        # Like error_has_exp, but only for real number handling
         # (there is no special meaning to a zero nominal value):
         nom_has_exp = not any_exp_factored and isfinite(nom_val_main)
 
         # Prefix for the parts:
-        if fmt_parts['width']:  # Individual widths
-
+        if fmt_parts["width"]:  # Individual widths
             # If zeros are needed, then the width is taken into
             # account now (before the exponent is added):
-            if fmt_parts['zero']:
-
-                width = int(fmt_parts['width'])
+            if fmt_parts["zero"]:
+                width = int(fmt_parts["width"])
 
                 # Remaining (minimum) width after including the
                 # exponent:
-                remaining_width = max(width-len(exp_str), 0)
+                remaining_width = max(width - len(exp_str), 0)
 
-                fmt_prefix_n = '%s%s%d%s' % (
-                    fmt_parts['sign'], fmt_parts['zero'],
+                fmt_prefix_n = "%s%s%d%s" % (
+                    fmt_parts["sign"],
+                    fmt_parts["zero"],
                     remaining_width if nom_has_exp else width,
-                    fmt_parts['comma'])
+                    fmt_parts["comma"],
+                )
 
-                fmt_prefix_e = '%s%d%s' % (
-                    fmt_parts['zero'],
+                fmt_prefix_e = "%s%d%s" % (
+                    fmt_parts["zero"],
                     remaining_width if error_has_exp else width,
-                    fmt_parts['comma'])
+                    fmt_parts["comma"],
+                )
 
             else:
-                fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
-                fmt_prefix_e = fmt_parts['comma']
+                fmt_prefix_n = fmt_parts["sign"] + fmt_parts["comma"]
+                fmt_prefix_e = fmt_parts["comma"]
 
         else:  # Global width
-            fmt_prefix_n = fmt_parts['sign']+fmt_parts['comma']
-            fmt_prefix_e = fmt_parts['comma']
+            fmt_prefix_n = fmt_parts["sign"] + fmt_parts["comma"]
+            fmt_prefix_e = fmt_parts["comma"]
 
         ## print "ANY_EXP_FACTORED", any_exp_factored
         ## print "ERROR_HAS_EXP", error_has_exp
@@ -480,7 +486,7 @@ def format_num(nom_val_main, error_main, common_exp,
         # print "FMT_PREFIX_N", fmt_prefix_n
         # print "FMT_SUFFIX_N", fmt_suffix_n
 
-        nom_val_str = robust_format(nom_val_main, fmt_prefix_n+fmt_suffix_n)
+        nom_val_str = robust_format(nom_val_main, fmt_prefix_n + fmt_suffix_n)
 
         # print "NOM_VAL_STR", nom_val_str
 
@@ -499,31 +505,32 @@ def format_num(nom_val_main, error_main, common_exp,
         if error_main:
             # The handling of NaN/inf in the nominal value identical to
             # the handling of NaN/inf in the standard deviation:
-            if (not isfinite(nom_val_main)
+            if (
+                not isfinite(nom_val_main)
                 # Only some formats have a nicer representation:
-                and fmt_parts['type'] in ('', 'g', 'G')):
+                and fmt_parts["type"] in ("", "g", "G")
+            ):
                 # The error can be formatted independently:
-                fmt_suffix_e = (fmt_parts['prec'] or '')+fmt_parts['type']
+                fmt_suffix_e = (fmt_parts["prec"] or "") + fmt_parts["type"]
             else:
-                fmt_suffix_e = '.%d%s' % (prec, main_pres_type)
+                fmt_suffix_e = ".%d%s" % (prec, main_pres_type)
         else:
-            fmt_suffix_e = '.0%s' % main_pres_type
+            fmt_suffix_e = ".0%s" % main_pres_type
 
-        error_str = robust_format(error_main, fmt_prefix_e+fmt_suffix_e)
+        error_str = robust_format(error_main, fmt_prefix_e + fmt_suffix_e)
 
         ##########
         # Overriding of nom_val_str and error_str for LaTeX:
-        if 'L' in options:
-
+        if "L" in options:
             if isnan(nom_val_main):
-                nom_val_str = r'\mathrm{%s}' % nom_val_str
+                nom_val_str = r"\mathrm{%s}" % nom_val_str
             elif isinf(nom_val_main):
-                nom_val_str = r'%s\infty' % ('-' if nom_val_main < 0 else '')
+                nom_val_str = r"%s\infty" % ("-" if nom_val_main < 0 else "")
 
             if isnan(error_main):
-                error_str = r'\mathrm{%s}' % error_str
+                error_str = r"\mathrm{%s}" % error_str
             elif isinf(error_main):
-                error_str = r'\infty'
+                error_str = r"\infty"
 
         if nom_has_exp:
             nom_val_str += exp_str
@@ -533,23 +540,22 @@ def format_num(nom_val_main, error_main, common_exp,
         ####################
         # Final alignment of each field, if needed:
 
-        if fmt_parts['width']:  # An individual alignment is needed:
-
+        if fmt_parts["width"]:  # An individual alignment is needed:
             # Default alignment, for numbers: to the right (if no
             # alignment is specified, a string is aligned to the
             # left):
-            effective_align = fmt_parts['align'] or '>'
+            effective_align = fmt_parts["align"] or ">"
 
             # robust_format() is used because it may handle alignment
             # options, where the % operator does not:
 
             nom_val_str = robust_align(
-                nom_val_str, fmt_parts['fill'], effective_align,
-                fmt_parts['width'])
+                nom_val_str, fmt_parts["fill"], effective_align, fmt_parts["width"]
+            )
 
             error_str = robust_align(
-                error_str, fmt_parts['fill'], effective_align,
-                fmt_parts['width'])
+                error_str, fmt_parts["fill"], effective_align, fmt_parts["width"]
+            )
 
         ####################
         pm_symbol = PM_SYMBOLS[print_type]  # Shortcut
@@ -567,33 +573,41 @@ def format_num(nom_val_main, error_main, common_exp,
         # percent sign handling because this sign may too need
         # parentheses.
         if any_exp_factored and common_exp is not None:  # Exponent
-            value_str = ''.join((
-                LEFT_GROUPING,
-                nom_val_str, pm_symbol, error_str,
-                RIGHT_GROUPING,
-                exp_str, percent_str))
+            value_str = "".join(
+                (
+                    LEFT_GROUPING,
+                    nom_val_str,
+                    pm_symbol,
+                    error_str,
+                    RIGHT_GROUPING,
+                    exp_str,
+                    percent_str,
+                )
+            )
         else:  # No exponent
-            value_str = ''.join([nom_val_str, pm_symbol, error_str])
+            value_str = "".join([nom_val_str, pm_symbol, error_str])
             if percent_str:
-                value_str = ''.join((
-                    LEFT_GROUPING, value_str, RIGHT_GROUPING, percent_str))
-            elif 'p' in options:
-                value_str = ''.join((LEFT_GROUPING, value_str, RIGHT_GROUPING))
+                value_str = "".join(
+                    (LEFT_GROUPING, value_str, RIGHT_GROUPING, percent_str)
+                )
+            elif "p" in options:
+                value_str = "".join((LEFT_GROUPING, value_str, RIGHT_GROUPING))
 
     return value_str
 
+
 def signif_dgt_to_limit(value, num_signif_d):
-    '''
+    """
     Return the precision limit necessary to display value with
     num_signif_d significant digits.
 
     The precision limit is given as -1 for 1 digit after the decimal
     point, 0 for integer rounding, etc. It can be positive.
-    '''
+    """
 
     fst_digit = first_digit(value)
 
-    limit_no_rounding = fst_digit-num_signif_d+1
+    limit_no_rounding = fst_digit - num_signif_d + 1
 
     # The number of significant digits of the uncertainty, when
     # rounded at this limit_no_rounding level, can be too large by 1
@@ -613,7 +627,7 @@ def signif_dgt_to_limit(value, num_signif_d):
 
 
 def format_ufloat(ufloat_to_format, format_spec):
-    '''
+    """
     Formats a number with uncertainty.
 
     The format specification are the same as for format() for
@@ -714,7 +728,7 @@ def format_ufloat(ufloat_to_format, format_spec):
 
     Some details of the formatting can be customized as described
     in format_num().
-    '''
+    """
 
     # Convention on limits "between" digits: 0 = exactly at the
     # decimal point, -1 = after the first decimal, 1 = before the
@@ -732,7 +746,8 @@ def format_ufloat(ufloat_to_format, format_spec):
 
     # Format specification parsing:
 
-    match = re.match(r'''
+    match = re.match(
+        r"""
         (?P<fill>[^{}]??)(?P<align>[<>=^]?)  # fill cannot be { or }
         (?P<sign>[-+ ]?)
         (?P<zero>0?)
@@ -743,18 +758,20 @@ def format_ufloat(ufloat_to_format, format_spec):
         # The type can be omitted. Options must not go here:
         (?P<type>[eEfFgG%]??)  # n not supported
         (?P<options>[PSLp]*)  # uncertainties-specific flags
-        $''',
+        $""",
         format_spec,
-        re.VERBOSE)
+        re.VERBOSE,
+    )
 
     # Does the format specification look correct?
     if not match:
         raise ValueError(
-            'Format specification %r cannot be used with object of type'
-            ' %r. Note that uncertainties-specific flags must be put at'
-            ' the end of the format string.'
+            "Format specification %r cannot be used with object of type"
+            " %r. Note that uncertainties-specific flags must be put at"
+            " the end of the format string."
             # Sub-classes handled:
-            % (format_spec, ufloat_to_format.__class__.__name__))
+            % (format_spec, ufloat_to_format.__class__.__name__)
+        )
 
     # Effective format presentation type: f, e, g, etc., or None,
     # like in
@@ -763,10 +780,10 @@ def format_ufloat(ufloat_to_format, format_spec):
     # None is "the same as 'g'": "{}".format() and "{:g}" do not
     # give the same result, on 31415000000.0. None is thus kept as
     # is instead of being replaced by "g".
-    pres_type = match.group('type') or None
+    pres_type = match.group("type") or None
 
     # Shortcut:
-    fmt_prec = match.group('prec')  # Can be None
+    fmt_prec = match.group("prec")  # Can be None
 
     ########################################
 
@@ -779,13 +796,13 @@ def format_ufloat(ufloat_to_format, format_spec):
     std_dev = ufloat_to_format.std_dev
 
     # 'options' is the options that must be given to format_num():
-    options = set(match.group('options'))
+    options = set(match.group("options"))
 
     ########################################
 
     # The '%' format is treated internally as a display option: it
     # should not be applied individually to each part:
-    if pres_type == '%':
+    if pres_type == "%":
         # Because '%' does 0.0055*100, the value
         # 0.5499999999999999 is obtained, which rounds to 0.5. The
         # original rounded value is 0.006. The same behavior is
@@ -795,8 +812,8 @@ def format_ufloat(ufloat_to_format, format_spec):
         # multiplication.
         std_dev *= 100
         nom_val *= 100
-        pres_type = 'f'
-        options.add('%')
+        pres_type = "f"
+        options.add("%")
 
     # At this point, pres_type is in eEfFgG or None (not %).
 
@@ -804,8 +821,7 @@ def format_ufloat(ufloat_to_format, format_spec):
 
     # Non-real values (nominal value or standard deviation) must
     # be handled in a specific way:
-    real_values = [value for value in [abs(nom_val), std_dev]
-                   if  isfinite(value)]
+    real_values = [value for value in [abs(nom_val), std_dev] if isfinite(value)]
 
     # Calculation of digits_limit, which defines the precision of
     # the nominal value and of the standard deviation (it can be
@@ -813,7 +829,7 @@ def format_ufloat(ufloat_to_format, format_spec):
 
     # Reference value for the calculation of a possible exponent,
     # if needed:
-    if pres_type in (None, 'e', 'E', 'g', 'G'):
+    if pres_type in (None, "e", "E", "g", "G"):
         # Reference value for the exponent: the largest value
         # defines what the exponent will be (another convention
         # could have been chosen, like using the exponent of the
@@ -829,21 +845,22 @@ def format_ufloat(ufloat_to_format, format_spec):
     # Should the precision be interpreted like for a float, or
     # should the number of significant digits on the uncertainty
     # be controlled?
-    if ((
-        # Default behavior: number of significant digits on the
-        # uncertainty controlled (if useful, i.e. only in
-        # situations where the nominal value and the standard
-        # error digits are truncated at the same place):
-        (not fmt_prec and len(real_values)==2)
-         or match.group('uncert_prec'))  # Explicit control
+    if (
+        (
+            # Default behavior: number of significant digits on the
+            # uncertainty controlled (if useful, i.e. only in
+            # situations where the nominal value and the standard
+            # error digits are truncated at the same place):
+            (not fmt_prec and len(real_values) == 2) or match.group("uncert_prec")
+        )  # Explicit control
         # The number of significant digits of the uncertainty must
         # be meaningful, otherwise the position of the significant
         # digits of the uncertainty does not have a clear
         # meaning. This gives us the *effective* uncertainty
         # control mode:
         and std_dev
-        and  isfinite(std_dev)):
-
+        and isfinite(std_dev)
+    ):
         # The number of significant digits on the uncertainty is
         # controlled.
 
@@ -859,15 +876,16 @@ def format_ufloat(ufloat_to_format, format_spec):
         if fmt_prec:
             num_signif_d = int(fmt_prec)  # Can only be non-negative
             if not num_signif_d:
-                raise ValueError("The number of significant digits"
-                                 " on the uncertainty should be positive")
+                raise ValueError(
+                    "The number of significant digits"
+                    " on the uncertainty should be positive"
+                )
         else:
             (num_signif_d, std_dev) = PDG_precision(std_dev)
 
         digits_limit = signif_dgt_to_limit(std_dev, num_signif_d)
 
     else:
-
         # No control of the number of significant digits on the
         # uncertainty.
 
@@ -891,25 +909,22 @@ def format_ufloat(ufloat_to_format, format_spec):
         else:
             prec = 6
 
-        if pres_type in ('f', 'F'):
-
+        if pres_type in ("f", "F"):
             digits_limit = -prec
 
         else:  # Format type in None, eEgG
-
             # We first calculate the number of significant digits
             # to be displayed (if possible):
 
-            if pres_type in ('e', 'E'):
+            if pres_type in ("e", "E"):
                 # The precision is the number of significant
                 # digits required - 1 (because there is a single
                 # digit before the decimal point, which is not
                 # included in the definition of the precision with
                 # the e/E format type):
-                num_signif_digits = prec+1
+                num_signif_digits = prec + 1
 
             else:  # Presentation type in None, g, G
-
                 # Effective format specification precision: the rule
                 # of
                 # http://docs.python.org/2.7/library/string.html#format-specification-mini-language
@@ -936,7 +951,8 @@ def format_ufloat(ufloat_to_format, format_spec):
             digits_limit = (
                 signif_dgt_to_limit(exp_ref_value, num_signif_digits)
                 if real_values
-                else None)
+                else None
+            )
 
             ## print "DIGITS_LIMIT", digits_limit
 
@@ -947,9 +963,9 @@ def format_ufloat(ufloat_to_format, format_spec):
     # True), 'common_exp' is set to the exponent that should be
     # used.
 
-    if pres_type in ('f', 'F'):
+    if pres_type in ("f", "F"):
         use_exp = False
-    elif pres_type in ('e', 'E'):
+    elif pres_type in ("e", "E"):
         if not real_values:
             use_exp = False
         else:
@@ -961,7 +977,6 @@ def format_ufloat(ufloat_to_format, format_spec):
             common_exp = first_digit(round(exp_ref_value, -digits_limit))
 
     else:  # None, g, G
-
         # The rules from
         # https://docs.python.org/3.4/library/string.html#format-specification-mini-language
         # are applied.
@@ -994,7 +1009,7 @@ def format_ufloat(ufloat_to_format, format_spec):
 
             # The number of significant digits of the reference value
             # rounded at digits_limit is exponent-digits_limit+1:
-            if -4 <= common_exp < common_exp-digits_limit+1:
+            if -4 <= common_exp < common_exp - digits_limit + 1:
                 use_exp = False
             else:
                 use_exp = True
@@ -1011,17 +1026,15 @@ def format_ufloat(ufloat_to_format, format_spec):
     # exponent should be used.
 
     if use_exp:
-
         # Not 10.**(-common_exp), for limit values of common_exp:
-        factor = 10.**common_exp
+        factor = 10.0**common_exp
 
-        nom_val_mantissa = nom_val/factor
-        std_dev_mantissa = std_dev/factor
+        nom_val_mantissa = nom_val / factor
+        std_dev_mantissa = std_dev / factor
         # Limit for the last digit of the mantissas:
         signif_limit = digits_limit - common_exp
 
     else:  # No common exponent
-
         common_exp = None
 
         nom_val_mantissa = nom_val
@@ -1035,7 +1048,7 @@ def format_ufloat(ufloat_to_format, format_spec):
     # Format of the main (i.e. with no exponent) parts (the None
     # presentation type is similar to the g format type):
 
-    main_pres_type = 'fF'[(pres_type or 'g').isupper()]
+    main_pres_type = "fF"[(pres_type or "g").isupper()]
 
     # The precision of the main parts must be adjusted so as
     # to take into account the special role of the decimal
@@ -1057,9 +1070,7 @@ def format_ufloat(ufloat_to_format, format_spec):
         # digit past the decimal point" of Python
         # (https://docs.python.org/3.4/library/string.html#format-specification-mini-language). This
         # is only applied for null uncertainties.
-        prec = max(-signif_limit,
-                   1 if pres_type is None and not std_dev
-                   else 0)
+        prec = max(-signif_limit, 1 if pres_type is None and not std_dev else 0)
     ## print "PREC", prec
 
     ########################################
@@ -1076,8 +1087,12 @@ def format_ufloat(ufloat_to_format, format_spec):
     #     options))
 
     # Final formatting:
-    return format_num(nom_val_mantissa, std_dev_mantissa, common_exp,
-                      match.groupdict(),
-                      prec=prec,
-                      main_pres_type=main_pres_type,
-                      options=options)
+    return format_num(
+        nom_val_mantissa,
+        std_dev_mantissa,
+        common_exp,
+        match.groupdict(),
+        prec=prec,
+        main_pres_type=main_pres_type,
+        options=options,
+    )

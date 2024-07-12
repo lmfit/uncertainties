@@ -1,4 +1,4 @@
-'''
+"""
 Mathematical operations that generalize many operations from the
 standard math module so that they also work on numbers with
 uncertainties.
@@ -33,7 +33,6 @@ Please send feature requests, bug reports, or feedback to this address.
 
 This software is released under a dual license.  (1) The BSD license.
 (2) Any other license, as long as it is obtained from the original
-author.'''
+author."""
 
-from .umath_core import *
-from .umath_core import __all__  # For a correct help(umath)
+from .umath_core import *  # noqa

@@ -1,4 +1,4 @@
-import re 
+import re
 from uncertainties.formatting import nrmlze_superscript
 
 ###############################################################################
@@ -10,7 +10,7 @@ from uncertainties.formatting import nrmlze_superscript
 # semantics of some representations (e.g. .1(2.) = .1+/-2, whereas
 # .1(2) = .1+/-0.2), so just getting the numerical value of the part
 # in parentheses would not be sufficient.
-POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = r'((\d*)(\.\d*)?|nan|NAN|inf|INF)'
+POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = r"((\d*)(\.\d*)?|nan|NAN|inf|INF)"
 
 # Regexp for a number with uncertainty (e.g., "-1.234(2)e-6"), where
 # the uncertainty is optional (in which case the uncertainty is
@@ -18,7 +18,7 @@ POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE = r'((\d*)(\.\d*)?|nan|NAN|inf|INF)'
 #
 # !! WARNING: in Python 2, the code relies on "… % <unicode string>" returning
 # a Unicode string (even if the template is not Unicode):
-NUMBER_WITH_UNCERT_RE_STR = u'''
+NUMBER_WITH_UNCERT_RE_STR = """
     ([+-])?  # Sign
     %s  # Main number
     (?:\\(%s\\))?  # Optional uncertainty
@@ -26,28 +26,36 @@ NUMBER_WITH_UNCERT_RE_STR = u'''
         (?:[eE]|\\s*×\\s*10)
         (.*)
     )?  # Optional exponent
-    ''' % (POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE,
-           POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE)
+    """ % (
+    POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE,
+    POSITIVE_DECIMAL_UNSIGNED_OR_NON_FINITE,
+)
 
 NUMBER_WITH_UNCERT_RE_MATCH = re.compile(
-    u"%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE).match
+    "%s$" % NUMBER_WITH_UNCERT_RE_STR, re.VERBOSE
+).match
 
 # Number with uncertainty with a factored exponent (e.g., of the form
 # (... +/- ...)e10): this is a loose matching, so as to accommodate
 # for multiple formats:
-NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(u'''
+NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(
+    """
     \\(
     (?P<simple_num_with_uncert>.*)
     \\)
     (?:[eE]|\\s*×\\s*10) (?P<exp_value>.*)
-    $''', re.VERBOSE).match
+    $""",
+    re.VERBOSE,
+).match
+
 
 class NotParenUncert(ValueError):
-    '''
+    """
     Raised when a string representing an exact number or a number with
     an uncertainty indicated between parentheses was expected but not
     found.
-    '''
+    """
+
 
 def parse_error_in_parentheses(representation):
     # !!!! The code seems to handle superscript exponents, but the
@@ -71,29 +79,31 @@ def parse_error_in_parentheses(representation):
         # The 'main' part is the nominal value, with 'int'eger part, and
         # 'dec'imal part.  The 'uncert'ainty is similarly broken into its
         # integer and decimal parts.
-        (sign, main, _, main_dec, uncert, uncert_int, uncert_dec,
-         exponent) = match.groups()
+        (sign, main, _, main_dec, uncert, uncert_int, uncert_dec, exponent) = (
+            match.groups()
+        )
     else:
-        raise NotParenUncert("Unparsable number representation: '%s'."
-                             " See the documentation of ufloat_fromstr()."
-                             % representation)
+        raise NotParenUncert(
+            "Unparsable number representation: '%s'."
+            " See the documentation of ufloat_fromstr()." % representation
+        )
 
     # Global exponent:
     if exponent:
-        factor = 10.**nrmlze_superscript(exponent)
+        factor = 10.0 ** nrmlze_superscript(exponent)
     else:
         factor = 1
 
     # Nominal value:
-    value = float((sign or '')+main)*factor
+    value = float((sign or "") + main) * factor
 
     if uncert is None:
         # No uncertainty was found: an uncertainty of 1 on the last
         # digit is assumed:
-        uncert_int = '1'  # The other parts of the uncertainty are None
+        uncert_int = "1"  # The other parts of the uncertainty are None
 
     # Do we have a fully explicit uncertainty?
-    if uncert_dec is not None or uncert in {'nan', 'NAN', 'inf', 'INF'}:
+    if uncert_dec is not None or uncert in {"nan", "NAN", "inf", "INF"}:
         uncert_value = float(uncert)
     else:
         # uncert_int represents an uncertainty on the last digits:
@@ -103,20 +113,22 @@ def parse_error_in_parentheses(representation):
         if main_dec is None:
             num_digits_after_period = 0
         else:
-            num_digits_after_period = len(main_dec)-1
+            num_digits_after_period = len(main_dec) - 1
 
-        uncert_value = int(uncert_int)/10.**num_digits_after_period
+        uncert_value = int(uncert_int) / 10.0**num_digits_after_period
 
     # We apply the exponent to the uncertainty as well:
     uncert_value *= factor
 
     return (value, uncert_value)
 
+
 # Regexp for catching the two variable parts of -1.2×10⁻¹²:
-PRETTY_PRINT_MATCH = re.compile(u'(.*?)\\s*×\\s*10(.*)').match
+PRETTY_PRINT_MATCH = re.compile("(.*?)\\s*×\\s*10(.*)").match
+
 
 def to_float(value_str):
-    '''
+    """
     Converts a string representing a float to a float.
 
     The usual valid Python float() representations are correctly
@@ -126,7 +138,7 @@ def to_float(value_str):
     converted.
 
     ValueError is raised if no float can be obtained.
-    '''
+    """
 
     try:
         return float(value_str)
@@ -137,18 +149,22 @@ def to_float(value_str):
     match = PRETTY_PRINT_MATCH(value_str)
     if match:
         try:
-            return float(match.group(1))*10.**nrmlze_superscript(match.group(2))
+            return float(match.group(1)) * 10.0 ** nrmlze_superscript(match.group(2))
         except ValueError:
-            raise ValueError('Mantissa or exponent incorrect in pretty-print'
-                             ' form %s' % value_str)
+            raise ValueError(
+                "Mantissa or exponent incorrect in pretty-print" " form %s" % value_str
+            )
     else:
-        raise ValueError('No valid Python float or pretty-print form'
-                         ' recognized in %s' % value_str)
+        raise ValueError(
+            "No valid Python float or pretty-print form" " recognized in %s" % value_str
+        )
 
 
 cannot_parse_ufloat_msg_pat = (
-    'Cannot parse %s: see the documentation for ufloat_fromstr() for a'
-    ' list of accepted formats')
+    "Cannot parse %s: see the documentation for ufloat_fromstr() for a"
+    " list of accepted formats"
+)
+
 
 # The following function is not exposed because it can in effect be
 # obtained by doing x = ufloat_fromstr(representation) and reading
@@ -171,7 +187,7 @@ def str_to_number_with_uncert(representation):
 
     # The "p" format can add parentheses around the whole printed result: we
     # remove them:
-    if representation.startswith('(') and representation.endswith(')'):
+    if representation.startswith("(") and representation.endswith(")"):
         representation = representation[1:-1]
 
     match = NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH(representation)
@@ -180,33 +196,30 @@ def str_to_number_with_uncert(representation):
     # calculated:
 
     if match:
-
         # We have a form with a factored exponent: (1.23 +/- 0.01)e10,
         # etc.
 
-        exp_value_str = match.group('exp_value')
+        exp_value_str = match.group("exp_value")
 
         try:
             exponent = nrmlze_superscript(exp_value_str)
         except ValueError:
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
 
-        factor = 10.**exponent
+        factor = 10.0**exponent
 
-        representation = match.group('simple_num_with_uncert')
+        representation = match.group("simple_num_with_uncert")
     else:
         factor = 1  # No global exponential factor
 
-    match = re.match(u'(.*)(?:\\+/-|±)(.*)', representation)
+    match = re.match("(.*)(?:\\+/-|±)(.*)", representation)
     if match:
-
         (nom_value, uncert) = match.groups()
 
         try:
             # Simple form 1234.45+/-1.2 or 1234.45±1.2, or 1.23e-10+/-1e-23
             # or -1.2×10⁻¹²±1e23:
-            parsed_value = (to_float(nom_value)*factor,
-                            to_float(uncert)*factor)
+            parsed_value = (to_float(nom_value) * factor, to_float(uncert) * factor)
         except ValueError:
             raise ValueError(cannot_parse_ufloat_msg_pat % representation)
 
