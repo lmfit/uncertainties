@@ -1,23 +1,10 @@
 import numpy as np
 import math
 # ufuncs are listed at https://numpy.org/doc/stable/reference/ufuncs.html
-from . import core as ops
+from . import ops
 # from .umath_core import log_der0,_deriv_copysign, _deriv_fabs, _deriv_pow_0, _deriv_pow_1
 
-# from .core import nan_if_exception
-def nan_if_exception(f):
-    '''
-    Wrapper around f(x, y) that let f return NaN when f raises one of
-    a few numerical exceptions.
-    '''
-
-    def wrapped_f(*args, **kwargs):
-        try:
-            return f(*args, **kwargs)
-        except (ValueError, ZeroDivisionError, OverflowError):
-            return float('nan')
-
-    return wrapped_f
+from .ops import nan_if_exception
 
 
 def log_der0(*args):
@@ -88,7 +75,7 @@ def implements(numpy_func_string, func_type):
 
     return decorator
 
-HANDLED_FUNCTIONS = {}
+HANDLED_FUNCTIONS = {} # noqa
 HANDLED_UFUNCS = {}
 
 
@@ -100,11 +87,15 @@ def apply_func_elementwise(func, inputs, kwargs, result_dtype="object"):
         for index, x in np.ndenumerate(inputs[0]):
             inputs_ = [x if i == 0 else inputs[i] for i in range(len(inputs))]
             result[index] = func(*inputs_, **kwargs)
+        if inputs[0].ndim == 0:
+            result = result.item()
     elif isinstance(inputs[1], np.ndarray):
         result = np.empty_like(inputs[1], dtype=result_dtype)
         for index, x in np.ndenumerate(inputs[1]):
             inputs_ = [x if i == 1 else inputs[i] for i in range(len(inputs))]
             result[index] = func(*inputs_, **kwargs)
+        if inputs[1].ndim == 0:
+            result = result.item()
     else:
         result = func(*inputs, **kwargs)
     return result
@@ -185,7 +176,7 @@ class UFloatNumpy(object):
             @implements(func_str, "ufunc")
             def implementation(*inputs, **kwargs):
                 return apply_func_elementwise(
-                    cls.wrap(func, derivatives), inputs, kwargs)
+                    ops._wrap(cls, func, derivatives), inputs, kwargs)
             return implementation
 
         ufunc_derivatives = {

@@ -658,6 +658,8 @@ class AffineScalarFunc(UFloatNumpy):
 ops.add_arithmetic_ops(AffineScalarFunc)
 ops.add_comparative_ops(AffineScalarFunc)
 to_affine_scalar = AffineScalarFunc._to_affine_scalar
+AffineScalarFunc._add_numpy_arithmetic_ufuncs()
+AffineScalarFunc._add_numpy_comparative_ufuncs()
 
 # Nicer name, for users: isinstance(ufloat(...), UFloat) is
 # True. Also: isinstance(..., UFloat) is the test for "is this a
