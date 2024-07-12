@@ -1,5 +1,6 @@
 import numpy as np
 import math
+
 # ufuncs are listed at https://numpy.org/doc/stable/reference/ufuncs.html
 from . import ops
 # from .umath_core import log_der0,_deriv_copysign, _deriv_fabs, _deriv_pow_0, _deriv_pow_1
@@ -14,24 +15,26 @@ def log_der0(*args):
     Works whether 1 or 2 arguments are given.
     """
     if len(args) == 1:
-        return 1/args[0]
+        return 1 / args[0]
     else:
-        return 1/args[0]/math.log(args[1])  # 2-argument form
+        return 1 / args[0] / math.log(args[1])  # 2-argument form
 
     # The following version goes about as fast:
 
     ## A 'try' is used for the most common case because it is fast when no
     ## exception is raised:
-    #try:
+    # try:
     #    return log_1arg_der(*args)  # Argument number check
-    #except TypeError:
+    # except TypeError:
     #    return 1/args[0]/math.log(args[1])  # 2-argument form
 
-def _deriv_copysign(x,y):
+
+def _deriv_copysign(x, y):
     if x >= 0:
         return math.copysign(1, y)
     else:
         return -math.copysign(1, y)
+
 
 def _deriv_fabs(x):
     if x >= 0:
@@ -39,24 +42,28 @@ def _deriv_fabs(x):
     else:
         return -1
 
+
 def _deriv_pow_0(x, y):
     if y == 0:
-        return  0.
+        return 0.0
     elif x != 0 or y % 1 == 0:
-        return y*math.pow(x, y-1)
+        return y * math.pow(x, y - 1)
     else:
-        return float('nan')
+        return float("nan")
+
 
 def _deriv_pow_1(x, y):
     if x == 0 and y > 0:
-        return 0.
+        return 0.0
     else:
         return math.log(x) * math.pow(x, y)
+
 
 def is_upcast_type(t):
     # This can be used to allow downstream modules to overide operations; see pint
     # TODO add upcast_type list or dict to a public interface
     return False
+
 
 def implements(numpy_func_string, func_type):
     """Register an __array_function__/__array_ufunc__ implementation for UArray
@@ -75,7 +82,8 @@ def implements(numpy_func_string, func_type):
 
     return decorator
 
-HANDLED_FUNCTIONS = {} # noqa
+
+HANDLED_FUNCTIONS = {}  # noqa
 HANDLED_UFUNCS = {}
 
 
@@ -102,6 +110,7 @@ def apply_func_elementwise(func, inputs, kwargs, result_dtype="object"):
         result = func(*inputs, **kwargs)
     return result
 
+
 def numpy_wrap(func_type, func, args, kwargs, types):
     """Return the result from a NumPy function/ufunc as wrapped by uncertainties."""
 
@@ -121,6 +130,7 @@ def numpy_wrap(func_type, func, args, kwargs, types):
         raise TypeError
         return NotImplemented
     return handled[name](*args, **kwargs)
+
 
 class UFloatNumpy(object):
     # NumPy function/ufunc support
@@ -170,53 +180,58 @@ class UFloatNumpy(object):
     #     for func_str, derivatives in ufunc_derivatives.items():
     #         implement_ufunc(func_str, derivatives)
 
-
     @classmethod
     def _add_numpy_arithmetic_ufuncs(cls):
         def implement_ufunc(func_str, derivatives):
             func = getattr(np, func_str)
+
             @implements(func_str, "ufunc")
             def implementation(*inputs, **kwargs):
                 return apply_func_elementwise(
-                    ops._wrap(cls, func, derivatives), inputs, kwargs)
+                    ops._wrap(cls, func, derivatives), inputs, kwargs
+                )
+
             return implementation
 
         ufunc_derivatives = {
-            'add': [lambda x, y: 1., lambda x, y: 1.],
-            'subtract': [lambda x, y: 1., lambda x, y: -1.],
-            'multiply': [lambda x, y: y, lambda x, y: x],
-            'divide': [lambda x, y: 1./y, lambda x, y: -x/y**2],
-            'true_divide': [lambda x, y: 1./y, lambda x, y: -x/y**2],
-            'floor_divide': [lambda x, y: 0., lambda x, y: 0.],
-            
-            'arccos': [nan_if_exception(lambda x: -1/math.sqrt(1-x**2))],
-            'arccosh': [nan_if_exception(lambda x: 1/math.sqrt(x**2-1))],
-            'arcsin': [nan_if_exception(lambda x: 1/math.sqrt(1-x**2))],
-            'arcsinh': [nan_if_exception(lambda x: 1/math.sqrt(1+x**2))],
-            'arctan': [nan_if_exception(lambda x: 1/(1+x**2))],
-            'arctan2': [nan_if_exception(lambda y, x: x/(x**2+y**2)),  # Correct for x == 0
-                        nan_if_exception(lambda y, x: -y/(x**2+y**2))],  # Correct for x == 0
-            'arctanh': [nan_if_exception(lambda x: 1/(1-x**2))],
-            'cos': [lambda x: -math.sin(x)],
-            'cosh': [math.sinh],
-            'sin': [math.cos],
-            'sinh': [math.cosh],
-            'tan': [nan_if_exception(lambda x: 1+math.tan(x)**2)],
-            'tanh': [nan_if_exception(lambda x: 1-math.tanh(x)**2)],
-            'exp': [math.exp],
+            "add": [lambda x, y: 1.0, lambda x, y: 1.0],
+            "subtract": [lambda x, y: 1.0, lambda x, y: -1.0],
+            "multiply": [lambda x, y: y, lambda x, y: x],
+            "divide": [lambda x, y: 1.0 / y, lambda x, y: -x / y**2],
+            "true_divide": [lambda x, y: 1.0 / y, lambda x, y: -x / y**2],
+            "floor_divide": [lambda x, y: 0.0, lambda x, y: 0.0],
+            "arccos": [nan_if_exception(lambda x: -1 / math.sqrt(1 - x**2))],
+            "arccosh": [nan_if_exception(lambda x: 1 / math.sqrt(x**2 - 1))],
+            "arcsin": [nan_if_exception(lambda x: 1 / math.sqrt(1 - x**2))],
+            "arcsinh": [nan_if_exception(lambda x: 1 / math.sqrt(1 + x**2))],
+            "arctan": [nan_if_exception(lambda x: 1 / (1 + x**2))],
+            "arctan2": [
+                nan_if_exception(lambda y, x: x / (x**2 + y**2)),  # Correct for x == 0
+                nan_if_exception(lambda y, x: -y / (x**2 + y**2)),
+            ],  # Correct for x == 0
+            "arctanh": [nan_if_exception(lambda x: 1 / (1 - x**2))],
+            "cos": [lambda x: -math.sin(x)],
+            "cosh": [math.sinh],
+            "sin": [math.cos],
+            "sinh": [math.cosh],
+            "tan": [nan_if_exception(lambda x: 1 + math.tan(x) ** 2)],
+            "tanh": [nan_if_exception(lambda x: 1 - math.tanh(x) ** 2)],
+            "exp": [math.exp],
             "exp2": [lambda y: _deriv_pow_1(2, y)],
-            'expm1': [math.exp],
-            'log10': [nan_if_exception(lambda x: 1/x/math.log(10))],
-            'log1p': [nan_if_exception(lambda x: 1/(1+x))],
-            'degrees': [lambda x: math.degrees(1)],
-            'rad2deg': [lambda x: math.degrees(1)],
-            'radians': [lambda x: math.radians(1)],
-            'deg2rad': [lambda x: math.radians(1)],
-            'power': [_deriv_pow_0, _deriv_pow_1],
-            'sqrt': [nan_if_exception(lambda x: 0.5/math.sqrt(x))],
-            'hypot': [lambda x, y: x/math.hypot(x, y),
-                      lambda x, y: y/math.hypot(x, y)],
-            }
+            "expm1": [math.exp],
+            "log10": [nan_if_exception(lambda x: 1 / x / math.log(10))],
+            "log1p": [nan_if_exception(lambda x: 1 / (1 + x))],
+            "degrees": [lambda x: math.degrees(1)],
+            "rad2deg": [lambda x: math.degrees(1)],
+            "radians": [lambda x: math.radians(1)],
+            "deg2rad": [lambda x: math.radians(1)],
+            "power": [_deriv_pow_0, _deriv_pow_1],
+            "sqrt": [nan_if_exception(lambda x: 0.5 / math.sqrt(x))],
+            "hypot": [
+                lambda x, y: x / math.hypot(x, y),
+                lambda x, y: y / math.hypot(x, y),
+            ],
+        }
         # TODO: test arctan2, power, hypot
         for func_str, derivatives in ufunc_derivatives.items():
             implement_ufunc(func_str, derivatives)
@@ -240,12 +255,12 @@ class UFloatNumpy(object):
             return implementation
 
         ufunc_comparatives = {
-            'equal': ops.eq_on_aff_funcs,
-            'not_equal': ops.ne_on_aff_funcs,
-            'less': ops.lt_on_aff_funcs,
-            'less_equal': ops.le_on_aff_funcs,
-            'greater': ops.gt_on_aff_funcs,
-            'greater_equal': ops.ge_on_aff_funcs,
+            "equal": ops.eq_on_aff_funcs,
+            "not_equal": ops.ne_on_aff_funcs,
+            "less": ops.lt_on_aff_funcs,
+            "less_equal": ops.le_on_aff_funcs,
+            "greater": ops.gt_on_aff_funcs,
+            "greater_equal": ops.ge_on_aff_funcs,
         }
         for func_str, func in ufunc_comparatives.items():
             implement_ufunc(func_str, func)
@@ -291,5 +306,3 @@ class UFloatNumpy(object):
     #         "rad2deg": ("radian", "degree"),
     #         "logaddexp": ("", ""),
     #         "logaddexp2": ("", ""),
-
-            

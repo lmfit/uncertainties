@@ -333,6 +333,7 @@ class LinearCombination(object):
     def __setstate__(self, state):
         (self.linear_combo,) = state
 
+
 class AffineScalarFunc(UFloatNumpy):
     """
     Affine functions that support basic mathematical operations
