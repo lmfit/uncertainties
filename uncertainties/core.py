@@ -17,14 +17,6 @@ from __future__ import division  # Many analytical derivatives depend on this
 from builtins import str, zip, range, object
 from math import sqrt, isnan, isinf  # Optimization: no attribute look-up
 
-try:
-    from math import isinfinite  # !! Python 3.2+
-except ImportError:
-
-    def isinfinite(x):
-        return isinf(x) or isnan(x)
-
-
 import copy
 import collections
 

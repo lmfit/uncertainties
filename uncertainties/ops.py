@@ -168,44 +168,39 @@ ops_with_reflection = get_ops_with_reflection()
 modified_operators = []
 modified_ops_with_reflection = []
 
-# Custom versions of some operators (instead of extending some float
-# __*__ operators to AffineScalarFunc, the operators in custom_ops
-# are used):
-if sys.version_info < (3,):
-    custom_ops = {}
 
-else:
-    # !!! This code is not run by the tests. It would be nice to have
-    # it be tested.
-    def no_complex_result(func):
+# !!! This code is not run by the tests. It would be nice to have
+# it be tested.
+def no_complex_result(func):
+    """
+    Return a function that does like func, but that raises a
+    ValueError if the result is complex.
+    """
+
+    def no_complex_func(*args, **kwargs):
         """
-        Return a function that does like func, but that raises a
-        ValueError if the result is complex.
-        """
+        Like %s, but raises a ValueError exception if the result
+        is complex.
+        """ % func.__name__
 
-        def no_complex_func(*args, **kwargs):
-            """
-            Like %s, but raises a ValueError exception if the result
-            is complex.
-            """ % func.__name__
+        value = func(*args, **kwargs)
+        if isinstance(value, complex):
+            raise ValueError(
+                "The uncertainties module does not handle" " complex results"
+            )
+        else:
+            return value
 
-            value = func(*args, **kwargs)
-            if isinstance(value, complex):
-                raise ValueError(
-                    "The uncertainties module does not handle" " complex results"
-                )
-            else:
-                return value
+    return no_complex_func
 
-        return no_complex_func
 
-    # This module does not handle uncertainties on complex numbers:
-    # complex results for the nominal value of some operations cannot
-    # be calculated with an uncertainty:
-    custom_ops = {
-        "pow": no_complex_result(float.__pow__),
-        "rpow": no_complex_result(float.__rpow__),
-    }
+# This module does not handle uncertainties on complex numbers:
+# complex results for the nominal value of some operations cannot
+# be calculated with an uncertainty:
+custom_ops = {
+    "pow": no_complex_result(float.__pow__),
+    "rpow": no_complex_result(float.__rpow__),
+}
 
 
 def add_arithmetic_ops(cls):
