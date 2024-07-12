@@ -87,6 +87,7 @@ def apply_func_elementwise(func, inputs, kwargs, result_dtype="object"):
         for index, x in np.ndenumerate(inputs[0]):
             inputs_ = [x if i == 0 else inputs[i] for i in range(len(inputs))]
             result[index] = func(*inputs_, **kwargs)
+        # unpack the result of operations with ndim=0 arrays
         if inputs[0].ndim == 0:
             result = result.item()
     elif isinstance(inputs[1], np.ndarray):
@@ -94,6 +95,7 @@ def apply_func_elementwise(func, inputs, kwargs, result_dtype="object"):
         for index, x in np.ndenumerate(inputs[1]):
             inputs_ = [x if i == 1 else inputs[i] for i in range(len(inputs))]
             result[index] = func(*inputs_, **kwargs)
+        # unpack the result of operations with ndim=0 arrays
         if inputs[1].ndim == 0:
             result = result.item()
     else:
@@ -221,10 +223,18 @@ class UFloatNumpy(object):
 
     @classmethod
     def _add_numpy_comparative_ufuncs(cls):
+        def recursive_to_affine_scalar(arr):
+            print(arr)
+            if isinstance(arr, (list, tuple)):
+                return type(arr)([recursive_to_affine_scalar(i) for i in arr])
+            if isinstance(arr, np.ndarray):
+                return np.array([recursive_to_affine_scalar(i) for i in arr], "object")
+            return cls._to_affine_scalar(arr)
+
         def implement_ufunc(func_str, func):
             @implements(func_str, "ufunc")
             def implementation(*inputs, **kwargs):
-                inputs = [cls._to_affine_scalar(i) for i in inputs]
+                inputs = recursive_to_affine_scalar(inputs)
                 return apply_func_elementwise(func, inputs, kwargs, result_dtype=bool)
 
             return implementation
