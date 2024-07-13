@@ -782,7 +782,7 @@ class Variable(AffineScalarFunc):
         # (Note: if NaN < 0 is False, there is no need to test
         # separately for NaN. But this is not guaranteed, even if it
         # should work on most platforms.)
-        if std_dev < 0 and not (isinf(std_dev) or isnan(std_dev)):
+        if std_dev < 0 and isfinite(std_dev):
             raise NegativeStdDev("The standard deviation cannot be negative")
 
         self._std_dev = float(std_dev)
