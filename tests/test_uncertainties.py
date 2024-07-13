@@ -15,7 +15,6 @@ from helpers import (
     numbers_close,
     ufloats_close,
     compare_derivatives,
-    uarrays_close,
 )
 
 
@@ -1711,6 +1710,7 @@ def test_custom_pretty_print_and_latex():
 # The tests below require NumPy, which is an optional package:
 try:
     import numpy
+    from helpers import uarrays_close
 except ImportError:
     pass
 else:
