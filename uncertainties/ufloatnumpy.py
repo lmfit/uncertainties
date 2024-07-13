@@ -84,6 +84,7 @@ def implements(numpy_func_string, func_type):
 
 
 HANDLED_UFUNCS = {}
+HANDLED_FUNCTIONS = {}
 
 
 def apply_func_elementwise(func, inputs, kwargs, result_dtype="object"):
