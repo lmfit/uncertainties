@@ -38,6 +38,29 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: lmfit/uncertainties
+  test_without_numpy:
+    name: Test without numpy
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install .[test]
+    - name: Test source code and docs
+      run:
+        cd tests;
+        python -m pytest --ignore=test_unumpy.py --ignore=test_ulinalg.py -k "not test_monte_carlo_comparison"
+          --cov=uncertainties --cov=. --cov-report=xml --cov-report=term
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: lmfit/uncertainties
   results:
     # This step aggregates the results from all the tests and allows us to
     # require only this single job to pass for a PR to be merged rather than
@@ -46,7 +69,7 @@ jobs:
     if: ${{ always() }}
     runs-on: ubuntu-latest
     name: Final Results
-    needs: [build]
+    needs: [build,test_without_numpy]
     steps:
       - run: exit 1
         if: >-
