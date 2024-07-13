@@ -15,15 +15,7 @@ Main module for the uncertainties package, with internal functions.
 from __future__ import division  # Many analytical derivatives depend on this
 
 from builtins import str, zip, range, object
-from math import sqrt, isnan, isinf  # Optimization: no attribute look-up
-
-try:
-    from math import isinfinite  # !! Python 3.2+
-except ImportError:
-
-    def isinfinite(x):
-        return isinf(x) or isnan(x)
-
+from math import sqrt, isfinite  # Optimization: no attribute look-up
 
 import copy
 import collections
@@ -790,7 +782,7 @@ class Variable(AffineScalarFunc):
         # (Note: if NaN < 0 is False, there is no need to test
         # separately for NaN. But this is not guaranteed, even if it
         # should work on most platforms.)
-        if std_dev < 0 and not isinfinite(std_dev):
+        if std_dev < 0 and isfinite(std_dev):
             raise NegativeStdDev("The standard deviation cannot be negative")
 
         self._std_dev = float(std_dev)
