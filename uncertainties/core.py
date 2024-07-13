@@ -334,7 +334,15 @@ class LinearCombination(object):
         (self.linear_combo,) = state
 
 
-class AffineScalarFunc(UFloatNumpy):
+try:
+    import numpy
+except ImportError:
+    parent_classes = []
+else:
+    parent_classes = [UFloatNumpy]
+
+
+class AffineScalarFunc(*parent_classes):
     """
     Affine functions that support basic mathematical operations
     (addition, etc.).  Such functions can for instance be used for

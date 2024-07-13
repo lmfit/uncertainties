@@ -83,7 +83,6 @@ def implements(numpy_func_string, func_type):
     return decorator
 
 
-HANDLED_FUNCTIONS = {}  # noqa
 HANDLED_UFUNCS = {}
 
 
@@ -126,8 +125,6 @@ def numpy_wrap(func_type, func, args, kwargs, types):
         raise ValueError(f"Invalid func_type {func_type}")
 
     if name not in handled or any(is_upcast_type(t) for t in types):
-        print("NotImplemented L54")
-        raise TypeError
         return NotImplemented
     return handled[name](*args, **kwargs)
 
@@ -152,33 +149,6 @@ class UFloatNumpy(object):
 
     def __array_function__(self, func, types, args, kwargs):
         return numpy_wrap("function", func, args, kwargs, types)
-
-    # original code for _add_numpy_ufuncs. may be helpful for writing a generic wraps
-    # this can be deleted:
-    # @classmethod
-    # def _add_numpy_ufuncs(cls):
-    #     def implement_ufunc(func_str, derivatives):
-    #         func = getattr(np, func_str)
-    #         @implements(func_str, "ufunc")
-    #         def implementation(*inputs, **kwargs):
-    #             if isinstance(inputs[0], np.ndarray):
-    #                 result = np.empty_like(inputs[0], dtype=object)
-    #                 for index, x in np.ndenumerate(inputs[0]):
-    #                     inputs_ = (x if i == 0 else inputs[i] for i in range(len(inputs)))
-    #                     result[index] = cls.wrap(func, derivatives)(*inputs_, **kwargs)
-    #             elif isinstance(inputs[1], np.ndarray):
-    #                 result = np.empty_like(inputs[1], dtype=object)
-    #                 for index, x in np.ndenumerate(inputs[1]):
-    #                     inputs_ = (x if i == 1 else inputs[i] for i in range(len(inputs)))
-    #                     result[index] = cls.wrap(func, derivatives)(*inputs_, **kwargs)
-    #             else:
-    #                 result = cls.wrap(func, derivatives)(*inputs, **kwargs)
-    #             return result
-
-    #         return implementation
-
-    #     for func_str, derivatives in ufunc_derivatives.items():
-    #         implement_ufunc(func_str, derivatives)
 
     @classmethod
     def _add_numpy_arithmetic_ufuncs(cls):
@@ -239,7 +209,6 @@ class UFloatNumpy(object):
     @classmethod
     def _add_numpy_comparative_ufuncs(cls):
         def recursive_to_affine_scalar(arr):
-            print(arr)
             if isinstance(arr, (list, tuple)):
                 return type(arr)([recursive_to_affine_scalar(i) for i in arr])
             if isinstance(arr, np.ndarray):
@@ -264,45 +233,3 @@ class UFloatNumpy(object):
         }
         for func_str, func in ufunc_comparatives.items():
             implement_ufunc(func_str, func)
-
-    # 'copysign': [_deriv_copysign,
-    #              lambda x, y: 0],
-    # 'degrees': [lambda x: math.degrees(1)],
-    # 'erf': [lambda x: math.exp(-x**2)*erf_coef],
-    # 'erfc': [lambda x: -math.exp(-x**2)*erf_coef],
-    # 'fabs': [_deriv_fabs],
-    # 'hypot': [lambda x, y: x/math.hypot(x, y),
-    #           lambda x, y: y/math.hypot(x, y)],
-    # 'log': [log_der0,
-    #         lambda x, y: -math.log(x, y)/y/math.log(y)],
-    # 'pow': [_deriv_pow_0, _deriv_pow_1],
-    # 'radians': [lambda x: math.radians(1)],
-    # 'sqrt': [lambda x: 0.5/math.sqrt(x)],
-    # def _add_trig_ufuncs(cls):
-
-    #         "cumprod": ("", ""),
-    #         "arccos": ("", "radian"),
-    #         "arcsin": ("", "radian"),
-    #         "arctan": ("", "radian"),
-    #         "arccosh": ("", "radian"),
-    #         "arcsinh": ("", "radian"),
-    #         "arctanh": ("", "radian"),
-    #         "exp": ("", ""),
-    #         "expm1": ("", ""),
-    #         "exp2": ("", ""),
-    #         "log": ("", ""),
-    #         "log10": ("", ""),
-    #         "log1p": ("", ""),
-    #         "log2": ("", ""),
-    #         "sin": ("radian", ""),
-    #         "cos": ("radian", ""),
-    #         "tan": ("radian", ""),
-    #         "sinh": ("radian", ""),
-    #         "cosh": ("radian", ""),
-    #         "tanh": ("radian", ""),
-    #         "radians": ("degree", "radian"),
-    #         "degrees": ("radian", "degree"),
-    #         "deg2rad": ("degree", "radian"),
-    #         "rad2deg": ("radian", "degree"),
-    #         "logaddexp": ("", ""),
-    #         "logaddexp2": ("", ""),
