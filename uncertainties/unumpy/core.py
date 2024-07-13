@@ -9,8 +9,6 @@ Core functions used by unumpy and some of its submodules.
 # imports one of the submodules in order to make it available to the
 # user.
 
-from __future__ import division
-
 # Standard modules:
 from builtins import next
 from builtins import zip
