@@ -1,4 +1,4 @@
-uncertainties-py23/
+uncertainties/version.py
 *.pyc
 build
 doc/_build
@@ -12,3 +12,7 @@ uncertainties.egg-info/
 .cache
 # vim temporary files
 .*.swp
+# For Visual Studio Code
+.vscode/
+
+coverage.xml

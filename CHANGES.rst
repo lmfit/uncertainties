@@ -1,136 +1,57 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+Change Log
+===================
 
-# !! This program must run with all version of Python since 2.3 included.
+3.2.2   2024-July-08
+-----------------------
 
-import os
-import sys
+Fixes:
 
-# setuptools has python_requires, but distutils doesn't, so we test the
-# Python version manually:
-min_version = (2, 7)
-error_msg = ("Sorry, this package is for Python %d.%d and higher only." %
-             min_version)
-try:
-    if sys.version_info < min_version:
-        sys.exit(error_msg)
-except AttributeError:  # sys.version_info was introduced in Python 2.0
-    sys.exit(error_msg)
+ - fix support for Numpy 2.0 (#245).  Note: `uncertainties.unumpy` still
+    provides `umatrix` based on `numpy.matrix`.  With `numpy.matrix`
+    discouraged, `umatrix` is too, and will be dropped in a  future release.
+ - fix automated running and reporting of code coverage with tests (#246)
+ - use `setuptools-scm` for setting version number from git tag  (#247)
 
-# Common options for distutils/setuptools's setup():
-setup_options = dict(
-    name='uncertainties',
-    version='3.1.7',
-    author='Eric O. LEBIGOT (EOL)',
-    author_email='eric.lebigot@normalesup.org',
-    url='http://uncertainties-python-package.readthedocs.io/',
-    license='Revised BSD License',
-    description=('Transparent calculations with uncertainties on the'
-                 ' quantities involved (aka error propagation);'
-                 ' fast calculation of derivatives'),
-    long_description='''\
-Overview
-========
+ 3.2.1   2024-June-08
+-----------------------
 
-``uncertainties`` allows **calculations** such as (2 +/- 0.1)*2 = 4 +/-
-0.2 to be **performed transparently**.  Much more complex mathematical
-expressions involving numbers with uncertainties can also be evaluated
-directly.
+Fixes for build, deployment, and docs
 
-The ``uncertainties`` package **takes the pain and complexity out**
-of uncertainty calculations.
+ - Use explicit package list to make sure unumpy is included (#232)
+ - Use setuptools-scm to make sure all files are in the source distribution (#235)
+ - updates to configuration for and links to readthedocs documentation. (#239)
+ - use double backticks more uniformly in docs. (#240)
+ - fixes to README.rst to allow it to render (needed for PyPI upload) (#243)
 
-**Detailed information** about this package can be found on its `main
-website`_.
+3.2.0   2024-June-02
+-----------------------
 
-Basic examples
-==============
+Version 3.2.0 is the first release of Uncertainties in nearly two years and the
+first minor release in over five years. It marks the beginning of an effort to
+refresh and update the project with a new and expanded team of maintainers.
 
-.. code-block:: python
+* Main Changes
 
-    >>> from uncertainties import ufloat
+  - Moved code development to lmfit organization, with 4 maintainers.
+  - Update documentation.
+  - Drop future dependency. Uncertainties now has no external dependencies when
+     not using Numpy integration (Drop official support for Python versions before 3.8 #200).
+  - Drop support for Python versions before 3.8, including Python 2 (Drop official support for Python versions before 3.8 #200)
+  - remove 1to2 and deprecations (remove 1to2 and depreciations #214)
 
-    >>> x = ufloat(2, 0.25)
-    >>> x
-    2.0+/-0.25
+* Developer related changes
 
-    >>> square = x**2  # Transparent calculations
-    >>> square
-    4.0+/-1.0
-    >>> square.nominal_value
-    4.0
-    >>> square.std_dev  # Standard deviation
-    1.0
-
-    >>> square - x*x
-    0.0  # Exactly 0: correlations taken into account
-
-    >>> from uncertainties.umath import *  # sin(), etc.
-    >>> sin(1+x**2)
-    -0.95892427466313845+/-0.2836621854632263
-
-    >>> print (2*x+1000).derivatives[x]  # Automatic calculation of derivatives
-    2.0
-
-    >>> from uncertainties import unumpy  # Array manipulation
-    >>> random_vars = unumpy.uarray([1, 2], [0.1, 0.2])
-    >>> print random_vars
-    [1.0+/-0.1 2.0+/-0.2]
-    >>> print random_vars.mean()
-    1.50+/-0.11
-    >>> print unumpy.cos(random_vars)
-    [0.540302305868+/-0.0841470984808 -0.416146836547+/-0.181859485365]
-
-Main features
-=============
-
-- **Transparent calculations with uncertainties**: **no or little
-  modification of existing code** is needed.  Similarly, the Python_ (or
-  IPython_) shell can be used as **a powerful calculator** that
-  handles quantities with uncertainties (``print`` statements are
-  optional, which is convenient).
-
-- **Correlations** between expressions are correctly taken into
-  account.  Thus, ``x-x`` is exactly zero, for instance (most
-  implementations found on the web yield a non-zero uncertainty for
-  ``x-x``, which is incorrect).
-
-- **Almost all mathematical operations** are supported, including most
-  functions from the standard math_ module (sin,...).  Comparison
-  operators (``>``, ``==``, etc.) are supported too.
-
-- Many **fast operations on arrays and matrices** of numbers with
-  uncertainties are supported.
-
-- **Extensive support for printing** numbers with uncertainties
-  (including LaTeX support and pretty-printing).
-
-- Most uncertainty calculations are performed **analytically**.
-
-- This module also gives access to the **derivatives** of any
-  mathematical expression (they are used by error
-  propagation theory, and are thus automatically calculated by this
-  module).
+  - Moved from setup.py to pyproject.toml (Transition from setup.py to pyproject.toml #199)
+  - Move tests to tests folder (Move tests to tests folder #216)
+  - Update unumpy test to be compatible with numpy 2
+  - Mark docstrings with backslashes as raw strings in tests (Mark docstrings with backslashes as raw strings #226)
 
 
-Installation or upgrade
-=======================
 
-Installation instructions are available on the `main web site
-<http://uncertainties-python-package.readthedocs.io/en/latest/index.html#installation-and-download>`_
-for this package.
-
-Contact
-=======
-
-Please send **feature requests, bug reports, or feedback** to
-`Eric O. LEBIGOT (EOL)`_.
-
-Version history
-===============
+Older Version history
+------------------------
 
 Main changes:
-
 - 3.1.6: The pretty-print and LaTeX format can now be customized.
 - 3.1.5: Added a "p" formatting option, that makes sure that there are always
   parentheses around the … ± … part of printed numbers.
@@ -225,7 +146,7 @@ Main changes:
 - 1.5.2: ``float_u``, ``array_u`` and ``matrix_u`` renamed ``ufloat``,
   ``uarray`` and ``umatrix``, for ease of typing.
 - 1.5:  Added functions ``nominal_value`` and ``std_dev``, and
-  modules ``unumpy`` (additional support for NumPy_ arrays and
+  modules ``unumpy`` (additional support for NumPy arrays and
   matrices) and ``unumpy.ulinalg`` (generalization of some
   functions from ``numpy.linalg``).
   Memory footprint of arrays of numbers with uncertainties
@@ -236,7 +157,7 @@ Main changes:
   ``unumpy.matrix_u``, with the added benefit of a shorter name.
 - 1.4.5: Added support for the standard ``pickle`` module.
 - 1.4.2: Added support for the standard ``copy`` module.
-- 1.4: Added utilities for manipulating NumPy_ arrays of numbers with
+- 1.4: Added utilities for manipulating NumPy arrays of numbers with
   uncertainties (``array_u``, ``nominal_values`` and ``std_devs``).
 - 1.3: Numbers with uncertainties are now constructed with
   ``num_with_uncert()``, which replaces ``NumberWithUncert()``.  This
@@ -260,109 +181,7 @@ Main changes:
 - 1.0.9: ``correlations()`` renamed more appropriately as
   ``covariance_matrix()``.
 
-.. _Python: http://docs.python.org/tutorial/interpreter.html
-.. _IPython: http://ipython.readthedocs.io/en/stable/
-.. _NumPy: http://numpy.scipy.org/
 .. _math: http://docs.python.org/library/math.html
 .. _PEP 8: http://www.python.org/dev/peps/pep-0008/
-.. _error propagation theory: http://en.wikipedia.org/wiki/Propagation_of_uncertainty
-.. _Eric O. LEBIGOT (EOL): mailto:eric.lebigot@normalesup.org
-.. _PayPal: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TK7KNDTEDT4S
-.. _main website: http://uncertainties-python-package.readthedocs.io/
 .. _code updater: http://uncertainties-python-package.readthedocs.io/en/latest/index.html#migration-from-version-1-to-version-2
-.. _formatting: http://uncertainties-python-package.readthedocs.io/en/latest/user_guide.html#printing''',
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Intended Audience :: Education',
-        'Intended Audience :: Other Audience',
-        'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: BSD License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        # Python 3.1 failed because of a problem with NumPy 1.6.1 (whereas
-        # everything was fine with Python 3.2 and Python 2.7).
-        'Programming Language :: Python :: 3.1',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: Implementation :: Jython',
-        'Programming Language :: Python :: Implementation :: PyPy',
-        'Topic :: Education',
-        'Topic :: Scientific/Engineering',
-        'Topic :: Scientific/Engineering :: Mathematics',
-        'Topic :: Scientific/Engineering :: Physics',
-        'Topic :: Software Development',
-        'Topic :: Software Development :: Libraries',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Utilities'
-    ],
-
-    keywords=[
-        'error propagation', 'uncertainties', 'uncertainty calculations',
-        'standard deviation', 'derivatives', 'partial derivatives',
-        'differentiation'
-    ],
-
-    # Files are defined in MANIFEST (which is automatically created by
-    # python setup.py sdist bdist_wheel):
-    packages=[
-        'uncertainties', 'uncertainties.unumpy', 'uncertainties.lib1to2',
-        'uncertainties.lib1to2.fixes'
-    ],
-
-    # The code runs with both Python 2 and Python 3:
-    options={"bdist_wheel": {"universal": True}}
-    )
-
-# The best available setup() is used (some users do not have
-# setuptools):
-try:
-    from setuptools import setup
-
-    # Some setuptools-specific options can be added:
-
-    addtl_setup_options = dict(
-
-        project_urls={
-            'Documentation':
-                'https://uncertainties-python-package.readthedocs.io/',
-            'Source': 'https://github.com/lebigot/uncertainties'
-        },
-
-        install_requires=['future'],
-
-        tests_require=['nose', 'numpy'],
-        
-        # Optional dependencies install using:
-        # `easy_install uncertainties[optional]`
-        extras_require={
-            'optional': ['numpy'],
-            'docs': ['sphinx'],
-        }
-    )
-
-    # easy_install uncertainties[tests] option:
-    addtl_setup_options['extras_require']['tests'] = (
-        addtl_setup_options['tests_require'])
-
-    # easy_install uncertainties[all] option: all dependencies are
-    # gathered
-    addtl_setup_options['extras_require']['all'] = set(
-        sum(addtl_setup_options['extras_require'].values(), []))
-
-    setup_options.update(addtl_setup_options)
-
-except ImportError:
-    from distutils.core import setup
-
-# End of setup definition
-
-setup(**setup_options)
+.. _formatting: http://uncertainties-python-package.readthedocs.io/en/latest/user_guide.html#printing

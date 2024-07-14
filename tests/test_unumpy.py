@@ -1,29 +1,18 @@
-"""
-Tests of the code in uncertainties/unumpy/__init__.py.
-
-These tests can be run through the Nose testing framework.
-
-(c) 2010-2016 by Eric O. LEBIGOT (EOL).
-"""
-
-from __future__ import division
-
-# 3rd-party modules:
 try:
     import numpy
 except ImportError:
     import sys
+
     sys.exit()  # There is no reason to test the interface to NumPy
 
-# Local modules:
 import uncertainties
 import uncertainties.core as uncert_core
-from uncertainties import ufloat, unumpy, test_uncertainties
+from uncertainties import ufloat, unumpy
 from uncertainties.unumpy import core
-from uncertainties.test_uncertainties import numbers_close, arrays_close
+from helpers import numbers_close, uarrays_close
+
 
 def test_numpy():
-
     """
     Interaction with NumPy, including matrix inversion,
     correlated_values, and calculation of the mean.
@@ -34,15 +23,15 @@ def test_numpy():
 
     # NumPy arrays can be multiplied by Variable objects,
     # whatever the order of the operands:
-    prod1 = arr*num
-    prod2 = num*arr
+    prod1 = arr * num
+    prod2 = num * arr
     # Additional check:
     assert (prod1 == prod2).all()
 
     # Operations with arrays work (they are first handled by NumPy,
     # then by this module):
-    prod1*prod2  # This should be calculable
-    assert not (prod1-prod2).any()  # All elements must be 0
+    prod1 * prod2  # This should be calculable
+    assert not (prod1 - prod2).any()  # All elements must be 0
 
     # Comparisons work too:
 
@@ -51,7 +40,7 @@ def test_numpy():
     # Comparisons with Variable objects:
     assert len(arr[arr > ufloat(1.5, 0.1)]) == 1
 
-    assert len(prod1[prod1 < prod1*prod2]) == 2
+    assert len(prod1[prod1 < prod1 * prod2]) == 2
 
     # The following can be calculated (special NumPy abs() function):
     numpy.abs(arr + ufloat(-1, 0.1))
@@ -73,10 +62,11 @@ def test_numpy():
     # Calculation of the mean, global and with a specific axis:
 
     arr_floats = numpy.random.random((10, 3, 5))
-    arr = unumpy.uarray(arr_floats, arr_floats/100)
+    arr = unumpy.uarray(arr_floats, arr_floats / 100)
     assert arr.mean(axis=0).shape == (3, 5)
     assert arr.mean(axis=1).shape == (10, 5)
     arr.mean()  # Global mean
+
 
 def test_matrix():
     "Matrices of numbers with uncertainties"
@@ -85,8 +75,7 @@ def test_matrix():
     # Matrix with a mix of Variable objects and regular
     # Python numbers:
 
-    m = unumpy.matrix([[ufloat(10, 1), -3.1],
-                       [0, ufloat(3, 0)]])
+    m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)]])
     m_nominal_values = unumpy.nominal_values(m)
 
     # Test of the nominal_value attribute:
@@ -95,8 +84,9 @@ def test_matrix():
     assert type(m[0, 0]) == uncert_core.Variable
 
     # Test of scalar multiplication, both sides:
-    3*m
-    m*3
+    3 * m
+    m * 3
+
 
 def derivatives_close(x, y):
     """
@@ -109,14 +99,15 @@ def derivatives_close(x, y):
     if set(x.derivatives) != set(y.derivatives):
         return False  # Not the same variables
 
-    return all(numbers_close(x.derivatives[var], y.derivatives[var])
-               for var in x.derivatives)
+    return all(
+        numbers_close(x.derivatives[var], y.derivatives[var]) for var in x.derivatives
+    )
+
 
 def test_inverse():
     "Tests of the matrix inverse"
 
-    m = unumpy.matrix([[ufloat(10, 1), -3.1],
-                       [0, ufloat(3, 0)]])
+    m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)]])
     m_nominal_values = unumpy.nominal_values(m)
 
     # "Regular" inverse matrix, when uncertainties are not taken
@@ -136,19 +127,19 @@ def test_inverse():
     # Checks of the numerical values: the diagonal elements of the
     # inverse should be the inverses of the diagonal elements of
     # m (because we started with a triangular matrix):
-    assert numbers_close(1/m_nominal_values[0, 0],
-                          m_inv_uncert[0, 0].nominal_value), "Wrong value"
+    assert numbers_close(
+        1 / m_nominal_values[0, 0], m_inv_uncert[0, 0].nominal_value
+    ), "Wrong value"
 
-    assert numbers_close(1/m_nominal_values[1, 1],
-                          m_inv_uncert[1, 1].nominal_value), "Wrong value"
-
+    assert numbers_close(
+        1 / m_nominal_values[1, 1], m_inv_uncert[1, 1].nominal_value
+    ), "Wrong value"
 
     ####################
 
     # Checks of the covariances between elements:
     x = ufloat(10, 1)
-    m = unumpy.matrix([[x, x],
-                       [0, 3+2*x]])
+    m = unumpy.matrix([[x, x], [0, 3 + 2 * x]])
 
     m_inverse = m.I
 
@@ -156,12 +147,10 @@ def test_inverse():
     m_double_inverse = m_inverse.I
     # The initial matrix should be recovered, including its
     # derivatives, which define covariances:
-    assert numbers_close(m_double_inverse[0, 0].nominal_value,
-                          m[0, 0].nominal_value)
-    assert numbers_close(m_double_inverse[0, 0].std_dev,
-                          m[0, 0].std_dev)
+    assert numbers_close(m_double_inverse[0, 0].nominal_value, m[0, 0].nominal_value)
+    assert numbers_close(m_double_inverse[0, 0].std_dev, m[0, 0].std_dev)
 
-    assert arrays_close(m_double_inverse, m)
+    assert uarrays_close(m_double_inverse, m)
 
     # Partial test:
     assert derivatives_close(m_double_inverse[0, 0], m[0, 0])
@@ -178,18 +167,19 @@ def test_inverse():
 
     # Correlations between m and m_inverse should create a perfect
     # inversion:
-    assert arrays_close(m * m_inverse,  numpy.eye(m.shape[0]))
+    assert uarrays_close(m * m_inverse, numpy.eye(m.shape[0]))
+
 
 def test_wrap_array_func():
-    '''
+    """
     Test of numpy.wrap_array_func(), with optional arguments and
     keyword arguments.
-    '''
+    """
 
     # Function that works with numbers with uncertainties in mat (if
     # mat is an uncertainties.unumpy.matrix):
     def f_unc(mat, *args, **kwargs):
-        return mat.I + args[0]*kwargs['factor']
+        return mat.I + args[0] * kwargs["factor"]
 
     # Test with optional arguments and keyword arguments:
     def f(mat, *args, **kwargs):
@@ -198,22 +188,19 @@ def test_wrap_array_func():
         assert not any(isinstance(v, uncert_core.UFloat) for v in mat.flat)
         return f_unc(mat, *args, **kwargs)
 
-
     # Wrapped function:
     f_wrapped = core.wrap_array_func(f)
 
     ##########
     # Full rank rectangular matrix:
-    m = unumpy.matrix([[ufloat(10, 1), -3.1],
-                       [0, ufloat(3, 0)],
-                       [1, -3.1]])
+    m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
 
     # Numerical and package (analytical) pseudo-inverses: they must be
     # the same:
     m_f_wrapped = f_wrapped(m, 2, factor=10)
     m_f_unc = f_unc(m, 2, factor=10)
 
-    assert arrays_close(m_f_wrapped, m_f_unc)
+    assert uarrays_close(m_f_wrapped, m_f_unc)
 
 
 def test_pseudo_inverse():
@@ -224,16 +211,14 @@ def test_pseudo_inverse():
 
     ##########
     # Full rank rectangular matrix:
-    m = unumpy.matrix([[ufloat(10, 1), -3.1],
-                       [0, ufloat(3, 0)],
-                       [1, -3.1]])
+    m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
 
     # Numerical and package (analytical) pseudo-inverses: they must be
     # the same:
     rcond = 1e-8  # Test of the second argument to pinv()
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core.pinv(m, rcond)
-    assert arrays_close(m_pinv_num, m_pinv_package)
+    assert uarrays_close(m_pinv_num, m_pinv_package)
 
     ##########
     # Example with a non-full rank rectangular matrix:
@@ -241,14 +226,15 @@ def test_pseudo_inverse():
     m = unumpy.matrix([vector, vector])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core.pinv(m, rcond)
-    assert arrays_close(m_pinv_num, m_pinv_package)
+    assert uarrays_close(m_pinv_num, m_pinv_package)
 
     ##########
     # Example with a non-full-rank square matrix:
     m = unumpy.matrix([[ufloat(10, 1), 0], [3, 0]])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core.pinv(m, rcond)
-    assert arrays_close(m_pinv_num, m_pinv_package)
+    assert uarrays_close(m_pinv_num, m_pinv_package)
+
 
 def test_broadcast_funcs():
     """
@@ -257,19 +243,22 @@ def test_broadcast_funcs():
     """
 
     x = ufloat(0.2, 0.1)
-    arr = numpy.array([x, 2*x])
+    arr = numpy.array([x, 2 * x])
     assert unumpy.cos(arr)[1] == uncertainties.umath.cos(arr[1])
 
     # Some functions do not bear the same name in the math module and
     # in NumPy (acos instead of arccos, etc.):
     assert unumpy.arccos(arr)[1] == uncertainties.umath.acos(arr[1])
-    # The acos() function should not exist in unumpy because it does
-    # not exist in numpy:
-    assert not hasattr(numpy, 'acos')
-    assert not hasattr(unumpy, 'acos')
+
+    # The acos() function should not exist in unumpy because the function
+    # should have been renamed to arccos(). Starting with numpy 2 numpy.acos()
+    # is an alias to numpy.arccos(). If similar aliases are added to unumpy,
+    # the following tests can be removed.
+    assert not hasattr(unumpy, "acos")
 
     # Test of the __all__ variable:
-    assert 'acos' not in unumpy.__all__
+    assert "acos" not in unumpy.__all__
+
 
 def test_array_and_matrix_creation():
     "Test of custom array creation"
@@ -281,8 +270,9 @@ def test_array_and_matrix_creation():
 
     # Same thing for matrices:
     mat = unumpy.umatrix([1, 2], [0.1, 0.2])
-    assert mat[0,1].nominal_value == 2
-    assert mat[0,1].std_dev == 0.2
+    assert mat[0, 1].nominal_value == 2
+    assert mat[0, 1].std_dev == 0.2
+
 
 def test_component_extraction():
     "Extracting the nominal values and standard deviations from an array"
@@ -309,23 +299,4 @@ def test_array_comparisons():
 
     # For matrices, 1D arrays are converted to 2D arrays:
     mat = unumpy.umatrix([1, 2], [1, 4])
-    assert numpy.all((mat == [mat[0,0], 4]) == [True, False])
-
-def test_obsolete():
-    'Test of obsolete functions'
-
-    # The new and old calls should give the same results:
-
-    # The unusual syntax is here to protect against automatic code
-    # update:
-    arr_obs = unumpy.uarray.__call__(([1, 2], [1, 4]))  # Obsolete call
-    arr = unumpy.uarray([1, 2], [1, 4])
-    assert arrays_close(arr_obs, arr)
-
-    # The new and old calls should give the same results:
-
-    # The unusual syntax is here to protect against automatic code
-    # update:
-    mat_obs = unumpy.umatrix.__call__(([1, 2], [1, 4]))  # Obsolete call
-    mat = unumpy.umatrix([1, 2], [1, 4])
-    assert arrays_close(mat_obs, mat)
+    assert numpy.all((mat == [mat[0, 0], 4]) == [True, False])

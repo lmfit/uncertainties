@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "uncertainties/version.py"
+version_scheme = "post-release"
+
+
+[project]
+name = "uncertainties"
+dynamic = ["version"]
+authors = [
+    {name = "Eric O. LEBIGOT (EOL)", email = "eric.lebigot@normalesup.org"},
+]
+description = "calculations with values with uncertainties, error propagation"
+readme = "README.rst"
+requires-python = ">=3.8"
+keywords = [
+    "error propagation", "uncertainties", "uncertainty calculations",
+    "standard deviation", "derivatives", "partial derivatives",
+    "differentiation"
+]
+license = {text = "Revised BSD License"}
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Other Audience",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: Jython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Education",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities"
+]
+dependencies = []
+
+[tool.setuptools]
+packages = ["uncertainties", "uncertainties.unumpy"]
+
+
+[project.urls]
+Documentation = "https://uncertainties.readthedocs.io/"
+Repository = "https://github.com/lmfit/uncertainties"
+Issues = "https://github.com/lmfit/uncertainties/issues"
+Changelog = "https://github.com/lmfit/uncertainties/blob/master/CHANGES.rst"
+
+[project.optional-dependencies]
+arrays = ["numpy"]
+test = ["pytest", "pytest_cov"]
+doc = ["sphinx", "sphinx-copybutton", "python-docs-theme"]
+all = ["uncertainties[doc,test,arrays]"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

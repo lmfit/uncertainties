@@ -1,10 +1,35 @@
 .. index:: technical details
 
-===============
-Technical Guide
-===============
+=========================
+Advanced Topics
+=========================
 
 
+This page gives more in-depth technical description of the
+:mod:`uncertainties` package.
+
+ .. index:: api
+
+.. _api_funcs:
+
+
+API: Application Programming Interface
+==============================================
+
+.. module:: uncertainties
+
+The most common and important functions for creating uncertain
+:class:`Variables` are :func:`ufloat` and :func:`ufloat_fromstr`.  In addition,
+the :func:`wrap` can be used to support the propagation of uncertainties with a
+user-supplied function.
+
+.. autofunction:: ufloat
+
+.. autofunction:: ufloat_fromstr
+
+.. autoclass:: Variable
+
+.. autofunction:: wrap
 
 Testing whether an object is a number with uncertainty
 ------------------------------------------------------
@@ -13,6 +38,13 @@ The recommended way of testing whether :data:`value` carries an
 uncertainty handled by this module is by checking whether
 :data:`value` is an instance of :class:`UFloat`, through
 ``isinstance(value, uncertainties.UFloat)``.
+
+
+
+
+Special Technical Topics
+============================================================
+
 
 
 .. index:: pickling
@@ -103,7 +135,7 @@ since :data:`x` and :data:`y` are independent random variables that
 *almost* always give a different value (put differently,
 :data:`x`-:data:`y` is not equal to 0, as it can take many different
 values). Note that this is different
-from the result of ``z = 3.14; t = 3.14; print z == t``, because
+from the result of ``z = 3.14; t = 3.14; print(z == t)``, because
 :data:`x` and :data:`y` are *random variables*, not pure numbers.
 
 Similarly,
@@ -162,9 +194,6 @@ that :data:`y` > :data:`x`.
 Linear propagation of uncertainties
 -----------------------------------
 
-Constraints on the uncertainties
-================================
-
 This package calculates the standard deviation of mathematical
 expressions through the linear approximation of `error propagation
 theory`_.
@@ -205,7 +234,7 @@ calculations are much slower than with approximation schemes.
    pair: uncertainty; NaN
 
 NaN uncertainty
-===============
+----------------------
 
 If linear `error propagation theory`_ cannot be applied, the functions
 defined by :mod:`uncertainties` internally use a `not-a-number value
@@ -328,7 +357,7 @@ If the variable :data:`a` above is modified, the value of :data:`poly`
 is not modified, as is usual in Python:
 
 >>> a = 123
->>> print poly
+>>> print(poly)
 46.0+/-0.4  # Still equal to x**2 + 42, not x**2 + 123
 
 Random variables can, on the other hand, have their uncertainty
@@ -336,7 +365,7 @@ updated on the fly, because quantities with uncertainties (like
 :data:`poly`) keep track of them:
 
 >>> x.std_dev = 0
->>> print poly
+>>> print(poly)
 46+/-0  # Zero uncertainty, now
 
 As usual, Python keeps track of objects as long as they are used.
@@ -345,13 +374,12 @@ Thus, redefining the value of :data:`x` does not change the fact that
 in :data:`x`:
 
 >>> x = 10000
->>> print poly
+>>> print(poly)
 46+/-0  # Unchanged
 
 These mechanisms make quantities with uncertainties behave mostly like
 regular numbers, while providing a fully transparent way of handling
 correlations between quantities.
-
 
 
 .. index:: number with uncertainty; classes, Variable class
@@ -372,8 +400,8 @@ classes:
 2. a class for functions that depend on independent variables
    (:class:`AffineScalarFunc`, aliased as :class:`UFloat`).
 
-Documentation for these classes is available in their Python
-docstring, which can for instance displayed through pydoc_.
+Additional documentation for these classes is available in their Python
+docstring.
 
 The factory function :func:`ufloat` creates variables and thus returns
 a :class:`Variable` object:
@@ -395,8 +423,6 @@ objects store all the variables they depend on:
 
 
 .. _automatic differentiation: http://en.wikipedia.org/wiki/Automatic_differentiation
-
-.. _pydoc: http://docs.python.org/library/pydoc.html
 
 .. _error propagation theory: http://en.wikipedia.org/wiki/Error_propagation
 

@@ -1,13 +1,37 @@
 .. index: NumPy support
 
-=======================
-Uncertainties in arrays
-=======================
+===============================
+Uncertainties and numpy arrays
+===============================
 
 .. index:: unumpy
+.. index:: arrays; simple use, matrices; simple use
+
+.. _simple_array_use:
+
+Arrays of uncertainties Variables
+====================================
+
+It is possible to put uncertainties Variable  in NumPy_ arrays and
+matrices:
+
+>>> arr = numpy.array([ufloat(1, 0.01), ufloat(2, 0.1)])
+>>> 2*arr
+[2.0+/-0.02 4.0+/-0.2]
+>>> print arr.sum()
+3.00+/-0.10
+
+Many common operations on NumPy arrays can be performed transparently
+even when these arrays contain numbers with uncertainties.
+
 
 The unumpy package
 ==================
+
+
+While :ref:`basic operations on arrays <simple_array_use>` that
+contain numbers with uncertainties can be performed without it, the
+:mod:`unumpy` package is useful for more advanced uses.
 
 This package contains:
 
@@ -17,9 +41,6 @@ NumPy_ arrays and matrices of numbers with uncertainties;
 2. **generalizations** of multiple NumPy functions so that they also
 work with arrays that contain numbers with uncertainties.
 
-While :ref:`basic operations on arrays <simple_array_use>` that
-contain numbers with uncertainties can be performed without it, the
-:mod:`unumpy` package is useful for more advanced uses.
 
 Operations on arrays (including their cosine, etc.)  can thus be
 performed transparently.
@@ -45,7 +66,7 @@ Arrays of numbers with uncertainties can be built from values and
 uncertainties:
 
 >>> arr = unumpy.uarray([1, 2], [0.01, 0.002])
->>> print arr
+>>> print(arr)
 [1.0+/-0.01 2.0+/-0.002]
 
 NumPy arrays of numbers with uncertainties can also be built directly
@@ -79,7 +100,7 @@ work).  This is why the :class:`unumpy.matrix` class is provided: both
 the inverse and the pseudo-inverse of a matrix can be calculated in
 the usual way: if :data:`mat` is a :class:`unumpy.matrix`,
 
->>> print mat.I
+>>> print(mat.I)
 
 does calculate the inverse or pseudo-inverse of :data:`mat` with
 uncertainties.
@@ -111,16 +132,14 @@ This module defines uncertainty-aware mathematical functions that
 generalize those from :mod:`uncertainties.umath` so that they work on
 NumPy arrays of numbers with uncertainties instead of just scalars:
 
->>> print unumpy.cos(arr)  # Cosine of each array element
+>>> print(unumpy.cos(arr))  # Cosine of each array element
 
 NumPy's function names are used, and not those from the :mod:`math`
 module (for instance, :func:`unumpy.arccos` is defined, like in NumPy,
 and is not named :func:`acos` like in the :mod:`math` module).
 
 The definition of the mathematical quantities calculated by these
-functions is available in the documentation for
-:mod:`uncertainties.umath` (which is accessible through :func:`help`
-or ``pydoc``).
+functions is available in the documentation for  :mod:`uncertainties.umath`.
 
 .. index::
    pair: testing and operations (in arrays); NaN
@@ -165,14 +184,13 @@ Arrays of numbers with uncertainties can be directly :ref:`pickled
 <pickling>`, saved to file and read from a file. Pickling has the
 advantage of preserving correlations between errors.
 
-Storing instead arrays in **text format** loses correlations between
-errors but has the advantage of being both computer- and
-human-readable. This can be done through NumPy's :func:`savetxt` and
-:func:`loadtxt`.
+Storing arrays in **text format** loses correlations between errors but has the
+advantage of being both computer- and human-readable. This can be done through
+NumPy's :func:`savetxt` and :func:`loadtxt`.
 
 Writing the array to file can be done by asking NumPy to use the
-*representation* of numbers with uncertainties (instead of the default
-float conversion):
+*representation* of numbers with uncertainties (instead of the default float
+conversion):
 
 >>> numpy.savetxt('arr.txt', arr, fmt='%r')
 
@@ -182,27 +200,18 @@ the array::
   1.0+/-0.01
   2.0+/-0.002
 
-The file can then be read back by instructing NumPy to convert all the
-columns with :func:`uncertainties.ufloat_fromstr`. The number
-:data:`num_cols` of columns in the input file (1, in our example) must
-be determined in advance, because NumPy requires a converter for each
-column separately. For Python 2:
+The file can then be read back by instructing NumPy with :meth:`numpy.loadtxt`,
+but for object arrays, this requires a converter function for each column
+separately.  We can use func:`uncertainties.ufloat_fromstr`, but
+:meth:`numpy.loadtxt` passes bytes to converters, they must first be converted
+into a string.  In addition the number of maximum number of columns must be
+known.  An example of using all of this to unpack the data saved with
+:meth:`numpy.savetxt` would be:
 
->>> converters = dict.fromkeys(range(num_cols), uncertainties.ufloat_fromstr)
-
-For Python 3, since :func:`numpy.loadtxt` passes bytes to converters,
-they must first be converted into a string:
-
->>> converters = dict.fromkeys(
-        range(num_cols),
-        lambda col_bytes: uncertainties.ufloat_fromstr(col_bytes.decode("latin1")))
-
-(Latin 1 appears to in fact be the encoding used in
-:func:`numpy.savetxt` [as of NumPy 1.12]. This encoding seems
-to be the one hardcoded in :func:`numpy.compat.asbytes`.)
-
-The array can then be loaded:
-
+>>> from uncertainties import ufloat_fromstr
+>>> max_cols = 1
+>>> converters = {col: lambda dat: ufloat_fromstr(dat.decode("utf-8"))
+....                              for col in range(max_cols)}
 >>> arr = numpy.loadtxt('arr.txt', converters=converters, dtype=object)
 
 .. index:: linear algebra; additional functions, ulinalg

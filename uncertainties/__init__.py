@@ -1,7 +1,7 @@
 #!! Whenever the documentation below is updated, setup.py should be
 # checked for consistency.
 
-'''
+"""
 Calculations with full error propagation for quantities with uncertainties.
 Derivatives can also be calculated.
 
@@ -177,7 +177,7 @@ an approximate standard deviation of 0 (because the cosine is not well
 approximated by a line around 0), which might not be precise enough
 for all applications.
 
-- Comparison operations (>, ==, etc.) on numbers with uncertainties
+- Comparison operations (``>``, ``==``, etc.) on numbers with uncertainties
 have a pragmatic semantics, in this package: numbers with
 uncertainties can be used wherever Python numbers are used, most of
 the time with a result identical to the one that would be obtained
@@ -185,7 +185,7 @@ with their nominal value only.  However, since the objects defined in
 this module represent probability distributions and not pure numbers,
 comparison operator are interpreted in a specific way.
 
-The result of a comparison operation ("==", ">", etc.) is defined so as
+The result of a comparison operation (``==``, ``>``, etc.) is defined so as
 to be essentially consistent with the requirement that uncertainties
 be small: the value of a comparison operation is True only if the
 operation yields True for all infinitesimal variations of its random
@@ -204,7 +204,7 @@ is not such that x == y, since x and y are independent random
 variables that almost never give the same value.  However, x == x
 still holds.
 
-The boolean value (bool(x), "if x...") of a number with uncertainty x
+The boolean value (bool(x), ``if x...``) of a number with uncertainty x
 is the result of x != 0.
 
 - The uncertainties package is for Python 2.3 and above.
@@ -212,21 +212,21 @@ is the result of x != 0.
 - This package contains tests.  They can be run either manually or
 automatically with the nose unit testing framework (nosetests).
 
-(c) 2009-2016 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
-Please send feature requests, bug reports, or feedback to this address.
+(c) 2009-2024 by Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>.
 
-Please support future development by donating $10 or more through PayPal!
+Please use the Github project at  https://github.com/lmfit/uncertainties
+for bug reports, feature requests, or feedback.
 
-This software is released under a dual license.  (1) The BSD license.
-(2) Any other license, as long as it is obtained from the original
-author.'''
 
-from builtins import map
-from .core import *
-from .core import __all__  # For a correct help(uncertainties)
+This software is released under the BSD license.
+"""
 
-# Numerical version:
-__version_info__ = (3, 1, 7)
-__version__ = '.'.join(map(str, __version_info__))
+from .core import *  # noqa
+from .core import __all__  # noqa For a correct help(uncertainties)
 
-__author__ = 'Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>'
+from .version import __version__, __version_tuple__  # noqa
+
+# for backward compatibility
+__version_info__ = __version_tuple__
+
+__author__ = "Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>"
