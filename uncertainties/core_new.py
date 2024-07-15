@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from functools import lru_cache, wraps
 import inspect
 from math import sqrt
+from numbers import Real
 import sys
 from typing import Callable, Collection, Dict, Optional, Tuple, Union, TYPE_CHECKING
 import uuid
@@ -18,11 +19,10 @@ if TYPE_CHECKING:
 @dataclass(frozen=True)
 class UncertaintyAtom:
     """
-    Custom class to keep track of "atoms" of uncertainty. Note e.g. that
-    UncertaintyAtom(3) is UncertaintyAtom(3)
-    returns False.
+    Custom class to keep track of "atoms" of uncertainty. Two UncertaintyAtoms are
+    always uncorrelated.
     """
-    unc: float
+    std_dev: float
     uuid: uuid.UUID = field(default_factory=uuid.uuid4, init=False)
 
 
@@ -45,25 +45,22 @@ UncertaintyComboExpanded = Tuple[
 @lru_cache
 def get_expanded_combo(combo: UncertaintyCombo) -> UncertaintyComboExpanded:
     """
-    Recursively expand a linear combination of uncertainties out into the base Atoms.
+    Recursively expand a linear combination of uncertainties out into the base atoms.
     It is a performance optimization to sometimes store unexpanded linear combinations.
     For example, there may be a long calculation involving many layers of UFloat
     manipulations. We need not expand the linear combination until the end when a
     calculation of a standard deviation on a UFloat is requested.
     """
     expanded_dict = defaultdict(float)
-    for unc_combo_1, weight_1 in combo:
-        if isinstance(unc_combo_1, UncertaintyAtom):
-            expanded_dict[unc_combo_1] += weight_1
+    for combo, combo_weight in combo:
+        if isinstance(combo, UncertaintyAtom):
+            expanded_dict[combo] += combo_weight
         else:
-            expanded_sub_combo = get_expanded_combo(unc_combo_1)
-            for unc_atom, weight_2 in expanded_sub_combo:
-                expanded_dict[unc_atom] += weight_2 * weight_1
+            expanded_combo = get_expanded_combo(combo)
+            for atom, atom_weight in expanded_combo:
+                expanded_dict[atom] += atom_weight * combo_weight
 
-    return tuple((unc_atom, weight) for unc_atom, weight in expanded_dict.items())
-
-
-Value = Union["UValue", float]
+    return tuple((atom, weight) for atom, weight in expanded_dict.items())
 
 
 class UFloat:
@@ -79,28 +76,57 @@ class UFloat:
     def __init__(
             self,
             /,
-            val: float,
-            unc: Union[UncertaintyCombo, float] = (),
+            value: Real,
+            uncertainty: Union[UncertaintyCombo, Real] = (),
             tag: Optional[str] = None
     ):
-        self._val = float(val)
-        if isinstance(unc, (float, int)):
-            unc_atom = UncertaintyAtom(float(unc))
-            unc_combo = ((unc_atom, 1.0),)
-            self.unc_linear_combo = unc_combo
+        self._val = float(value)
+        if isinstance(uncertainty, Real):
+            atom = UncertaintyAtom(float(uncertainty))
+            uncertainty_combo = ((atom, 1.0),)
+            self.uncertainty_lin_combo = uncertainty_combo
         else:
-            self.unc_linear_combo = unc
+            self.uncertainty_lin_combo = uncertainty
         self.tag = tag
+
+    class dtype(object):
+        type = staticmethod(lambda value: value)
 
     @property
     def val(self: "UFloat") -> float:
         return self._val
 
     @property
-    def unc(self: "UFloat") -> float:
-        expanded_combo = get_expanded_combo(self.unc_linear_combo)
-        return float(sqrt(sum([(weight * unc_atom.unc)**2 for unc_atom, weight in expanded_combo])))
+    def std_dev(self: "UFloat") -> float:
+        # TODO: It would be interesting to memoize/cache this result. However, if we
+        #   stored this result as an instance attribute that would qualify as a mutation
+        #   of the object and have implications for hashability. For example, two UFloat
+        #   objects might have different uncertainty_lin_combo, but when expanded
+        #   they're the same so that the std_dev and even correlations with other UFloat
+        #   are the same. Should these two have the same hash? My opinion is no.
+        #   I think a good path forward could be to cache this as an instance attribute
+        #   nonetheless, but to not include the std_dev in the hash. Also equality would
+        #   be based on equality of uncertainty_lin_combo, not equality of std_dev.
+        expanded_lin_combo = get_expanded_combo(self.uncertainty_lin_combo)
+        list_of_squares = [
+            (weight * atom.std_dev)**2 for atom, weight in expanded_lin_combo
+        ]
+        std_dev = sqrt(sum(list_of_squares))
+        return std_dev
 
+    def __eq__(self: "UFloat", other: "UFloat") -> bool:
+        if not isinstance(other, UFloat):
+            return False
+        val_eq = self.val == other.val
+        uncertainty_eq = self.uncertainty_lin_combo == other.uncertainty_lin_combo
+        return val_eq and uncertainty_eq
+
+    # def __gt__(self, other):
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}({self.val}, {self.std_dev})'
+
+    # Aliases
     @property
     def nominal_value(self: "UFloat") -> float:
         return self.val
@@ -110,16 +136,8 @@ class UFloat:
         return self.val
 
     @property
-    def std_dev(self: "UFloat") -> float:
-        return self.unc
-
-    @property
     def s(self: "UFloat") -> float:
-        return self.unc
-
-    def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self.val}, {self.unc})'
-
+        return self.std_dev
 
 SQRT_EPS = sqrt(sys.float_info.epsilon)
 
@@ -132,7 +150,7 @@ def get_param_name(sig: Signature, param: Union[int, str]):
     return param_name
 
 
-def partial_derivative(
+def numerical_partial_derivative(
         f: Callable[..., float],
         target_param: Union[str, int],
         *args,
@@ -232,7 +250,7 @@ class ToUFunc:
                 if isinstance(param_val, UFloat):
                     float_bound.arguments[param] = param_val.val
                     return_u_val = True
-                elif isinstance(param_val, int):
+                elif isinstance(param_val, Real):
                     float_bound.arguments[param] = float(param_val)
 
             new_val = f(*float_bound.args, **float_bound.kwargs)
@@ -243,10 +261,10 @@ class ToUFunc:
                 u_float_param_name = get_param_name(sig, u_float_param)
                 arg = bound.arguments[u_float_param_name]
                 if isinstance(arg, UFloat):
-                    sub_unc_linear_combo = arg.unc_linear_combo
+                    sub_unc_linear_combo = arg.uncertainty_lin_combo
                     deriv_func = self.deriv_func_dict[u_float_param]
                     if deriv_func is None:
-                        derivative = partial_derivative(
+                        derivative = numerical_partial_derivative(
                             f,
                             u_float_param_name,
                             *args,
@@ -409,3 +427,6 @@ print(f'{usin(x)=}  # We can UFloat-ify complex functions')
 
 
 
+import numpy as np
+arr = np.array([x, y, z])
+print(np.mean(arr))
