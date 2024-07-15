@@ -4,7 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from functools import lru_cache, wraps
 import inspect
-from math import sqrt
+from math import sqrt, isnan
 from numbers import Real
 import sys
 from typing import Callable, Collection, Dict, Optional, Tuple, Union, TYPE_CHECKING
@@ -60,7 +60,33 @@ def get_expanded_combo(combo: UncertaintyCombo) -> UncertaintyComboExpanded:
             for atom, atom_weight in expanded_combo:
                 expanded_dict[atom] += atom_weight * combo_weight
 
-    return tuple((atom, weight) for atom, weight in expanded_dict.items())
+    pruned_expanded_dict = {}
+    for atom, weight in expanded_dict.items():
+        if atom.std_dev == 0 or (weight == 0 and not isnan(atom.std_dev)):
+            continue
+        pruned_expanded_dict[atom] = weight
+
+    return tuple((atom, weight) for atom, weight in pruned_expanded_dict.items())
+
+
+# class UFloatBinOp:
+#     def __init__(self, bin_op_str):
+#         self.bin_op_str = bin_op_str
+#
+#     def __call__(self, bin_op):
+#         @wraps(bin_op)
+#         def ufloat_bin_op(first, second):
+#             if isinstance(second, UFloat):
+#                 return bin_op(first.val, second.val)
+#             elif isinstance(second, Real):
+#                 return bin_op(first.val, float(second))
+#             else:
+#                 pass
+#                 # raise TypeError(
+#                 #     f'\'{self.bin_op_str}\' not supported between instances of '
+#                 #     f'\'UFloat\' and \'{type(second)}\''
+#                 # )
+#         return ufloat_bin_op
 
 
 class UFloat:
@@ -115,13 +141,45 @@ class UFloat:
         if not isinstance(other, UFloat):
             return False
         val_eq = self.val == other.val
-        uncertainty_eq = self.uncertainty_lin_combo == other.uncertainty_lin_combo
-        return val_eq and uncertainty_eq
 
+        self_expanded_linear_combo = get_expanded_combo(self.uncertainty_lin_combo)
+        other_expanded_linear_combo = get_expanded_combo(other.uncertainty_lin_combo)
+        uncertainty_eq = self_expanded_linear_combo == other_expanded_linear_combo
+        return val_eq and uncertainty_eq
+    #
+    # TODO: UFloat shouldn't implement binary comparison operators. The easy way to do
+    #   it would be to have the operators [==, !=, >, >=, <, <=] all do direct
+    #   comparisons on UFloat.val. But then we would have
+    #     ufloat(1, 1) - ufloat(1, 1) == ufloat(0, 0)
+    #   which I don't think is totally appropriate since the lefthand side has
+    #   non-zero uncertainty due to the lack of correlations. But if __eq__ depends on
+    #   both val and uncertainty_lin_combo it's impossible to define a total order on
+    #   UFloat. We could define [>, <] to depend only on UFloat.val, but it would be
+    #   impossible to define [>=, <=] in a way that respects both [>, <] that depend
+    #   only on val AND respects [==, !=] which depend on val and uncertainty_lin_combo.
+
+    #
+    # @UFloatBinOp('>')
     # def __gt__(self, other):
+    #     return self > other
+    #
+    # @UFloatBinOp('>=')
+    # def __ge__(self, other):
+    #     return self >= other
+    #
+    # @UFloatBinOp('<')
+    # def __lt__(self, other):
+    #     return self < other
+    #
+    # @UFloatBinOp('<=')
+    # def __le__(self, other):
+    #     return self <= other
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.val}, {self.std_dev})'
+
+    def __bool__(self):
+        return self != UFloat(0, 0)
 
     # Aliases
     @property
@@ -354,7 +412,7 @@ def add_float_funcs_to_uvalue():
         '__sub__': ('1', '-1'),
         '__rsub__': ('-1', '1'),  # Note reversed order
         '__mul__': ('y', 'x'),
-        '__rmul__': ('x', 'y'),  # Note reversed order
+        '__rmul__': ('y', 'x'),  # Note reversed order
         '__truediv__': ('1/y', '-x/y**2'),
         '__rtruediv__': ('-x/y**2', '1/y'),  # Note reversed order
         '__floordiv__': ('0', '0'),  # ?
@@ -381,55 +439,3 @@ def ufloat(val, unc, tag=None):
 def ufloat_fromstr(string, tag=None):
     (nom, std) = str_to_number_with_uncert(string.strip())
     return ufloat(nom, std, tag)
-
-
-"""
-^^^
-End libary code
-____
-Begin sample test code
-vvvv
-"""
-from math import sin
-
-usin = ToUFunc((0,))(sin)
-
-x = UFloat(10, 1)
-
-y = UFloat(10, 1)
-
-z = UFloat(20, 2)
-
-print(f'{x=}')
-print(f'{-x=}')
-print(f'{3*x=}')
-print(f'{x-x=}  # A UFloat is correlated with itself')
-
-print(f'{y=}')
-print(f'{x-y=}  # Two distinct UFloats are not correlated unless they have the same Uncertainty Atoms')
-
-print(f'{z=}')
-
-print(f'{x*z=}')
-print(f'{x/z=}')
-print(f'{x**z=}')
-
-print(f'{usin(x)=}  # We can UFloat-ify complex functions')
-
-# x=UFloat(10.0, 1.0)
-# -x=UFloat(-10.0, 1.0)
-# 3*x=UFloat(30.0, 3.0)
-# x-x=UFloat(0.0, 0.0)  # A UFloat is correlated with itself
-# y=UFloat(10.0, 1.0)
-# x-y=UFloat(0.0, 1.4142135623730951)  # Two distinct UFloats are not correlated unless they have the same Uncertainty Atoms
-# z=UFloat(20.0, 2.0)
-# x*z=UFloat(200.0, 28.284271247461902)
-# x/z=UFloat(0.5, 0.07071067811865477)
-# x**z=UFloat(1e+20, 5.0207163276303525e+20)
-# usin(x)=UFloat(-0.5440211108893698, 0.8390715289860964)  # We can UFloat-ify complex functions
-
-
-
-import numpy as np
-arr = np.array([x, y, z])
-print(np.mean(arr))
