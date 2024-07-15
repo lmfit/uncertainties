@@ -89,9 +89,6 @@ class UFloat:
             self.uncertainty_lin_combo = uncertainty
         self.tag = tag
 
-    class dtype(object):
-        type = staticmethod(lambda value: value)
-
     @property
     def val(self: "UFloat") -> float:
         return self._val
@@ -139,6 +136,7 @@ class UFloat:
     def s(self: "UFloat") -> float:
         return self.std_dev
 
+
 SQRT_EPS = sqrt(sys.float_info.epsilon)
 
 
@@ -165,10 +163,10 @@ def numerical_partial_derivative(
     lower_bound_sig = sig.bind(*args, **kwargs)
     upper_bound_sig = sig.bind(*args, **kwargs)
 
-    for arg, val in lower_bound_sig.arguments.items():
-        if isinstance(val, UFloat):
-            lower_bound_sig.arguments[arg] = val.val
-            upper_bound_sig.arguments[arg] = val.val
+    for param, arg in lower_bound_sig.arguments.items():
+        if isinstance(arg, UFloat):
+            lower_bound_sig.arguments[param] = arg.val
+            upper_bound_sig.arguments[param] = arg.val
 
     target_param_name = get_param_name(sig, target_param)
 
@@ -227,10 +225,12 @@ class ToUFunc:
             deriv_func_dict: DerivFuncDict = None,
     ):
         self.ufloat_params = ufloat_params
+
         if deriv_func_dict is None:
-            deriv_func_dict = {
-                ufloat_param: None for ufloat_param in self.ufloat_params
-            }
+            deriv_func_dict = {}
+        for ufloat_param in ufloat_params:
+            if ufloat_param not in deriv_func_dict:
+                deriv_func_dict[ufloat_param] = None
         self.deriv_func_dict: DerivFuncDict = deriv_func_dict
 
     def __call__(self, f: Callable[..., float]):
@@ -238,11 +238,6 @@ class ToUFunc:
 
         @wraps(f)
         def wrapped(*args, **kwargs):
-            """
-            Calculate the
-            """
-            unc_linear_combo = []
-            bound = sig.bind(*args, **kwargs)
             float_bound = sig.bind(*args, **kwargs)
 
             return_u_val = False
@@ -257,11 +252,12 @@ class ToUFunc:
             if not return_u_val:
                 return new_val
 
+            ufloat_bound = sig.bind(*args, **kwargs)
+            new_uncertainty_lin_combo = []
             for u_float_param in self.ufloat_params:
                 u_float_param_name = get_param_name(sig, u_float_param)
-                arg = bound.arguments[u_float_param_name]
+                arg = ufloat_bound.arguments[u_float_param_name]
                 if isinstance(arg, UFloat):
-                    sub_unc_linear_combo = arg.uncertainty_lin_combo
                     deriv_func = self.deriv_func_dict[u_float_param]
                     if deriv_func is None:
                         derivative = numerical_partial_derivative(
@@ -273,9 +269,11 @@ class ToUFunc:
                     else:
                         derivative = deriv_func(*float_bound.args, **float_bound.kwargs)
 
-                    unc_linear_combo.append((sub_unc_linear_combo, derivative))
+                    new_uncertainty_lin_combo.append(
+                        (arg.uncertainty_lin_combo, derivative)
+                    )
 
-            unc_linear_combo = tuple(unc_linear_combo)
+            unc_linear_combo = tuple(new_uncertainty_lin_combo)
             return UFloat(new_val, unc_linear_combo)
 
         return wrapped
@@ -293,24 +291,27 @@ def func_str_to_positional_func(func_str, nargs):
     return pos_func
 
 
-def deriv_func_dict_positional_helper(deriv_funcs):
-    if not isinstance(deriv_funcs, tuple):
-        raise ValueError(f'deriv_funcs must be a tuple, not \"{deriv_funcs}\".')
+PositionalDerivFunc = Union[Callable[..., float], str]
 
+
+def deriv_func_dict_positional_helper(
+        deriv_funcs: Tuple[Optional[PositionalDerivFunc]],
+):
     nargs = len(deriv_funcs)
     deriv_func_dict = {}
 
     for arg_num, deriv_func in enumerate(deriv_funcs):
-        if isinstance(deriv_func, str):
-            deriv_func = func_str_to_positional_func(deriv_func, nargs)
-        elif deriv_func is None:
+        if deriv_func is None:
             pass
+        elif callable(deriv_func):
+            pass
+        elif isinstance(deriv_func, str):
+            deriv_func = func_str_to_positional_func(deriv_func, nargs)
         else:
-            if not callable(deriv_func):
-                raise ValueError(
-                    f'Derivative functions must be callable or strings. Not '
-                    f'{deriv_func}.'
-                )
+            raise ValueError(
+                f'Invalid deriv_func: {deriv_func}. Must be None, callable, or a '
+                f'string.'
+            )
         deriv_func_dict[arg_num] = deriv_func
     return deriv_func_dict
 
@@ -324,7 +325,7 @@ class ToUFuncPositional(ToUFunc):
     we just pass a list of derivative functions. Each derivative function can either be
     a callable of a function string like '-x/y**2'.
     """
-    def __init__(self, deriv_funcs: tuple[Callable[..., float]]):
+    def __init__(self, deriv_funcs: Tuple[Optional[PositionalDerivFunc]]):
         ufloat_params = tuple(range(len(deriv_funcs)))
         deriv_func_dict = deriv_func_dict_positional_helper(deriv_funcs)
         super().__init__(ufloat_params, deriv_func_dict)
@@ -376,9 +377,11 @@ add_float_funcs_to_uvalue()
 def ufloat(val, unc, tag=None):
     return UFloat(val, unc, tag)
 
+
 def ufloat_fromstr(string, tag=None):
     (nom, std) = str_to_number_with_uncert(string.strip())
     return ufloat(nom, std, tag)
+
 
 """
 ^^^
