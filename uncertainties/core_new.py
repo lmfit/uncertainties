@@ -412,7 +412,7 @@ def add_float_funcs_to_uvalue():
         '__sub__': ('1', '-1'),
         '__rsub__': ('-1', '1'),  # Note reversed order
         '__mul__': ('y', 'x'),
-        '__rmul__': ('y', 'x'),  # Note reversed order
+        '__rmul__': ('y', 'x'),
         '__truediv__': ('1/y', '-x/y**2'),
         '__rtruediv__': ('-x/y**2', '1/y'),  # Note reversed order
         '__floordiv__': ('0', '0'),  # ?
