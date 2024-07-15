@@ -5,7 +5,7 @@ import random  # noqa
 from math import isnan
 
 import uncertainties.core as uncert_core
-from uncertainties.core_new import ufloat, UFloat as AffineScalarFunc, ufloat_fromstr
+from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr
 from uncertainties import formatting
 from uncertainties import umath
 from helpers import (
@@ -108,8 +108,8 @@ def test_ufloat_fromstr():
         # NaN value:
         "nan+/-3.14e2": (float("nan"), 314),
         # "Double-floats"
-        # "(-3.1415 +/- 1e-4)e+200": (-3.1415e200, 1e196),
-        # "(-3.1415e-10 +/- 1e-4)e+200": (-3.1415e190, 1e196),
+        "(-3.1415 +/- 1e-4)e+200": (-3.1415e200, 1e196),
+        "(-3.1415e-10 +/- 1e-4)e+200": (-3.1415e190, 1e196),
         # Special float representation:
         "-3(0.)": (-3, 0),
     }
