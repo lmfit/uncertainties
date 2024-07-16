@@ -26,6 +26,24 @@ class UncertaintyAtom:
     uuid: uuid.UUID = field(default_factory=uuid.uuid4, init=False)
 
 
+"""
+UncertaintyCombo represents a (possibly nested) linear superposition of 
+UncertaintyAtoms. The UncertaintyCombo is an n-tuple of terms in the linear 
+superposition and each term is represented by a 2-tuple. The second element of the
+2-tuple is the weight of that term. The first element is either an UncertaintyAtom or
+another UncertaintyCombo. In the latter case the original UncertaintyCombo is nested.
+
+By passing the weights through the linear combinations and collecting like terms, any 
+UncertaintyCombo can be expanded into a form where each term is an UncertaintyAtom. This
+would be an ExpandedUncertaintyCombo.
+
+Nested UncertaintyCombos are supported as a performance optimization. There is a
+cost to expanding linear combinations during uncertainty propagation calculations. 
+Supporting nested UncertaintyCombos allows expansion to be deferred through intermediate
+calculations until a standard deviation or correlation must be calculated at the end of
+an error propagation calculation.
+"""
+# TODO: How much does this optimization quantitatively improve performance?
 UncertaintyCombo = Tuple[
     Tuple[
         Union[UncertaintyAtom, "UncertaintyCombo"],
@@ -33,7 +51,7 @@ UncertaintyCombo = Tuple[
     ],
     ...
 ]
-UncertaintyComboExpanded = Tuple[
+ExpandedUncertaintyCombo = Tuple[
     Tuple[
         UncertaintyAtom,
         float
@@ -43,13 +61,10 @@ UncertaintyComboExpanded = Tuple[
 
 
 @lru_cache
-def get_expanded_combo(combo: UncertaintyCombo) -> UncertaintyComboExpanded:
+def get_expanded_combo(combo: UncertaintyCombo) -> ExpandedUncertaintyCombo:
     """
-    Recursively expand a linear combination of uncertainties out into the base atoms.
-    It is a performance optimization to sometimes store unexpanded linear combinations.
-    For example, there may be a long calculation involving many layers of UFloat
-    manipulations. We need not expand the linear combination until the end when a
-    calculation of a standard deviation on a UFloat is requested.
+    Recursively expand a nested UncertaintyCombo into an ExpandedUncertaintyCombo whose
+    terms all represent weighted UncertaintyAtoms.
     """
     expanded_dict = defaultdict(float)
     for combo, combo_weight in combo:
@@ -71,12 +86,12 @@ def get_expanded_combo(combo: UncertaintyCombo) -> UncertaintyComboExpanded:
 
 class UFloat:
     """
-    Core class. Stores a mean value (val, nominal_value, n) and an uncertainty stored
+    Core class. Stores a mean value (value, nominal_value, n) and an uncertainty stored
     as a (possibly unexpanded) linear combination of uncertainty atoms. Two UFloat's
     which share non-zero weight for a certain uncertainty atom are correlated.
 
     UFloats can be combined using arithmetic and more sophisticated mathematical
-    operations. The uncertainty is propagation using rules of linear uncertainty
+    operations. The uncertainty is propagtaed using the rules of linear uncertainty
     propagation.
     """
     def __init__(
