@@ -60,7 +60,7 @@ ExpandedUncertaintyCombo = Tuple[
 ]
 
 
-@lru_cache
+@lru_cache(maxsize=None)
 def get_expanded_combo(combo: UncertaintyCombo) -> ExpandedUncertaintyCombo:
     """
     Recursively expand a nested UncertaintyCombo into an ExpandedUncertaintyCombo whose
@@ -82,6 +82,20 @@ def get_expanded_combo(combo: UncertaintyCombo) -> ExpandedUncertaintyCombo:
         pruned_expanded_dict[atom] = weight
 
     return tuple((atom, weight) for atom, weight in pruned_expanded_dict.items())
+
+
+@lru_cache(maxsize=None)
+def get_std_dev(combo: UncertaintyCombo) -> float:
+    """
+    Get the standard deviation corresponding to an UncertaintyCombo. The UncertainyCombo
+    is expanded and the weighted UncertaintyAtoms are added in quadrature.
+    """
+    expanded_combo = get_expanded_combo(combo)
+    list_of_squares = [
+        (weight*atom.std_dev)**2 for atom, weight in expanded_combo
+    ]
+    std_dev = sqrt(sum(list_of_squares))
+    return std_dev
 
 
 class UFloat:
@@ -116,21 +130,7 @@ class UFloat:
 
     @property
     def std_dev(self: "UFloat") -> float:
-        # TODO: It would be interesting to memoize/cache this result. However, if we
-        #   stored this result as an instance attribute that would qualify as a mutation
-        #   of the object and have implications for hashability. For example, two UFloat
-        #   objects might have different uncertainty_lin_combo, but when expanded
-        #   they're the same so that the std_dev and even correlations with other UFloat
-        #   are the same. Should these two have the same hash? My opinion is no.
-        #   I think a good path forward could be to cache this as an instance attribute
-        #   nonetheless, but to not include the std_dev in the hash. Also equality would
-        #   be based on equality of uncertainty_lin_combo, not equality of std_dev.
-        expanded_lin_combo = get_expanded_combo(self.uncertainty_lin_combo)
-        list_of_squares = [
-            (weight * atom.std_dev)**2 for atom, weight in expanded_lin_combo
-        ]
-        std_dev = sqrt(sum(list_of_squares))
-        return std_dev
+        return get_std_dev(self.uncertainty_lin_combo)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.val}, {self.std_dev})'
