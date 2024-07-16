@@ -69,26 +69,6 @@ def get_expanded_combo(combo: UncertaintyCombo) -> UncertaintyComboExpanded:
     return tuple((atom, weight) for atom, weight in pruned_expanded_dict.items())
 
 
-# class UFloatBinOp:
-#     def __init__(self, bin_op_str):
-#         self.bin_op_str = bin_op_str
-#
-#     def __call__(self, bin_op):
-#         @wraps(bin_op)
-#         def ufloat_bin_op(first, second):
-#             if isinstance(second, UFloat):
-#                 return bin_op(first.val, second.val)
-#             elif isinstance(second, Real):
-#                 return bin_op(first.val, float(second))
-#             else:
-#                 pass
-#                 # raise TypeError(
-#                 #     f'\'{self.bin_op_str}\' not supported between instances of '
-#                 #     f'\'UFloat\' and \'{type(second)}\''
-#                 # )
-#         return ufloat_bin_op
-
-
 class UFloat:
     """
     Core class. Stores a mean value (val, nominal_value, n) and an uncertainty stored
@@ -137,44 +117,6 @@ class UFloat:
         std_dev = sqrt(sum(list_of_squares))
         return std_dev
 
-    def __eq__(self: "UFloat", other: "UFloat") -> bool:
-        if not isinstance(other, UFloat):
-            return False
-        val_eq = self.val == other.val
-
-        self_expanded_linear_combo = get_expanded_combo(self.uncertainty_lin_combo)
-        other_expanded_linear_combo = get_expanded_combo(other.uncertainty_lin_combo)
-        uncertainty_eq = self_expanded_linear_combo == other_expanded_linear_combo
-        return val_eq and uncertainty_eq
-    #
-    # TODO: UFloat shouldn't implement binary comparison operators. The easy way to do
-    #   it would be to have the operators [==, !=, >, >=, <, <=] all do direct
-    #   comparisons on UFloat.val. But then we would have
-    #     ufloat(1, 1) - ufloat(1, 1) == ufloat(0, 0)
-    #   which I don't think is totally appropriate since the lefthand side has
-    #   non-zero uncertainty due to the lack of correlations. But if __eq__ depends on
-    #   both val and uncertainty_lin_combo it's impossible to define a total order on
-    #   UFloat. We could define [>, <] to depend only on UFloat.val, but it would be
-    #   impossible to define [>=, <=] in a way that respects both [>, <] that depend
-    #   only on val AND respects [==, !=] which depend on val and uncertainty_lin_combo.
-
-    #
-    # @UFloatBinOp('>')
-    # def __gt__(self, other):
-    #     return self > other
-    #
-    # @UFloatBinOp('>=')
-    # def __ge__(self, other):
-    #     return self >= other
-    #
-    # @UFloatBinOp('<')
-    # def __lt__(self, other):
-    #     return self < other
-    #
-    # @UFloatBinOp('<=')
-    # def __le__(self, other):
-    #     return self <= other
-
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.val}, {self.std_dev})'
 
@@ -193,6 +135,48 @@ class UFloat:
     @property
     def s(self: "UFloat") -> float:
         return self.std_dev
+
+    def __eq__(self: "UFloat", other: "UFloat") -> bool:
+        if not isinstance(other, UFloat):
+            return False
+        val_eq = self.val == other.val
+
+        self_expanded_linear_combo = get_expanded_combo(self.uncertainty_lin_combo)
+        other_expanded_linear_combo = get_expanded_combo(other.uncertainty_lin_combo)
+        uncertainty_eq = self_expanded_linear_combo == other_expanded_linear_combo
+        return val_eq and uncertainty_eq
+
+    def __pos__(self: "UFloat") -> "UFloat": ...
+
+    def __neg__(self: "UFloat") -> "UFloat": ...
+
+    def __abs__(self: "UFloat") -> "UFloat": ...
+
+    def __trunc__(self: "UFloat") -> "UFloat": ...
+
+    def __add__(self: "UFloat", other: Union["UFloat", Real]) -> "UFloat": ...
+
+    def __radd__(self: "UFloat", other: Union["UFloat", Real]) -> "UFloat": ...
+
+    def __sub__(self: "UFloat", other: Union["UFloat", Real]) -> "UFloat": ...
+
+    def __rsub__(self: "UFloat", other: Union["UFloat", Real]) -> "UFloat": ...
+
+    def __mul__(self: "UFloat", other: Union["UFloat", Real]) -> "UFloat": ...
+
+    def __rmul__(self: "UFloat", other: Union["UFloat", Real]) -> "UFloat": ...
+
+    def __truediv__(self: "UFloat", other: Union["UFloat", Real]) -> "UFloat": ...
+
+    def __rtruediv__(self: "UFloat", other: Union["UFloat", Real]) -> "UFloat": ...
+
+    def __pow__(self: "UFloat", other: Union["UFloat", Real]) -> "UFloat": ...
+
+    def __rpow__(self: "UFloat", other: Union["UFloat", Real]) -> "UFloat": ...
+
+    def __mod__(self: "UFloat", other: Union["UFloat", Real]) -> "UFloat": ...
+
+    def __rmod__(self: "UFloat", other: Union["UFloat", Real]) -> "UFloat": ...
 
 
 SQRT_EPS = sqrt(sys.float_info.epsilon)
