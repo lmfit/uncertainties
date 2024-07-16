@@ -10,8 +10,6 @@ import sys
 from typing import Callable, Collection, Dict, Optional, Tuple, Union, TYPE_CHECKING
 import uuid
 
-from uncertainties.parsing import str_to_number_with_uncert
-
 if TYPE_CHECKING:
     from inspect import Signature
 
@@ -220,11 +218,6 @@ def numerical_partial_derivative(
     lower_bound_sig = sig.bind(*args, **kwargs)
     upper_bound_sig = sig.bind(*args, **kwargs)
 
-    for param, arg in lower_bound_sig.arguments.items():
-        if isinstance(arg, UFloat):
-            lower_bound_sig.arguments[param] = arg.val
-            upper_bound_sig.arguments[param] = arg.val
-
     target_param_name = get_param_name(sig, target_param)
 
     x = lower_bound_sig.arguments[target_param_name]
@@ -309,8 +302,8 @@ class ToUFunc:
                         derivative = numerical_partial_derivative(
                             f,
                             u_float_param_name,
-                            *args,
-                            **kwargs,
+                            *float_bound.args,
+                            **float_bound.kwargs,
                         )
                     else:
                         derivative = deriv_func(*float_bound.args, **float_bound.kwargs)
@@ -319,19 +312,18 @@ class ToUFunc:
                         (arg.uncertainty_lin_combo, derivative)
                     )
 
-            unc_linear_combo = tuple(new_uncertainty_lin_combo)
-            return UFloat(new_val, unc_linear_combo)
+            new_uncertainty_lin_combo = tuple(new_uncertainty_lin_combo)
+            return UFloat(new_val, new_uncertainty_lin_combo)
 
         return wrapped
 
 
-# noinspection PyUnusedLocal
 def func_str_to_positional_func(func_str, nargs):
     if nargs == 1:
-        def pos_func(x):
+        def pos_func(x):  # noqa
             return eval(func_str)
     elif nargs == 2:
-        def pos_func(x, y):
+        def pos_func(x, y):  # noqa
             return eval(func_str)
     else:
         raise ValueError(f'Only nargs=1 or nargs=2 is supported, not {nargs=}.')
@@ -365,12 +357,17 @@ def deriv_func_dict_positional_helper(
 
 class ToUFuncPositional(ToUFunc):
     """
-    Helper decorator for decorating a function to be UFloat compatible when only
-    positional arguments are being converted. Instead of passing a list of parameter
-    specifiers (names or number of parameters) and a dict of
-    parameter specifiers : derivative functions
-    we just pass a list of derivative functions. Each derivative function can either be
-    a callable of a function string like '-x/y**2'.
+    Helper decorator for ToUFunc for functions which accept one or two floats as
+    positional input parameters and return a float.
+
+    :param deriv_funcs: List of functions or strings specifying a custom partial
+      derivative function for each parameter of the wrapped function. There must be an
+      element in the list for every parameter of the wrapped function. Elements of the
+      list can be callable functions with the same number of positional arguments
+      as the wrapped function. They can also be string representations of functions such
+      as 'x', 'y', '1/y', '-x/y**2' etc. Unary functions should use 'x' as the parameter
+      and binary functions should use 'x' and 'y' as the two parameters respectively.
+      An entry of None will cause the partial derivative to be calculated numerically.
     """
     def __init__(self, deriv_funcs: Tuple[Optional[PositionalDerivFunc]]):
         ufloat_params = tuple(range(len(deriv_funcs)))
@@ -380,17 +377,13 @@ class ToUFuncPositional(ToUFunc):
 
 def add_float_funcs_to_uvalue():
     """
-    Monkey-patch common float instance methods over to UFloat
-
-    Here I use a notation involving x and y which is parsed by
-    resolve_deriv_func_dict_from_func_str_list. This is a compact way to specify the
-    formulas to calculate the partial derivatives of binary and unary functions.
-
-    # TODO: There's a bit of complexity added by allowing analytic derivative function
-    #   in addition to the default numerical derivative function. It would be
-    #   interesting to see performance differences between the two methods. Is the
-    #   added complexity *actually* buying performance?
+    Monkey-patch common float operations from the float class over to the UFloat class
+    using the ToUFuncPositional decorator.
     """
+    # TODO: There is some additional complexity added by allowing analytic derivative
+    #   functions instead of taking numerical derivatives for all functions. It would
+    #   be interesting to benchmark the different approaches and see if the additional
+    #   complexity is worth the performance.
     float_funcs_dict = {
         '__abs__': ('abs(x)/x',),
         '__pos__': ('1',),
@@ -423,8 +416,3 @@ add_float_funcs_to_uvalue()
 
 def ufloat(val, unc, tag=None):
     return UFloat(val, unc, tag)
-
-
-def ufloat_fromstr(string, tag=None):
-    (nom, std) = str_to_number_with_uncert(string.strip())
-    return ufloat(nom, std, tag)
