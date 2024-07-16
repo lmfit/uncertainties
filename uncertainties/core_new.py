@@ -233,33 +233,22 @@ DerivFuncDict = Optional[Dict[ParamSpecifier, Optional[Callable[..., float]]]]
 
 class ToUFunc:
     """
-    Decorator to convert a function which typically accepts float inputs into a function
-    which accepts UFloat inputs.
+    Decorator which converts a function which accepts real numbers and returns a real
+    number into a function which accepts UFloats and returns a UFloat. The returned
+    UFloat will have the same value as if the original function had been called using
+    the values of the input UFloats. But, additionally, it will have an uncertainty
+    corresponding to the square root of the sum of squares of the uncertainties of the
+    input UFloats weighted by the partial derivatives of the original function with
+    respect to the corresponding input parameters.
 
-    >>> @ToUFunc(('x', 'y'))
-    >>> def multiply(x, y, print_str='print this string!', do_print=False):
-    ...     if do_print:
-    ...         print(print_str)
-    ...     return x * y
-
-    Pass in a list of parameter names which correspond to float inputs that should now
-    accept UFloat inputs.
-
-    To calculate the output nominal value the decorator replaces all float inputs with
-    their respective nominal values and evaluates the function directly.
-
-    To calculate the output uncertainty linear combination the decorator calculates the
-    partial derivative of the function with respect to each UFloat entry and appends the
-    uncertainty linear combination corresponding to that UFloat, weighted by the
-    corresponding partial derivative.
-
-    The partial derivative is evaluated numerically by default using the
-    partial_derivative() function. However, the user can optionaly pass in
-    deriv_func_dict which maps each u_float parameter to a function that will calculate
-    the partial derivative given *args and **kwargs supplied to the converted function.
-    This latter approach may provide performance optimizations when it is faster to
-    use an analytic formula to evaluate the partial derivative than the numerical
-    calculation.
+    :param ufloat_params: Collection of strings or integers indicating the name or
+      position index of the parameters which will be made to accept UFloat.
+    :param deriv_func_dict: Dictionary mapping parameters specified in ufloat_params to
+      functions that return the partial derivatives of the decorated function with
+      respect to the corresponding parameter. The partial derivative functions should
+      have the same signature as the decorated function. If any ufloat param is absent
+      or is mapped to ``None`` then the partial derivatives will be evaluated
+      numerically.
     """
     def __init__(
             self,
@@ -321,6 +310,7 @@ class ToUFunc:
         return wrapped
 
 
+# noinspection PyUnusedLocal
 def func_str_to_positional_func(func_str, nargs):
     if nargs == 1:
         def pos_func(x):
