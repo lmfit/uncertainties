@@ -392,13 +392,13 @@ def add_float_funcs_to_uvalue():
         '__add__': ('1', '1'),
         '__radd__': ('1', '1'),
         '__sub__': ('1', '-1'),
-        '__rsub__': ('-1', '1'),  # Note reversed order
+        '__rsub__': ('-1', '1'),  # Reversed order __rsub__(x, y) = y - x
         '__mul__': ('y', 'x'),
         '__rmul__': ('y', 'x'),
         '__truediv__': ('1/y', '-x/y**2'),
-        '__rtruediv__': ('-x/y**2', '1/y'),  # Note reversed order
-        '__floordiv__': ('0', '0'),  # ?
-        '__rfloordiv__': ('0', '0'),  # ?
+        '__rtruediv__': ('-x/y**2', '1/y'),  # reversed order __rtruediv__(x, y) = y/x
+        '__floordiv__': ('0', '0'),
+        '__rfloordiv__': ('0', '0'),
         '__pow__': (None, None),  # TODO: add these, see `uncertainties` source
         '__rpow__': (None, None),
         '__mod__': (None, None),
