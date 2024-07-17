@@ -45,7 +45,7 @@ def erfc(value: UReal) -> UReal: ...
 def exp(value: UReal) -> UReal: ...
 
 
-# def log(value: UReal) -> UReal: ...
+def log(value: UReal) -> UReal: ...
 
 
 def log10(value: UReal) -> UReal: ...
@@ -95,7 +95,7 @@ deriv_dict = {
     "erf": ("(2/math.sqrt(math.pi))*math.exp(-(x**2))",),
     "erfc": ("-(2/math.sqrt(math.pi))*math.exp(-(x**2))",),
     "exp": ("math.exp(x)",),
-    # "log": (log_der0, "-math.log(x, y) / y / math.log(y)"),
+    "log": (log_der0, "-math.log(x, y) / y / math.log(y)"),
     "log10": ("1/x/math.log(10)",),
     "radians": ("math.radians(1)",),
     "sin": ("math.cos(x)",),

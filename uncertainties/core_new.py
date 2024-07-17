@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass, field
 from functools import lru_cache, wraps
-import inspect
 from math import sqrt, isnan
 from numbers import Real
 import sys
@@ -218,22 +217,38 @@ def numerical_partial_derivative(
     target_param (string name or position number of the float parameter to f to be
     varied) holding all other arguments, *args and **kwargs, constant.
     """
-    sig = inspect.signature(f)
-    lower_bound_sig = sig.bind(*args, **kwargs)
-    upper_bound_sig = sig.bind(*args, **kwargs)
-
-    target_param_name = get_param_name(sig, target_param)
-
-    x = lower_bound_sig.arguments[target_param_name]
+    if isinstance(target_param, int):
+        x = args[target_param]
+    else:
+        x = kwargs[target_param]
     dx = abs(x) * SQRT_EPS  # Numerical Recipes 3rd Edition, eq. 5.7.5
 
-    # Inject x - dx into target_param and evaluate f
-    lower_bound_sig.arguments[target_param_name] = x - dx
-    lower_y = f(*lower_bound_sig.args, **lower_bound_sig.kwargs)
+    # TODO: The construction below could be simplied using inspect.signature. However,
+    #   the math.log, and other math functions do not yet (as of python 3.12) work with
+    #   inspect.signature. Therefore, we need to manually loop of args and kwargs.
+    #   Monitor https://github.com/python/cpython/pull/117671
+    lower_args = []
+    upper_args = []
+    for idx, arg in enumerate(args):
+        if idx == target_param:
+            lower_args.append(x - dx)
+            upper_args.append(x + dx)
+        else:
+            lower_args.append(arg)
+            upper_args.append(arg)
 
-    # Inject x + dx into target_param and evaluate f
-    upper_bound_sig.arguments[target_param_name] = x + dx
-    upper_y = f(*upper_bound_sig.args, **upper_bound_sig.kwargs)
+    lower_kwargs = {}
+    upper_kwargs = {}
+    for key, arg in kwargs.items():
+        if key == target_param:
+            lower_kwargs[key] = x - dx
+            upper_kwargs[key] = x + dx
+        else:
+            lower_kwargs[key] = arg
+            upper_kwargs[key] = arg
+
+    lower_y = f(*lower_args, **lower_kwargs)
+    upper_y = f(*upper_args, **upper_kwargs)
 
     derivative = (upper_y - lower_y) / (2 * dx)
     return derivative
@@ -277,40 +292,59 @@ class ToUFunc:
         self.deriv_func_dict: DerivFuncDict = deriv_func_dict
 
     def __call__(self, f: Callable[..., float]):
-        sig = inspect.signature(f)
+        # sig = inspect.signature(f)
 
         @wraps(f)
         def wrapped(*args, **kwargs):
-            float_bound = sig.bind(*args, **kwargs)
-
+            # TODO: The construction below could be simplied using inspect.signature.
+            #   However, the math.log, and other math functions do not yet
+            #   (as of python 3.12) work with inspect.signature. Therefore, we need to
+            #   manually loop of args and kwargs.
+            #   Monitor https://github.com/python/cpython/pull/117671
             return_u_val = False
-            for param, param_val in float_bound.arguments.items():
-                if isinstance(param_val, UFloat):
-                    float_bound.arguments[param] = param_val.val
+            float_args = []
+            for arg in args:
+                if isinstance(arg, UFloat):
+                    float_args.append(arg.val)
                     return_u_val = True
-                elif isinstance(param_val, Real):
-                    float_bound.arguments[param] = float(param_val)
+                else:
+                    float_args.append(arg)
+            float_kwargs = {}
+            for key, arg in kwargs.items():
+                if isinstance(arg, UFloat):
+                    float_kwargs[key] = arg.val
+                    return_u_val = True
+                else:
+                    float_kwargs[key] = arg
 
-            new_val = f(*float_bound.args, **float_bound.kwargs)
+            new_val = f(*float_args, **float_kwargs)
+
             if not return_u_val:
                 return new_val
 
-            ufloat_bound = sig.bind(*args, **kwargs)
             new_uncertainty_lin_combo = []
             for u_float_param in self.ufloat_params:
-                u_float_param_name = get_param_name(sig, u_float_param)
-                arg = ufloat_bound.arguments[u_float_param_name]
+                if isinstance(u_float_param, int):
+                    try:
+                        arg = args[u_float_param]
+                    except IndexError:
+                        continue
+                else:
+                    try:
+                        arg = kwargs[u_float_param]
+                    except KeyError:
+                        continue
                 if isinstance(arg, UFloat):
                     deriv_func = self.deriv_func_dict[u_float_param]
                     if deriv_func is None:
                         derivative = numerical_partial_derivative(
                             f,
-                            u_float_param_name,
-                            *float_bound.args,
-                            **float_bound.kwargs,
+                            u_float_param,
+                            *float_args,
+                            **float_kwargs,
                         )
                     else:
-                        derivative = deriv_func(*float_bound.args, **float_bound.kwargs)
+                        derivative = deriv_func(*float_args, **float_kwargs)
 
                     new_uncertainty_lin_combo.append(
                         (arg.uncertainty_lin_combo, derivative)
