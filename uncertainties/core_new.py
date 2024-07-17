@@ -7,7 +7,7 @@ import inspect
 from math import sqrt, isnan
 from numbers import Real
 import sys
-from typing import Callable, Collection, Dict, Optional, Tuple, Union, TYPE_CHECKING
+from typing import Any, Callable, Collection, Dict, Optional, Tuple, Union, TYPE_CHECKING
 import uuid
 
 if TYPE_CHECKING:
@@ -322,13 +322,18 @@ class ToUFunc:
         return wrapped
 
 
-def func_str_to_positional_func(func_str, nargs):
+def func_str_to_positional_func(func_str, nargs, eval_locals=None):
+    if eval_locals is None:
+        eval_locals = {}
     if nargs == 1:
-        def pos_func(x):  # noqa
-            return eval(func_str)
+        def pos_func(x):
+            eval_locals['x'] = x
+            return eval(func_str, None, eval_locals)
     elif nargs == 2:
-        def pos_func(x, y):  # noqa
-            return eval(func_str)
+        def pos_func(x, y):
+            eval_locals['x'] = x
+            eval_locals['y'] = y
+            return eval(func_str, None, eval_locals)
     else:
         raise ValueError(f'Only nargs=1 or nargs=2 is supported, not {nargs=}.')
     return pos_func
@@ -339,6 +344,7 @@ PositionalDerivFunc = Union[Callable[..., float], str]
 
 def deriv_func_dict_positional_helper(
         deriv_funcs: Tuple[Optional[PositionalDerivFunc]],
+        eval_locals=None,
 ):
     nargs = len(deriv_funcs)
     deriv_func_dict = {}
@@ -349,7 +355,7 @@ def deriv_func_dict_positional_helper(
         elif callable(deriv_func):
             pass
         elif isinstance(deriv_func, str):
-            deriv_func = func_str_to_positional_func(deriv_func, nargs)
+            deriv_func = func_str_to_positional_func(deriv_func, nargs, eval_locals)
         else:
             raise ValueError(
                 f'Invalid deriv_func: {deriv_func}. Must be None, callable, or a '
@@ -373,9 +379,13 @@ class ToUFuncPositional(ToUFunc):
       and binary functions should use 'x' and 'y' as the two parameters respectively.
       An entry of None will cause the partial derivative to be calculated numerically.
     """
-    def __init__(self, deriv_funcs: Tuple[Optional[PositionalDerivFunc]]):
+    def __init__(
+            self,
+            deriv_funcs: Tuple[Optional[PositionalDerivFunc]],
+            eval_locals: Optional[Dict[str, Any]] = None,
+    ):
         ufloat_params = tuple(range(len(deriv_funcs)))
-        deriv_func_dict = deriv_func_dict_positional_helper(deriv_funcs)
+        deriv_func_dict = deriv_func_dict_positional_helper(deriv_funcs, eval_locals)
         super().__init__(ufloat_params, deriv_func_dict)
 
 
