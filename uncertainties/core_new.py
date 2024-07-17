@@ -115,6 +115,10 @@ class UFloat:
     ):
         self._val = float(value)
         if isinstance(uncertainty, Real):
+            if uncertainty < 0:
+                raise ValueError(
+                    f'Uncertainty must be non-negative, not {uncertainty}.'
+                )
             atom = UncertaintyAtom(float(uncertainty))
             uncertainty_combo = ((atom, 1.0),)
             self.uncertainty_lin_combo = uncertainty_combo

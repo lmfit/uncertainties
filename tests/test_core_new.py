@@ -148,3 +148,8 @@ bool_val_cases = [
 )
 def test_bool(unum: UFloat, bool_val: bool):
     assert bool(unum) is bool_val
+
+
+def test_negative_std():
+    with pytest.raises(ValueError, match=r'Uncertainty must be non-negative'):
+        unum = UFloat(-1.0, -1.0)
