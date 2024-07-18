@@ -87,7 +87,7 @@ deriv_dict = {
     "acosh": ("1/math.sqrt(x**2-1)",),
     "asinh": ("1/math.sqrt(1+x**2)",),
     "atan": ("1/(1+x**2)",),
-    "atan2": ('x/(x**2+y**2)', "-y/(x**2+y**2)"),
+    "atan2": ('y/(x**2+y**2)', "-x/(x**2+y**2)"),
     "atanh": ("1/(1-x**2)",),
     "cos": ("-math.sin(x)",),
     "cosh": ("math.sinh(x)",),
