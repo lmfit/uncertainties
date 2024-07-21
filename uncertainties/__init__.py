@@ -221,12 +221,16 @@ for bug reports, feature requests, or feedback.
 This software is released under the BSD license.
 """
 
+import importlib.metadata
+import packaging.version
+
+
 from .core import *  # noqa
 from .core import __all__  # noqa For a correct help(uncertainties)
 
-from .version import __version__, __version_tuple__  # noqa
 
-# for backward compatibility
-__version_info__ = __version_tuple__
+__version__ = importlib.metadata.version('uncertainties')
+__version_info__ = packaging.version.Version(__version__).release
+
 
 __author__ = "Eric O. LEBIGOT (EOL) <eric.lebigot@normalesup.org>"
