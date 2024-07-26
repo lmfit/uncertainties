@@ -1,6 +1,3 @@
-from math import isnan
-import sys
-
 import pytest
 
 from uncertainties import ufloat, ufloat_fromstr, formatting
@@ -68,7 +65,7 @@ formatting_cases = [  # (Nominal value, uncertainty): {format: result,...}
     # Full generalization of float formatting:
     (3.1415, 0.0001, "+09.2uf", "+03.14150+/-000.00010"),
     (3.1415, 0.0001, "*^+9.2uf", "+3.14150*+/-*0.00010*"),
-    (3.1415, 0.0001, ">9f", "  3.14150+/-  0.00010"), # Width and align
+    (3.1415, 0.0001, ">9f", "  3.14150+/-  0.00010"),  # Width and align
     # Number of digits of the uncertainty fixed:
     (123.456789, 0.00123, ".1uf", "123.457+/-0.001"),
     (123.456789, 0.00123, ".2uf", "123.4568+/-0.0012"),
@@ -164,14 +161,29 @@ formatting_cases = [  # (Nominal value, uncertainty): {format: result,...}
     (-1.2e-12, 0, "1L", r"-1.2 \times 10^{-12} \pm 0"),
     (-1.2e-12, 0, "SL", r"-1.2(0) \times 10^{-12}"),
     (-1.2e-12, 0, "SP", "-1.2(0)×10⁻¹²"),
-    (-1.2e-12, float("nan"), ".2uG", "(-1.2+/-%s)E-12" % NaN_EFG),  # u ignored, format used
+    (
+        -1.2e-12,
+        float("nan"),
+        ".2uG",
+        "(-1.2+/-%s)E-12" % NaN_EFG,
+    ),  # u ignored, format used
     (-1.2e-12, float("nan"), "15GS", "  -1.2(%s)E-12" % NaN_EFG),
     (-1.2e-12, float("nan"), "SL", r"-1.2(\mathrm{nan}) \times 10^{-12}"),  # LaTeX NaN
     # Pretty-print priority, but not for NaN:
     (-1.2e-12, float("nan"), "PSL", r"-1.2(\mathrm{nan})×10⁻¹²"),
-    (-1.2e-12, float("nan"), "L", r"\left(-1.2 \pm \mathrm{nan}\right) \times 10^{-12}"),
+    (
+        -1.2e-12,
+        float("nan"),
+        "L",
+        r"\left(-1.2 \pm \mathrm{nan}\right) \times 10^{-12}",
+    ),
     # Uppercase NaN and LaTeX:
-    (-1.2e-12, float("nan"), ".1EL", (r"\left(-1.2 \pm \mathrm{%s}\right) \times 10^{-12}" % NaN_EFG)),
+    (
+        -1.2e-12,
+        float("nan"),
+        ".1EL",
+        (r"\left(-1.2 \pm \mathrm{%s}\right) \times 10^{-12}" % NaN_EFG),
+    ),
     (-1.2e-12, float("nan"), "10", "  -1.2e-12+/-       nan"),
     (-1.2e-12, float("nan"), "15S", "  -1.2(nan)e-12"),
     # Character (Unicode) strings:
@@ -257,14 +269,34 @@ formatting_cases = [  # (Nominal value, uncertainty): {format: result,...}
     (float("nan"), 1e8, ".1e", "(nan+/-1.0)e+08"),
     (float("nan"), 1e8, ".1E", "(%s+/-1.0)E+08" % NaN_EFG),
     (float("nan"), 1e8, ".1ue", "(nan+/-1)e+08"),
-    (float("nan"), 1e8, "10.1e", "       nan+/-   1.0e+08"),  # 'nane+08' would be strange
+    (
+        float("nan"),
+        1e8,
+        "10.1e",
+        "       nan+/-   1.0e+08",
+    ),  # 'nane+08' would be strange
     # NaN *nominal value*
-    (float("nan"), 123456789, "", "nan+/-123456789.0"),  # Similar to '{}'.format(123456789.)
-    (float("nan"), 123456789, "g", "(nan+/-1.23457)e+08"),  # Similar to '{:g}'.format(123456789.)
+    (
+        float("nan"),
+        123456789,
+        "",
+        "nan+/-123456789.0",
+    ),  # Similar to '{}'.format(123456789.)
+    (
+        float("nan"),
+        123456789,
+        "g",
+        "(nan+/-1.23457)e+08",
+    ),  # Similar to '{:g}'.format(123456789.)
     (float("nan"), 123456789, ".1e", "(nan+/-1.2)e+08"),
     (float("nan"), 123456789, ".1E", "(%s+/-1.2)E+08" % NaN_EFG),
     (float("nan"), 123456789, ".1ue", "(nan+/-1)e+08"),
-    (float("nan"), 123456789, ".1ueL", r"\left(\mathrm{nan} \pm 1\right) \times 10^{8}"),
+    (
+        float("nan"),
+        123456789,
+        ".1ueL",
+        r"\left(\mathrm{nan} \pm 1\right) \times 10^{8}",
+    ),
     (float("nan"), 123456789, "10.1e", "       nan+/-   1.2e+08"),
     (float("nan"), 123456789, "10.1eL", r"\mathrm{nan} \pm 1.2 \times 10^{8}"),
     # *Double* NaN
@@ -272,7 +304,12 @@ formatting_cases = [  # (Nominal value, uncertainty): {format: result,...}
     (float("nan"), float("nan"), ".1e", "nan+/-nan"),
     (float("nan"), float("nan"), ".1E", "%s+/-%s" % (NaN_EFG, NaN_EFG)),
     (float("nan"), float("nan"), ".1ue", "nan+/-nan"),
-    (float("nan"), float("nan"), "EL", r"\mathrm{%s} \pm \mathrm{%s}" % (NaN_EFG, NaN_EFG)),
+    (
+        float("nan"),
+        float("nan"),
+        "EL",
+        r"\mathrm{%s} \pm \mathrm{%s}" % (NaN_EFG, NaN_EFG),
+    ),
     # Inf *nominal value*
     (float("inf"), 100, "", "inf+/-100.0"),  # Like '{}'.format(100.)
     (float("inf"), 100, "g", "inf+/-100"),  # Like '{:g}'.format(100.)
@@ -286,10 +323,25 @@ formatting_cases = [  # (Nominal value, uncertainty): {format: result,...}
     (float("inf"), 1e8, ".1e", "(inf+/-1.0)e+08"),
     (float("inf"), 1e8, ".1E", "(%s+/-1.0)E+08" % Inf_EFG),
     (float("inf"), 1e8, ".1ue", "(inf+/-1)e+08"),
-    (float("inf"), 1e8, "10.1e", "       inf+/-   1.0e+08"),  # 'infe+08' would be strange
+    (
+        float("inf"),
+        1e8,
+        "10.1e",
+        "       inf+/-   1.0e+08",
+    ),  # 'infe+08' would be strange
     # Inf *nominal value*
-    (float("inf"), 123456789, "", "inf+/-123456789.0"),  # Similar to '{}'.format(123456789.)
-    (float("inf"), 123456789, "g", "(inf+/-1.23457)e+08"),  # Similar to '{:g}'.format(123456789.)
+    (
+        float("inf"),
+        123456789,
+        "",
+        "inf+/-123456789.0",
+    ),  # Similar to '{}'.format(123456789.)
+    (
+        float("inf"),
+        123456789,
+        "g",
+        "(inf+/-1.23457)e+08",
+    ),  # Similar to '{:g}'.format(123456789.)
     (float("inf"), 123456789, ".1e", "(inf+/-1.2)e+08"),
     (float("inf"), 123456789, ".1ep", "(inf+/-1.2)e+08"),
     (float("inf"), 123456789, ".1E", "(%s+/-1.2)E+08" % Inf_EFG),
@@ -319,10 +371,25 @@ formatting_cases = [  # (Nominal value, uncertainty): {format: result,...}
     (float("-inf"), 1e8, ".1e", "(-inf+/-1.0)e+08"),
     (float("-inf"), 1e8, ".1E", "(-%s+/-1.0)E+08" % Inf_EFG),
     (float("-inf"), 1e8, ".1ue", "(-inf+/-1)e+08"),
-    (float("-inf"), 1e8, "10.1e", "      -inf+/-   1.0e+08"),  # 'infe+08' would be strange
+    (
+        float("-inf"),
+        1e8,
+        "10.1e",
+        "      -inf+/-   1.0e+08",
+    ),  # 'infe+08' would be strange
     # Inf *nominal value*
-    (float("-inf"), 123456789, "", "-inf+/-123456789.0"),  # Similar to '{}'.format(123456789.)
-    (float("-inf"), 123456789, "g", "(-inf+/-1.23457)e+08"),  # Similar to '{:g}'.format(123456789.)
+    (
+        float("-inf"),
+        123456789,
+        "",
+        "-inf+/-123456789.0",
+    ),  # Similar to '{}'.format(123456789.)
+    (
+        float("-inf"),
+        123456789,
+        "g",
+        "(-inf+/-1.23457)e+08",
+    ),  # Similar to '{:g}'.format(123456789.)
     (float("-inf"), 123456789, ".1e", "(-inf+/-1.2)e+08"),
     (float("-inf"), 123456789, ".1E", "(-%s+/-1.2)E+08" % Inf_EFG),
     (float("-inf"), 123456789, ".1ue", "(-inf+/-1)e+08"),
@@ -393,16 +460,14 @@ def test_format(val, std_dev, fmt_spec, expected_str):
     ):
         x_back = ufloat_fromstr(actual_str)
 
-        '''
-        The original number and the new one should be consistent with each other. The 
-        nominal value can be rounded to 0 when the uncertainty is larger (because p 
-        digits on the uncertainty can still show 0.00... for the nominal value). The 
+        """
+        The original number and the new one should be consistent with each other. The
+        nominal value can be rounded to 0 when the uncertainty is larger (because p
+        digits on the uncertainty can still show 0.00... for the nominal value). The
         relative error is infinite, so this should not cause an error:
-        '''
+        """
         if x_back.nominal_value:
-            assert numbers_close(
-                x.nominal_value, x_back.nominal_value, 2.4e-1
-            )
+            assert numbers_close(x.nominal_value, x_back.nominal_value, 2.4e-1)
 
         # If the uncertainty is zero, then the relative change can be large:
         assert numbers_close(x.std_dev, x_back.std_dev, 3e-1)

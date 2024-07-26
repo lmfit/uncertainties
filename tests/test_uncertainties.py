@@ -1,12 +1,9 @@
 import copy
 import math
-import sys
 import random  # noqa
-from math import isnan
 
 import uncertainties.core as uncert_core
 from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr
-from uncertainties import formatting
 from uncertainties import umath
 from helpers import (
     power_special_cases,
