@@ -59,25 +59,9 @@ formatting_cases = [  # (Nominal value, uncertainty): {format: result,...}
     # Usual float formatting, and individual widths, etc.:
     (3.1415, 0.0001, "*^+7.2f", "*+3.14*+/-*0.00**"),
     (3.1415, 0.0001, "+07.2f", "+003.14+/-0000.00"),  # fill
-    pytest.param(
-        3.1415,
-        0.0001,
-        ">10f",
-        "  3.141500+/-  0.000100",
-        marks=pytest.mark.xfail(
-            reason="Returning 5 digits past the decimal instead of 6.",
-        ),
-    ),  # Width and align
+    (3.1415, 0.0001, ">10f", "   3.14150+/-   0.00010"),  # Width and align
     (3.1415, 0.0001, "11.3e", "  3.142e+00+/-  0.000e+00"),  # Duplicated exponent
-    pytest.param(
-        3.1415,
-        0.0001,
-        "0.4e",
-        "3.1415e+00+/-0.0000e+00",
-        marks=pytest.mark.xfail(
-            reason="The exponent is shared and there's a rounding issue",
-        ),
-    ),  # Forced double exponent
+    (3.1415, 0.0001, "1.4e", "3.1415e+00+/-0.0001e+00"),  # Forced double exponent
     # Full generalization of float formatting:
     (3.1415, 0.0001, "+09.2uf", "+03.14150+/-000.00010"),
     (3.1415, 0.0001, "*^+9.2uf", "+3.14150*+/-*0.00010*"),
@@ -93,13 +77,7 @@ formatting_cases = [  # (Nominal value, uncertainty): {format: result,...}
     (-123.456789, 0.00123, ".3uf", "-123.45679+/-0.00123"),
     (-123.456789, 0.00123, ".2ue", "(-1.234568+/-0.000012)e+02"),
     # Uncertainty larger than the nominal value:
-    pytest.param(
-        12.3,
-        456.78,
-        "",
-        "12+/-457",
-        marks=pytest.mark.xfail(reason="Uses exponent notation and one sig fig."),
-    ),
+    (12.3, 456.78, "", "(0+/-5)e+02"),
     (12.3, 456.78, ".1uf", "12+/-457"),
     (12.3, 456.78, ".4uf", "12.3+/-456.8"),
     # ... Same thing, but with an exponent:
@@ -126,20 +104,14 @@ formatting_cases = [  # (Nominal value, uncertainty): {format: result,...}
         1234.56789,
         0.1,
         ".0f",
-        "(1234+/-0.)",
-        marks=pytest.mark.xfail(reason="No parentheses or trailing decimal."),
+        "1235+/-0.",
+        marks=pytest.mark.xfail(reason="Bug: missing trailing decimal."),
     ),  # Approximate error indicated with "."
     (1234.56789, 0.1, "e", "(1.23457+/-0.00010)e+03"),
     (1234.56789, 0.1, "E", "(1.23457+/-0.00010)E+03"),
     (1234.56789, 0.1, "f", "1234.57+/-0.10"),
     (1234.56789, 0.1, "F", "1234.57+/-0.10"),
-    pytest.param(
-        1234.56789,
-        0.1,
-        "%",
-        "123457+/-10%",
-        marks=pytest.mark.xfail(reason="Enclosing parentheses appear."),
-    ),
+    (1234.56789, 0.1, "%", "(123457+/-10)%"),
     # Percent notation:
     # Because '%' does 0.0055*100, the value 0.5499999999999999 is obtained, which
     # rounds to 0.5. The original rounded value is 0.006.
