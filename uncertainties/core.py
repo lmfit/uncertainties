@@ -18,7 +18,6 @@ from builtins import str, zip, range, object
 from math import sqrt, isfinite  # Optimization: no attribute look-up
 
 import copy
-import collections
 
 from uncertainties.formatting import format_ufloat
 from uncertainties.parsing import str_to_number_with_uncert
@@ -31,6 +30,7 @@ from uncertainties.ops import (
     modified_operators,
     modified_ops_with_reflection,
 )
+from uncertainties.ucombo import UCombo, UAtom
 
 # Attributes that are always exported (some other attributes are
 # exported only if the NumPy module is available...):
@@ -179,20 +179,29 @@ else:
         # We use the fact that the eigenvectors in 'transform' are
         # special: 'transform' is unitary: its inverse is its transpose:
 
-        variables = tuple(
-            # The variables represent "pure" uncertainties:
-            Variable(0, sqrt(variance), tag)
-            for (variance, tag) in zip(variances, tags)
-        )
+        # variables = tuple(
+        #     # The variables represent "pure" uncertainties:
+        #     Variable(0, sqrt(variance), tag)
+        #     for (variance, tag) in zip(variances, tags)
+        # )
+        ind_vars = tuple(UCombo(((UAtom(), sqrt(variance)),)) for variance in variances)
 
         # The coordinates of each new uncertainty as a function of the
         # new variables must include the variable scale (standard deviation):
         transform *= std_devs[:, numpy.newaxis]
 
+        corr_vars = []
+        for sub_coords in transform:
+            corr_var = sum(
+                (ind_var * coord for ind_var, coord in zip(ind_vars, sub_coords)),
+                UCombo(()),
+            )
+            corr_vars.append(corr_var)
+
         # Representation of the initial correlated values:
         values_funcs = tuple(
-            AffineScalarFunc(value, LinearCombination(dict(zip(variables, coords))))
-            for (coords, value) in zip(transform, nominal_values)
+            AffineScalarFunc(value, corr_var)
+            for (corr_var, value) in zip(corr_vars, nominal_values)
         )
 
         return values_funcs
@@ -225,105 +234,6 @@ class NumericalDerivatives(object):
 
 
 ########################################
-class LinearCombination(object):
-    """
-    Linear combination of Variable differentials.
-
-    The linear_combo attribute can change formally, but its value
-    always remains the same. Typically, the linear combination can
-    thus be expanded.
-
-    The expanded form of linear_combo is a mapping from Variables to
-    the coefficient of their differential.
-    """
-
-    # ! Invariant: linear_combo is represented internally exactly as
-    # the linear_combo argument to __init__():
-    __slots__ = "linear_combo"
-
-    def __init__(self, linear_combo):
-        """
-        linear_combo can be modified by the object, during its
-        lifetime. This allows the object to change its internal
-        representation over time (for instance by expanding the linear
-        combination and replacing the original expression with the
-        expanded one).
-
-        linear_combo -- if linear_combo is a dict, then it represents
-        an expanded linear combination and must map Variables to the
-        coefficient of their differential. Otherwise, it should be a
-        list of (coefficient, LinearCombination) pairs (that
-        represents a linear combination expression).
-        """
-
-        self.linear_combo = linear_combo
-
-    def __bool__(self):
-        """
-        Return True only if the linear combination is non-empty, i.e. if
-        the linear combination contains any term.
-        """
-        return bool(self.linear_combo)
-
-    def expanded(self):
-        """
-        Return True if and only if the linear combination is expanded.
-        """
-        return isinstance(self.linear_combo, dict)
-
-    def expand(self):
-        """
-        Expand the linear combination.
-
-        The expansion is a collections.defaultdict(float).
-
-        This should only be called if the linear combination is not
-        yet expanded.
-        """
-
-        # The derivatives are built progressively by expanding each
-        # term of the linear combination until there is no linear
-        # combination to be expanded.
-
-        # Final derivatives, constructed progressively:
-        derivatives = collections.defaultdict(float)
-
-        while self.linear_combo:  # The list of terms is emptied progressively
-            # One of the terms is expanded or, if no expansion is
-            # needed, simply added to the existing derivatives.
-            #
-            # Optimization note: since Python's operations are
-            # left-associative, a long sum of Variables can be built
-            # such that the last term is essentially a Variable (and
-            # not a NestedLinearCombination): popping from the
-            # remaining terms allows this term to be quickly put in
-            # the final result, which limits the number of terms
-            # remaining (and whose size can temporarily grow):
-            (main_factor, main_expr) = self.linear_combo.pop()
-
-            # print "MAINS", main_factor, main_expr
-
-            if main_expr.expanded():
-                for var, factor in main_expr.linear_combo.items():
-                    derivatives[var] += main_factor * factor
-
-            else:  # Non-expanded form
-                for factor, expr in main_expr.linear_combo:
-                    # The main_factor is applied to expr:
-                    self.linear_combo.append((main_factor * factor, expr))
-
-            # print "DERIV", derivatives
-
-        self.linear_combo = derivatives
-
-    def __getstate__(self):
-        # Not false, otherwise __setstate__() will not be called:
-        return (self.linear_combo,)
-
-    def __setstate__(self, state):
-        (self.linear_combo,) = state
-
-
 class AffineScalarFunc(object):
     """
     Affine functions that support basic mathematical operations
@@ -405,8 +315,6 @@ class AffineScalarFunc(object):
         # terms: efficiently handling such terms [so, without copies]
         # is not obvious, when the algorithm should work for all
         # functions beyond sums).
-        if not isinstance(linear_part, LinearCombination):
-            linear_part = LinearCombination(linear_part)
         self._linear_part = linear_part
 
     # The following prevents the 'nominal_value' attribute from being
@@ -437,13 +345,13 @@ class AffineScalarFunc(object):
         This mapping is cached, for subsequent calls.
         """
 
-        if not self._linear_part.expanded():
-            self._linear_part.expand()
-            # Attempts to get the contribution of a variable that the
-            # function does not depend on raise a KeyError:
-            self._linear_part.linear_combo.default_factory = None
+        # if not self._linear_part.expanded():
+        #     self._linear_part.expand()
+        #     # Attempts to get the contribution of a variable that the
+        #     # function does not depend on raise a KeyError:
+        #     self._linear_part.linear_combo.default_factory = None
 
-        return self._linear_part.linear_combo
+        return self._linear_part.expanded
 
     ########################################
 
@@ -460,27 +368,27 @@ class AffineScalarFunc(object):
         object take scalar values (and are not a tuple, like what
         math.frexp() returns, for instance).
         """
-
-        # Calculation of the variance:
-        error_components = {}
-
-        for variable, derivative in self.derivatives.items():
-            # print "TYPE", type(variable), type(derivative)
-
-            # Individual standard error due to variable:
-
-            # 0 is returned even for a NaN derivative (in this case no
-            # multiplication by the derivative is performed): an exact
-            # variable obviously leads to no uncertainty in the
-            # functions that depend on it.
-            if variable._std_dev == 0:
-                # !!! Shouldn't the errors always be floats, as a
-                # convention of this module?
-                error_components[variable] = 0
-            else:
-                error_components[variable] = abs(derivative * variable._std_dev)
-
-        return error_components
+        return self._linear_part.expanded
+        # # Calculation of the variance:
+        # error_components = {}
+        #
+        # for variable, derivative in self.derivatives.items():
+        #     # print "TYPE", type(variable), type(derivative)
+        #
+        #     # Individual standard error due to variable:
+        #
+        #     # 0 is returned even for a NaN derivative (in this case no
+        #     # multiplication by the derivative is performed): an exact
+        #     # variable obviously leads to no uncertainty in the
+        #     # functions that depend on it.
+        #     if variable._std_dev == 0:
+        #         # !!! Shouldn't the errors always be floats, as a
+        #         # convention of this module?
+        #         error_components[variable] = 0
+        #     else:
+        #         error_components[variable] = abs(derivative * variable._std_dev)
+        #
+        # return error_components
 
     @property
     def std_dev(self):
@@ -499,7 +407,8 @@ class AffineScalarFunc(object):
         # std_dev value (in fact, many intermediate AffineScalarFunc do
         # not need to have their std_dev calculated: only the final
         # AffineScalarFunc returned to the user does).
-        return float(sqrt(sum(delta**2 for delta in self.error_components().values())))
+        return self._linear_part.std_dev
+        # return float(sqrt(sum(delta**2 for delta in self.error_components().values())))
 
     # Abbreviation (for formulas, etc.):
     s = std_dev
@@ -761,7 +670,7 @@ class Variable(AffineScalarFunc):
         # takes much more memory.  Thus, this implementation chooses
         # more cycles and a smaller memory footprint instead of no
         # cycles and a larger memory footprint.
-        super(Variable, self).__init__(value, LinearCombination({self: 1.0}))
+        super(Variable, self).__init__(value, UCombo(((UAtom(), std_dev),)))
 
         self.std_dev = std_dev  # Assignment through a Python property
 
@@ -905,7 +814,7 @@ def covariance_matrix(nums_with_uncert):
             coefs_expr1.append(
                 sum(
                     (
-                        (derivatives1[var] * derivatives2[var] * var._std_dev**2)
+                        (derivatives1[var] * derivatives2[var])
                         # var is a variable common to both numbers with
                         # uncertainties:
                         for var in vars1.intersection(derivatives2)

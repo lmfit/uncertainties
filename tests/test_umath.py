@@ -11,6 +11,7 @@ from helpers import (
     power_wrt_ref,
     compare_derivatives,
     numbers_close,
+    ufloats_close,
 )
 ###############################################################################
 # Unit tests
@@ -73,7 +74,7 @@ def test_compound_expression():
     x = ufloat(3, 0.1)
 
     # Prone to numerical errors (but not much more than floats):
-    assert umath_core.tan(x) == umath_core.sin(x) / umath_core.cos(x)
+    assert ufloats_close(umath_core.tan(x), umath_core.sin(x) / umath_core.cos(x))
 
 
 def test_numerical_example():
@@ -274,8 +275,8 @@ def test_hypot():
     # Derivatives that cannot be calculated simply return NaN, with no
     # exception being raised, normally:
     result = umath_core.hypot(x, y)
-    assert isnan(result.derivatives[x])
-    assert isnan(result.derivatives[y])
+    for val in result.derivatives.values():
+        assert isnan(val)
 
 
 def test_power_all_cases():
