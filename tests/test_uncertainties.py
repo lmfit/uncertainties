@@ -485,18 +485,33 @@ def test_basic_access_to_data():
     # Details on the sources of error:
     a = ufloat(-1, 0.001)
     y = 2 * x + 3 * x + 2 + a
-    y_error_sources = y.error_components()
-    assert len(y_error_sources) == 2
-    for x_atom, x_weight in x.error_components().items():
-        assert y_error_sources[x_atom] == 5 * x_weight
-    for a_atom, a_weight in a.error_components().items():
-        assert y_error_sources[a_atom] == a_weight
+    error_sources = y.error_components()
+    assert len(error_sources) == 2  # 'a' and 'x'
+    assert error_sources[x] == 0.05
+    assert error_sources[a] == 0.001
+
+    # Derivative values should be available:
+    assert y.derivatives[x] == 5
+
+    # Modification of the standard deviation of variables:
+    x.std_dev = 1
+    assert y.error_components()[x] == 5  # New error contribution!
+
+    # Calculated values with uncertainties should not have a settable
+    # standard deviation:
+    y = 2 * x
+    try:
+        y.std_dev = 1
+    except AttributeError:
+        pass
+    else:
+        raise Exception("std_dev should not be settable for calculated results")
 
     # Calculation of deviations in units of the standard deviations:
-    assert numbers_close(x.std_score(10 * x.std_dev + x.nominal_value), 10)
+    assert 10 / x.std_dev == x.std_score(10 + x.nominal_value)
 
     # "In units of the standard deviation" is not always meaningful:
-    x = ufloat(1, 0)
+    x.std_dev = 0
     try:
         x.std_score(1)
     except ValueError:
