@@ -32,69 +32,74 @@ def power_all_cases(op):
     non_int_larger_than_one = ufloat(3.1, 0.01)
     positive_smaller_than_one = ufloat(0.3, 0.01)
 
-    negative_uatom = next(iter(negative.derivatives))
-    positive_uatom = next(iter(positive.derivatives))
-    positive2_uatom = next(iter(positive2.derivatives))
-    integer_uatom = next(iter(integer.derivatives))
-    one_uatom = next(iter(one.derivatives))
-    zero_uatom = next(iter(zero.derivatives))
-    zero2_uatom = next(iter(zero2.derivatives))
-    non_int_larger_than_one_uatom = next(iter(non_int_larger_than_one.derivatives))
-    positive_smaller_than_one_uatom = next(iter(positive_smaller_than_one.derivatives))
+    negative_uatom = next(iter(negative.uncertainty.expanded_dict))
+    positive_uatom = next(iter(positive.uncertainty.expanded_dict))
+    positive2_uatom = next(iter(positive2.uncertainty.expanded_dict))
+    integer_uatom = next(iter(integer.uncertainty.expanded_dict))
+    one_uatom = next(iter(one.uncertainty.expanded_dict))
+    zero_uatom = next(iter(zero.uncertainty.expanded_dict))
+    zero2_uatom = next(iter(zero2.uncertainty.expanded_dict))
+    non_int_larger_than_one_uatom = next(
+        iter(non_int_larger_than_one.uncertainty.expanded_dict)
+    )
+    positive_smaller_than_one_uatom = next(
+        iter(positive_smaller_than_one.uncertainty.expanded_dict)
+    )
     ## negative**integer
 
     result = op(negative, integer)
-    assert not isnan(result.derivatives[negative_uatom])
-    assert isnan(result.derivatives[integer_uatom])
+    assert not isnan(result.uncertainty.expanded_dict[negative_uatom])
+    assert isnan(result.uncertainty.expanded_dict[integer_uatom])
 
     # Limit cases:
     result = op(negative, one)
-    assert result.derivatives[negative_uatom] == 1
-    assert isnan(result.derivatives[one_uatom])
+    print(result.uncertainty.expanded_dict)
+    assert result.uncertainty.expanded_dict[negative_uatom] == negative.std_dev
+    assert isnan(result.uncertainty.expanded_dict[one_uatom])
 
     result = op(negative, zero)
-    assert result.derivatives[negative_uatom] == 0
-    assert isnan(result.derivatives[zero_uatom])
+    assert result.uncertainty.expanded_dict[negative_uatom] == 0
+    assert isnan(result.uncertainty.expanded_dict[zero_uatom])
 
     ## negative**non-integer
 
     ## zero**...
 
     result = op(zero, non_int_larger_than_one)
-    assert isnan(result.derivatives[zero_uatom])
-    assert result.derivatives[non_int_larger_than_one_uatom] == 0
+    assert isnan(result.uncertainty.expanded_dict[zero_uatom])
+    assert result.uncertainty.expanded_dict[non_int_larger_than_one_uatom] == 0
 
     # Special cases:
     result = op(zero, one)
-    assert result.derivatives[zero_uatom] == 1
-    assert result.derivatives[one_uatom] == 0
+    assert result.uncertainty.expanded_dict[zero_uatom] == zero.std_dev
+    assert result.uncertainty.expanded_dict[one_uatom] == 0
 
     result = op(zero, 2 * one)
-    assert result.derivatives[zero_uatom] == 0
-    assert result.derivatives[one_uatom] == 0
+    assert result.uncertainty.expanded_dict[zero_uatom] == 0
+    assert result.uncertainty.expanded_dict[one_uatom] == 0
 
     result = op(zero, positive_smaller_than_one)
-    assert isnan(result.derivatives[zero_uatom])
-    assert result.derivatives[positive_smaller_than_one_uatom] == 0
+    assert isnan(result.uncertainty.expanded_dict[zero_uatom])
+    assert result.uncertainty.expanded_dict[positive_smaller_than_one_uatom] == 0
 
     result = op(zero, zero2)
-    assert result.derivatives[zero_uatom] == 0
-    assert isnan(result.derivatives[zero2_uatom])
+    assert result.uncertainty.expanded_dict[zero_uatom] == 0
+    assert isnan(result.uncertainty.expanded_dict[zero2_uatom])
 
     ## positive**...: this is a quite regular case where the value and
-    ## the derivatives are all defined.
+    ## the uncertainty.expanded_dict are all defined.
 
     result = op(positive, positive2)
-    assert not isnan(result.derivatives[positive_uatom])
-    assert not isnan(result.derivatives[positive2_uatom])
+    assert not isnan(result.uncertainty.expanded_dict[positive_uatom])
+    assert not isnan(result.uncertainty.expanded_dict[positive2_uatom])
 
     result = op(positive, zero)
-    assert result.derivatives[positive_uatom] == 0
-    assert not isnan(result.derivatives[zero_uatom])
+    assert result.uncertainty.expanded_dict[positive_uatom] == 0
+    assert not isnan(result.uncertainty.expanded_dict[zero_uatom])
 
     result = op(positive, negative)
-    assert not isnan(result.derivatives[positive_uatom])
-    assert not isnan(result.derivatives[negative_uatom])
+    assert not isnan(result.uncertainty.expanded_dict[positive_uatom])
+    assert not isnan(result.uncertainty.expanded_dict[negative_uatom])
 
 
 def power_special_cases(op):
@@ -291,7 +296,9 @@ def compare_derivatives(func, numerical_derivatives, num_args_list=None):
                     if arg_num in integer_arg_nums:
                         args.append(random.choice(range(-10, 10)))
                     else:
-                        args.append(uncert_core.Variable(random.random() * 4 - 2, 0))
+                        args.append(
+                            uncert_core.AffineScalarFunc(random.random() * 4 - 2, 0)
+                        )
 
                 # 'args', but as scalar values:
                 args_scalar = [uncert_core.nominal_value(v) for v in args]

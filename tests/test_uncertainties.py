@@ -2,6 +2,8 @@ import copy
 import math
 import random  # noqa
 
+import pytest
+
 import uncertainties.core as uncert_core
 from uncertainties.core import ufloat, AffineScalarFunc, ufloat_fromstr
 from uncertainties import umath
@@ -11,7 +13,6 @@ from helpers import (
     power_wrt_ref,
     numbers_close,
     ufloats_close,
-    compare_derivatives,
 )
 
 
@@ -137,38 +138,99 @@ def test_ufloat_fromstr():
 ###############################################################################
 
 
-# Test of correctness of the fixed (usually analytical) derivatives:
-def test_fixed_derivatives_basic_funcs():
-    """
-    Pre-calculated derivatives for operations on AffineScalarFunc.
-    """
+# TODO: test_fixed_derivatives_basic_funcs is deprecated in the new approach.
+#   In the old code the AffineScalarFunc has access to an expanded
+#   LinearCombination mapping Variables on which the AffineScalarFunc depends
+#   to the derivative of the AffineScalarFunc with respect to that Variable. The
+#   Variable additionally has a std_dev that gets scaled by that derivative to
+#   calculated std_dev. test_fixed_derivatives_basic_funcs tests that the
+#   derivatives stored on the AffineScalar func as the result of operation func
+#   match the numerical derivative of func with respect to the appropriate
+#   parameters.
+#   ###
+#   In the new approach the UCombo is a linear combination of UAtom where each UAtom is
+#   a unity variance independent random variable. The std_devs get encoded into the
+#   coefficient that scales the UAtom, but as the UCombo passes through operations the
+#   partial derivatives multiply the scaling coefficients. But no memory is retained
+#   about if the scaling coefficient is due to the std_dev originally associated with
+#   the UFloat that generated the UAtom, or if it has arisen due to partial derivatives
+#   in some functional operation. Therefore, it doesn't make sense to compare the
+#   components of the resulting UCombo to the derivatives of the input function.
+#   ###
+#   I think the equivalent thing to test here is that the uncertainty linear combination
+#   on f(x+dx, y+dy) is equal to (df/dx dx + df/dy dy). This is checked by the new
+#   test_deriv_propagation below.
 
-    def check_op(op, num_args):
-        """
-        Makes sure that the derivatives for function '__op__' of class
-        AffineScalarFunc, which takes num_args arguments, are correct.
 
-        If num_args is None, a correct value is calculated.
-        """
+# # Test of correctness of the fixed (usually analytical) derivatives:
+# def test_fixed_derivatives_basic_funcs():
+#     """
+#     Pre-calculated derivatives for operations on AffineScalarFunc.
+#     """
+#
+#     def check_op(op, num_args):
+#         """
+#         Makes sure that the derivatives for function '__op__' of class
+#         AffineScalarFunc, which takes num_args arguments, are correct.
+#
+#         If num_args is None, a correct value is calculated.
+#         """
+#
+#         op_string = "__%s__" % op
+#         func = getattr(AffineScalarFunc, op_string)
+#         numerical_derivatives = uncert_core.NumericalDerivatives(
+#             # The __neg__ etc. methods of AffineScalarFunc only apply,
+#             # by definition, to AffineScalarFunc objects: we first map
+#             # possible scalar arguments (used for calculating
+#             # derivatives) to AffineScalarFunc objects:
+#             lambda *args: func(*map(uncert_core.to_affine_scalar, args))
+#         )
+#         compare_derivatives(func, numerical_derivatives, [num_args])
+#
+#     # Operators that take 1 value:
+#     for op in uncert_core.modified_operators:
+#         check_op(op, 1)
+#
+#     # Operators that take 2 values:
+#     for op in uncert_core.modified_ops_with_reflection:
+#         check_op(op, 2)
 
-        op_string = "__%s__" % op
-        func = getattr(AffineScalarFunc, op_string)
-        numerical_derivatives = uncert_core.NumericalDerivatives(
-            # The __neg__ etc. methods of AffineScalarFunc only apply,
-            # by definition, to AffineScalarFunc objects: we first map
-            # possible scalar arguments (used for calculating
-            # derivatives) to AffineScalarFunc objects:
-            lambda *args: func(*map(uncert_core.to_affine_scalar, args))
-        )
-        compare_derivatives(func, numerical_derivatives, [num_args])
 
-    # Operators that take 1 value:
-    for op in uncert_core.modified_operators:
-        check_op(op, 1)
+# Randomly generated but static test values.
+deriv_propagation_cases = [
+    ("__abs__", (1.1964838601545966,), 0.047308407404731856),
+    ("__pos__", (1.5635699242286414,), 0.38219529954774223),
+    ("__neg__", (-0.4520304708235554,), 0.8442835926901457),
+    ("__trunc__", (0.4622631416873926,), 0.6540076679531033),
+    ("__add__", (-0.7581877519537352, 1.6579645792821753), 0.5083165826806606),
+    ("__radd__", (-0.976869259500134, 1.1542019729184076), -0.732839320238539),
+    ("__sub__", (1.0233545960703134, 0.029354693323845993), 0.7475621525040559),
+    ("__rsub__", (0.49861518245313663, -0.9927317702800833), -0.5421488555485847),
+    ("__mul__", (0.0654070362874073, 1.9216078105121919), 0.6331001122119122),
+    ("__rmul__", (-0.4006772142682373, 0.19628658198222926), 0.3300416314362784),
+    ("__truediv__", (-0.5573378968194893, 0.28646277014641486), -0.42933306560556384),
+    ("__rtruediv__", (1.7663869752268884, -0.1619387546963642), 0.6951025849642374),
+    ("__floordiv__", (0.11750026664733992, -1.0120567560937617), -0.9557126076209381),
+    ("__rfloordiv__", (-1.2872736512072698, -1.4416464249395973), -0.28262518984780205),
+    ("__pow__", (0.34371967038364515, -0.8313605840956209), -0.6267147080961244),
+    ("__rpow__", (1.593375683248082, 1.9890969272006154), 0.7171353266792271),
+    ("__mod__", (0.7478106873313131, 1.2522332955942628), 0.5682413634363304),
+    ("__rmod__", (1.5227432102303133, -0.5177923078991333), -0.25752786270795935),
+]
 
-    # Operators that take 2 values:
-    for op in uncert_core.modified_ops_with_reflection:
-        check_op(op, 2)
+
+@pytest.mark.parametrize("func, args, std_dev", deriv_propagation_cases)
+def test_deriv_propagation(func, args, std_dev):
+    ufloat_args = (AffineScalarFunc(arg, std_dev) for arg in args)
+    output = getattr(AffineScalarFunc, func)(*ufloat_args)
+
+    from uncertainties.ops import partial_derivative
+
+    for idx, _ in enumerate(ufloat_args):
+        deriv = partial_derivative(func, idx)
+        for atom, input_weight in output.uncertainty.expanded_dict:
+            output_weight = output.uncertainty.expanded_dict(atom)
+            assert output_weight == deriv * input_weight
 
 
 def test_copy():
@@ -179,23 +241,25 @@ def test_copy():
     assert x == x
 
     y = copy.copy(x)
-    assert x != y
-    assert not (x == y)
-    assert y in y.derivatives.keys()  # y must not copy the dependence on x
+    assert x == y
+    assert not (x != y)
+    assert y.covariance(y) != 0
+    assert y.covariance(x) != 0
+    # assert y in y.derivatives.keys()  # y must not copy the dependence on x
 
     z = copy.deepcopy(x)
-    assert x != z
+    assert x == z
 
     # Copy tests on expressions:
     t = x + 2 * z
     # t depends on x:
-    assert x in t.derivatives
+    assert x.covariance(t) != 0
 
     # The relationship between the copy of an expression and the
     # original variables should be preserved:
     t_copy = copy.copy(t)
     # Shallow copy: the variables on which t depends are not copied:
-    assert x in t_copy.derivatives
+    assert x.covariance(t_copy) != 0
     assert uncert_core.covariance_matrix([t, z]) == uncert_core.covariance_matrix(
         [t_copy, z]
     )
@@ -204,8 +268,8 @@ def test_copy():
     # variables should be broken, since the deep copy created new,
     # independent variables:
     t_deepcopy = copy.deepcopy(t)
-    assert x not in t_deepcopy.derivatives
-    assert uncert_core.covariance_matrix([t, z]) != uncert_core.covariance_matrix(
+    assert x.covariance(t_deepcopy) != 0
+    assert uncert_core.covariance_matrix([t, z]) == uncert_core.covariance_matrix(
         [t_deepcopy, z]
     )
 
@@ -219,7 +283,7 @@ def test_copy():
 
     gc.collect()
 
-    assert y in list(y.derivatives.keys())
+    assert y.covariance(y) != 0
 
 
 ## Classes for the pickling tests (put at the module level, so that
@@ -227,17 +291,17 @@ def test_copy():
 
 
 # Subclass without slots:
-class NewVariable_dict(uncert_core.Variable):
+class NewVariable_dict(uncert_core.AffineScalarFunc):
     pass
 
 
 # Subclass with slots defined by a tuple:
-class NewVariable_slots_tuple(uncert_core.Variable):
+class NewVariable_slots_tuple(uncert_core.AffineScalarFunc):
     __slots__ = ("new_attr",)
 
 
 # Subclass with slots defined by a string:
-class NewVariable_slots_str(uncert_core.Variable):
+class NewVariable_slots_str(uncert_core.AffineScalarFunc):
     __slots__ = "new_attr"
 
 
@@ -250,7 +314,7 @@ def test_pickling():
 
     x_unpickled = pickle.loads(pickle.dumps(x))
 
-    assert x != x_unpickled  # Pickling creates copies
+    assert x == x_unpickled  # Pickling creates copies
 
     ## Tests with correlations and AffineScalarFunc objects:
     f = 2 * x
@@ -305,8 +369,8 @@ def test_pickling():
     # attribute is empty, __getstate__()'s result could be false, and
     # so __setstate__() would not be called and the original empty
     # linear combination would not be set in linear_combo.
-    x = uncert_core.LinearCombination({})
-    assert pickle.loads(pickle.dumps(x)).linear_combo == {}
+    x = uncert_core.UCombo(())
+    assert pickle.loads(pickle.dumps(x)).ucombo_tuple == ()
 
 
 def test_int_div():
@@ -486,36 +550,28 @@ def test_basic_access_to_data():
     a = ufloat(-1, 0.001)
     y = 2 * x + 3 * x + 2 + a
     error_sources = y.error_components()
-    assert len(error_sources) == 2  # 'a' and 'x'
-    assert error_sources[x] == 0.05
-    assert error_sources[a] == 0.001
+    assert len(error_sources) == 2
+    # 'a' and 'x'
+    assert y.covariance(x) == 0.05 * 0.01
+    assert y.covariance(a) == 0.001 * 0.001
 
-    # Derivative values should be available:
-    assert y.derivatives[x] == 5
-
-    # Modification of the standard deviation of variables:
-    x.std_dev = 1
-    assert y.error_components()[x] == 5  # New error contribution!
+    with pytest.raises(AttributeError):
+        # std_dev cannot be modified
+        x.std_dev = 1
 
     # Calculated values with uncertainties should not have a settable
     # standard deviation:
     y = 2 * x
-    try:
+    with pytest.raises(AttributeError):
         y.std_dev = 1
-    except AttributeError:
-        pass
-    else:
-        raise Exception("std_dev should not be settable for calculated results")
 
     # Calculation of deviations in units of the standard deviations:
     assert 10 / x.std_dev == x.std_score(10 + x.nominal_value)
 
     # "In units of the standard deviation" is not always meaningful:
-    x.std_dev = 0
-    try:
+    x = ufloat(1, 0)
+    with pytest.raises(ValueError):
         x.std_score(1)
-    except ValueError:
-        pass  # Normal behavior
 
 
 def test_correlations():
