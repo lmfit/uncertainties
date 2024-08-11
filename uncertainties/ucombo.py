@@ -1,18 +1,25 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from functools import cached_property
-from dataclasses import dataclass, field
 from math import sqrt
 from numbers import Real
-from typing import Dict, Optional, Tuple, TypeVar, Union
+from typing import Tuple, TypeVar, Union
 import uuid
 
 
-@dataclass(frozen=True)
 class UAtom:
-    uuid: uuid.UUID = field(init=False, default_factory=uuid.uuid4)
-    tag: Optional[str] = None
+    __slots__ = ["uuid", "tag", "hash"]
+
+    def __init__(self, tag: str = None):
+        self.tag = tag
+        self.uuid: uuid.UUID = uuid.uuid4()
+        self.hash = hash(self.uuid)  # memoize the hash
+
+    def __eq__(self, other):
+        return self.hash == other.hash
+
+    def __hash__(self):
+        return self.hash
 
     def __str__(self):
         uuid_abbrev = f"{str(self.uuid)[0:2]}..{str(self.uuid)[-3:-1]}"
@@ -26,42 +33,59 @@ class UAtom:
 Self = TypeVar("Self", bound="UCombo")  # TODO: typing.Self introduced in Python 3.11
 
 
-# TODO: Right now UCombo lacks __slots__. Python 3.10 allows slot=True input argument to
-#   dataclass. Until then the easiest way to get __slots__ back would be to not use a
-#   dataclass here.
-@dataclass(frozen=True)
 class UCombo:
-    ucombo_tuple: Tuple[Tuple[Union[UAtom, UCombo], float], ...]
+    __slots__ = ["ucombo_tuple", "_std_dev", "hash", "_expanded_dict", "is_expanded"]
 
-    # TODO: Using cached_property instead of lru_cache. This misses the opportunity to
-    #   cache across separate instances.
-    @cached_property
-    def expanded_dict(self: Self) -> Dict[UAtom, float]:
-        expanded_dict: Dict[UAtom, float] = defaultdict(float)
-
-        for term, term_weight in self:
-            if isinstance(term, UAtom):
-                expanded_dict[term] += term_weight
-            else:
-                expanded_term = term.expanded_dict
-                for atom, atom_weight in expanded_term.items():
-                    expanded_dict[atom] += term_weight * atom_weight
-
-        # pruned_expanded_dict = defaultdict(float)
-        # pruned_expanded_dict.update({
-        #     atom: float(weight) for atom, weight in expanded_dict.items() if weight != 0
-        # })
-        # # pruned_expanded_dict = defaultdict(float)
-
-        return expanded_dict
+    def __init__(self, ucombo_tuple: Tuple[Tuple[Union[UAtom, UCombo], float], ...]):
+        self.ucombo_tuple = ucombo_tuple
+        self.hash = hash(self.ucombo_tuple)
+        self._std_dev = None
+        self._expanded_dict = None
+        self.is_expanded = False
 
     @property
-    def expanded(self: Self) -> Dict[UAtom, float]:
+    def expanded_dict(self: Self) -> dict[UAtom, float]:
+        if self._expanded_dict is None:
+            term_list = list(self.ucombo_tuple)
+            self._expanded_dict = defaultdict(float)
+            while term_list:
+                term, weight = term_list.pop()
+
+                if isinstance(term, UAtom):
+                    self._expanded_dict[term] += weight
+                elif term.is_expanded:
+                    for sub_term, sub_weight in term.expanded_dict.items():
+                        self._expanded_dict[sub_term] += weight * sub_weight
+                else:
+                    for sub_term, sub_weight in term.ucombo_tuple:
+                        term_list.append((sub_term, weight * sub_weight))
+            self.is_expanded = True
+        return self._expanded_dict
+
+    @property
+    def expanded(self: Self) -> dict[UAtom, float]:
         return self.expanded_dict
 
-    @cached_property
+    @property
     def std_dev(self: Self) -> float:
-        return sqrt(sum(weight**2 for weight in self.expanded_dict.values()))
+        if self._std_dev is None:
+            self._std_dev = sqrt(
+                sum(weight**2 for weight in self.expanded_dict.values())
+            )
+        return self._std_dev
+
+    def covariance(self: Self, other: UCombo):
+        # TODO: pull out to module function and cache
+        self_uatoms = set(self.expanded_dict.keys())
+        other_uatoms = set(other.expanded_dict.keys())
+        shared_uatoms = self_uatoms.intersection(other_uatoms)
+        covariance = 0
+        for uatom in shared_uatoms:
+            covariance += self.expanded_dict[uatom] * other.expanded_dict[uatom]
+        return covariance
+
+    def __hash__(self):
+        return self.hash
 
     def __add__(self: Self, other) -> Self:
         if not isinstance(other, UCombo):
@@ -81,6 +105,9 @@ class UCombo:
 
     def __iter__(self: Self):
         return iter(self.ucombo_tuple)
+
+    def __bool__(self):
+        return bool(self.ucombo_tuple)
 
     def __str__(self: Self) -> str:
         ret_str = ""
