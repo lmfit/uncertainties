@@ -50,7 +50,6 @@ class UCombo:
             self._expanded_dict = defaultdict(float)
             while term_list:
                 term, weight = term_list.pop()
-
                 if isinstance(term, UAtom):
                     self._expanded_dict[term] += weight
                 elif term.is_expanded:

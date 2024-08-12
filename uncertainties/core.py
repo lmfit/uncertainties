@@ -717,7 +717,7 @@ def ufloat_fromstr(representation, tag=None):
     return ufloat(nom, std, tag)
 
 
-def ufloat(nominal_value, std_dev=None, tag=None):
+def ufloat(nominal_value, std_dev, tag=None):
     """
     Create an uncertainties Variable
 
