@@ -8,6 +8,7 @@ Fixes:
 
 - fix `readthedocs` configuration so that the build passes (#254)
 - Add `unumpy.covariance_matrix`: A vectorized variant of the pure Python function `covariance_matrix` (#265)
+- Add `unumpy.average` to calculate uncertainties aware average (#264)
 
 3.2.2   2024-July-08
 -----------------------

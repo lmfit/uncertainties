@@ -1,3 +1,5 @@
+import pytest
+
 try:
     import numpy
 except ImportError:
@@ -300,3 +302,70 @@ def test_array_comparisons():
     # For matrices, 1D arrays are converted to 2D arrays:
     mat = unumpy.umatrix([1, 2], [1, 4])
     assert numpy.all((mat == [mat[0, 0], 4]) == [True, False])
+
+
+class TestAverage:
+    arr1d = unumpy.uarray(
+        [2.1, 2.0, 2.05, 2.08, 2.02],
+        [0.05, 0.03, 0.04, 0.06, 0.05],
+    )
+
+    def __init__(self):
+        sigma2d = 0.3
+        means2d = np.linspace(4, 20, num=50).reshape(5, 10)
+        self.arr2d = unumpy.uarray(
+            np.random.normal(loc=means, scale=sigma2d),
+            np.random.uniform(low=0, high=sigma2d),
+        )
+        meansNd = np.random.rand(4, 7, 5, 2, 10, 14) + 10
+        self.arrNd = unumpy.uarray(
+            meansNd, np.random.uniform(low=0, high=0.2, size=meansNd.shape)
+        )
+
+    def test_average_type_check():
+        with pytest.raises(ValueError):
+            unumpy.average(numpy.array(["bla"]))
+
+    def test_average_example():
+        """Tests the example from the docs."""
+        avg = unumpy.average(self.arr1d)
+        assert np.isclose(avg.n, 2.0360612043435338)
+        assert np.isclose(avg.s, 0.018851526708200846)
+
+    @pytest.mark.parametrize("invalid_axis", [1, 2, 3])
+    def test_average1d_invalid_axes(invalid_axis):
+        with pytest.raises(ValueError):
+            unumpy.average(self.arr1d, axes=invalid_axis)
+
+    @pytest.mark.parametrize("invalid_axis", [2, 3])
+    def test_average2d_invalid_axes(invalid_axis):
+        with pytest.raises(ValueError):
+            unumpy.average(self.arr1d, axes=invalid_axis)
+
+    @pytest.mark.parametrize(
+        "expected_shape, axis_argument",
+        [
+            ((), None),
+            # According to the linspace reshape in __init__
+            ((5,), 1),
+            ((5,), (1,)),
+            ((10,), 0),
+            ((10,), (0,)),
+        ],
+    )
+    def test_average2d_shape(expected_shape, axis_argument):
+        assert unumpy.average(self.arr2d, axes=axis_argument).shape == expected_shape
+
+    @pytest.mark.parametrize(
+        "expected_shape, axis_argument",
+        [
+            ((), None),
+            # According to random.rand() argument in __init__
+            ((4, 5, 10), (1, 3, 5)),
+            ((10,), (0, 1, 2, 3, 4, 6)),
+            ((14,), (0, 1, 2, 3, 4, 5)),
+            ((7, 2), (0, 2, 4, 5, 6)),
+        ],
+    )
+    def test_averageNd_shape(expected_shape, axis_argument):
+        assert unumpy.average(self.arrNd, axes=axis_argument).shape == expected_shape

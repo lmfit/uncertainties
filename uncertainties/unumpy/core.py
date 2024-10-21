@@ -31,9 +31,78 @@ __all__ = [
     "nominal_values",
     "covariance_matrix",
     "std_devs",
+    "average",
     # Classes:
     "matrix",
 ]
+
+
+def _average(arr):
+    """
+    The real implementation of average, for 1D arrays.
+    """
+    assert arr.ndim == 1
+    cov_matrix = covariance_matrix(arr)
+    weights = numpy.diagonal(cov_matrix) ** -1
+    weights_sum = weights.sum()
+    return uarray(
+        (nominal_values(arr) * weights).sum() / weights_sum,
+        numpy.sqrt(
+            numpy.einsum(
+                "i,ij,j",
+                weights,
+                cov_matrix,
+                weights,
+            )
+        ) / weights_sum,
+    )
+
+def average(arr, axes=None):
+    """
+    Return a weighted averaged along with a weighted mean over a certain axis
+    or a axes. The formulas implemented by this are:
+
+    $$ \\mu = \frac{\\sum_i (x_i/\\sigma_i^2)}{\\sum_i \\sigma_i^{-2}}$$
+
+    $$\\sigma_\\mu = \\frac{\\sqrt{\\sum_{i,j} \\sigma_i^{-2} \\sigma_j^{-2} \\cdot Cov(x_i, x_j)}}{\\sum_i \\sigma_i^{-2}}$$
+
+    Where of course $Cov(x_i, x_i) = \\sigma_i^2$.
+
+    By default, (when ``axes=None``), it flattens the given array first and
+    then applies the above equations. When axes is a list or tuple, it applies
+    the same formula over each axis in a loop, and hence correlations between
+    values in different axes are not taken into account.
+    """
+    # NOTE regarding the above implementation disclaimer: Ideally we could have
+    # taken the (2N)-D shaped covariance_matrix(arr) and worked with that, but
+    # it is not very clear how to do that truely correctly.
+    arr = np.asanyarray(arr)
+    if axes is None:
+        axes = [0]
+        arr = arr.flatten()
+    # The following sanity checks on axes similar to what Numpy 2.x's
+    # lib.array_utils.normalize_axis_tuple do.
+    elif not isinstance(axes, [tuple, list]):
+        axes = [operator.index(axes)]
+    else:
+        axes = tuple(axes)
+    if len(set(axes)) != len(axes):
+        raise ValueError("repeated axis found in axes argument")
+    # This one is not checked by np.lib.array_utils.normalize_axis_tuple
+    if max(axes) >= arr.ndim:
+        raise ValueError(
+            f"Cannot average over an inexistent axis {max(axes)} >= arr.ndim = "
+            f"{arr.ndim}"
+        )
+    if not isinstance(arr.flat[0], core.Variable):
+        raise ValueError(
+            "unumpy.average is meant to operate upon numpy arrays of ufloats, "
+            "not pure numpy arrays"
+        )
+    for axis in sorted(axes, reverse=True):
+        arr = numpy.apply_over_axis(_average, axis, arr)
+    return arr
+
 
 ###############################################################################
 # Utilities:
