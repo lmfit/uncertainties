@@ -29,6 +29,7 @@ __all__ = [
     "umatrix",
     # Utilities:
     "nominal_values",
+    "covariance_matrix",
     "std_devs",
     # Classes:
     "matrix",
@@ -69,6 +70,18 @@ to_std_devs = numpy.vectorize(
         " contained in a NumPy array, or zero for other objects."
     ),
 )
+
+def covariance_matrix(a):
+    """
+    Return an array of covariances of given array's numbers with uncertainties,
+    given shape ``(d0,d1,d2,...,dN)``, the output shape is
+    ``(d0,d1,d2,...,dN,d0,d1,d2,...,dN)``.
+    """
+    arr = numpy.array(a)
+    return numpy.reshape(
+        uncert_core.covariance_matrix(arr.ravel()),
+        arr.shape*2,
+    )
 
 
 def unumpy_to_numpy_matrix(arr):
