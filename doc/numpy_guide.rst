@@ -144,6 +144,29 @@ functions is available in the documentation for  :mod:`uncertainties.umath`.
 .. index::
    pair: testing and operations (in arrays); NaN
 
+Uncertainties aware average
+---------------------------
+
+If you have measured a certain value multiple times, with a different
+uncertainty every measurement. Averaging over the results in a manner aware of
+the different uncertainties, is not trivial. The function ``unumpy.average()``
+does that:
+
+>>> measurements = numpy.array([2.1, 2.0, 2.05, 2.08, 2.02])
+>>> stds = numpy.array([0.05, 0.03, 0.04, 0.06, 0.05])
+>>> arr = unumpy.uarray(measurements, stds)
+>>> unumpy.average(arr)
+2.03606+/-0.019
+
+Note how that function gives a value different from numpy's ``mean`` function:
+
+>>> numpy.mean(arr)
+2.050+/-0.019
+
+If you have an array with correlated values, the covariances will be considered
+as well. You can also specify an ``axes`` argument, to specify a certain axis
+or a tuple of axes upon which to average the result.
+
 NaN testing and NaN-aware operations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
