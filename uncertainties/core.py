@@ -66,13 +66,14 @@ __all__ = [
 
 try:
     import numpy
+
     __all__ += [
         "correlated_values",
         "correlated_values_norm",
         "correlation_matrix",
     ]
 except ImportError:
-    msg = 'Unable to import numpy. Some functionality will be unavailable'
+    msg = "Unable to import numpy. Some functionality will be unavailable"
     warnings.warn(msg)
     numpy = None
 
@@ -209,7 +210,6 @@ def correlation_matrix(nums_with_uncert):
     std_devs = numpy.sqrt(cov_mat.diagonal())
 
     return cov_mat / std_devs / std_devs[numpy.newaxis].T
-
 
 
 ###############################################################################
