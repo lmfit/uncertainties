@@ -57,6 +57,9 @@ __all__ = [
     "nan_if_exception",
     "modified_operators",
     "modified_ops_with_reflection",
+    "correlated_values",
+    "correlated_values_norm",
+    "correlation_matrix",
 ]
 
 ###############################################################################
@@ -65,14 +68,7 @@ __all__ = [
 
 try:
     import numpy
-
-    __all__ += [
-        "correlated_values",
-        "correlated_values_norm",
-        "correlation_matrix",
-    ]
 except ImportError:
-    msg = "Unable to import numpy. Some functionality will be unavailable"
     numpy = None
 
 
