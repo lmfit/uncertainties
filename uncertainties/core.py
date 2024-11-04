@@ -97,6 +97,9 @@ def correlated_values(nom_values, covariance_mat, tags=None):
 
     tags -- if 'tags' is not None, it must list the tag of each new
     independent variable.
+
+    This function raises NotImplementedError if numpy cannot be
+    imported.
     """
     if numpy is None:
         msg = (
@@ -151,6 +154,9 @@ def correlated_values_norm(values_with_std_dev, correlation_mat, tags=None):
     NumPy array, etc.).
 
     tags -- like for correlated_values().
+
+    This function raises NotImplementedError if numpy cannot be
+    imported.
     """
     if numpy is None:
         msg = (
@@ -208,6 +214,9 @@ def correlation_matrix(nums_with_uncert):
     """
     Return the correlation matrix of the given sequence of
     numbers with uncertainties, as a NumPy array of floats.
+
+    This function raises NotImplementedError if numpy cannot be
+    imported.
     """
     if numpy is None:
         msg = (
