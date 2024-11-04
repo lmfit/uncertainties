@@ -10,7 +10,7 @@ Changes
    importing a `numpy`-dependent function, like `correlated_values`,
    without `numpy` installed would result in an `ImportError` at import
    time. Now such a function can be imported but if the user attempts to
-   execute it, a new `ImportError` is raised indicating that the
+   execute it, a `NotImplementedError` is raised indicating that the
    function can't be used because `numpy` couldn't be imported.
 
 Fixes:
