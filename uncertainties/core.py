@@ -19,7 +19,6 @@ from math import sqrt, isfinite  # Optimization: no attribute look-up
 
 import copy
 import collections
-import warnings
 
 from uncertainties.formatting import format_ufloat
 from uncertainties.parsing import str_to_number_with_uncert
@@ -74,7 +73,6 @@ try:
     ]
 except ImportError:
     msg = "Unable to import numpy. Some functionality will be unavailable"
-    warnings.warn(msg)
     numpy = None
 
 
@@ -104,7 +102,12 @@ def correlated_values(nom_values, covariance_mat, tags=None):
     tags -- if 'tags' is not None, it must list the tag of each new
     independent variable.
     """
-
+    if numpy is None:
+        msg = (
+            "uncertainties was not able to import numpy so "
+            "correlated_values is unavailable."
+        )
+        raise NotImplementedError(msg)
     # !!! It would in principle be possible to handle 0 variance
     # variables by first selecting the sub-matrix that does not contain
     # such variables (with the help of numpy.ix_()), and creating
@@ -153,6 +156,12 @@ def correlated_values_norm(values_with_std_dev, correlation_mat, tags=None):
 
     tags -- like for correlated_values().
     """
+    if numpy is None:
+        msg = (
+            "uncertainties was not able to import numpy so "
+            "correlated_values_norm is unavailable."
+        )
+        raise NotImplementedError(msg)
 
     # If no tags were given, we prepare tags for the newly created
     # variables:
@@ -204,6 +213,12 @@ def correlation_matrix(nums_with_uncert):
     Return the correlation matrix of the given sequence of
     numbers with uncertainties, as a NumPy array of floats.
     """
+    if numpy is None:
+        msg = (
+            "uncertainties was not able to import numpy so "
+            "correlation_matrix is unavailable."
+        )
+        raise NotImplementedError(msg)
 
     cov_mat = numpy.array(covariance_matrix(nums_with_uncert))
 
