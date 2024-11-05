@@ -6,6 +6,8 @@ import itertools
 from inspect import getfullargspec
 import numbers
 
+from uncertainties.ucombo import UCombo
+
 # Some types known to not depend on Variable objects are put in
 # CONSTANT_TYPES.  The most common types can be put in front, as this
 # may slightly improve the execution speed.
@@ -521,16 +523,12 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
         # defined by (coefficient, argument) pairs, where 'argument'
         # is an AffineScalarFunc (for all AffineScalarFunc found as
         # argument of f):
-        linear_part = []
+        linear_part = UCombo(())
 
         for pos in pos_w_uncert:
-            linear_part.append(
-                (
-                    # Coefficient:
-                    derivatives_args_index[pos](*args_values, **kwargs),
-                    # Linear part of the AffineScalarFunc expression:
-                    args[pos]._linear_part,
-                )
+            linear_part += (
+                derivatives_args_index[pos](*args_values, **kwargs)
+                * args[pos]._linear_part
             )
 
         for name in names_w_uncert:
@@ -544,14 +542,9 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
                 # Derivative never needed before:
                 partial_derivative(f, name),
             )
-
-            linear_part.append(
-                (
-                    # Coefficient:
-                    derivative(*args_values, **kwargs),
-                    # Linear part of the AffineScalarFunc expression:
-                    kwargs_uncert_values[name]._linear_part,
-                )
+            linear_part += (
+                derivative(*args_values, **kwargs)
+                * kwargs_uncert_values[name]._linear_part
             )
 
         # The function now returns the necessary linear approximation
@@ -741,7 +734,7 @@ def add_comparative_ops(cls):
 
         if isinstance(x, CONSTANT_TYPES):
             # No variable => no derivative:
-            return cls(x, {})
+            return cls(x, UCombo(()))
 
         # Case of lists, etc.
         raise NotUpcast(
