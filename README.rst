@@ -57,7 +57,7 @@ Basic examples
 Main features
 -------------
 
-- **Transparent calculations with uncertainties**: Liittle or
+- **Transparent calculations with uncertainties**: Little or
   no modification of existing code is needed to convert calculations of floats
   to calculations of values with uncertainties.
 

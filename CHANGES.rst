@@ -1,6 +1,13 @@
 Change Log
 ===================
 
+Unreleased
+----------
+
+Fixes:
+
+- fix `readthedocs` configuration so that the build passes (#254)
+
 3.2.2   2024-July-08
 -----------------------
 
