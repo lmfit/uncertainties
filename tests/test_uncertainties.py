@@ -1,7 +1,6 @@
 import copy
 import math
 import random  # noqa
-from unittest.mock import patch
 
 import pytest
 
@@ -21,6 +20,12 @@ from helpers import (
     ufloats_close,
     compare_derivatives,
 )
+
+
+try:
+    import numpy as np
+except ImportError:
+    np = None
 
 
 def test_value_construction():
@@ -1323,7 +1328,10 @@ else:
         )
 
 
-@patch("uncertainties.core.numpy", None)
+@pytest.mark.skipif(
+    np is not None,
+    reason="This test is only run when numpy is not installed.",
+)
 def test_no_numpy():
     nom_values = [1, 2, 3]
     std_devs = [0.1, 0.2, 0.3]
