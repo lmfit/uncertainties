@@ -36,8 +36,6 @@ jobs:
       uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        slug: lmfit/uncertainties
-        file: coverage.xml
   test_without_numpy:
     name: Test without numpy
     runs-on: ubuntu-latest
@@ -59,8 +57,6 @@ jobs:
       uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        slug: lmfit/uncertainties
-        file: coverage.xml
   results:
     # This step aggregates the results from all the tests and allows us to
     # require only this single job to pass for a PR to be merged rather than
