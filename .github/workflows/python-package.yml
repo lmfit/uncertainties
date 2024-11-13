@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v4.6.0
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
@@ -33,7 +33,7 @@ jobs:
       run: |
         python -m pytest --cov --cov-report xml --cov-report term
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v4.6.0
       with:
         file: ./coverage.xml
       env:
@@ -42,7 +42,7 @@ jobs:
     name: Test without numpy
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4.6.0
+    - uses: actions/checkout@v4
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -56,7 +56,7 @@ jobs:
         python -m pytest --ignore tests/test_unumpy.py --ignore tests/test_ulinalg.py -k "not test_monte_carlo_comparison"
           --cov --cov-report xml --cov-report term
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v4.6.0
       with:
         file: ./coverage.xml
       env:
