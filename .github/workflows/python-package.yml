@@ -37,7 +37,7 @@ jobs:
       with:
         file: ./coverage.xml
       env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        CODECOV_TOKEN: 02571ae7-4151-471b-b966-99394d268e29
   test_without_numpy:
     name: Test without numpy
     runs-on: ubuntu-latest
@@ -60,7 +60,8 @@ jobs:
       with:
         file: ./coverage.xml
       env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        CODECOV_TOKEN: 02571ae7-4151-471b-b966-99394d268e29
+
   results:
     # This step aggregates the results from all the tests and allows us to
     # require only this single job to pass for a PR to be merged rather than
