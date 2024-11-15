@@ -36,6 +36,7 @@ jobs:
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.6.0
       with:
+        name: ${{ matrix.os }}-${{ matrix.python-version }}
         flags: ${{ matrix.os }}-${{ matrix.python-version }}
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -60,6 +61,7 @@ jobs:
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.6.0
       with:
+        name: no-numpy
         flags: no-numpy
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
