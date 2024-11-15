@@ -35,8 +35,6 @@ jobs:
         python -m pytest --cov=uncertainties --cov=. --cov-report=xml --cov-report=term
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.6.0
-      with:
-        file: ./coverage.xml
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   test_without_numpy:
@@ -59,11 +57,8 @@ jobs:
           --cov=uncertainties --cov=. --cov-report=xml --cov-report=term
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.6.0
-      with:
-        file: ./coverage.xml
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
   results:
     # This step aggregates the results from all the tests and allows us to
     # require only this single job to pass for a PR to be merged rather than
