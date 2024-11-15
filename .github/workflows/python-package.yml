@@ -60,7 +60,7 @@ jobs:
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.6.0
       with:
-        flags: no_numpy
+        flags: no-numpy
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   results:
