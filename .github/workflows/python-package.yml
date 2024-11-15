@@ -31,7 +31,8 @@ jobs:
         python -m pip install .[arrays,test]
     - name: Test source code and docs
       run: |
-        python -m pytest --cov --cov-report xml --cov-report term
+        cd tests
+        python -m pytest --cov=uncertainties --cov=. --cov-report=xml --cov-report=term
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.6.0
       with:
@@ -53,8 +54,9 @@ jobs:
         python -m pip install .[test]
     - name: Test source code and docs
       run:
-        python -m pytest --ignore tests/test_unumpy.py --ignore tests/test_ulinalg.py -k "not test_monte_carlo_comparison"
-          --cov --cov-report xml --cov-report term
+        cd tests;
+        python -m pytest --ignore=test_unumpy.py --ignore=test_ulinalg.py -k "not test_monte_carlo_comparison"
+          --cov=uncertainties --cov=. --cov-report=xml --cov-report=term
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.6.0
       with:
