@@ -105,13 +105,6 @@ def test_ufloat_fromstr():
         "3.4(nan)e10": (3.4e10, float("nan")),
         # NaN value:
         "nan+/-3.14e2": (float("nan"), 314),
-        # "Double-floats"
-        # TODO: These floats are too large to handle. In the old framework the
-        #   std_dev was eagerly stored into the object so it could be
-        #   immediately displayed. In the new framework the std_dev is lazily
-        #   stored and requires computation, even for reading it the first time.
-        # "(-3.1415 +/- 1e-4)e+200": (-3.1415e200, 1e196),
-        # "(-3.1415e-10 +/- 1e-4)e+200": (-3.1415e190, 1e196),
         # Special float representation:
         "-3(0.)": (-3, 0),
     }
