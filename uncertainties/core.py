@@ -160,11 +160,11 @@ def correlated_values(nom_values, covariance_mat, tags=None):
         So Y = U * S * X defined as above has covariance C.
         """
         eig_vals, U = numpy.linalg.eigh(covariance_mat)
+        eig_vals[numpy.isclose(eig_vals, 0)] = 0
         """
         Eigenvalues may be close to zero but negative. We clip these
         to zero.
         """
-        eig_vals = numpy.clip(eig_vals, a_min=0, a_max=None)
         if numpy.any(eig_vals < 0):
             raise ValueError("covariance_mat must be positive semi-definite.")
         S = numpy.diag(numpy.sqrt(eig_vals))
