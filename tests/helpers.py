@@ -2,7 +2,14 @@ import random
 from math import isnan, isinf
 
 import uncertainties.core as uncert_core
-from uncertainties.core import ufloat, AffineScalarFunc
+from uncertainties.core import ufloat, UFloat, AffineScalarFunc
+
+
+def get_single_uatom(num_with_uncertainty: UFloat):
+    error_components = num_with_uncertainty.error_components
+    if len(error_components) > 1:
+        raise ValueError("UFloat has more than one error component.")
+    return next(iter(error_components.keys()))
 
 
 def power_all_cases(op):

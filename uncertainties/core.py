@@ -15,7 +15,7 @@ Main module for the uncertainties package, with internal functions.
 from __future__ import division  # Many analytical derivatives depend on this
 
 from builtins import str, zip, range, object
-from math import sqrt  # Optimization: no attribute look-up
+from math import isnan, sqrt  # Optimization: no attribute look-up
 from numbers import Real
 from typing import Optional, Union
 
@@ -276,6 +276,8 @@ class UFloat(object):
         """
         self._nominal_value = float(nominal_value)
         if isinstance(uncertainty, Real):
+            if not isnan(uncertainty) and uncertainty < 0:
+                raise NegativeStdDev("The standard deviation cannot be negative")
             uncertainty = UCombo(((UAtom(tag=tag), float(uncertainty)),))
         self._uncertainty = uncertainty
 
@@ -296,6 +298,7 @@ class UFloat(object):
     def covariance(self, other):
         return self.uncertainty.covariance(other.uncertainty)
 
+    @property
     def error_components(self):
         """
         The uncertainty is stored as a float-weighted linear combination of
