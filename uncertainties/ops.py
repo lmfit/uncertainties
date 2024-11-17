@@ -523,12 +523,12 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
         # defined by (coefficient, argument) pairs, where 'argument'
         # is an AffineScalarFunc (for all AffineScalarFunc found as
         # argument of f):
-        linear_part = UCombo(())
+        uncertainty = UCombo(())
 
         for pos in pos_w_uncert:
-            linear_part += (
+            uncertainty += (
                 derivatives_args_index[pos](*args_values, **kwargs)
-                * args[pos]._linear_part
+                * args[pos].uncertainty
             )
 
         for name in names_w_uncert:
@@ -542,14 +542,14 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
                 # Derivative never needed before:
                 partial_derivative(f, name),
             )
-            linear_part += (
+            uncertainty += (
                 derivative(*args_values, **kwargs)
                 * kwargs_uncert_values[name]._linear_part
             )
 
         # The function now returns the necessary linear approximation
         # to the function:
-        return cls(f_nominal_value, linear_part)
+        return cls(f_nominal_value, uncertainty)
 
     f_with_affine_output = set_doc(
         """\
