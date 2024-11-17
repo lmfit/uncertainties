@@ -861,6 +861,9 @@ def test_wrap_with_kwargs():
     z = ufloat(100, 0.111)
     t = ufloat(0.1, 0.1111)
 
+    z_uatom = get_single_uatom(z)
+    t_uatom = get_single_uatom(t)
+
     assert ufloats_close(
         f_wrapped(x, y, z, t=t), f_auto_unc(x, y, z, t=t), tolerance=1e-5
     )
@@ -879,8 +882,8 @@ def test_wrap_with_kwargs():
     # to try to confuse the code:
 
     assert (
-        f_wrapped2(x, y, z, t=t).derivatives[y]
-        == f_auto_unc(x, y, z, t=t).derivatives[y]
+        f_wrapped2(x, y, z, t=t).error_components[z_uatom]
+        == f_auto_unc(x, y, z, t=t).error_components[z_uatom]
     )
 
     # Derivatives supplied through the keyword-parameter dictionary of
@@ -896,12 +899,12 @@ def test_wrap_with_kwargs():
     # The derivatives should be exactly the same, because they are
     # obtained with the exact same analytic formula:
     assert (
-        f_wrapped3(x, y, z, t=t).derivatives[z]
-        == f_auto_unc(x, y, z, t=t).derivatives[z]
+        f_wrapped3(x, y, z, t=t).error_components[z_uatom]
+        == f_auto_unc(x, y, z, t=t).error_components[z_uatom]
     )
     assert (
-        f_wrapped3(x, y, z, t=t).derivatives[t]
-        == f_auto_unc(x, y, z, t=t).derivatives[t]
+        f_wrapped3(x, y, z, t=t).error_components[t_uatom]
+        == f_auto_unc(x, y, z, t=t).error_components[t_uatom]
     )
 
     ########################################

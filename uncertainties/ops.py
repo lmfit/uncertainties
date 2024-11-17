@@ -544,7 +544,7 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
             )
             uncertainty += (
                 derivative(*args_values, **kwargs)
-                * kwargs_uncert_values[name]._linear_part
+                * kwargs_uncert_values[name].uncertainty
             )
 
         # The function now returns the necessary linear approximation
