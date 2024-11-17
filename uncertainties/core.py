@@ -18,7 +18,6 @@ from builtins import str, zip, range, object
 from math import sqrt  # Optimization: no attribute look-up
 from numbers import Real
 from typing import Optional, Union
-import copy
 
 from uncertainties.formatting import format_ufloat
 from uncertainties.parsing import str_to_number_with_uncert
@@ -234,98 +233,68 @@ class NumericalDerivatives(object):
 
 
 ########################################
-class AffineScalarFunc(object):
+class UFloat(object):
     """
-    Affine functions that support basic mathematical operations
-    (addition, etc.).  Such functions can for instance be used for
-    representing the local (linear) behavior of any function.
+    UFloat objects represent random variables.
 
-    This class can also be used to represent constants.
+    UFloat objects are represented by a float nominal value which gives
+    the mean of the abstract random variable and a UCombo uncertainty.
+    The UCombo uncertainty is a linear combination of UAtom where each
+    UAtom is like a random variable with zero mean and unity variance.
 
-    The variables of affine scalar functions are Variable objects.
+    The variance and standard deviation of the UFloat random variable
+    can be calculated using the uncertainty UCombo. Also, if two UFloat
+    objects share uncertainty dependence on any shared UAtoms then those
+    two UFloat's may exhibit correlations which can be calculated.
 
-    AffineScalarFunc objects include facilities for calculating the
-    'error' on the function, from the uncertainties on its variables.
-
-    Main attributes and methods:
-
-    - nominal_value, std_dev: value at the origin / nominal value, and
-      standard deviation.  The standard deviation can be NaN or infinity.
-
-    - n, s: abbreviations for nominal_value and std_dev.
-
-    - error_components(): error_components()[x] is the error due to
-      Variable x.
-
-    - derivatives: derivatives[x] is the (value of the) derivative
-      with respect to Variable x.  This attribute is a Derivatives
-      dictionary whose keys are the Variable objects on which the
-      function depends. The values are the numerical values of the
-      derivatives.
-
-      All the Variable objects on which the function depends are in
-      'derivatives'.
-
-    - std_score(x): position of number x with respect to the
-      nominal value, in units of the standard deviation.
+    Finally, UFloat objects can pass through simple or complicated
+    mathematical operations such as addition or trigonometric
+    manipulations. The result of these operations will be new UFloat
+    objects whose uncertainty is calculated according to the rules of
+    linear error propagation.
     """
 
-    # To save memory in large arrays:
     __slots__ = ("_nominal_value", "_uncertainty", "tag")
-
-    # !! Fix for mean() in NumPy 1.8.0:
-    class dtype(object):
-        type = staticmethod(lambda value: value)
-
-    #! The code could be modified in order to accommodate for non-float
-    # nominal values.  This could for instance be done through
-    # the operator module: instead of delegating operations to
-    # float.__*__ operations, they could be delegated to
-    # operator.__*__ functions (while taking care of properly handling
-    # reverse operations: __radd__, etc.).
 
     def __init__(
         self,
         nominal_value: float,
-        uncertainty: Union[UCombo, float],
+        uncertainty: Union[UCombo, Real],
         tag: Optional[str] = None,
     ):
         """
-        nominal_value -- average value
-        uncertainty -- linear combination of uncertain terms
-        tag -- label
+        nominal_value -- (float) mean value of the random variable.
+
+        uncertainty -- Uncertainty of the random variable. This can either be a UCombo
+        object which represents a linear combination of UAtoms or a simple non-negative
+        float. In the latter case the non-negative float uncertainty will be created to
+        use a single term UCombo with a new UAtom using that float as the weight for the
+        single new UAtom.
+
+        tag -- (string) optional tag for the new UAtom used if the uncertainty is a
+        float such that a new UCombo and UAtom is generated.
         """
         self._nominal_value = float(nominal_value)
         if isinstance(uncertainty, Real):
             uncertainty = UCombo(((UAtom(tag=tag), float(uncertainty)),))
         self._uncertainty = uncertainty
-        self.tag = tag
 
     @property
     def nominal_value(self):
         """Nominal value of the random number."""
         return self._nominal_value
 
-    # Abbreviation (for formulas, etc.):
-    n = nominal_value
+    @property
+    def n(self):
+        """Abbreviation for nominal_value"""
+        return self.nominal_value
 
     @property
     def uncertainty(self):
         return self._uncertainty
 
-    ############################################################
-
-    @property
-    def _linear_part(self):
-        # Legacy
-        return self.uncertainty
-
     def covariance(self, other):
         return self.uncertainty.covariance(other.uncertainty)
-
-    ########################################
-
-    # Uncertainties handling:
 
     def error_components(self):
         """
@@ -340,41 +309,21 @@ class AffineScalarFunc(object):
 
     @property
     def std_dev(self):
-        """
-        Standard deviation of the affine function.
-        """
+        """Standard deviation of the affine function."""
         return self.uncertainty.std_dev
 
-    # Abbreviation (for formulas, etc.):
-    s = std_dev
+    @property
+    def s(self):
+        """Abbreviation for std_dev."""
+        return self.std_dev
 
     def __repr__(self):
-        # Not putting spaces around "+/-" helps with arrays of
-        # Variable, as each value with an uncertainty is a
-        # block of signs (otherwise, the standard deviation can be
-        # mistaken for another element of the array).
-
-        std_dev = self.std_dev  # Optimization, since std_dev is calculated
-
-        # A zero standard deviation is printed because otherwise,
-        # ufloat_fromstr() does not correctly parse back the value
-        # ("1.23" is interpreted as "1.23(1)"):
-
-        if std_dev:
-            std_dev_str = repr(std_dev)
-        else:
-            std_dev_str = "0"
-
-        num_repr = "%r+/-%s" % (self.nominal_value, std_dev_str)
+        num_repr = f"{self.nominal_value}+/-{self.std_dev}"
         if self.tag is not None:
-            return "< %s = %s >" % (self.tag, num_repr)
-
+            return f"< {self.tag} = {num_repr} >"
         return num_repr
 
     def __str__(self):
-        # An empty format string and str() usually return the same
-        # string
-        # (http://docs.python.org/2/library/string.html#format-specification-mini-language):
         return self.format("")
 
     @set_doc(format_ufloat.__doc__)
@@ -400,108 +349,17 @@ class AffineScalarFunc(object):
         Raises a ValueError exception if the standard deviation is zero.
         """
         try:
-            # The ._nominal_value is a float: there is no integer division,
-            # here:
             return (value - self._nominal_value) / self.std_dev
         except ZeroDivisionError:
             raise ValueError("The standard deviation is zero:" " undefined result")
 
-    def __deepcopy__(self, memo):
-        """
-        Hook for the standard copy module.
 
-        The returned AffineScalarFunc is a completely fresh copy,
-        which is fully independent of any variable defined so far.
-        New variables are specially created for the returned
-        AffineScalarFunc object.
-        """
-        return AffineScalarFunc(self._nominal_value, copy.deepcopy(self._linear_part))
+ops.add_arithmetic_ops(UFloat)
+ops.add_comparative_ops(UFloat)
+to_affine_scalar = UFloat._to_affine_scalar
 
-    def __getstate__(self):
-        """
-        Hook for the pickle module.
-
-        The slot attributes of the parent classes are returned, as
-        well as those of the __dict__ attribute of the object (if
-        any).
-        """
-
-        # In general (case where this class is subclassed), data
-        # attribute are stored in two places: possibly in __dict_, and
-        # in slots. Data from both locations is returned by this
-        # method.
-
-        all_attrs = {}
-
-        # Support for subclasses that do not use __slots__ (except
-        # through inheritance): instances have a __dict__
-        # attribute. The keys in this __dict__ are shadowed by the
-        # slot attribute names (reference:
-        # http://stackoverflow.com/questions/15139067/attribute-access-in-python-first-slots-then-dict/15139208#15139208).
-        # The method below not only preserves this behavior, but also
-        # saves the full contents of __dict__. This is robust:
-        # unpickling gives back the original __dict__ even if __dict__
-        # contains keys that are shadowed by slot names:
-
-        try:
-            all_attrs["__dict__"] = self.__dict__
-        except AttributeError:
-            pass
-
-        # All the slot attributes are gathered.
-
-        # Classes that do not define __slots__ have the __slots__ of
-        # one of their parents (the first parent with their own
-        # __slots__ in MRO). This is why the slot names are first
-        # gathered (with repetitions removed, in general), and their
-        # values obtained later.
-
-        all_slots = set()
-
-        for cls in type(self).mro():
-            # In the diamond inheritance pattern, some parent classes
-            # may not have __slots__:
-            slot_names = getattr(cls, "__slots__", ())
-
-            # Slot names can be given in various forms (string,
-            # sequence, iterable):
-            if isinstance(slot_names, str):
-                all_slots.add(slot_names)  # Single name
-            else:
-                all_slots.update(slot_names)
-
-        # The slot values are stored:
-        for name in all_slots:
-            try:
-                # !! It might happen that '__dict__' is itself a slot
-                # name. In this case, its value is saved
-                # again. Alternatively, the loop could be done on
-                # all_slots - {'__dict__'}:
-                all_attrs[name] = getattr(self, name)
-            except AttributeError:
-                pass  # Undefined slot attribute
-
-        return all_attrs
-
-    def __setstate__(self, data_dict):
-        """
-        Hook for the pickle module.
-        """
-        for name, value in data_dict.items():
-            # Contrary to the default __setstate__(), this does not
-            # necessarily save to the instance dictionary (because the
-            # instance might contain slots):
-            setattr(self, name, value)
-
-
-ops.add_arithmetic_ops(AffineScalarFunc)
-ops.add_comparative_ops(AffineScalarFunc)
-to_affine_scalar = AffineScalarFunc._to_affine_scalar
-
-# Nicer name, for users: isinstance(ufloat(...), UFloat) is
-# True. Also: isinstance(..., UFloat) is the test for "is this a
-# number with uncertainties from the uncertainties package?":
-UFloat = AffineScalarFunc
+# Legacy alias for UFloat
+AffineScalarFunc = UFloat
 
 
 def wrap(f, derivatives_args=None, derivatives_kwargs=None):
@@ -749,4 +607,4 @@ def ufloat(nominal_value, std_dev, tag=None):
        and `tag` which match the input values.
     """
 
-    return AffineScalarFunc(nominal_value, std_dev, tag=tag)
+    return UFloat(nominal_value, std_dev, tag=tag)
