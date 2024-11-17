@@ -1,6 +1,7 @@
 import copy
 import math
 import gc
+import pickle
 import random
 
 import pytest
@@ -207,89 +208,48 @@ def test_copy():
     assert x_uatom in y.error_components
 
 
-## Classes for the pickling tests (put at the module level, so that
-## they can be unpickled):
+"""
+Classes to test pickling with different types of __slots__ inheritance
+"""
 
 
-# Subclass without slots:
-class NewVariable_dict(uncert_core.AffineScalarFunc):
+class UFloatDict(UFloat):
     pass
 
 
-# Subclass with slots defined by a tuple:
-class NewVariable_slots_tuple(uncert_core.AffineScalarFunc):
+class UFloatSlotsTuple(UFloat):
     __slots__ = ("new_attr",)
 
 
-# Subclass with slots defined by a string:
-class NewVariable_slots_str(uncert_core.AffineScalarFunc):
+class UFloatSlotsStr(UFloat):
     __slots__ = "new_attr"
 
 
 def test_pickling():
-    "Standard pickle module integration."
-
-    import pickle
-
-    x = ufloat(2, 0.1)
-
+    """Standard pickle module integration."""
+    x = UFloat(2, 0.1)
     x_unpickled = pickle.loads(pickle.dumps(x))
 
-    assert x == x_unpickled  # Pickling creates copies
+    assert x_unpickled == x
 
-    ## Tests with correlations and AffineScalarFunc objects:
     f = 2 * x
     assert isinstance(f, UFloat)
-    (f_unpickled, x_unpickled2) = pickle.loads(pickle.dumps((f, x)))
-    # Correlations must be preserved:
-    assert f_unpickled - x_unpickled2 - x_unpickled2 == 0
 
-    ## Tests with subclasses:
+    f_unpickled, x_unpickled2 = pickle.loads(pickle.dumps((f, x)))
+    assert f_unpickled - 2 * x_unpickled2 == 0
 
-    for subclass in (NewVariable_dict, NewVariable_slots_tuple, NewVariable_slots_str):
+    for subclass in (UFloatDict, UFloatSlotsTuple, UFloatSlotsStr):
         x = subclass(3, 0.14)
 
         # Pickling test with possibly uninitialized slots:
-        pickle.loads(pickle.dumps(x))
+        assert pickle.loads(pickle.dumps(x)) == x
 
         # Unpickling test:
         x.new_attr = "New attr value"
         x_unpickled = pickle.loads(pickle.dumps(x))
-        # Must exist (from the slots of the parent class):
-        x_unpickled.nominal_value
-        x_unpickled.new_attr  # Must exist
+        assert x_unpickled == x
+        assert x_unpickled.new_attr == "New attr value"
 
-    ##
-
-    # Corner case test: when an attribute is present both in __slots__
-    # and in __dict__, it is first looked up from the slots
-    # (references:
-    # http://docs.python.org/2/reference/datamodel.html#invoking-descriptors,
-    # http://stackoverflow.com/a/15139208/42973). As a consequence,
-    # the pickling process must pickle the correct value (i.e., not
-    # the value from __dict__):
-    x = NewVariable_dict(3, 0.14)
-    x._nominal_value = "in slots"
-    # Corner case: __dict__ key which is also a slot name (it is
-    # shadowed by the corresponding slot, so this is very unusual,
-    # though):
-    x.__dict__["_nominal_value"] = "in dict"
-    # Additional __dict__ attribute:
-    x.dict_attr = "dict attribute"
-
-    x_unpickled = pickle.loads(pickle.dumps(x))
-    # We make sure that the data is still there and untouched:
-    assert x_unpickled._nominal_value == "in slots"
-    assert x_unpickled.__dict__ == x.__dict__
-
-    ##
-
-    # Corner case that should have no impact on the code but which is
-    # not prevented by the documentation: case of constant linear
-    # terms (the potential gotcha is that if the linear_combo
-    # attribute is empty, __getstate__()'s result could be false, and
-    # so __setstate__() would not be called and the original empty
-    # linear combination would not be set in linear_combo.
     x = uncert_core.UCombo(())
     assert pickle.loads(pickle.dumps(x)).ucombo_tuple == ()
 
