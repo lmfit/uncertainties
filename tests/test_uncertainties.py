@@ -1,5 +1,6 @@
 import copy
 import math
+import gc
 import random
 
 import pytest
@@ -134,67 +135,6 @@ def test_ufloat_fromstr(input_str, nominal_value, std_dev):
     assert get_single_uatom(num).tag == "test variable"
 
 
-###############################################################################
-
-
-# TODO: test_fixed_derivatives_basic_funcs is deprecated in the new approach.
-#   In the old code the AffineScalarFunc has access to an expanded
-#   LinearCombination mapping Variables on which the AffineScalarFunc depends
-#   to the derivative of the AffineScalarFunc with respect to that Variable. The
-#   Variable additionally has a std_dev that gets scaled by that derivative to
-#   calculated std_dev. test_fixed_derivatives_basic_funcs tests that the
-#   derivatives stored on the AffineScalar func as the result of operation func
-#   match the numerical derivative of func with respect to the appropriate
-#   parameters.
-#   ###
-#   In the new approach the UCombo is a linear combination of UAtom where each UAtom is
-#   a unity variance independent random variable. The std_devs get encoded into the
-#   coefficient that scales the UAtom, but as the UCombo passes through operations the
-#   partial derivatives multiply the scaling coefficients. But no memory is retained
-#   about if the scaling coefficient is due to the std_dev originally associated with
-#   the UFloat that generated the UAtom, or if it has arisen due to partial derivatives
-#   in some functional operation. Therefore, it doesn't make sense to compare the
-#   components of the resulting UCombo to the derivatives of the input function.
-#   ###
-#   I think the equivalent thing to test here is that the uncertainty linear combination
-#   on f(x+dx, y+dy) is equal to (df/dx dx + df/dy dy). This is checked by the new
-#   test_deriv_propagation below.
-
-
-# # Test of correctness of the fixed (usually analytical) derivatives:
-# def test_fixed_derivatives_basic_funcs():
-#     """
-#     Pre-calculated derivatives for operations on AffineScalarFunc.
-#     """
-#
-#     def check_op(op, num_args):
-#         """
-#         Makes sure that the derivatives for function '__op__' of class
-#         AffineScalarFunc, which takes num_args arguments, are correct.
-#
-#         If num_args is None, a correct value is calculated.
-#         """
-#
-#         op_string = "__%s__" % op
-#         func = getattr(AffineScalarFunc, op_string)
-#         numerical_derivatives = uncert_core.NumericalDerivatives(
-#             # The __neg__ etc. methods of AffineScalarFunc only apply,
-#             # by definition, to AffineScalarFunc objects: we first map
-#             # possible scalar arguments (used for calculating
-#             # derivatives) to AffineScalarFunc objects:
-#             lambda *args: func(*map(uncert_core.to_affine_scalar, args))
-#         )
-#         compare_derivatives(func, numerical_derivatives, [num_args])
-#
-#     # Operators that take 1 value:
-#     for op in uncert_core.modified_operators:
-#         check_op(op, 1)
-#
-#     # Operators that take 2 values:
-#     for op in uncert_core.modified_ops_with_reflection:
-#         check_op(op, 2)
-
-
 # Randomly generated but static test values.
 deriv_propagation_cases = [
     ("__abs__", (1.1964838601545966,), 0.047308407404731856),
@@ -233,56 +173,38 @@ def test_deriv_propagation(func, args, std_dev):
 
 
 def test_copy():
-    "Standard copy module integration"
-    import gc
-
+    """Standard copy module integration."""
     x = ufloat(3, 0.1)
     assert x == x
 
+    x_uatom = get_single_uatom(x)
+
     y = copy.copy(x)
-    assert x == y
-    assert not (x != y)
-    assert y.covariance(y) != 0
-    assert y.covariance(x) != 0
-    # assert y in y.derivatives.keys()  # y must not copy the dependence on x
+    assert y == x
+    assert get_single_uatom(y) == x_uatom
 
     z = copy.deepcopy(x)
-    assert x == z
+    assert z == x
+    assert get_single_uatom(z) == x_uatom
 
-    # Copy tests on expressions:
     t = x + 2 * z
-    # t depends on x:
-    assert x.covariance(t) != 0
+    assert x_uatom in t.error_components
 
-    # The relationship between the copy of an expression and the
-    # original variables should be preserved:
     t_copy = copy.copy(t)
-    # Shallow copy: the variables on which t depends are not copied:
-    assert x.covariance(t_copy) != 0
+    assert x_uatom in t_copy.error_components
     assert uncert_core.covariance_matrix([t, z]) == uncert_core.covariance_matrix(
         [t_copy, z]
     )
 
-    # However, the relationship between a deep copy and the original
-    # variables should be broken, since the deep copy created new,
-    # independent variables:
     t_deepcopy = copy.deepcopy(t)
-    assert x.covariance(t_deepcopy) != 0
+    assert x_uatom in t_deepcopy.error_components
     assert uncert_core.covariance_matrix([t, z]) == uncert_core.covariance_matrix(
         [t_deepcopy, z]
     )
 
-    # Test of implementations with weak references:
-
-    # Weak references: destroying a variable should never destroy the
-    # integrity of its copies (which would happen if the copy keeps a
-    # weak reference to the original, in its derivatives member: the
-    # weak reference to the original would become invalid):
     del x
-
     gc.collect()
-
-    assert y.covariance(y) != 0
+    assert x_uatom in y.error_components
 
 
 ## Classes for the pickling tests (put at the module level, so that
