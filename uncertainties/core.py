@@ -254,7 +254,7 @@ class UFloat(object):
     linear error propagation.
     """
 
-    __slots__ = ("_nominal_value", "_uncertainty", "tag")
+    __slots__ = ("_nominal_value", "_uncertainty")
 
     def __init__(
         self,
@@ -318,9 +318,12 @@ class UFloat(object):
         return self.std_dev
 
     def __repr__(self):
-        num_repr = f"{self.nominal_value}+/-{self.std_dev}"
-        if self.tag is not None:
-            return f"< {self.tag} = {num_repr} >"
+        if self.std_dev == 0:
+            std_dev_str = "0"
+        else:
+            std_dev_str = repr(self.std_dev)
+
+        num_repr = f"{self.nominal_value}+/-{std_dev_str}"
         return num_repr
 
     def __str__(self):
