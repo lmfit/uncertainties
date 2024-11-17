@@ -417,7 +417,7 @@ def test_basic_access_to_data():
     "Access to data from Variable and AffineScalarFunc objects."
 
     x = ufloat(3.14, 0.01, "x var")
-    assert x.tag == "x var"
+    assert get_single_uatom(x).tag == "x var"
     assert x.nominal_value == 3.14
     assert x.std_dev == 0.01
 
@@ -430,7 +430,7 @@ def test_basic_access_to_data():
     # Details on the sources of error:
     a = ufloat(-1, 0.001)
     y = 2 * x + 3 * x + 2 + a
-    error_sources = y.error_components()
+    error_sources = y.error_components
     assert len(error_sources) == 2
     # 'a' and 'x'
     assert y.covariance(x) == 0.05 * 0.01
