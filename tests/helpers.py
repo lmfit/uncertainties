@@ -39,28 +39,23 @@ def power_all_cases(op):
     non_int_larger_than_one = ufloat(3.1, 0.01)
     positive_smaller_than_one = ufloat(0.3, 0.01)
 
-    negative_uatom = next(iter(negative.uncertainty.expanded_dict))
-    positive_uatom = next(iter(positive.uncertainty.expanded_dict))
-    positive2_uatom = next(iter(positive2.uncertainty.expanded_dict))
-    integer_uatom = next(iter(integer.uncertainty.expanded_dict))
-    one_uatom = next(iter(one.uncertainty.expanded_dict))
-    zero_uatom = next(iter(zero.uncertainty.expanded_dict))
-    zero2_uatom = next(iter(zero2.uncertainty.expanded_dict))
-    non_int_larger_than_one_uatom = next(
-        iter(non_int_larger_than_one.uncertainty.expanded_dict)
-    )
-    positive_smaller_than_one_uatom = next(
-        iter(positive_smaller_than_one.uncertainty.expanded_dict)
-    )
+    negative_uatom = get_single_uatom(negative)
+    positive_uatom = get_single_uatom(positive)
+    positive2_uatom = get_single_uatom(positive2)
+    integer_uatom = get_single_uatom(integer)
+    one_uatom = get_single_uatom(one)
+    zero_uatom = get_single_uatom(zero)
+    zero2_uatom = get_single_uatom(zero2)
+    non_int_larger_than_one_uatom = get_single_uatom(non_int_larger_than_one)
+    positive_smaller_than_one_uatom = get_single_uatom(positive_smaller_than_one)
     ## negative**integer
 
     result = op(negative, integer)
-    assert not isnan(result.uncertainty.expanded_dict[negative_uatom])
-    assert isnan(result.uncertainty.expanded_dict[integer_uatom])
+    assert not isnan(result.error_components[negative_uatom])
+    assert integer_uatom not in result.error_components
 
     # Limit cases:
     result = op(negative, one)
-    print(result.uncertainty.expanded_dict)
     assert result.uncertainty.expanded_dict[negative_uatom] == negative.std_dev
     assert isnan(result.uncertainty.expanded_dict[one_uatom])
 

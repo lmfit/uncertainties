@@ -990,7 +990,6 @@ def test_power_all_cases():
 ###############################################################################
 
 
-@pytest.mark.xfail(reason="Need to figure out how to handle these special case.")
 def test_power_special_cases():
     """
     Checks special cases of x**p.

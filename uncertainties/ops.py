@@ -526,6 +526,8 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
         uncertainty = UCombo(())
 
         for pos in pos_w_uncert:
+            if args[pos].s == 0:
+                continue
             uncertainty += (
                 derivatives_args_index[pos](*args_values, **kwargs)
                 * args[pos].uncertainty
@@ -537,6 +539,8 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
             # discovered. This gives a speedup when the original
             # function is called repeatedly with the same keyword
             # arguments:
+            if kwargs_uncert_values[name].s == 0:
+                continue
             derivative = derivatives_all_kwargs.setdefault(
                 name,
                 # Derivative never needed before:
