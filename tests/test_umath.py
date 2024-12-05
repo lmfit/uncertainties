@@ -1,6 +1,7 @@
 import math
 from math import isnan
 
+from tests.helpers import get_single_uatom
 from uncertainties import ufloat
 import uncertainties.core as uncert_core
 import uncertainties.umath_core as umath_core
@@ -271,11 +272,13 @@ def test_hypot():
     """
     x = ufloat(0, 1)
     y = ufloat(0, 2)
+    x_uatom = get_single_uatom(x)
+    y_uatom = get_single_uatom(y)
     # Derivatives that cannot be calculated simply return NaN, with no
     # exception being raised, normally:
     result = umath_core.hypot(x, y)
-    assert isnan(result.derivatives[x])
-    assert isnan(result.derivatives[y])
+    assert isnan(result.error_components[x_uatom])
+    assert isnan(result.error_components[y_uatom])
 
 
 def test_power_all_cases():
