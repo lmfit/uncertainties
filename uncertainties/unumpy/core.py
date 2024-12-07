@@ -307,7 +307,7 @@ def uarray(nominal_values, std_devs=None):
         # ! Looking up uncert_core.Variable beforehand through
         # '_Variable = uncert_core.Variable' does not result in a
         # significant speed up:
-        lambda v, s: uncert_core.Variable(v, s),
+        lambda v, s: uncert_core.UFloat(v, s),
         otypes=[object],
     )(nominal_values, std_devs)
 

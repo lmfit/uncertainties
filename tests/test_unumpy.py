@@ -81,7 +81,7 @@ def test_matrix():
     # Test of the nominal_value attribute:
     assert numpy.all(m_nominal_values == m.nominal_values)
 
-    assert type(m[0, 0]) == uncert_core.Variable
+    assert type(m[0, 0]) == uncert_core.UFloat
 
     # Test of scalar multiplication, both sides:
     3 * m
