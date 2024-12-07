@@ -1,69 +1,162 @@
+import itertools
+import json
 import math
 from math import isnan
+from pathlib import Path
+
+import pytest
 
 from tests.helpers import get_single_uatom
 from uncertainties import ufloat
 import uncertainties.core as uncert_core
 import uncertainties.umath_core as umath_core
+from uncertainties import umath
 
 from helpers import (
     power_special_cases,
     power_all_cases,
     power_wrt_ref,
-    compare_derivatives,
     numbers_close,
+    ufloats_close,
 )
 ###############################################################################
 # Unit tests
 
 
-def test_fixed_derivatives_math_funcs():
-    """
-    Comparison between function derivatives and numerical derivatives.
+single_input_data_path = Path(Path(__file__).parent, "cases", "single_inputs.json")
+with open(single_input_data_path, "r") as f:
+    single_input_dict = json.load(f)
 
-    This comparison is useful for derivatives that are analytical.
-    """
+double_input_data_path = Path(Path(__file__).parent, "cases", "double_inputs.json")
+with open(double_input_data_path, "r") as f:
+    double_input_dict = json.load(f)
 
-    for name in umath_core.many_scalars_to_scalar_funcs:
-        func = getattr(umath_core, name)
-        # Numerical derivatives of func: the nominal value of func() results
-        # is used as the underlying function:
-        numerical_derivatives = uncert_core.NumericalDerivatives(
-            lambda *args: func(*args)
-        )
-        compare_derivatives(func, numerical_derivatives)
+real_single_input_funcs = (
+    "asinh",
+    "atan",
+    "cos",
+    "cosh",
+    "degrees",
+    "erf",
+    "erfc",
+    "exp",
+    "expm1",
+    "fabs",
+    "gamma",
+    "lgamma",
+    "radians",
+    "sin",
+    "sinh",
+    "tan",
+    "tanh",
+)
+positive_single_input_funcs = (
+    "log",
+    "log1p",
+    "log10",
+    "sqrt",
+)
+minus_one_to_plus_one_single_input_funcs = (
+    "acos",
+    "asin",
+    "atanh",
+)
+greater_than_one_single_input_funcs = ("acosh",)
 
-    # Functions that are not in umath_core.many_scalars_to_scalar_funcs:
-
-    ##
-    # modf(): returns a tuple:
-    def frac_part_modf(x):
-        return umath_core.modf(x)[0]
-
-    def int_part_modf(x):
-        return umath_core.modf(x)[1]
-
-    compare_derivatives(
-        frac_part_modf, uncert_core.NumericalDerivatives(lambda x: frac_part_modf(x))
+real_single_input_cases = list(
+    itertools.product(real_single_input_funcs, single_input_dict["real"])
+)
+positive_single_input_cases = list(
+    itertools.product(positive_single_input_funcs, single_input_dict["positive"])
+)
+minus_one_to_plus_one_single_input_cases = list(
+    itertools.product(
+        minus_one_to_plus_one_single_input_funcs,
+        single_input_dict["minus_one_to_plus_one"],
     )
-    compare_derivatives(
-        int_part_modf, uncert_core.NumericalDerivatives(lambda x: int_part_modf(x))
+)
+greater_than_one_single_input_cases = list(
+    itertools.product(
+        greater_than_one_single_input_funcs,
+        single_input_dict["greater_than_one"],
     )
+)
+single_input_cases = (
+    real_single_input_cases
+    + positive_single_input_cases
+    + minus_one_to_plus_one_single_input_cases
+    + greater_than_one_single_input_cases
+)
 
-    ##
-    # frexp(): returns a tuple:
-    def mantissa_frexp(x):
-        return umath_core.frexp(x)[0]
 
-    def exponent_frexp(x):
-        return umath_core.frexp(x)[1]
+@pytest.mark.parametrize("func, value", single_input_cases)
+def test_single_input_func_derivatives(func, value):
+    uval = ufloat(value, 1.0)
+    uatom = get_single_uatom(uval)
 
-    compare_derivatives(
-        mantissa_frexp, uncert_core.NumericalDerivatives(lambda x: mantissa_frexp(x))
-    )
-    compare_derivatives(
-        exponent_frexp, uncert_core.NumericalDerivatives(lambda x: exponent_frexp(x))
-    )
+    umath_func = getattr(umath, func)
+    result = umath_func(uval)
+    analytic_deriv = result.error_components[uatom]
+
+    math_func = getattr(math, func)
+    numerical_deriv = uncert_core.partial_derivative(math_func, 0)(value)
+
+    assert math.isclose(analytic_deriv, numerical_deriv, rel_tol=1e-6, abs_tol=1e-6)
+
+
+real_double_input_funcs = (
+    "atan2",
+    "copysign",
+    "fmod",
+    "pow",
+)
+
+positive_double_input_funcs = (
+    "hypot",
+    "log",
+)
+
+real_double_input_cases = list(
+    itertools.product(real_double_input_funcs, *zip(*double_input_dict["real"]))
+)
+print(real_double_input_cases)
+positive_double_input_cases = list(
+    itertools.product(positive_double_input_funcs, *zip(*double_input_dict["positive"]))
+)
+
+double_input_cases = real_double_input_cases + positive_double_input_cases
+
+
+@pytest.mark.parametrize("func, value_0, value_1", double_input_cases)
+def test_double_input_func_derivatives(func, value_0, value_1):
+    if func == "pow":
+        value_0 = abs(value_0)
+
+    uval_0 = ufloat(value_0, 1.0)
+    uval_1 = ufloat(value_1, 1.0)
+
+    uatom_0 = get_single_uatom(uval_0)
+    uatom_1 = get_single_uatom(uval_1)
+
+    math_func = getattr(math, func)
+    umath_func = getattr(umath, func)
+
+    result = umath_func(uval_0, uval_1)
+
+    analytic_deriv_0 = result.error_components[uatom_0]
+    analytic_deriv_1 = result.error_components[uatom_1]
+
+    numerical_deriv_0 = uncert_core.partial_derivative(
+        math_func,
+        0,
+    )(value_0, value_1)
+    numerical_deriv_1 = uncert_core.partial_derivative(
+        math_func,
+        1,
+    )(value_0, value_1)
+
+    assert math.isclose(analytic_deriv_0, numerical_deriv_0, rel_tol=1e-6, abs_tol=1e-6)
+    assert math.isclose(analytic_deriv_1, numerical_deriv_1, rel_tol=1e-6, abs_tol=1e-6)
 
 
 def test_compound_expression():
@@ -72,9 +165,9 @@ def test_compound_expression():
     """
 
     x = ufloat(3, 0.1)
-
-    # Prone to numerical errors (but not much more than floats):
-    assert umath_core.tan(x) == umath_core.sin(x) / umath_core.cos(x)
+    y1 = umath_core.tan(x)
+    y2 = umath_core.sin(x) / umath_core.cos(x)
+    assert ufloats_close(y1, y2)
 
 
 def test_numerical_example():
