@@ -463,6 +463,13 @@ def std_dev(x):
         return 0.0
 
 
+def uncertainty(x):
+    if isinstance(x, UFloat):
+        return x.uncertainty
+    else:
+        return UCombo(())
+
+
 def covariance_matrix(nums_with_uncert):
     """
     Return a matrix that contains the covariances between the given
