@@ -8,7 +8,13 @@ import pytest
 
 import uncertainties.core as uncert_core
 from uncertainties.core import ufloat, ufloat_fromstr
-from uncertainties import umath, UFloat
+from uncertainties import (
+    umath,
+    UFloat,
+    correlated_values,
+    correlated_values_norm,
+    correlation_matrix,
+)
 from helpers import (
     get_single_uatom,
     power_special_cases,
@@ -17,6 +23,12 @@ from helpers import (
     numbers_close,
     ufloats_close,
 )
+
+
+try:
+    import numpy as np
+except ImportError:
+    np = None
 
 
 def test_UFloat_class_construction():
@@ -1253,3 +1265,42 @@ else:
             numpy.array(cov_mat),
             numpy.array(uncert_core.covariance_matrix([x2, y2, z2])),
         )
+
+
+@pytest.mark.skipif(
+    np is not None,
+    reason="This test is only run when numpy is not installed.",
+)
+def test_no_numpy():
+    nom_values = [1, 2, 3]
+    std_devs = [0.1, 0.2, 0.3]
+    cov = [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
+    ]
+
+    with pytest.raises(
+        NotImplementedError,
+        match="not able to import numpy",
+    ):
+        _ = correlated_values(nom_values, cov)
+
+    with pytest.raises(
+        NotImplementedError,
+        match="not able to import numpy",
+    ):
+        _ = correlated_values_norm(
+            list(zip(nom_values, std_devs)),
+            cov,
+        )
+
+    x = ufloat(1, 0.1)
+    y = ufloat(2, 0.2)
+    z = ufloat(3, 0.3)
+
+    with pytest.raises(
+        NotImplementedError,
+        match="not able to import numpy",
+    ):
+        _ = correlation_matrix([x, y, z])
