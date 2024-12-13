@@ -366,6 +366,9 @@ class UFloat(object):
     def __str__(self):
         return self.format("")
 
+    def __hash__(self):
+        return hash((self.nominal_value, self.uncertainty))
+
     @set_doc(format_ufloat.__doc__)
     def __format__(self, format_spec):
         return format_ufloat(self, format_spec)

@@ -16,10 +16,13 @@ class UAtom:
         self.hash = hash(self.uuid)  # memoize the hash
 
     def __eq__(self, other):
-        return self.hash == other.hash
+        return hash(self) == hash(other)
 
     def __hash__(self):
         return self.hash
+
+    def __lt__(self, other):
+        return self.uuid < other.uuid
 
     def __str__(self):
         uuid_abbrev = f"{str(self.uuid)[0:2]}..{str(self.uuid)[-3:-1]}"
@@ -34,12 +37,13 @@ Self = TypeVar("Self", bound="UCombo")  # TODO: typing.Self introduced in Python
 
 
 class UCombo:
-    __slots__ = ["ucombo_tuple", "_std_dev", "_expanded_dict"]
+    __slots__ = ["ucombo_tuple", "_std_dev", "_expanded_dict", "_hash"]
 
     def __init__(self, ucombo_tuple: Tuple[Tuple[Union[UAtom, UCombo], float], ...]):
         self.ucombo_tuple = ucombo_tuple
         self._std_dev = None
         self._expanded_dict = None
+        self._hash = None
 
     @property
     def expanded_dict(self: Self) -> dict[UAtom, float]:
@@ -116,3 +120,14 @@ class UCombo:
             else:
                 ret_str += f"{weight}×({str(term)})"
         return ret_str
+
+    def __hash__(self):
+        if self._hash is None:
+            sorted_expanded_dict = dict(sorted(self.expanded_dict.items()))
+            self._hash = hash(
+                tuple((key, value) for key, value in sorted_expanded_dict.items())
+            )
+        return self._hash
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
