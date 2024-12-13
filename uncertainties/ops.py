@@ -526,8 +526,6 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
         uncertainty = UCombo(())
 
         for pos in pos_w_uncert:
-            if args[pos].s == 0:
-                continue
             uncertainty += (
                 derivatives_args_index[pos](*args_values, **kwargs)
                 * args[pos].uncertainty
