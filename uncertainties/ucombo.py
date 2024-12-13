@@ -37,10 +37,11 @@ Self = TypeVar("Self", bound="UCombo")  # TODO: typing.Self introduced in Python
 
 
 class UCombo:
-    __slots__ = ["ucombo_tuple", "_std_dev", "_expanded_dict", "_hash"]
+    __slots__ = ["ucombo_tuple", "is_expanded", "_std_dev", "_expanded_dict", "_hash"]
 
     def __init__(self, ucombo_tuple: Tuple[Tuple[Union[UAtom, UCombo], float], ...]):
         self.ucombo_tuple = ucombo_tuple
+        self.is_expanded = False
         self._std_dev = None
         self._expanded_dict = None
         self._hash = None
@@ -54,12 +55,13 @@ class UCombo:
                 term, weight = term_list.pop()
                 if isinstance(term, UAtom):
                     self._expanded_dict[term] += weight
-                elif term.expanded_dict is not None:
+                elif term.is_expanded:
                     for sub_term, sub_weight in term.expanded_dict.items():
                         self._expanded_dict[sub_term] += weight * sub_weight
                 else:
                     for sub_term, sub_weight in term.ucombo_tuple:
                         term_list.append((sub_term, weight * sub_weight))
+            self.is_expanded = True
         return self._expanded_dict
 
     @property
