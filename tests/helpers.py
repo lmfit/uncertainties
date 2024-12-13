@@ -38,10 +38,11 @@ def power_all_cases(op):
     non_int_larger_than_one = ufloat(3.1, 0.01)
     positive_smaller_than_one = ufloat(0.3, 0.01)
 
+    assert integer.uncertainty.ucombo_tuple == ()
+
     negative_uatom = get_single_uatom(negative)
     positive_uatom = get_single_uatom(positive)
     positive2_uatom = get_single_uatom(positive2)
-    integer_uatom = get_single_uatom(integer)
     one_uatom = get_single_uatom(one)
     zero_uatom = get_single_uatom(zero)
     zero2_uatom = get_single_uatom(zero2)
@@ -51,7 +52,6 @@ def power_all_cases(op):
 
     result = op(negative, integer)
     assert not isnan(result.error_components[negative_uatom])
-    assert integer_uatom not in result.error_components
 
     # Limit cases:
     result = op(negative, one)

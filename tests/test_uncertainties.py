@@ -133,19 +133,28 @@ def test_ufloat_fromstr(input_str, nominal_value, std_dev):
     num = ufloat_fromstr(input_str)
     assert numbers_close(num.nominal_value, nominal_value)
     assert numbers_close(num.std_dev, std_dev)
-    assert get_single_uatom(num).tag is None
+    if std_dev != 0:
+        assert get_single_uatom(num).tag is None
+    else:
+        assert num.uncertainty.ucombo_tuple == ()
 
     # With a tag as positional argument:
     num = ufloat_fromstr(input_str, "test variable")
     assert numbers_close(num.nominal_value, nominal_value)
     assert numbers_close(num.std_dev, std_dev)
-    assert get_single_uatom(num).tag == "test variable"
+    if std_dev != 0:
+        assert get_single_uatom(num).tag == "test variable"
+    else:
+        assert num.uncertainty.ucombo_tuple == ()
 
     # With a tag as keyword argument:
     num = ufloat_fromstr(input_str, tag="test variable")
     assert numbers_close(num.nominal_value, nominal_value)
     assert numbers_close(num.std_dev, std_dev)
-    assert get_single_uatom(num).tag == "test variable"
+    if std_dev != 0:
+        assert get_single_uatom(num).tag == "test variable"
+    else:
+        assert num.uncertainty.ucombo_tuple == ()
 
 
 # Randomly generated but static test values.
