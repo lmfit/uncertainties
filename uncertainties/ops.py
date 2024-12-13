@@ -526,10 +526,12 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
         uncertainty = UCombo(())
 
         for pos in pos_w_uncert:
-            uncertainty += (
-                derivatives_args_index[pos](*args_values, **kwargs)
-                * args[pos].uncertainty
-            )
+            arg_uncertainty = args[pos].uncertainty
+            if arg_uncertainty.ucombo_tuple:
+                uncertainty += (
+                    derivatives_args_index[pos](*args_values, **kwargs)
+                    * arg_uncertainty
+                )
 
         for name in names_w_uncert:
             # Optimization: caching of the automatic numerical

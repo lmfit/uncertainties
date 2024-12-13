@@ -89,6 +89,10 @@ class UCombo:
     def __add__(self: Self, other) -> Self:
         if not isinstance(other, UCombo):
             return NotImplemented
+        if not other.ucombo_tuple:
+            return self
+        if not self.ucombo_tuple:
+            return other
         return UCombo(((self, 1.0), (other, 1.0)))
 
     def __radd__(self: Self, other):
@@ -97,6 +101,8 @@ class UCombo:
     def __mul__(self: Self, scalar: Real):
         if not isinstance(scalar, Real):
             return NotImplemented
+        if scalar == 0 or not self.ucombo_tuple:
+            return UCombo(())
         return UCombo(((self, float(scalar)),))
 
     def __rmul__(self: Self, scalar: Real):
