@@ -119,6 +119,16 @@ def std_devs(arr):
 
 ###############################################################################
 
+def ufloat_from_sample(sample):
+    """
+    Return a ufloat where the nominal value and standard deviation are
+    the mean and uncertainty on the mean of the sample of values.
+    If a the sample is a set of random measurements of a normal distribtuion
+    then the returned value will contain the best estimate of the mean
+    and standard deviation of the distribution.
+    """
+    return uncert_core.ufloat(numpy.mean(sample),numpy.std(sample,ddof=1)/numpy.sqrt(len(sample)))
+
 
 def derivative(u, var):
     """
