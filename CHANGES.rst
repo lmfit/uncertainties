@@ -12,6 +12,7 @@ Changes
    time. Now such a function can be imported but if the user attempts to
    execute it, a `NotImplementedError` is raised indicating that the
    function can't be used because `numpy` couldn't be imported.
+- Added unumpy.ufloat_from_sample to create a ufloat from a random sample of a variable.
 
 Fixes:
 
