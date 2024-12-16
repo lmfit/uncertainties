@@ -1,3 +1,4 @@
+import time
 import timeit
 
 import pytest
@@ -11,7 +12,11 @@ def ufloat_sum_benchmark(num):
 
 def time_ufloat_sum_benchmark(num):
     reps = int(100000 / num)
-    t = timeit.timeit(lambda: ufloat_sum_benchmark(num), number=reps)
+    t = timeit.timeit(
+        lambda: ufloat_sum_benchmark(num),
+        number=reps,
+        timer=time.process_time,
+    )
     return t / reps
 
 
