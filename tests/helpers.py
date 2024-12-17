@@ -55,52 +55,52 @@ def power_all_cases(op):
 
     # Limit cases:
     result = op(negative, one)
-    assert result.uncertainty.expanded_dict[negative_uatom] == negative.std_dev
-    assert isnan(result.uncertainty.expanded_dict[one_uatom])
+    assert result.error_components[negative_uatom] == negative.std_dev
+    assert isnan(result.error_components[one_uatom])
 
     result = op(negative, zero)
-    assert result.uncertainty.expanded_dict[negative_uatom] == 0
-    assert isnan(result.uncertainty.expanded_dict[zero_uatom])
+    assert result.error_components[negative_uatom] == 0
+    assert isnan(result.error_components[zero_uatom])
 
     ## negative**non-integer
 
     ## zero**...
 
     result = op(zero, non_int_larger_than_one)
-    assert isnan(result.uncertainty.expanded_dict[zero_uatom])
-    assert result.uncertainty.expanded_dict[non_int_larger_than_one_uatom] == 0
+    assert isnan(result.error_components[zero_uatom])
+    assert result.error_components[non_int_larger_than_one_uatom] == 0
 
     # Special cases:
     result = op(zero, one)
-    assert result.uncertainty.expanded_dict[zero_uatom] == zero.std_dev
-    assert result.uncertainty.expanded_dict[one_uatom] == 0
+    assert result.error_components[zero_uatom] == zero.std_dev
+    assert result.error_components[one_uatom] == 0
 
     result = op(zero, 2 * one)
-    assert result.uncertainty.expanded_dict[zero_uatom] == 0
-    assert result.uncertainty.expanded_dict[one_uatom] == 0
+    assert result.error_components[zero_uatom] == 0
+    assert result.error_components[one_uatom] == 0
 
     result = op(zero, positive_smaller_than_one)
-    assert isnan(result.uncertainty.expanded_dict[zero_uatom])
-    assert result.uncertainty.expanded_dict[positive_smaller_than_one_uatom] == 0
+    assert isnan(result.error_components[zero_uatom])
+    assert result.error_components[positive_smaller_than_one_uatom] == 0
 
     result = op(zero, zero2)
-    assert result.uncertainty.expanded_dict[zero_uatom] == 0
-    assert isnan(result.uncertainty.expanded_dict[zero2_uatom])
+    assert result.error_components[zero_uatom] == 0
+    assert isnan(result.error_components[zero2_uatom])
 
     ## positive**...: this is a quite regular case where the value and
-    ## the uncertainty.expanded_dict are all defined.
+    ## the error_components are all defined.
 
     result = op(positive, positive2)
-    assert not isnan(result.uncertainty.expanded_dict[positive_uatom])
-    assert not isnan(result.uncertainty.expanded_dict[positive2_uatom])
+    assert not isnan(result.error_components[positive_uatom])
+    assert not isnan(result.error_components[positive2_uatom])
 
     result = op(positive, zero)
-    assert result.uncertainty.expanded_dict[positive_uatom] == 0
-    assert not isnan(result.uncertainty.expanded_dict[zero_uatom])
+    assert result.error_components[positive_uatom] == 0
+    assert not isnan(result.error_components[zero_uatom])
 
     result = op(positive, negative)
-    assert not isnan(result.uncertainty.expanded_dict[positive_uatom])
-    assert not isnan(result.uncertainty.expanded_dict[negative_uatom])
+    assert not isnan(result.error_components[positive_uatom])
+    assert not isnan(result.error_components[negative_uatom])
 
 
 def power_special_cases(op):

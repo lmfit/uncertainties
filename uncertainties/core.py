@@ -531,17 +531,17 @@ def covariance_matrix(nums_with_uncert):
 
     covariance_matrix = []
     for i1, expr1 in enumerate(nums_with_uncert, 1):
-        expanded_dict_1 = expr1.uncertainty.expanded_dict
-        uatoms_1 = set(expanded_dict_1)
+        error_components_1 = expr1.error_components
+        uatoms_1 = set(error_components_1)
         coefs_expr1 = []
 
         for expr2 in nums_with_uncert[:i1]:
-            expanded_dict_2 = expr2.uncertainty.expanded_dict
-            uatom_2 = set(expanded_dict_2)
+            error_components_2 = expr2.error_components
+            uatom_2 = set(error_components_2)
             coefs_expr1.append(
                 sum(
                     (
-                        (expanded_dict_1[uatom] * expanded_dict_2[uatom])
+                        (error_components_1[uatom] * error_components_2[uatom])
                         # uatom is common to both numbers with uncertainties:
                         for uatom in uatoms_1.intersection(uatom_2)
                     ),
