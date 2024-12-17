@@ -1,3 +1,4 @@
+from math import log10
 import time
 import timeit
 
@@ -20,7 +21,7 @@ def time_ufloat_sum_benchmark(num):
     return t / reps
 
 
-def test_algorithm_complexity():
+def test_complexity():
     result_dict = {}
     n_list = (10, 100, 1000, 10000, 100000)
     for n in n_list:
@@ -28,8 +29,10 @@ def test_algorithm_complexity():
     n0 = n_list[0]
     t0 = result_dict[n0]
     for n, t in result_dict.items():
-        assert 1 / 4 < (t / n) / (t0 / n0) < 4
-    assert result_dict[100000] < 0.75 * 4
+        if n == n0:
+            continue
+        # Check that the plot of t vs n is linear on a log scale to within 10%
+        assert 0.9 * log10(n / n0) < log10(t / t0) < 1.1 * log10(n / n0)
 
 
 @pytest.mark.benchmark
