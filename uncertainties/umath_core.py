@@ -366,6 +366,7 @@ def ldexp(x, i):
     # Another approach would be to add an additional argument to
     # uncert_core.wrap() so that some arguments are automatically
     # considered as constants.
+    # TODO: This function is untested and probably broken right now
 
     aff_func = to_affine_scalar(x)  # y must be an integer, for math.ldexp
 
@@ -395,7 +396,7 @@ def frexp(x):
     Version of frexp that works for numbers with uncertainty, and also
     for regular numbers.
     """
-
+    # TODO: This function is untested and probably broken right now
     # The code below is inspired by uncert_core.wrap().  It is
     # simpler because only 1 argument is given, and there is no
     # delegation to other functions involved (as for __mul__, etc.).
