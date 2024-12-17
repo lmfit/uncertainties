@@ -152,7 +152,6 @@ def correlated_values_norm(values_with_std_dev, correlation_mat, tags=None):
     diagonal.  This matrix must be an NumPy array-like (list of lists,
     NumPy array, etc.).
 
-
     tags -- like for correlated_values().
 
     This function raises NotImplementedError if numpy cannot be
@@ -188,15 +187,10 @@ def correlated_values_norm(values_with_std_dev, correlation_mat, tags=None):
 
     # Creation of new, independent variables:
 
-    # We use the fact that the eigenvectors in 'transform' are
-    # special: 'transform' is unitary: its inverse is its transpose:
-
-    # variables = tuple(
-    #     # The variables represent "pure" uncertainties:
-    #     Variable(0, sqrt(variance), tag)
-    #     for (variance, tag) in zip(variances, tags)
-    # )
-    ind_vars = tuple(UCombo(((UAtom(), sqrt(variance)),)) for variance in variances)
+    ind_vars = tuple(
+        UCombo(((UAtom(tag), sqrt(variance)),))
+        for variance, tag in zip(variances, tags)
+    )
 
     # The coordinates of each new uncertainty as a function of the
     # new variables must include the variable scale (standard deviation):
@@ -212,8 +206,7 @@ def correlated_values_norm(values_with_std_dev, correlation_mat, tags=None):
 
     # Representation of the initial correlated values:
     values_funcs = tuple(
-        AffineScalarFunc(value, corr_var)
-        for (corr_var, value) in zip(corr_vars, nominal_values)
+        UFloat(value, corr_var) for (corr_var, value) in zip(corr_vars, nominal_values)
     )
 
     return values_funcs
