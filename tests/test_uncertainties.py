@@ -15,6 +15,7 @@ from uncertainties import (
     correlated_values_norm,
     correlation_matrix,
 )
+from uncertainties.ops import partial_derivative
 from helpers import (
     get_single_uatom,
     power_special_cases,
@@ -180,18 +181,17 @@ deriv_propagation_cases = [
 ]
 
 
-@pytest.mark.parametrize("func, args, std_dev", deriv_propagation_cases)
-def test_deriv_propagation(func, args, std_dev):
-    ufloat_args = (UFloat(arg, std_dev) for arg in args)
-    output = getattr(UFloat, func)(*ufloat_args)
-
-    from uncertainties.ops import partial_derivative
+@pytest.mark.parametrize("func_name, args, std_dev", deriv_propagation_cases)
+def test_deriv_propagation(func_name, args, std_dev):
+    func = getattr(UFloat, func_name)
+    ufloat_args = [UFloat(arg, std_dev) for arg in args]
+    output = func(*ufloat_args)
 
     for idx, _ in enumerate(ufloat_args):
-        deriv = partial_derivative(func, idx)
-        for atom, input_weight in output.uncertainty.expanded_dict:
-            output_weight = output.uncertainty.expanded_dict(atom)
-            assert output_weight == deriv * input_weight
+        deriv = partial_derivative(func, idx)(*args)
+        for atom, input_weight in ufloat_args[idx].error_components.items():
+            output_weight = output.error_components[atom]
+            assert numbers_close(output_weight, deriv * input_weight)
 
 
 def test_copy():
