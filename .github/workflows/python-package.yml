@@ -39,11 +39,6 @@ jobs:
         flags: ${{ matrix.os }}-${{ matrix.python-version }}
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-    - name: Benchmarking upload to Codspeed
-      uses: CodSpeedHQ/action@v3
-      with:
-        run: pytest tests/ --codspeed
-        token: ${{ secrets.CODSPEED_TOKEN }}
   test_without_numpy:
     name: Test without numpy
     runs-on: ubuntu-latest
