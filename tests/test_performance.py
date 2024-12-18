@@ -40,5 +40,6 @@ def test_complexity():
 
 
 @pytest.mark.benchmark
-def test_speed():
-    time_ufloat_sum_benchmark(100000)
+@pytest.mark.parametrize("num", (10, 100, 1000, 10000, 100000))
+def test_speed(num):
+    time_ufloat_sum_benchmark(num)
