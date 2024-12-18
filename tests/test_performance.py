@@ -8,10 +8,11 @@ from uncertainties import ufloat
 
 
 def ufloat_sum_benchmark(num):
-    sum(ufloat(1, 1) for _ in range(num)).std_dev
+    sum(ufloat(1, 0.1) for _ in range(num)).std_dev
 
 
 def time_ufloat_sum_benchmark(num):
+    # T ~ N * 10 us, so if we do 1001`000 / N repetitions the test takes ~ 1 s
     reps = int(100000 / num)
     t = timeit.timeit(
         lambda: ufloat_sum_benchmark(num),
@@ -22,6 +23,9 @@ def time_ufloat_sum_benchmark(num):
 
 
 def test_complexity():
+    """
+    Test that the execution time is linear in problem size
+    """
     result_dict = {}
     n_list = (10, 100, 1000, 10000, 100000)
     for n in n_list:
