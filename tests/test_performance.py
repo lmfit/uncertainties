@@ -8,7 +8,7 @@ from uncertainties import ufloat
 
 
 def ufloat_sum_benchmark(num):
-    sum(ufloat(1, 1) for _ in range(num)).std_dev
+    sum(ufloat(1, 0.1) for _ in range(num)).std_dev
 
 
 def time_ufloat_sum_benchmark(num):
