@@ -7,39 +7,50 @@ import pytest
 from uncertainties import ufloat
 
 
-def ufloat_sum_benchmark(num):
-    sum(ufloat(1, 0.1) for _ in range(num)).std_dev
-
-
-def time_ufloat_sum_benchmark(num):
-    # T ~ N * 10 us, so if we do 1001`000 / N repetitions the test takes ~ 1 s
-    reps = int(100000 / num)
-    t = timeit.timeit(
-        lambda: ufloat_sum_benchmark(num),
-        number=reps,
-        timer=time.process_time,
-    )
-    return t / reps
-
-
-def test_complexity():
+def repeated_summation(num):
     """
-    Test that the execution time is linear in problem size
+    generate and sum many floats together, then calculate the standard deviation of the
+    output. Under the lazy expansion algorithm, the uncertainty remains non-expanded
+    until a request is made to calculate the standard deviation.
     """
-    result_dict = {}
-    n_list = (10, 100, 1000, 10000, 100000)
+    result = sum(ufloat(1, 0.1) for _ in range(num)).std_dev
+    return result
+
+
+def test_repeated_summation_complexity():
+    """
+    Test that the execution time is linear in summation length
+    """
+    approx_execution_time_per_n = 10e-6  # 10 us
+    target_test_duration = 1  # 1 s
+
+    n_list = [10, 100, 1000, 10000, 100000]
+    t_list = []
     for n in n_list:
-        result_dict[n] = time_ufloat_sum_benchmark(n)
+        """
+        Choose the number of repetitions so that the test takes target_test_duration
+        assuming the timing of a single run is approximately
+        N * approx_execution_time_per_n
+        """
+        # Choose the number of repetitions so that the test
+        single_rep_duration = n * approx_execution_time_per_n
+        num_reps = int(target_test_duration / single_rep_duration)
+
+        t_tot = timeit.timeit(
+            lambda: repeated_summation(n),
+            number=num_reps,
+            timer=time.process_time,
+        )
+        t_single = t_tot / num_reps
+        t_list.append(t_single)
     n0 = n_list[0]
-    t0 = result_dict[n0]
-    for n, t in result_dict.items():
-        if n == n0:
-            continue
+    t0 = t_list[0]
+    for n, t in zip(n_list[1:], t_list[1:]):
         # Check that the plot of t vs n is linear on a log scale to within 10%
         assert 0.9 * log10(n / n0) < log10(t / t0) < 1.1 * log10(n / n0)
 
 
 @pytest.mark.parametrize("num", (10, 100, 1000, 10000, 100000))
 @pytest.mark.benchmark
-def test_speed(num):
-    ufloat_sum_benchmark(num)
+def test_repeated_summation_speed(num):
+    repeated_summation(num)
