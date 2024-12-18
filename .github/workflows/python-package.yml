@@ -44,7 +44,7 @@ jobs:
       with:
         run: |
           cd tests
-          python -m pytest pytest tests/ --codspeed
+          python -m pytest --codspeed
         token: ${{ secrets.CODSPEED_TOKEN }}
   test_without_numpy:
     name: Test without numpy
