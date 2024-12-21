@@ -17,6 +17,9 @@ from __future__ import division  # Many analytical derivatives depend on this
 from builtins import str, zip, range, object
 from math import sqrt, isfinite  # Optimization: no attribute look-up
 
+from statistics import mean as stats_mean
+from statistics import stdev as stats_stddev
+
 import copy
 import collections
 
@@ -1003,6 +1006,54 @@ def ufloat_fromstr(representation, tag=None):
     """
     (nom, std) = str_to_number_with_uncert(representation.strip())
     return ufloat(nom, std, tag)
+
+def ufloat_from_sample(sample, method="gaussian", axis=None):
+    '''
+    Converts a collection of values into a ufloat.
+
+    Arguments:
+    ----------
+    sample: list or numpy array of numbers
+        The sample of values
+
+    method: optional string
+        The method used to calculate the ufloat. currently only 
+        the 'gaussian' method is implimented.
+
+        gaussian: The nominal value is the mean of the sample. 
+        The standard deviantion is the error on the mean. This 
+        method assumes that the sample follows a gaussian 
+        distrobution, and works best for large samples. This 
+        method works well to find an estimate of a fixed value 
+        that has been measured multiuple times with some random 
+        error.
+
+    axis: integer or None
+        Only when the sample is a numpy array. The axis along 
+        which the ufloats are computed.
+    
+    '''
+    
+    if method=="gaussian":
+
+        if numpy is None:
+            #if numpy is not present, use pythons statistics functions instead
+            mean_value=stats_mean(sample)
+            error_on_mean=stats_stddev(sample)/sqrt(len(sample)-1)
+
+        else:
+            #if numpy is present, use the faster numpy functions that can handle a wider range of inputs
+            mean_value=numpy.mean(sample, axis=axis)
+            error_on_mean=numpy.std(sample, ddof=1, axis=axis)/numpy.sqrt(len(sample))
+
+        return ufloat(mean_value,error_on_mean)
+
+    else:
+        msg={
+            "method must be one of the implemented methods"
+        }
+        raise ValueError(msg)
+
 
 
 def ufloat(nominal_value, std_dev=None, tag=None):
