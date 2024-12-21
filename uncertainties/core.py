@@ -1071,7 +1071,7 @@ def ufloat_from_sample(sample, method="gaussian", axis=None):
                     )(mean_value, error_on_mean)
     else:
         msg={
-            "method must be one of the implemented methods"
+            "{} is not one of the implemented methods".format(method)
         }
         raise ValueError(msg)
 
