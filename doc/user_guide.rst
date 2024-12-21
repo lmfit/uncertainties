@@ -536,9 +536,9 @@ manner**.  This is what the :func:`nominal_value` and
 
 Numbers with uncertainties can be found from samples of numbers 
 without uncertainties using :func:`ufloat_from_sample`. This is
-an estimate on the true value of the number and its uncertainty.
-The current implimented method returns the mean and the error on the
-mean, so it works best for large samples that are normally dristobuted.
+an estimate of the true value of the number and its uncertainty.
+The currently implemented "gaussian" method returns the mean and the error on the
+mean, so it works best for large samples that are normally distributed.
 
 Finally, a utility method is provided that directly yields the
 `standard score <http://en.wikipedia.org/wiki/Standard_score>`_
