@@ -534,6 +534,12 @@ manner**.  This is what the :func:`nominal_value` and
 >>> uncertainties.std_dev(3)
 0.0
 
+Numbers with uncertainties can be found from samples of numbers 
+without uncertainties using :func:`ufloat_from_sample`. This is
+an estimate on the true value of the number and its uncertainty.
+The current implimented method returns the mean and the error on the
+mean, so it works best for large samples that are normally dristobuted.
+
 Finally, a utility method is provided that directly yields the
 `standard score <http://en.wikipedia.org/wiki/Standard_score>`_
 (number of standard deviations) between a number and a result with
