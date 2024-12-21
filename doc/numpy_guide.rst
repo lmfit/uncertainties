@@ -149,7 +149,7 @@ Numbers with uncertainties from samples
 Numbers with uncertainties can be found from samples of numbers 
 without uncertainties using :func:`ufloat_from_sample`. This is
 an estimate on the true value of the number and its uncertainty,
-and so it works best for large samples that are normally distributed.
+and so it works best for large samples that are normally dristobuted.
 
 .. index::
    pair: testing and operations (in arrays); NaN
