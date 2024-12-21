@@ -74,10 +74,6 @@ try:
 except ImportError:
     numpy = None
 
-if numpy != None:
-    from uncertainties.unumpy.core import uarray
-
-
 def correlated_values(nom_values, covariance_mat, tags=None):
     """
     Return numbers with uncertainties (AffineScalarFunc objects)
@@ -1065,8 +1061,14 @@ def ufloat_from_sample(sample, method="gaussian", axis=None):
                 # if the output is a single ufloat
                 return ufloat(mean_value,error_on_mean)
             else:
-                #if the output is an array of ufloats
-                return uarray(mean_value,error_on_mean)
+                #if the output is an array of ufloats (duplicate of code from unnumpy.core.uarray to avoid circular import)
+                return numpy.vectorize(
+                    # ! Looking up uncert_core.Variable beforehand through
+                    # '_Variable = uncert_core.Variable' does not result in a
+                    # significant speed up:
+                    lambda v, s: Variable(v, s),
+                    otypes=[object],
+                    )(mean_value, error_on_mean)
     else:
         msg={
             "method must be one of the implemented methods"
