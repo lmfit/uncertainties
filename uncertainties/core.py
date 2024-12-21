@@ -1016,13 +1016,13 @@ def ufloat_from_sample(sample, method="gaussian", axis=None):
         The sample of values
 
     method: optional string
-        The method used to calculate the ufloat. currently only 
-        the 'gaussian' method is implimented.
+        The method used to calculate the ufloat. currently, only 
+        the 'gaussian' method is implemented.
 
         gaussian: The nominal value is the mean of the sample. 
-        The standard deviantion is the error on the mean. This 
+        The standard deviation is the error on the mean. This 
         method assumes that the sample follows a gaussian 
-        distrobution, and works best for large samples. This 
+        distribution, and works best for large samples. This 
         method works well to find an estimate of a fixed value 
         that has been measured multiuple times with some random 
         error.
@@ -1030,7 +1030,7 @@ def ufloat_from_sample(sample, method="gaussian", axis=None):
     axis: integer or None
         Only when the sample is a numpy array. The axis along 
         which the ufloats are computed. If None (the default value)
-        sample is the whole flattend array. 
+        the sample is the whole flattened array. 
     
     '''
     
