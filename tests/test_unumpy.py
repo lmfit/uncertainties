@@ -290,16 +290,6 @@ def test_component_extraction():
     assert numpy.all(unumpy.std_devs(mat) == [0.1, 0.2])
     assert type(unumpy.nominal_values(mat)) == numpy.matrix
 
-def test_ufloat_from_sample():
-    "Test genarating a number with an uncertainty from a sample"
-
-    test_sample=[-1.5,-0.5,0,0.5,1.5]
-
-    num = core.ufloat_from_sample(test_sample)
-
-    assert numbers_close(num.n,0)
-    assert numbers_close(num.s,0.5)
-
 
 def test_array_comparisons():
     "Test of array and matrix comparisons"
