@@ -74,6 +74,9 @@ try:
 except ImportError:
     numpy = None
 
+if numpy != None:
+    from uncertainties.unumpy.core import uarray
+
 
 def correlated_values(nom_values, covariance_mat, tags=None):
     """
@@ -1030,7 +1033,8 @@ def ufloat_from_sample(sample, method="gaussian", axis=None):
 
     axis: integer or None
         Only when the sample is a numpy array. The axis along 
-        which the ufloats are computed.
+        which the ufloats are computed. If None (the default value)
+        sample is the whole flattend array. 
     
     '''
     
@@ -1041,13 +1045,28 @@ def ufloat_from_sample(sample, method="gaussian", axis=None):
             mean_value=stats_mean(sample)
             error_on_mean=stats_stddev(sample)/sqrt(len(sample)-1)
 
+            return ufloat(mean_value,error_on_mean)
+        
         else:
             #if numpy is present, use the faster numpy functions that can handle a wider range of inputs
             mean_value=numpy.mean(sample, axis=axis)
-            error_on_mean=numpy.std(sample, ddof=1, axis=axis)/numpy.sqrt(len(sample))
+            
+            #the size of each sample being collected
+            sample_size=0
 
-        return ufloat(mean_value,error_on_mean)
+            if axis == None: 
+                sample_size=numpy.size(sample)
+            else:
+                sample_size=numpy.shape(sample)[axis]
 
+            error_on_mean=numpy.std(sample, ddof=1, axis=axis)/numpy.sqrt(sample_size)
+
+            if len(numpy.shape(mean_value))==0:
+                # if the output is a single ufloat
+                return ufloat(mean_value,error_on_mean)
+            else:
+                #if the output is an array of ufloats
+                return uarray(mean_value,error_on_mean)
     else:
         msg={
             "method must be one of the implemented methods"
