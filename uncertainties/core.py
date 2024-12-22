@@ -18,7 +18,7 @@ from builtins import str, zip, range, object
 from math import sqrt, isfinite  # Optimization: no attribute look-up
 
 from statistics import mean as stats_mean
-from statistics import stdev as stats_stddev
+from statistics import stdev as stats_stdev
 
 import copy
 import collections
@@ -1039,7 +1039,7 @@ def ufloat_from_sample(sample, method="gaussian", axis=None):
         if numpy is None:
             #if numpy is not present, use pythons statistics functions instead
             mean_value=stats_mean(sample)
-            error_on_mean=stats_stddev(sample)/sqrt(len(sample)-1)
+            error_on_mean=stats_stdev(sample)/sqrt(len(sample)-1)
 
             return ufloat(mean_value,error_on_mean)
         
