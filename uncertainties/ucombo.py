@@ -126,7 +126,7 @@ class UCombo:
     def __hash__(self: UCombo) -> int:
         if self._hash is None:
             self._hash = hash(
-                sorted(tuple((key, value) for key, value in self.expanded.items()))
+                tuple(sorted((key, value) for key, value in self.expanded.items()))
             )
         return self._hash
 
