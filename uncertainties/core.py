@@ -16,7 +16,6 @@ from __future__ import division  # Many analytical derivatives depend on this
 
 from builtins import str, zip, range, object
 from math import isnan, sqrt  # Optimization: no attribute look-up
-from numbers import Real
 from typing import Optional, Union
 
 from uncertainties.formatting import format_ufloat
@@ -286,7 +285,7 @@ class UFloat(object):
     def __init__(
         self,
         nominal_value: float,
-        uncertainty: Union[UCombo, Real],
+        uncertainty: Union[UCombo, float],
         tag: Optional[str] = None,
     ):
         """
@@ -302,7 +301,7 @@ class UFloat(object):
         float such that a new UCombo and UAtom is generated.
         """
         self._nominal_value = float(nominal_value)
-        if isinstance(uncertainty, Real):
+        if isinstance(uncertainty, float):
             if not isnan(uncertainty) and uncertainty < 0:
                 raise NegativeStdDev("The standard deviation cannot be negative")
             if uncertainty == 0:

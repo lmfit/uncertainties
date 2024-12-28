@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections import defaultdict
 from math import sqrt
-from numbers import Real
 from typing import Optional, Tuple, Union
 import uuid
 
@@ -92,14 +91,14 @@ class UCombo:
     def __radd__(self: UCombo, other: UCombo) -> UCombo:
         return self.__add__(other)
 
-    def __mul__(self: UCombo, scalar: Real) -> UCombo:
-        if not isinstance(scalar, Real):
+    def __mul__(self: UCombo, scalar: float) -> UCombo:
+        if not isinstance(scalar, float):
             return NotImplemented
         if scalar == 0 or not self:
             return UCombo(())
         return UCombo(((self, float(scalar)),))
 
-    def __rmul__(self: UCombo, scalar: Real) -> UCombo:
+    def __rmul__(self: UCombo, scalar: float) -> UCombo:
         return self.__mul__(scalar)
 
     def __iter__(self: UCombo):
