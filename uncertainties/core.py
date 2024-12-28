@@ -285,7 +285,7 @@ class UFloat(object):
     def __init__(
         self,
         nominal_value: float,
-        uncertainty: Union[UCombo, float],
+        uncertainty: Union[UCombo, Union[float, int]],
         tag: Optional[str] = None,
     ):
         """
@@ -301,7 +301,7 @@ class UFloat(object):
         float such that a new UCombo and UAtom is generated.
         """
         self._nominal_value = float(nominal_value)
-        if isinstance(uncertainty, float):
+        if isinstance(uncertainty, (float, int)):
             if not isnan(uncertainty) and uncertainty < 0:
                 raise NegativeStdDev("The standard deviation cannot be negative")
             if uncertainty == 0:
