@@ -5,28 +5,31 @@
 User Guide
 ==========
 
+The :mod:`uncertainties` package is built around the :class:`UFloat` class.
+:class:`UFloat` objects model statistical random variables.
+A :class:`UFloat` object has a nominal value which models the mean of a random variable
+and an uncertainty which can be used to calculate the standard deviation of the random
+variable and correlations between one random variable and another.
+It is possible to construct new random variables by applying mathematical operations to
+and between existing random variables.
+Likewise, it is possible to apply mathematical operations such as arithmetic or
+trigonometric functions to :class:`UFloat` objects to get new :class:`UFloat` objects.
+The nominal values pass through the mathematical operations as if they were regular
+:class:`float` objects, but the uncertainties propagate according to the approximate
+rules of linear error propagation based on local derivatives of the mathematical
+operations.
 
-Basic usage
-===========
-
-Basic mathematical operations involving numbers with uncertainties requires
-importing the :func:`ufloat` function which creates a :class:`Variable`:
-number with both a nominal value and an uncertainty.
-
-     >>> from uncertainties import ufloat
-     >>> x = ufloat(2.7, 0.01)   #  a Variable with a value 2.7+/-0.01
-
-The :mod:`uncertainties` module contains sub-modules for :ref:`advanced
-mathematical functions <advanced math operations>`, and :doc:`arrays and
-matrices <numpy_guide>`, which can be accessed as well.
+In addition to the :class:`UFloat` class, the :mod:`uncertainties` package also provides
+sub-modules for :ref:`advanced mathematical functions <advanced math operations>`, and
+:doc:`arrays and matrix <numpy_guide>` operations.
 
 .. index::
-   pair: number with uncertainty; creation
+   pair: number with uncertainty;
 
-Creating Variables: numbers with uncertainties
-================================================
+Creating UFloat objects: numbers with uncertainties
+===================================================
 
-To create a number with uncertainties or *Variable*, use the :func:`ufloat`
+To create a number with uncertainties or :class:`UFloat`, use the :func:`ufloat`
 function, which takes a *nominal value* (which can be interpreted as the most
 likely value, or the mean or central value of the distribution of values), a
 *standard error* (the standard deviation or :math:`1-\sigma` uncertainty), and
@@ -39,8 +42,8 @@ an optional *tag*:
    pair: nominal value; scalar
    pair: uncertainty; scalar
 
-You can access the nominal value and standard deviation for any Variable with
-the `nominal_value` and `std_dev` attributes:
+You can access the nominal value and standard deviation for any :class:`UFloat` object
+with the `nominal_value` and `std_dev` attributes:
 
 >>> print(x.nominal_value,  x.std_dev)
 2.7 0.01
@@ -52,9 +55,9 @@ abbreviated as `n` and `std_dev` as `s`:
 >>> print(x.n,  x.s)
 2.7 0.01
 
-uncertainties Variables can also be created from one of many string
-representations.  The following forms will all create Variables with the same
-value:
+uncertainties :class:`UFloat` objects can also be created from one of many string
+representations.  The following forms will all create :class:`UFloat` objects with
+the same values:
 
 >>> from uncertainties import ufloat_fromstr
 >>> x = ufloat(0.2, 0.01)
@@ -68,12 +71,13 @@ value:
 More details on the :func:`ufloat` and :func:`ufloat_from_str` can be found in
 :ref:`api_funcs`.
 
-Basic math with uncertain Variables
-=========================================
+Basic math with uncertain UFloat objects
+========================================
 
-Uncertainties variables created in :func:`ufloat` or :func:`ufloat_fromstr` can
-be used in basic mathematical calculations (``+``, ``-``, ``*``, ``/``, ``**``)
-as with other Python numbers and variables.
+Uncertainties :class:`UFloat` objects created using :func:`ufloat` or
+:func:`ufloat_fromstr` can be used in basic mathematical calculations
+(``+``, ``-``, ``*``, ``/``, ``**``)
+as with other Python numbers.
 
 >>> t = ufloat(0.2, 0.01)
 >>> double = 2.0*t
@@ -83,44 +87,45 @@ as with other Python numbers and variables.
 >>> print(square)
 0.040+/-0.004
 
-When adding two Variables, the uncertainty in the result is the quadrature sum
-(square-root of the sum of squares) of the uncertainties of the two Variables:
+When adding two uncorrelated :class:`UFloat` objects, the standard deviation in the
+resulting :class:`UFloat` object is the quadrature sum (square-root of the sum of
+squares) of the standard deviations of the two input :class:`UFloat` objects.
 
 >>> x = ufloat(20, 4)
 >>> y = ufloat(12, 3)
 >>> print(x+y)
 32.0+/-5.0
 
-We can check that error propagation when adding two independent variables
-(using the abbreviation `.s` for the standard error):
+Note that calls :func:`ufloat` create :class:`UFloat` objects which have no correlation
+to any previously created :class:`UFloat` objects.
+We can check the correctness of the error propagation for adding two uncorrelated
+:class:`UFloat` objects:
 
 >>> from math import sqrt
 >>> (x+y).s == sqrt(x.s**2 + y.s**2)
 True
 
-
-Multiplying two Variables will properly propagate those
-uncertainties too:
+We can also multiply two :class:`UFloat` objects:
 
 >>> print(x*y)
 240.0+/-76.83749084919418
 >>> (x*y).s == (x*y).n *  sqrt((x.s/x.n)**2 + (y.s/y.n)**2 )
 True
 
-But note that adding a Variable to itself does not add its uncertainties in
-quadrature, but are simply scaled:
+However, consider the behavior when we add a :class:`UFloat` object to itself:
 
 >>> print(x+x)
 40.0+/-8.0
 >>> print(3*x + 10)
 70.0+/-12.0
 
-
-It is important to understand that calculations done with Variable know about
-the correlation between the Variables.   Variables created with :func:`ufloat`
-(and  :func:`ufloat_fromstr`) are completely uncorrelated with each other, but
-are known to be completely correlated with themselves.  This means that
-
+In this case the resulting standard deviation is not the quadrature sum of the
+standard deviation on the inputs.
+This is because the :class:`UFloat` ``x`` is correlated with itself so the error
+propagation must be handled accordingly.
+This begins to demonstrate that calculations performed using :class:`UFloat` objects are
+aware of correlations between :class:`UFloat` objects.
+Consider the behavior in these two simple examples:
 
 >>> x = ufloat(5, 0.5)
 >>> y = ufloat(5, 0.5)
@@ -128,11 +133,6 @@ are known to be completely correlated with themselves.  This means that
 0.0+/-0.7071067811865476
 >>> x - x
 0.0+/-0
-
-For two *different* Variables, uncorrelated uncertainties will be propagated.
-But when doing a calculation with a single Variable, the uncertainties are
-correlated, and calculations will reflect that.
-
 
 .. index:: mathematical operation; on a scalar, umath
 
