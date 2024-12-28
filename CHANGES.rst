@@ -13,6 +13,15 @@ Changes
    execute it, a `NotImplementedError` is raised indicating that the
    function can't be used because `numpy` couldn't be imported.
 
+Adds:
+
+- Added a small benchmarking suite to CI to guard against absolute performance
+   regressions and accidental breakage of the lazy expansion algorithm whichs ensures
+   O(N), rather than O(N^2), scaling complexity for operations involving many numbers
+   with uncertainty. Established connectivity with `codspeed.io<codspeed.io>`_ to track
+   benchmarking results. (#274)
+
+
 Fixes:
 
 - fix `readthedocs` configuration so that the build passes (#254)
