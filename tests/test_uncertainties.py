@@ -1278,6 +1278,28 @@ else:
 
         assert uarrays_close(cov, numpy.array(uncert_core.covariance_matrix(variables)))
 
+        nom_values = [0, 0, 0]
+        covariance_mat = numpy.diag([1, 1, -1])
+        with pytest.raises(
+            ValueError,
+            match="must be positive semi-definite.",
+        ):
+            x, y, z = correlated_values(nom_values, covariance_mat)
+
+        covariance_mat = numpy.array([[1, 0, 1], [0, 1, 0], [0, 0, 1]])
+        with pytest.raises(
+            ValueError,
+            match="must be symmetric.",
+        ):
+            x, y, z = correlated_values(nom_values, covariance_mat)
+
+        covariance_mat = numpy.array([[1, 0, 0], [0, 1j, 0], [0, 0, 1]])
+        with pytest.raises(
+            ValueError,
+            match="must be real.",
+        ):
+            x, y, z = correlated_values(nom_values, covariance_mat)
+
     def test_correlated_values_correlation_mat():
         """
         Tests the input of correlated value.
@@ -1326,6 +1348,11 @@ else:
             numpy.array(cov_mat),
             numpy.array(uncert_core.covariance_matrix([x2, y2, z2])),
         )
+
+        values_with_std_dev = ((0, 1), (0, 1), (0, -1))
+        correlation_mat = np.diag((1, 1, 1))
+        with pytest.raises(ValueError, match="must be non-negative."):
+            x, y, z = correlated_values_norm(values_with_std_dev, correlation_mat)
 
 
 @pytest.mark.skipif(
