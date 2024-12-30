@@ -31,6 +31,9 @@ class UAtom:
             label = uuid_abbrev
         return f"{self.__class__.__name__}({label})"
 
+    def __repr__(self: UAtom) -> str:
+        return f"{self.__class__.__name__}({self.uuid})"
+
 
 class UCombo:
     __slots__ = ["ucombo_tuple", "is_expanded", "_std_dev", "_expanded_dict", "_hash"]
