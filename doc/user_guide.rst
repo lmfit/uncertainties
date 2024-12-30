@@ -325,7 +325,8 @@ single new independent :class:`UAtom` is also instantiated (and given the option
 passed into :func:`ufloat`) and paired with the new :class:`UFloat`.
 When :class:`UFloat` objects are combined together using mathematical operations the
 resulting :class:`UFloat` objects inherit dependence on the :class:`UAtom` objects
-on which the input :class:`UFloat` objects depend.
+on which the input :class:`UFloat` objects depend in accordance with
+:ref:`linear error propagation theory <linear_method>`.
 In this way, the correlation between :class:`UFloat` objects can be tracked.
 
 We can get access to the :class:`UAtom` objects on which a given :class:`UFloat`
@@ -407,50 +408,21 @@ relationships in a more human-readable way:
 
    p.stop()
 
-Every :class:`UFloat` object has an :attribute:`uncertainty` attribute
-
-The various contributions to an uncertainty can be obtained through the
-:func:`error_components` method, which maps the **independent variables
-a quantity depends on** to their **contribution to the total
-uncertainty**. According to :ref:`linear error propagation theory
-<linear_method>` (which is the method followed by :mod:`uncertainties`),
-the sum of the squares of these contributions is the squared
-uncertainty.
-
-The individual contributions to the uncertainty are more easily usable
-when the variables are **tagged**:
-
->>> u = ufloat(1, 0.1, "u variable")  # Tag
->>> v = ufloat(10, 0.1, "v variable")
->>> sum_value = u+2*v
->>> sum_value
-21.0+/-0.223606797749979
->>> for (var, error) in sum_value.error_components().items():
-...     print("{}: {}".format(var.tag, error))
-...
-u variable: 0.1
-v variable: 0.2
-
-The variance (i.e. squared uncertainty) of the result
-(:data:`sum_value`) is the quadratic sum of these independent
-uncertainties, as it should be (``0.1**2 + 0.2**2``).
-
-The tags *do not have to be distinct*. For instance, *multiple* random
-variables can be tagged as ``"systematic"``, and their contribution to
-the total uncertainty of :data:`result` can simply be obtained as:
+The tags *do not have to be distinct*. For instance, *multiple* :class:`UFloat` objects
+can be tagged as ``"systematic"``, and their contribution to the total uncertainty of
+:data:`result` can simply be obtained as:
 
 >>> syst_error = math.sqrt(sum(  # Error from *all* systematic errors
 ...     error**2
-...     for (var, error) in result.error_components().items()
-...     if var.tag == "systematic"))
+...     for (uatom, error) in result.error_components().items()
+...     if uatom.tag == "systematic"))
 
 The remaining contribution to the uncertainty is:
 
 >>> other_error = math.sqrt(result.std_dev**2 - syst_error**2)
 
-The variance of :data:`result` is in fact simply the quadratic sum of
-these two errors, since the variables from
-:func:`result.error_components` are independent.
+The variance of :data:`result` is in fact simply the quadratic sum of these two errors,
+since the :class:`UAtom` objects from :func:`result.error_components` are independent.
 
 .. index:: comparison operators
 
