@@ -357,15 +357,15 @@ attribute:
 
 .. doctest:: uuid
 
-  >>> x = ufloat(1, 0.1)
-  >>> y = ufloat(2, 0.2)
-  >>> z = x * y
-  >>> print(x.error_components)
-  defaultdict(<class 'float'>, {UAtom(e3..cd): 0.1})
-  >>> print(y.error_components)
-  defaultdict(<class 'float'>, {UAtom(cd..f5): 0.2})
-  >>> print(z.error_components)
-  defaultdict(<class 'float'>, {UAtom(cd..f5): 0.2, UAtom(e3..cd): 0.2})
+   >>> x = ufloat(1, 0.1)
+   >>> y = ufloat(2, 0.3)
+   >>> z = x * y
+   >>> print(x.error_components)
+   {UAtom(e3e70682-c209-4cac-a29f-6fbed82c07cd): 0.1}
+   >>> print(y.error_components)
+   {UAtom(cd613e30-d8f1-4adf-91b7-584a2265b1f5): 0.3}
+   >>> print(z.error_components)
+   {UAtom(cd613e30-d8f1-4adf-91b7-584a2265b1f5): 0.3, UAtom(e3e70682-c209-4cac-a29f-6fbed82c07cd): 0.2}
 
 .. testcleanup :: uuid
 
