@@ -60,6 +60,7 @@ class UCombo:
                 else:
                     for sub_term, sub_weight in term.ucombo_tuple:
                         term_list.append((sub_term, weight * sub_weight))
+            self._expanded_dict = dict(self._expanded_dict)
             self.is_expanded = True
         return self._expanded_dict
 
@@ -82,10 +83,6 @@ class UCombo:
     def __add__(self: UCombo, other) -> UCombo:
         if not isinstance(other, UCombo):
             return NotImplemented
-        if not other:
-            return self
-        if not self:
-            return other
         return UCombo(((self, 1.0), (other, 1.0)))
 
     def __radd__(self: UCombo, other: UCombo) -> UCombo:
@@ -94,8 +91,6 @@ class UCombo:
     def __mul__(self: UCombo, scalar: Union[float, int]) -> UCombo:
         if not isinstance(scalar, (float, int)):
             return NotImplemented
-        if scalar == 0 or not self:
-            return UCombo(())
         return UCombo(((self, float(scalar)),))
 
     def __rmul__(self: UCombo, scalar: Union[float, int]) -> UCombo:
