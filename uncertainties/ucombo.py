@@ -24,7 +24,7 @@ class UAtom:
         return self.uuid < other.uuid
 
     def __str__(self: UAtom) -> str:
-        uuid_abbrev = f"{str(self.uuid)[0:2]}..{str(self.uuid)[-3:-1]}"
+        uuid_abbrev = f"{str(self.uuid)[0:2]}..{str(self.uuid)[-2:]}"
         if self.tag is not None:
             label = f"{self.tag}, {uuid_abbrev}"
         else:
