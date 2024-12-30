@@ -329,7 +329,7 @@ on which the input :class:`UFloat` objects depend.
 In this way, the correlation between :class:`UFloat` objects can be tracked.
 
 We can get access to the :class:`UAtom` objects on which a given :class:`UFloat`
-depends, and their corresponding weights using the :attribute:`Ufloat.error_components`
+depends, and their corresponding weights using the :attribute:`UFloat.error_components`
 attribute:
 
 
@@ -366,6 +366,42 @@ attribute:
    {UAtom(cd613e30-d8f1-4adf-91b7-584a2265b1f5): 0.3}
    >>> print(z.error_components)
    {UAtom(cd613e30-d8f1-4adf-91b7-584a2265b1f5): 0.3, UAtom(e3e70682-c209-4cac-a29f-6fbed82c07cd): 0.2}
+
+The standard deviation of each :class:`UFloat` is given by the sum of squares of the
+weights for all the :class:`UAtom` objects on which that :class:`UFloat` depends
+
+.. doctest:: uuid
+
+   >>> print(x.std_dev)
+   0.1
+   >>> print(y.std_dev)
+   0.3
+   >>> print(z.std_dev)
+   0.36055512754639896
+
+The :func:`ufloat` function accepts a ``tag`` argument.
+If a string is passed in as the ``tag`` then this ``tag`` gets added to the new
+:class:`UAtom` object that is instantiated together with the new :class:`UFloat`.
+Note that :class:`UFloat` objects do not carry tags, only the underlying :class`UAtom`
+objects do.
+The tags on :class:`UAtom` objects can be used to keep track of the statistical
+relationships in a more human-readable way:
+
+.. doctest:: uuid
+
+   >>> x = ufloat(1, 0.1, tag='x')
+   >>> y = ufloat(2, 0.3, tag='y')
+   >>> z = x * y
+   >>>
+   >>> for uatom, weight in z.error_components.items():
+   ...     if uatom.tag is not None:
+   ...         label = uatom.tag
+   ...     else:
+   ...         label = uatom.uuid
+   ...     print(f"{label}: {weight}")
+   y: 0.3
+   x: 0.2
+
 
 .. testcleanup :: uuid
 
