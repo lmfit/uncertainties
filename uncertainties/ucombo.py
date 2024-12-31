@@ -86,7 +86,7 @@ class UCombo:
     def __add__(self: UCombo, other) -> UCombo:
         if not isinstance(other, UCombo):
             return NotImplemented
-        return UCombo(((self, 1.0), (other, 1.0)))
+        return UCombo(self.ucombo_tuple + other.ucombo_tuple)
 
     def __radd__(self: UCombo, other: UCombo) -> UCombo:
         return self.__add__(other)
