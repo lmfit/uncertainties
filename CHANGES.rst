@@ -24,6 +24,7 @@ Adds:
 
 Fixes:
 
+- fix typos in `ufloat_fromstr` docstring examples (#285)
 - fix `readthedocs` configuration so that the build passes (#254)
 - adjust `codecov.io` configuration so that minor code coverage changes will not result
    in indications that tests are failing. Rather code coverage reports will be purely

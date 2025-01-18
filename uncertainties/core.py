@@ -988,13 +988,13 @@ def ufloat_fromstr(representation, tag=None):
     Examples:
     -----------
 
-    >>> x = ufloat_fromsstr("12.58+/-0.23")  # = ufloat(12.58, 0.23)
-    >>> x = ufloat_fromsstr("12.58 ± 0.23")  # = ufloat(12.58, 0.23)
-    >>> x = ufloat_fromsstr("3.85e5 +/- 2.3e4")  # = ufloat(3.8e5, 2.3e4)
-    >>> x = ufloat_fromsstr("(38.5 +/- 2.3)e4")  # = ufloat(3.8e5, 2.3e4)
+    >>> x = ufloat_fromstr("12.58+/-0.23")  # = ufloat(12.58, 0.23)
+    >>> x = ufloat_fromstr("12.58 ± 0.23")  # = ufloat(12.58, 0.23)
+    >>> x = ufloat_fromstr("3.85e5 +/- 2.3e4")  # = ufloat(3.8e5, 2.3e4)
+    >>> x = ufloat_fromstr("(38.5 +/- 2.3)e4")  # = ufloat(3.8e5, 2.3e4)
 
-    >>> x = ufloat_fromsstr("72.1(2.2)")  # = ufloat(72.1, 2.2)
-    >>> x = ufloat_fromsstr("72.15(4)")  # = ufloat(72.15, 0.04)
+    >>> x = ufloat_fromstr("72.1(2.2)")  # = ufloat(72.1, 2.2)
+    >>> x = ufloat_fromstr("72.15(4)")  # = ufloat(72.15, 0.04)
     >>> x = ufloat_fromstr("680(41)e-3")  # = ufloat(0.68, 0.041)
     >>> x = ufloat_fromstr("23.2")  # = ufloat(23.2, 0.1)
     >>> x = ufloat_fromstr("23.29")  # = ufloat(23.29, 0.01)
