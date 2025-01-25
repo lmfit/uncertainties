@@ -1,8 +1,14 @@
-import random
 from math import isnan, isinf
 
 import uncertainties.core as uncert_core
-from uncertainties.core import ufloat, AffineScalarFunc
+from uncertainties.core import ufloat, UFloat
+
+
+def get_single_uatom(num_with_uncertainty: UFloat):
+    error_components = num_with_uncertainty.error_components
+    if len(error_components) > 1:
+        raise ValueError("UFloat has more than one error component.")
+    return next(iter(error_components.keys()))
 
 
 def power_all_cases(op):
@@ -32,60 +38,69 @@ def power_all_cases(op):
     non_int_larger_than_one = ufloat(3.1, 0.01)
     positive_smaller_than_one = ufloat(0.3, 0.01)
 
+    assert integer.uncertainty.ucombo_tuple == ()
+
+    negative_uatom = get_single_uatom(negative)
+    positive_uatom = get_single_uatom(positive)
+    positive2_uatom = get_single_uatom(positive2)
+    one_uatom = get_single_uatom(one)
+    zero_uatom = get_single_uatom(zero)
+    zero2_uatom = get_single_uatom(zero2)
+    non_int_larger_than_one_uatom = get_single_uatom(non_int_larger_than_one)
+    positive_smaller_than_one_uatom = get_single_uatom(positive_smaller_than_one)
     ## negative**integer
 
     result = op(negative, integer)
-    assert not isnan(result.derivatives[negative])
-    assert isnan(result.derivatives[integer])
+    assert not isnan(result.error_components[negative_uatom])
 
     # Limit cases:
     result = op(negative, one)
-    assert result.derivatives[negative] == 1
-    assert isnan(result.derivatives[one])
+    assert result.error_components[negative_uatom] == negative.std_dev
+    assert isnan(result.error_components[one_uatom])
 
     result = op(negative, zero)
-    assert result.derivatives[negative] == 0
-    assert isnan(result.derivatives[zero])
+    assert result.error_components[negative_uatom] == 0
+    assert isnan(result.error_components[zero_uatom])
 
     ## negative**non-integer
 
     ## zero**...
 
     result = op(zero, non_int_larger_than_one)
-    assert isnan(result.derivatives[zero])
-    assert result.derivatives[non_int_larger_than_one] == 0
+    assert isnan(result.error_components[zero_uatom])
+    assert result.error_components[non_int_larger_than_one_uatom] == 0
 
     # Special cases:
     result = op(zero, one)
-    assert result.derivatives[zero] == 1
-    assert result.derivatives[one] == 0
+    assert result.error_components[zero_uatom] == zero.std_dev
+    assert result.error_components[one_uatom] == 0
 
     result = op(zero, 2 * one)
-    assert result.derivatives[zero] == 0
-    assert result.derivatives[one] == 0
+    assert result.error_components[zero_uatom] == 0
+    assert result.error_components[one_uatom] == 0
 
     result = op(zero, positive_smaller_than_one)
-    assert isnan(result.derivatives[zero])
-    assert result.derivatives[positive_smaller_than_one] == 0
+    assert isnan(result.error_components[zero_uatom])
+    assert result.error_components[positive_smaller_than_one_uatom] == 0
 
     result = op(zero, zero2)
-    assert result.derivatives[zero] == 0
-    assert isnan(result.derivatives[zero2])
+    assert result.error_components[zero_uatom] == 0
+    assert isnan(result.error_components[zero2_uatom])
 
     ## positive**...: this is a quite regular case where the value and
-    ## the derivatives are all defined.
+    ## the error_components are all defined.
 
     result = op(positive, positive2)
-    assert not isnan(result.derivatives[positive])
-    assert not isnan(result.derivatives[positive2])
+    assert not isnan(result.error_components[positive_uatom])
+    assert not isnan(result.error_components[positive2_uatom])
 
     result = op(positive, zero)
-    assert result.derivatives[positive] == 0
-    assert not isnan(result.derivatives[zero])
+    assert result.error_components[positive_uatom] == 0
+    assert not isnan(result.error_components[zero_uatom])
 
     result = op(positive, negative)
-    assert not isnan(result.derivatives[positive])
-    assert not isnan(result.derivatives[negative])
+    assert not isnan(result.error_components[positive_uatom])
+    assert not isnan(result.error_components[negative_uatom])
 
 
 def power_special_cases(op):
@@ -209,145 +224,6 @@ def ufloats_close(x, y, tolerance=1e-6):
 
 class DerivativesDiffer(Exception):
     pass
-
-
-def compare_derivatives(func, numerical_derivatives, num_args_list=None):
-    """
-    Checks the derivatives of a function 'func' (as returned by the
-    wrap() wrapper), by comparing them to the
-    'numerical_derivatives' functions.
-
-    Raises a DerivativesDiffer exception in case of problem.
-
-    These functions all take the number of arguments listed in
-    num_args_list.  If num_args is None, it is automatically obtained.
-
-    Tests are done on random arguments.
-    """
-
-    try:
-        funcname = func.name
-    except AttributeError:
-        funcname = func.__name__
-
-    # print "Testing", func.__name__
-
-    if not num_args_list:
-        # Detecting automatically the correct number of arguments is not
-        # always easy (because not all values are allowed, etc.):
-
-        num_args_table = {
-            "atanh": [1],
-            "log": [1, 2],  # Both numbers of arguments are tested
-        }
-        if funcname in num_args_table:
-            num_args_list = num_args_table[funcname]
-        else:
-            num_args_list = []
-
-            # We loop until we find reasonable function arguments:
-            # We get the number of arguments by trial and error:
-            for num_args in range(10):
-                try:
-                    #! Giving integer arguments is good for preventing
-                    # certain functions from failing even though num_args
-                    # is their correct number of arguments
-                    # (e.g. math.ldexp(x, i), where i must be an integer)
-                    func(*(1,) * num_args)
-                except TypeError:
-                    pass  # Not the right number of arguments
-                else:  # No error
-                    # num_args is a good number of arguments for func:
-                    num_args_list.append(num_args)
-
-            if not num_args_list:
-                raise Exception(
-                    "Can't find a reasonable number of arguments"
-                    " for function '%s'." % funcname
-                )
-
-    for num_args in num_args_list:
-        # Argument numbers that will have a random integer value:
-        integer_arg_nums = set()
-
-        if funcname == "ldexp":
-            # The second argument must be an integer:
-            integer_arg_nums.add(1)
-
-        while True:
-            try:
-                # We include negative numbers, for more thorough tests:
-                args = []
-                for arg_num in range(num_args):
-                    if arg_num in integer_arg_nums:
-                        args.append(random.choice(range(-10, 10)))
-                    else:
-                        args.append(uncert_core.Variable(random.random() * 4 - 2, 0))
-
-                # 'args', but as scalar values:
-                args_scalar = [uncert_core.nominal_value(v) for v in args]
-
-                func_approx = func(*args)
-
-                # Some functions yield simple Python constants, after
-                # wrapping in wrap(): no test has to be performed.
-                # Some functions also yield tuples...
-                if isinstance(func_approx, AffineScalarFunc):
-                    # We compare all derivatives:
-                    for arg_num, (arg, numerical_deriv) in enumerate(
-                        zip(args, numerical_derivatives)
-                    ):
-                        # Some arguments might not be differentiable:
-                        if isinstance(arg, int):
-                            continue
-
-                        fixed_deriv_value = func_approx.derivatives[arg]
-
-                        num_deriv_value = numerical_deriv(*args_scalar)
-
-                        # This message is useful: the user can see that
-                        # tests are really performed (instead of not being
-                        # performed, silently):
-                        print(
-                            "Testing derivative #%d of %s at %s"
-                            % (arg_num, funcname, args_scalar)
-                        )
-
-                        if not numbers_close(fixed_deriv_value, num_deriv_value, 1e-4):
-                            # It is possible that the result is NaN:
-                            if not isnan(func_approx):
-                                raise DerivativesDiffer(
-                                    "Derivative #%d of function '%s' may be"
-                                    " wrong: at args = %s,"
-                                    " value obtained = %.16f,"
-                                    " while numerical approximation = %.16f."
-                                    % (
-                                        arg_num,
-                                        funcname,
-                                        args,
-                                        fixed_deriv_value,
-                                        num_deriv_value,
-                                    )
-                                )
-
-            except ValueError as err:  # Arguments out of range, or of wrong type
-                # Factorial(real) lands here:
-                if str(err).startswith("factorial"):
-                    integer_arg_nums = set([0])
-                continue  # We try with different arguments
-            # Some arguments might have to be integers, for instance:
-            except TypeError as err:
-                if len(integer_arg_nums) == num_args:
-                    raise Exception(
-                        "Incorrect testing procedure: unable to "
-                        "find correct argument values for %s: %s" % (funcname, err)
-                    )
-
-                # Another argument might be forced to be an integer:
-                integer_arg_nums.add(random.choice(range(num_args)))
-            else:
-                # We have found reasonable arguments, and the test passed:
-                break
 
 
 ###############################################################################
