@@ -15,6 +15,8 @@ from builtins import zip
 from builtins import range
 import sys
 import inspect
+import re
+import ast
 
 # 3rd-party modules:
 import numpy
@@ -138,17 +140,17 @@ def uarray_fromstr(representation, tag=None):
     Returns:
     --------
     uarray Variable.
-
-    Examples:
-    -----------
-
-    >>> x = uarray_fromstr("[0.20+/-0.01 0.30+/-0.02]")  # = numpy.array([ufloat(0.20, 0.01), ufloat(0.30, 0.02)])
-    >>> x = uarray_fromstr("[0.20(1) 0.30(2)]")  # = numpy.array([ufloat(0.20, 0.01), ufloat(0.30, 0.02)])
-    >>> x = uarray_fromstr("[nan nan"])  # = numpy.array([ufloat(numpy.nan, 1.0), ufloat(numpy.nan, 1.0)])
     """
-    values = representation.strip("[]").split()
-    values = [uncert_core.ufloat_fromstr(value, tag) for value in values]
-    return uarray(values)
+    # Replace whitespace with commas. Representations of ufloats should never
+    # contain commas, and we disallow spaces in the ufloat representations.
+    rep = re.sub("\s+", ",", str(representation))
+    # Wrap any part of the representation that is not a square bracket or comma in
+    # quotes, in order to turn it into a string, then eval the resulting string
+    # to get a numpy array of string representations of ufloats.
+    arr = numpy.array(ast.literal_eval(re.sub(r"([^\[\],]+)", r'"\1"', rep)))
+    # Finally, convert the string representations to ufloats.
+    uarr = numpy.vectorize(uncert_core.ufloat_fromstr)(arr, tag)
+    return uarr
 
 
 ###############################################################################
