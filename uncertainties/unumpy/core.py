@@ -30,6 +30,7 @@ __all__ = [
     # Utilities:
     "nominal_values",
     "std_devs",
+    "uarray_fromstr",
     # Classes:
     "matrix",
 ]
@@ -115,6 +116,39 @@ def std_devs(arr):
     """
 
     return unumpy_to_numpy_matrix(to_std_devs(arr))
+
+
+def uarray_fromstr(representation, tag=None):
+    """
+    Create an uarray Variable from a string representation.
+
+    The string representation is expected to be a space-separated list of
+    ufloat representations, enclosed in square brackets.
+
+    The same ufloat representations as in ufloat_fromstr are accepted, except
+    representations containing spaces.
+
+    Arguments:
+    ----------
+    representation: string
+        string representation of an array of ufloat string representations
+    tag:   string or `None`
+        optional tag for tracing and organizing Variables ['None']
+
+    Returns:
+    --------
+    uarray Variable.
+
+    Examples:
+    -----------
+
+    >>> x = uarray_fromstr("[0.20+/-0.01 0.30+/-0.02]")  # = numpy.array([ufloat(0.20, 0.01), ufloat(0.30, 0.02)])
+    >>> x = uarray_fromstr("[0.20(1) 0.30(2)]")  # = numpy.array([ufloat(0.20, 0.01), ufloat(0.30, 0.02)])
+    >>> x = uarray_fromstr("[nan nan"])  # = numpy.array([ufloat(numpy.nan, 1.0), ufloat(numpy.nan, 1.0)])
+    """
+    values = representation.strip("[]").split()
+    values = [uncert_core.ufloat_fromstr(value, tag) for value in values]
+    return uarray(values)
 
 
 ###############################################################################
