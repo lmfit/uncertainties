@@ -20,6 +20,8 @@ Adds:
    O(N), rather than O(N^2), scaling complexity for operations involving many numbers
    with uncertainty. Established connectivity with `codspeed.io<codspeed.io>`_ to track
    benchmarking results. (#274)
+- Added a function `unumpy.uarray_fromstr` to create unumpy arrays from string
+   representations.
 
 
 Fixes:
