@@ -311,7 +311,7 @@ def test_uarray_fromstr():
         "[1+/-0.1 2+/-0.2]": [(1, 0.1), (2, 0.2)],
         "[1.0+/-0.1 2.0+/-0.2]": [(1, 0.1), (2, 0.2)],
         # Global exponent:
-        "[(3.141+/-0.001)E+02 (6.283+/-0.002)E+02]": [(3.141, 0.001), (6.283, 0.002)],
+        "[(3.141+/-0.001)E+02 (6.283+/-0.002)E+02]": [(314.1, 0.1), (628.3, 0.2)],
         # Without uncertainties:
         "[25]": [(25, 1)],
         "[1 2 3]": [(1, 1), (2, 1), (3, 1)],
@@ -351,6 +351,6 @@ def test_uarray_fromstr():
         # With a tag as keyword argument:
         num_array = core.uarray_fromstr(representation, tag="test variable")
         for i, num in enumerate(num_array.flatten()):
-            assert numbers_close(num.nominal_value, values[0])
-            assert numbers_close(num.std_dev, values[1])
+            assert numbers_close(num.nominal_value, values[i][0])
+            assert numbers_close(num.std_dev, values[i][1])
             assert num.tag == "test variable"
