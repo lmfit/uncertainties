@@ -303,10 +303,10 @@ def test_array_comparisons():
 
 
 def test_uarray_fromstr():
-    "Test array creation from string representation"
+    "Test uarray creation from string representation"
 
-    # String representation, and numerical values:
-    tests = {
+    # 1D string representations, and numerical values:
+    tests_1D = {
         # Standard output from str(uarray):
         "[1+/-0.1 2+/-0.2]": [(1, 0.1), (2, 0.2)],
         "[1.0+/-0.1 2.0+/-0.2]": [(1, 0.1), (2, 0.2)],
@@ -333,7 +333,8 @@ def test_uarray_fromstr():
         "[-3(0.) 2(0.)]": [(-3, 0), (2, 0)],
     }
 
-    for representation, values in tests.items():
+    # Test the 1D representations:
+    for representation, values in tests_1D.items():
         # Without tag:
         num_array = core.uarray_fromstr(representation)
         for i, num in enumerate(num_array.flatten()):
@@ -354,3 +355,33 @@ def test_uarray_fromstr():
             assert numbers_close(num.nominal_value, values[i][0])
             assert numbers_close(num.std_dev, values[i][1])
             assert num.tag == "test variable"
+
+    # Higher dimensional arrays:
+    tests_ND = {
+        # 2D array:
+        "[[1+/-0.1 2+/-0.2]\n [3+/-0.3 4+/-0.4]]": numpy.array(
+            [
+                [(1, 0.1), (2, 0.2)],
+                [(3, 0.3), (4, 0.4)],
+            ],
+            dtype="f,f",
+        ),
+        # 3D array:
+        "[[[1+/-0.1 2+/-0.2]\n [3+/-0.3 4+/-0.4]]\n\n [[5+/-0.5 6+/-0.6]\n [7+/-0.7 8+/-0.8]]]": numpy.array(
+            [
+                [(1, 0.1), (2, 0.2)],
+                [(3, 0.3), (4, 0.4)],
+                [(5, 0.5), (6, 0.6)],
+                [(7, 0.7), (8, 0.8)],
+            ],
+            dtype="f,f",
+        ),
+    }
+
+    # Test the higher-dimensional representations:
+    for representation, values in tests_ND.items():
+        num_array = core.uarray_fromstr(representation)
+        for i, num in enumerate(num_array.flatten()):
+            assert numbers_close(num.nominal_value, values.flatten()[i][0])
+            assert numbers_close(num.std_dev, values.flatten()[i][1])
+            assert num.tag is None
