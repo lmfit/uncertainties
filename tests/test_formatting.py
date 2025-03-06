@@ -26,6 +26,7 @@ def test_PDG_precision():
     for std_dev, result in tests.items():
         assert formatting.PDG_precision(std_dev) == result
 
+
 def test_small_float():
     """
     Make sure that very small floats do not error, even though printing as str

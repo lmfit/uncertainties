@@ -995,9 +995,8 @@ def format_ufloat(ufloat_to_format, format_spec):
             # cases where this doesn't apply: too many digits when expressed like this,
             # or the common factor is way too small.
             if pres_type not in ("e", "E"):  # g, G, None
-                use_exp = (
-                    not (-4 <= common_exp < common_exp - digits_limit + 1)
-                    and (common_factor != 0.0)
+                use_exp = not (-4 <= common_exp < common_exp - digits_limit + 1) and (
+                    common_factor != 0.0
                 )
 
     ########################################
