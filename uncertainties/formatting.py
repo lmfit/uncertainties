@@ -965,18 +965,8 @@ def format_ufloat(ufloat_to_format, format_spec):
 
     if pres_type in ("f", "F"):
         use_exp = False
-    elif pres_type in ("e", "E"):
-        if not real_values:
-            use_exp = False
-        else:
-            use_exp = True
-            # !! This calculation might have been already done,
-            # for instance when using the .0e format:
-            # signif_dgt_to_limit() was called before, which
-            # prompted a similar calculation:
-            common_exp = first_digit(round(exp_ref_value, -digits_limit))
 
-    else:  # None, g, G
+    else:  # e, E, g, G, None
         # The rules from
         # https://docs.python.org/3.4/library/string.html#format-specification-mini-language
         # are applied.
@@ -997,18 +987,18 @@ def format_ufloat(ufloat_to_format, format_spec):
         # for floats is used ("-4 <= exponent of rounded value <
         # p"), on the nominal value.
 
-        if not real_values:
-            use_exp = False
-        else:
-            # Common exponent *if* used:
-            common_exp = first_digit(round(exp_ref_value, -digits_limit))
-
+        if use_exp := real_values:
             # The number of significant digits of the reference value
             # rounded at digits_limit is exponent-digits_limit+1:
-            use_exp = (
-                not (-4 <= common_exp < common_exp - digits_limit + 1)
-                and (factor := 10.0**common_exp) != 0.0
-            )
+            common_exp = first_digit(round(exp_ref_value, -digits_limit))
+            common_factor = 10.0**common_exp
+            # cases where this doesn't apply: too many digits when expressed like this,
+            # or the common factor is way too small.
+            if pres_type not in ("e", "E"):  # g, G, None
+                use_exp = (
+                    not (-4 <= common_exp < common_exp - digits_limit + 1)
+                    and (common_factor != 0.0)
+                )
 
     ########################################
 
@@ -1022,11 +1012,8 @@ def format_ufloat(ufloat_to_format, format_spec):
     # exponent should be used.
 
     if use_exp:
-        # Not 10.**(-common_exp), for limit values of common_exp:
-        factor = 10.0**common_exp
-
-        nom_val_mantissa = nom_val / factor
-        std_dev_mantissa = std_dev / factor
+        nom_val_mantissa = nom_val / common_factor
+        std_dev_mantissa = std_dev / common_factor
         # Limit for the last digit of the mantissas:
         signif_limit = digits_limit - common_exp
 
