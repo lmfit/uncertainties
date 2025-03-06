@@ -1003,16 +1003,12 @@ def format_ufloat(ufloat_to_format, format_spec):
             # Common exponent *if* used:
             common_exp = first_digit(round(exp_ref_value, -digits_limit))
 
-            # print "COMMON EXP TEST VALUE", common_exp
-            # print "LIMIT EXP", common_exp-digits_limit+1
-            # print "WITH digits_limit", digits_limit
-
             # The number of significant digits of the reference value
             # rounded at digits_limit is exponent-digits_limit+1:
-            if -4 <= common_exp < common_exp - digits_limit + 1:
-                use_exp = False
-            else:
-                use_exp = True
+            use_exp = (
+                not (-4 <= common_exp < common_exp - digits_limit + 1)
+                and (factor := 10.0**common_exp) != 0.0
+            )
 
     ########################################
 
