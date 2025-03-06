@@ -26,6 +26,18 @@ def test_PDG_precision():
     for std_dev, result in tests.items():
         assert formatting.PDG_precision(std_dev) == result
 
+def test_small_float():
+    """
+    Make sure that very small floats do not error, even though printing as str
+    causes the number to be rounded to the nearest 324.
+    Suggested by issue #135.
+    """
+    a = 1e-324
+    b = 3e-324
+    assert a < b
+    str(ufloat(a, 0.0))
+    str(ufloat(b, 0.0))
+
 
 def test_repr():
     """Test the representation of numbers with uncertainty."""
