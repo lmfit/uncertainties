@@ -30,6 +30,8 @@ Fixes:
 - adjust `codecov.io` configuration so that minor code coverage changes will not result
    in indications that tests are failing. Rather code coverage reports will be purely
    informational for code reviewers. Also fix other minor configuration issues. (#270)
+- fixes to the str representation which occassionally errors when AffineScalarFunc is
+  too small (#135)
 
 3.2.2   2024-July-08
 -----------------------
