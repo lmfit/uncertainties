@@ -5,30 +5,40 @@ import uncertainties.core as uncert_core
 from uncertainties.core import ufloat, AffineScalarFunc
 
 
+zero = ufloat(0, 0.1)
+zero2 = ufloat(0, 0.1)
+one = ufloat(1, 0.1)
+two = ufloat(2, 0.2)
+positive = ufloat(0.3, 0.01)
+positive2 = ufloat(0.3, 0.01)
+negative = ufloat(-0.3, 0.01)
+integer = ufloat(-3, 0)
+non_int_larger_than_one = ufloat(3.1, 0.01)
+positive_smaller_than_one = ufloat(0.3, 0.01)
+
+
 power_derivative_cases = (
-    ((-0.3, 0.01), (-3.0, 0.0), -370.37037037037044, float("nan")),
-    ((-0.3, 0.01), (1.0, 0.1), 1.0, float("nan")),
-    ((-0.3, 0.01), (0.0, 0.1), 0.0, float("nan")),
-    ((0.0, 0.1), (3.1, 0.01), float("nan"), 0.0),
-    ((0.0, 0.1), (1.0, 0.1), 1.0, 0.0),
-    ((0.0, 0.1), (2.0, 0.2), 0.0, 0.0),
-    ((0.0, 0.1), (0.3, 0.01), float("nan"), 0.0),
-    ((0.0, 0.1), (0.0, 0.1), 0.0, float("nan")),
-    ((0.3, 0.01), (0.3, 0.01), 0.696845301935949, -0.8389827923531782),
-    ((0.3, 0.01), (0.0, 0.1), 0.0, -1.2039728043259361),
-    ((0.3, 0.01), (-0.3, 0.01), -1.4350387341664474, -1.7277476090907193),
+    (negative, integer, -370.37037037037044, float("nan")),
+    (negative, one, 1.0, float("nan")),
+    (negative, zero, 0.0, float("nan")),
+    (zero, non_int_larger_than_one, float("nan"), 0.0),
+    (zero, one, 1.0, 0.0),
+    (zero, two, 0.0, 0.0),
+    (zero, positive_smaller_than_one, float("nan"), 0.0),
+    (zero, zero2, 0.0, float("nan")),
+    (positive, positive2, 0.696845301935949, -0.8389827923531782),
+    (positive, zero, 0.0, -1.2039728043259361),
+    (positive, negative, -1.4350387341664474, -1.7277476090907193),
 )
 
 
 def power_all_cases(op):
     for (
-        (first_val, first_std),
-        (second_val, second_std),
+        first_ufloat,
+        second_ufloat,
         first_der,
         second_der,
     ) in power_derivative_cases:
-        first_ufloat = ufloat(first_val, first_std)
-        second_ufloat = ufloat(second_val, second_std)
         result = op(first_ufloat, second_ufloat)
         first_der_result = result.derivatives[first_ufloat]
         second_der_result = result.derivatives[second_ufloat]
