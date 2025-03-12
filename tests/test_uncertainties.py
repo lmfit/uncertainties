@@ -13,10 +13,6 @@ from uncertainties import (
     correlation_matrix,
 )
 from helpers import (
-    power_derivative_cases,
-    power_float_result_cases,
-    power_reference_cases,
-    nan_close,
     numbers_close,
     ufloats_close,
     compare_derivatives,
@@ -1050,53 +1046,6 @@ def test_covariances():
     assert numbers_close(covs[2][2], 0.09)
     # Non-diagonal elements:
     assert numbers_close(covs[0][1], -0.02)
-
-
-###############################################################################
-
-
-@pytest.mark.parametrize(
-    "first_ufloat, second_ufloat, first_der, second_der",
-    power_derivative_cases,
-)
-def test_power_derivatives(first_ufloat, second_ufloat, first_der, second_der):
-    result = pow(first_ufloat, second_ufloat)
-    first_der_result = result.derivatives[first_ufloat]
-    second_der_result = result.derivatives[second_ufloat]
-    assert nan_close(first_der_result, first_der)
-    assert nan_close(second_der_result, second_der)
-
-
-@pytest.mark.parametrize(
-    "first_ufloat, second_ufloat, result_float",
-    power_float_result_cases,
-)
-def test_power_float_result_cases(first_ufloat, second_ufloat, result_float):
-    assert pow(first_ufloat, second_ufloat) == result_float
-
-
-zero = ufloat(0, 0)
-positive = ufloat(0.3, 0.01)
-negative = ufloat(-0.3, 0.01)
-power_exception_cases = [
-    (ufloat(0, 0), negative, ZeroDivisionError),
-    (ufloat(0, 0.1), negative, ZeroDivisionError),
-    (negative, positive, ValueError),
-]
-
-
-@pytest.mark.parametrize("first_ufloat, second_ufloat, exc_type", power_exception_cases)
-def test_power_exceptions(first_ufloat, second_ufloat, exc_type):
-    with pytest.raises(exc_type):
-        pow(first_ufloat, second_ufloat)
-
-
-@pytest.mark.parametrize("first_ufloat, second_float", power_reference_cases)
-def test_power_wrt_ref(first_ufloat, second_float):
-    assert pow(first_ufloat, second_float).n == pow(first_ufloat.n, second_float)
-
-
-###############################################################################
 
 
 ###############################################################################

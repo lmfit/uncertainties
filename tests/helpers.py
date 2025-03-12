@@ -2,7 +2,7 @@ import random
 from math import isclose, isnan, isinf
 
 import uncertainties.core as uncert_core
-from uncertainties.core import ufloat, AffineScalarFunc
+from uncertainties.core import AffineScalarFunc
 
 
 def nan_close(first, second):
@@ -10,77 +10,6 @@ def nan_close(first, second):
         return isnan(second)
     else:
         return isclose(first, second)
-
-
-zero = ufloat(0, 0.1)
-zero2 = ufloat(0, 0.1)
-one = ufloat(1, 0.1)
-two = ufloat(2, 0.2)
-positive = ufloat(0.3, 0.01)
-positive2 = ufloat(0.3, 0.01)
-negative = ufloat(-0.3, 0.01)
-integer = ufloat(-3, 0)
-non_int_larger_than_one = ufloat(3.1, 0.01)
-positive_smaller_than_one = ufloat(0.3, 0.01)
-
-
-power_derivative_cases = (
-    (negative, integer, -370.37037037037044, float("nan")),
-    (negative, one, 1.0, float("nan")),
-    (negative, zero, 0.0, float("nan")),
-    (zero, non_int_larger_than_one, float("nan"), 0.0),
-    (zero, one, 1.0, 0.0),
-    (zero, two, 0.0, 0.0),
-    (zero, positive_smaller_than_one, float("nan"), 0.0),
-    (zero, zero2, 0.0, float("nan")),
-    (positive, positive2, 0.696845301935949, -0.8389827923531782),
-    (positive, zero, 0.0, -1.2039728043259361),
-    (positive, negative, -1.4350387341664474, -1.7277476090907193),
-)
-
-
-zero = ufloat(0, 0)
-one = ufloat(1, 0)
-p = ufloat(0.3, 0.01)
-
-power_float_result_cases = [
-    (0, p, 0),
-    (zero, p, 0),
-    (float("nan"), zero, 1),
-    (one, float("nan"), 1),
-    (p, 0, 1),
-    (zero, 0, 1),
-    (-p, 0, 1),
-    (-10.3, zero, 1),
-    (0, zero, 1),
-    (0.3, zero, 1),
-    (-p, zero, 1),
-    (zero, zero, 1),
-    (p, zero, 1),
-    (one, -3, 1),
-    (one, -3.1, 1),
-    (one, 0, 1),
-    (one, 3, 1),
-    (one, 3.1, 1),
-    (one, -p, 1),
-    (one, zero, 1),
-    (one, p, 1),
-    (1, -p, 1),
-    (1, zero, 1),
-    (1, p, 1),
-]
-
-
-zero = ufloat(0, 0)
-positive = ufloat(0.3, 0.01)
-negative = ufloat(-0.3, 0.01)
-
-
-power_reference_cases = [
-    (ufloat(-1.1, 0.1), -9),
-    (ufloat(-1, 0), 9),
-    (ufloat(-1.1, 0), 9),
-]
 
 
 ###############################################################

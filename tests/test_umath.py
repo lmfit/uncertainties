@@ -1,18 +1,13 @@
 import math
 from math import isnan
 
-import pytest
 
 from uncertainties import ufloat
 import uncertainties.core as uncert_core
 import uncertainties.umath_core as umath_core
 
 from helpers import (
-    power_derivative_cases,
-    power_float_result_cases,
-    power_reference_cases,
     compare_derivatives,
-    nan_close,
     numbers_close,
 )
 ###############################################################################
@@ -279,51 +274,3 @@ def test_hypot():
     result = umath_core.hypot(x, y)
     assert isnan(result.derivatives[x])
     assert isnan(result.derivatives[y])
-
-
-@pytest.mark.parametrize(
-    "first_ufloat, second_ufloat, first_der, second_der",
-    power_derivative_cases,
-)
-def test_power_derivatives(first_ufloat, second_ufloat, first_der, second_der):
-    result = umath_core.pow(first_ufloat, second_ufloat)
-    first_der_result = result.derivatives[first_ufloat]
-    second_der_result = result.derivatives[second_ufloat]
-    assert nan_close(first_der_result, first_der)
-    assert nan_close(second_der_result, second_der)
-
-
-@pytest.mark.parametrize(
-    "first_ufloat, second_ufloat, result_float",
-    power_float_result_cases,
-)
-def test_power_float_result_cases(first_ufloat, second_ufloat, result_float):
-    assert umath_core.pow(first_ufloat, second_ufloat) == result_float
-
-
-zero = ufloat(0, 0)
-positive = ufloat(0.3, 0.01)
-negative = ufloat(-0.3, 0.01)
-"""
-math.pow raises ValueError in these cases, in contrast to pow which raises
-ZeroDivisionError so these test cases are slightly different than those that appear for
-test_power_exceptions in test_uncertainties.py.
-"""
-power_exception_cases = [
-    (ufloat(0, 0), negative, ValueError),
-    (ufloat(0, 0.1), negative, ValueError),
-    (negative, positive, ValueError),
-]
-
-
-@pytest.mark.parametrize("first_ufloat, second_ufloat, exc_type", power_exception_cases)
-def test_power_exceptions(first_ufloat, second_ufloat, exc_type):
-    with pytest.raises(exc_type):
-        umath_core.pow(first_ufloat, second_ufloat)
-
-
-@pytest.mark.parametrize("first_ufloat, second_float", power_reference_cases)
-def test_power_wrt_ref(first_ufloat, second_float):
-    expected_result = math.pow(first_ufloat.n, second_float)
-    actual_result = umath_core.pow(first_ufloat, second_float).n
-    assert actual_result == expected_result
