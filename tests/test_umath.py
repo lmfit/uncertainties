@@ -1,15 +1,18 @@
 import math
 from math import isnan
 
+import pytest
+
 from uncertainties import ufloat
 import uncertainties.core as uncert_core
 import uncertainties.umath_core as umath_core
 
 from helpers import (
-    power_special_cases,
-    power_all_cases,
-    power_wrt_ref,
+    power_derivative_cases,
+    power_float_result_cases,
+    power_reference_cases,
     compare_derivatives,
+    nan_close,
     numbers_close,
 )
 ###############################################################################
@@ -278,65 +281,49 @@ def test_hypot():
     assert isnan(result.derivatives[y])
 
 
-def test_power_all_cases():
-    """
-    Test special cases of umath_core.pow().
-    """
-    power_all_cases(umath_core.pow)
+@pytest.mark.parametrize(
+    "first_ufloat, second_ufloat, first_der, second_der",
+    power_derivative_cases,
+)
+def test_power_derivatives(first_ufloat, second_ufloat, first_der, second_der):
+    result = umath_core.pow(first_ufloat, second_ufloat)
+    first_der_result = result.derivatives[first_ufloat]
+    second_der_result = result.derivatives[second_ufloat]
+    assert nan_close(first_der_result, first_der)
+    assert nan_close(second_der_result, second_der)
 
 
-# test_power_special_cases() is similar to
-# test_uncertainties.py:test_power_special_cases(), but with small
-# differences: the built-in pow() and math.pow() are slightly
-# different:
-def test_power_special_cases():
-    """
-    Checks special cases of umath_core.pow().
-    """
-
-    power_special_cases(umath_core.pow)
-
-    # We want the same behavior for numbers with uncertainties and for
-    # math.pow() at their nominal values.
-
-    positive = ufloat(0.3, 0.01)
-    negative = ufloat(-0.3, 0.01)
-
-    # The type of the expected exception is first determined, because
-    # it varies between versions of Python (OverflowError in Python
-    # 2.6+, ValueError in Python 2.5,...):
-    try:
-        math.pow(0, negative.nominal_value)
-    except Exception as err_math:
-        # Python 3 does not make exceptions local variables: they are
-        # restricted to their except block:
-        err_math_args = err_math.args  # noqa
-        exception_class = err_math.__class__  # noqa
-
-    # http://stackoverflow.com/questions/10282674/difference-between-the-built-in-pow-and-math-pow-for-floats-in-python
-
-    try:
-        umath_core.pow(ufloat(0, 0.1), negative)
-    except exception_class:  # "as err", for Python 2.6+
-        pass
-    else:
-        raise Exception("%s exception expected" % exception_class.__name__)
-
-    try:
-        result = umath_core.pow(negative, positive)  # noqa
-    except exception_class:  # Assumed: same exception as for pow(0, negative)
-        # The reason why it should also fail in Python 3 is that the
-        # result of Python 3 is a complex number, which uncertainties
-        # does not handle (no uncertainties on complex numbers). In
-        # Python 2, this should always fail, since Python 2 does not
-        # know how to calculate it.
-        pass
-    else:
-        raise Exception("%s exception expected" % exception_class.__name__)
+@pytest.mark.parametrize(
+    "first_ufloat, second_ufloat, result_float",
+    power_float_result_cases,
+)
+def test_power_float_result_cases(first_ufloat, second_ufloat, result_float):
+    assert umath_core.pow(first_ufloat, second_ufloat) == result_float
 
 
-def test_power_wrt_ref():
-    """
-    Checks special cases of the umath_core.pow() power operator.
-    """
-    power_wrt_ref(umath_core.pow, math.pow)
+zero = ufloat(0, 0)
+positive = ufloat(0.3, 0.01)
+negative = ufloat(-0.3, 0.01)
+"""
+math.pow raises ValueError in these cases, in contrast to pow which raises
+ZeroDivisionError so these test cases are slightly different than those that appear for
+test_power_exceptions in test_uncertainties.py.
+"""
+power_exception_cases = [
+    (ufloat(0, 0), negative, ValueError),
+    (ufloat(0, 0.1), negative, ValueError),
+    (negative, positive, ValueError),
+]
+
+
+@pytest.mark.parametrize("first_ufloat, second_ufloat, exc_type", power_exception_cases)
+def test_power_exceptions(first_ufloat, second_ufloat, exc_type):
+    with pytest.raises(exc_type):
+        umath_core.pow(first_ufloat, second_ufloat)
+
+
+@pytest.mark.parametrize("first_ufloat, second_float", power_reference_cases)
+def test_power_wrt_ref(first_ufloat, second_float):
+    expected_result = math.pow(first_ufloat.n, second_float)
+    actual_result = umath_core.pow(first_ufloat, second_float).n
+    assert actual_result == expected_result

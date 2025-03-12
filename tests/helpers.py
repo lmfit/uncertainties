@@ -5,6 +5,13 @@ import uncertainties.core as uncert_core
 from uncertainties.core import ufloat, AffineScalarFunc
 
 
+def nan_close(first, second):
+    if isnan(first):
+        return isnan(second)
+    else:
+        return isclose(first, second)
+
+
 zero = ufloat(0, 0.1)
 zero2 = ufloat(0, 0.1)
 one = ufloat(1, 0.1)
@@ -30,26 +37,6 @@ power_derivative_cases = (
     (positive, zero, 0.0, -1.2039728043259361),
     (positive, negative, -1.4350387341664474, -1.7277476090907193),
 )
-
-
-def power_all_cases(op):
-    for (
-        first_ufloat,
-        second_ufloat,
-        first_der,
-        second_der,
-    ) in power_derivative_cases:
-        result = op(first_ufloat, second_ufloat)
-        first_der_result = result.derivatives[first_ufloat]
-        second_der_result = result.derivatives[second_ufloat]
-        if isnan(first_der):
-            assert isnan(first_der_result)
-        else:
-            assert isclose(first_der_result, first_der)
-        if isnan(second_der):
-            assert isnan(second_der_result)
-        else:
-            assert isclose(second_der_result, second_der)
 
 
 zero = ufloat(0, 0)
@@ -84,27 +71,16 @@ power_float_result_cases = [
 ]
 
 
-def power_special_cases(op):
-    for first, second, result in power_float_result_cases:
-        assert op(first, second) == result
+zero = ufloat(0, 0)
+positive = ufloat(0.3, 0.01)
+negative = ufloat(-0.3, 0.01)
 
 
-def power_wrt_ref(op, ref_op):
-    """
-    Checks special cases of the uncertainty power operator op (where
-    op is typically the built-in pow or uncertainties.umath.pow), by
-    comparing its results to the reference power operator ref_op
-    (which is typically the built-in pow or math.pow).
-    """
-
-    # Negative numbers with uncertainty can be exponentiated to an
-    # integral power:
-    assert op(ufloat(-1.1, 0.1), -9).nominal_value == ref_op(-1.1, -9)
-
-    # Case of numbers with no uncertainty: should give the same result
-    # as numbers with uncertainties:
-    assert op(ufloat(-1, 0), 9) == ref_op(-1, 9)
-    assert op(ufloat(-1.1, 0), 9) == ref_op(-1.1, 9)
+power_reference_cases = [
+    (ufloat(-1.1, 0.1), -9),
+    (ufloat(-1, 0), 9),
+    (ufloat(-1.1, 0), 9),
+]
 
 
 ###############################################################

@@ -13,9 +13,10 @@ from uncertainties import (
     correlation_matrix,
 )
 from helpers import (
-    power_special_cases,
-    power_all_cases,
-    power_wrt_ref,
+    power_derivative_cases,
+    power_float_result_cases,
+    power_reference_cases,
+    nan_close,
     numbers_close,
     ufloats_close,
     compare_derivatives,
@@ -1052,63 +1053,47 @@ def test_covariances():
 
 
 ###############################################################################
-def test_power_all_cases():
-    """
-    Checks all cases for the value and derivatives of x**p.
-    """
-
-    power_all_cases(pow)
 
 
-###############################################################################
+@pytest.mark.parametrize(
+    "first_ufloat, second_ufloat, first_der, second_der",
+    power_derivative_cases,
+)
+def test_power_derivatives(first_ufloat, second_ufloat, first_der, second_der):
+    result = pow(first_ufloat, second_ufloat)
+    first_der_result = result.derivatives[first_ufloat]
+    second_der_result = result.derivatives[second_ufloat]
+    assert nan_close(first_der_result, first_der)
+    assert nan_close(second_der_result, second_der)
 
 
-def test_power_special_cases():
-    """
-    Checks special cases of x**p.
-    """
-    power_special_cases(pow)
-
-    # We want the same behavior for numbers with uncertainties and for
-    # math.pow() at their nominal values:
-
-    positive = ufloat(0.3, 0.01)
-    negative = ufloat(-0.3, 0.01)
-
-    # http://stackoverflow.com/questions/10282674/difference-between-the-built-in-pow-and-math-pow-for-floats-in-python
-
-    try:
-        pow(ufloat(0, 0), negative)
-    except ZeroDivisionError:
-        pass
-    else:
-        raise Exception("A proper exception should have been raised")
-
-    try:
-        pow(ufloat(0, 0.1), negative)
-    except ZeroDivisionError:
-        pass
-    else:
-        raise Exception("A proper exception should have been raised")
-
-    try:
-        result = pow(negative, positive)  # noqa
-    except ValueError:
-        # The reason why it should also fail in Python 3 is that the
-        # result of Python 3 is a complex number, which uncertainties
-        # does not handle (no uncertainties on complex numbers). In
-        # Python 2, this should always fail, since Python 2 does not
-        # know how to calculate it.
-        pass
-    else:
-        raise Exception("A proper exception should have been raised")
+@pytest.mark.parametrize(
+    "first_ufloat, second_ufloat, result_float",
+    power_float_result_cases,
+)
+def test_power_float_result_cases(first_ufloat, second_ufloat, result_float):
+    assert pow(first_ufloat, second_ufloat) == result_float
 
 
-def test_power_wrt_ref():
-    """
-    Checks special cases of the built-in pow() power operator.
-    """
-    power_wrt_ref(pow, pow)
+zero = ufloat(0, 0)
+positive = ufloat(0.3, 0.01)
+negative = ufloat(-0.3, 0.01)
+power_exception_cases = [
+    (ufloat(0, 0), negative, ZeroDivisionError),
+    (ufloat(0, 0.1), negative, ZeroDivisionError),
+    (negative, positive, ValueError),
+]
+
+
+@pytest.mark.parametrize("first_ufloat, second_ufloat, exc_type", power_exception_cases)
+def test_power_exceptions(first_ufloat, second_ufloat, exc_type):
+    with pytest.raises(exc_type):
+        pow(first_ufloat, second_ufloat)
+
+
+@pytest.mark.parametrize("first_ufloat, second_float", power_reference_cases)
+def test_power_wrt_ref(first_ufloat, second_float):
+    assert pow(first_ufloat, second_float).n == pow(first_ufloat.n, second_float)
 
 
 ###############################################################################
