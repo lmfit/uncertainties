@@ -1,141 +1,82 @@
 import random
-from math import isnan, isinf
+from math import isclose, isnan, isinf
 
 import uncertainties.core as uncert_core
 from uncertainties.core import ufloat, AffineScalarFunc
 
 
+power_derivative_cases = (
+    ((-0.3, 0.01), (-3.0, 0.0), -370.37037037037044, float("nan")),
+    ((-0.3, 0.01), (1.0, 0.1), 1.0, float("nan")),
+    ((-0.3, 0.01), (0.0, 0.1), 0.0, float("nan")),
+    ((0.0, 0.1), (3.1, 0.01), float("nan"), 0.0),
+    ((0.0, 0.1), (1.0, 0.1), 1.0, 0.0),
+    ((0.0, 0.1), (2.0, 0.2), 0.0, 0.0),
+    ((0.0, 0.1), (0.3, 0.01), float("nan"), 0.0),
+    ((0.0, 0.1), (0.0, 0.1), 0.0, float("nan")),
+    ((0.3, 0.01), (0.3, 0.01), 0.696845301935949, -0.8389827923531782),
+    ((0.3, 0.01), (0.0, 0.1), 0.0, -1.2039728043259361),
+    ((0.3, 0.01), (-0.3, 0.01), -1.4350387341664474, -1.7277476090907193),
+)
+
+
 def power_all_cases(op):
-    """
-    Checks all cases for the value and derivatives of power-like
-    operator op (op is typically the built-in pow(), or math.pow()).
+    for (
+        (first_val, first_std),
+        (second_val, second_std),
+        first_der,
+        second_der,
+    ) in power_derivative_cases:
+        first_ufloat = ufloat(first_val, first_std)
+        second_ufloat = ufloat(second_val, second_std)
+        result = op(first_ufloat, second_ufloat)
+        first_der_result = result.derivatives[first_ufloat]
+        second_der_result = result.derivatives[second_ufloat]
+        if isnan(first_der):
+            assert isnan(first_der_result)
+        else:
+            assert isclose(first_der_result, first_der)
+        if isnan(second_der):
+            assert isnan(second_der_result)
+        else:
+            assert isclose(second_der_result, second_der)
 
-    Checks only the details of special results like 0, 1 or NaN).
 
-    Different cases for the value of x**p and its derivatives are
-    tested by dividing the (x, p) plane with:
+zero = ufloat(0, 0)
+one = ufloat(1, 0)
+p = ufloat(0.3, 0.01)
 
-    - x < 0, x = 0, x > 0
-    - p integer or not, p < 0, p = 0, p > 0
-
-    (not all combinations are distinct: for instance x > 0 gives
-    identical formulas for all p).
-    """
-
-    zero = ufloat(0, 0.1)
-    zero2 = ufloat(0, 0.1)
-    one = ufloat(1, 0.1)
-    positive = ufloat(0.3, 0.01)
-    positive2 = ufloat(0.3, 0.01)
-    negative = ufloat(-0.3, 0.01)
-    integer = ufloat(-3, 0)
-    non_int_larger_than_one = ufloat(3.1, 0.01)
-    positive_smaller_than_one = ufloat(0.3, 0.01)
-
-    ## negative**integer
-
-    result = op(negative, integer)
-    assert not isnan(result.derivatives[negative])
-    assert isnan(result.derivatives[integer])
-
-    # Limit cases:
-    result = op(negative, one)
-    assert result.derivatives[negative] == 1
-    assert isnan(result.derivatives[one])
-
-    result = op(negative, zero)
-    assert result.derivatives[negative] == 0
-    assert isnan(result.derivatives[zero])
-
-    ## negative**non-integer
-
-    ## zero**...
-
-    result = op(zero, non_int_larger_than_one)
-    assert isnan(result.derivatives[zero])
-    assert result.derivatives[non_int_larger_than_one] == 0
-
-    # Special cases:
-    result = op(zero, one)
-    assert result.derivatives[zero] == 1
-    assert result.derivatives[one] == 0
-
-    result = op(zero, 2 * one)
-    assert result.derivatives[zero] == 0
-    assert result.derivatives[one] == 0
-
-    result = op(zero, positive_smaller_than_one)
-    assert isnan(result.derivatives[zero])
-    assert result.derivatives[positive_smaller_than_one] == 0
-
-    result = op(zero, zero2)
-    assert result.derivatives[zero] == 0
-    assert isnan(result.derivatives[zero2])
-
-    ## positive**...: this is a quite regular case where the value and
-    ## the derivatives are all defined.
-
-    result = op(positive, positive2)
-    assert not isnan(result.derivatives[positive])
-    assert not isnan(result.derivatives[positive2])
-
-    result = op(positive, zero)
-    assert result.derivatives[positive] == 0
-    assert not isnan(result.derivatives[zero])
-
-    result = op(positive, negative)
-    assert not isnan(result.derivatives[positive])
-    assert not isnan(result.derivatives[negative])
+power_float_result_cases = [
+    (0, p, 0),
+    (zero, p, 0),
+    (float("nan"), zero, 1),
+    (one, float("nan"), 1),
+    (p, 0, 1),
+    (zero, 0, 1),
+    (-p, 0, 1),
+    (-10.3, zero, 1),
+    (0, zero, 1),
+    (0.3, zero, 1),
+    (-p, zero, 1),
+    (zero, zero, 1),
+    (p, zero, 1),
+    (one, -3, 1),
+    (one, -3.1, 1),
+    (one, 0, 1),
+    (one, 3, 1),
+    (one, 3.1, 1),
+    (one, -p, 1),
+    (one, zero, 1),
+    (one, p, 1),
+    (1, -p, 1),
+    (1, zero, 1),
+    (1, p, 1),
+]
 
 
 def power_special_cases(op):
-    """
-    Checks special cases of the uncertainty power operator op (where
-    op is typically the built-in pow or uncertainties.umath.pow).
-
-    The values x = 0, x = 1 and x = NaN are special, as are null,
-    integral and NaN values of p.
-    """
-
-    zero = ufloat(0, 0)
-    one = ufloat(1, 0)
-    p = ufloat(0.3, 0.01)
-
-    assert op(0, p) == 0
-    assert op(zero, p) == 0
-
-    # The outcome of 1**nan and nan**0 was undefined before Python
-    # 2.6 (http://docs.python.org/library/math.html#math.pow):
-    assert op(float("nan"), zero) == 1.0
-    assert op(one, float("nan")) == 1.0
-
-    # …**0 == 1.0:
-    assert op(p, 0) == 1.0
-    assert op(zero, 0) == 1.0
-    assert op((-p), 0) == 1.0
-    # …**zero:
-    assert op((-10.3), zero) == 1.0
-    assert op(0, zero) == 1.0
-    assert op(0.3, zero) == 1.0
-    assert op((-p), zero) == 1.0
-    assert op(zero, zero) == 1.0
-    assert op(p, zero) == 1.0
-
-    # one**… == 1.0
-    assert op(one, -3) == 1.0
-    assert op(one, -3.1) == 1.0
-    assert op(one, 0) == 1.0
-    assert op(one, 3) == 1.0
-    assert op(one, 3.1) == 1.0
-
-    # … with two numbers with uncertainties:
-    assert op(one, (-p)) == 1.0
-    assert op(one, zero) == 1.0
-    assert op(one, p) == 1.0
-    # 1**… == 1.0:
-    assert op(1.0, (-p)) == 1.0
-    assert op(1.0, zero) == 1.0
-    assert op(1.0, p) == 1.0
+    for first, second, result in power_float_result_cases:
+        assert op(first, second) == result
 
 
 def power_wrt_ref(op, ref_op):
