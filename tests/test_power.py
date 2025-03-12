@@ -90,13 +90,8 @@ power_float_result_cases = [
     power_float_result_cases,
 )
 def test_power_float_result_cases(first_ufloat, second_ufloat, result_float):
-    assert pow(first_ufloat, second_ufloat) == result_float
-    assert umath_pow(first_ufloat, second_ufloat) == result_float
-
-
-zero = ufloat(0, 0)
-positive = ufloat(0.3, 0.01)
-negative = ufloat(-0.3, 0.01)
+    for op in [pow, umath_pow]:
+        assert op(first_ufloat, second_ufloat) == result_float
 
 
 power_reference_cases = [
@@ -108,13 +103,13 @@ power_reference_cases = [
 
 @pytest.mark.parametrize("first_ufloat, second_float", power_reference_cases)
 def test_power_wrt_ref(first_ufloat, second_float):
-    assert pow(first_ufloat, second_float).n == pow(first_ufloat.n, second_float)
-    assert umath_pow(first_ufloat, second_float).n == math_pow(
-        first_ufloat.n, second_float
-    )
+    test_op_ref_op_pairs = [(pow, pow), (umath_pow, math_pow)]
+    for test_op, ref_op in test_op_ref_op_pairs:
+        test_result = test_op(first_ufloat, second_float).n
+        ref_result = ref_op(first_ufloat.n, second_float)
+        assert test_result == ref_result
 
 
-zero = ufloat(0, 0)
 positive = ufloat(0.3, 0.01)
 negative = ufloat(-0.3, 0.01)
 power_exception_cases = [
