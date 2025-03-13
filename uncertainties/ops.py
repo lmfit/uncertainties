@@ -64,6 +64,28 @@ def nan_if_exception(f):
     return wrapped_f
 
 
+def pow_deriv_0(x, y):
+    if x > 0:
+        return y * x ** (y - 1)
+    elif x < 0 and y % 1 == 0:
+        return y * x ** (y - 1)
+    elif x == 0 and y % 1 == 0 and y >= 1:
+        return y * x ** (y - 1)
+    elif x == 0 and y == 0:
+        return 0
+    else:
+        return float("nan")
+
+
+def pow_deriv_1(x, y):
+    if x > 0:
+        return log(x) * x**y
+    elif x == 0 and y > 0:
+        return 0
+    else:
+        return float("nan")
+
+
 def get_ops_with_reflection():
     """
     Return operators with a reflection, along with their partial derivatives.
@@ -118,29 +140,6 @@ def get_ops_with_reflection():
         ops_with_reflection["r" + op] = [
             eval("lambda y, x: %s" % expr) for expr in reversed(derivatives)
         ]
-
-    # The derivatives of pow() are more complicated:
-
-    # The case x**y is constant one the line x = 0 and in y = 0;
-    # the corresponding derivatives must be zero in these
-    # cases. If the function is actually not defined (e.g. 0**-3),
-    # then an exception will be raised when the nominal value is
-    # calculated.  These derivatives are transformed to NaN if an
-    # error happens during their calculation:
-
-    def pow_deriv_0(x, y):
-        if y == 0:
-            return 0.0
-        elif x != 0 or y % 1 == 0:
-            return y * x ** (y - 1)
-        else:
-            return float("nan")
-
-    def pow_deriv_1(x, y):
-        if x == 0 and y > 0:
-            return 0.0
-        else:
-            return log(x) * x**y
 
     ops_with_reflection["pow"] = [pow_deriv_0, pow_deriv_1]
     ops_with_reflection["rpow"] = [
