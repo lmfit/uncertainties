@@ -65,11 +65,11 @@ def nan_if_exception(f):
 
 
 def pow_deriv_0(x, y):
-    if x > 0:
-        return y * x ** (y - 1)
-    elif x < 0 and y % 1 == 0:
-        return y * x ** (y - 1)
-    elif x == 0 and y % 1 == 0 and y >= 1:
+    """
+    The formula below works if x is positive or if y is an integer and x is negative
+    of y is an integer, x is zero and y is greater than or equal to 1.
+    """
+    if x > 0 or (y % 1 == 0 and (x < 0 or y >= 1)):
         return y * x ** (y - 1)
     elif x == 0 and y == 0:
         return 0
