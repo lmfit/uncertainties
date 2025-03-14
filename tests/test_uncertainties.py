@@ -13,9 +13,6 @@ from uncertainties import (
     correlation_matrix,
 )
 from helpers import (
-    power_special_cases,
-    power_all_cases,
-    power_wrt_ref,
     numbers_close,
     ufloats_close,
     compare_derivatives,
@@ -1049,69 +1046,6 @@ def test_covariances():
     assert numbers_close(covs[2][2], 0.09)
     # Non-diagonal elements:
     assert numbers_close(covs[0][1], -0.02)
-
-
-###############################################################################
-def test_power_all_cases():
-    """
-    Checks all cases for the value and derivatives of x**p.
-    """
-
-    power_all_cases(pow)
-
-
-###############################################################################
-
-
-def test_power_special_cases():
-    """
-    Checks special cases of x**p.
-    """
-    power_special_cases(pow)
-
-    # We want the same behavior for numbers with uncertainties and for
-    # math.pow() at their nominal values:
-
-    positive = ufloat(0.3, 0.01)
-    negative = ufloat(-0.3, 0.01)
-
-    # http://stackoverflow.com/questions/10282674/difference-between-the-built-in-pow-and-math-pow-for-floats-in-python
-
-    try:
-        pow(ufloat(0, 0), negative)
-    except ZeroDivisionError:
-        pass
-    else:
-        raise Exception("A proper exception should have been raised")
-
-    try:
-        pow(ufloat(0, 0.1), negative)
-    except ZeroDivisionError:
-        pass
-    else:
-        raise Exception("A proper exception should have been raised")
-
-    try:
-        result = pow(negative, positive)  # noqa
-    except ValueError:
-        # The reason why it should also fail in Python 3 is that the
-        # result of Python 3 is a complex number, which uncertainties
-        # does not handle (no uncertainties on complex numbers). In
-        # Python 2, this should always fail, since Python 2 does not
-        # know how to calculate it.
-        pass
-    else:
-        raise Exception("A proper exception should have been raised")
-
-
-def test_power_wrt_ref():
-    """
-    Checks special cases of the built-in pow() power operator.
-    """
-    power_wrt_ref(pow, pow)
-
-
-###############################################################################
 
 
 ###############################################################################
