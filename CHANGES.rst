@@ -12,6 +12,8 @@ Changes
    time. Now such a function can be imported but if the user attempts to
    execute it, a `NotImplementedError` is raised indicating that the
    function can't be used because `numpy` couldn't be imported.
+- Refactored the implementation for the calculation of the derivatives of the power
+   function and improves the corresponding testing.
 
 Adds:
 
