@@ -5,7 +5,7 @@ import pytest
 from uncertainties import ufloat
 from uncertainties.umath_core import pow as umath_pow
 
-from helpers import nan_close
+from helpers import nan_close, get_single_uatom
 
 
 zero = ufloat(0, 0.1)
@@ -40,17 +40,18 @@ power_derivative_cases = (
     power_derivative_cases,
 )
 def test_power_derivatives(first_ufloat, second_ufloat, first_der, second_der):
-    result = pow(first_ufloat, second_ufloat)
-    first_der_result = result.derivatives[first_ufloat]
-    second_der_result = result.derivatives[second_ufloat]
-    assert nan_close(first_der_result, first_der)
-    assert nan_close(second_der_result, second_der)
+    for op in [pow, umath_pow]:
+        result = op(first_ufloat, second_ufloat)
 
-    result = umath_pow(first_ufloat, second_ufloat)
-    first_der_result = result.derivatives[first_ufloat]
-    second_der_result = result.derivatives[second_ufloat]
-    assert nan_close(first_der_result, first_der)
-    assert nan_close(second_der_result, second_der)
+        if first_ufloat.s != 0:
+            first_uatom = get_single_uatom(first_ufloat)
+            first_der_result = result.error_components[first_uatom] / first_ufloat.s
+            assert nan_close(first_der_result, first_der)
+
+        if second_ufloat.s != 0:
+            second_uatom = get_single_uatom(second_ufloat)
+            second_der_result = result.error_components[second_uatom] / second_ufloat.s
+            assert nan_close(second_der_result, second_der)
 
 
 zero = ufloat(0, 0)
