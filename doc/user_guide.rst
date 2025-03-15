@@ -5,28 +5,31 @@
 User Guide
 ==========
 
+The :mod:`uncertainties` package is built around the :class:`UFloat` class.
+:class:`UFloat` objects model statistical random variables.
+A :class:`UFloat` object has a nominal value which models the mean of a random variable
+and an uncertainty which can be used to calculate the standard deviation of the random
+variable and correlations between one random variable and another.
+It is possible to construct new random variables by applying mathematical operations to
+and between existing random variables.
+Likewise, it is possible to apply mathematical operations such as arithmetic or
+trigonometric functions to :class:`UFloat` objects to get new :class:`UFloat` objects.
+The nominal values pass through the mathematical operations as if they were regular
+:class:`float` objects, but the uncertainties propagate according to the approximate
+rules of linear error propagation based on local derivatives of the mathematical
+operations.
 
-Basic usage
-===========
-
-Basic mathematical operations involving numbers with uncertainties requires
-importing the :func:`ufloat` function which creates a :class:`Variable`:
-number with both a nominal value and an uncertainty.
-
-     >>> from uncertainties import ufloat
-     >>> x = ufloat(2.7, 0.01)   #  a Variable with a value 2.7+/-0.01
-
-The :mod:`uncertainties` module contains sub-modules for :ref:`advanced
-mathematical functions <advanced math operations>`, and :doc:`arrays and
-matrices <numpy_guide>`, which can be accessed as well.
+In addition to the :class:`UFloat` class, the :mod:`uncertainties` package also provides
+sub-modules for :ref:`advanced mathematical functions <advanced math operations>`, and
+:doc:`arrays and matrix <numpy_guide>` operations.
 
 .. index::
-   pair: number with uncertainty; creation
+   pair: number with uncertainty;
 
-Creating Variables: numbers with uncertainties
-================================================
+Creating UFloat objects: numbers with uncertainties
+===================================================
 
-To create a number with uncertainties or *Variable*, use the :func:`ufloat`
+To create a number with uncertainties or :class:`UFloat`, use the :func:`ufloat`
 function, which takes a *nominal value* (which can be interpreted as the most
 likely value, or the mean or central value of the distribution of values), a
 *standard error* (the standard deviation or :math:`1-\sigma` uncertainty), and
@@ -39,8 +42,8 @@ an optional *tag*:
    pair: nominal value; scalar
    pair: uncertainty; scalar
 
-You can access the nominal value and standard deviation for any Variable with
-the `nominal_value` and `std_dev` attributes:
+You can access the nominal value and standard deviation for any :class:`UFloat` object
+with the `nominal_value` and `std_dev` attributes:
 
 >>> print(x.nominal_value,  x.std_dev)
 2.7 0.01
@@ -52,9 +55,9 @@ abbreviated as `n` and `std_dev` as `s`:
 >>> print(x.n,  x.s)
 2.7 0.01
 
-uncertainties Variables can also be created from one of many string
-representations.  The following forms will all create Variables with the same
-value:
+uncertainties :class:`UFloat` objects can also be created from one of many string
+representations.  The following forms will all create :class:`UFloat` objects with
+the same values:
 
 >>> from uncertainties import ufloat_fromstr
 >>> x = ufloat(0.2, 0.01)
@@ -68,12 +71,13 @@ value:
 More details on the :func:`ufloat` and :func:`ufloat_from_str` can be found in
 :ref:`api_funcs`.
 
-Basic math with uncertain Variables
-=========================================
+Basic math with uncertain UFloat objects
+========================================
 
-Uncertainties variables created in :func:`ufloat` or :func:`ufloat_fromstr` can
-be used in basic mathematical calculations (``+``, ``-``, ``*``, ``/``, ``**``)
-as with other Python numbers and variables.
+Uncertainties :class:`UFloat` objects created using :func:`ufloat` or
+:func:`ufloat_fromstr` can be used in basic mathematical calculations
+(``+``, ``-``, ``*``, ``/``, ``**``)
+as with other Python numbers.
 
 >>> t = ufloat(0.2, 0.01)
 >>> double = 2.0*t
@@ -83,44 +87,45 @@ as with other Python numbers and variables.
 >>> print(square)
 0.040+/-0.004
 
-When adding two Variables, the uncertainty in the result is the quadrature sum
-(square-root of the sum of squares) of the uncertainties of the two Variables:
+When adding two uncorrelated :class:`UFloat` objects, the standard deviation in the
+resulting :class:`UFloat` object is the quadrature sum (square-root of the sum of
+squares) of the standard deviations of the two input :class:`UFloat` objects.
 
 >>> x = ufloat(20, 4)
 >>> y = ufloat(12, 3)
 >>> print(x+y)
 32.0+/-5.0
 
-We can check that error propagation when adding two independent variables
-(using the abbreviation `.s` for the standard error):
+Note that calls :func:`ufloat` create :class:`UFloat` objects which have no correlation
+to any previously created :class:`UFloat` objects.
+We can check the correctness of the error propagation for adding two uncorrelated
+:class:`UFloat` objects:
 
 >>> from math import sqrt
 >>> (x+y).s == sqrt(x.s**2 + y.s**2)
 True
 
-
-Multiplying two Variables will properly propagate those
-uncertainties too:
+We can also multiply two :class:`UFloat` objects:
 
 >>> print(x*y)
 240.0+/-76.83749084919418
 >>> (x*y).s == (x*y).n *  sqrt((x.s/x.n)**2 + (y.s/y.n)**2 )
 True
 
-But note that adding a Variable to itself does not add its uncertainties in
-quadrature, but are simply scaled:
+However, consider the behavior when we add a :class:`UFloat` object to itself:
 
 >>> print(x+x)
 40.0+/-8.0
 >>> print(3*x + 10)
 70.0+/-12.0
 
-
-It is important to understand that calculations done with Variable know about
-the correlation between the Variables.   Variables created with :func:`ufloat`
-(and  :func:`ufloat_fromstr`) are completely uncorrelated with each other, but
-are known to be completely correlated with themselves.  This means that
-
+In this case the resulting standard deviation is not the quadrature sum of the
+standard deviation on the inputs.
+This is because the :class:`UFloat` ``x`` is correlated with itself so the error
+propagation must be handled accordingly.
+This begins to demonstrate that calculations performed using :class:`UFloat` objects are
+aware of correlations between :class:`UFloat` objects.
+This is demonstrated in these two simple examples:
 
 >>> x = ufloat(5, 0.5)
 >>> y = ufloat(5, 0.5)
@@ -129,20 +134,15 @@ are known to be completely correlated with themselves.  This means that
 >>> x - x
 0.0+/-0
 
-For two *different* Variables, uncorrelated uncertainties will be propagated.
-But when doing a calculation with a single Variable, the uncertainties are
-correlated, and calculations will reflect that.
-
-
 .. index:: mathematical operation; on a scalar, umath
 
 .. _advanced math operations:
 
-Mathematical operations with uncertain Variables
+Mathematical operations with uncertain UFloat objects
 =====================================================
 
-Besides being able to apply basic mathematical operations to uncertainties
-Variables, this package provides generalized versions of 40 of the the
+Besides being able to apply basic arithmetic operations to uncertainties
+:class`UFloat` objects, this package provides generalized versions of 40 of the the
 functions from the standard :mod:`math` *module*.  These mathematical functions
 are found in the :mod:`uncertainties.umath` module:
 
@@ -171,19 +171,17 @@ The functions in the :mod:`uncertainties.umath` module include:
 Comparison operators
 ====================
 
-Comparison operators (``==``, ``!=``, ``>``, ``<``, ``>=``, and ``<=``) for Variables with
-uncertainties are somewhat complicated, and need special attention.  As we
-hinted at above, and will explore in more detail below and in the
+Comparison operators (``==``, ``!=``, ``>``, ``<``, ``>=``, and ``<=``) for
+:class:`UFloat` objects with uncertainties are somewhat complicated, and need special
+attention.  As we hinted at above, and will explore in more detail below and in the
 :ref:`Technical Guide <comparison_operators>`, this relates to the correlation
-between Variables.
-
-
+between :class:`UFloat` objects.
 
 Equality and inequality comparisons
 ------------------------------------
 
-If we compare the equality of two Variables with the same nominal value and
-uncertainty, we see
+If we compare the equality of two :class:`UFloat` objects with the same nominal value
+and standard deviation, we see
 
 >>> x = ufloat(5, 0.5)
 >>> y = ufloat(5, 0.5)
@@ -192,20 +190,20 @@ True
 >>> x == y
 False
 
-The difference here is that although the two Python objects have the same
-nominal value and uncertainty, these are independent, uncorrelated values.  It
-is not exactly true that the difference is based on identity, note that
+The difference here is that although the two :class:`UFloat` objects have the same
+nominal value and standard deviation, they model two *uncorrelated* random variables.
+This can be demonstrated with the :meth:`UFloat.covariance` method.
 
->>> x == (1.0*x)
-True
->>> x is (1.0*x)
-False
+>>> print(x.covariance(x))
+0.25
+>>> print(x.covariance(y))
+0
 
 In order for the result of two calculations with uncertainties to be considered
 equal, the :mod:`uncertainties` package does not test whether the nominal value
-and the uncertainty have the same value.  Instead it checks whether the
-difference of the two calculations has a nominal value of 0 *and* an
-uncertainty of 0.
+and the standard deviation have the same value.  Instead it checks whether the
+difference of the two calculations has a nominal value of 0 *and* a standard deviation
+of 0.
 
 >>> (x -x)
 0.0+/-0
@@ -214,13 +212,14 @@ uncertainty of 0.
 
 
 Comparisons of magnitude
-------------------------------------
+------------------------
 
 The concept of comparing the magnitude of values with uncertainties is a bit
-complicated.  That is, a Variable with a value of 25 +/- 10 might be greater
-than a Variable with a value of 24 +/- 8 most of the time, but *sometimes* it
-might be less than it.   The :mod:`uncertainties` package takes the simple
-approach of comparing nominal values.  That is
+complicated.  That is, a random variable with a mean of 25 and standard deviation of 1
+might be greater than a random variable with a mean of 24 and standard deviation of 0.8
+most of the time, but *sometimes* it might be less than it.
+The :mod:`uncertainties` package takes the simple approach of comparing nominal values.
+That is
 
 >>> a = ufloat(25, 10)
 >>> b = ufloat(24, 8)
@@ -228,7 +227,7 @@ approach of comparing nominal values.  That is
 True
 
 Note that combining this comparison and the above discussion of `==` and `!=`
-can lead to a result that maybe somewhat surprising:
+can lead to a somewhat surprising result:
 
 
 >>> a = ufloat(25, 10)
@@ -258,10 +257,10 @@ Variable.  As is always the case, care must be exercised when handling NaN
 values.
 
 While :func:`math.isnan` and :func:`numpy.isnan` will raise `TypeError`
-exceptions for uncertainties Variables (because an uncertainties Variable is
-not a float), the function :func:`umath.isnan` will return whether the nominal
-value of a Variable is NaN.  Similarly, :func:`umath.isinf` will return whether
-the nominal value of a Variable is infinite.
+exceptions for uncertainties :class:`UFloat` objects (because an uncertainties
+:class:`UFloat` object is not a float), the function :func:`umath.isnan` will return
+whether the nominal value of a Variable is NaN.  Similarly, :func:`umath.isinf` will
+return whether the nominal value of a Variable is infinite.
 
 To check whether the uncertainty is NaN or Inf, use one of :func:`math.isnan`,
 :func:`math.isinf`, :func:`nupmy.isnan`, or , :func:`nupmy.isinf` on the
@@ -274,8 +273,8 @@ To check whether the uncertainty is NaN or Inf, use one of :func:`math.isnan`,
 Automatic correlations
 ======================
 
-Correlations between variables are **automatically handled** whatever
-the number of variables involved, and whatever the complexity of the
+Correlations between :class:`UFloat` objects are **automatically handled** whatever
+the number of :class:`UFloat` objects involved, and whatever the complexity of the
 calculation. For example, when :data:`x` is the number with
 uncertainty defined above,
 
@@ -302,51 +301,128 @@ transparently.
 
 
 
-Access to the individual sources of uncertainty
-===============================================
+UAtoms: How Uncertainty and Correlations are Tracked
+====================================================
 
-The various contributions to an uncertainty can be obtained through the
-:func:`error_components` method, which maps the **independent variables
-a quantity depends on** to their **contribution to the total
-uncertainty**. According to :ref:`linear error propagation theory
-<linear_method>` (which is the method followed by :mod:`uncertainties`),
-the sum of the squares of these contributions is the squared
-uncertainty.
+The basic, indivisibile, unit of uncertainty in the :mod:`uncertainties` package is the
+:class:`UAtom`.
+A :class:`UAtom` models a random variable with zero mean and unity standard deviation.
+Every :class:`UAtom` is unique and uncorrelated with every other :class:`UAtom`.
+The uncertainty of a :class:`UFloat` object is a :class:`UCombo` object which models a
+:class:`float`-weighted linear combination of :class:`UAtom` objects.
+A :class:`UFloat` object can be thought of as a sum of a fixed nominal value together
+with a zero-mean :class:`UCombo` object.
 
-The individual contributions to the uncertainty are more easily usable
-when the variables are **tagged**:
+The standard deviation of a single :class:`UFloat` object is calculated by taking the
+sum-of-squares of the weights for all the :class:`UAtom` objects that make up the
+corresponding :attribute:`uncertainty` attribute for that :class:`UFloat` object.
+The correlation between two :class:`UFloat` objects is calculated by taking the sum
+of products of the weights of shared :class:`UAtom` objects between the two
+:class:`UFloat` :attribute:`uncertainty` attributes.
 
->>> u = ufloat(1, 0.1, "u variable")  # Tag
->>> v = ufloat(10, 0.1, "v variable")
->>> sum_value = u+2*v
->>> sum_value
-21.0+/-0.223606797749979
->>> for (var, error) in sum_value.error_components().items():
-...     print("{}: {}".format(var.tag, error))
-...
-u variable: 0.1
-v variable: 0.2
+Every time a new :class:`UFloat` is instantiated via the :func:`ufloat` function a
+single new independent :class:`UAtom` is also instantiated (and given the optional tag
+passed into :func:`ufloat`) and paired with the new :class:`UFloat`.
+When :class:`UFloat` objects are combined together using mathematical operations the
+resulting :class:`UFloat` objects inherit dependence on the :class:`UAtom` objects
+on which the input :class:`UFloat` objects depend in accordance with
+:ref:`linear error propagation theory <linear_method>`.
+In this way, the correlation between :class:`UFloat` objects can be tracked.
 
-The variance (i.e. squared uncertainty) of the result
-(:data:`sum_value`) is the quadratic sum of these independent
-uncertainties, as it should be (``0.1**2 + 0.2**2``).
+We can get access to the :class:`UAtom` objects on which a given :class:`UFloat`
+depends, and their corresponding weights using the :attribute:`UFloat.error_components`
+attribute:
 
-The tags *do not have to be distinct*. For instance, *multiple* random
-variables can be tagged as ``"systematic"``, and their contribution to
-the total uncertainty of :data:`result` can simply be obtained as:
+
+.. testsetup:: uuid
+
+   from uncertainties import ufloat
+   from unittest.mock import patch
+   import uuid
+   import random
+
+   class FakeUUID4:
+       def __init__(self):
+           self.seed = 0
+           self.rnd = random.Random()
+
+       def __call__(self):
+           self.rnd.seed(self.seed)
+           fake_uuid = uuid.UUID(int=self.rnd.getrandbits(128), version=4)
+           self.seed += 1
+           return fake_uuid
+   fake_uuid4 = FakeUUID4()
+
+   p = patch('uncertainties.ucombo.uuid.uuid4', fake_uuid4)
+   p.start()
+
+.. doctest:: uuid
+
+   >>> x = ufloat(1, 0.1)
+   >>> y = ufloat(2, 0.3)
+   >>> z = x * y
+   >>> print(x.error_components)
+   {UAtom(e3e70682-c209-4cac-a29f-6fbed82c07cd): 0.1}
+   >>> print(y.error_components)
+   {UAtom(cd613e30-d8f1-4adf-91b7-584a2265b1f5): 0.3}
+   >>> print(z.error_components)
+   {UAtom(cd613e30-d8f1-4adf-91b7-584a2265b1f5): 0.3, UAtom(e3e70682-c209-4cac-a29f-6fbed82c07cd): 0.2}
+
+The standard deviation of each :class:`UFloat` is given by the sum of squares of the
+weights for all the :class:`UAtom` objects on which that :class:`UFloat` depends
+
+.. doctest:: uuid
+
+   >>> print(x.std_dev)
+   0.1
+   >>> print(y.std_dev)
+   0.3
+   >>> print(z.std_dev)
+   0.36055512754639896
+
+The :func:`ufloat` function accepts a ``tag`` argument.
+If a string is passed in as the ``tag`` then this ``tag`` gets added to the new
+:class:`UAtom` object that is instantiated together with the new :class:`UFloat`.
+Note that :class:`UFloat` objects do not carry tags, only the underlying :class`UAtom`
+objects do.
+The tags on :class:`UAtom` objects can be used to keep track of the statistical
+relationships in a more human-readable way:
+
+.. doctest:: uuid
+
+   >>> x = ufloat(1, 0.1, tag='x')
+   >>> y = ufloat(2, 0.3, tag='y')
+   >>> z = x * y
+   >>>
+   >>> for uatom, weight in z.error_components.items():
+   ...     if uatom.tag is not None:
+   ...         label = uatom.tag
+   ...     else:
+   ...         label = uatom.uuid
+   ...     print(f"{label}: {weight}")
+   y: 0.3
+   x: 0.2
+
+
+.. testcleanup :: uuid
+
+   p.stop()
+
+The tags *do not have to be distinct*. For instance, *multiple* :class:`UFloat` objects
+can be tagged as ``"systematic"``, and their contribution to the total uncertainty of
+:data:`result` can simply be obtained as:
 
 >>> syst_error = math.sqrt(sum(  # Error from *all* systematic errors
 ...     error**2
-...     for (var, error) in result.error_components().items()
-...     if var.tag == "systematic"))
+...     for (uatom, error) in result.error_components().items()
+...     if uatom.tag == "systematic"))
 
 The remaining contribution to the uncertainty is:
 
 >>> other_error = math.sqrt(result.std_dev**2 - syst_error**2)
 
-The variance of :data:`result` is in fact simply the quadratic sum of
-these two errors, since the variables from
-:func:`result.error_components` are independent.
+The variance of :data:`result` is in fact simply the quadratic sum of these two errors,
+since the :class:`UAtom` objects from :func:`result.error_components` are independent.
 
 .. index:: comparison operators
 

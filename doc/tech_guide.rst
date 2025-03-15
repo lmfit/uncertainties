@@ -27,7 +27,7 @@ user-supplied function.
 
 .. autofunction:: ufloat_fromstr
 
-.. autoclass:: Variable
+.. autoclass:: UFloat
 
 .. autofunction:: wrap
 
