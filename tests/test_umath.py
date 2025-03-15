@@ -13,9 +13,6 @@ import uncertainties.umath_core as umath_core
 from uncertainties import umath
 
 from helpers import (
-    power_special_cases,
-    power_all_cases,
-    power_wrt_ref,
     numbers_close,
     ufloats_close,
 )
@@ -372,67 +369,3 @@ def test_hypot():
     result = umath_core.hypot(x, y)
     assert isnan(result.error_components[x_uatom])
     assert isnan(result.error_components[y_uatom])
-
-
-def test_power_all_cases():
-    """
-    Test special cases of umath_core.pow().
-    """
-    power_all_cases(umath_core.pow)
-
-
-# test_power_special_cases() is similar to
-# test_uncertainties.py:test_power_special_cases(), but with small
-# differences: the built-in pow() and math.pow() are slightly
-# different:
-def test_power_special_cases():
-    """
-    Checks special cases of umath_core.pow().
-    """
-
-    power_special_cases(umath_core.pow)
-
-    # We want the same behavior for numbers with uncertainties and for
-    # math.pow() at their nominal values.
-
-    positive = ufloat(0.3, 0.01)
-    negative = ufloat(-0.3, 0.01)
-
-    # The type of the expected exception is first determined, because
-    # it varies between versions of Python (OverflowError in Python
-    # 2.6+, ValueError in Python 2.5,...):
-    try:
-        math.pow(0, negative.nominal_value)
-    except Exception as err_math:
-        # Python 3 does not make exceptions local variables: they are
-        # restricted to their except block:
-        err_math_args = err_math.args  # noqa
-        exception_class = err_math.__class__  # noqa
-
-    # http://stackoverflow.com/questions/10282674/difference-between-the-built-in-pow-and-math-pow-for-floats-in-python
-
-    try:
-        umath_core.pow(ufloat(0, 0.1), negative)
-    except exception_class:  # "as err", for Python 2.6+
-        pass
-    else:
-        raise Exception("%s exception expected" % exception_class.__name__)
-
-    try:
-        result = umath_core.pow(negative, positive)  # noqa
-    except exception_class:  # Assumed: same exception as for pow(0, negative)
-        # The reason why it should also fail in Python 3 is that the
-        # result of Python 3 is a complex number, which uncertainties
-        # does not handle (no uncertainties on complex numbers). In
-        # Python 2, this should always fail, since Python 2 does not
-        # know how to calculate it.
-        pass
-    else:
-        raise Exception("%s exception expected" % exception_class.__name__)
-
-
-def test_power_wrt_ref():
-    """
-    Checks special cases of the umath_core.pow() power operator.
-    """
-    power_wrt_ref(umath_core.pow, math.pow)

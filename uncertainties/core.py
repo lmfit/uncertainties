@@ -579,19 +579,25 @@ def ufloat_fromstr(representation, tag=None):
        That is, "1.25(3)" is the same as `ufloat(1.25, 0.03)`,
        while "1.25(3.)" is the same as `ufloat(1.25, 3.)`
 
+    3. If the representation does not contain an uncertainty, an
+       uncertainty of 1 in the least significant digit is assigned to
+       the nominal value. For nominal values corresponding to "nan", an
+       uncertainty of 1 is assigned.
+
     Examples:
     -----------
 
-    >>> x = ufloat_fromsstr("12.58+/-0.23")  # = ufloat(12.58, 0.23)
-    >>> x = ufloat_fromsstr("12.58 ± 0.23")  # = ufloat(12.58, 0.23)
-    >>> x = ufloat_fromsstr("3.85e5 +/- 2.3e4")  # = ufloat(3.8e5, 2.3e4)
-    >>> x = ufloat_fromsstr("(38.5 +/- 2.3)e4")  # = ufloat(3.8e5, 2.3e4)
+    >>> x = ufloat_fromstr("12.58+/-0.23")  # = ufloat(12.58, 0.23)
+    >>> x = ufloat_fromstr("12.58 ± 0.23")  # = ufloat(12.58, 0.23)
+    >>> x = ufloat_fromstr("3.85e5 +/- 2.3e4")  # = ufloat(3.8e5, 2.3e4)
+    >>> x = ufloat_fromstr("(38.5 +/- 2.3)e4")  # = ufloat(3.8e5, 2.3e4)
 
-    >>> x = ufloat_fromsstr("72.1(2.2)")  # = ufloat(72.1, 2.2)
-    >>> x = ufloat_fromsstr("72.15(4)")  # = ufloat(72.15, 0.04)
+    >>> x = ufloat_fromstr("72.1(2.2)")  # = ufloat(72.1, 2.2)
+    >>> x = ufloat_fromstr("72.15(4)")  # = ufloat(72.15, 0.04)
     >>> x = ufloat_fromstr("680(41)e-3")  # = ufloat(0.68, 0.041)
     >>> x = ufloat_fromstr("23.2")  # = ufloat(23.2, 0.1)
     >>> x = ufloat_fromstr("23.29")  # = ufloat(23.29, 0.01)
+    >>> x = ufloat_fromstr("nan")  # = ufloat(numpy.nan, 1.0)
 
     >>> x = ufloat_fromstr("680.3(nan)") # = ufloat(680.3, numpy.nan)
     """
