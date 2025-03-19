@@ -33,7 +33,6 @@ minus_one_to_plus_one_single_input_funcs = [
     "atanh",
 ]
 greater_than_one_single_input_funcs = ["acosh"]
-
 single_input_funcs = (
     real_single_input_funcs
     + positive_single_input_funcs
@@ -43,9 +42,8 @@ single_input_funcs = (
 
 real_double_input_funcs = (
     "atan2",
-    "pow",
+    "pow",  # We will coerce the base to be positive
 )
-
 positive_double_input_funcs = (
     "hypot",
     "log",

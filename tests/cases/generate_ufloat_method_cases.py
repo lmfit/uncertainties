@@ -37,11 +37,13 @@ for func_name in binary_functions:
             nominal_value_0 = abs(nominal_value_0)
         std_dev_0 = random.uniform(0, 100)
         ufloat_tuple_0 = (nominal_value_0, std_dev_0)
+
         nominal_value_1 = random.uniform(-100, 100)
         if func_name == "__rpow__":
             nominal_value_1 = abs(nominal_value_1)
         std_dev_1 = random.uniform(0, 100)
         ufloat_tuple_1 = (nominal_value_1, std_dev_1)
+
         case = (ufloat_tuple_0, ufloat_tuple_1)
         cases_list.append(case)
     ufloat_method_cases_dict[func_name] = cases_list

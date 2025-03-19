@@ -27,7 +27,11 @@ for func_name, ufloat_tuples_list in umath_function_cases_dict.items():
         ufloat_cases_list.append((func_name, ufloat_tuples))
 
 
-@pytest.mark.parametrize("func_name, ufloat_tuples", ufloat_cases_list)
+@pytest.mark.parametrize(
+    "func_name, ufloat_tuples",
+    ufloat_cases_list,
+    ids=lambda x: str(x),
+)
 def test_umath_function_derivatives(func_name, ufloat_tuples):
     ufloat_arg_list = []
     for nominal_value, std_dev in ufloat_tuples:
@@ -35,6 +39,7 @@ def test_umath_function_derivatives(func_name, ufloat_tuples):
     float_arg_list = [arg.n for arg in ufloat_arg_list]
 
     func = getattr(umath_core, func_name)
+
     result = func(*ufloat_arg_list)
 
     for arg_num, arg in enumerate(ufloat_arg_list):
@@ -42,7 +47,10 @@ def test_umath_function_derivatives(func_name, ufloat_tuples):
         numerical_deriv_func = partial_derivative(func, arg_num)
         numerical_deriv_value = numerical_deriv_func(*float_arg_list)
         assert math.isclose(
-            ufloat_deriv_value, numerical_deriv_value, rel_tol=1e-6, abs_tol=1e-6
+            ufloat_deriv_value,
+            numerical_deriv_value,
+            rel_tol=1e-6,
+            abs_tol=1e-6,
         )
 
 

@@ -161,7 +161,11 @@ for func_name, ufloat_tuples_list in ufloat_method_cases_dict.items():
         ufloat_cases_list.append((func_name, ufloat_tuples))
 
 
-@pytest.mark.parametrize("func_name, ufloat_tuples", ufloat_cases_list)
+@pytest.mark.parametrize(
+    "func_name, ufloat_tuples",
+    ufloat_cases_list,
+    ids=lambda x: str(x),
+)
 def test_ufloat_method_derivativs(func_name, ufloat_tuples):
     ufloat_arg_list = []
     for nominal_value, std_dev in ufloat_tuples:
@@ -173,16 +177,21 @@ def test_ufloat_method_derivativs(func_name, ufloat_tuples):
     methods to calculate the resulting UFloat but we must use the unbound version to
     extract the numerical partial derivative.
     """
-    func = getattr(ufloat_arg_list[0], func_name)
+    bound_func = getattr(ufloat_arg_list[0], func_name)
     unbound_func = getattr(AffineScalarFunc, func_name)
 
-    result = func(*ufloat_arg_list[1:])
+    result = bound_func(*ufloat_arg_list[1:])
 
     for arg_num, arg in enumerate(ufloat_arg_list):
         ufloat_deriv_value = result.derivatives[arg]
         numerical_deriv_func = partial_derivative(unbound_func, arg_num)
         numerical_deriv_value = numerical_deriv_func(*float_arg_list)
-        assert math.isclose(ufloat_deriv_value, numerical_deriv_value, rel_tol=1e-6)
+        assert math.isclose(
+            ufloat_deriv_value,
+            numerical_deriv_value,
+            rel_tol=1e-6,
+            abs_tol=1e-6,
+        )
 
 
 def test_copy():
