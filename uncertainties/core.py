@@ -1054,7 +1054,7 @@ def ufloat(nominal_value, std_dev=None, tag=None):
 def deprecation_wrapper(func, msg):
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
-        warn(msg, FutureWarning)
+        warn(msg, FutureWarning, stacklevel=2)
         return func(*args, **kwargs)
 
     return wrapped
