@@ -424,6 +424,36 @@ def frexp(x):
 
 non_std_wrapped_funcs.append("frexp")
 
+# Deprecated functions
+
+deprecated_functions = [
+    "ceil",
+    "copysign",
+    "fabs",
+    "factorial",
+    "floor",
+    "fmod",
+    "frexp",
+    "ldexp",
+    "modf",
+    "trunc",
+]
+
+for function_name in deprecated_functions:
+    message = (
+        f"umath.{function_name}() is deprecated. It will be removed in a future "
+        f"release."
+    )
+    setattr(
+        this_module,
+        function_name,
+        uncert_core.deprecation_wrapper(
+            getattr(this_module, function_name),
+            message,
+        ),
+    )
+
+
 ###############################################################################
 # Exported functions:
 
