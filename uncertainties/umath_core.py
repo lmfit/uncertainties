@@ -429,8 +429,6 @@ non_std_wrapped_funcs.append("frexp")
 deprecated_functions = [
     "ceil",
     "copysign",
-    "isinf",
-    "isnan",
     "fabs",
     "factorial",
     "floor",
