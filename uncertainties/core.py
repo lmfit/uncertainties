@@ -15,7 +15,9 @@ Main module for the uncertainties package, with internal functions.
 from __future__ import division  # Many analytical derivatives depend on this
 
 from builtins import str, zip, range, object
+import functools
 from math import sqrt, isfinite  # Optimization: no attribute look-up
+from warnings import warn
 
 import copy
 import collections
@@ -1018,3 +1020,34 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     """
 
     return Variable(nominal_value, std_dev, tag=tag)
+
+
+# Deprecated UFloat methods
+
+
+def deprecation_wrapper(func, msg):
+    @functools.wraps(func)
+    def wrapped(*args, **kwargs):
+        warn(msg, FutureWarning, stacklevel=2)
+        return func(*args, **kwargs)
+
+    return wrapped
+
+
+deprecated_methods = [
+    "__floordiv__",
+    "__mod__",
+    "__abs__",
+    "__trunc__",
+]
+
+for method_name in deprecated_methods:
+    message = (
+        f"AffineScalarFunc.{method_name}() is deprecated. It will be removed in a future "
+        f"release."
+    )
+    setattr(
+        AffineScalarFunc,
+        method_name,
+        deprecation_wrapper(getattr(AffineScalarFunc, method_name), message),
+    )
