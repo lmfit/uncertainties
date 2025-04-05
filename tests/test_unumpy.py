@@ -300,3 +300,88 @@ def test_array_comparisons():
     # For matrices, 1D arrays are converted to 2D arrays:
     mat = unumpy.umatrix([1, 2], [1, 4])
     assert numpy.all((mat == [mat[0, 0], 4]) == [True, False])
+
+
+def test_uarray_fromstr():
+    "Test uarray creation from string representation"
+
+    # 1D string representations, and numerical values:
+    tests_1D = {
+        # Standard output from str(uarray):
+        "[1+/-0.1 2+/-0.2]": [(1, 0.1), (2, 0.2)],
+        "[1.0+/-0.1 2.0+/-0.2]": [(1, 0.1), (2, 0.2)],
+        # Global exponent:
+        "[(3.141+/-0.001)E+02 (6.283+/-0.002)E+02]": [(314.1, 0.1), (628.3, 0.2)],
+        # Without uncertainties:
+        "[25]": [(25, 1)],
+        "[1 2 3]": [(1, 1), (2, 1), (3, 1)],
+        "[1.1 2.2 3.3]": [(1.1, 0.1), (2.2, 0.1), (3.3, 0.1)],
+        "[-3.1e10 2.2e-5]": [(-3.1e10, 0.1e10), (2.2e-5, 0.1e-5)],
+        ## Pretty-print notation (without spaces):
+        # ± sign, global exponent (not pretty-printed):
+        "[(3.141±0.001)E+02 (6.283±0.002)E+02]": [(314.1, 0.1), (628.3, 0.2)],
+        # ± sign, individual exponent:
+        "[3.141E+02±0.001e2 6.283E+02±0.002e2]": [(314.1, 0.1), (628.3, 0.2)],
+        ## Others
+        # With NaN:
+        "[(3.141±nan)E+02 (6.283±nan)E+02]": [
+            (314.1, float("nan")),
+            (628.3, float("nan")),
+        ],
+        "[3.141±nan 6.283±nan]": [(3.141, float("nan")), (6.283, float("nan"))],
+        # Special float representation:
+        "[-3(0.) 2(0.)]": [(-3, 0), (2, 0)],
+    }
+
+    # Test the 1D representations:
+    for representation, values in tests_1D.items():
+        # Without tag:
+        num_array = core.uarray_fromstr(representation)
+        for i, num in enumerate(num_array.flatten()):
+            assert numbers_close(num.nominal_value, values[i][0])
+            assert numbers_close(num.std_dev, values[i][1])
+            assert num.tag is None
+
+        # With a tag as positional argument:
+        num_array = core.uarray_fromstr(representation, "test variable")
+        for i, num in enumerate(num_array.flatten()):
+            assert numbers_close(num.nominal_value, values[i][0])
+            assert numbers_close(num.std_dev, values[i][1])
+            assert num.tag == "test variable"
+
+        # With a tag as keyword argument:
+        num_array = core.uarray_fromstr(representation, tag="test variable")
+        for i, num in enumerate(num_array.flatten()):
+            assert numbers_close(num.nominal_value, values[i][0])
+            assert numbers_close(num.std_dev, values[i][1])
+            assert num.tag == "test variable"
+
+    # Higher dimensional arrays:
+    tests_ND = {
+        # 2D array:
+        "[[1+/-0.1 2+/-0.2]\n [3+/-0.3 4+/-0.4]]": numpy.array(
+            [
+                [(1, 0.1), (2, 0.2)],
+                [(3, 0.3), (4, 0.4)],
+            ],
+            dtype="f,f",
+        ),
+        # 3D array:
+        "[[[1+/-0.1 2+/-0.2]\n [3+/-0.3 4+/-0.4]]\n\n [[5+/-0.5 6+/-0.6]\n [7+/-0.7 8+/-0.8]]]": numpy.array(
+            [
+                [(1, 0.1), (2, 0.2)],
+                [(3, 0.3), (4, 0.4)],
+                [(5, 0.5), (6, 0.6)],
+                [(7, 0.7), (8, 0.8)],
+            ],
+            dtype="f,f",
+        ),
+    }
+
+    # Test the higher-dimensional representations:
+    for representation, values in tests_ND.items():
+        num_array = core.uarray_fromstr(representation)
+        for i, num in enumerate(num_array.flatten()):
+            assert numbers_close(num.nominal_value, values.flatten()[i][0])
+            assert numbers_close(num.std_dev, values.flatten()[i][1])
+            assert num.tag is None
