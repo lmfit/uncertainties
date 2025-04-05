@@ -33,6 +33,8 @@ from uncertainties.ops import (
     modified_operators,
     modified_ops_with_reflection,
 )
+from .ufloatnumpy import UFloatNumpy
+
 
 # Attributes that are always exported (some other attributes are
 # exported only if the NumPy module is available...):
@@ -359,7 +361,15 @@ class LinearCombination(object):
         (self.linear_combo,) = state
 
 
-class AffineScalarFunc(object):
+try:
+    import numpy
+except ImportError:
+    parent_classes = []
+else:
+    parent_classes = [UFloatNumpy]
+
+
+class AffineScalarFunc(*parent_classes):
     """
     Affine functions that support basic mathematical operations
     (addition, etc.).  Such functions can for instance be used for
@@ -684,6 +694,8 @@ class AffineScalarFunc(object):
 ops.add_arithmetic_ops(AffineScalarFunc)
 ops.add_comparative_ops(AffineScalarFunc)
 to_affine_scalar = AffineScalarFunc._to_affine_scalar
+AffineScalarFunc._add_numpy_arithmetic_ufuncs()
+AffineScalarFunc._add_numpy_comparative_ufuncs()
 
 # Nicer name, for users: isinstance(ufloat(...), UFloat) is
 # True. Also: isinstance(..., UFloat) is the test for "is this a
