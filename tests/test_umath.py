@@ -1,68 +1,58 @@
+import json
 import inspect
 import math
 from math import isnan
+from pathlib import Path
 
 import pytest
 
 from uncertainties import ufloat
 import uncertainties.core as uncert_core
 import uncertainties.umath_core as umath_core
+from uncertainties.ops import partial_derivative
 
-from helpers import (
-    compare_derivatives,
-    numbers_close,
-)
+from helpers import numbers_close
 ###############################################################################
 # Unit tests
 
+umath_function_cases_json_path = Path(
+    Path.cwd(),
+    "cases",
+    "umath_function_cases.json",
+)
+with open(umath_function_cases_json_path, "r") as f:
+    umath_function_cases_dict = json.load(f)
+ufloat_cases_list = []
+for func_name, ufloat_tuples_list in umath_function_cases_dict.items():
+    for ufloat_tuples in ufloat_tuples_list:
+        ufloat_cases_list.append((func_name, ufloat_tuples))
 
-def test_fixed_derivatives_math_funcs():
-    """
-    Comparison between function derivatives and numerical derivatives.
 
-    This comparison is useful for derivatives that are analytical.
-    """
+@pytest.mark.parametrize(
+    "func_name, ufloat_tuples",
+    ufloat_cases_list,
+    ids=lambda x: str(x),
+)
+def test_umath_function_derivatives(func_name, ufloat_tuples):
+    ufloat_arg_list = []
+    for nominal_value, std_dev in ufloat_tuples:
+        ufloat_arg_list.append(ufloat(nominal_value, std_dev))
+    float_arg_list = [arg.n for arg in ufloat_arg_list]
 
-    for name in umath_core.many_scalars_to_scalar_funcs:
-        func = getattr(umath_core, name)
-        # Numerical derivatives of func: the nominal value of func() results
-        # is used as the underlying function:
-        numerical_derivatives = uncert_core.NumericalDerivatives(
-            lambda *args: func(*args)
+    func = getattr(umath_core, func_name)
+
+    result = func(*ufloat_arg_list)
+
+    for arg_num, arg in enumerate(ufloat_arg_list):
+        ufloat_deriv_value = result.derivatives[arg]
+        numerical_deriv_func = partial_derivative(func, arg_num)
+        numerical_deriv_value = numerical_deriv_func(*float_arg_list)
+        assert math.isclose(
+            ufloat_deriv_value,
+            numerical_deriv_value,
+            rel_tol=1e-6,
+            abs_tol=1e-6,
         )
-        compare_derivatives(func, numerical_derivatives)
-
-    # Functions that are not in umath_core.many_scalars_to_scalar_funcs:
-
-    ##
-    # modf(): returns a tuple:
-    def frac_part_modf(x):
-        return umath_core.modf(x)[0]
-
-    def int_part_modf(x):
-        return umath_core.modf(x)[1]
-
-    compare_derivatives(
-        frac_part_modf, uncert_core.NumericalDerivatives(lambda x: frac_part_modf(x))
-    )
-    compare_derivatives(
-        int_part_modf, uncert_core.NumericalDerivatives(lambda x: int_part_modf(x))
-    )
-
-    ##
-    # frexp(): returns a tuple:
-    def mantissa_frexp(x):
-        return umath_core.frexp(x)[0]
-
-    def exponent_frexp(x):
-        return umath_core.frexp(x)[1]
-
-    compare_derivatives(
-        mantissa_frexp, uncert_core.NumericalDerivatives(lambda x: mantissa_frexp(x))
-    )
-    compare_derivatives(
-        exponent_frexp, uncert_core.NumericalDerivatives(lambda x: exponent_frexp(x))
-    )
 
 
 def test_compound_expression():

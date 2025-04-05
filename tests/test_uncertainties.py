@@ -1,6 +1,8 @@
 import copy
+import json
 import inspect
 import math
+from pathlib import Path
 import random  # noqa
 
 import pytest
@@ -18,10 +20,10 @@ from uncertainties import (
     correlated_values_norm,
     correlation_matrix,
 )
+from uncertainties.ops import partial_derivative
 from helpers import (
     numbers_close,
     ufloats_close,
-    compare_derivatives,
 )
 
 
@@ -152,39 +154,50 @@ def test_ufloat_fromstr():
 
 ###############################################################################
 
+ufloat_method_cases_json_path = Path(
+    Path.cwd(),
+    "cases",
+    "ufloat_method_cases.json",
+)
+with open(ufloat_method_cases_json_path, "r") as f:
+    ufloat_method_cases_dict = json.load(f)
+ufloat_cases_list = []
+for func_name, ufloat_tuples_list in ufloat_method_cases_dict.items():
+    for ufloat_tuples in ufloat_tuples_list:
+        ufloat_cases_list.append((func_name, ufloat_tuples))
 
-# Test of correctness of the fixed (usually analytical) derivatives:
-def test_fixed_derivatives_basic_funcs():
+
+@pytest.mark.parametrize(
+    "func_name, ufloat_tuples",
+    ufloat_cases_list,
+    ids=lambda x: str(x),
+)
+def test_ufloat_method_derivativs(func_name, ufloat_tuples):
+    ufloat_arg_list = []
+    for nominal_value, std_dev in ufloat_tuples:
+        ufloat_arg_list.append(ufloat(nominal_value, std_dev))
+    float_arg_list = [arg.n for arg in ufloat_arg_list]
+
     """
-    Pre-calculated derivatives for operations on AffineScalarFunc.
+    Because of how the UFloat methods are wrapped, we must use the bound version of the
+    methods to calculate the resulting UFloat but we must use the unbound version to
+    extract the numerical partial derivative.
     """
+    bound_func = getattr(ufloat_arg_list[0], func_name)
+    unbound_func = getattr(AffineScalarFunc, func_name)
 
-    def check_op(op, num_args):
-        """
-        Makes sure that the derivatives for function '__op__' of class
-        AffineScalarFunc, which takes num_args arguments, are correct.
+    result = bound_func(*ufloat_arg_list[1:])
 
-        If num_args is None, a correct value is calculated.
-        """
-
-        op_string = "__%s__" % op
-        func = getattr(AffineScalarFunc, op_string)
-        numerical_derivatives = uncert_core.NumericalDerivatives(
-            # The __neg__ etc. methods of AffineScalarFunc only apply,
-            # by definition, to AffineScalarFunc objects: we first map
-            # possible scalar arguments (used for calculating
-            # derivatives) to AffineScalarFunc objects:
-            lambda *args: func(*map(uncert_core.to_affine_scalar, args))
+    for arg_num, arg in enumerate(ufloat_arg_list):
+        ufloat_deriv_value = result.derivatives[arg]
+        numerical_deriv_func = partial_derivative(unbound_func, arg_num)
+        numerical_deriv_value = numerical_deriv_func(*float_arg_list)
+        assert math.isclose(
+            ufloat_deriv_value,
+            numerical_deriv_value,
+            rel_tol=1e-6,
+            abs_tol=1e-6,
         )
-        compare_derivatives(func, numerical_derivatives, [num_args])
-
-    # Operators that take 1 value:
-    for op in uncert_core.modified_operators:
-        check_op(op, 1)
-
-    # Operators that take 2 values:
-    for op in uncert_core.modified_ops_with_reflection:
-        check_op(op, 2)
 
 
 def test_copy():
