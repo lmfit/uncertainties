@@ -1,6 +1,8 @@
+import inspect
 import math
 from math import isnan
 
+import pytest
 
 from uncertainties import ufloat
 import uncertainties.core as uncert_core
@@ -274,3 +276,19 @@ def test_hypot():
     result = umath_core.hypot(x, y)
     assert isnan(result.derivatives[x])
     assert isnan(result.derivatives[y])
+
+
+@pytest.mark.parametrize("function_name", umath_core.deprecated_functions)
+def test_deprecated_function(function_name):
+    num_args = len(inspect.signature(getattr(math, function_name)).parameters)
+    args = [ufloat(1, 0.1)]
+    if num_args == 1:
+        if function_name == "factorial":
+            args[0] = 6
+    else:
+        if function_name == "ldexp":
+            args.append(3)
+        else:
+            args.append(ufloat(-12, 2.4))
+    with pytest.warns(FutureWarning, match="will be removed"):
+        getattr(umath_core, function_name)(*args)
