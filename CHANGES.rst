@@ -33,6 +33,15 @@ Fixes:
 - fixes to the str representation which occassionally errors when AffineScalarFunc is
   too small (#135)
 
+Deprecates:
+
+- Certain `umath` functions and `AffineScalarFunc`/`UFloat` methods will be removed in
+   a future release. A deprecation warning has been added to these functions and
+   methods. The following `umath` functions are marked as deprecated: `ceil`,
+   `copysign`, `fabs`, `factorial`, `floor`, `fmod`, `frexp`, `ldexp`, `modf`, `trunc`.
+   The following `AffineScalarFunc`/`UFloat` methods are marked as deprecated:
+   `__floordiv__`, `__mod__`, `__abs__`, `__trunc__`.
+
 3.2.2   2024-July-08
 -----------------------
 

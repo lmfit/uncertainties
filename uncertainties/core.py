@@ -17,6 +17,8 @@ from __future__ import division  # Many analytical derivatives depend on this
 from builtins import str, zip, range, object
 from math import isnan, sqrt  # Optimization: no attribute look-up
 from typing import Optional, Union
+import functools
+from warnings import warn
 
 from uncertainties.formatting import format_ufloat
 from uncertainties.parsing import str_to_number_with_uncert
@@ -638,3 +640,34 @@ def ufloat(nominal_value, std_dev, tag=None):
     """
 
     return UFloat(nominal_value, std_dev, tag=tag)
+
+
+# Deprecated UFloat methods
+
+
+def deprecation_wrapper(func, msg):
+    @functools.wraps(func)
+    def wrapped(*args, **kwargs):
+        warn(msg, FutureWarning, stacklevel=2)
+        return func(*args, **kwargs)
+
+    return wrapped
+
+
+deprecated_methods = [
+    "__floordiv__",
+    "__mod__",
+    "__abs__",
+    "__trunc__",
+]
+
+for method_name in deprecated_methods:
+    message = (
+        f"AffineScalarFunc.{method_name}() is deprecated. It will be removed in a future "
+        f"release."
+    )
+    setattr(
+        AffineScalarFunc,
+        method_name,
+        deprecation_wrapper(getattr(AffineScalarFunc, method_name), message),
+    )

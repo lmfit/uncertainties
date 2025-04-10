@@ -1,4 +1,5 @@
 import copy
+import inspect
 import math
 import gc
 import pickle
@@ -7,7 +8,11 @@ import random
 import pytest
 
 import uncertainties.core as uncert_core
-from uncertainties.core import ufloat, ufloat_fromstr
+from uncertainties.core import (
+    ufloat,
+    ufloat_fromstr,
+    deprecated_methods,
+)
 from uncertainties import (
     umath,
     UFloat,
@@ -1247,3 +1252,15 @@ def test_no_numpy():
         match="not able to import numpy",
     ):
         _ = correlation_matrix([x, y, z])
+
+
+@pytest.mark.parametrize("method_name", deprecated_methods)
+def test_deprecated_method(method_name):
+    x = ufloat(1, 0.1)
+    y = ufloat(-12, 2.4)
+    num_args = len(inspect.signature(getattr(float, method_name)).parameters)
+    with pytest.warns(FutureWarning, match="will be removed"):
+        if num_args == 1:
+            getattr(x, method_name)()
+        else:
+            getattr(x, method_name)(y)
