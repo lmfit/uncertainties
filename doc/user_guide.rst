@@ -314,16 +314,15 @@ ValueError: The uncertainties module does not handle complex results
 
 The ``x`` derivative is real anywhere ``x**y`` is real except along ``x==0`` for
 non-integer ``y``.
-At these points the ``x`` derivative would be complex so :mod:`uncertainties` uses a
-NaN value:
+At these points the ``x`` derivative would be complex so a NaN value is used:
 
 >>> x = ufloat(0, 0.2)
 >>> y=1.5
 >>> print((x**y).error_components())
 {0.0+/-0.2: nan}
 
-The ``y` derivative is real anywhere ``x**y`` is real as long as ``x>=0``.
-For ``x < 0`` the ``y`` derivative is always complex valued so :mod:`uncertainties`
+The ``y`` derivative is real anywhere ``x**y`` is real as long as ``x>=0``.
+For ``x < 0`` the ``y`` derivative is always complex valued so a NaN value is used:
 returns a NaN value.
 
 >>> x = -2
