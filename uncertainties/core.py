@@ -27,7 +27,6 @@ from uncertainties.parsing import str_to_number_with_uncert
 from . import ops
 from uncertainties.ops import (
     _wrap,
-    partial_derivative,
     set_doc,
     nan_if_exception,
     modified_operators,
@@ -232,31 +231,6 @@ def correlation_matrix(nums_with_uncert):
     std_devs = numpy.sqrt(cov_mat.diagonal())
 
     return cov_mat / std_devs / std_devs[numpy.newaxis].T
-
-
-###############################################################################
-
-
-class NumericalDerivatives(object):
-    """
-    Convenient access to the partial derivatives of a function,
-    calculated numerically.
-    """
-
-    # This is not a list because the number of arguments of the
-    # function is not known in advance, in general.
-
-    def __init__(self, function):
-        """
-        'function' is the function whose derivatives can be computed.
-        """
-        self._function = function
-
-    def __getitem__(self, n):
-        """
-        Return the n-th numerical derivative of the function.
-        """
-        return partial_derivative(self._function, n)
 
 
 ########################################
