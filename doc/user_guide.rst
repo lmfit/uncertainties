@@ -300,8 +300,8 @@ Traceback (most recent call last):
  ...
 ZeroDivisionError: 0.0 cannot be raised to a negative power
 
-On the domain where it is defined, ``x**y`` is real valued for ``x >= 0`` and for all
-integer values of ``y``.
+On the domain where it is defined, ``x**y`` is always real for ``x >= 0``.
+For ``x < 0`` it is real for all integer values of ``y``.
 If ``x<0`` and ``y`` is not an integer then ``x**y`` has a non-zero imaginary component.
 The :mod:`uncertainties` module does not handle complex values:
 
@@ -323,7 +323,6 @@ At these points the ``x`` derivative would be complex so a NaN value is used:
 
 The ``y`` derivative is real anywhere ``x**y`` is real as long as ``x>=0``.
 For ``x < 0`` the ``y`` derivative is always complex valued so a NaN value is used:
-returns a NaN value.
 
 >>> x = -2
 >>> y = ufloat(1, 0.2)
