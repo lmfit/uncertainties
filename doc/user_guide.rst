@@ -537,9 +537,10 @@ manner**.  This is what the :func:`nominal_value` and
 Finally, a utility method is provided that directly yields the
 `standard score <http://en.wikipedia.org/wiki/Standard_score>`_
 (number of standard deviations) between a number and a result with
-uncertainty: with :data:`x` equal to 0.20±0.01,
+uncertainty:
 
->>> x.std_score(0.17)
+>>> x = ufloat(0.20, 0.01)
+>>> print(x.std_score(0.17))
 -3.0
 
 .. index:: derivatives
