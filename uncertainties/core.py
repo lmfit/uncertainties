@@ -1039,6 +1039,10 @@ deprecated_methods = [
     "__mod__",
     "__abs__",
     "__trunc__",
+    "__lt__",
+    "__gt__",
+    "__le__",
+    "__ge__",
 ]
 
 for method_name in deprecated_methods:
