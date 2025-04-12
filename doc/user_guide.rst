@@ -475,7 +475,15 @@ It is thus possible to take a function :func:`f` *that returns a
 single float*, and to automatically generalize it so that it also
 works with numbers with uncertainties:
 
->>> wrapped_f = uncertainties.wrap(f)
+>>> from scipy.special import jv
+>>> from uncertainties import wrap as u_wrap
+>>> x = ufloat(2, 0.01)
+>>> jv(0, x)
+Traceback (most recent call last):
+ ...
+TypeError: ufunc 'jv' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule ''safe''
+>>> print(u_wrap(jv)(0, x))
+0.224+/-0.006
 
 The new function :func:`wrapped_f` (optionally) *accepts a number
 with uncertainty* in place of any float *argument* of :func:`f` (note
@@ -525,13 +533,15 @@ access the **nominal value and uncertainty of all numbers in a uniform
 manner**.  This is what the :func:`nominal_value` and
 :func:`std_dev` functions do:
 
->>> print(uncertainties.nominal_value(x))
+>>> from uncertainties import nominal_value, std_dev
+>>> x = ufloat(0.2, 0.01)
+>>> print(nominal_value(x))
 0.2
->>> print(uncertainties.std_dev(x))
+>>> print(std_dev(x))
 0.01
->>> uncertainties.nominal_value(3)
+>>> print(nominal_value(3))
 3
->>> uncertainties.std_dev(3)
+>>> print(std_dev(3))
 0.0
 
 Finally, a utility method is provided that directly yields the
