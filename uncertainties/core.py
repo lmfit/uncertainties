@@ -1018,7 +1018,11 @@ def ufloat(nominal_value, std_dev=None, tag=None):
     3. The returned Variable will have attributes `nominal_value`, `std_dev`,
        and `tag` which match the input values.
     """
-
+    if std_dev == 0:
+        warn(
+            "Certain operations may give unexpected results for UFloat objects with "
+            "std_dev==0."
+        )
     return Variable(nominal_value, std_dev, tag=tag)
 
 
