@@ -969,6 +969,7 @@ def ufloat_fromstr(representation, tag=None):
     Examples:
     -----------
 
+    >>> from uncertainties import ufloat_fromstr
     >>> x = ufloat_fromstr("12.58+/-0.23")  # = ufloat(12.58, 0.23)
     >>> x = ufloat_fromstr("12.58 ± 0.23")  # = ufloat(12.58, 0.23)
     >>> x = ufloat_fromstr("3.85e5 +/- 2.3e4")  # = ufloat(3.8e5, 2.3e4)
@@ -1006,6 +1007,7 @@ def ufloat(nominal_value, std_dev=None, tag=None):
 
     Examples
     ----------
+    >>> from uncertainties import ufloat
     >>> a = ufloat(5, 0.2)
     >>> b = ufloat(1000, 30, tag='kilo')
 
