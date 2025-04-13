@@ -500,7 +500,7 @@ def inv_with_derivatives(arr, input_type, derivatives):
 
 
 inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
-inv.__doc__ = """\
+inv.__doc__ = """
     Version of numpy.linalg.inv that works with array-like objects
     that contain numbers with uncertainties.
 
@@ -508,8 +508,6 @@ inv.__doc__ = """\
     matrix for the array of nominal values.
 
     Analytical formulas are used.
-
-    Original documentation:
     """
 
 ########## Matrix pseudo-inverse
