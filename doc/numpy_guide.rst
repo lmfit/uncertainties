@@ -162,15 +162,15 @@ Since NaN±1 is *not* (the scalar) NaN, functions like
 with a NaN nominal value:
 
 >>> nan = float("nan")
->>> arr = numpy.array([nan, uncertainties.ufloat(nan, 1), uncertainties.ufloat(1, nan), 2])
->>> arr
-array([nan, nan+/-1.0, 1.0+/-nan, 2], dtype=object)
->>> arr[~unumpy.isnan(arr)].mean()
+>>> arr = np.array([nan, ufloat(nan, 1), ufloat(1, nan), 2])
+>>> print(arr)
+[nan nan+/-1.0 1.0+/-nan 2]
+>>> print(arr[~unumpy.isnan(arr)].mean())
 1.5+/-nan
 
 or equivalently, by using masked arrays:
 
->>> masked_arr = numpy.ma.array(arr, mask=unumpy.isnan(arr))
+>>> masked_arr = np.ma.array(arr, mask=unumpy.isnan(arr))
 >>> masked_arr.mean()
 1.5+/-nan
 
@@ -198,7 +198,7 @@ Writing the array to file can be done by asking NumPy to use the
 *representation* of numbers with uncertainties (instead of the default float
 conversion):
 
->>> numpy.savetxt('arr.txt', arr, fmt='%r')
+>>> np.savetxt('arr.txt', arr, fmt='%r')
 
 This produces a file `arr.txt` that contains a text representation of
 the array::
@@ -217,8 +217,9 @@ known.  An example of using all of this to unpack the data saved with
 >>> from uncertainties import ufloat_fromstr
 >>> max_cols = 1
 >>> converters = {col: lambda dat: ufloat_fromstr(dat.decode("utf-8"))
-....                              for col in range(max_cols)}
->>> arr = numpy.loadtxt('arr.txt', converters=converters, dtype=object)
+...                              for col in range(max_cols)}
+>>> arr = np.loadtxt('arr.txt', converters=converters, dtype=object)
+>>> print(arr)
 
 .. index:: linear algebra; additional functions, ulinalg
 
@@ -232,10 +233,10 @@ It currently offers generalizations of two functions from
 :mod:`numpy.linalg` that work on arrays (or matrices) that contain
 numbers with uncertainties, the **matrix inverse and pseudo-inverse**:
 
->>> unumpy.ulinalg.inv([[ufloat(2, 0.1)]])
-array([[0.5+/-0.025]], dtype=object)
->>> unumpy.ulinalg.pinv(mat)
-matrix([[0.2+/-0.0012419339757],
-        [0.4+/-0.00161789987329]], dtype=object)
+>>> print(unumpy.ulinalg.inv([[ufloat(2, 0.1)]]))
+[[0.5+/-0.025]]
+>>> print(unumpy.ulinalg.pinv(mat))
+[[0.19999999999999996+/-0.012004265908417718]
+ [0.3999999999999999+/-0.01600179989876138]]
 
 .. _NumPy: http://numpy.scipy.org/
