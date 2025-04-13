@@ -427,8 +427,8 @@ covariance matrix:
 21.00+/-0.22
 >>> print(sum2)
 21.00+/-0.22
->>> print(sum2 - (u2+2*v2))
-(0+/-5)e-09
+>>> print(format(sum2 - (u2+2*v2), ".6f"))
+0.000000+/-0.000000
 
 The theoretical value of the last expression is exactly zero, like for
 ``sum - (u+2*v)``, but numerical errors yield a small uncertainty
