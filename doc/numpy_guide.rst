@@ -217,7 +217,7 @@ known.  An example of using all of this to unpack the data saved with
 
 >>> from uncertainties import ufloat_fromstr
 >>> max_cols = 1
->>> converters = {col: lambda dat: ufloat_fromstr(dat)
+>>> converters = {col: lambda dat: ufloat_fromstr(str(dat))
 ...                              for col in range(max_cols)}
 >>> arr = np.loadtxt('arr.txt', converters=converters, dtype=object)
 >>> print(arr)
