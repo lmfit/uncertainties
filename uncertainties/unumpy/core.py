@@ -513,7 +513,7 @@ inv.__doc__ = (
     Original documentation:
     %s
     """
-    % numpy.linalg.inv.__doc__
+    # % numpy.linalg.inv.__doc__
 )
 
 ########## Matrix pseudo-inverse
