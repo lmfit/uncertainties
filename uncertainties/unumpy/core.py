@@ -592,11 +592,7 @@ pinv = uncert_core.set_doc(
     matrix for the array of nominal values.
 
     Analytical formulas are used.
-
-    Original documentation:
-    %s
     """
-    % numpy.linalg.pinv.__doc__
 )(pinv)
 
 ########## Matrix class
