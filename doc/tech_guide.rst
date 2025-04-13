@@ -64,6 +64,7 @@ If multiple variables are pickled together (including when pickling
 :doc:`NumPy arrays <numpy_guide>`), their correlations are preserved:
 
 >>> import pickle
+>>> from uncertainties import ufloat
 >>> x = ufloat(2, 0.1)
 >>> y = 2*x
 >>> p = pickle.dumps([x, y])  # Pickling to a string
@@ -243,6 +244,7 @@ derivative.
 
 As a consequence, it is possible for uncertainties to be ``nan``:
 
+>>> from uncertainties import umath
 >>> umath.sqrt(ufloat(0, 1))
 0.0+/-nan
 
