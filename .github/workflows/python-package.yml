@@ -31,8 +31,7 @@ jobs:
         python -m pip install .[all]
     - name: Test source code and docs
       run: |
-        python -m pytest --cov=uncertainties --cov=tests/ uncertainties/ --cov-report=xml --cov-report=term --doctest-modules
-        python -m sphinx -b doctest doc/ doc/build/doctest/
+        python -m pytest tests/ doc/ uncertainties/ --cov=uncertainties --cov-report=xml --cov-report=term --doctest-modules
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.6.0
       with:
