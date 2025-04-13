@@ -155,7 +155,7 @@ def test_ufloat_fromstr():
 ###############################################################################
 
 ufloat_method_cases_json_path = Path(
-    Path.cwd(),
+    Path(__file__),
     "cases",
     "ufloat_method_cases.json",
 )
