@@ -198,6 +198,7 @@ Writing the array to file can be done by asking NumPy to use the
 *representation* of numbers with uncertainties (instead of the default float
 conversion):
 
+>>> arr = np.array([ufloat(1, 0.1), ufloat(2, 0.002)])
 >>> np.savetxt('arr.txt', arr, fmt='%r')
 
 This produces a file `arr.txt` that contains a text representation of
@@ -220,7 +221,7 @@ known.  An example of using all of this to unpack the data saved with
 ...                              for col in range(max_cols)}
 >>> arr = np.loadtxt('arr.txt', converters=converters, dtype=object)
 >>> print(arr)
-[nan+/-1.0 nan+/-1.0 1.0+/-nan 2.0+/-1.0]
+[1.0+/-0.1 2.0+/-0.002]
 
 .. index:: linear algebra; additional functions, ulinalg
 
