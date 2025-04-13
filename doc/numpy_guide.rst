@@ -15,10 +15,12 @@ Arrays of uncertainties Variables
 It is possible to put uncertainties Variable  in NumPy_ arrays and
 matrices:
 
->>> arr = numpy.array([ufloat(1, 0.01), ufloat(2, 0.1)])
->>> 2*arr
+>>> import numpy as np
+>>> from uncertainties import ufloat
+>>> arr = np.array([ufloat(1, 0.01), ufloat(2, 0.1)])
+>>> print(2*arr)
 [2.0+/-0.02 4.0+/-0.2]
->>> print arr.sum()
+>>> print(str(arr.sum()))
 3.00+/-0.10
 
 Many common operations on NumPy arrays can be performed transparently
@@ -72,7 +74,7 @@ uncertainties:
 NumPy arrays of numbers with uncertainties can also be built directly
 through NumPy, thanks to NumPy's support of arrays of arbitrary objects:
 
->>> arr = numpy.array([ufloat(1, 0.1), ufloat(2, 0.002)])
+>>> arr = np.array([ufloat(1, 0.1), ufloat(2, 0.002)])
 
 .. index::
    single: matrices; creation and manipulation
@@ -101,6 +103,8 @@ the inverse and the pseudo-inverse of a matrix can be calculated in
 the usual way: if :data:`mat` is a :class:`unumpy.matrix`,
 
 >>> print(mat.I)
+[[0.19999999999999996+/-0.012004265908417718]
+ [0.3999999999999999+/-0.01600179989876138]]
 
 does calculate the inverse or pseudo-inverse of :data:`mat` with
 uncertainties.
@@ -118,9 +122,9 @@ directly accessed (through functions that work on pure float arrays
 too):
 
 >>> unumpy.nominal_values(arr)
-array([ 1.,  2.])
+array([1., 2.])
 >>> unumpy.std_devs(mat)
-matrix([[ 0.1  ,  0.002]])
+matrix([[0.1  , 0.002]])
 
 
 .. index:: mathematical operation; on an array of numbers
@@ -133,6 +137,8 @@ generalize those from :mod:`uncertainties.umath` so that they work on
 NumPy arrays of numbers with uncertainties instead of just scalars:
 
 >>> print(unumpy.cos(arr))  # Cosine of each array element
+[0.5403023058681398+/-0.08414709848078966
+ -0.4161468365471424+/-0.0018185948536513636]
 
 NumPy's function names are used, and not those from the :mod:`math`
 module (for instance, :func:`unumpy.arccos` is defined, like in NumPy,
