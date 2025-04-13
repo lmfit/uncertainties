@@ -438,10 +438,10 @@ correlations should in fact cancel the uncertainty on :data:`sum2`).
 The covariance matrix is the desired one:
 
 >>> import numpy as np
->>> print(np.array_str(np.array(covariance_matrix([u2, v2, sum2])), precision=3))
-[[1.000e-02 2.602e-18 1.000e-02]
- [2.602e-18 1.000e-02 2.000e-02]
- [1.000e-02 2.000e-02 5.000e-02]]
+>>> print(np.array_str(np.array(covariance_matrix([u2, v2, sum2])), suppress_small=True))
+[[0.01 0.   0.01]
+ [0.   0.01 0.02]
+ [0.01 0.02 0.05]]
 
 reproduces the original covariance matrix :data:`cov_matrix` (up to
 rounding errors).
