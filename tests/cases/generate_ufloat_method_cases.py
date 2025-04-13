@@ -50,5 +50,6 @@ for func_name in binary_functions:
 
 ufloat_method_cases_json_path = Path(Path.cwd(), "ufloat_method_cases.json")
 
-with open(ufloat_method_cases_json_path, "w") as f:
-    json.dump(ufloat_method_cases_dict, f, indent=4)
+if __name__ == "__main__":
+    with open(ufloat_method_cases_json_path, "w") as f:
+        json.dump(ufloat_method_cases_dict, f, indent=4)

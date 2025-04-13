@@ -103,5 +103,6 @@ for func_name in double_input_funcs:
 
 umath_function_cases_json_path = Path(Path.cwd(), "umath_function_cases.json")
 
-with open(umath_function_cases_json_path, "w") as f:
-    json.dump(umath_function_cases_dict, f, indent=4)
+if __name__ == "__main__":
+    with open(umath_function_cases_json_path, "w") as f:
+        json.dump(umath_function_cases_dict, f, indent=4)
