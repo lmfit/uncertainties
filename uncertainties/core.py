@@ -75,89 +75,124 @@ except ImportError:
 
 def correlated_values(nom_values, covariance_mat, tags=None):
     """
-    Return numbers with uncertainties (AffineScalarFunc objects)
-    that correctly reproduce the given covariance matrix, and have
-    the given (float) values as their nominal value.
+    Return numbers with uncertainties (AffineScalarFunc objects) that have nominal
+    values given by nom_values and are correlated according to covariance_mat.
 
-    The correlated_values_norm() function returns the same result,
-    but takes a correlation matrix instead of a covariance matrix.
+    nom_values -- length (N,) sequence of (real) nominal values for the returned numbers
+    with uncertainties.
 
-    The list of values and the covariance matrix must have the
-    same length, and the matrix must be a square (symmetric) one.
+    covariance_mat -- (N, N) array representing the target covariance matrix for the
+    returned numbers with uncertainties. This matrix must be positive semi-definite.
 
-    The numbers with uncertainties returned depend on newly
-    created, independent variables (Variable objects).
+    tags -- optional length (N,) sequence of strings to use as tags for the variables on
+    which the returned numbers with uncertainties depend.
 
-    nom_values -- sequence with the nominal (real) values of the
-    numbers with uncertainties to be returned.
-
-    covariance_mat -- full covariance matrix of the returned numbers with
-    uncertainties. For example, the first element of this matrix is the
-    variance of the first number with uncertainty. This matrix must be a
-    NumPy array-like (list of lists, NumPy array, etc.).
-
-    tags -- if 'tags' is not None, it must list the tag of each new
-    independent variable.
-
-    This function raises NotImplementedError if numpy cannot be
-    imported.
+    This function raises NotImplementedError if numpy cannot be imported.
     """
     if numpy is None:
         msg = (
-            "uncertainties was not able to import numpy so "
-            "correlated_values is unavailable."
+            "uncertainties was not able to import numpy so correlated_values is "
+            "unavailable."
         )
         raise NotImplementedError(msg)
-    # !!! It would in principle be possible to handle 0 variance
-    # variables by first selecting the sub-matrix that does not contain
-    # such variables (with the help of numpy.ix_()), and creating
-    # them separately.
 
-    std_devs = numpy.sqrt(numpy.diag(covariance_mat))
+    covariance_mat = numpy.array(covariance_mat)
 
-    # For numerical stability reasons, we go through the correlation
-    # matrix, because it is insensitive to any change of scale in the
-    # quantities returned. However, care must be taken with 0 variance
-    # variables: calculating the correlation matrix cannot be simply done
-    # by dividing by standard deviations. We thus use specific
-    # normalization values, with no null value:
-    norm_vector = std_devs.copy()
-    norm_vector[norm_vector == 0] = 1
+    if not numpy.all(numpy.isreal(covariance_mat)):
+        raise ValueError("covariance_mat must be real.")
+    if not numpy.all(
+        numpy.isclose(
+            covariance_mat,
+            numpy.transpose(covariance_mat),
+        )
+    ):
+        raise ValueError("covariance_mat must be symmetric.")
 
-    return correlated_values_norm(
-        # !! The following zip() is a bit suboptimal: correlated_values()
-        # separates back the nominal values and the standard deviations:
-        list(zip(nom_values, std_devs)),
-        covariance_mat / norm_vector / norm_vector[:, numpy.newaxis],
-        tags,
-    )
+    n_dims = covariance_mat.shape[0]
+    if tags is None:
+        tags = [None] * n_dims
+
+    X = numpy.array([Variable(0, 1, tags[dim]) for dim in range(n_dims)])
+
+    try:
+        """
+        Covariance matrices for linearly independent random variables are symmetric and
+        positive-definite so they can be Cholesky decomposed as
+
+        C = L * L.T
+
+        with L a lower triangular matrix. Let X be a vector of independent random
+        variables with zero mean and unity variance. Then consider
+
+        Y = L * X
+
+        and
+
+        Cov(Y) = E[Y * Y.T] = E[L * X * X.T * L.T] = L * E[X * X.t] * L.T
+               = L * Cov(X) * L.T = L * I * L.T = L * L.T = C
+
+        where Cov(X) = I because the random variables in X are independent with
+        unity variance. So Y = L * X has covariance C.
+        """
+        L = numpy.linalg.cholesky(covariance_mat)
+        Y = L @ X
+    except numpy.linalg.LinAlgError:
+        """"
+        If two random variables are linearly dependent, e.g. x and y=2*x, then their
+        covariance matrix will be degenerate. In this case, a Cholesky decomposition is
+        not possible, but an eigenvalue decomposition is. Even in this case, covariance
+        matrices are symmetric, so they can be decomposed as
+
+        C = U D U^T
+
+        with U orthogonal and D diagonal with non-negative (though possibly
+        zero-valued) entries. Let S = sqrt(D) and
+
+        Y = U * S * X
+
+        Then
+
+        Cov(Y) = E[Y * Y.T] = E[U * S * X * X.T * S.T * U.T]
+            = U * S * E[X * X.T] * S.T * U.T
+            = U * S * I * S.T * U.T
+            = U * S * S.T * U.T = U * D * U.T
+            = C
+
+        So Y = U * S * X defined as above has covariance C.
+        """
+        eig_vals, U = numpy.linalg.eigh(covariance_mat)
+        eig_vals[numpy.isclose(eig_vals, 0)] = 0
+        """
+        Eigenvalues may be close to zero but negative. We clip these
+        to zero.
+        """
+        if numpy.any(eig_vals < 0):
+            raise ValueError("covariance_mat must be positive semi-definite.")
+        S = numpy.diag(numpy.sqrt(eig_vals))
+        Y = numpy.transpose(U @ S @ X)
+
+    result = numpy.array(nom_values) + Y
+    return result
 
 
 def correlated_values_norm(values_with_std_dev, correlation_mat, tags=None):
     """
-    Return correlated values like correlated_values(), but takes
-    instead as input:
+    Return numbers with uncertainties (AffineScalarFunc objects) that have nominal
+    values and standard deviations given by values_with_std_dev and whose correlation
+    matrix is given by correlation_mat.
 
-    - nominal (float) values along with their standard deviation, and
-    - a correlation matrix (i.e. a normalized covariance matrix).
+    values_with_std_dev -- Length (N,) sequence of tuples of (nominal_value, std_dev)
+    corresponding to the nominal values and standard deviations of the returned numbers
+    with uncertainty. std_devs must be non-negative.
 
-    values_with_std_dev -- sequence of (nominal value, standard
-    deviation) pairs. The returned, correlated values have these
-    nominal values and standard deviations.
+    correlation_mat -- (N, N) array representing the target normalized correlation
+    matrix between the returned values with uncertainty. This matrix must be positive
+    semi-definite.
 
-    correlation_mat -- correlation matrix between the given values, except
-    that any value with a 0 standard deviation must have its correlations
-    set to 0, with a diagonal element set to an arbitrary value (something
-    close to 0-1 is recommended, for a better numerical precision).  When
-    no value has a 0 variance, this is the covariance matrix normalized by
-    standard deviations, and thus a symmetric matrix with ones on its
-    diagonal.  This matrix must be an NumPy array-like (list of lists,
-    NumPy array, etc.).
+    tags -- optional length (N,) sequence of strings to use as tags for the variables on
+    which the returned numbers with uncertainties depend.
 
-    tags -- like for correlated_values().
-
-    This function raises NotImplementedError if numpy cannot be
-    imported.
+    This function raises NotImplementedError if numpy cannot be imported.
     """
     if numpy is None:
         msg = (
@@ -166,49 +201,22 @@ def correlated_values_norm(values_with_std_dev, correlation_mat, tags=None):
         )
         raise NotImplementedError(msg)
 
-    # If no tags were given, we prepare tags for the newly created
-    # variables:
-    if tags is None:
-        tags = (None,) * len(values_with_std_dev)
+    nominal_values, std_devs = tuple(zip(*values_with_std_dev))
+    if any(numpy.array(std_devs) < 0):
+        raise ValueError("All std_devs must be non-negative.")
 
-    (nominal_values, std_devs) = numpy.transpose(values_with_std_dev)
+    """
+    The entries Corr[i, j] of the correlation matrix are related to the entries
+    Cov[i, j] by
 
-    # We diagonalize the correlation matrix instead of the
-    # covariance matrix, because this is generally more stable
-    # numerically. In fact, the covariance matrix can have
-    # coefficients with arbitrary values, through changes of units
-    # of its input variables. This creates numerical instabilities.
-    #
-    # The covariance matrix is diagonalized in order to define
-    # the independent variables that model the given values:
-    (variances, transform) = numpy.linalg.eigh(correlation_mat)
+    Cov[i, j] = Corr[i, j] * s[i] * s[j]
 
-    # Numerical errors might make some variances negative: we set
-    # them to zero:
-    variances[variances < 0] = 0.0
+    where s[i] is the standard deviation of random variable i.
+    """
+    outer_std_devs = numpy.outer(std_devs, std_devs)
+    cov_mat = correlation_mat * outer_std_devs
 
-    # Creation of new, independent variables:
-
-    # We use the fact that the eigenvectors in 'transform' are
-    # special: 'transform' is unitary: its inverse is its transpose:
-
-    variables = tuple(
-        # The variables represent "pure" uncertainties:
-        Variable(0, sqrt(variance), tag)
-        for (variance, tag) in zip(variances, tags)
-    )
-
-    # The coordinates of each new uncertainty as a function of the
-    # new variables must include the variable scale (standard deviation):
-    transform *= std_devs[:, numpy.newaxis]
-
-    # Representation of the initial correlated values:
-    values_funcs = tuple(
-        AffineScalarFunc(value, LinearCombination(dict(zip(variables, coords))))
-        for (coords, value) in zip(transform, nominal_values)
-    )
-
-    return values_funcs
+    return correlated_values(nominal_values, cov_mat, tags)
 
 
 def correlation_matrix(nums_with_uncert):
