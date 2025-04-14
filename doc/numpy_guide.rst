@@ -74,6 +74,19 @@ through NumPy, thanks to NumPy's support of arrays of arbitrary objects:
 
 >>> arr = numpy.array([ufloat(1, 0.1), ufloat(2, 0.002)])
 
+uarray Variables can also be created from a string representation. This follows the
+numpy convention, with square brackets and spaces separating the elements. A number of
+ufloat string representations are supported, as long as they do not contain any
+whitespace:
+
+>>> arr = unumpy.uarray_fromstr("[1.0+/-0.01 2.0+/-0.002]")
+>>> arr = unumpy.uarray_fromstr("[1.0(1) 2.0(2)]")
+>>> arr = unumpy.uarray_fromstr("[1.0+/-0.01 2.0(2) (6.283±0.002)E+02]")
+
+Creation from string representations of higher-dimensional arrays is also supported:
+
+>>> arr = unumpy.uarray_fromstr("[[1+/-1 2+/-2]\n [3+/-3 4+/-4]]")
+
 .. index::
    single: matrices; creation and manipulation
    single: creation; matrices

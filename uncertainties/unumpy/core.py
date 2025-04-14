@@ -15,6 +15,8 @@ from builtins import zip
 from builtins import range
 import sys
 import inspect
+import re
+import ast
 
 # 3rd-party modules:
 import numpy
@@ -30,6 +32,7 @@ __all__ = [
     # Utilities:
     "nominal_values",
     "std_devs",
+    "uarray_fromstr",
     # Classes:
     "matrix",
 ]
@@ -115,6 +118,39 @@ def std_devs(arr):
     """
 
     return unumpy_to_numpy_matrix(to_std_devs(arr))
+
+
+def uarray_fromstr(representation, tag=None):
+    """
+    Create an uarray Variable from a string representation.
+
+    The string representation is expected to be a space-separated list of
+    ufloat representations, enclosed in square brackets.
+
+    The same ufloat representations as in ufloat_fromstr are accepted, except
+    representations containing spaces.
+
+    Arguments:
+    ----------
+    representation: string
+        string representation of an array of ufloat string representations
+    tag:   string or `None`
+        optional tag for tracing and organizing Variables ['None']
+
+    Returns:
+    --------
+    uarray Variable.
+    """
+    # Replace whitespace with commas. Representations of ufloats should never
+    # contain commas, and we disallow spaces in the ufloat representations.
+    rep = re.sub("\s+", ",", str(representation))
+    # Wrap any part of the representation that is not a square bracket or comma in
+    # quotes, in order to turn it into a string, then eval the resulting string
+    # to get a numpy array of string representations of ufloats.
+    arr = numpy.array(ast.literal_eval(re.sub(r"([^\[\],]+)", r'"\1"', rep)))
+    # Finally, convert the string representations to ufloats.
+    uarr = numpy.vectorize(uncert_core.ufloat_fromstr)(arr, tag)
+    return uarr
 
 
 ###############################################################################
