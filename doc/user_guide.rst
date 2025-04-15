@@ -78,7 +78,7 @@ as with other Python numbers and variables.
 >>> t = ufloat(0.2, 0.01)
 >>> double = 2.0*t
 >>> print(double)
-0.4+/-0.02
+0.400+/-0.020
 >>> square = t**2
 >>> print(square)
 0.040+/-0.004
@@ -89,7 +89,7 @@ When adding two Variables, the uncertainty in the result is the quadrature sum
 >>> x = ufloat(20, 4)
 >>> y = ufloat(12, 3)
 >>> print(x+y)
-32.0+/-5.0
+32+/-5
 
 We can check that error propagation when adding two independent variables
 (using the abbreviation `.s` for the standard error):
@@ -103,7 +103,7 @@ Multiplying two Variables will properly propagate those
 uncertainties too:
 
 >>> print(x*y)
-240.0+/-76.83749084919418
+(2.4+/-0.8)e+02
 >>> (x*y).s == (x*y).n *  sqrt((x.s/x.n)**2 + (y.s/y.n)**2 )
 True
 
@@ -111,9 +111,9 @@ But note that adding a Variable to itself does not add its uncertainties in
 quadrature, but are simply scaled:
 
 >>> print(x+x)
-40.0+/-8.0
+40+/-8
 >>> print(3*x + 10)
-70.0+/-12.0
+70+/-12
 
 
 It is important to understand that calculations done with Variable know about
@@ -337,6 +337,7 @@ the number of variables involved, and whatever the complexity of the
 calculation. For example, when :data:`x` is the number with
 uncertainty defined above,
 
+>>> x = ufloat(0.2, 0.01)
 >>> square = x**2
 >>> print(square)
 0.040+/-0.004
@@ -382,8 +383,8 @@ when the variables are **tagged**:
 >>> for (var, error) in sum_value.error_components().items():
 ...     print("{}: {}".format(var.tag, error))
 ...
-u variable: 0.1
 v variable: 0.2
+u variable: 0.1
 
 The variance (i.e. squared uncertainty) of the result
 (:data:`sum_value`) is the quadratic sum of these independent
@@ -393,10 +394,17 @@ The tags *do not have to be distinct*. For instance, *multiple* random
 variables can be tagged as ``"systematic"``, and their contribution to
 the total uncertainty of :data:`result` can simply be obtained as:
 
+>>> import math
+>>> x = ufloat(132, 0.02, "statistical")
+>>> y = ufloat(2.1, 0.05, "systematic")
+>>> z = ufloat(12, 0.1, "systematic")
+>>> result = x**y / z
 >>> syst_error = math.sqrt(sum(  # Error from *all* systematic errors
 ...     error**2
 ...     for (var, error) in result.error_components().items()
 ...     if var.tag == "systematic"))
+>>> print(format(syst_error, ".3f"))
+577.984
 
 The remaining contribution to the uncertainty is:
 
@@ -420,8 +428,9 @@ Covariance matrix
 The covariance matrix between various variables or calculated
 quantities can be simply obtained:
 
+>>> from uncertainties import covariance_matrix
 >>> sum_value = u+2*v
->>> cov_matrix = uncertainties.covariance_matrix([u, v, sum_value])
+>>> cov_matrix = covariance_matrix([u, v, sum_value])
 
 has value
 
@@ -446,11 +455,12 @@ Correlation matrix
 If the NumPy_ package is available, the correlation matrix can be
 obtained as well:
 
->>> corr_matrix = uncertainties.correlation_matrix([u, v, sum_value])
->>> corr_matrix
-array([[ 1.        ,  0.        ,  0.4472136 ],
-       [ 0.        ,  1.        ,  0.89442719],
-       [ 0.4472136 ,  0.89442719,  1.        ]])
+>>> from uncertainties import correlation_matrix
+>>> corr_matrix = correlation_matrix([u, v, sum_value])
+>>> print(corr_matrix)
+[[1.         0.         0.4472136 ]
+ [0.         1.         0.89442719]
+ [0.4472136  0.89442719 1.        ]]
 
 .. index:: correlations; correlated variables
 
@@ -465,17 +475,18 @@ Use of a covariance matrix
 
 Correlated variables can be obtained through the *covariance* matrix:
 
->>> (u2, v2, sum2) = uncertainties.correlated_values([1, 10, 21], cov_matrix)
+>>> from uncertainties import correlated_values
+>>> (u2, v2, sum2) = correlated_values([1, 10, 21], cov_matrix)
 
 creates three new variables with the listed nominal values, and the given
 covariance matrix:
 
->>> sum_value
-21.0+/-0.223606797749979
->>> sum2
-21.0+/-0.223606797749979
->>> sum2 - (u2+2*v2)
-0.0+/-3.83371856862256e-09
+>>> print(sum_value)
+21.00+/-0.22
+>>> print(sum2)
+21.00+/-0.22
+>>> print(format(sum2 - (u2+2*v2), ".6f"))
+0.000000+/-0.000000
 
 The theoretical value of the last expression is exactly zero, like for
 ``sum - (u+2*v)``, but numerical errors yield a small uncertainty
@@ -484,7 +495,11 @@ correlations should in fact cancel the uncertainty on :data:`sum2`).
 
 The covariance matrix is the desired one:
 
->>> uncertainties.covariance_matrix([u2, v2, sum2])
+>>> import numpy as np
+>>> print(np.array_str(np.array(covariance_matrix([u2, v2, sum2])), suppress_small=True))
+[[0.01 0.   0.01]
+ [0.   0.01 0.02]
+ [0.01 0.02 0.05]]
 
 reproduces the original covariance matrix :data:`cov_matrix` (up to
 rounding errors).
@@ -503,8 +518,11 @@ Alternatively, correlated values can be defined through:
 
 Example:
 
->>> (u3, v3, sum3) = uncertainties.correlated_values_norm(
-...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)], corr_matrix)
+>>> from uncertainties import correlated_values_norm
+>>> (u3, v3, sum3) = correlated_values_norm(
+...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)],
+...     corr_matrix,
+... )
 >>> print(u3)
 1.00+/-0.10
 
@@ -533,7 +551,15 @@ It is thus possible to take a function :func:`f` *that returns a
 single float*, and to automatically generalize it so that it also
 works with numbers with uncertainties:
 
->>> wrapped_f = uncertainties.wrap(f)
+>>> from scipy.special import jv
+>>> from uncertainties import wrap as u_wrap
+>>> x = ufloat(2, 0.01)
+>>> jv(0, x)
+Traceback (most recent call last):
+ ...
+TypeError: ufunc 'jv' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule ''safe''
+>>> print(u_wrap(jv)(0, x))
+0.224+/-0.006
 
 The new function :func:`wrapped_f` (optionally) *accepts a number
 with uncertainty* in place of any float *argument* of :func:`f` (note
@@ -583,21 +609,24 @@ access the **nominal value and uncertainty of all numbers in a uniform
 manner**.  This is what the :func:`nominal_value` and
 :func:`std_dev` functions do:
 
->>> print(uncertainties.nominal_value(x))
+>>> from uncertainties import nominal_value, std_dev
+>>> x = ufloat(0.2, 0.01)
+>>> print(nominal_value(x))
 0.2
->>> print(uncertainties.std_dev(x))
+>>> print(std_dev(x))
 0.01
->>> uncertainties.nominal_value(3)
+>>> print(nominal_value(3))
 3
->>> uncertainties.std_dev(3)
+>>> print(std_dev(3))
 0.0
 
 Finally, a utility method is provided that directly yields the
 `standard score <http://en.wikipedia.org/wiki/Standard_score>`_
 (number of standard deviations) between a number and a result with
-uncertainty: with :data:`x` equal to 0.20±0.01,
+uncertainty:
 
->>> x.std_score(0.17)
+>>> x = ufloat(0.20, 0.01)
+>>> print(x.std_score(0.17))
 -3.0
 
 .. index:: derivatives

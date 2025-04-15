@@ -64,6 +64,7 @@ If multiple variables are pickled together (including when pickling
 :doc:`NumPy arrays <numpy_guide>`), their correlations are preserved:
 
 >>> import pickle
+>>> from uncertainties import ufloat
 >>> x = ufloat(2, 0.1)
 >>> y = 2*x
 >>> p = pickle.dumps([x, y])  # Pickling to a string
@@ -243,6 +244,7 @@ derivative.
 
 As a consequence, it is possible for uncertainties to be ``nan``:
 
+>>> from uncertainties import umath
 >>> umath.sqrt(ufloat(0, 1))
 0.0+/-nan
 
@@ -348,7 +350,7 @@ yield correct uncertainties.  For example:
 >>> poly
 46.0+/-0.4
 >>> poly - x*x
-42+/-0
+42.0+/-0
 
 Even though ``x*x`` has a non-zero uncertainty, the result has a zero
 uncertainty, because it is equal to :data:`a`.
@@ -357,16 +359,16 @@ If the variable :data:`a` above is modified, the value of :data:`poly`
 is not modified, as is usual in Python:
 
 >>> a = 123
->>> print(poly)
-46.0+/-0.4  # Still equal to x**2 + 42, not x**2 + 123
+>>> print(poly)  # Still equal to x**2 + 42, not x**2 + 123
+46.0+/-0.4
 
 Random variables can, on the other hand, have their uncertainty
 updated on the fly, because quantities with uncertainties (like
 :data:`poly`) keep track of them:
 
 >>> x.std_dev = 0
->>> print(poly)
-46+/-0  # Zero uncertainty, now
+>>> print(poly)  # Zero uncertainty, now
+46.0+/-0
 
 As usual, Python keeps track of objects as long as they are used.
 Thus, redefining the value of :data:`x` does not change the fact that
@@ -374,8 +376,8 @@ Thus, redefining the value of :data:`x` does not change the fact that
 in :data:`x`:
 
 >>> x = 10000
->>> print(poly)
-46+/-0  # Unchanged
+>>> print(poly)  # Unchanged
+46.0+/-0
 
 These mechanisms make quantities with uncertainties behave mostly like
 regular numbers, while providing a fully transparent way of handling
@@ -408,7 +410,7 @@ a :class:`Variable` object:
 
 >>> x = ufloat(1, 0.1)
 >>> type(x)
-<class 'uncertainties.Variable'>
+<class 'uncertainties.core.Variable'>
 
 :class:`Variable` objects can be used as if they were regular Python
 numbers (the summation, etc. of these objects is defined).
@@ -419,7 +421,7 @@ represent mathematical functions and not simple variables; these
 objects store all the variables they depend on:
 
 >>> type(umath.sin(x))
-<class 'uncertainties.AffineScalarFunc'>
+<class 'uncertainties.core.AffineScalarFunc'>
 
 
 .. _automatic differentiation: http://en.wikipedia.org/wiki/Automatic_differentiation
