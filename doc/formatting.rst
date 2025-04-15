@@ -16,6 +16,8 @@ Printing
 
 Numbers with uncertainties can be printed conveniently:
 
+>>> from uncertainties import ufloat
+>>> x = ufloat(0.2, 0.01)
 >>> print(x)
 0.200+/-0.010
 
@@ -160,7 +162,7 @@ integer:
 >>> print(ufloat(3.1415, 0))
 3.1415+/-0
 >>> print(ufloat(3.1415e10, 0))
-(3.1415+/-0)e+10
+31415000000.0+/-0
 >>> print(ufloat(3.1415, 0.0005))
 3.1415+/-0.0005
 >>> print('{:.2f}'.format(ufloat(3.14, 0.001)))

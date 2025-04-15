@@ -16,7 +16,7 @@ from helpers import numbers_close
 # Unit tests
 
 umath_function_cases_json_path = Path(
-    Path.cwd(),
+    Path(__file__).parent,
     "cases",
     "umath_function_cases.json",
 )
