@@ -15,10 +15,12 @@ Arrays of uncertainties Variables
 It is possible to put uncertainties Variable  in NumPy_ arrays and
 matrices:
 
->>> arr = numpy.array([ufloat(1, 0.01), ufloat(2, 0.1)])
->>> 2*arr
+>>> import numpy as np
+>>> from uncertainties import ufloat
+>>> arr = np.array([ufloat(1, 0.01), ufloat(2, 0.1)])
+>>> print(2*arr)
 [2.0+/-0.02 4.0+/-0.2]
->>> print arr.sum()
+>>> print(str(arr.sum()))
 3.00+/-0.10
 
 Many common operations on NumPy arrays can be performed transparently
@@ -72,7 +74,7 @@ uncertainties:
 NumPy arrays of numbers with uncertainties can also be built directly
 through NumPy, thanks to NumPy's support of arrays of arbitrary objects:
 
->>> arr = numpy.array([ufloat(1, 0.1), ufloat(2, 0.002)])
+>>> arr = np.array([ufloat(1, 0.1), ufloat(2, 0.002)])
 
 .. index::
    single: matrices; creation and manipulation
@@ -101,6 +103,8 @@ the inverse and the pseudo-inverse of a matrix can be calculated in
 the usual way: if :data:`mat` is a :class:`unumpy.matrix`,
 
 >>> print(mat.I)
+[[0.19999999999999996+/-0.012004265908417718]
+ [0.3999999999999999+/-0.01600179989876138]]
 
 does calculate the inverse or pseudo-inverse of :data:`mat` with
 uncertainties.
@@ -118,9 +122,9 @@ directly accessed (through functions that work on pure float arrays
 too):
 
 >>> unumpy.nominal_values(arr)
-array([ 1.,  2.])
+array([1., 2.])
 >>> unumpy.std_devs(mat)
-matrix([[ 0.1  ,  0.002]])
+matrix([[0.1  , 0.002]])
 
 
 .. index:: mathematical operation; on an array of numbers
@@ -133,6 +137,8 @@ generalize those from :mod:`uncertainties.umath` so that they work on
 NumPy arrays of numbers with uncertainties instead of just scalars:
 
 >>> print(unumpy.cos(arr))  # Cosine of each array element
+[0.5403023058681398+/-0.08414709848078966
+ -0.4161468365471424+/-0.0018185948536513636]
 
 NumPy's function names are used, and not those from the :mod:`math`
 module (for instance, :func:`unumpy.arccos` is defined, like in NumPy,
@@ -156,15 +162,15 @@ Since NaN±1 is *not* (the scalar) NaN, functions like
 with a NaN nominal value:
 
 >>> nan = float("nan")
->>> arr = numpy.array([nan, uncertainties.ufloat(nan, 1), uncertainties.ufloat(1, nan), 2])
->>> arr
-array([nan, nan+/-1.0, 1.0+/-nan, 2], dtype=object)
->>> arr[~unumpy.isnan(arr)].mean()
+>>> arr = np.array([nan, ufloat(nan, 1), ufloat(1, nan), 2])
+>>> print(arr)
+[nan nan+/-1.0 1.0+/-nan 2]
+>>> print(arr[~unumpy.isnan(arr)].mean())
 1.5+/-nan
 
 or equivalently, by using masked arrays:
 
->>> masked_arr = numpy.ma.array(arr, mask=unumpy.isnan(arr))
+>>> masked_arr = np.ma.array(arr, mask=unumpy.isnan(arr))
 >>> masked_arr.mean()
 1.5+/-nan
 
@@ -180,39 +186,65 @@ values.
 Storing arrays in text format
 =============================
 
-Arrays of numbers with uncertainties can be directly :ref:`pickled
-<pickling>`, saved to file and read from a file. Pickling has the
-advantage of preserving correlations between errors.
+Number with uncertainties can easy be cast to strings and back. This means that arrays
+of numbers with uncertainties can also be cast to string representations and back.
+There are many ways to convert an array of numbers with uncertainties to a string
+representation for storage and then convert it back to a python array of numbers with
+uncertainties.
+Here is one example set of functions to perform this operation.
 
-Storing arrays in **text format** loses correlations between errors but has the
-advantage of being both computer- and human-readable. This can be done through
-NumPy's :func:`savetxt` and :func:`loadtxt`.
-
-Writing the array to file can be done by asking NumPy to use the
-*representation* of numbers with uncertainties (instead of the default float
-conversion):
-
->>> numpy.savetxt('arr.txt', arr, fmt='%r')
-
-This produces a file `arr.txt` that contains a text representation of
-the array::
-
-  1.0+/-0.01
-  2.0+/-0.002
-
-The file can then be read back by instructing NumPy with :meth:`numpy.loadtxt`,
-but for object arrays, this requires a converter function for each column
-separately.  We can use func:`uncertainties.ufloat_fromstr`, but
-:meth:`numpy.loadtxt` passes bytes to converters, they must first be converted
-into a string.  In addition the number of maximum number of columns must be
-known.  An example of using all of this to unpack the data saved with
-:meth:`numpy.savetxt` would be:
-
+>>> import json
 >>> from uncertainties import ufloat_fromstr
->>> max_cols = 1
->>> converters = {col: lambda dat: ufloat_fromstr(dat.decode("utf-8"))
-....                              for col in range(max_cols)}
->>> arr = numpy.loadtxt('arr.txt', converters=converters, dtype=object)
+>>> def serialize_unumpy_array(u_arr):
+...     string_u_arr = np.vectorize(repr)(u_arr)
+...     return json.dumps(string_u_arr.tolist(), indent=4)
+>>>
+>>> def deserialize_unumpy_arr(serialized_u_arr):
+...     string_u_arr = np.array(json.loads(serialized_u_arr))
+...     return np.vectorize(ufloat_fromstr)(string_u_arr)
+
+We can use the first function to serialize an array
+
+>>> u_arr = np.array([
+...     [ufloat(1, 0.1), ufloat(2, 0.2)],
+...     [ufloat(3, 0.3), ufloat(4, 0.4)],
+... ])
+>>> print(u_arr)
+[[1.0+/-0.1 2.0+/-0.2]
+ [3.0+/-0.3 4.0+/-0.4]]
+>>> serialized_u_arr = serialize_unumpy_array(u_arr)
+>>> print(serialized_u_arr)
+[
+    [
+        "1.0+/-0.1",
+        "2.0+/-0.2"
+    ],
+    [
+        "3.0+/-0.3",
+        "4.0+/-0.4"
+    ]
+]
+
+This can then of course be stored in a ``.json`` file using ``json.dump``.
+We can then deserialize
+
+>>> u_arr_2 = deserialize_unumpy_arr(serialized_u_arr)
+>>> print(u_arr_2)
+[[1.0+/-0.1 2.0+/-0.2]
+ [3.0+/-0.3 4.0+/-0.4]]
+
+Note that the process of serializing and deserializing the array of numbers with
+uncertainties has result in all correlations between numbers within one array, and also
+between numbers from the original array and its deserialized copy
+
+>>> print(u_arr[0, 0] - u_arr_2[0, 0])
+0.00+/-0.14
+>>> print(u_arr[0, 0] == u_arr_2[0, 0])
+False
+
+A future release of :mod:`uncertainties` may provide functionality for
+serializing/deserializing number with uncertainties in such a way that correlations can
+be preserved.
 
 .. index:: linear algebra; additional functions, ulinalg
 
@@ -226,10 +258,10 @@ It currently offers generalizations of two functions from
 :mod:`numpy.linalg` that work on arrays (or matrices) that contain
 numbers with uncertainties, the **matrix inverse and pseudo-inverse**:
 
->>> unumpy.ulinalg.inv([[ufloat(2, 0.1)]])
-array([[0.5+/-0.025]], dtype=object)
->>> unumpy.ulinalg.pinv(mat)
-matrix([[0.2+/-0.0012419339757],
-        [0.4+/-0.00161789987329]], dtype=object)
+>>> print(unumpy.ulinalg.inv([[ufloat(2, 0.1)]]))
+[[0.5+/-0.025]]
+>>> print(unumpy.ulinalg.pinv(mat))
+[[0.19999999999999996+/-0.012004265908417718]
+ [0.3999999999999999+/-0.01600179989876138]]
 
 .. _NumPy: http://numpy.scipy.org/
