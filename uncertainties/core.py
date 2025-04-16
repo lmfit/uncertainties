@@ -19,6 +19,9 @@ import functools
 from math import sqrt, isfinite  # Optimization: no attribute look-up
 from warnings import warn
 
+from statistics import mean as stats_mean
+from statistics import stdev as stats_stdev
+
 import copy
 import collections
 
@@ -71,7 +74,6 @@ try:
     import numpy
 except ImportError:
     numpy = None
-
 
 def correlated_values(nom_values, covariance_mat, tags=None):
     """
@@ -986,6 +988,76 @@ def ufloat_fromstr(representation, tag=None):
     """
     (nom, std) = str_to_number_with_uncert(representation.strip())
     return ufloat(nom, std, tag)
+
+def ufloat_from_sample(sample, method="gaussian", axis=None):
+    '''
+    Converts a collection of values into a ufloat.
+
+    Arguments:
+    ----------
+    sample: list or numpy array of numbers
+        The sample of values
+
+    method: optional string
+        The method used to calculate the ufloat. currently, only 
+        the 'gaussian' method is implemented.
+
+        gaussian: The nominal value is the mean of the sample. 
+        The standard deviation is the error on the mean. This 
+        method assumes that the sample follows a gaussian 
+        distribution, and works best for large samples. This 
+        method works well to find an estimate of a fixed value 
+        that has been measured multiuple times with some random 
+        error.
+
+    axis: integer or None
+        Only when the sample is a numpy array. The axis along 
+        which the ufloats are computed. If None (the default value)
+        the sample is the whole flattened array. 
+    
+    '''
+    
+    if method=="gaussian":
+
+        if numpy is None:
+            #if numpy is not present, use pythons statistics functions instead
+            mean_value=stats_mean(sample)
+            error_on_mean=stats_stdev(sample)/sqrt(len(sample)-1)
+
+            return ufloat(mean_value,error_on_mean)
+        
+        else:
+            #if numpy is present, use the faster numpy functions that can handle a wider range of inputs
+            mean_value=numpy.mean(sample, axis=axis)
+            
+            #the size of each sample being collected
+            sample_size=0
+
+            if axis == None: 
+                sample_size=numpy.size(sample)
+            else:
+                sample_size=numpy.shape(sample)[axis]
+
+            error_on_mean=numpy.std(sample, ddof=1, axis=axis)/numpy.sqrt(sample_size)
+
+            if len(numpy.shape(mean_value))==0:
+                # if the output is a single ufloat
+                return ufloat(mean_value,error_on_mean)
+            else:
+                #if the output is an array of ufloats (duplicate of code from unnumpy.core.uarray to avoid circular import)
+                return numpy.vectorize(
+                    # ! Looking up uncert_core.Variable beforehand through
+                    # '_Variable = uncert_core.Variable' does not result in a
+                    # significant speed up:
+                    lambda v, s: Variable(v, s),
+                    otypes=[object],
+                    )(mean_value, error_on_mean)
+    else:
+        msg={
+            "{} is not one of the implemented methods".format(method)
+        }
+        raise ValueError(msg)
+
 
 
 def ufloat(nominal_value, std_dev=None, tag=None):

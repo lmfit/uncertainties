@@ -32,6 +32,8 @@ try:
 except ImportError:
     np = None
 
+if np != None:
+    from uncertainties.unumpy.core import nominal_values,std_devs
 
 def test_value_construction():
     """
@@ -150,6 +152,71 @@ def test_ufloat_fromstr():
         assert numbers_close(num.nominal_value, values[0])
         assert numbers_close(num.std_dev, values[1])
         assert num.tag == "test variable"
+
+def test_ufloat_from_sample():
+    "Test genarating a number with an uncertainty from a sample"
+
+    #the test imputs for the sample paramiter
+    test_samples=[
+        [-1.5,-0.5,0,0.5,1.5] #test standard list input
+    ]
+
+    #the test imputs for the other arguments
+    optional_args=[{}]
+
+    #the expected nominal values
+    expected_n=[0]
+
+    #expected standard deviations
+    expected_s=[0.5]
+
+    if np != None:
+        #include extra tests for numpy arrays
+        test_samples+=[
+            np.array([-1.5,-0.5,0,0.5,1.5]),
+            np.array([
+                    [-3,    -1,     0,      1,      3],
+                    [-1.5,  -0.5,   0,      0.5,    1.5],
+                    [-0.75, -0.25,  0,      0.25,   0.75],
+                    [0,     0,      0,      0,      0],
+                    [1.5,   0.5,    0,      -0.5,   -1.5]  
+                ]),
+            np.array([
+                    [-3,    -1,     0,      1,      3],
+                    [-1.5,  -0.5,   0,      0.5,    1.5],
+                    [-0.75, -0.25,  0,      0.25,   0.75],
+                    [0,     0,      0,      0,      0],
+                    [1.5,   0.5,    0,      -0.5,   -1.5]  
+                ])
+        ]
+        optional_args+=[
+            {},
+            {'axis':0},
+            {'axis':1}
+        ]
+        expected_n+=[
+            0,
+            [-0.75,-0.25,0.0,0.25,0.75],
+            [0, 0, 0, 0, 0]
+        ]
+        expected_s+=[
+            0.5,
+            [0.75,0.25,0.0,0.25,0.75],
+            [1, 0.5, 0.25, 0, 0.5]
+
+        ]
+
+
+    #run the tests
+    for i,sample in enumerate(test_samples):
+
+        num=uncert_core.ufloat_from_sample(sample,**(optional_args[i]))
+
+        #check nominal values
+        assert(np.allclose(nominal_values(num),expected_n[i]))
+
+        #check standard deviations
+        assert(np.allclose(std_devs(num),expected_s[i]))
 
 
 ###############################################################################
