@@ -271,6 +271,64 @@ To check whether the uncertainty is NaN or Inf, use one of :func:`math.isnan`,
 .. index:: correlations; detailed example
 
 
+Power Function Behavior
+=======================
+
+The value of one :class:`UFloat` raised to the power of another can be calculated in two
+ways:
+
+>>> from uncertainties import umath
+>>>
+>>> x = ufloat(4.5, 0.2)
+>>> y = ufloat(3.4, 0.4)
+>>> print(x**y)
+(1.7+/-1.0)e+02
+>>> print(umath.pow(x, y))
+(1.7+/-1.0)e+02
+
+The function ``x**y`` is defined for all ``x != 0`` and for ``x == 0`` as long as
+``y > 0``.
+There is not a unique definition for ``0**0``, however python takes the convention for
+:class:`float` that ``0**0 == 1``.
+If the power operation is performed on an ``(x, y)`` pair for which ``x**y`` is
+undefined then an exception will be raised:
+
+>>> x = ufloat(0, 0.2)
+>>> y = ufloat(-3.4, 0.4)
+>>> print(x**y)
+Traceback (most recent call last):
+ ...
+ZeroDivisionError: 0.0 cannot be raised to a negative power
+
+On the domain where it is defined, ``x**y`` is always real for ``x >= 0``.
+For ``x < 0`` it is real for all integer values of ``y``.
+If ``x<0`` and ``y`` is not an integer then ``x**y`` has a non-zero imaginary component.
+The :mod:`uncertainties` module does not handle complex values:
+
+>>> x = ufloat(-4.5, 0.2)
+>>> y = ufloat(-3.4, 0.4)
+>>> print(x**y)
+Traceback (most recent call last):
+ ...
+ValueError: The uncertainties module does not handle complex results
+
+The ``x`` derivative is real anywhere ``x**y`` is real except along ``x==0`` for
+non-integer ``y``.
+At these points the ``x`` derivative would be complex so a NaN value is used:
+
+>>> x = ufloat(0, 0.2)
+>>> y=1.5
+>>> print((x**y).error_components())
+{0.0+/-0.2: nan}
+
+The ``y`` derivative is real anywhere ``x**y`` is real as long as ``x>=0``.
+For ``x < 0`` the ``y`` derivative is always complex valued so a NaN value is used:
+
+>>> x = -2
+>>> y = ufloat(1, 0.2)
+>>> print((x**y).error_components())
+{1.0+/-0.2: nan}
+
 Automatic correlations
 ======================
 
