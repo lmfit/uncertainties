@@ -42,7 +42,8 @@ Deprecates:
    methods. The following `umath` functions are marked as deprecated: `ceil`,
    `copysign`, `fabs`, `factorial`, `floor`, `fmod`, `frexp`, `ldexp`, `modf`, `trunc`.
    The following `AffineScalarFunc`/`UFloat` methods are marked as deprecated:
-   `__floordiv__`, `__mod__`, `__abs__`, `__trunc__`.
+   `__floordiv__`, `__mod__`, `__abs__`, `__trunc__`, `__lt__`, `__le__`, `__gt__`,
+   `__ge__`.
 
 3.2.2   2024-July-08
 -----------------------
