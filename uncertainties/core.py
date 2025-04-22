@@ -1021,7 +1021,10 @@ def ufloat(nominal_value, std_dev=None, tag=None):
        and `tag` which match the input values.
     """
     if std_dev == 0:
-        warn("Using UFloat objects with std_dev==0 may give unexpected results.")
+        warn(
+            "Using UFloat objects with std_dev==0 may give unexpected results.",
+            stacklevel=2,
+        )
     return Variable(nominal_value, std_dev, tag=tag)
 
 
