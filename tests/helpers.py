@@ -45,6 +45,18 @@ def numbers_close(x, y, tolerance=1e-6):
         return abs(x or y) < tolerance
 
 
+def nominal_and_std_dev_close(x, y, tolerance=1e-6):
+    """
+    Tests if two numbers with uncertainties are close, NOT as random
+    variables. Checks whether the magnitude of the nominal
+    values and standard deviations are close.
+
+    The tolerance is applied to both the nominal value and the
+    standard deviation of the difference between the numbers.
+    """
+    return numbers_close(x.n, y.n, tolerance) and numbers_close(x.s, y.s, tolerance)
+
+
 def ufloats_close(x, y, tolerance=1e-6):
     """
     Tests if two numbers with uncertainties are close, as random
