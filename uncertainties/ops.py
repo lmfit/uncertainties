@@ -121,10 +121,8 @@ def get_ops_with_reflection():
         # AffineScalarFunc._nominal_value numbers, it is applied on
         # floats, and is therefore the "usual" mathematical division.
         "div": ("1/y", "-x/y**2"),
-        "floordiv": ("0.", "0."),  # Non exact: there is a discontinuity
         # The derivative wrt the 2nd arguments is something like (..., x//y),
         # but it is calculated numerically, for convenience:
-        "mod": ("1.", "partial_derivative(float.__mod__, 1)(x, y)"),
         "mul": ("y", "x"),
         "sub": ("1.", "-1."),
         "truediv": ("1/y", "-x/y**2"),
@@ -226,10 +224,8 @@ def add_arithmetic_ops(cls):
     # Single-argument operators that should be adapted from floats to
     # AffineScalarFunc objects, associated to their derivative:
     simple_numerical_operators_derivatives = {
-        "abs": _simple_add_deriv,
         "neg": lambda x: -1.0,
         "pos": lambda x: 1.0,
-        "trunc": lambda x: 0.0,
     }
 
     for op, derivative in iter(simple_numerical_operators_derivatives.items()):
@@ -689,40 +685,6 @@ def ne_on_aff_funcs(self, y_with_uncert):
     return not eq_on_aff_funcs(self, y_with_uncert)
 
 
-def gt_on_aff_funcs(self, y_with_uncert):
-    """
-    __gt__ operator, assuming that both self and y_with_uncert are
-    AffineScalarFunc objects.
-    """
-    return self._nominal_value > y_with_uncert._nominal_value
-
-
-def ge_on_aff_funcs(self, y_with_uncert):
-    """
-    __ge__ operator, assuming that both self and y_with_uncert are
-    AffineScalarFunc objects.
-    """
-
-    return gt_on_aff_funcs(self, y_with_uncert) or eq_on_aff_funcs(self, y_with_uncert)
-
-
-def lt_on_aff_funcs(self, y_with_uncert):
-    """
-    __lt__ operator, assuming that both self and y_with_uncert are
-    AffineScalarFunc objects.
-    """
-    return self._nominal_value < y_with_uncert._nominal_value
-
-
-def le_on_aff_funcs(self, y_with_uncert):
-    """
-    __le__ operator, assuming that both self and y_with_uncert are
-    AffineScalarFunc objects.
-    """
-
-    return lt_on_aff_funcs(self, y_with_uncert) or eq_on_aff_funcs(self, y_with_uncert)
-
-
 def add_comparative_ops(cls):
     def to_affine_scalar(x):
         """
@@ -843,15 +805,6 @@ def add_comparative_ops(cls):
     cls.__eq__ = force_aff_func_args(eq_on_aff_funcs)
 
     cls.__ne__ = force_aff_func_args(ne_on_aff_funcs)
-    cls.__gt__ = force_aff_func_args(gt_on_aff_funcs)
-
-    # __ge__ is not the opposite of __lt__ because these operators do
-    # not always yield a boolean (for instance, 0 <= numpy.arange(10)
-    # yields an array).
-    cls.__ge__ = force_aff_func_args(ge_on_aff_funcs)
-
-    cls.__lt__ = force_aff_func_args(lt_on_aff_funcs)
-    cls.__le__ = force_aff_func_args(le_on_aff_funcs)
 
 
 # Mathematical operations with local approximations (affine scalar
