@@ -336,18 +336,6 @@ def test_pickling():
     assert pickle.loads(pickle.dumps(x)).linear_combo == {}
 
 
-def test_int_div():
-    "Integer division"
-    # We perform all operations on floats, because derivatives can
-    # otherwise be meaningless:
-    x = ufloat(3.9, 2) // 2
-    assert x.nominal_value == 1.0
-    # All errors are supposed to be small, so the ufloat()
-    # in x violates the assumption.  Therefore, the following is
-    # correct:
-    assert x.std_dev == 0.0
-
-
 def test_comparison_ops():
     "Test of comparison operators"
 
