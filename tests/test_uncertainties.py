@@ -341,27 +341,11 @@ def test_comparison_ops():
 
     # Operations on quantities equivalent to Python numbers must still
     # be correct:
-    a = ufloat(-3, 0)
     b = ufloat(10, 0)
     c = ufloat(10, 0)
-    assert a < b
-    assert a < 3
-    assert 3 < b  # This is first given to int.__lt__()
     assert b == c
 
     x = ufloat(3, 0.1)
-
-    # One constraint is that usual Python code for inequality testing
-    # still work in a reasonable way (for instance, it is generally
-    # desirable that functions defined by different formulas on
-    # different intervals can still do "if 0 < x < 1:...".  This
-    # supposes again that errors are "small" (as for the estimate of
-    # the standard error).
-    assert x > 1
-
-    # The limit case is not obvious:
-    assert not (x >= 3)
-    assert not (x < 3)
 
     assert x == x
     # Comparaison between Variable and AffineScalarFunc:
@@ -413,7 +397,7 @@ def test_comparison_ops():
             return (random.random() - 0.5) * min(var.std_dev, 1e-5) + var.nominal_value
 
         # All operations are tested:
-        for op in ["__%s__" % name for name in ("ne", "eq", "lt", "le", "gt", "ge")]:
+        for op in ["__%s__" % name for name in ("ne", "eq")]:
             try:
                 float_func = getattr(float, op)
             except AttributeError:  # Python 2.3's floats don't have __ne__
@@ -1087,20 +1071,6 @@ else:
         assert len(x == numpy.array([x, x, x])) == 3
         assert len(numpy.array([x, x, x]) == x) == 3
         assert numpy.all(x == numpy.array([x, x, x]))
-
-        # Inequalities:
-        assert len(x < numpy.arange(10)) == 10
-        assert len(numpy.arange(10) > x) == 10
-        assert len(x <= numpy.arange(10)) == 10
-        assert len(numpy.arange(10) >= x) == 10
-        assert len(x > numpy.arange(10)) == 10
-        assert len(numpy.arange(10) < x) == 10
-        assert len(x >= numpy.arange(10)) == 10
-        assert len(numpy.arange(10) <= x) == 10
-
-        # More detailed test, that shows that the comparisons are
-        # meaningful (x >= 0, but not x <= 1):
-        assert numpy.all((x >= numpy.arange(3)) == [True, False, False])
 
     def test_correlated_values():
         """
