@@ -1,6 +1,14 @@
 from math import isclose, isnan, isinf
 
 import uncertainties.core as uncert_core
+from uncertainties.core import UFloat
+
+
+def get_single_uatom(num_with_uncertainty: UFloat):
+    error_components = num_with_uncertainty.error_components
+    if len(error_components) > 1:
+        raise ValueError("UFloat has more than one error component.")
+    return next(iter(error_components.keys()))
 
 
 def nan_close(first, second):
