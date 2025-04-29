@@ -614,13 +614,12 @@ def ufloat(nominal_value, std_dev, tag=None):
     3. The returned Variable will have attributes `nominal_value`, `std_dev`,
        and `tag` which match the input values.
     """
-
-    return UFloat(nominal_value, std_dev, tag=tag)
     if std_dev == 0:
         warn(
             "Using UFloat objects with std_dev==0 may give unexpected results.",
             stacklevel=2,
         )
+    return UFloat(nominal_value, std_dev, tag=tag)
 
 
 # Deprecated UFloat methods
