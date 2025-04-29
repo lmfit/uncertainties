@@ -10,6 +10,7 @@ import pytest
 from helpers import get_single_uatom
 from uncertainties import ufloat
 import uncertainties.core as uncert_core
+from uncertainties.ops import partial_derivative
 import uncertainties.umath_core as umath_core
 from uncertainties import umath
 
@@ -108,7 +109,7 @@ def test_single_input_func_derivatives(func, value):
     analytic_deriv = result.error_components[uatom]
 
     math_func = getattr(math, func)
-    numerical_deriv = uncert_core.partial_derivative(math_func, 0)(value)
+    numerical_deriv = partial_derivative(math_func, 0)(value)
 
     assert math.isclose(analytic_deriv, numerical_deriv, rel_tol=1e-6, abs_tol=1e-6)
 
@@ -155,11 +156,11 @@ def test_double_input_func_derivatives(func, value_0, value_1):
     analytic_deriv_0 = result.error_components[uatom_0]
     analytic_deriv_1 = result.error_components[uatom_1]
 
-    numerical_deriv_0 = uncert_core.partial_derivative(
+    numerical_deriv_0 = partial_derivative(
         math_func,
         0,
     )(value_0, value_1)
-    numerical_deriv_1 = uncert_core.partial_derivative(
+    numerical_deriv_1 = partial_derivative(
         math_func,
         1,
     )(value_0, value_1)
