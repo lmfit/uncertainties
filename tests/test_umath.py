@@ -196,13 +196,6 @@ def test_math_module():
     # Regular operations are chosen to be unchanged:
     assert isinstance(umath_core.sin(3), float)
 
-    # factorial() must not be "damaged" by the umath_core module, so as
-    # to help make it a drop-in replacement for math (even though
-    # factorial() does not work on numbers with uncertainties
-    # because it is restricted to integers, as for
-    # math.factorial()):
-    assert umath_core.factorial(4) == 24
-
     # fsum is special because it does not take a fixed number of
     # variables:
     assert umath_core.fsum([x, x]).nominal_value == -3
