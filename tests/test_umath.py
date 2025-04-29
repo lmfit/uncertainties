@@ -1,6 +1,6 @@
+import json
 import inspect
 import itertools
-import json
 import math
 from math import isnan
 from pathlib import Path
@@ -20,6 +20,17 @@ from helpers import (
 ###############################################################################
 # Unit tests
 
+umath_function_cases_json_path = Path(
+    Path(__file__).parent,
+    "cases",
+    "umath_function_cases.json",
+)
+with open(umath_function_cases_json_path, "r") as f:
+    umath_function_cases_dict = json.load(f)
+ufloat_cases_list = []
+for func_name, ufloat_tuples_list in umath_function_cases_dict.items():
+    for ufloat_tuples in ufloat_tuples_list:
+        ufloat_cases_list.append((func_name, ufloat_tuples))
 
 single_input_data_path = Path(Path(__file__).parent, "cases", "single_inputs.json")
 with open(single_input_data_path, "r") as f:

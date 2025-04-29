@@ -4,43 +4,57 @@ Change Log
 Unreleased
 ----------
 
+- Increases the stacklevel of the warning about `std_dev==0` so that it blames
+  the caller rather than blaming the `ufloat()` function.
+
+3.2.3   2025-April-18
+-----------------------
+
 Changes
 
-- Changed how `numpy` is handled as an optional dependency. Previously,
+- Changes how `numpy` is handled as an optional dependency. Previously,
    importing a `numpy`-dependent function, like `correlated_values`,
    without `numpy` installed would result in an `ImportError` at import
    time. Now such a function can be imported but if the user attempts to
    execute it, a `NotImplementedError` is raised indicating that the
    function can't be used because `numpy` couldn't be imported.
+- Refactors the implementation for the calculation of the derivatives of
+   the power function and improves the corresponding testing.
 
 Adds:
 
-- Added a small benchmarking suite to CI to guard against absolute performance
-   regressions and accidental breakage of the lazy expansion algorithm whichs ensures
-   O(N), rather than O(N^2), scaling complexity for operations involving many numbers
-   with uncertainty. Established connectivity with `codspeed.io<codspeed.io>`_ to track
-   benchmarking results. (#274)
+- Adds a small benchmarking suite to CI to guard against absolute
+   performance regressions and accidental breakage of the lazy expansion
+   algorithm whichs ensures O(N), rather than O(N^2), scaling complexity
+   for operations involving many numbers with uncertainty. Established
+   connectivity with `codspeed.io<codspeed.io>`_ to track benchmarking
+   results. (#274)
 
 
 Fixes:
 
-- add note on string not containing uncertainty to `ufloat_fromstr` doctring (#287)
-- fix typos in `ufloat_fromstr` docstring examples (#285)
-- fix `readthedocs` configuration so that the build passes (#254)
-- adjust `codecov.io` configuration so that minor code coverage changes will not result
-   in indications that tests are failing. Rather code coverage reports will be purely
-   informational for code reviewers. Also fix other minor configuration issues. (#270)
-- fixes to the str representation which occassionally errors when AffineScalarFunc is
-  too small (#135)
+- Adds documentation for `ufloat_fromstr` behavior for strings which do
+    not contain uncertainty. (#287)
+- Fixes typos in `ufloat_fromstr` docstring examples (#285)
+- Fixes `readthedocs` configuration so that the build passes (#254)
+- Fixes all doctests (#281)
+- Adjusts `codecov.io` configuration so that minor code coverage changes
+   will not result in indications that tests are failing. Rather code
+   coverage reports will be purely informational for code reviewers.
+   Also fix other minor configuration issues. (#270)
+- Fixes a bug that resulted in a `ZeroDivisionError` while formatting
+   very small numbers with uncertainty (#135)
 
 Deprecates:
 
-- Certain `umath` functions and `AffineScalarFunc`/`UFloat` methods will be removed in
-   a future release. A deprecation warning has been added to these functions and
-   methods. The following `umath` functions are marked as deprecated: `ceil`,
-   `copysign`, `fabs`, `factorial`, `floor`, `fmod`, `frexp`, `ldexp`, `modf`, `trunc`.
-   The following `AffineScalarFunc`/`UFloat` methods are marked as deprecated:
-   `__floordiv__`, `__mod__`, `__abs__`, `__trunc__`.
+- Certain `umath` functions and `AffineScalarFunc`/`UFloat` methods will
+   be removed in a future release. A deprecation warning has been added
+   to these functions and methods. The following `umath` functions are
+   marked as deprecated: `ceil`, `copysign`, `fabs`, `factorial`,
+   `floor`, `fmod`, `frexp`, `ldexp`, `modf`, `trunc`. The following
+   `AffineScalarFunc`/`UFloat` methods are marked as deprecated:
+   `__floordiv__`, `__mod__`, `__abs__`, `__trunc__`, `__lt__`,
+   `__le__`, `__gt__`, `__ge__`.
 
 3.2.2   2024-July-08
 -----------------------

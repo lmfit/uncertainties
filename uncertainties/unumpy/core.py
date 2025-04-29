@@ -354,8 +354,7 @@ def inv_deriv(label, multi_index, *args, **kwargs):
 
 
 inv = to_uarray_func(numpy.linalg.inv, derivs={0: inv_deriv, "a": inv_deriv})
-inv.__doc__ = (
-    """\
+inv.__doc__ = """\
     Version of numpy.linalg.inv that works with array-like objects
     that contain numbers with uncertainties.
 
@@ -363,12 +362,7 @@ inv.__doc__ = (
     matrix for the array of nominal values.
 
     Analytical formulas are used.
-
-    Original documentation:
-    %s
     """
-    % numpy.linalg.inv.__doc__
-)
 
 ########## Matrix pseudo-inverse
 
@@ -428,11 +422,7 @@ pinv = uncert_core.set_doc(
     matrix for the array of nominal values.
 
     Analytical formulas are used.
-
-    Original documentation:
-    %s
     """
-    % numpy.linalg.pinv.__doc__
 )(pinv)
 
 ########## Matrix class

@@ -69,10 +69,6 @@ def ufloats_close(x, y, tolerance=1e-6):
     )
 
 
-class DerivativesDiffer(Exception):
-    pass
-
-
 ###############################################################################
 
 

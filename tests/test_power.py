@@ -3,9 +3,38 @@ from math import pow as math_pow
 import pytest
 
 from uncertainties import ufloat
+from uncertainties.ops import pow_deriv_0, pow_deriv_1
 from uncertainties.umath_core import pow as umath_pow
 
 from helpers import nan_close, get_single_uatom
+
+
+pow_deriv_cases = [
+    (0.5, 2, 1.0, -0.17328679513998632),
+    (0.5, 1.5, 1.0606601717798214, -0.2450645358671368),
+    (0.5, 0, 0.0, -0.6931471805599453),
+    (0.5, -1.5, -8.485281374238571, -1.9605162869370945),
+    (0.5, -2, -16.0, -2.772588722239781),
+    (0, 2, 0, 0),
+    (0, 1.5, float("nan"), 0),
+    (0, 0, 0, float("nan")),
+    (0, -0.5, float("nan"), float("nan")),
+    (0, -2, float("nan"), float("nan")),
+    (-0.5, 2, -1.0, float("nan")),
+    (-0.5, 1.5, float("nan"), float("nan")),
+    (-0.5, 0, -0.0, float("nan")),
+    (-0.5, -1.5, float("nan"), float("nan")),
+    (-0.5, -2, 16.0, float("nan")),
+]
+
+
+@pytest.mark.parametrize("x, y, x_deriv_expected, y_deriv_expected", pow_deriv_cases)
+def test_pow_deriv_0(x, y, x_deriv_expected, y_deriv_expected):
+    x_deriv_actual = pow_deriv_0(x, y)
+    assert nan_close(x_deriv_actual, x_deriv_expected)
+
+    y_deriv_actual = pow_deriv_1(x, y)
+    assert nan_close(y_deriv_actual, y_deriv_expected)
 
 
 zero = ufloat(0, 0.1)

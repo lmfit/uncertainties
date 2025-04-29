@@ -1264,3 +1264,8 @@ def test_deprecated_method(method_name):
             getattr(x, method_name)()
         else:
             getattr(x, method_name)(y)
+
+
+def test_zero_std_dev_warn():
+    with pytest.warns(UserWarning, match="std_dev==0.*unexpected results"):
+        ufloat(1, 0)
