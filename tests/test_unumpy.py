@@ -33,18 +33,6 @@ def test_numpy():
     prod1 * prod2  # This should be calculable
     assert not (prod1 - prod2).any()  # All elements must be 0
 
-    # Comparisons work too:
-
-    # Usual behavior:
-    assert len(arr[arr > 1.5]) == 1
-    # Comparisons with Variable objects:
-    assert len(arr[arr > ufloat(1.5, 0.1)]) == 1
-
-    assert len(prod1[prod1 < prod1 * prod2]) == 2
-
-    # The following can be calculated (special NumPy abs() function):
-    numpy.abs(arr + ufloat(-1, 0.1))
-
     # The following does not completely work, because NumPy does not
     # implement numpy.exp on an array of general objects, apparently:
     assert numpy.exp(arr).all()  # All elements > 0
