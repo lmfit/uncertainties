@@ -1,10 +1,5 @@
 from math import isclose, isnan
 
-try:
-    import numpy as np
-except ImportError:
-    np = None
-
 
 def nan_close(first, second, *, rel_tol=1e-9, abs_tol=0.0):
     if isnan(first):
@@ -50,7 +45,7 @@ def ufloat_nan_close(x, y, tolerance=1e-6):
 
 
 try:
-    import numpy  # noqa
+    import numpy as np  # noqa
 except ImportError:
     pass
 else:
