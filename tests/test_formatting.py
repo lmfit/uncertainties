@@ -1,8 +1,7 @@
 import pytest
 
 from uncertainties import ufloat, ufloat_fromstr, formatting
-
-from helpers import numbers_close
+from helpers import nan_close
 
 
 def test_PDG_precision():
@@ -486,10 +485,12 @@ def test_format(val, std_dev, fmt_spec, expected_str):
         relative error is infinite, so this should not cause an error:
         """
         if x_back.nominal_value:
-            assert numbers_close(x.nominal_value, x_back.nominal_value, 2.4e-1)
+            assert nan_close(
+                x.nominal_value, x_back.nominal_value, rel_tol=2.4e-1, abs_tol=2.4e-1
+            )
 
         # If the uncertainty is zero, then the relative change can be large:
-        assert numbers_close(x.std_dev, x_back.std_dev, 3e-1)
+        assert nan_close(x.std_dev, x_back.std_dev, rel_tol=3e-1, abs_tol=3e-1)
 
 
 def test_unicode_format():
