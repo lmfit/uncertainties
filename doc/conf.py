@@ -44,7 +44,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "uncertainties"
-copyright = f"2010–{date.today().year}, Eric O. LEBIGOT (EOL)"
+copyright = f"2010-{date.today().year}, Eric O. LEBIGOT (EOL)"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
