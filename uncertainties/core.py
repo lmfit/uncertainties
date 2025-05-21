@@ -513,6 +513,15 @@ class AffineScalarFunc(object):
     # Abbreviation (for formulas, etc.):
     s = std_dev
 
+    def __bool__(self):
+        return self.n != 0 or self.s != 0
+
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        diff = self - other
+        return diff.n == 0 and diff.s == 0
+
     def __repr__(self):
         # Not putting spaces around "+/-" helps with arrays of
         # Variable, as each value with an uncertainty is a
