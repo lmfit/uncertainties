@@ -1,6 +1,13 @@
 Change Log
 ===================
 
+Unreleased 4.x
+--------------
+
+Changes:
+
+- Includes the `main` branch in continuous integration automation.
+
 Unreleased
 ----------
 
