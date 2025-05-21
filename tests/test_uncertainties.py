@@ -20,8 +20,8 @@ from uncertainties import (
 )
 from uncertainties.ops import partial_derivative
 from helpers import (
-    numbers_close,
-    ufloats_close,
+    nan_close,
+    ufloat_nan_close,
 )
 
 
@@ -133,20 +133,20 @@ def test_ufloat_fromstr():
 
         # Without tag:
         num = ufloat_fromstr(representation)
-        assert numbers_close(num.nominal_value, values[0])
-        assert numbers_close(num.std_dev, values[1])
+        assert nan_close(num.nominal_value, values[0])
+        assert nan_close(num.std_dev, values[1])
         assert num.tag is None
 
         # With a tag as positional argument:
         num = ufloat_fromstr(representation, "test variable")
-        assert numbers_close(num.nominal_value, values[0])
-        assert numbers_close(num.std_dev, values[1])
+        assert nan_close(num.nominal_value, values[0])
+        assert nan_close(num.std_dev, values[1])
         assert num.tag == "test variable"
 
         # With a tag as keyword argument:
         num = ufloat_fromstr(representation, tag="test variable")
-        assert numbers_close(num.nominal_value, values[0])
-        assert numbers_close(num.std_dev, values[1])
+        assert nan_close(num.nominal_value, values[0])
+        assert nan_close(num.std_dev, values[1])
         assert num.tag == "test variable"
 
 
@@ -567,35 +567,35 @@ def test_wrapped_func_no_args_no_kwargs():
 
     ## Fully automatic numerical derivatives:
     f_wrapped = uncert_core.wrap(f)
-    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+    assert ufloat_nan_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+    assert ufloat_nan_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
     ## Automatic additional derivatives for non-defined derivatives,
     ## and explicit None derivative:
     f_wrapped = uncert_core.wrap(f, [None])  # No derivative for y
-    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+    assert ufloat_nan_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+    assert ufloat_nan_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
     ### Explicit derivatives:
 
     ## Fully defined derivatives:
     f_wrapped = uncert_core.wrap(f, [lambda x, y: 2, lambda x, y: math.cos(y)])
 
-    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+    assert ufloat_nan_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+    assert ufloat_nan_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
     ## Automatic additional derivatives for non-defined derivatives:
     f_wrapped = uncert_core.wrap(f, [lambda x, y: 2])  # No derivative for y
-    assert ufloats_close(f_auto_unc(x, y), f_wrapped(x, y))
+    assert ufloat_nan_close(f_auto_unc(x, y), f_wrapped(x, y))
 
     # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
+    assert ufloat_nan_close(f_auto_unc(y=y, x=x), f_wrapped(y=y, x=x))
 
 
 def test_wrapped_func_args_no_kwargs():
@@ -625,12 +625,12 @@ def test_wrapped_func_args_no_kwargs():
 
     ## Fully automatic numerical derivatives:
     f_wrapped = uncert_core.wrap(f)
-    assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
+    assert ufloat_nan_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
     ## Automatic additional derivatives for non-defined derivatives,
     ## and explicit None derivative:
     f_wrapped = uncert_core.wrap(f, [None])  # No derivative for y
-    assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
+    assert ufloat_nan_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
     ### Explicit derivatives:
 
@@ -645,13 +645,13 @@ def test_wrapped_func_args_no_kwargs():
         ],
     )
 
-    assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
+    assert ufloat_nan_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
     ## Automatic additional derivatives for non-defined derivatives:
 
     # No derivative for y:
     f_wrapped = uncert_core.wrap(f, [lambda x, y, *args: 2])
-    assert ufloats_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
+    assert ufloat_nan_close(f_auto_unc(x, y, *args), f_wrapped(x, y, *args))
 
 
 def test_wrapped_func_no_args_kwargs():
@@ -682,10 +682,12 @@ def test_wrapped_func_no_args_kwargs():
 
     ## Fully automatic numerical derivatives:
     f_wrapped = uncert_core.wrap(f)
-    assert ufloats_close(f_auto_unc(x, y, **kwargs), f_wrapped(x, y, **kwargs))
+    assert ufloat_nan_close(f_auto_unc(x, y, **kwargs), f_wrapped(x, y, **kwargs))
 
     # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs), f_wrapped(y=y, x=x, **kwargs))
+    assert ufloat_nan_close(
+        f_auto_unc(y=y, x=x, **kwargs), f_wrapped(y=y, x=x, **kwargs)
+    )
 
     ## Automatic additional derivatives for non-defined derivatives,
     ## and explicit None derivative:
@@ -693,26 +695,32 @@ def test_wrapped_func_no_args_kwargs():
     # No derivative for positional-or-keyword parameter y, no
     # derivative for optional-keyword parameter z:
     f_wrapped = uncert_core.wrap(f, [None])
-    assert ufloats_close(f_auto_unc(x, y, **kwargs), f_wrapped(x, y, **kwargs))
+    assert ufloat_nan_close(f_auto_unc(x, y, **kwargs), f_wrapped(x, y, **kwargs))
 
     # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs), f_wrapped(y=y, x=x, **kwargs))
+    assert ufloat_nan_close(
+        f_auto_unc(y=y, x=x, **kwargs), f_wrapped(y=y, x=x, **kwargs)
+    )
 
     # No derivative for positional-or-keyword parameter y, no
     # derivative for optional-keyword parameter z:
     f_wrapped = uncert_core.wrap(f, [None], {"z": None})
-    assert ufloats_close(f_auto_unc(x, y, **kwargs), f_wrapped(x, y, **kwargs))
+    assert ufloat_nan_close(f_auto_unc(x, y, **kwargs), f_wrapped(x, y, **kwargs))
 
     # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs), f_wrapped(y=y, x=x, **kwargs))
+    assert ufloat_nan_close(
+        f_auto_unc(y=y, x=x, **kwargs), f_wrapped(y=y, x=x, **kwargs)
+    )
 
     # No derivative for positional-or-keyword parameter y, derivative
     # for optional-keyword parameter z:
     f_wrapped = uncert_core.wrap(f, [None], {"z": lambda x, y, **kwargs: 3})
-    assert ufloats_close(f_auto_unc(x, y, **kwargs), f_wrapped(x, y, **kwargs))
+    assert ufloat_nan_close(f_auto_unc(x, y, **kwargs), f_wrapped(x, y, **kwargs))
 
     # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs), f_wrapped(y=y, x=x, **kwargs))
+    assert ufloat_nan_close(
+        f_auto_unc(y=y, x=x, **kwargs), f_wrapped(y=y, x=x, **kwargs)
+    )
 
     ### Explicit derivatives:
 
@@ -723,18 +731,22 @@ def test_wrapped_func_no_args_kwargs():
         {"z:": lambda x, y, **kwargs: 3},
     )
 
-    assert ufloats_close(f_auto_unc(x, y, **kwargs), f_wrapped(x, y, **kwargs))
+    assert ufloat_nan_close(f_auto_unc(x, y, **kwargs), f_wrapped(x, y, **kwargs))
     # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs), f_wrapped(y=y, x=x, **kwargs))
+    assert ufloat_nan_close(
+        f_auto_unc(y=y, x=x, **kwargs), f_wrapped(y=y, x=x, **kwargs)
+    )
 
     ## Automatic additional derivatives for non-defined derivatives:
 
     # No derivative for y or z:
     f_wrapped = uncert_core.wrap(f, [lambda x, y, **kwargs: 2])
-    assert ufloats_close(f_auto_unc(x, y, **kwargs), f_wrapped(x, y, **kwargs))
+    assert ufloat_nan_close(f_auto_unc(x, y, **kwargs), f_wrapped(x, y, **kwargs))
 
     # Call with keyword arguments:
-    assert ufloats_close(f_auto_unc(y=y, x=x, **kwargs), f_wrapped(y=y, x=x, **kwargs))
+    assert ufloat_nan_close(
+        f_auto_unc(y=y, x=x, **kwargs), f_wrapped(y=y, x=x, **kwargs)
+    )
 
 
 def test_wrapped_func_args_kwargs():
@@ -768,7 +780,7 @@ def test_wrapped_func_args_kwargs():
     ## Fully automatic numerical derivatives:
     f_wrapped = uncert_core.wrap(f)
 
-    assert ufloats_close(
+    assert ufloat_nan_close(
         f_auto_unc(x, y, *args, **kwargs),
         f_wrapped(x, y, *args, **kwargs),
         tolerance=1e-5,
@@ -780,7 +792,7 @@ def test_wrapped_func_args_kwargs():
     # No derivative for positional-or-keyword parameter y, no
     # derivative for optional-keyword parameter z:
     f_wrapped = uncert_core.wrap(f, [None, None, None, lambda x, y, *args, **kwargs: 4])
-    assert ufloats_close(
+    assert ufloat_nan_close(
         f_auto_unc(x, y, *args, **kwargs),
         f_wrapped(x, y, *args, **kwargs),
         tolerance=1e-5,
@@ -789,7 +801,7 @@ def test_wrapped_func_args_kwargs():
     # No derivative for positional-or-keyword parameter y, no
     # derivative for optional-keyword parameter z:
     f_wrapped = uncert_core.wrap(f, [None], {"z": None})
-    assert ufloats_close(
+    assert ufloat_nan_close(
         f_auto_unc(x, y, *args, **kwargs),
         f_wrapped(x, y, *args, **kwargs),
         tolerance=1e-5,
@@ -798,7 +810,7 @@ def test_wrapped_func_args_kwargs():
     # No derivative for positional-or-keyword parameter y, derivative
     # for optional-keyword parameter z:
     f_wrapped = uncert_core.wrap(f, [None], {"z": lambda x, y, *args, **kwargs: 3})
-    assert ufloats_close(
+    assert ufloat_nan_close(
         f_auto_unc(x, y, *args, **kwargs),
         f_wrapped(x, y, *args, **kwargs),
         tolerance=1e-5,
@@ -813,7 +825,7 @@ def test_wrapped_func_args_kwargs():
         {"z:": lambda x, y, *args, **kwargs: 3},
     )
 
-    assert ufloats_close(
+    assert ufloat_nan_close(
         f_auto_unc(x, y, *args, **kwargs),
         f_wrapped(x, y, *args, **kwargs),
         tolerance=1e-5,
@@ -823,7 +835,7 @@ def test_wrapped_func_args_kwargs():
 
     # No derivative for y or z:
     f_wrapped = uncert_core.wrap(f, [lambda x, y, *args, **kwargs: 2])
-    assert ufloats_close(
+    assert ufloat_nan_close(
         f_auto_unc(x, y, *args, **kwargs),
         f_wrapped(x, y, *args, **kwargs),
         tolerance=1e-5,
@@ -868,9 +880,11 @@ def test_wrapped_func():
 
     # The random variables must be the same (full correlation):
 
-    assert ufloats_close(f_wrapped(angle, *[1, angle]), f_auto_unc(angle, *[1, angle]))
+    assert ufloat_nan_close(
+        f_wrapped(angle, *[1, angle]), f_auto_unc(angle, *[1, angle])
+    )
 
-    assert ufloats_close(
+    assert ufloat_nan_close(
         f_wrapped(angle, *[list_value, angle]), f_auto_unc(angle, *[list_value, angle])
     )
 
@@ -887,7 +901,7 @@ def test_wrapped_func():
 
     x = uncert_core.ufloat(10, 1)
 
-    assert numbers_close(
+    assert nan_close(
         f_wrapped(x, "string argument", x, x, x).std_dev, (1 + 2 + 3 + 4) * x.std_dev
     )
 
@@ -923,7 +937,7 @@ def test_wrap_with_kwargs():
     z = ufloat(100, 0.111)
     t = ufloat(0.1, 0.1111)
 
-    assert ufloats_close(
+    assert ufloat_nan_close(
         f_wrapped(x, y, z, t=t), f_auto_unc(x, y, z, t=t), tolerance=1e-5
     )
 
@@ -1030,11 +1044,11 @@ def test_covariances():
     z = -3 * x
     covs = uncert_core.covariance_matrix([x, y, z])
     # Diagonal elements are simple:
-    assert numbers_close(covs[0][0], 0.01)
-    assert numbers_close(covs[1][1], 0.04)
-    assert numbers_close(covs[2][2], 0.09)
+    assert nan_close(covs[0][0], 0.01)
+    assert nan_close(covs[1][1], 0.04)
+    assert nan_close(covs[2][2], 0.09)
     # Non-diagonal elements:
-    assert numbers_close(covs[0][1], -0.02)
+    assert nan_close(covs[0][1], -0.02)
 
 
 ###############################################################################
@@ -1098,9 +1112,9 @@ else:
         covs = uncert_core.covariance_matrix([x, y, z])
 
         # Test of the diagonal covariance elements:
-        assert uarrays_close(
+        assert np.isclose(
             numpy.array([v.std_dev**2 for v in (x, y, z)]), numpy.array(covs).diagonal()
-        )
+        ).all()
 
         # "Inversion" of the covariance matrix: creation of new
         # variables:
@@ -1111,15 +1125,22 @@ else:
         )
 
         # Even the uncertainties should be correctly reconstructed:
-        assert uarrays_close(numpy.array((x, y, z)), numpy.array((x_new, y_new, z_new)))
+        from uncertainties.unumpy.core import nominal_values, std_devs
+
+        orig_uarr = np.array((x, y, z))
+        new_uarr = np.array((x_new, y_new, z_new))
+        assert np.isclose(nominal_values(orig_uarr), nominal_values(new_uarr)).all()
+        assert np.isclose(std_devs(orig_uarr), std_devs(new_uarr)).all()
 
         # ... and the covariances too:
-        assert uarrays_close(
+        assert np.isclose(
             numpy.array(covs),
             numpy.array(uncert_core.covariance_matrix([x_new, y_new, z_new])),
-        )
+        ).all()
 
-        assert uarrays_close(numpy.array([z_new]), numpy.array([-3 * x_new + y_new]))
+        assert uarrays_close(
+            numpy.array([z_new]), numpy.array([-3 * x_new + y_new])
+        ).all()
 
         ####################
 
@@ -1138,17 +1159,17 @@ else:
             [x.nominal_value for x in [u, v, sum_value]], cov_matrix
         )
 
-        # uarrays_close() is used instead of numbers_close() because
-        # it compares uncertainties too:
-        assert uarrays_close(numpy.array([u]), numpy.array([u2]))
-        assert uarrays_close(numpy.array([v]), numpy.array([v2]))
-        assert uarrays_close(numpy.array([sum_value]), numpy.array([sum2]))
-        assert uarrays_close(numpy.array([0]), numpy.array([sum2 - (u2 + 2 * v2)]))
+        assert nan_close(u.n, u2.n)
+        assert nan_close(v.n, v2.n)
+        assert nan_close(sum_value.n, sum2.n)
+        assert nan_close(sum_value.s, sum2.s)
+        assert nan_close(0, (sum2 - (u2 + 2 * v2)).n)
+        assert nan_close(0, (sum2 - (u2 + 2 * v2)).s, abs_tol=1e-6)
 
         # Spot checks of the correlation matrix:
         corr_matrix = uncert_core.correlation_matrix([u, v, sum_value])
-        assert numbers_close(corr_matrix[0, 0], 1)
-        assert numbers_close(corr_matrix[1, 2], 2 * v.std_dev / sum_value.std_dev)
+        assert nan_close(corr_matrix[0, 0], 1)
+        assert nan_close(corr_matrix[1, 2], 2 * v.std_dev / sum_value.std_dev)
 
         ####################
 
@@ -1164,11 +1185,11 @@ else:
         # Since the numbers are very small, we need to compare them
         # in a stricter way, that handles the case of a 0 variance
         # in `variables`:
-        assert numbers_close(
-            1e66 * cov[0, 0], 1e66 * variables[0].s ** 2, tolerance=1e-5
+        assert nan_close(
+            1e66 * cov[0, 0], 1e66 * variables[0].s ** 2, rel_tol=1e-5, abs_tol=1e-5
         )
-        assert numbers_close(
-            1e66 * cov[1, 1], 1e66 * variables[1].s ** 2, tolerance=1e-5
+        assert nan_close(
+            1e66 * cov[1, 1], 1e66 * variables[1].s ** 2, rel_tol=1e-5, abs_tol=1e-5
         )
 
         ####################
@@ -1182,10 +1203,12 @@ else:
         variables = uncert_core.correlated_values(nom_values, cov)
 
         for variable, nom_value, variance in zip(variables, nom_values, cov.diagonal()):
-            assert numbers_close(variable.n, nom_value)
-            assert numbers_close(variable.s**2, variance)
+            assert nan_close(variable.n, nom_value)
+            assert nan_close(variable.s**2, variance)
 
-        assert uarrays_close(cov, numpy.array(uncert_core.covariance_matrix(variables)))
+        assert np.isclose(
+            cov, numpy.array(uncert_core.covariance_matrix(variables))
+        ).all()
 
     def test_correlated_values_correlation_mat():
         """
@@ -1223,18 +1246,21 @@ else:
         # it compares uncertainties too:
 
         # Test of individual variables:
-        assert uarrays_close(numpy.array([x]), numpy.array([x2]))
-        assert uarrays_close(numpy.array([y]), numpy.array([y2]))
-        assert uarrays_close(numpy.array([z]), numpy.array([z2]))
+        assert nan_close(x.n, x2.n)
+        assert nan_close(x.s, x2.s)
+        assert nan_close(y.n, y2.n)
+        assert nan_close(y.s, y2.s)
+        assert nan_close(z.n, z2.n)
+        assert nan_close(z.s, z2.s)
 
-        # Partial correlation test:
-        assert uarrays_close(numpy.array([0]), numpy.array([z2 - (-3 * x2 + y2)]))
+        assert nan_close(0, (z2 - (-3 * x2 + y2)).n)
+        assert nan_close(0, (z2 - (-3 * x2 + y2)).s, abs_tol=1e-6)
 
         # Test of the full covariance matrix:
-        assert uarrays_close(
+        assert np.isclose(
             numpy.array(cov_mat),
             numpy.array(uncert_core.covariance_matrix([x2, y2, z2])),
-        )
+        ).all()
 
 
 @pytest.mark.skipif(
