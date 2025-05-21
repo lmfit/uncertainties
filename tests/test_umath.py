@@ -10,7 +10,7 @@ import uncertainties.core as uncert_core
 import uncertainties.umath_core as umath_core
 from uncertainties.ops import partial_derivative
 
-from helpers import numbers_close
+from helpers import nan_close
 ###############################################################################
 # Unit tests
 
@@ -155,8 +155,11 @@ def test_monte_carlo_comparison():
     # or assert_array_max_ulp. This is relevant for all vectorized
     # occurrences of numbers_close.
 
-    assert numpy.vectorize(numbers_close)(
-        covariances_this_module, covariances_samples, 0.06
+    assert numpy.vectorize(nan_close)(
+        covariances_this_module,
+        covariances_samples,
+        rel_tol=0.06,
+        abs_tol=0.06,
     ).all(), (
         "The covariance matrices do not coincide between"
         " the Monte-Carlo simulation and the direct calculation:\n"
@@ -165,13 +168,13 @@ def test_monte_carlo_comparison():
     )
 
     # The nominal values must be close:
-    assert numbers_close(
+    assert nan_close(
         nominal_value_this_module,
         nominal_value_samples,
         # The scale of the comparison depends on the standard
         # deviation: the nominal values can differ by a fraction of
         # the standard deviation:
-        math.sqrt(covariances_samples[2, 2]) / abs(nominal_value_samples) * 0.5,
+        rel_tol=math.sqrt(covariances_samples[2, 2]) / abs(nominal_value_samples) * 0.5,
     ), (
         "The nominal value (%f) does not coincide with that of"
         " the Monte-Carlo simulation (%f), for a standard deviation of %f."
