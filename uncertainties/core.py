@@ -665,7 +665,6 @@ class AffineScalarFunc(object):
 
 
 ops.add_arithmetic_ops(AffineScalarFunc)
-to_affine_scalar = AffineScalarFunc._to_affine_scalar
 
 # Nicer name, for users: isinstance(ufloat(...), UFloat) is
 # True. Also: isinstance(..., UFloat) is the test for "is this a
