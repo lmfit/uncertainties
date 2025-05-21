@@ -284,7 +284,7 @@ def test_pickling():
     assert isinstance(f, AffineScalarFunc)
     (f_unpickled, x_unpickled2) = pickle.loads(pickle.dumps((f, x)))
     # Correlations must be preserved:
-    assert f_unpickled - x_unpickled2 - x_unpickled2 == 0
+    assert f_unpickled == x_unpickled2 + x_unpickled2
 
     ## Tests with subclasses:
 
@@ -364,7 +364,7 @@ def test_comparison_ops():
 
     # Comparison to other types should work:
     assert x is not None  # Not comparable
-    assert x - x == 0  # Comparable, even though the types are different
+    assert x - x != 0  # Equality comparison with float is always False
     assert x != [1, 2]
 
     ####################
