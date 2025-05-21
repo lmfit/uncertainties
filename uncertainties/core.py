@@ -24,6 +24,7 @@ import collections
 
 from uncertainties.formatting import format_ufloat
 from uncertainties.parsing import str_to_number_with_uncert
+from . import ops
 from uncertainties.ops import (
     _wrap,
     set_doc,
@@ -653,6 +654,9 @@ class AffineScalarFunc(object):
             # instance might contain slots):
             setattr(self, name, value)
 
+
+ops.add_arithmetic_ops(AffineScalarFunc)
+to_affine_scalar = AffineScalarFunc._to_affine_scalar
 
 # Nicer name, for users: isinstance(ufloat(...), UFloat) is
 # True. Also: isinstance(..., UFloat) is the test for "is this a
