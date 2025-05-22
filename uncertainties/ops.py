@@ -750,29 +750,6 @@ def add_comparative_ops(cls):
 
     ########################################
 
-    # __nonzero__() is supposed to return a boolean value (it is used
-    # by bool()).  It is for instance used for converting the result
-    # of comparison operators to a boolean, in sorted().  If we want
-    # to be able to sort AffineScalarFunc objects, __nonzero__ cannot
-    # return a AffineScalarFunc object.  Since boolean results (such
-    # as the result of bool()) don't have a very meaningful
-    # uncertainty unless it is zero, this behavior is fine.
-
-    def __bool__(self):
-        """
-        Equivalent to self != 0.
-        """
-        #! This might not be relevant for AffineScalarFunc objects
-        # that contain values in a linear space which does not convert
-        # the float 0 into the null vector (see the __eq__ function:
-        # __nonzero__ works fine if subtracting the 0 float from a
-        # vector of the linear space works as if 0 were the null
-        # vector of that space):
-        return self != 0.0  # Uses the AffineScalarFunc.__ne__ function
-
-    cls.__bool__ = __bool__
-    ########################################
-
     ## Logical operators: warning: the resulting value cannot always
     ## be differentiated.
 

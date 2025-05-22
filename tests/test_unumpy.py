@@ -31,7 +31,6 @@ def test_numpy():
     # Operations with arrays work (they are first handled by NumPy,
     # then by this module):
     prod1 * prod2  # This should be calculable
-    assert not (prod1 - prod2).any()  # All elements must be 0
 
     # The following does not completely work, because NumPy does not
     # implement numpy.exp on an array of general objects, apparently:
