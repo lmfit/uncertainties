@@ -1,11 +1,41 @@
 Change Log
 ===================
 
+Unreleased 4.x
+--------------
+
+Changes:
+
+- Includes the `main` branch in continuous integration automation.
+
+Removes:
+
+- [*BREAKING*] Removes certain deprecated `umath` functions and
+   `AffineScalarFunc`/`UFloat` methods. The following `umath` functions are removed:
+   `ceil`, `copysign`, `fabs`, `factorial`, `floor`, `fmod`, `frexp`, `ldexp`, `modf`,
+   `trunc`. The following `AffineScalarFunc`/`UFloat` methods are removed:
+   `__floordiv__`, `__mod__`, `__abs__`, `__trunc__`, `__lt__`, `__le__`, `__gt__`,
+   `__ge__`, `__bool__`.
+- [*BREAKING*] Previously it was possible for a `UFloat` object to compare equal to a
+   `float` object if the `UFloat` `standard_deviation` was zero and the `UFloat`
+   `nominal_value` was equal to the `float`. Now, when an equality comparison is made
+   between a `UFloat` object and another object, if the object is not a `UFloat` then
+   the equality comparison is deferred to this other object. For the specific case of
+   `float` this means that the equality comparison always returns `False`.
+
 Unreleased
 ----------
 
+Fixes:
+
+Adds:
+
+- Add github action CI to automatically publish a new package version to ``pypi`` when
+   a github release of a new version is published.
 - Increases the stacklevel of the warning about `std_dev==0` so that it blames
   the caller rather than blaming the `ufloat()` function.
+- Adjusts the Sphinx configuration to allow for reproducible builds using
+  ``SOURCE_DATE_EPOCH``.
 
 3.2.3   2025-April-18
 -----------------------

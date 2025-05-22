@@ -1,5 +1,4 @@
 import json
-import inspect
 import math
 from math import isnan
 from pathlib import Path
@@ -11,7 +10,7 @@ import uncertainties.core as uncert_core
 import uncertainties.umath_core as umath_core
 from uncertainties.ops import partial_derivative
 
-from helpers import numbers_close
+from helpers import nan_close
 ###############################################################################
 # Unit tests
 
@@ -156,8 +155,11 @@ def test_monte_carlo_comparison():
     # or assert_array_max_ulp. This is relevant for all vectorized
     # occurrences of numbers_close.
 
-    assert numpy.vectorize(numbers_close)(
-        covariances_this_module, covariances_samples, 0.06
+    assert numpy.vectorize(nan_close)(
+        covariances_this_module,
+        covariances_samples,
+        rel_tol=0.06,
+        abs_tol=0.06,
     ).all(), (
         "The covariance matrices do not coincide between"
         " the Monte-Carlo simulation and the direct calculation:\n"
@@ -166,13 +168,13 @@ def test_monte_carlo_comparison():
     )
 
     # The nominal values must be close:
-    assert numbers_close(
+    assert nan_close(
         nominal_value_this_module,
         nominal_value_samples,
         # The scale of the comparison depends on the standard
         # deviation: the nominal values can differ by a fraction of
         # the standard deviation:
-        math.sqrt(covariances_samples[2, 2]) / abs(nominal_value_samples) * 0.5,
+        rel_tol=math.sqrt(covariances_samples[2, 2]) / abs(nominal_value_samples) * 0.5,
     ), (
         "The nominal value (%f) does not coincide with that of"
         " the Monte-Carlo simulation (%f), for a standard deviation of %f."
@@ -196,13 +198,6 @@ def test_math_module():
 
     # Regular operations are chosen to be unchanged:
     assert isinstance(umath_core.sin(3), float)
-
-    # factorial() must not be "damaged" by the umath_core module, so as
-    # to help make it a drop-in replacement for math (even though
-    # factorial() does not work on numbers with uncertainties
-    # because it is restricted to integers, as for
-    # math.factorial()):
-    assert umath_core.factorial(4) == 24
 
     # fsum is special because it does not take a fixed number of
     # variables:
@@ -266,19 +261,3 @@ def test_hypot():
     result = umath_core.hypot(x, y)
     assert isnan(result.derivatives[x])
     assert isnan(result.derivatives[y])
-
-
-@pytest.mark.parametrize("function_name", umath_core.deprecated_functions)
-def test_deprecated_function(function_name):
-    num_args = len(inspect.signature(getattr(math, function_name)).parameters)
-    args = [ufloat(1, 0.1)]
-    if num_args == 1:
-        if function_name == "factorial":
-            args[0] = 6
-    else:
-        if function_name == "ldexp":
-            args.append(3)
-        else:
-            args.append(ufloat(-12, 2.4))
-    with pytest.warns(FutureWarning, match="will be removed"):
-        getattr(umath_core, function_name)(*args)
