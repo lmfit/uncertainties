@@ -454,17 +454,16 @@ def test_comparison_ops():
 
 
 def test_logic():
-    "Boolean logic: __nonzero__, bool."
-
+    "bool defers to object.__bool__ and always returns True."
     x = ufloat(3, 0)
     y = ufloat(0, 0)
     z = ufloat(0, 0.1)
     t = ufloat(-1, 2)
 
     assert bool(x)
-    assert not bool(y)
+    assert bool(y)
     assert bool(z)
-    assert bool(t)  # Only infinitseimal neighborhood are used
+    assert bool(t)
 
 
 def test_basic_access_to_data():
