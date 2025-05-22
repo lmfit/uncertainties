@@ -267,13 +267,6 @@ class LinearCombination(object):
 
         self.linear_combo = linear_combo
 
-    def __bool__(self):
-        """
-        Return True only if the linear combination is non-empty, i.e. if
-        the linear combination contains any term.
-        """
-        return bool(self.linear_combo)
-
     def expanded(self):
         """
         Return True if and only if the linear combination is expanded.
