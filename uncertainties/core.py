@@ -469,26 +469,10 @@ class AffineScalarFunc(object):
         object take scalar values (and are not a tuple, like what
         math.frexp() returns, for instance).
         """
-
-        # Calculation of the variance:
-        error_components = {}
-
-        for variable, derivative in self.derivatives.items():
-            # print "TYPE", type(variable), type(derivative)
-
-            # Individual standard error due to variable:
-
-            # 0 is returned even for a NaN derivative (in this case no
-            # multiplication by the derivative is performed): an exact
-            # variable obviously leads to no uncertainty in the
-            # functions that depend on it.
-            if variable._std_dev == 0:
-                # !!! Shouldn't the errors always be floats, as a
-                # convention of this module?
-                error_components[variable] = 0
-            else:
-                error_components[variable] = abs(derivative * variable._std_dev)
-
+        error_components = {
+            variable: abs(derivative * variable._std_dev)
+            for variable, derivative in self.derivatives.items()
+        }
         return error_components
 
     @property
