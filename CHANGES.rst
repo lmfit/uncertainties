@@ -6,6 +6,10 @@ Unreleased
 
 Fixes:
 
+Adds:
+
+- Add github action CI to automatically publish a new package version to ``pypi`` when
+   a github release of a new version is published.
 - Increases the stacklevel of the warning about `std_dev==0` so that it blames
   the caller rather than blaming the `ufloat()` function.
 - Adjusts the Sphinx configuration to allow for reproducible builds using
