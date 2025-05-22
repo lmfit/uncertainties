@@ -8,6 +8,15 @@ Changes:
 
 - Includes the `main` branch in continuous integration automation.
 
+Removes:
+
+- [*BREAKING*] Removes certain deprecated `umath` functions and
+   `AffineScalarFunc`/`UFloat` methods. The following `umath` functions are removed:
+   `ceil`, `copysign`, `fabs`, `factorial`, `floor`, `fmod`, `frexp`, `ldexp`, `modf`,
+   `trunc`. The following `AffineScalarFunc`/`UFloat` methods are removed:
+   `__floordiv__`, `__mod__`, `__abs__`, `__trunc__`, `__lt__`, `__le__`, `__gt__`,
+   `__ge__`, `__bool__`.
+
 Unreleased
 ----------
 
