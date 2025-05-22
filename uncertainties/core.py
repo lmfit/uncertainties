@@ -513,6 +513,12 @@ class AffineScalarFunc(object):
     # Abbreviation (for formulas, etc.):
     s = std_dev
 
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        diff = self - other
+        return diff.n == 0 and diff.s == 0
+
     def __repr__(self):
         # Not putting spaces around "+/-" helps with arrays of
         # Variable, as each value with an uncertainty is a
@@ -656,8 +662,6 @@ class AffineScalarFunc(object):
 
 
 ops.add_arithmetic_ops(AffineScalarFunc)
-ops.add_comparative_ops(AffineScalarFunc)
-to_affine_scalar = AffineScalarFunc._to_affine_scalar
 
 # Nicer name, for users: isinstance(ufloat(...), UFloat) is
 # True. Also: isinstance(..., UFloat) is the test for "is this a
