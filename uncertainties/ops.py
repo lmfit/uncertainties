@@ -5,6 +5,7 @@ import sys
 import itertools
 from inspect import getfullargspec
 import numbers
+from warnings import warn
 
 # Some types known to not depend on Variable objects are put in
 # CONSTANT_TYPES.  The most common types can be put in front, as this
@@ -806,6 +807,11 @@ def add_comparative_ops(cls):
         # __nonzero__ works fine if subtracting the 0 float from a
         # vector of the linear space works as if 0 were the null
         # vector of that space):
+        msg = (
+            f"{self.__class__.__name__}.__bool__() is deprecated. In future releases "
+            f"it will defer to object.__bool__() and always return True."
+        )
+        warn(msg, FutureWarning, stacklevel=2)
         return self != 0.0  # Uses the AffineScalarFunc.__ne__ function
 
     cls.__bool__ = __bool__
