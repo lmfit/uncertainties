@@ -1,5 +1,4 @@
 import json
-import itertools
 import math
 from math import isnan
 from pathlib import Path
@@ -11,7 +10,6 @@ from uncertainties import ufloat
 import uncertainties.core as uncert_core
 from uncertainties.ops import partial_derivative
 import uncertainties.umath_core as umath_core
-from uncertainties import umath
 
 from helpers import nan_close, ufloat_nan_close
 ###############################################################################
@@ -29,137 +27,35 @@ for func_name, ufloat_tuples_list in umath_function_cases_dict.items():
     for ufloat_tuples in ufloat_tuples_list:
         ufloat_cases_list.append((func_name, ufloat_tuples))
 
-single_input_data_path = Path(Path(__file__).parent, "cases", "single_inputs.json")
-with open(single_input_data_path, "r") as f:
-    single_input_dict = json.load(f)
 
-double_input_data_path = Path(Path(__file__).parent, "cases", "double_inputs.json")
-with open(double_input_data_path, "r") as f:
-    double_input_dict = json.load(f)
-
-real_single_input_funcs = (
-    "asinh",
-    "atan",
-    "cos",
-    "cosh",
-    "degrees",
-    "erf",
-    "erfc",
-    "exp",
-    "expm1",
-    "gamma",
-    "lgamma",
-    "radians",
-    "sin",
-    "sinh",
-    "tan",
-    "tanh",
+@pytest.mark.parametrize(
+    "func_name, ufloat_tuples",
+    ufloat_cases_list,
+    ids=lambda x: str(x),
 )
-positive_single_input_funcs = (
-    "log",
-    "log1p",
-    "log10",
-    "sqrt",
-)
-minus_one_to_plus_one_single_input_funcs = (
-    "acos",
-    "asin",
-    "atanh",
-)
-greater_than_one_single_input_funcs = ("acosh",)
+def test_umath_function_derivatives(func_name, ufloat_tuples):
+    ufloat_arg_list = []
+    for nominal_value, std_dev in ufloat_tuples:
+        ufloat_arg_list.append(ufloat(nominal_value, std_dev))
+    float_arg_list = [arg.n for arg in ufloat_arg_list]
 
-real_single_input_cases = list(
-    itertools.product(real_single_input_funcs, single_input_dict["real"])
-)
-positive_single_input_cases = list(
-    itertools.product(positive_single_input_funcs, single_input_dict["positive"])
-)
-minus_one_to_plus_one_single_input_cases = list(
-    itertools.product(
-        minus_one_to_plus_one_single_input_funcs,
-        single_input_dict["minus_one_to_plus_one"],
-    )
-)
-greater_than_one_single_input_cases = list(
-    itertools.product(
-        greater_than_one_single_input_funcs,
-        single_input_dict["greater_than_one"],
-    )
-)
-single_input_cases = (
-    real_single_input_cases
-    + positive_single_input_cases
-    + minus_one_to_plus_one_single_input_cases
-    + greater_than_one_single_input_cases
-)
+    func = getattr(umath_core, func_name)
 
+    result = func(*ufloat_arg_list)
 
-@pytest.mark.parametrize("func, value", single_input_cases)
-def test_single_input_func_derivatives(func, value):
-    uval = ufloat(value, 1.0)
-    uatom = get_single_uatom(uval)
-
-    umath_func = getattr(umath, func)
-    result = umath_func(uval)
-    analytic_deriv = result.error_components[uatom]
-
-    math_func = getattr(math, func)
-    numerical_deriv = partial_derivative(math_func, 0)(value)
-
-    assert math.isclose(analytic_deriv, numerical_deriv, rel_tol=1e-6, abs_tol=1e-6)
-
-
-real_double_input_funcs = (
-    "atan2",
-    "pow",
-)
-
-positive_double_input_funcs = (
-    "hypot",
-    "log",
-)
-
-real_double_input_cases = list(
-    itertools.product(real_double_input_funcs, *zip(*double_input_dict["real"]))
-)
-print(real_double_input_cases)
-positive_double_input_cases = list(
-    itertools.product(positive_double_input_funcs, *zip(*double_input_dict["positive"]))
-)
-
-double_input_cases = real_double_input_cases + positive_double_input_cases
-
-
-@pytest.mark.parametrize("func, value_0, value_1", double_input_cases)
-def test_double_input_func_derivatives(func, value_0, value_1):
-    if func == "pow":
-        value_0 = abs(value_0)
-
-    uval_0 = ufloat(value_0, 1.0)
-    uval_1 = ufloat(value_1, 1.0)
-
-    uatom_0 = get_single_uatom(uval_0)
-    uatom_1 = get_single_uatom(uval_1)
-
-    math_func = getattr(math, func)
-    umath_func = getattr(umath, func)
-
-    result = umath_func(uval_0, uval_1)
-
-    analytic_deriv_0 = result.error_components[uatom_0]
-    analytic_deriv_1 = result.error_components[uatom_1]
-
-    numerical_deriv_0 = partial_derivative(
-        math_func,
-        0,
-    )(value_0, value_1)
-    numerical_deriv_1 = partial_derivative(
-        math_func,
-        1,
-    )(value_0, value_1)
-
-    assert math.isclose(analytic_deriv_0, numerical_deriv_0, rel_tol=1e-6, abs_tol=1e-6)
-    assert math.isclose(analytic_deriv_1, numerical_deriv_1, rel_tol=1e-6, abs_tol=1e-6)
+    for arg_num, arg in enumerate(ufloat_arg_list):
+        uatom = get_single_uatom(arg)
+        orig_weight = arg.error_components[uatom]
+        result_weight = result.error_components[uatom]
+        ufloat_deriv_value = result_weight / orig_weight
+        numerical_deriv_func = partial_derivative(func, arg_num)
+        numerical_deriv_value = numerical_deriv_func(*float_arg_list)
+        assert math.isclose(
+            ufloat_deriv_value,
+            numerical_deriv_value,
+            rel_tol=1e-6,
+            abs_tol=1e-6,
+        )
 
 
 def test_compound_expression():
