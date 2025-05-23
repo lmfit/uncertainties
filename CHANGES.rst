@@ -16,9 +16,7 @@ Changes:
    `(-1)**ufloat(1, 0)` gave `-1.0+/-0`. The justification for this was that the second
    `UFloat` with `std_dev` of `0` should be treated like a regular float. Now the same
    calculation returns `-1.0+/-nan`. In this case the `UFloat` in the second argument
-   of the power operator is treated as a degenerate `UFloat`. Included with this change
-   is that the `uncertainties` package is generally dropping formal support for edge
-   cases involving `UFloat` objects with `std_dev == 0`.
+   of the power operator is treated as a degenerate `UFloat`.
 
 Removes:
 
@@ -34,6 +32,8 @@ Removes:
    between a `UFloat` object and another object, if the object is not a `UFloat` then
    the equality comparison is deferred to this other object. For the specific case of
    `float` this means that the equality comparison always returns `False`.
+- [**BREAKING**] The `uncertainties` package is generally dropping formal support for
+   edge cases involving `UFloat` objects with `std_dev == 0`.
 
 Unreleased
 ----------
