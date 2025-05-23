@@ -82,6 +82,8 @@ def test_power_derivatives(first_ufloat, second_ufloat, first_der, second_der):
     assert nan_close(second_der_result, second_der)
 
 
+zero = ufloat(0, 0)
+one = ufloat(1, 0)
 p = ufloat(0.3, 0.01)
 
 power_zero_std_dev_result_cases = [
@@ -89,8 +91,16 @@ power_zero_std_dev_result_cases = [
     (p, 0, 1),
     (zero, 0, 1),
     (-p, 0, 1),
+    (0.3, zero, 1),
+    (p, zero, 1),
+    (one, -3, 1),
+    (one, -3.1, 1),
     (one, 0, 1),
+    (one, 3, 1),
+    (one, 3.1, 1),
+    (one, -p, 1),
     (one, zero, 1),
+    (one, p, 1),
     (1, -p, 1),
     (1, zero, 1),
     (1, p, 1),
