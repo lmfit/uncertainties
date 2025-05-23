@@ -1,6 +1,5 @@
-from math import isclose, isnan, isinf
+from math import isclose, isnan
 
-import uncertainties.core as uncert_core
 from uncertainties.core import UFloat
 
 
@@ -11,11 +10,11 @@ def get_single_uatom(num_with_uncertainty: UFloat):
     return next(iter(error_components.keys()))
 
 
-def nan_close(first, second):
+def nan_close(first, second, *, rel_tol=1e-9, abs_tol=0.0):
     if isnan(first):
         return isnan(second)
     else:
-        return isclose(first, second)
+        return isclose(first, second, rel_tol=rel_tol, abs_tol=abs_tol)
 
 
 ###############################################################
@@ -25,35 +24,7 @@ def nan_close(first, second):
 # Utilities for unit testing
 
 
-def numbers_close(x, y, tolerance=1e-6):
-    """
-    Returns True if the given floats are close enough.
-
-    The given tolerance is the relative difference allowed, or the absolute
-    difference, if one of the numbers is 0.
-
-    NaN is allowed: it is considered close to itself.
-    """
-
-    # !!! Python 3.5+ has math.isclose(): maybe it could be used here.
-
-    # Instead of using a try and ZeroDivisionError, we do a test,
-    # NaN could appear silently:
-
-    if x != 0 and y != 0:
-        if isinf(x):
-            return isinf(y)
-        elif isnan(x):
-            return isnan(y)
-        else:
-            # Symmetric form of the test:
-            return 2 * abs(x - y) / (abs(x) + abs(y)) < tolerance
-
-    else:  # Either x or y is zero
-        return abs(x or y) < tolerance
-
-
-def ufloats_close(x, y, tolerance=1e-6):
+def ufloat_nan_close(x, y, tolerance=1e-6):
     """
     Tests if two numbers with uncertainties are close, as random
     variables: this is stronger than testing whether their nominal
@@ -64,16 +35,26 @@ def ufloats_close(x, y, tolerance=1e-6):
     """
 
     diff = x - y
-    return numbers_close(diff.nominal_value, 0, tolerance) and numbers_close(
-        diff.std_dev, 0, tolerance
+    nominal_values_close = nan_close(
+        diff.n,
+        0,
+        rel_tol=tolerance,
+        abs_tol=tolerance,
     )
+    std_devs_close = nan_close(
+        diff.s,
+        0,
+        rel_tol=tolerance,
+        abs_tol=tolerance,
+    )
+    return nominal_values_close and std_devs_close
 
 
 ###############################################################################
 
 
 try:
-    import numpy  # noqa
+    import numpy as np  # noqa
 except ImportError:
     pass
 else:
@@ -92,21 +73,19 @@ else:
         precision -- precision passed through to
         uncertainties.test_uncertainties.numbers_close().
         """
-
-        # ! numpy.allclose() is similar to this function, but does not
-        # work on arrays that contain numbers with uncertainties, because
-        # of the isinf() function.
-
-        for elmt1, elmt2 in zip(m1.flat, m2.flat):
-            # For a simpler comparison, both elements are
-            # converted to AffineScalarFunc objects:
-            elmt1 = uncert_core.to_affine_scalar(elmt1)
-            elmt2 = uncert_core.to_affine_scalar(elmt2)
-
-            if not numbers_close(elmt1.nominal_value, elmt2.nominal_value, precision):
-                return False
-
-            if not numbers_close(elmt1.std_dev, elmt2.std_dev, precision):
-                return False
-
-        return True
+        diff_arr = m1 - m2
+        nominal_values_arr = np.vectorize(lambda x: x.n)(diff_arr)
+        std_devs_arr = np.vectorize(lambda x: x.s)(diff_arr)
+        nominal_values_close_arr = np.isclose(
+            nominal_values_arr,
+            0,
+            rtol=precision,
+            atol=precision,
+        )
+        std_devs_close_arr = np.isclose(
+            std_devs_arr,
+            0,
+            rtol=precision,
+            atol=precision,
+        )
+        return np.logical_and(nominal_values_close_arr, std_devs_close_arr)

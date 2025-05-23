@@ -210,41 +210,6 @@ of 0.
 >>> (x -y)
 0.0+/-0.7071067811865476
 
-
-Comparisons of magnitude
-------------------------
-
-The concept of comparing the magnitude of values with uncertainties is a bit
-complicated.  That is, a random variable with a mean of 25 and standard deviation of 1
-might be greater than a random variable with a mean of 24 and standard deviation of 0.8
-most of the time, but *sometimes* it might be less than it.
-The :mod:`uncertainties` package takes the simple approach of comparing nominal values.
-That is
-
->>> a = ufloat(25, 10)
->>> b = ufloat(24, 8)
->>> a > b
-True
-
-Note that combining this comparison and the above discussion of `==` and `!=`
-can lead to a somewhat surprising result:
-
-
->>> a = ufloat(25, 10)
->>> b = ufloat(25, 8)
->>> a >= b
-False
->>> a > b
-False
->>> a == b
-False
->>> a.nominal_value >= b.nominal_value
-True
-
-That is, since `a` is neither greater than `b` (nominal value only) nor equal to
-`b`, it cannot be greater than or equal to `b`.
-
-
  .. index::
    pair: testing (scalar); NaN
 

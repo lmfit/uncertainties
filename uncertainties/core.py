@@ -632,26 +632,3 @@ def deprecation_wrapper(func, msg):
         return func(*args, **kwargs)
 
     return wrapped
-
-
-deprecated_methods = [
-    "__floordiv__",
-    "__mod__",
-    "__abs__",
-    "__trunc__",
-    "__lt__",
-    "__gt__",
-    "__le__",
-    "__ge__",
-]
-
-for method_name in deprecated_methods:
-    message = (
-        f"AffineScalarFunc.{method_name}() is deprecated. It will be removed in a future "
-        f"release."
-    )
-    setattr(
-        AffineScalarFunc,
-        method_name,
-        deprecation_wrapper(getattr(AffineScalarFunc, method_name), message),
-    )

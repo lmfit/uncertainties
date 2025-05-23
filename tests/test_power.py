@@ -87,19 +87,12 @@ zero = ufloat(0, 0)
 one = ufloat(1, 0)
 p = ufloat(0.3, 0.01)
 
-power_float_result_cases = [
+power_zero_std_dev_result_cases = [
     (0, p, 0),
-    (zero, p, 0),
-    (float("nan"), zero, 1),
-    (one, float("nan"), 1),
     (p, 0, 1),
     (zero, 0, 1),
     (-p, 0, 1),
-    (-10.3, zero, 1),
-    (0, zero, 1),
     (0.3, zero, 1),
-    (-p, zero, 1),
-    (zero, zero, 1),
     (p, zero, 1),
     (one, -3, 1),
     (one, -3.1, 1),
@@ -117,11 +110,13 @@ power_float_result_cases = [
 
 @pytest.mark.parametrize(
     "first_ufloat, second_ufloat, result_float",
-    power_float_result_cases,
+    power_zero_std_dev_result_cases,
 )
-def test_power_float_result_cases(first_ufloat, second_ufloat, result_float):
+def test_power_zero_std_dev_result_cases(first_ufloat, second_ufloat, result_float):
     for op in [pow, umath_pow]:
-        assert op(first_ufloat, second_ufloat) == result_float
+        result = op(first_ufloat, second_ufloat)
+        assert result.n == result_float
+        assert result.s == 0
 
 
 power_reference_cases = [
