@@ -87,8 +87,12 @@ p = ufloat(0.3, 0.01)
 power_zero_std_dev_result_cases = [
     (0, p, 0),
     (p, 0, 1),
+    (zero, 0, 1),
     (-p, 0, 1),
+    (one, 0, 1),
+    (one, zero, 1),
     (1, -p, 1),
+    (1, zero, 1),
     (1, p, 1),
 ]
 
