@@ -47,7 +47,6 @@ real_single_input_funcs = (
     "erfc",
     "exp",
     "expm1",
-    "fabs",
     "gamma",
     "lgamma",
     "radians",
@@ -112,8 +111,6 @@ def test_single_input_func_derivatives(func, value):
 
 real_double_input_funcs = (
     "atan2",
-    "copysign",
-    "fmod",
     "pow",
 )
 

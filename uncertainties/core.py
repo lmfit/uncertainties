@@ -300,6 +300,11 @@ class UFloat(object):
     def uncertainty(self):
         return self._uncertainty
 
+    @property
+    def u(self):
+        """Abbreviation for uncertainty."""
+        return self.uncertainty
+
     def covariance(self, other):
         return self.uncertainty.covariance(other.uncertainty)
 
@@ -324,6 +329,11 @@ class UFloat(object):
     def s(self):
         """Abbreviation for std_dev."""
         return self.std_dev
+
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return self.n == other.n and self.u == other.u
 
     def __repr__(self):
         if self.std_dev == 0:
@@ -369,8 +379,6 @@ class UFloat(object):
 
 
 ops.add_arithmetic_ops(UFloat)
-ops.add_comparative_ops(UFloat)
-to_affine_scalar = UFloat._to_affine_scalar
 
 # Legacy alias for UFloat
 AffineScalarFunc = UFloat

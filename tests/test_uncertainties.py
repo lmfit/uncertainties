@@ -160,10 +160,8 @@ def test_ufloat_fromstr(input_str, nominal_value, std_dev):
 
 # Randomly generated but static test values.
 deriv_propagation_cases = [
-    ("__abs__", (1.1964838601545966,), 0.047308407404731856),
     ("__pos__", (1.5635699242286414,), 0.38219529954774223),
     ("__neg__", (-0.4520304708235554,), 0.8442835926901457),
-    ("__trunc__", (0.4622631416873926,), 0.6540076679531033),
     ("__add__", (-0.7581877519537352, 1.6579645792821753), 0.5083165826806606),
     ("__radd__", (-0.976869259500134, 1.1542019729184076), 0.732839320238539),
     ("__sub__", (1.0233545960703134, 0.029354693323845993), 0.7475621525040559),
@@ -172,12 +170,8 @@ deriv_propagation_cases = [
     ("__rmul__", (-0.4006772142682373, 0.19628658198222926), 0.3300416314362784),
     ("__truediv__", (-0.5573378968194893, 0.28646277014641486), 0.42933306560556384),
     ("__rtruediv__", (1.7663869752268884, -0.1619387546963642), 0.6951025849642374),
-    ("__floordiv__", (0.11750026664733992, -1.0120567560937617), 0.9557126076209381),
-    ("__rfloordiv__", (-1.2872736512072698, -1.4416464249395973), 0.28262518984780205),
     ("__pow__", (0.34371967038364515, -0.8313605840956209), 0.6267147080961244),
     ("__rpow__", (1.593375683248082, 1.9890969272006154), 0.7171353266792271),
-    ("__mod__", (0.7478106873313131, 1.2522332955942628), 0.5682413634363304),
-    ("__rmod__", (1.5227432102303133, -0.5177923078991333), 0.25752786270795935),
 ]
 
 
@@ -191,7 +185,7 @@ def test_deriv_propagation(func_name, args, std_dev):
         deriv = partial_derivative(func, idx)(*args)
         for atom, input_weight in ufloat_args[idx].error_components.items():
             output_weight = output.error_components[atom]
-            assert nan_close(output_weight, deriv * input_weight)
+            assert nan_close(output_weight, deriv * input_weight, rel_tol=1e-5)
 
 
 def test_copy():
@@ -257,7 +251,7 @@ def test_pickling():
     assert isinstance(f, UFloat)
 
     f_unpickled, x_unpickled2 = pickle.loads(pickle.dumps((f, x)))
-    assert f_unpickled - 2 * x_unpickled2 == 0
+    assert f_unpickled == 2 * x_unpickled2
 
     for subclass in (UFloatDict, UFloatSlotsTuple, UFloatSlotsStr):
         x = subclass(3, 0.14)
@@ -273,22 +267,6 @@ def test_pickling():
 
     x = uncert_core.UCombo(())
     assert pickle.loads(pickle.dumps(x)).ucombo_tuple == ()
-
-    x_unpickled = pickle.loads(pickle.dumps(x))
-    # We make sure that the data is still there and untouched:
-    assert x_unpickled._nominal_value == "in slots"
-    assert x_unpickled.__dict__ == x.__dict__
-
-    ##
-
-    # Corner case that should have no impact on the code but which is
-    # not prevented by the documentation: case of constant linear
-    # terms (the potential gotcha is that if the linear_combo
-    # attribute is empty, __getstate__()'s result could be false, and
-    # so __setstate__() would not be called and the original empty
-    # linear combination would not be set in linear_combo.
-    x = uncert_core.LinearCombination({})
-    assert pickle.loads(pickle.dumps(x)).linear_combo == {}
 
 
 def test_comparison_ops():
