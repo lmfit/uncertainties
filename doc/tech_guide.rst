@@ -197,16 +197,6 @@ This indicates that **the derivative required by linear error
 propagation theory is not defined** (a Monte-Carlo calculation of the
 resulting random variable is more adapted to this specific case).
 
-However, even in this case where the derivative at the nominal value
-is infinite, the :mod:`uncertainties` package **correctly handles
-perfectly precise numbers**:
-
->>> umath.sqrt(ufloat(0, 0))
-0.0+/-0
-
-is thus the correct result, despite the fact that the derivative of
-the square root is not defined in zero.
-
 .. _math_def_num_uncert:
 
 Mathematical definition of numbers with uncertainties
