@@ -617,7 +617,7 @@ class matrix(numpy.matrix):
             "removed in a future release.",
             FutureWarning,
         )
-        super().__init__(self)
+        super().__init__()
 
     def __rmul__(self, other):
         # ! NumPy's matrix __rmul__ uses an apparently restrictive
