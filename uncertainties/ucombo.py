@@ -64,6 +64,11 @@ class UCombo:
                     for sub_term, sub_weight in term.ucombo_tuple:
                         term_list.append((sub_term, weight * sub_weight))
             self._expanded_dict = dict(self._expanded_dict)
+            self._expanded_dict = {
+                uatom: weight
+                for uatom, weight in self._expanded_dict.items()
+                if weight != 0
+            }
             self.is_expanded = True
         return self._expanded_dict
 

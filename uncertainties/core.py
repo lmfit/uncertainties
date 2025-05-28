@@ -280,10 +280,7 @@ class UFloat(object):
         if isinstance(uncertainty, (float, int)):
             if not isnan(uncertainty) and uncertainty < 0:
                 raise NegativeStdDev("The standard deviation cannot be negative")
-            if uncertainty == 0:
-                uncertainty = UCombo(())
-            else:
-                uncertainty = UCombo(((UAtom(tag=tag), float(uncertainty)),))
+            uncertainty = UCombo(((UAtom(tag=tag), float(uncertainty)),))
         self._uncertainty = uncertainty
 
     @property
