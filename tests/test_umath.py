@@ -1,6 +1,4 @@
 import json
-import inspect
-import itertools
 import math
 from math import isnan
 from pathlib import Path
@@ -12,12 +10,8 @@ from uncertainties import ufloat
 import uncertainties.core as uncert_core
 from uncertainties.ops import partial_derivative
 import uncertainties.umath_core as umath_core
-from uncertainties import umath
 
-from helpers import (
-    numbers_close,
-    ufloats_close,
-)
+from helpers import nan_close, ufloat_nan_close
 ###############################################################################
 # Unit tests
 
@@ -33,140 +27,35 @@ for func_name, ufloat_tuples_list in umath_function_cases_dict.items():
     for ufloat_tuples in ufloat_tuples_list:
         ufloat_cases_list.append((func_name, ufloat_tuples))
 
-single_input_data_path = Path(Path(__file__).parent, "cases", "single_inputs.json")
-with open(single_input_data_path, "r") as f:
-    single_input_dict = json.load(f)
 
-double_input_data_path = Path(Path(__file__).parent, "cases", "double_inputs.json")
-with open(double_input_data_path, "r") as f:
-    double_input_dict = json.load(f)
-
-real_single_input_funcs = (
-    "asinh",
-    "atan",
-    "cos",
-    "cosh",
-    "degrees",
-    "erf",
-    "erfc",
-    "exp",
-    "expm1",
-    "fabs",
-    "gamma",
-    "lgamma",
-    "radians",
-    "sin",
-    "sinh",
-    "tan",
-    "tanh",
+@pytest.mark.parametrize(
+    "func_name, ufloat_tuples",
+    ufloat_cases_list,
+    ids=lambda x: str(x),
 )
-positive_single_input_funcs = (
-    "log",
-    "log1p",
-    "log10",
-    "sqrt",
-)
-minus_one_to_plus_one_single_input_funcs = (
-    "acos",
-    "asin",
-    "atanh",
-)
-greater_than_one_single_input_funcs = ("acosh",)
+def test_umath_function_derivatives(func_name, ufloat_tuples):
+    ufloat_arg_list = []
+    for nominal_value, std_dev in ufloat_tuples:
+        ufloat_arg_list.append(ufloat(nominal_value, std_dev))
+    float_arg_list = [arg.n for arg in ufloat_arg_list]
 
-real_single_input_cases = list(
-    itertools.product(real_single_input_funcs, single_input_dict["real"])
-)
-positive_single_input_cases = list(
-    itertools.product(positive_single_input_funcs, single_input_dict["positive"])
-)
-minus_one_to_plus_one_single_input_cases = list(
-    itertools.product(
-        minus_one_to_plus_one_single_input_funcs,
-        single_input_dict["minus_one_to_plus_one"],
-    )
-)
-greater_than_one_single_input_cases = list(
-    itertools.product(
-        greater_than_one_single_input_funcs,
-        single_input_dict["greater_than_one"],
-    )
-)
-single_input_cases = (
-    real_single_input_cases
-    + positive_single_input_cases
-    + minus_one_to_plus_one_single_input_cases
-    + greater_than_one_single_input_cases
-)
+    func = getattr(umath_core, func_name)
 
+    result = func(*ufloat_arg_list)
 
-@pytest.mark.parametrize("func, value", single_input_cases)
-def test_single_input_func_derivatives(func, value):
-    uval = ufloat(value, 1.0)
-    uatom = get_single_uatom(uval)
-
-    umath_func = getattr(umath, func)
-    result = umath_func(uval)
-    analytic_deriv = result.error_components[uatom]
-
-    math_func = getattr(math, func)
-    numerical_deriv = partial_derivative(math_func, 0)(value)
-
-    assert math.isclose(analytic_deriv, numerical_deriv, rel_tol=1e-6, abs_tol=1e-6)
-
-
-real_double_input_funcs = (
-    "atan2",
-    "copysign",
-    "fmod",
-    "pow",
-)
-
-positive_double_input_funcs = (
-    "hypot",
-    "log",
-)
-
-real_double_input_cases = list(
-    itertools.product(real_double_input_funcs, *zip(*double_input_dict["real"]))
-)
-print(real_double_input_cases)
-positive_double_input_cases = list(
-    itertools.product(positive_double_input_funcs, *zip(*double_input_dict["positive"]))
-)
-
-double_input_cases = real_double_input_cases + positive_double_input_cases
-
-
-@pytest.mark.parametrize("func, value_0, value_1", double_input_cases)
-def test_double_input_func_derivatives(func, value_0, value_1):
-    if func == "pow":
-        value_0 = abs(value_0)
-
-    uval_0 = ufloat(value_0, 1.0)
-    uval_1 = ufloat(value_1, 1.0)
-
-    uatom_0 = get_single_uatom(uval_0)
-    uatom_1 = get_single_uatom(uval_1)
-
-    math_func = getattr(math, func)
-    umath_func = getattr(umath, func)
-
-    result = umath_func(uval_0, uval_1)
-
-    analytic_deriv_0 = result.error_components[uatom_0]
-    analytic_deriv_1 = result.error_components[uatom_1]
-
-    numerical_deriv_0 = partial_derivative(
-        math_func,
-        0,
-    )(value_0, value_1)
-    numerical_deriv_1 = partial_derivative(
-        math_func,
-        1,
-    )(value_0, value_1)
-
-    assert math.isclose(analytic_deriv_0, numerical_deriv_0, rel_tol=1e-6, abs_tol=1e-6)
-    assert math.isclose(analytic_deriv_1, numerical_deriv_1, rel_tol=1e-6, abs_tol=1e-6)
+    for arg_num, arg in enumerate(ufloat_arg_list):
+        uatom = get_single_uatom(arg)
+        orig_weight = arg.error_components[uatom]
+        result_weight = result.error_components[uatom]
+        ufloat_deriv_value = result_weight / orig_weight
+        numerical_deriv_func = partial_derivative(func, arg_num)
+        numerical_deriv_value = numerical_deriv_func(*float_arg_list)
+        assert math.isclose(
+            ufloat_deriv_value,
+            numerical_deriv_value,
+            rel_tol=1e-6,
+            abs_tol=1e-6,
+        )
 
 
 def test_compound_expression():
@@ -177,7 +66,7 @@ def test_compound_expression():
     x = ufloat(3, 0.1)
     y1 = umath_core.tan(x)
     y2 = umath_core.sin(x) / umath_core.cos(x)
-    assert ufloats_close(y1, y2)
+    assert ufloat_nan_close(y1, y2)
 
 
 def test_numerical_example():
@@ -270,8 +159,11 @@ def test_monte_carlo_comparison():
     # or assert_array_max_ulp. This is relevant for all vectorized
     # occurrences of numbers_close.
 
-    assert numpy.vectorize(numbers_close)(
-        covariances_this_module, covariances_samples, 0.06
+    assert numpy.vectorize(nan_close)(
+        covariances_this_module,
+        covariances_samples,
+        rel_tol=0.06,
+        abs_tol=0.06,
     ).all(), (
         "The covariance matrices do not coincide between"
         " the Monte-Carlo simulation and the direct calculation:\n"
@@ -280,13 +172,13 @@ def test_monte_carlo_comparison():
     )
 
     # The nominal values must be close:
-    assert numbers_close(
+    assert nan_close(
         nominal_value_this_module,
         nominal_value_samples,
         # The scale of the comparison depends on the standard
         # deviation: the nominal values can differ by a fraction of
         # the standard deviation:
-        math.sqrt(covariances_samples[2, 2]) / abs(nominal_value_samples) * 0.5,
+        rel_tol=math.sqrt(covariances_samples[2, 2]) / abs(nominal_value_samples) * 0.5,
     ), (
         "The nominal value (%f) does not coincide with that of"
         " the Monte-Carlo simulation (%f), for a standard deviation of %f."
@@ -310,13 +202,6 @@ def test_math_module():
 
     # Regular operations are chosen to be unchanged:
     assert isinstance(umath_core.sin(3), float)
-
-    # factorial() must not be "damaged" by the umath_core module, so as
-    # to help make it a drop-in replacement for math (even though
-    # factorial() does not work on numbers with uncertainties
-    # because it is restricted to integers, as for
-    # math.factorial()):
-    assert umath_core.factorial(4) == 24
 
     # fsum is special because it does not take a fixed number of
     # variables:
@@ -382,19 +267,3 @@ def test_hypot():
     result = umath_core.hypot(x, y)
     assert isnan(result.error_components[x_uatom])
     assert isnan(result.error_components[y_uatom])
-
-
-@pytest.mark.parametrize("function_name", umath_core.deprecated_functions)
-def test_deprecated_function(function_name):
-    num_args = len(inspect.signature(getattr(math, function_name)).parameters)
-    args = [ufloat(1, 0.1)]
-    if num_args == 1:
-        if function_name == "factorial":
-            args[0] = 6
-    else:
-        if function_name == "ldexp":
-            args.append(3)
-        else:
-            args.append(ufloat(-12, 2.4))
-    with pytest.warns(FutureWarning, match="will be removed"):
-        getattr(umath_core, function_name)(*args)

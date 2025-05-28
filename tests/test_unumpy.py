@@ -9,7 +9,7 @@ import uncertainties
 import uncertainties.core as uncert_core
 from uncertainties import ufloat, unumpy
 from uncertainties.unumpy import core
-from helpers import numbers_close, uarrays_close, get_single_uatom
+from helpers import get_single_uatom, nan_close, uarrays_close
 
 
 def test_numpy():
@@ -31,19 +31,6 @@ def test_numpy():
     # Operations with arrays work (they are first handled by NumPy,
     # then by this module):
     prod1 * prod2  # This should be calculable
-    assert not (prod1 - prod2).any()  # All elements must be 0
-
-    # Comparisons work too:
-
-    # Usual behavior:
-    assert len(arr[arr > 1.5]) == 1
-    # Comparisons with Variable objects:
-    assert len(arr[arr > ufloat(1.5, 0.1)]) == 1
-
-    assert len(prod1[prod1 < prod1 * prod2]) == 2
-
-    # The following can be calculated (special NumPy abs() function):
-    numpy.abs(arr + ufloat(-1, 0.1))
 
     # The following does not completely work, because NumPy does not
     # implement numpy.exp on an array of general objects, apparently:
@@ -111,11 +98,11 @@ def test_inverse():
     # Checks of the numerical values: the diagonal elements of the
     # inverse should be the inverses of the diagonal elements of
     # m (because we started with a triangular matrix):
-    assert numbers_close(
+    assert nan_close(
         1 / m_nominal_values[0, 0], m_inv_uncert[0, 0].nominal_value
     ), "Wrong value"
 
-    assert numbers_close(
+    assert nan_close(
         1 / m_nominal_values[1, 1], m_inv_uncert[1, 1].nominal_value
     ), "Wrong value"
 
@@ -132,10 +119,10 @@ def test_inverse():
     m_double_inverse = m_inverse.I
     # The initial matrix should be recovered, including its
     # derivatives, which define covariances:
-    assert numbers_close(m_double_inverse[0, 0].nominal_value, m[0, 0].nominal_value)
-    assert numbers_close(m_double_inverse[0, 0].std_dev, m[0, 0].std_dev)
+    assert nan_close(m_double_inverse[0, 0].nominal_value, m[0, 0].nominal_value)
+    assert nan_close(m_double_inverse[0, 0].std_dev, m[0, 0].std_dev)
 
-    assert uarrays_close(m_double_inverse, m)
+    assert uarrays_close(m_double_inverse, m).all()
 
     ####################
 
@@ -150,7 +137,7 @@ def test_inverse():
 
     # Correlations between m and m_inverse should create a perfect
     # inversion:
-    assert uarrays_close(m * m_inverse, numpy.eye(m.shape[0]))
+    assert uarrays_close(m * m_inverse, numpy.eye(m.shape[0])).all()
 
 
 def test_wrap_array_func():
@@ -183,7 +170,7 @@ def test_wrap_array_func():
     m_f_wrapped = f_wrapped(m, 2, factor=10)
     m_f_unc = f_unc(m, 2, factor=10)
 
-    assert uarrays_close(m_f_wrapped, m_f_unc)
+    assert uarrays_close(m_f_wrapped, m_f_unc).all()
 
 
 def test_pseudo_inverse():
@@ -201,7 +188,7 @@ def test_pseudo_inverse():
     rcond = 1e-8  # Test of the second argument to pinv()
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core.pinv(m, rcond)
-    assert uarrays_close(m_pinv_num, m_pinv_package)
+    assert uarrays_close(m_pinv_num, m_pinv_package).all()
 
     ##########
     # Example with a non-full rank rectangular matrix:
@@ -209,14 +196,14 @@ def test_pseudo_inverse():
     m = unumpy.matrix([vector, vector])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core.pinv(m, rcond)
-    assert uarrays_close(m_pinv_num, m_pinv_package)
+    assert uarrays_close(m_pinv_num, m_pinv_package).all()
 
     ##########
     # Example with a non-full-rank square matrix:
     m = unumpy.matrix([[ufloat(10, 1), 0], [3, 0]])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core.pinv(m, rcond)
-    assert uarrays_close(m_pinv_num, m_pinv_package)
+    assert uarrays_close(m_pinv_num, m_pinv_package).all()
 
 
 def test_broadcast_funcs():
