@@ -46,7 +46,10 @@ def test_umath_function_derivatives(func_name, ufloat_tuples):
     for arg_num, arg in enumerate(ufloat_arg_list):
         uatom = get_single_uatom(arg)
         orig_weight = arg.error_components[uatom]
-        result_weight = result.error_components[uatom]
+        try:
+            result_weight = result.error_components[uatom]
+        except KeyError:
+            result_weight = 0
         ufloat_deriv_value = result_weight / orig_weight
         numerical_deriv_func = partial_derivative(func, arg_num)
         numerical_deriv_value = numerical_deriv_func(*float_arg_list)

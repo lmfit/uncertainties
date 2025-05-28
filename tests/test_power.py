@@ -74,12 +74,20 @@ def test_power_derivatives(first_ufloat, second_ufloat, first_der, second_der):
 
         if first_ufloat.s != 0:
             first_uatom = get_single_uatom(first_ufloat)
-            first_der_result = result.error_components[first_uatom] / first_ufloat.s
+            try:
+                first_der_result = result.error_components[first_uatom] / first_ufloat.s
+            except KeyError:
+                first_der_result = 0
             assert nan_close(first_der_result, first_der)
 
         if second_ufloat.s != 0:
             second_uatom = get_single_uatom(second_ufloat)
-            second_der_result = result.error_components[second_uatom] / second_ufloat.s
+            try:
+                second_der_result = (
+                    result.error_components[second_uatom] / second_ufloat.s
+                )
+            except KeyError:
+                second_der_result = 0
             assert nan_close(second_der_result, second_der)
 
 
