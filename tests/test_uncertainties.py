@@ -209,6 +209,13 @@ def test_ufloat_method_derivativs(func_name, ufloat_tuples):
         )
 
 
+def test_calculate_zero_equality():
+    zero = ufloat(0, 0)
+    x = ufloat(1, 0.1)
+    x_zero = x - x
+    assert zero == x_zero
+
+
 def test_copy():
     """Standard copy module integration."""
     x = ufloat(3, 0.1)
