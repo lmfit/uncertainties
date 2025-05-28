@@ -1,6 +1,8 @@
 import copy
+import json
 import math
 import gc
+from pathlib import Path
 import pickle
 import random
 
@@ -158,34 +160,53 @@ def test_ufloat_fromstr(input_str, nominal_value, std_dev):
         assert num.uncertainty.ucombo_tuple == ()
 
 
-# Randomly generated but static test values.
-deriv_propagation_cases = [
-    ("__pos__", (1.5635699242286414,), 0.38219529954774223),
-    ("__neg__", (-0.4520304708235554,), 0.8442835926901457),
-    ("__add__", (-0.7581877519537352, 1.6579645792821753), 0.5083165826806606),
-    ("__radd__", (-0.976869259500134, 1.1542019729184076), 0.732839320238539),
-    ("__sub__", (1.0233545960703134, 0.029354693323845993), 0.7475621525040559),
-    ("__rsub__", (0.49861518245313663, -0.9927317702800833), 0.5421488555485847),
-    ("__mul__", (0.0654070362874073, 1.9216078105121919), 0.6331001122119122),
-    ("__rmul__", (-0.4006772142682373, 0.19628658198222926), 0.3300416314362784),
-    ("__truediv__", (-0.5573378968194893, 0.28646277014641486), 0.42933306560556384),
-    ("__rtruediv__", (1.7663869752268884, -0.1619387546963642), 0.6951025849642374),
-    ("__pow__", (0.34371967038364515, -0.8313605840956209), 0.6267147080961244),
-    ("__rpow__", (1.593375683248082, 1.9890969272006154), 0.7171353266792271),
-]
+ufloat_method_cases_json_path = Path(
+    Path(__file__).parent,
+    "cases",
+    "ufloat_method_cases.json",
+)
+with open(ufloat_method_cases_json_path, "r") as f:
+    ufloat_method_cases_dict = json.load(f)
+ufloat_cases_list = []
+for func_name, ufloat_tuples_list in ufloat_method_cases_dict.items():
+    for ufloat_tuples in ufloat_tuples_list:
+        ufloat_cases_list.append((func_name, ufloat_tuples))
 
 
-@pytest.mark.parametrize("func_name, args, std_dev", deriv_propagation_cases)
-def test_deriv_propagation(func_name, args, std_dev):
-    func = getattr(UFloat, func_name)
-    ufloat_args = [UFloat(arg, std_dev) for arg in args]
-    output = func(*ufloat_args)
+@pytest.mark.parametrize(
+    "func_name, ufloat_tuples",
+    ufloat_cases_list,
+    ids=lambda x: str(x),
+)
+def test_ufloat_method_derivativs(func_name, ufloat_tuples):
+    ufloat_arg_list = []
+    for nominal_value, std_dev in ufloat_tuples:
+        ufloat_arg_list.append(ufloat(nominal_value, std_dev))
+    float_arg_list = [arg.n for arg in ufloat_arg_list]
 
-    for idx, _ in enumerate(ufloat_args):
-        deriv = partial_derivative(func, idx)(*args)
-        for atom, input_weight in ufloat_args[idx].error_components.items():
-            output_weight = output.error_components[atom]
-            assert nan_close(output_weight, deriv * input_weight, rel_tol=1e-5)
+    """
+    Because of how the UFloat methods are wrapped, we must use the bound version of the
+    methods to calculate the resulting UFloat but we must use the unbound version to
+    extract the numerical partial derivative.
+    """
+    bound_func = getattr(ufloat_arg_list[0], func_name)
+    unbound_func = getattr(UFloat, func_name)
+
+    result = bound_func(*ufloat_arg_list[1:])
+
+    for arg_num, arg in enumerate(ufloat_arg_list):
+        uatom = get_single_uatom(arg)
+        orig_weight = arg.error_components[uatom]
+        result_weight = result.error_components[uatom]
+        ufloat_deriv_value = result_weight / orig_weight
+        numerical_deriv_func = partial_derivative(unbound_func, arg_num)
+        numerical_deriv_value = numerical_deriv_func(*float_arg_list)
+        assert math.isclose(
+            ufloat_deriv_value,
+            numerical_deriv_value,
+            rel_tol=1e-6,
+            abs_tol=1e-6,
+        )
 
 
 def test_copy():
