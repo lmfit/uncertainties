@@ -96,6 +96,11 @@ are completely uncorrelated.
 Comparison operators
 --------------------
 
+.. warning::
+   Support for comparing variables with uncertainties is deprecated and will be
+   removed in Uncertainties 4.0. The behavior of ``bool`` will also be changed
+   to always return ``True`` for ``UFloat`` objects.
+
 Comparison operations (>, ==, etc.) on numbers with uncertainties have
 a **pragmatic semantics**, in this package: numbers with uncertainties
 can be used wherever Python numbers are used, most of the time with a
