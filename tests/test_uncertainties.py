@@ -57,22 +57,11 @@ def test_value_construction():
     assert x.std_dev == 0.14
     assert x.tag == "pi"
 
-    # Negative standard deviations should be caught in a nice way
-    # (with the right exception):
-    try:
-        x = ufloat(3, -0.1)
-    except uncert_core.NegativeStdDev:
-        pass
+    with pytest.raises(uncert_core.NegativeStdDev):
+        _ = ufloat(3, -0.1)
 
-    ## Incorrect forms should not raise any deprecation warning, but
-    ## raise an exception:
-
-    try:
-        ufloat(1)  # Form that has never been allowed
-    except TypeError:
-        pass
-    else:
-        raise Exception("An exception should be raised")
+    with pytest.raises(TypeError):
+        ufloat(1)
 
 
 def test_ufloat_fromstr():
@@ -198,6 +187,13 @@ def test_ufloat_method_derivativs(func_name, ufloat_tuples):
             rel_tol=1e-6,
             abs_tol=1e-6,
         )
+
+
+def test_calculate_zero_equality():
+    zero = ufloat(0, 0)
+    x = ufloat(1, 0.1)
+    x_zero = x - x
+    assert zero == x_zero
 
 
 def test_copy():
