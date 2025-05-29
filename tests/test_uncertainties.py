@@ -33,7 +33,7 @@ except ImportError:
     np = None
 
 
-def test_value_construction():
+def test_ufloat_function_construction():
     """
     Tests the various means of constructing a constant number with
     uncertainty *without a string* (see test_ufloat_fromstr(), for this).
