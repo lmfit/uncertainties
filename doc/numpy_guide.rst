@@ -83,6 +83,9 @@ through NumPy, thanks to NumPy's support of arrays of arbitrary objects:
 Matrices
 ^^^^^^^^
 
+.. warning::
+   ``unumpy.umatrix`` is deprecated and will be removed in Uncertainties 4.0.
+
 Matrices of numbers with uncertainties are best created in one of
 two ways.  The first way is similar to using :func:`uarray`:
 

@@ -171,6 +171,10 @@ The functions in the :mod:`uncertainties.umath` module include:
 Comparison operators
 ====================
 
+.. warning::
+   Support for comparing variables with uncertainties is deprecated and will be
+   removed in Uncertainties 4.0.
+
 Comparison operators (``==``, ``!=``, ``>``, ``<``, ``>=``, and ``<=``) for Variables with
 uncertainties are somewhat complicated, and need special attention.  As we
 hinted at above, and will explore in more detail below and in the

@@ -31,7 +31,7 @@ except ImportError:
     np = None
 
 
-def test_value_construction():
+def test_ufloat_function_construction():
     """
     Tests the various means of constructing a constant number with
     uncertainty *without a string* (see test_ufloat_fromstr(), for this).
@@ -55,99 +55,82 @@ def test_value_construction():
     assert x.std_dev == 0.14
     assert x.tag == "pi"
 
-    # Negative standard deviations should be caught in a nice way
-    # (with the right exception):
-    try:
-        x = ufloat(3, -0.1)
-    except uncert_core.NegativeStdDev:
-        pass
+    with pytest.raises(uncert_core.NegativeStdDev):
+        _ = ufloat(3, -0.1)
 
-    ## Incorrect forms should not raise any deprecation warning, but
-    ## raise an exception:
-
-    try:
-        ufloat(1)  # Form that has never been allowed
-    except TypeError:
-        pass
-    else:
-        raise Exception("An exception should be raised")
+    with pytest.raises(TypeError):
+        ufloat(1)
 
 
-def test_ufloat_fromstr():
-    "Input of numbers with uncertainties as a string"
+ufloat_from_str_cases = [
+    ("-1.23(3.4)", -1.23, 3.4),
+    ("  -1.23(3.4)  ", -1.23, 3.4),  # Test that leading and trailing spaces are ignored
+    ("-1.34(5)", -1.34, 0.05),
+    ("1(6)", 1, 6),
+    ("3(4.2)", 3, 4.2),
+    ("-9(2)", -9, 2),
+    ("1234567(1.2)", 1234567, 1.2),
+    ("12.345(15)", 12.345, 0.015),
+    ("-12.3456(78)e-6", -12.3456e-6, 0.0078e-6),
+    ("0.29", 0.29, 0.01),
+    ("31.", 31, 1),
+    ("-31.", -31, 1),
+    # The following tests that the ufloat() routine does
+    # not consider '31' like the tuple ('3', '1'), which would
+    # make it expect two numbers (instead of 2 1-character
+    # strings):
+    ("31", 31, 1),
+    ("-3.1e10", -3.1e10, 0.1e10),
+    ("169.0(7)", 169, 0.7),
+    ("-0.1+/-1", -0.1, 1),
+    ("-13e-2+/-1e2", -13e-2, 1e2),
+    ("-14.(15)", -14, 15),
+    ("-100.0(15)", -100, 1.5),
+    ("14.(15)", 14, 15),
+    # Global exponent:
+    ("(3.141+/-0.001)E+02", 314.1, 0.1),
+    ## Pretty-print notation:
+    # ± sign, global exponent (not pretty-printed):
+    ("(3.141±0.001)E+02", 314.1, 0.1),
+    # ± sign, individual exponent:
+    ("3.141E+02±0.001e2", 314.1, 0.1),
+    # ± sign, times symbol, superscript (= full pretty-print):
+    ("(3.141 ± 0.001) × 10²", 314.1, 0.1),
+    ## Others
+    # Forced parentheses:
+    ("(2 +/- 0.1)", 2, 0.1),
+    # NaN uncertainty:
+    ("(3.141±nan)E+02", 314.1, float("nan")),
+    ("3.141e+02+/-nan", 314.1, float("nan")),
+    ("3.4(nan)e10", 3.4e10, float("nan")),
+    # NaN value:
+    ("nan+/-3.14e2", float("nan"), 314),
+    # "Double-floats"
+    ("(-3.1415 +/- 1e-4)e+200", -3.1415e200, 1e196),
+    ("(-3.1415e-10 +/- 1e-4)e+200", -3.1415e190, 1e196),
+    # Special float representation:
+    ("-3(0.)", -3, 0),
+]
 
-    # String representation, and numerical values:
-    tests = {
-        "-1.23(3.4)": (-1.23, 3.4),  # (Nominal value, error)
-        "  -1.23(3.4)  ": (-1.23, 3.4),  # Spaces ignored
-        "-1.34(5)": (-1.34, 0.05),
-        "1(6)": (1, 6),
-        "3(4.2)": (3, 4.2),
-        "-9(2)": (-9, 2),
-        "1234567(1.2)": (1234567, 1.2),
-        "12.345(15)": (12.345, 0.015),
-        "-12.3456(78)e-6": (-12.3456e-6, 0.0078e-6),
-        "0.29": (0.29, 0.01),
-        "31.": (31, 1),
-        "-31.": (-31, 1),
-        # The following tests that the ufloat() routine does
-        # not consider '31' like the tuple ('3', '1'), which would
-        # make it expect two numbers (instead of 2 1-character
-        # strings):
-        "31": (31, 1),
-        "-3.1e10": (-3.1e10, 0.1e10),
-        "169.0(7)": (169, 0.7),
-        "-0.1+/-1": (-0.1, 1),
-        "-13e-2+/-1e2": (-13e-2, 1e2),
-        "-14.(15)": (-14, 15),
-        "-100.0(15)": (-100, 1.5),
-        "14.(15)": (14, 15),
-        # Global exponent:
-        "(3.141+/-0.001)E+02": (314.1, 0.1),
-        ## Pretty-print notation:
-        # ± sign, global exponent (not pretty-printed):
-        "(3.141±0.001)E+02": (314.1, 0.1),
-        # ± sign, individual exponent:
-        "3.141E+02±0.001e2": (314.1, 0.1),
-        # ± sign, times symbol, superscript (= full pretty-print):
-        "(3.141 ± 0.001) × 10²": (314.1, 0.1),
-        ## Others
-        # Forced parentheses:
-        "(2 +/- 0.1)": (2, 0.1),
-        # NaN uncertainty:
-        "(3.141±nan)E+02": (314.1, float("nan")),
-        "3.141e+02+/-nan": (314.1, float("nan")),
-        "3.4(nan)e10": (3.4e10, float("nan")),
-        # NaN value:
-        "nan+/-3.14e2": (float("nan"), 314),
-        # "Double-floats"
-        "(-3.1415 +/- 1e-4)e+200": (-3.1415e200, 1e196),
-        "(-3.1415e-10 +/- 1e-4)e+200": (-3.1415e190, 1e196),
-        # Special float representation:
-        "-3(0.)": (-3, 0),
-    }
 
-    for representation, values in tests.items():
-        # We test the fact that surrounding spaces are removed:
-        representation = "  {}  ".format(representation)
+@pytest.mark.parametrize("input_str,nominal_value,std_dev", ufloat_from_str_cases)
+def test_ufloat_fromstr(input_str, nominal_value, std_dev):
+    num = ufloat_fromstr(input_str)
+    assert nan_close(num.nominal_value, nominal_value)
+    assert nan_close(num.std_dev, std_dev)
+    assert num.tag is None
 
-        # Without tag:
-        num = ufloat_fromstr(representation)
-        assert nan_close(num.nominal_value, values[0])
-        assert nan_close(num.std_dev, values[1])
-        assert num.tag is None
+    # With a tag as positional argument:
+    num = ufloat_fromstr(input_str, "test variable")
+    assert nan_close(num.nominal_value, nominal_value)
+    assert nan_close(num.std_dev, std_dev)
+    assert num.tag == "test variable"
 
-        # With a tag as positional argument:
-        num = ufloat_fromstr(representation, "test variable")
-        assert nan_close(num.nominal_value, values[0])
-        assert nan_close(num.std_dev, values[1])
-        assert num.tag == "test variable"
-
-        # With a tag as keyword argument:
-        num = ufloat_fromstr(representation, tag="test variable")
-        assert nan_close(num.nominal_value, values[0])
-        assert nan_close(num.std_dev, values[1])
-        assert num.tag == "test variable"
+    # With a tag as keyword argument:
+    num = ufloat_fromstr(input_str, tag="test variable")
+    assert nan_close(num.nominal_value, nominal_value)
+    assert nan_close(num.std_dev, std_dev)
+    assert num.tag == "test variable"
 
 
 ###############################################################################
@@ -196,6 +179,13 @@ def test_ufloat_method_derivativs(func_name, ufloat_tuples):
             rel_tol=1e-6,
             abs_tol=1e-6,
         )
+
+
+def test_calculate_zero_equality():
+    zero = ufloat(0, 0)
+    x = ufloat(1, 0.1)
+    x_zero = x - x
+    assert zero == x_zero
 
 
 def test_copy():

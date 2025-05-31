@@ -49,6 +49,13 @@ Adds:
 - Adjusts the Sphinx configuration to allow for reproducible builds using
   ``SOURCE_DATE_EPOCH``.
 
+Deprecates:
+
+- Support for interoperability between `uncertainties` `AffineScalarFunc` scalar objects
+   and `np.matrix` objects is now marked as deprecated. According to the
+   `numpy documentation <https://numpy.org/doc/stable/reference/generated/numpy.matrix.html>`_
+   usage of the `np.matrix` class is no longer recommended.
+
 3.2.3   2025-April-18
 -----------------------
 
