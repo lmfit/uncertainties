@@ -11,7 +11,7 @@ import uncertainties.core as uncert_core
 import uncertainties.umath_core as umath_core
 from uncertainties.ops import partial_derivative
 
-from helpers import nan_close
+from helpers import nan_close, ufloat_nan_close
 ###############################################################################
 # Unit tests
 
@@ -61,9 +61,9 @@ def test_compound_expression():
     """
 
     x = ufloat(3, 0.1)
-
-    # Prone to numerical errors (but not much more than floats):
-    assert umath_core.tan(x) == umath_core.sin(x) / umath_core.cos(x)
+    y1 = umath_core.tan(x)
+    y2 = umath_core.sin(x) / umath_core.cos(x)
+    assert ufloat_nan_close(y1, y2)
 
 
 def test_numerical_example():
