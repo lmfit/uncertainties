@@ -15,6 +15,7 @@ from functools import wraps
 import sys
 from typing import Callable, Union
 from numbers import Real
+from warnings import warn
 
 # 3rd-party modules:
 import numpy
@@ -260,7 +261,11 @@ def unumpy_to_numpy_matrix(arr):
     If arr in a unumpy.matrix, it is converted to a numpy.matrix.
     Otherwise, it is returned unchanged.
     """
-
+    msg = (
+        "the uncertainties.unumpy.unumpy_to_numpy_matrix function is deprecated. It "
+        "will be removed in a future release."
+    )
+    warn(msg, FutureWarning)
     if isinstance(arr, matrix):
         return arr.view(numpy.matrix)
     else:
@@ -436,6 +441,14 @@ class matrix(numpy.matrix):
     matrix contains numbers with uncertainties.
     """
 
+    def __init__(self, *args, **kwargs):
+        warn(
+            "the uncertainties.unumpy.matrix() class is deprecated. It will be "
+            "removed in a future release.",
+            FutureWarning,
+        )
+        super().__init__()
+
     def __rmul__(self, other):
         # ! NumPy's matrix __rmul__ uses an apparently restrictive
         # dot() function that cannot handle the multiplication of a
@@ -484,6 +497,11 @@ def umatrix(nominal_values, std_devs=None):
     The returned matrix can be inverted, thanks to the fact that it is
     a unumpy.matrix object instead of a numpy.matrix one.
     """
+    msg = (
+        "the uncertainties.unumpy.umatrix function is deprecated. It will be removed in "
+        "a future release."
+    )
+    warn(msg, FutureWarning)
 
     if std_devs is None:  # Obsolete, single tuple argument call
         raise TypeError("umatrix() should be called with two arguments.")
