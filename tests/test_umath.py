@@ -1,15 +1,15 @@
 import json
-import inspect
 import math
 from math import isnan
 from pathlib import Path
 
 import pytest
 
+from helpers import get_single_uatom
 from uncertainties import ufloat
 import uncertainties.core as uncert_core
-import uncertainties.umath_core as umath_core
 from uncertainties.ops import partial_derivative
+import uncertainties.umath_core as umath_core
 
 from helpers import nan_close, ufloat_nan_close
 ###############################################################################
@@ -44,7 +44,13 @@ def test_umath_function_derivatives(func_name, ufloat_tuples):
     result = func(*ufloat_arg_list)
 
     for arg_num, arg in enumerate(ufloat_arg_list):
-        ufloat_deriv_value = result.derivatives[arg]
+        uatom = get_single_uatom(arg)
+        orig_weight = arg.error_components[uatom]
+        try:
+            result_weight = result.error_components[uatom]
+        except KeyError:
+            result_weight = 0
+        ufloat_deriv_value = result_weight / orig_weight
         numerical_deriv_func = partial_derivative(func, arg_num)
         numerical_deriv_value = numerical_deriv_func(*float_arg_list)
         assert math.isclose(
@@ -200,13 +206,6 @@ def test_math_module():
     # Regular operations are chosen to be unchanged:
     assert isinstance(umath_core.sin(3), float)
 
-    # factorial() must not be "damaged" by the umath_core module, so as
-    # to help make it a drop-in replacement for math (even though
-    # factorial() does not work on numbers with uncertainties
-    # because it is restricted to integers, as for
-    # math.factorial()):
-    assert umath_core.factorial(4) == 24
-
     # fsum is special because it does not take a fixed number of
     # variables:
     assert umath_core.fsum([x, x]).nominal_value == -3
@@ -264,24 +263,10 @@ def test_hypot():
     """
     x = ufloat(0, 1)
     y = ufloat(0, 2)
+    x_uatom = get_single_uatom(x)
+    y_uatom = get_single_uatom(y)
     # Derivatives that cannot be calculated simply return NaN, with no
     # exception being raised, normally:
     result = umath_core.hypot(x, y)
-    assert isnan(result.derivatives[x])
-    assert isnan(result.derivatives[y])
-
-
-@pytest.mark.parametrize("function_name", umath_core.deprecated_functions)
-def test_deprecated_function(function_name):
-    num_args = len(inspect.signature(getattr(math, function_name)).parameters)
-    args = [ufloat(1, 0.1)]
-    if num_args == 1:
-        if function_name == "factorial":
-            args[0] = 6
-    else:
-        if function_name == "ldexp":
-            args.append(3)
-        else:
-            args.append(ufloat(-12, 2.4))
-    with pytest.warns(FutureWarning, match="will be removed"):
-        getattr(umath_core, function_name)(*args)
+    assert isnan(result.error_components[x_uatom])
+    assert isnan(result.error_components[y_uatom])

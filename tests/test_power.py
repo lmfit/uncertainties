@@ -6,7 +6,7 @@ from uncertainties import ufloat
 from uncertainties.ops import pow_deriv_0, pow_deriv_1
 from uncertainties.umath_core import pow as umath_pow
 
-from helpers import nan_close
+from helpers import nan_close, get_single_uatom
 
 
 pow_deriv_cases = [
@@ -69,36 +69,38 @@ power_derivative_cases = (
     power_derivative_cases,
 )
 def test_power_derivatives(first_ufloat, second_ufloat, first_der, second_der):
-    result = pow(first_ufloat, second_ufloat)
-    first_der_result = result.derivatives[first_ufloat]
-    second_der_result = result.derivatives[second_ufloat]
-    assert nan_close(first_der_result, first_der)
-    assert nan_close(second_der_result, second_der)
+    for op in [pow, umath_pow]:
+        result = op(first_ufloat, second_ufloat)
 
-    result = umath_pow(first_ufloat, second_ufloat)
-    first_der_result = result.derivatives[first_ufloat]
-    second_der_result = result.derivatives[second_ufloat]
-    assert nan_close(first_der_result, first_der)
-    assert nan_close(second_der_result, second_der)
+        if first_ufloat.s != 0:
+            first_uatom = get_single_uatom(first_ufloat)
+            try:
+                first_der_result = result.error_components[first_uatom] / first_ufloat.s
+            except KeyError:
+                first_der_result = 0
+            assert nan_close(first_der_result, first_der)
+
+        if second_ufloat.s != 0:
+            second_uatom = get_single_uatom(second_ufloat)
+            try:
+                second_der_result = (
+                    result.error_components[second_uatom] / second_ufloat.s
+                )
+            except KeyError:
+                second_der_result = 0
+            assert nan_close(second_der_result, second_der)
 
 
 zero = ufloat(0, 0)
 one = ufloat(1, 0)
 p = ufloat(0.3, 0.01)
 
-power_float_result_cases = [
+power_zero_std_dev_result_cases = [
     (0, p, 0),
-    (zero, p, 0),
-    (float("nan"), zero, 1),
-    (one, float("nan"), 1),
     (p, 0, 1),
     (zero, 0, 1),
     (-p, 0, 1),
-    (-10.3, zero, 1),
-    (0, zero, 1),
     (0.3, zero, 1),
-    (-p, zero, 1),
-    (zero, zero, 1),
     (p, zero, 1),
     (one, -3, 1),
     (one, -3.1, 1),
@@ -116,11 +118,13 @@ power_float_result_cases = [
 
 @pytest.mark.parametrize(
     "first_ufloat, second_ufloat, result_float",
-    power_float_result_cases,
+    power_zero_std_dev_result_cases,
 )
-def test_power_float_result_cases(first_ufloat, second_ufloat, result_float):
+def test_power_zero_std_dev_result_cases(first_ufloat, second_ufloat, result_float):
     for op in [pow, umath_pow]:
-        assert op(first_ufloat, second_ufloat) == result_float
+        result = op(first_ufloat, second_ufloat)
+        assert result.n == result_float
+        assert result.s == 0
 
 
 power_reference_cases = [

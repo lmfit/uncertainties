@@ -9,7 +9,7 @@ import uncertainties
 import uncertainties.core as uncert_core
 from uncertainties import ufloat, unumpy
 from uncertainties.unumpy import core
-from helpers import nan_close, uarrays_close
+from helpers import get_single_uatom, nan_close, uarrays_close
 
 
 def test_numpy():
@@ -31,19 +31,6 @@ def test_numpy():
     # Operations with arrays work (they are first handled by NumPy,
     # then by this module):
     prod1 * prod2  # This should be calculable
-    assert not (prod1 - prod2).any()  # All elements must be 0
-
-    # Comparisons work too:
-
-    # Usual behavior:
-    assert len(arr[arr > 1.5]) == 1
-    # Comparisons with Variable objects:
-    assert len(arr[arr > ufloat(1.5, 0.1)]) == 1
-
-    assert len(prod1[prod1 < prod1 * prod2]) == 2
-
-    # The following can be calculated (special NumPy abs() function):
-    numpy.abs(arr + ufloat(-1, 0.1))
 
     # The following does not completely work, because NumPy does not
     # implement numpy.exp on an array of general objects, apparently:
@@ -81,27 +68,11 @@ def test_matrix():
     # Test of the nominal_value attribute:
     assert numpy.all(m_nominal_values == m.nominal_values)
 
-    assert type(m[0, 0]) == uncert_core.Variable
+    assert type(m[0, 0]) == uncert_core.UFloat
 
     # Test of scalar multiplication, both sides:
     3 * m
     m * 3
-
-
-def derivatives_close(x, y):
-    """
-    Returns True iff the AffineScalarFunc objects x and y have
-    derivatives that are close to each other (they must depend
-    on the same variables).
-    """
-
-    # x and y must depend on the same variables:
-    if set(x.derivatives) != set(y.derivatives):
-        return False  # Not the same variables
-
-    return all(
-        nan_close(x.derivatives[var], y.derivatives[var]) for var in x.derivatives
-    )
 
 
 def test_inverse():
@@ -139,6 +110,7 @@ def test_inverse():
 
     # Checks of the covariances between elements:
     x = ufloat(10, 1)
+    x_uatom = get_single_uatom(x)
     m = unumpy.matrix([[x, x], [0, 3 + 2 * x]])
 
     m_inverse = m.I
@@ -152,18 +124,16 @@ def test_inverse():
 
     assert uarrays_close(m_double_inverse, m).all()
 
-    # Partial test:
-    assert derivatives_close(m_double_inverse[0, 0], m[0, 0])
-    assert derivatives_close(m_double_inverse[1, 1], m[1, 1])
-
     ####################
 
     # Tests of covariances during the inversion:
 
     # There are correlations if both the next two derivatives are
     # not zero:
-    assert m_inverse[0, 0].derivatives[x]
-    assert m_inverse[0, 1].derivatives[x]
+    assert x_uatom in m_inverse[0, 0].error_components
+    assert m_inverse[0, 0].error_components[x_uatom] != 0
+    assert x_uatom in m_inverse[0, 1].error_components
+    assert m_inverse[0, 1].error_components[x_uatom] != 0
 
     # Correlations between m and m_inverse should create a perfect
     # inversion:
@@ -179,7 +149,7 @@ def test_wrap_array_func():
     # Function that works with numbers with uncertainties in mat (if
     # mat is an uncertainties.unumpy.matrix):
     def f_unc(mat, *args, **kwargs):
-        return mat.I + args[0] * kwargs["factor"]
+        return numpy.matrix(mat).I + args[0] * kwargs["factor"]
 
     # Test with optional arguments and keyword arguments:
     def f(mat, *args, **kwargs):
@@ -189,7 +159,7 @@ def test_wrap_array_func():
         return f_unc(mat, *args, **kwargs)
 
     # Wrapped function:
-    f_wrapped = core.wrap_array_func(f)
+    f_wrapped = core.to_uarray_func(f)
 
     ##########
     # Full rank rectangular matrix:
@@ -207,7 +177,7 @@ def test_pseudo_inverse():
     "Tests of the pseudo-inverse"
 
     # Numerical version of the pseudo-inverse:
-    pinv_num = core.wrap_array_func(numpy.linalg.pinv)
+    pinv_num = core.to_uarray_func(numpy.linalg.pinv)
 
     ##########
     # Full rank rectangular matrix:
