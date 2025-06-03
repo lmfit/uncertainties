@@ -178,7 +178,7 @@ def test_pseudo_inverse():
 
     ##########
     # Full rank rectangular matrix:
-    m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
+    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
 
     # Numerical and package (analytical) pseudo-inverses: they must be
     # the same:
@@ -190,14 +190,14 @@ def test_pseudo_inverse():
     ##########
     # Example with a non-full rank rectangular matrix:
     vector = [ufloat(10, 1), -3.1, 11]
-    m = unumpy.matrix([vector, vector])
+    m = numpy.array([vector, vector])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core.pinv(m, rcond)
     assert uarrays_close(m_pinv_num, m_pinv_package).all()
 
     ##########
     # Example with a non-full-rank square matrix:
-    m = unumpy.matrix([[ufloat(10, 1), 0], [3, 0]])
+    m = numpy.array([[ufloat(10, 1), 0], [3, 0]])
     m_pinv_num = pinv_num(m, rcond)
     m_pinv_package = core.pinv(m, rcond)
     assert uarrays_close(m_pinv_num, m_pinv_package).all()
