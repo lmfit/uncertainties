@@ -55,26 +55,6 @@ def test_numpy():
     arr.mean()  # Global mean
 
 
-def test_matrix():
-    "Matrices of numbers with uncertainties"
-    # Matrix inversion:
-
-    # Matrix with a mix of Variable objects and regular
-    # Python numbers:
-
-    m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)]])
-    m_nominal_values = unumpy.nominal_values(m)
-
-    # Test of the nominal_value attribute:
-    assert numpy.all(m_nominal_values == m.nominal_values)
-
-    assert type(m[0, 0]) == uncert_core.Variable
-
-    # Test of scalar multiplication, both sides:
-    3 * m
-    m * 3
-
-
 def derivatives_close(x, y):
     """
     Returns True iff the AffineScalarFunc objects x and y have
@@ -94,48 +74,48 @@ def derivatives_close(x, y):
 def test_inverse():
     "Tests of the matrix inverse"
 
-    m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)]])
+    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)]])
     m_nominal_values = unumpy.nominal_values(m)
 
     # "Regular" inverse matrix, when uncertainties are not taken
     # into account:
-    m_no_uncert_inv = m_nominal_values.I
+    m_no_uncert_inv = numpy.linalg.inv(m_nominal_values)
 
     # The matrix inversion should not yield numbers with uncertainties:
     assert m_no_uncert_inv.dtype == numpy.dtype(float)
 
     # Inverse with uncertainties:
-    m_inv_uncert = m.I  # AffineScalarFunc elements
+    m_inv_uncert = core.inv(m)  # AffineScalarFunc elements
     # The inverse contains uncertainties: it must support custom
     # operations on matrices with uncertainties:
-    assert isinstance(m_inv_uncert, unumpy.matrix)
+    assert isinstance(m_inv_uncert, numpy.ndarray)
     assert type(m_inv_uncert[0, 0]) == uncert_core.AffineScalarFunc
 
     # Checks of the numerical values: the diagonal elements of the
     # inverse should be the inverses of the diagonal elements of
     # m (because we started with a triangular matrix):
     assert nan_close(
-        1 / m_nominal_values[0, 0], m_inv_uncert[0, 0].nominal_value
+        1 / m_nominal_values[0, 0], core.nominal_values(m_inv_uncert[0, 0])
     ), "Wrong value"
 
     assert nan_close(
-        1 / m_nominal_values[1, 1], m_inv_uncert[1, 1].nominal_value
+        1 / m_nominal_values[1, 1], core.nominal_values(m_inv_uncert[1, 1])
     ), "Wrong value"
 
     ####################
 
     # Checks of the covariances between elements:
     x = ufloat(10, 1)
-    m = unumpy.matrix([[x, x], [0, 3 + 2 * x]])
+    m = numpy.array([[x, x], [0, 3 + 2 * x]])
 
-    m_inverse = m.I
+    m_inverse = core.inv(m)
 
     # Check of the properties of the inverse:
-    m_double_inverse = m_inverse.I
+    m_double_inverse = core.inv(m_inverse)
     # The initial matrix should be recovered, including its
     # derivatives, which define covariances:
-    assert nan_close(m_double_inverse[0, 0].nominal_value, m[0, 0].nominal_value)
-    assert nan_close(m_double_inverse[0, 0].std_dev, m[0, 0].std_dev)
+    assert nan_close(m_double_inverse[0, 0].nominal_value, core.nominal_values(m[0, 0]))
+    assert nan_close(m_double_inverse[0, 0].std_dev, core.std_devs(m[0, 0]))
 
     assert uarrays_close(m_double_inverse, m).all()
 
@@ -154,7 +134,7 @@ def test_inverse():
 
     # Correlations between m and m_inverse should create a perfect
     # inversion:
-    assert uarrays_close(m * m_inverse, numpy.eye(m.shape[0])).all()
+    assert uarrays_close(m @ m_inverse, numpy.eye(m.shape[0])).all()
 
 
 def test_wrap_array_func():
