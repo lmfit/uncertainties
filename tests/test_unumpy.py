@@ -146,7 +146,7 @@ def test_wrap_array_func():
     # Function that works with numbers with uncertainties in mat (if
     # mat is an uncertainties.unumpy.matrix):
     def f_unc(mat, *args, **kwargs):
-        return mat.I + args[0] * kwargs["factor"]
+        return core.pinv(mat) + args[0] * kwargs["factor"]
 
     # Test with optional arguments and keyword arguments:
     def f(mat, *args, **kwargs):
@@ -160,7 +160,7 @@ def test_wrap_array_func():
 
     ##########
     # Full rank rectangular matrix:
-    m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
+    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
 
     # Numerical and package (analytical) pseudo-inverses: they must be
     # the same:
