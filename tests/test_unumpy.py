@@ -227,7 +227,7 @@ def test_broadcast_funcs():
     assert "acos" not in unumpy.__all__
 
 
-def test_array_and_matrix_creation():
+def test_array_creation():
     "Test of custom array creation"
 
     arr = unumpy.uarray([1, 2], [0.1, 0.2])
