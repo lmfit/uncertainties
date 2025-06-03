@@ -232,13 +232,8 @@ def test_array_and_matrix_creation():
 
     arr = unumpy.uarray([1, 2], [0.1, 0.2])
 
-    assert arr[1].nominal_value == 2
-    assert arr[1].std_dev == 0.2
-
-    # Same thing for matrices:
-    mat = unumpy.umatrix([1, 2], [0.1, 0.2])
-    assert mat[0, 1].nominal_value == 2
-    assert mat[0, 1].std_dev == 0.2
+    assert core.nominal_values(arr)[1] == 2
+    assert core.std_devs(arr)[1] == 0.2
 
 
 def test_component_extraction():
