@@ -5,7 +5,7 @@ except ImportError:
 
     sys.exit()  # There is no reason to test the interface to NumPy
 
-import uncertainties
+import uncertainties.umath
 import uncertainties.core as uncert_core
 from uncertainties import ufloat, unumpy
 from uncertainties.unumpy import core
