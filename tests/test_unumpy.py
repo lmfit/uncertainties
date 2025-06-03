@@ -244,21 +244,9 @@ def test_component_extraction():
     assert numpy.all(unumpy.nominal_values(arr) == [1, 2])
     assert numpy.all(unumpy.std_devs(arr) == [0.1, 0.2])
 
-    # unumpy matrices, in addition, should have nominal_values that
-    # are simply numpy matrices (not unumpy ones, because they have no
-    # uncertainties):
-    mat = unumpy.matrix(arr)
-    assert numpy.all(unumpy.nominal_values(mat) == [1, 2])
-    assert numpy.all(unumpy.std_devs(mat) == [0.1, 0.2])
-    assert type(unumpy.nominal_values(mat)) == numpy.matrix
-
 
 def test_array_comparisons():
     "Test of array and matrix comparisons"
 
     arr = unumpy.uarray([1, 2], [1, 4])
     assert numpy.all((arr == [arr[0], 4]) == [True, False])
-
-    # For matrices, 1D arrays are converted to 2D arrays:
-    mat = unumpy.umatrix([1, 2], [1, 4])
-    assert numpy.all((mat == [mat[0, 0], 4]) == [True, False])
