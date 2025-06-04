@@ -26,6 +26,9 @@ Removes:
    `trunc`. The following `AffineScalarFunc`/`UFloat` methods are removed:
    `__floordiv__`, `__mod__`, `__abs__`, `__trunc__`, `__lt__`, `__le__`, `__gt__`,
    `__ge__`, `__bool__`.
+- [**BREAKING**] Removes the `uncertainties.unumpy.matrix` class and the corresponding
+   `umatrix` constructor function. The `unumpy_to_numpy_matrix` function is also
+   removed. Various `unumpy` functions have dropped support for matrix compatibility.
 - [**BREAKING**] Previously it was possible for a `UFloat` object to compare equal to a
    `float` object if the `UFloat` `standard_deviation` was zero and the `UFloat`
    `nominal_value` was equal to the `float`. Now, when an equality comparison is made
