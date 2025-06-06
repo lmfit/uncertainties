@@ -7,18 +7,17 @@ from typing import Optional, Tuple, Union
 
 
 class UAtom:
-    __slots__ = ["uuid", "tag", "_hash"]
+    __slots__ = ["uuid", "tag"]
 
     def __init__(self: UAtom, tag: Optional[str] = None):
         self.tag = tag
         self.uuid: int = random.getrandbits(128)
-        self._hash = hash(self.uuid)
 
     def __eq__(self: UAtom, other: UAtom) -> bool:
         return hash(self) == hash(other)
 
     def __hash__(self: UAtom) -> int:
-        return self._hash
+        return self.uuid
 
     def __lt__(self: UAtom, other: UAtom) -> bool:
         return self.uuid < other.uuid
