@@ -89,16 +89,16 @@ class UCombo:
         return covariance
 
     def __add__(self: UCombo, other) -> UCombo:
-        if not isinstance(other, UCombo):
-            return NotImplemented
+        # if not isinstance(other, UCombo):
+        #     return NotImplemented
         return UCombo(self.ucombo_tuple + other.ucombo_tuple)
 
     def __radd__(self: UCombo, other: UCombo) -> UCombo:
         return self.__add__(other)
 
     def __mul__(self: UCombo, scalar: Union[float, int]) -> UCombo:
-        if not isinstance(scalar, (float, int)):
-            return NotImplemented
+        # if not isinstance(scalar, (float, int)):
+        #     return NotImplemented
         return UCombo(((self, float(scalar)),))
 
     def __rmul__(self: UCombo, scalar: Union[float, int]) -> UCombo:
