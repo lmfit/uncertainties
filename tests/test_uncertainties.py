@@ -51,7 +51,7 @@ def test_UFloat_class_construction():
     assert x.std_dev == 0.14
     assert get_single_uatom(x).tag == "pi"
 
-    with pytest.raises(uncert_core.NegativeStdDev):
+    with pytest.raises(ValueError):
         _ = UFloat(3, -0.1)
 
     with pytest.raises(TypeError):
