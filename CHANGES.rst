@@ -40,6 +40,13 @@ Removes:
 - [**BREAKING**] Previously if a negative `std_dev` was used to construct a `UFloat`
    object a custom `NegativeStdDev` exception was raised. Now a standard `ValueError`
    exception is raised.
+- Previously it was possible to generate and print `UFloat` objects with very large
+   values, e.g. `ufloat(3.14e200, 0.1e200)`. However, applying any mathematical
+   operation would result in an `OverflowError` rendering these objects of minimal use.
+   As a result of other changes, it is no longer possible to print such large `UFloat`
+   objects. It is still possible to generate large `UFloat` objects, but operations
+   still result in `OverflowError` and their use is generally not supported.
+
 
 Unreleased
 ----------
