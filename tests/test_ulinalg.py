@@ -43,7 +43,7 @@ def test_list_pseudo_inverse():
 
     x = ufloat(1, 0.1)
     y = ufloat(2, 0.1)
-    mat = [[x, x], [y, 0]]
+    mat = numpy.array([[x, x], [y, 0]])
 
     # Internal consistency: the inverse and the pseudo-inverse yield
     # the same result on square matrices:
