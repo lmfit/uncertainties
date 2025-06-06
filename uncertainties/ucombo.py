@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from collections import defaultdict
 from math import sqrt
+import random
 from typing import Optional, Tuple, Union
-import uuid
 
 
 class UAtom:
@@ -11,7 +11,7 @@ class UAtom:
 
     def __init__(self: UAtom, tag: Optional[str] = None):
         self.tag = tag
-        self.uuid: uuid.UUID = uuid.uuid1()
+        self.uuid: int = random.getrandbits(128)
         self._hash = hash(self.uuid)
 
     def __eq__(self: UAtom, other: UAtom) -> bool:
