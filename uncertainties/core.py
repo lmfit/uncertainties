@@ -279,7 +279,7 @@ class UFloat(object):
         self._nominal_value = float(nominal_value)
         if isinstance(uncertainty, (float, int)):
             if not isnan(uncertainty) and uncertainty < 0:
-                raise NegativeStdDev("The standard deviation cannot be negative")
+                raise ValueError("The standard deviation cannot be negative")
             uncertainty = UCombo(((UAtom(tag=tag), float(uncertainty)),))
         self._uncertainty = uncertainty
 
@@ -428,15 +428,6 @@ def wrap(f, derivatives_args=None, derivatives_kwargs=None):
         derivatives_args=derivatives_args,
         derivatives_kwargs=derivatives_kwargs,
     )
-
-
-###############################################################################
-
-
-class NegativeStdDev(Exception):
-    """Raise for a negative standard deviation"""
-
-    pass
 
 
 ###############################################################################
