@@ -11,7 +11,7 @@ class UAtom:
 
     def __init__(self: UAtom, tag: Optional[str] = None):
         self.tag = tag
-        self.uuid: uuid.UUID = uuid.uuid4()
+        self.uuid: uuid.UUID = uuid.uuid1()
         self._hash = hash(self.uuid)
 
     def __eq__(self: UAtom, other: UAtom) -> bool:
