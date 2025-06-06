@@ -522,9 +522,9 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
 
         for pos in pos_w_uncert:
             arg_uncertainty = args[pos].uncertainty
-            if arg_uncertainty:
-                derivative_val = derivatives_args_index[pos](*args_values, **kwargs)
-                uncertainty += derivative_val * arg_uncertainty
+            # if arg_uncertainty:
+            derivative_val = derivatives_args_index[pos](*args_values, **kwargs)
+            uncertainty += derivative_val * arg_uncertainty
 
         for name in names_w_uncert:
             # Optimization: caching of the automatic numerical
@@ -532,8 +532,8 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
             # discovered. This gives a speedup when the original
             # function is called repeatedly with the same keyword
             # arguments:
-            if not kwargs_uncert_values[name].uncertainty:
-                continue
+            # if not kwargs_uncert_values[name].uncertainty:
+            #     continue
             derivative_func = derivatives_all_kwargs.setdefault(
                 name,
                 # Derivative never needed before:
