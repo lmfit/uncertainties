@@ -37,6 +37,9 @@ Removes:
    `float` this means that the equality comparison always returns `False`.
 - [**BREAKING**] The `uncertainties` package is generally dropping formal support for
    edge cases involving `UFloat` objects with `std_dev == 0`.
+- [**BREAKING**] Previously if a negative `std_dev` was used to construct a `UFloat`
+   object a custom `NegativeStdDev` exception was raised. Now a standard `ValueError`
+   exception is raised.
 
 Unreleased
 ----------

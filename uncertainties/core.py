@@ -705,12 +705,6 @@ def wrap(f, derivatives_args=None, derivatives_kwargs=None):
 ###############################################################################
 
 
-class NegativeStdDev(Exception):
-    """Raise for a negative standard deviation"""
-
-    pass
-
-
 class Variable(AffineScalarFunc):
     """
     Representation of a float-like scalar Variable with its uncertainty.
@@ -780,7 +774,7 @@ class Variable(AffineScalarFunc):
         # separately for NaN. But this is not guaranteed, even if it
         # should work on most platforms.)
         if std_dev < 0 and isfinite(std_dev):
-            raise NegativeStdDev("The standard deviation cannot be negative")
+            raise ValueError("The standard deviation cannot be negative")
 
         self._std_dev = float(std_dev)
 

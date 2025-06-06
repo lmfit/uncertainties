@@ -55,7 +55,7 @@ def test_ufloat_function_construction():
     assert x.std_dev == 0.14
     assert x.tag == "pi"
 
-    with pytest.raises(uncert_core.NegativeStdDev):
+    with pytest.raises(ValueError):
         _ = ufloat(3, -0.1)
 
     with pytest.raises(TypeError):
