@@ -60,7 +60,7 @@ The quantities with uncertainties created by the :mod:`uncertainties`
 package can be `pickled <http://docs.python.org/library/pickle.html>`_
 (they can be stored in a file, for instance).
 
-If multiple variables are pickled together (including when pickling
+If multiple :class:`UFloat` objects are pickled together (including when pickling
 :doc:`NumPy arrays <numpy_guide>`), their correlations are preserved:
 
 >>> import pickle
@@ -72,20 +72,16 @@ If multiple variables are pickled together (including when pickling
 >>> y2 - 2*x2
 0.0+/-0
 
-The final result is exactly zero because the unpickled variables :data:`x2`
-and :data:`y2` are completely correlated.
+The final result is exactly zero because the unpickled :class:`UFloat` objects
+:data:`x2` and :data:`y2` are completely correlated.
 
-However, **unpickling necessarily creates new variables that bear no
-relationship with the original variables** (in fact, the pickled
-representation can be stored in a file and read from another program
-after the program that did the pickling is finished: the unpickled
-variables cannot be correlated to variables that can disappear).  Thus
+The original :class:`UFloat` object is also correlated with its unpickled counerpart:
 
 >>> x - x2
-0.0+/-0.14142135623730953
+0.0+/-0
 
 which shows that the original variable :data:`x` and the new variable :data:`x2`
-are completely uncorrelated.
+are completely correlated.
 
 
 .. index:: comparison operators; technical details
