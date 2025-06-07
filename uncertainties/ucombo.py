@@ -96,12 +96,10 @@ class UCombo:
     def __radd__(self: UCombo, other: UCombo) -> UCombo:
         return self.__add__(other)
 
-    def __mul__(self: UCombo, scalar: Union[float, int]) -> UCombo:
-        # if not isinstance(scalar, (float, int)):
-        #     return NotImplemented
+    def __mul__(self: UCombo, scalar: float) -> UCombo:
         return UCombo(((self, float(scalar)),))
 
-    def __rmul__(self: UCombo, scalar: Union[float, int]) -> UCombo:
+    def __rmul__(self: UCombo, scalar: float) -> UCombo:
         return self.__mul__(scalar)
 
     def __iter__(self: UCombo):
