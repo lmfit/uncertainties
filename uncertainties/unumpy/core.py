@@ -23,6 +23,7 @@ import numpy
 import uncertainties.umath_core as umath_core
 import uncertainties.core as uncert_core
 from uncertainties import UFloat
+from uncertainties.ops import ufloat_from_uncertainty
 from uncertainties.ucombo import UCombo
 
 
@@ -202,7 +203,9 @@ def to_uarray_func(func, derivs=None):
                                 )
                             ucombo_array += numpy.array(deriv_arr) * u_num.uncertainty
 
-        u_array = numpy.vectorize(UFloat)(new_nominal_array, ucombo_array)
+        u_array = numpy.vectorize(ufloat_from_uncertainty)(
+            UFloat, new_nominal_array, ucombo_array
+        )
         if return_matrix:
             u_array = numpy.matrix(u_array)
         return u_array

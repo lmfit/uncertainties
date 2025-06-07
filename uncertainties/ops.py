@@ -343,6 +343,16 @@ class IndexableIter(object):
         )
 
 
+def ufloat_from_uncertainty(cls, nominal_value: float, uncertainty: UCombo):
+    # TODO: It is a hack that needs to be removed that this function uses a generic
+    #   cls input. This issue stems from the monkey patching that connects core.py and
+    #   ops.py.
+    result = object.__new__(cls)
+    result._nominal_value = nominal_value
+    result._uncertainty = uncertainty
+    return result
+
+
 def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
     if derivatives_args is None:
         derivatives_args = []
@@ -544,7 +554,7 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
 
         # The function now returns the necessary linear approximation
         # to the function:
-        return cls(f_nominal_value, uncertainty)
+        return ufloat_from_uncertainty(cls, f_nominal_value, uncertainty)
 
     f_with_affine_output = set_doc(
         """\

@@ -16,7 +16,7 @@ from __future__ import division  # Many analytical derivatives depend on this
 
 from builtins import str, zip, range, object
 from math import isnan, sqrt  # Optimization: no attribute look-up
-from typing import Optional, Union
+from typing import Optional
 import functools
 from warnings import warn
 
@@ -206,7 +206,8 @@ def correlated_values_norm(values_with_std_dev, correlation_mat, tags=None):
 
     # Representation of the initial correlated values:
     values_funcs = tuple(
-        UFloat(value, corr_var) for (corr_var, value) in zip(corr_vars, nominal_values)
+        ops.ufloat_from_uncertainty(UFloat, value, corr_var)
+        for (corr_var, value) in zip(corr_vars, nominal_values)
     )
 
     return values_funcs
@@ -261,7 +262,7 @@ class UFloat(object):
     def __init__(
         self,
         nominal_value: float,
-        uncertainty: Union[UCombo, Union[float, int]],
+        std_dev: float,
         tag: Optional[str] = None,
     ):
         """
@@ -277,11 +278,9 @@ class UFloat(object):
         float such that a new UCombo and UAtom is generated.
         """
         self._nominal_value = float(nominal_value)
-        if isinstance(uncertainty, (float, int)):
-            if not isnan(uncertainty) and uncertainty < 0:
-                raise ValueError("The standard deviation cannot be negative")
-            uncertainty = UCombo(((UAtom(tag=tag), float(uncertainty)),))
-        self._uncertainty = uncertainty
+        if not isnan(std_dev) and std_dev < 0:
+            raise ValueError("The standard deviation cannot be negative")
+        self._uncertainty = UCombo(((UAtom(tag=tag), float(std_dev)),))
 
     @property
     def nominal_value(self):
