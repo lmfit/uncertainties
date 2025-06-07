@@ -11,7 +11,7 @@ class UAtom:
 
     def __init__(self: UAtom, tag: Optional[str] = None):
         self.tag = tag
-        self.uuid: int = random.getrandbits(128)
+        self.uuid: int = random.getrandbits(64)
         self._hash = hash(self.uuid)
 
     def __eq__(self: UAtom, other: UAtom) -> bool:
@@ -24,7 +24,8 @@ class UAtom:
         return self.uuid < other.uuid
 
     def __str__(self: UAtom) -> str:
-        uuid_abbrev = f"{str(self.uuid)[0:2]}..{str(self.uuid)[-2:]}"
+        uuid_str = format(self.uuid, "x")
+        uuid_abbrev = f"{str(uuid_str)[0:2]}..{str(uuid_str)[-2:]}"
         if self.tag is not None:
             label = f"{self.tag}, {uuid_abbrev}"
         else:
@@ -32,7 +33,7 @@ class UAtom:
         return f"{self.__class__.__name__}({label})"
 
     def __repr__(self: UAtom) -> str:
-        return f"{self.__class__.__name__}({self.uuid})"
+        return f"{self.__class__.__name__}({self.uuid:x})"
 
 
 class UCombo:
