@@ -76,41 +76,6 @@ through NumPy, thanks to NumPy's support of arrays of arbitrary objects:
 
 >>> arr = np.array([ufloat(1, 0.1), ufloat(2, 0.002)])
 
-.. index::
-   single: matrices; creation and manipulation
-   single: creation; matrices
-
-Matrices
-^^^^^^^^
-
-.. warning::
-   ``unumpy.umatrix`` is deprecated and will be removed in Uncertainties 4.0.
-
-Matrices of numbers with uncertainties are best created in one of
-two ways.  The first way is similar to using :func:`uarray`:
-
->>> mat = unumpy.umatrix([1, 2], [0.01, 0.002])
-
-Matrices can also be built by converting arrays of numbers with
-uncertainties into matrices through the :class:`unumpy.matrix` class:
-
->>> mat = unumpy.matrix(arr)
-
-:class:`unumpy.matrix` objects behave like :class:`numpy.matrix`
-objects of numbers with uncertainties, but with better support for
-some operations (such as matrix inversion).  For instance, regular
-NumPy matrices cannot be inverted, if they contain numbers with
-uncertainties (i.e., ``numpy.matrix([[ufloat(…), …]]).I`` does not
-work).  This is why the :class:`unumpy.matrix` class is provided: both
-the inverse and the pseudo-inverse of a matrix can be calculated in
-the usual way: if :data:`mat` is a :class:`unumpy.matrix`,
-
->>> print(mat.I)
-[[0.19999999999999996+/-0.012004265908417718]
- [0.3999999999999999+/-0.01600179989876138]]
-
-does calculate the inverse or pseudo-inverse of :data:`mat` with
-uncertainties.
 
 .. index::
    pair: nominal value; uniform access (array)
@@ -120,14 +85,11 @@ uncertainties.
 Uncertainties and nominal values
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Nominal values and uncertainties in arrays (and matrices) can be
-directly accessed (through functions that work on pure float arrays
-too):
+Nominal values and uncertainties in arrays can be directly accessed (through functions
+that work on pure float arrays too):
 
 >>> unumpy.nominal_values(arr)
 array([1., 2.])
->>> unumpy.std_devs(mat)
-matrix([[0.1  , 0.002]])
 
 
 .. index:: mathematical operation; on an array of numbers
@@ -263,6 +225,7 @@ numbers with uncertainties, the **matrix inverse and pseudo-inverse**:
 
 >>> print(unumpy.ulinalg.inv([[ufloat(2, 0.1)]]))
 [[0.5+/-0.025]]
+>>> mat = np.array([[ufloat(1, 0.1), ufloat(2, 0.002)]])
 >>> print(unumpy.ulinalg.pinv(mat))
 [[0.19999999999999996+/-0.012004265908417718]
  [0.3999999999999999+/-0.01600179989876138]]
