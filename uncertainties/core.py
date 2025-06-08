@@ -292,20 +292,11 @@ class UFloat(object):
         """Abbreviation for nominal_value"""
         return self.nominal_value
 
-    @property
-    def uncertainty(self):
-        return self._uncertainty
+    def covariance(self, other: "UFloat"):
+        return self._uncertainty.covariance(other._uncertainty)
 
-    @property
-    def u(self):
-        """Abbreviation for uncertainty."""
-        return self.uncertainty
-
-    def covariance(self, other):
-        return self.uncertainty.covariance(other.uncertainty)
-
-    def correlation(self, other):
-        return self.uncertainty.correlation(other.uncertainty)
+    def correlation(self, other: "UFloat"):
+        return self._uncertainty.correlation(other._uncertainty)
 
     @property
     def error_components(self):
@@ -317,12 +308,12 @@ class UFloat(object):
         This method returns a dictionary mapping each UAtom with which the
         AffineScalarFunc is correlated to its corresponding float weight.
         """
-        return self.uncertainty.expanded
+        return self._uncertainty.expanded
 
     @property
     def std_dev(self):
         """Standard deviation of the affine function."""
-        return self.uncertainty.std_dev
+        return self._uncertainty.std_dev
 
     @property
     def s(self):
@@ -332,7 +323,7 @@ class UFloat(object):
     def __eq__(self, other):
         if not isinstance(other, type(self)):
             return NotImplemented
-        return self.n == other.n and self.u == other.u
+        return self.n == other.n and self._uncertainty == other._uncertainty
 
     def __repr__(self):
         if self.std_dev == 0:
@@ -347,7 +338,7 @@ class UFloat(object):
         return self.format("")
 
     def __hash__(self):
-        return hash((self.nominal_value, self.uncertainty))
+        return hash((self.nominal_value, self._uncertainty))
 
     @set_doc(format_ufloat.__doc__)
     def __format__(self, format_spec):
@@ -467,13 +458,6 @@ def std_dev(x):
         return x.std_dev
     else:
         return 0.0
-
-
-def uncertainty(x):
-    if isinstance(x, UFloat):
-        return x.uncertainty
-    else:
-        return UCombo(())
 
 
 def covariance_matrix(nums_with_uncert):

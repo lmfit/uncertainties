@@ -139,7 +139,7 @@ def test_ufloat_fromstr(input_str, nominal_value, std_dev):
     if std_dev != 0:
         assert get_single_uatom(num).tag is None
     else:
-        assert num.uncertainty.expanded == {}
+        assert num.error_components == {}
 
     # With a tag as positional argument:
     num = ufloat_fromstr(input_str, "test variable")
@@ -148,7 +148,7 @@ def test_ufloat_fromstr(input_str, nominal_value, std_dev):
     if std_dev != 0:
         assert get_single_uatom(num).tag == "test variable"
     else:
-        assert num.uncertainty.expanded == {}
+        assert num.error_components == {}
 
     # With a tag as keyword argument:
     num = ufloat_fromstr(input_str, tag="test variable")
@@ -157,7 +157,7 @@ def test_ufloat_fromstr(input_str, nominal_value, std_dev):
     if std_dev != 0:
         assert get_single_uatom(num).tag == "test variable"
     else:
-        assert num.uncertainty.expanded == {}
+        assert num.error_components == {}
 
 
 ufloat_method_cases_json_path = Path(

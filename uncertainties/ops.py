@@ -531,7 +531,7 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
         uncertainty = UCombo(())
 
         for pos in pos_w_uncert:
-            arg_uncertainty = args[pos].uncertainty
+            arg_uncertainty = args[pos]._uncertainty
             # if arg_uncertainty:
             derivative_val = derivatives_args_index[pos](*args_values, **kwargs)
             uncertainty += derivative_val * arg_uncertainty
@@ -550,7 +550,7 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
                 partial_derivative(f, name),
             )
             derivative_val = derivative_func(*args_values, **kwargs)
-            uncertainty += derivative_val * kwargs_uncert_values[name].uncertainty
+            uncertainty += derivative_val * kwargs_uncert_values[name]._uncertainty
 
         # The function now returns the necessary linear approximation
         # to the function:

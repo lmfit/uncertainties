@@ -177,7 +177,7 @@ def to_uarray_func(func, derivs=None):
                     deriv_arr = array_numerical_partial_derivative(
                         func, label, None, *float_args, **float_kwargs
                     )
-                ucombo_array += deriv_arr * arg.uncertainty
+                ucombo_array += deriv_arr * arg._uncertainty
             elif isinstance(arg, numpy.ndarray):
                 if isinstance(arg.flat[0], UFloat):
                     it = numpy.nditer(arg, flags=["multi_index", "refs_ok"])
@@ -201,7 +201,7 @@ def to_uarray_func(func, derivs=None):
                                     *float_args,
                                     **float_kwargs,
                                 )
-                            ucombo_array += numpy.array(deriv_arr) * u_num.uncertainty
+                            ucombo_array += numpy.array(deriv_arr) * u_num._uncertainty
 
         u_array = numpy.vectorize(ufloat_from_uncertainty)(
             UFloat, new_nominal_array, ucombo_array
@@ -247,11 +247,6 @@ to_std_devs = numpy.vectorize(
         "Return the standard deviation of the numbers with uncertainties"
         " contained in a NumPy array, or zero for other objects."
     ),
-)
-
-to_uncertainties = numpy.vectorize(
-    uncert_core.uncertainty,
-    otypes=[object],
 )
 
 
