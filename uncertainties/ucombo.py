@@ -84,10 +84,13 @@ class UCombo:
         self_uatoms = set(self.expanded.keys())
         other_uatoms = set(other.expanded.keys())
         shared_uatoms = self_uatoms.intersection(other_uatoms)
-        covariance = 0
+        covariance = 0.0
         for uatom in shared_uatoms:
             covariance += self.expanded[uatom] * other.expanded[uatom]
         return covariance
+
+    def correlation(self: UCombo, other: UCombo):
+        return self.covariance(other) / (self.std_dev * other.std_dev)
 
     def __add__(self: UCombo, other) -> UCombo:
         # if not isinstance(other, UCombo):

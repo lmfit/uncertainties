@@ -304,6 +304,9 @@ class UFloat(object):
     def covariance(self, other):
         return self.uncertainty.covariance(other.uncertainty)
 
+    def correlation(self, other):
+        return self.uncertainty.correlation(other.uncertainty)
+
     @property
     def error_components(self):
         """
