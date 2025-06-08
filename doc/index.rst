@@ -14,9 +14,9 @@ The :mod:`uncertainties` package takes the pain and
 complexity out of uncertainty calculations and error propagation.  Here is a
 quick taste of how to use :mod:`uncertainties`:
 
->>> from uncertainties import ufloat
->>> x = ufloat(2, 0.1)   # x = 2+/-0.1
->>> y = ufloat(3, 0.2)   # y = 3+/-0.2
+>>> from uncertainties import UFloat
+>>> x = UFloat(2, 0.1)   # x = 2+/-0.1
+>>> y = UFloat(3, 0.2)   # y = 3+/-0.2
 >>> print(2*x)
 4.00+/-0.20
 >>> print(x+y)
