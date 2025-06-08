@@ -27,13 +27,16 @@ class UAtom:
         uuid_str = format(self.uuid, "x")
         uuid_abbrev = f"{str(uuid_str)[0:2]}..{str(uuid_str)[-2:]}"
         if self.tag is not None:
-            label = f"{self.tag}, {uuid_abbrev}"
+            label = f'{uuid_abbrev}, tag="{self.tag}"'
         else:
             label = uuid_abbrev
         return f"{self.__class__.__name__}({label})"
 
     def __repr__(self: UAtom) -> str:
-        return f"{self.__class__.__name__}({self.uuid:x})"
+        if self.tag is None:
+            return f"{self.__class__.__name__}({self.uuid:x})"
+        else:
+            return f'{self.__class__.__name__}({self.uuid:x}, tag="{self.tag}"))'
 
 
 class UCombo:
