@@ -4,6 +4,11 @@ Change Log
 Unreleased 4.x
 --------------
 
+Adds:
+
+- Adds `UFloat.covariance()` and `UFloat.correlation()` methods to allow easy
+   calclation of the correlation and covariance between two `UFloat` objects.
+
 Changes:
 
 - Includes the `main` branch in continuous integration automation.
