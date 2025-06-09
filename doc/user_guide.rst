@@ -1,6 +1,3 @@
-from scipy.linalg.cython_blas import dzasum.. index:: user guide
-.. _user guide:
-
 ==========
 User Guide
 ==========
@@ -26,8 +23,8 @@ sub-modules for :ref:`advanced mathematical functions <advanced math operations>
 .. index::
    pair: number with uncertainty;
 
-Creating UFloat objects: numbers with uncertainties
-===================================================
+Creating UFloat Objects
+=======================
 
 :class:`UFloat` objects are directly instantiated by passing in a :class:`float`
 *nominal value* and positive :class:`float` *standard deviation*.
@@ -86,14 +83,14 @@ factory method:
 >>> print(y)
 4.5+/-1.2
 
-However, it is now encouraged to instantiate :class:`UFloat` objects directy using the
+However, it is now encouraged to instantiate :class:`UFloat` objects directly using the
 class constructor.
 
 More details on the :class:`UFloat` class and :func:`ufloat_from_str` :func:`ufloat`
 functions can be found in :ref:`api_funcs`.
 
-Basic math with UFloat objects
-==============================
+Basic Arithmetic with UFloat Objects
+====================================
 
 Uncertainties :class:`UFloat` objects can be used in basic mathematical calculations
 (``+``, ``-``, ``*``, ``/``, ``**``)
@@ -118,7 +115,7 @@ So we see that we can perform basic mathematical operations between :class:`UFlo
 We can also see that :mod:`uncertainties` handles the mathematical propagation of the
 uncertainty to the final result.
 
-.. _linear_uncertainty_math
+.. _linear_uncertainty_math:
 
 Linear Uncertainty Propagation
 ==============================
@@ -194,7 +191,7 @@ A :class:`UAtom` object is like the ``dx``, ``dy``, or ``dz`` random variables a
 It is like an independent random variable with zero mean and unity variance.
 Whenver a new :class:`UFloat` object is directly instantiated, a new  :class:`UAtom`
 is generated with a unique identifer.
-Let's study the single :class:`UAtom` object responsible for the uncertainty in ``A``::
+Let's study the single :class:`UAtom` object responsible for the uncertainty in ``A``:
 
 >>> single_uatom = list(A.error_components.keys())[0]
 >>> print(type(single_uatom))
@@ -213,7 +210,7 @@ We will demonstrate usage of the :attr:`tag` attribute below, but for now, it is
 important to know that the :attr:`tag` attribute is not unique between :class:`UAtom`
 instances and it in no way replaces the :attr:`uuid` attribute.
 
-We can now reproduce the manipulations in the `<linear_uncertainty_math>`_ section.
+We can now reproduce the manipulations in the :ref:`linear_uncertainty_math` section.
 
 >>> dx = UFloat(0, 1)
 >>> print(dx.error_components)
@@ -311,12 +308,24 @@ We can calculate the covariance and correlation between ``x`` and ``y``
 >>> print(x.correlation(x))
 1.0
 
+Here is one more set of examples:
+
+>>> x = UFloat(0.2, 0.01)
+>>> square = x**2
+>>> print(square)
+0.040+/-0.004
+>>> print(square - x*x)
+0.0+/-0
+>>> y = x*x + 1
+>>> print(y - square)
+1.0+/-0
+
 .. index:: mathematical operation; on a scalar, umath
 
 .. _advanced math operations:
 
-Mathematical operations with uncertain UFloat objects
-=====================================================
+Mathematical operations with UFloat objects
+===========================================
 
 Besides being able to apply basic arithmetic operations to uncertainties
 :class`UFloat` objects, this package provides generalized versions of 40 of the the
@@ -419,19 +428,35 @@ NaN values can appear in either the nominal value or uncertainty of a
 Variable.  As is always the case, care must be exercised when handling NaN
 values.
 
-While :func:`math.isnan` and :func:`numpy.isnan` will raise `TypeError`
-exceptions for uncertainties :class:`UFloat` objects (because an uncertainties
-:class:`UFloat` object is not a float), the function :func:`umath.isnan` will return
-whether the nominal value of a Variable is NaN.  Similarly, :func:`umath.isinf` will
-return whether the nominal value of a Variable is infinite.
+The standard library :func:`math.isnan` and :func:`numpy.isnan` functions will raise
+``TypeError`` exceptions for :mod:`uncertainties` :class:`UFloat` objects since these
+functions can only handle :class:`float` input.
+The :mod:`uncertainties` package provides the :func:`umath.isnan` function which reports
+if the :attr:`nominal_value` attribute of a :class:`UFloat` object is NaN or not.
 
-To check whether the uncertainty is NaN or Inf, use one of :func:`math.isnan`,
-:func:`math.isinf`, :func:`nupmy.isnan`, or , :func:`nupmy.isinf` on the
-``std_dev`` attribute.
+>>> from uncertainties import umath
+>>> print(umath.isnan(UFloat(float("nan"), float("nan"))))
+True
+>>> print(umath.isnan(UFloat(float("nan"), 0.1)))
+True
+>>> print(umath.isnan(UFloat(1.0, float("nan"))))
+False
+>>> print(umath.isnan(UFloat(1.0, 0.1)))
+False
 
+The :func:`umath.isinf` function detects if the :attr:`nominal_value` is infinite.
+
+To check if the :attr:`std_dev` attribute of a :class:`UFloat` object is
+NaN or infinite, you must explicitly apply the :func:`math.isnan` or :func:`math.isinf`
+function to the :attr:`std_dev` attribute of the :class:`UFloat` object.
+
+>>> import math
+>>> print(math.isinf(UFloat(1, float("inf")).s))
+True
+>>> print(math.isnan(UFloat(1, float("nan")).s))
+True
 
 .. index:: correlations; detailed example
-
 
 Power Function Behavior
 =======================
@@ -439,10 +464,8 @@ Power Function Behavior
 The value of one :class:`UFloat` raised to the power of another can be calculated in two
 ways:
 
->>> from uncertainties import umath
->>>
->>> x = ufloat(4.5, 0.2)
->>> y = ufloat(3.4, 0.4)
+>>> x = UFloat(4.5, 0.2)
+>>> y = UFloat(3.4, 0.4)
 >>> print(x**y)
 (1.7+/-1.0)e+02
 >>> print(umath.pow(x, y))
