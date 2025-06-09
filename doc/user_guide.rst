@@ -289,42 +289,9 @@ between two :class:`UFloat` objects
 >>> print(C.correlation(B))
 0.8908553128346921
 
-
-Correlations between UFloat objects
-===================================
-
-We see that, when adding two uncorrelated :class:`UFloat` objects, the standard deviation in the
-resulting :class:`UFloat` object is the quadrature sum (square-root of the sum of
-squares) of the standard deviations of the two input :class:`UFloat` objects.
-
->>> x = UFloat(20, 4)
->>> y = UFloat(12, 3)
->>> print(x+y)
-32+/-5
-
-Indeed, we can calculate this explicitly
-
->>> from math import sqrt
->>> print((x+y).s == sqrt(x.s**2 + y.s**2))
-True
-
-
-Note that any newly instantiated :class:`UFloat` object has no correlation with any
-previously generated :class:`UFloat` object.
-However, consider the behavior when we add a :class:`UFloat` object to itself:
-
->>> print(x+x)
-40+/-8
->>> print(3*x + 10)
-70+/-12
-
-In this case the resulting standard deviation is not the quadrature sum of the
-standard deviation on the inputs.
-This is because the :class:`UFloat` ``x`` is correlated with itself so the error
-propagation must be handled accordingly.
-This begins to demonstrate that calculations performed using :class:`UFloat` objects are
-aware of correlations between :class:`UFloat` objects.
-This is demonstrated in these two simple examples:
+We plainly see how the :mod:`uncertainties` package is aware of the correlation, or
+lack of correlation, between :class:`UFloat` objects by looking at the following simple
+example
 
 >>> x = UFloat(5, 0.5)
 >>> y = UFloat(5, 0.5)
@@ -333,7 +300,7 @@ This is demonstrated in these two simple examples:
 >>> print(x - x)
 0.0+/-0
 
-Indeed, we can calculate the covariance and correlation between ``x`` and ``y``
+We can calculate the covariance and correlation between ``x`` and ``y``
 
 >>> print(x.covariance(y))
 0.0
@@ -343,9 +310,6 @@ Indeed, we can calculate the covariance and correlation between ``x`` and ``y``
 0.25
 >>> print(x.correlation(x))
 1.0
-
-So we see that ``x`` and ``y`` are entirely uncorrelated while ``x`` is entirely
-correlated with itself.
 
 .. index:: mathematical operation; on a scalar, umath
 
@@ -360,7 +324,7 @@ functions from the standard :mod:`math` *module*.  These mathematical functions
 are found in the :mod:`uncertainties.umath` module:
 
     >>> from uncertainties.umath import sin, exp, sqrt
-    >>> x   = ufloat(0.2, 0.01)
+    >>> x = ufloat(0.2, 0.01)
     >>> sin(x)
     0.19866933079506122+/-0.009800665778412416
     >>> sin(x*x)
@@ -370,15 +334,27 @@ are found in the :mod:`uncertainties.umath` module:
     >>> sqrt(230*x + 3)
     7.0+/-0.16428571428571428
 
+We can verify the ``sin(x)`` example follows the linear error propagation formula above.
+We know the derivative of ``sin(x)`` is ``cos(x)``. So, if ``x`` only depends on a
+single :class:`UAtom` as it does in this example, we expect the corresponding error
+contribution to be ``cos(x0)`` times the weight of that :class:`UAtom` for ``x``, 0.01.
+
+>>> from uncertainties.umath import cos
+>>> print(x.error_components)
+{UAtom(8b9d2434e465e150): 0.01}
+>>> print(0.01 * cos(0.2))
+0.009800665778412416
+>>> print(sin(x).error_components)
+{UAtom(8b9d2434e465e150): 0.009800665778412416}
+
+We see the expected weighting.
 
 The functions in the :mod:`uncertainties.umath` module include:
 
-    ``acos``, ``acosh``, ``asin``, ``asinh``, ``atan``, ``atan2``, ``atanh``,
-    ``ceil``, ``copysign``, ``cos``, ``cosh``, ``degrees``, ``erf``, ``erfc``,
-    ``exp``, ``expm1``, ``fabs``, ``factorial``, ``floor``, ``fmod``,
-    ``frexp``, ``fsum``, ``gamma``, ``hypot``, ``isinf``, ``isnan``,
-    ``ldexp``, ``lgamma``, ``log``, ``log10``, ``log1p``, ``modf``,
-    ``pow``, ``radians``, ``sin``, ``sinh``, ``sqrt``, ``tan``, ``tanh``, ``trunc``
+    ``acos``, ``acosh``, ``asin``, ``asinh``, ``atan``, ``atan2``, ``atanh``, ``cos``,
+    ``cosh``, ``degrees``, ``erf``, ``erfc``, ``exp``, ``expm1``, ``fsum``, ``gamma``,
+    ``hypot``, ``isinf``, ``isnan``, ``lgamma``, ``log``, ``log10``, ``log1p``, ``pow``,
+    ``radians``, ``sin``, ``sinh``, ``sqrt``, ``tan``, ``tanh``,
 
 
 Comparison operators
@@ -387,6 +363,19 @@ Comparison operators
 .. warning::
    Support for comparing variables with uncertainties is deprecated and will be
    removed in Uncertainties 4.0.
+
+Two :class:`UFloat` objects are equal if their nominal values are equal as
+:class:`float` objects and their :attr:`error_components` dictionaries are equal.
+Note that if  a :class:`UFloat` object is ever found to have dependence on a
+:class:`UAtom` object with a weight of 0 then that :class:`UAtom` is excluded from the
+:attr:`error_components`.
+
+>>> x = ufloat(5, 0.5)
+>>> y = ufloat(5, 0.5)
+>>> print(x == x)
+True
+>>> print(x == y)
+False
 
 Comparison operators (``==``, ``!=``, ``>``, ``<``, ``>=``, and ``<=``) for Variables with
 uncertainties are somewhat complicated, and need special attention.  As we
@@ -401,31 +390,23 @@ If we compare the equality of two :class:`UFloat` objects with the same nominal 
 and standard deviation, we see
 
 >>> x = ufloat(5, 0.5)
->>> y = ufloat(5, 0.5)
->>> x == x
+>>> print(x == x)
 True
+
+However, if we define a new :class:`UFloat` object with the same nominal value and
+standard deviation we find::
+
+>>> y = ufloat(5, 0.5)
 >>> x == y
 False
 
-The difference here is that although the two :class:`UFloat` objects have the same
-nominal value and standard deviation, they model two *uncorrelated* random variables.
-This can be demonstrated with the :meth:`UFloat.covariance` method.
+We can see that this is because ``x`` and ``y`` depend on independent :class:`UAtom`
+objects.
 
->>> print(x.covariance(x))
-0.25
->>> print(x.covariance(y))
-0
-
-In order for the result of two calculations with uncertainties to be considered
-equal, the :mod:`uncertainties` package does not test whether the nominal value
-and the standard deviation have the same value.  Instead it checks whether the
-difference of the two calculations has a nominal value of 0 *and* a standard deviation
-of 0.
-
->>> (x -x)
-0.0+/-0
->>> (x -y)
-0.0+/-0.7071067811865476
+>>> print(x.error_components)
+{UAtom(17fc695a07a0ca6e): 0.5}
+>>> print(y.error_components)
+{UAtom(822e8f36c031199): 0.5}
 
  .. index::
    pair: testing (scalar); NaN
