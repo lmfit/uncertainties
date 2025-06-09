@@ -185,7 +185,7 @@ The :class:`UFloat` object has an :attr:`error_components` property
 >>> print(A.error_components)
 {UAtom(1c80317fa3b1799d, tag="A special tag")): 0.1}
 
-We see that the :attr:`error_components` property returns a dict whos keys are
+We see that the :attr:`error_components` property returns a dict whose keys are
 :class:`UAtom` objects and whose values are floats.
 A :class:`UAtom` object is like the ``dx``, ``dy``, or ``dz`` random variables above.
 It is like an independent random variable with zero mean and unity variance.
@@ -403,10 +403,10 @@ and standard deviation, we see
 True
 
 However, if we define a new :class:`UFloat` object with the same nominal value and
-standard deviation we find::
+standard deviation we find:
 
 >>> y = ufloat(5, 0.5)
->>> x == y
+>>> print(x == y)
 False
 
 We can see that this is because ``x`` and ``y`` depend on independent :class:`UAtom`
@@ -513,164 +513,6 @@ For ``x < 0`` the ``y`` derivative is always complex valued so a NaN value is us
 >>> y = ufloat(1, 0.2)
 >>> print((x**y).error_components())
 {1.0+/-0.2: nan}
-
-Automatic correlations
-======================
-
-Correlations between :class:`UFloat` objects are **automatically handled** whatever
-the number of :class:`UFloat` objects involved, and whatever the complexity of the
-calculation. For example, when :data:`x` is the number with
-uncertainty defined above,
-
->>> x = ufloat(0.2, 0.01)
->>> square = x**2
->>> print(square)
-0.040+/-0.004
->>> square - x*x
-0.0+/-0
->>> y = x*x + 1
->>> y - square
-1.0+/-0
-
-The last two printed results above have a zero uncertainty despite the
-fact that :data:`x`, :data:`y` and :data:`square` have a non-zero uncertainty: the
-calculated functions give the same value for all samples of the random
-variable :data:`x`.
-
-Thanks to the automatic correlation handling, calculations can be
-performed in as many steps as necessary, exactly as with simple
-floats.  When various quantities are combined through mathematical
-operations, the result is calculated by taking into account all the
-correlations between the quantities involved.  All of this is done
-transparently.
-
-
-
-UAtoms: How Uncertainty and Correlations are Tracked
-====================================================
-
-The basic, indivisibile, unit of uncertainty in the :mod:`uncertainties` package is the
-:class:`UAtom`.
-A :class:`UAtom` models a random variable with zero mean and unity standard deviation.
-Every :class:`UAtom` is unique and uncorrelated with every other :class:`UAtom`.
-The uncertainty of a :class:`UFloat` object is a :class:`UCombo` object which models a
-:class:`float`-weighted linear combination of :class:`UAtom` objects.
-A :class:`UFloat` object can be thought of as a sum of a fixed nominal value together
-with a zero-mean :class:`UCombo` object.
-
-The standard deviation of a single :class:`UFloat` object is calculated by taking the
-sum-of-squares of the weights for all the :class:`UAtom` objects that make up the
-corresponding :attribute:`uncertainty` attribute for that :class:`UFloat` object.
-The correlation between two :class:`UFloat` objects is calculated by taking the sum
-of products of the weights of shared :class:`UAtom` objects between the two
-:class:`UFloat` :attribute:`uncertainty` attributes.
-
-Every time a new :class:`UFloat` is instantiated via the :func:`ufloat` function a
-single new independent :class:`UAtom` is also instantiated (and given the optional tag
-passed into :func:`ufloat`) and paired with the new :class:`UFloat`.
-When :class:`UFloat` objects are combined together using mathematical operations the
-resulting :class:`UFloat` objects inherit dependence on the :class:`UAtom` objects
-on which the input :class:`UFloat` objects depend in accordance with
-:ref:`linear error propagation theory <linear_method>`.
-In this way, the correlation between :class:`UFloat` objects can be tracked.
-
-We can get access to the :class:`UAtom` objects on which a given :class:`UFloat`
-depends, and their corresponding weights using the :attribute:`UFloat.error_components`
-attribute:
-
-
-.. testsetup:: uuid
-
-   from uncertainties import ufloat
-   from unittest.mock import patch
-   import uuid
-   import random
-
-   class FakeUUID4:
-       def __init__(self):
-           self.seed = 0
-           self.rnd = random.Random()
-
-       def __call__(self):
-           self.rnd.seed(self.seed)
-           fake_uuid = uuid.UUID(int=self.rnd.getrandbits(128), version=4)
-           self.seed += 1
-           return fake_uuid
-   fake_uuid4 = FakeUUID4()
-
-   p = patch('uncertainties.ucombo.uuid.uuid4', fake_uuid4)
-   p.start()
-
-.. doctest:: uuid
-
-   >>> x = ufloat(1, 0.1)
-   >>> y = ufloat(2, 0.3)
-   >>> z = x * y
-   >>> print(x.error_components)
-   {UAtom(e3e70682-c209-4cac-a29f-6fbed82c07cd): 0.1}
-   >>> print(y.error_components)
-   {UAtom(cd613e30-d8f1-4adf-91b7-584a2265b1f5): 0.3}
-   >>> print(z.error_components)
-   {UAtom(cd613e30-d8f1-4adf-91b7-584a2265b1f5): 0.3, UAtom(e3e70682-c209-4cac-a29f-6fbed82c07cd): 0.2}
-
-The standard deviation of each :class:`UFloat` is given by the sum of squares of the
-weights for all the :class:`UAtom` objects on which that :class:`UFloat` depends
-
-.. doctest:: uuid
-
-   >>> print(x.std_dev)
-   0.1
-   >>> print(y.std_dev)
-   0.3
-   >>> print(z.std_dev)
-   0.36055512754639896
-
-The :func:`ufloat` function accepts a ``tag`` argument.
-If a string is passed in as the ``tag`` then this ``tag`` gets added to the new
-:class:`UAtom` object that is instantiated together with the new :class:`UFloat`.
-Note that :class:`UFloat` objects do not carry tags, only the underlying :class`UAtom`
-objects do.
-The tags on :class:`UAtom` objects can be used to keep track of the statistical
-relationships in a more human-readable way:
-
-.. doctest:: uuid
-
-   >>> x = ufloat(1, 0.1, tag='x')
-   >>> y = ufloat(2, 0.3, tag='y')
-   >>> z = x * y
-   >>>
-   >>> for uatom, weight in z.error_components.items():
-   ...     if uatom.tag is not None:
-   ...         label = uatom.tag
-   ...     else:
-   ...         label = uatom.uuid
-   ...     print(f"{label}: {weight}")
-   y: 0.3
-   x: 0.2
-
-
-.. testcleanup :: uuid
-
-   p.stop()
-
-The tags *do not have to be distinct*. For instance, *multiple* :class:`UFloat` objects
-can be tagged as ``"systematic"``, and their contribution to the total uncertainty of
-:data:`result` can simply be obtained as:
-
->>> syst_error = math.sqrt(sum(  # Error from *all* systematic errors
-...     error**2
-...     for (uatom, error) in result.error_components().items()
-...     if uatom.tag == "systematic"))
-
-The remaining contribution to the uncertainty is:
-
->>> other_error = math.sqrt(result.std_dev**2 - syst_error**2)
-
-The variance of :data:`result` is in fact simply the quadratic sum of these two errors,
-since the :class:`UAtom` objects from :func:`result.error_components` are independent.
-
-.. index:: comparison operators
-
 
 .. index:: covariance matrix
 
