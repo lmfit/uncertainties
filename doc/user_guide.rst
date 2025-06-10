@@ -1,4 +1,4 @@
-==========
+from uncertainties import correlation_matrixfrom uncertainties import covariance_matrix==========
 User Guide
 ==========
 
@@ -332,16 +332,22 @@ Besides being able to apply basic arithmetic operations to uncertainties
 functions from the standard :mod:`math` *module*.  These mathematical functions
 are found in the :mod:`uncertainties.umath` module:
 
-    >>> from uncertainties.umath import sin, exp, sqrt
-    >>> x = ufloat(0.2, 0.01)
-    >>> sin(x)
-    0.19866933079506122+/-0.009800665778412416
-    >>> sin(x*x)
-    0.03998933418663417+/-0.003996800426643912
-    >>> exp(-x/3.0)
-    0.9355069850316178+/-0.003118356616772059
-    >>> sqrt(230*x + 3)
-    7.0+/-0.16428571428571428
+.. doctest::
+   :hide:
+
+   >>> import random
+   >>> random.seed(123)
+
+>>> from uncertainties.umath import sin, exp, sqrt
+>>> x = ufloat(0.2, 0.01)
+>>> sin(x)
+0.19866933079506122+/-0.009800665778412416
+>>> sin(x*x)
+0.03998933418663417+/-0.003996800426643912
+>>> exp(-x/3.0)
+0.9355069850316178+/-0.003118356616772059
+>>> sqrt(230*x + 3)
+7.0+/-0.16428571428571428
 
 We can verify the ``sin(x)`` example follows the linear error propagation formula above.
 We know the derivative of ``sin(x)`` is ``cos(x)``. So, if ``x`` only depends on a
@@ -350,11 +356,11 @@ contribution to be ``cos(x0)`` times the weight of that :class:`UAtom` for ``x``
 
 >>> from uncertainties.umath import cos
 >>> print(x.error_components)
-{UAtom(8b9d2434e465e150): 0.01}
+{UAtom(44867db30d67b366): 0.01}
 >>> print(0.01 * cos(0.2))
 0.009800665778412416
 >>> print(sin(x).error_components)
-{UAtom(8b9d2434e465e150): 0.009800665778412416}
+{UAtom(44867db30d67b366): 0.009800665778412416}
 
 We see the expected weighting.
 
@@ -366,45 +372,23 @@ The functions in the :mod:`uncertainties.umath` module include:
     ``radians``, ``sin``, ``sinh``, ``sqrt``, ``tan``, ``tanh``,
 
 
-Comparison operators
-====================
-
-.. warning::
-   Support for comparing variables with uncertainties is deprecated and will be
-   removed in Uncertainties 4.0.
+Equality and inequality Comparisons
+===================================
 
 Two :class:`UFloat` objects are equal if their nominal values are equal as
 :class:`float` objects and their :attr:`error_components` dictionaries are equal.
-Note that if  a :class:`UFloat` object is ever found to have dependence on a
-:class:`UAtom` object with a weight of 0 then that :class:`UAtom` is excluded from the
-:attr:`error_components`.
+It is not sufficient for the two :class:`UFloat` to have equal :attr:`nominal_value`
+and :attr:`std_dev` attributes.
 
->>> x = ufloat(5, 0.5)
->>> y = ufloat(5, 0.5)
->>> print(x == x)
-True
->>> print(x == y)
-False
+.. doctest::
+   :hide:
 
-Comparison operators (``==``, ``!=``, ``>``, ``<``, ``>=``, and ``<=``) for Variables with
-uncertainties are somewhat complicated, and need special attention.  As we
-hinted at above, and will explore in more detail below and in the
-:ref:`Technical Guide <comparison_operators>`, this relates to the correlation
-between :class:`UFloat` objects.
-
-Equality and inequality comparisons
-------------------------------------
-
-If we compare the equality of two :class:`UFloat` objects with the same nominal value
-and standard deviation, we see
+   >>> import random
+   >>> random.seed(1)
 
 >>> x = ufloat(5, 0.5)
 >>> print(x == x)
 True
-
-However, if we define a new :class:`UFloat` object with the same nominal value and
-standard deviation we find:
-
 >>> y = ufloat(5, 0.5)
 >>> print(x == y)
 False
@@ -413,13 +397,123 @@ We can see that this is because ``x`` and ``y`` depend on independent :class:`UA
 objects.
 
 >>> print(x.error_components)
-{UAtom(17fc695a07a0ca6e): 0.5}
+{UAtom(91b7584a2265b1f5): 0.5}
 >>> print(y.error_components)
-{UAtom(822e8f36c031199): 0.5}
+{UAtom(cd613e30d8f16adf): 0.5}
+
+Note that if  a :class:`UFloat` object is ever found to have dependence on a
+:class:`UAtom` object with a weight of 0 then that :class:`UAtom` is excluded from the
+:attr:`error_components`.
+
+.. index:: covariance matrix
+
+Covariance and correlation matrices
+===================================
+
+To lowest order, a size ``N`` set of random variables can be described by a length ``N``
+sequence of mean values together with an ``NxN`` matrix capturing the pairwise
+covariance or correlation matrix between the random variables.
+We've seen above that the :mod:`uncertainties` package supports calculating the
+covariance and correlation between two :class:`UFloat` objects.
+The :mod:`uncertainties` package also provides utility functions for calculating the
+``NxN`` covariance or correlation matrix for a sequence of :class:`UFloat` objects.
+
+Furthermore, given a length ``N`` sequence of nominal values together with a valid
+``NxN`` covariance orcorrelation matrix, :mod:`uncertainties` provides functions to
+construct a sequence of :class:`UFloat` objects whose statistics match those inputs.
+
+For ``N`` random variables ``X_i`` the elements of the covariance and correlation
+matrices are given by:
+
+   Cov_{i, j} = E[(X_i - E[X_i])(X_j - E[X_j])]
+   Corr_{i, j} = Cov_{i, j} / sqrt(Cov_{i, i} * Cov_{j, j})
+
+Calculating the Covariance and Correlation Matrices
+---------------------------------------------------
+
+We calculate the covariance and correlation matrices for a sequence of :class:`UFloat`
+objects:
+
+>>> from uncertainties import covariance_matrix, correlation_matrix
+>>> x = ufloat(1, 0.1)
+>>> y = ufloat(10, 0.1)
+>>> z = x + 2 * y
+>>> cov_mat = covariance_matrix([x, y, z])
+>>> corr_mat = correlation_matrix(([x, y, z]))
+
+We can view the matrices
+
+>>> import numpy as np
+>>> np.set_printoptions(precision=3)
+>>> print(cov_mat)
+[[0.01 0.   0.01]
+ [0.   0.01 0.02]
+ [0.01 0.02 0.05]]
+
+The diagonal elements are the variances, the squares of the standard deviations, of the
+three :class:`UFloat` objects.
+The two 0 off-diagonal elements indicate that ``x`` and ``y`` are uncorrelated.
+The non-zero off-diagonal elements show that ``z`` is correlated to ``x`` and ``y``.
+The correlation matrix is a rescaled version of the covariance matrix whose entries
+range from 0, for totally uncorrelated random variables, to 1, for perfectly correlated
+variables:
+
+>>> print(corr_mat)
+[[1.    0.    0.447]
+ [0.    1.    0.894]
+ [0.447 0.894 1.   ]]
+
+Generating `UFloat` Objects from a Covariance or Correlation Matrix
+-------------------------------------------------------------------
+
+Above we generated a covariance or correlation matrix from a sequence of :class:`UFloat`
+objects.
+The :mod:`uncertainties` package expose the reverse functionality.
+Given a covariance matrix and a sequence of nominal values, it is
+possible to construct a sequence of :class:`UFloat` with nominal values and correlations
+matching the covariance matrix passed in.
+
+>>> from uncertainties import correlated_values, correlated_values_norm
+>>> x0 = 1
+>>> y0 = 10
+>>> z0 = x0 + 2 * y0
+>>> nominal_values = [x0, y0, z0]
+
+With this we can generate a sequence of :class:`UFloat` objects given a covariance
+matrix
+
+>>> x2, y2, z2 = correlated_values(nominal_values, cov_mat)
+>>> print(x2)
+1.00+/-0.10
+>>> print(y2)
+10.00+/-0.10
+>>> print(z2)
+21.00+/-0.22
+>>> cov_mat_2 = covariance_matrix([x2, y2, z2])
+>>> print(np.all(np.isclose(cov_mat_2, cov_mat)))
+True
+
+We can do the same with a correlation matrix, but because the correlation matrix is
+normalized, we must independently supply information about the standard deviations of
+the resulting :class:`UFloat` objects.
+or given a correlation matrix
+
+>>> dx = 0.1
+>>> dy = 0.1
+>>> dz = 0.22
+>>> x3, y3, z3 = correlated_values_norm(((x0, dx), (y0, dy), (z0, dz)), corr_mat)
+>>> print(x3)
+1.00+/-0.10
+>>> print(y3)
+10.00+/-0.10
+>>> print(z3)
+21.00+/-0.22
+>>> corr_mat_3 = correlation_matrix([x3, y3, z3])
+>>> print(np.all(np.isclose(corr_mat_3, corr_mat)))
+True
 
  .. index::
    pair: testing (scalar); NaN
-
 
 Handling NaNs and infinities
 ===============================
@@ -514,124 +608,10 @@ For ``x < 0`` the ``y`` derivative is always complex valued so a NaN value is us
 >>> print((x**y).error_components())
 {1.0+/-0.2: nan}
 
-.. index:: covariance matrix
-
-Covariance and correlation matrices
-===================================
-
-Covariance matrix
------------------
-
-The covariance matrix between various variables or calculated
-quantities can be simply obtained:
-
->>> from uncertainties import covariance_matrix
->>> sum_value = u+2*v
->>> cov_matrix = covariance_matrix([u, v, sum_value])
-
-has value
-
-::
-
-  [[0.01, 0.0,  0.01],
-   [0.0,  0.01, 0.02],
-   [0.01, 0.02, 0.05]]
-
-In this matrix, the zero covariances indicate that :data:`u` and :data:`v` are
-independent from each other; the last column shows that :data:`sum_value`
-does depend on these variables.  The :mod:`uncertainties` package
-keeps track at all times of all correlations between quantities
-(variables and functions):
-
->>> sum_value - (u+2*v)
-0.0+/-0
-
-Correlation matrix
-------------------
-
-If the NumPy_ package is available, the correlation matrix can be
-obtained as well:
-
->>> from uncertainties import correlation_matrix
->>> corr_matrix = correlation_matrix([u, v, sum_value])
->>> print(corr_matrix)
-[[1.         0.         0.4472136 ]
- [0.         1.         0.89442719]
- [0.4472136  0.89442719 1.        ]]
-
-.. index:: correlations; correlated variables
-
-Correlated variables
-====================
-
-Reciprocally, **correlated variables can be created** transparently,
-provided that the NumPy_ package is available.
-
-Use of a covariance matrix
---------------------------
-
-Correlated variables can be obtained through the *covariance* matrix:
-
->>> from uncertainties import correlated_values
->>> (u2, v2, sum2) = correlated_values([1, 10, 21], cov_matrix)
-
-creates three new variables with the listed nominal values, and the given
-covariance matrix:
-
->>> print(sum_value)
-21.00+/-0.22
->>> print(sum2)
-21.00+/-0.22
->>> print(format(sum2 - (u2+2*v2), ".6f"))
-0.000000+/-0.000000
-
-The theoretical value of the last expression is exactly zero, like for
-``sum - (u+2*v)``, but numerical errors yield a small uncertainty
-(3e-9 is indeed very small compared to the uncertainty on :data:`sum2`:
-correlations should in fact cancel the uncertainty on :data:`sum2`).
-
-The covariance matrix is the desired one:
-
->>> import numpy as np
->>> print(np.array_str(np.array(covariance_matrix([u2, v2, sum2])), suppress_small=True))
-[[0.01 0.   0.01]
- [0.   0.01 0.02]
- [0.01 0.02 0.05]]
-
-reproduces the original covariance matrix :data:`cov_matrix` (up to
-rounding errors).
-
-Use of a correlation matrix
----------------------------
-
-Alternatively, correlated values can be defined through:
-
-- a sequence of nominal values and standard deviations, and
-- a *correlation* matrix between each variable of this sequence
-  (the correlation matrix is the covariance matrix
-  normalized with individual standard deviations; it has ones on its
-  diagonal)—in the form of a NumPy array-like object, e.g. a
-  list of lists, or a NumPy array.
-
-Example:
-
->>> from uncertainties import correlated_values_norm
->>> (u3, v3, sum3) = correlated_values_norm(
-...     [(1, 0.1), (10, 0.1), (21, 0.22360679774997899)],
-...     corr_matrix,
-... )
->>> print(u3)
-1.00+/-0.10
-
-The three returned numbers with uncertainties have the correct
-uncertainties and correlations (:data:`corr_matrix` can be recovered
-through :func:`correlation_matrix`).
-
 .. index::
    single: C code; wrapping
    single: Fortran code; wrapping
    single: wrapping (C, Fortran,…) functions
-
 
 Making custom functions accept numbers with uncertainties
 =========================================================
