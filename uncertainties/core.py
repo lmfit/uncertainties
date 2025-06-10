@@ -509,6 +509,9 @@ def covariance_matrix(nums_with_uncert):
             [covariance_matrix[j][i] for j in range(i + 1, len(covariance_matrix))]
         )
 
+    if numpy is not None:
+        covariance_matrix = numpy.array(covariance_matrix)
+
     return covariance_matrix
 
 
