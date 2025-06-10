@@ -14,9 +14,9 @@ The :mod:`uncertainties` package takes the pain and
 complexity out of uncertainty calculations and error propagation.  Here is a
 quick taste of how to use :mod:`uncertainties`:
 
->>> from uncertainties import ufloat
->>> x = ufloat(2, 0.1)   # x = 2+/-0.1
->>> y = ufloat(3, 0.2)   # y = 3+/-0.2
+>>> from uncertainties import UFloat
+>>> x = UFloat(2, 0.1)   # x = 2+/-0.1
+>>> y = UFloat(3, 0.2)   # y = 3+/-0.2
 >>> print(2*x)
 4.00+/-0.20
 >>> print(x+y)
@@ -27,10 +27,8 @@ quick taste of how to use :mod:`uncertainties`:
 The :mod:`uncertainties` library calculates uncertainties using linear `error
 propagation theory`_ by automatically :ref:`calculating derivatives
 <derivatives>` and analytically propagating these to the results.  Correlations
-between variables are automatically handled.  This library can also yield the
-derivatives of any expression with respect to the variables that have uncertain
-values.  For other approaches, see soerp_ (using higher-order terms) and mcerp_
-(using a Monte-Carlo approach).
+between variables are automatically handled. For other approaches, see soerp_ (using
+higher-order terms) and mcerp_ (using a Monte-Carlo approach).
 
 The `source code`_ for the uncertainties package is licensed under the `Revised
 BSD License`_.  This documentation is licensed under the `CC-SA-3 License`_.
