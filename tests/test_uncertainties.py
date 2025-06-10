@@ -236,14 +236,16 @@ def test_copy():
 
     t_copy = copy.copy(t)
     assert x_uatom in t_copy.error_components
-    assert uncert_core.covariance_matrix([t, z]) == uncert_core.covariance_matrix(
-        [t_copy, z]
+    assert np.all(
+        uncert_core.covariance_matrix([t, z])
+        == uncert_core.covariance_matrix([t_copy, z])
     )
 
     t_deepcopy = copy.deepcopy(t)
     assert x_uatom in t_deepcopy.error_components
-    assert uncert_core.covariance_matrix([t, z]) == uncert_core.covariance_matrix(
-        [t_deepcopy, z]
+    assert np.all(
+        uncert_core.covariance_matrix([t, z])
+        == uncert_core.covariance_matrix([t_deepcopy, z])
     )
 
     del x

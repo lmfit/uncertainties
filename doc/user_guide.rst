@@ -21,7 +21,7 @@ sub-modules for :ref:`advanced mathematical functions <advanced math operations>
 :doc:`arrays <numpy_guide>` operations.
 
 .. index::
-   pair: number with uncertainty;
+   pair: number with uncertainty; creation
 
 Creating UFloat Objects
 =======================
@@ -597,105 +597,59 @@ At these points the ``x`` derivative would be complex so a NaN value is used:
 
 >>> x = ufloat(0, 0.2)
 >>> y=1.5
->>> print((x**y).error_components())
-{0.0+/-0.2: nan}
+>>> print((x**y).error_components)
+{UAtom(e1988ad9f06c144a): nan}
 
 The ``y`` derivative is real anywhere ``x**y`` is real as long as ``x>=0``.
 For ``x < 0`` the ``y`` derivative is always complex valued so a NaN value is used:
 
 >>> x = -2
 >>> y = ufloat(1, 0.2)
->>> print((x**y).error_components())
-{1.0+/-0.2: nan}
+>>> print((x**y).error_components)
+{UAtom(afbd67f9619699cf): nan}
 
 .. index::
    single: C code; wrapping
    single: Fortran code; wrapping
    single: wrapping (C, Fortran,…) functions
 
-Making custom functions accept numbers with uncertainties
-=========================================================
+Converting Functions to Support ``UFloat`` Input
+================================================
 
-This package allows **code which is not meant to be used with numbers
-with uncertainties to handle them anyway**. This is for instance
-useful when calling external functions (which are out of the user's
-control), including functions written in C or Fortran.  Similarly,
-**functions that do not have a simple analytical form** can be
-automatically wrapped so as to also work with arguments that contain
-uncertainties.
-
-It is thus possible to take a function :func:`f` *that returns a
-single float*, and to automatically generalize it so that it also
-works with numbers with uncertainties:
+Users may have their own functions which manipulate :class:`float` input and produce
+:class:`float` output.
+With the :mod:`uncertainties` package, users can wrap those functions so that they
+accept :class:`UFloat` input and track the uncertainty according to the rules of linear
+error propagation.
+This is realized using the :func:`wrap` function.
+Consider calculating a Bessel function
 
 >>> from scipy.special import jv
->>> from uncertainties import wrap as u_wrap
 >>> x = ufloat(2, 0.01)
 >>> jv(0, x)
 Traceback (most recent call last):
  ...
 TypeError: ufunc 'jv' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule ''safe''
+
+We see that this naive approach fails because the :func:`jv` function does not support
+:class:`UFloat` input.
+We can remedy this using the :func:`wrap` function
+
+>>> from uncertainties import wrap as u_wrap
 >>> print(u_wrap(jv)(0, x))
 0.224+/-0.006
 
-The new function :func:`wrapped_f` (optionally) *accepts a number
-with uncertainty* in place of any float *argument* of :func:`f` (note
-that floats contained instead *inside* arguments of :func:`f`, like
-in a list or a NumPy array, *cannot* be replaced by numbers with
-uncertainties).
-:func:`wrapped_f` returns the same values as :func:`f`, but with
-uncertainties.
+The wrapped function must return exactly one :class:`float`.
+The wrapper resulting function can accept either a :class:`float` or :class:`UFloat`
+input for any parameter for which the wrapped function accepted a :class:`float` input.
+The derivatives of the function with respect to its inputs are, by default, calculated
+numerically.
+However, the user can provide a sequence of derivative functions to the
+``derivative_args`` parameter or a dictionary of derivative functions to the
+``derivative_kwargs`` parameter of the :func:`wrap` function to provide an alternative
+calculation for the partial derivative of the input function with respect to any
+positional or keyword argument of the input function.
 
-With a simple wrapping call like above, uncertainties in the function
-result are automatically calculated numerically. **Analytical
-uncertainty calculations can be performed** if derivatives are
-provided to :func:`wrap`.
-
-
-Miscellaneous utilities
-=======================
-
-.. index:: standard deviation; on the fly modification
-
-It is sometimes useful to modify the error on certain parameters so as
-to study its impact on a final result.  With this package, the
-**uncertainty of a variable can be changed** on the fly:
-
->>> sum_value = u+2*v
->>> sum_value
-21.0+/-0.223606797749979
->>> prev_uncert = u.std_dev
->>> u.std_dev = 10
->>> sum_value
-21.0+/-10.00199980003999
->>> u.std_dev = prev_uncert
-
-The relevant concept is that :data:`sum_value` does depend on the
-variables :data:`u` and :data:`v`: the :mod:`uncertainties` package keeps
-track of this fact, as detailed in the :ref:`Technical Guide
-<variable_tracking>`, and uncertainties can thus be updated at any time.
-
-.. index::
-   pair: nominal value; uniform access (scalar)
-   pair: uncertainty; uniform access (scalar)
-   pair: standard deviation; uniform access (scalar)
-
-When manipulating ensembles of numbers, *some* of which contain
-uncertainties while others are simple floats, it can be useful to
-access the **nominal value and uncertainty of all numbers in a uniform
-manner**.  This is what the :func:`nominal_value` and
-:func:`std_dev` functions do:
-
->>> from uncertainties import nominal_value, std_dev
->>> x = ufloat(0.2, 0.01)
->>> print(nominal_value(x))
-0.2
->>> print(std_dev(x))
-0.01
->>> print(nominal_value(3))
-3
->>> print(std_dev(3))
-0.0
 
 Finally, a utility method is provided that directly yields the
 `standard score <http://en.wikipedia.org/wiki/Standard_score>`_
