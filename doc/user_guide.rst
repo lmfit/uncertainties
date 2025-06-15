@@ -555,6 +555,12 @@ True
 Power Function Behavior
 =======================
 
+.. doctest::
+   :hide:
+
+   >>> import random
+   >>> random.seed(2)
+
 The value of one :class:`UFloat` raised to the power of another can be calculated in two
 ways:
 
@@ -598,7 +604,7 @@ At these points the ``x`` derivative would be complex so a NaN value is used:
 >>> x = ufloat(0, 0.2)
 >>> y=1.5
 >>> print((x**y).error_components)
-{UAtom(e1988ad9f06c144a): nan}
+{UAtom(da94e3e8ab73738f): nan}
 
 The ``y`` derivative is real anywhere ``x**y`` is real as long as ``x>=0``.
 For ``x < 0`` the ``y`` derivative is always complex valued so a NaN value is used:
@@ -606,7 +612,7 @@ For ``x < 0`` the ``y`` derivative is always complex valued so a NaN value is us
 >>> x = -2
 >>> y = ufloat(1, 0.2)
 >>> print((x**y).error_components)
-{UAtom(afbd67f9619699cf): nan}
+{UAtom(4067c3584ee207f8): nan}
 
 .. index::
    single: C code; wrapping
