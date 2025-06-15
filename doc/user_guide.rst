@@ -372,8 +372,8 @@ The functions in the :mod:`uncertainties.umath` module include:
     ``radians``, ``sin``, ``sinh``, ``sqrt``, ``tan``, ``tanh``,
 
 
-Equality and inequality Comparisons
-===================================
+Equality Comparison
+===================
 
 Two :class:`UFloat` objects are equal if their nominal values are equal as
 :class:`float` objects and their :attr:`error_components` dictionaries are equal.
@@ -404,6 +404,29 @@ objects.
 Note that if  a :class:`UFloat` object is ever found to have dependence on a
 :class:`UAtom` object with a weight of 0 then that :class:`UAtom` is excluded from the
 :attr:`error_components`.
+
+Recall that :class:`UFloat` objects model real random variables.
+It is not conventional to define an ordering on random variables.
+For example, suppose ``X`` is a normally distributed random variable with mean 1 and
+standard deviation 10 and ``Y`` is also a random variable with mean 2 and standard
+deviation 10 then, over all possible samples, it will usually be true that ``Y>X``, but
+for a large fraction of samples it will be ``X>Y``.
+For this reason, the ordering operations ``<, <=, >=, >`` are not defined on the
+:class:`UFloat` class.
+
+In previous versions of the :mod:`uncertainties` package these ordering operations were
+defined based on comparison of the :class:`UFloat` :attr:`nominal_value` attribute.
+Now, if users want to compare :class:`UFloat` objects based on the ordering of the
+:attr:`nominal_value` attribute they can do so explicitly
+
+>>> x = UFloat(1, 10)
+>>> y = UFloat(2, 10)
+>>> print(y > x)
+Traceback (most recent call last):
+    ...
+TypeError: '>' not supported between instances of 'UFloat' and 'UFloat'
+>>> print(y.n > x.n)
+True
 
 .. index:: covariance matrix
 
