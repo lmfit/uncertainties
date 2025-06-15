@@ -160,6 +160,11 @@ We will also note that ``C = f(A, B)`` has dependence on ``dy`` due to both ``A`
 In other words, ``A`` and ``B`` have non-zero correlation and a proper uncertainty
 propagation calculation of ``C`` must take this correlation into account.
 
+Note that linear uncertainty propagation is only accurate when the function ``f`` has an
+accurate linear approximation in a region about the mean values of its input random
+variables with a size given by the standard deviations of the input variables.
+This is discussed in more detail in the section below.
+
 Error Components, `UAtom` Objects, and Uncertainty Propagation
 ==============================================================
 
@@ -319,6 +324,37 @@ Here is one more set of examples:
 >>> y = x*x + 1
 >>> print(y - square)
 1.0+/-0
+
+It is possible to perform calculations where the linear uncertainty propagation theory
+breaks down, however, the results will be erroneous.
+A common occurence of this breakdown is calculating the uncertainty at the extremal
+point in a quadratic function.
+
+>>> x = UFloat(0, 1)
+>>> y = x **2
+>>> print(y)
+0.0+/-0
+
+Thinking of ``x`` as a random variable, it is not correct that ``x**2`` should have zero
+uncertainty.
+This is an artifact of the breakdown in linear uncertainty propagation in the region
+where ``x**2`` has no accurate linear approximation.
+For more accurate uncertainty propagation calculations, users can use the soerp_ package
+which performs second order uncertainty propagation.
+This approach is more accurate and still relatively fast but breaks down when cubic or
+higher order approximations are necessary.
+When lineary uncertainty propagation is valid then, for example, if the input random
+variables are normally disributed, then the output random variables will also be
+normally distributed.
+But, whe linear uncertainty propagation breaks down, the probability distributions are
+transformed in non-trivial ways.
+
+Even more accurate uncertainty propagation calculations can be made ussing Monte-Carlo
+techniques.
+The mcerp_ and emcee_ are examples packages which can be used for to perform Monte-Carlo
+non-linear uncertainty propagation.
+The Monte-Carlo approaches may be more accurate but the calculations can be become much
+slower.
 
 .. index:: mathematical operation; on a scalar, umath
 
@@ -756,3 +792,7 @@ information are given in the
 .. |minus2html| raw:: html
 
    <sup>-2</sup>
+
+.. _soerp: https://pypi.python.org/pypi/soerp
+.. _mcerp: https://pypi.python.org/pypi/mcerp
+.. _emcee: https://pypi.python.org/pypi/emcee
