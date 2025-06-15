@@ -34,27 +34,6 @@ user-supplied function.
 Special Technical Topics
 ============================================================
 
-.. index::
-   pair: uncertainty; NaN
-
-NaN uncertainty
-----------------------
-
-If linear `error propagation theory`_ cannot be applied, the functions
-defined by :mod:`uncertainties` internally use a `not-a-number value
-<http://en.wikipedia.org/wiki/Not_a_number>`_ (``nan``) for the
-derivative.
-
-As a consequence, it is possible for uncertainties to be ``nan``:
-
->>> from uncertainties import umath
->>> umath.sqrt(ufloat(0, 1))
-0.0+/-nan
-
-This indicates that **the derivative required by linear error
-propagation theory is not defined** (a Monte-Carlo calculation of the
-resulting random variable is more adapted to this specific case).
-
 .. _math_def_num_uncert:
 
 Mathematical definition of numbers with uncertainties

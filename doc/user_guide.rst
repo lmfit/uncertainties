@@ -577,8 +577,8 @@ True
 Handling NaNs and infinities
 ===============================
 
-NaN values can appear in either the nominal value or uncertainty of a
-Variable.  As is always the case, care must be exercised when handling NaN
+``nan`` values can appear in either the nominal value or uncertainty of a
+Variable.  As is always the case, care must be exercised when handling ``nan``
 values.
 
 The standard library :func:`math.isnan` and :func:`numpy.isnan` functions will raise
@@ -600,7 +600,7 @@ False
 The :func:`umath.isinf` function detects if the :attr:`nominal_value` is infinite.
 
 To check if the :attr:`std_dev` attribute of a :class:`UFloat` object is
-NaN or infinite, you must explicitly apply the :func:`math.isnan` or :func:`math.isinf`
+``nan`` or infinite, you must explicitly apply the :func:`math.isnan` or :func:`math.isinf`
 function to the :attr:`std_dev` attribute of the :class:`UFloat` object.
 
 >>> import math
@@ -608,6 +608,18 @@ function to the :attr:`std_dev` attribute of the :class:`UFloat` object.
 True
 >>> print(math.isnan(UFloat(1, float("nan")).s))
 True
+
+``nan`` values can also result during the course of calculations at points where the
+derivatives of the functions are undefined
+
+>>> from uncertainties import umath
+>>> x = ufloat(0, 1)
+>>> print(umath.sqrt(x))
+0.0+/-nan
+
+In cases such as these, linear error propagation has broken down and the calculation
+should instead use, for example, a Monte-Carlo calculation for the uncertainty
+propagation.
 
 .. index:: correlations; detailed example
 
