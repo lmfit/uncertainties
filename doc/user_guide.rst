@@ -613,8 +613,8 @@ For ``x < 0`` the ``y`` derivative is always complex valued so a NaN value is us
    single: Fortran code; wrapping
    single: wrapping (C, Fortran,…) functions
 
-Converting Functions to Support ``UFloat`` Input
-================================================
+Wrapping Functions to Support ``UFloat`` Input
+==============================================
 
 Users may have their own functions which manipulate :class:`float` input and produce
 :class:`float` output.
@@ -635,54 +635,66 @@ We see that this naive approach fails because the :func:`jv` function does not s
 :class:`UFloat` input.
 We can remedy this using the :func:`wrap` function
 
->>> from uncertainties import wrap as u_wrap
->>> print(u_wrap(jv)(0, x))
+>>> from uncertainties import wrap
+>>> wrapped = jv
+>>> wrapper = wrap(wrapped)
+>>> print(wrapper(0, x))
 0.224+/-0.006
 
 The wrapped function must return exactly one :class:`float`.
-The wrapper resulting function can accept either a :class:`float` or :class:`UFloat`
+The resulting wrapper function can accept either a :class:`float` or :class:`UFloat`
 input for any parameter for which the wrapped function accepted a :class:`float` input.
 The derivatives of the function with respect to its inputs are, by default, calculated
 numerically.
-However, the user can provide a sequence of derivative functions to the
-``derivative_args`` parameter or a dictionary of derivative functions to the
-``derivative_kwargs`` parameter of the :func:`wrap` function to provide an alternative
-calculation for the partial derivative of the input function with respect to any
-positional or keyword argument of the input function.
+However, if the user has alternative functions available to calculate the derivatives
+these can be used instead of the default numerical calculation.
+The :mod:`uncertainties` package needs to calculate the derivative for any parameter
+into which a :class:`UFloat` object is passed as an argument.
+Derivatives for positional arguments can be passed in as a tuple into the
+``derivatives_args`` parameter of the :func:`wraps` function and derivativs for keyword
+arguments can be passed in as a dictionary into the ``derivatives_kwargs`` parameter.
+Any parameters for which a user does not supply an alternative derivative calculation
+function will use the default numerical derivative calculation.
 
+>>> def wrapped(x, a, b, c):
+...     return a * x**2 + b * x + c
+>>>
+>>> def x_deriv(x, a, b, c):
+...     return 2 * a * x + b
+>>>
+>>> def a_deriv(x, a, b, c):
+...     return x**2
+>>>
+>>> def c_deriv(x, a , b, c):
+...     return 0
+>>>
+>>>
+>>> wrapper_analytic = wrap(
+...     wrapped,
+...     derivatives_args=(x_deriv, a_deriv),
+...     derivatives_kwargs={"c": c_deriv},
+... )
+>>> wrapper_numerical = wrap(wrapped)
+>>> x = ufloat(1, 0.1)
+>>> a = ufloat(3, 0.2)
+>>> b = ufloat(2, 0.5)
+>>> c = ufloat(8, 2)
+>>>
+>>> print(wrapper_analytic(x, a, b, c) == wrapper_numerical(x, a, b, c))
+True
 
-Finally, a utility method is provided that directly yields the
-`standard score <http://en.wikipedia.org/wiki/Standard_score>`_
-(number of standard deviations) between a number and a result with
-uncertainty:
+Standard Score
+==============
+
+A utility method is provided that directly yields the
+`standard score <http://en.wikipedia.org/wiki/Standard_score>`_ (number of standard
+deviations) between a number and a :class:`UFloat` object
 
 >>> x = ufloat(0.20, 0.01)
 >>> print(x.std_score(0.17))
 -3.0
 
-.. index:: derivatives
-
-.. _derivatives:
-
-Derivatives
-===========
-
-Since the application of :ref:`linear error propagation theory
-<linear_method>` involves the calculation of **derivatives**, this
-package automatically performs such calculations; users can thus
-easily get the derivative of an expression with respect to any of its
-variables:
-
->>> u = ufloat(1, 0.1)
->>> v = ufloat(10, 0.1)
->>> sum_value = u+2*v
->>> sum_value.derivatives[u]
-1.0
->>> sum_value.derivatives[v]
-2.0
-
-These values are obtained with a :ref:`fast differentiation algorithm
-<differentiation method>`.
+This means that 0.17 is -3.0 standard deviations away from 0.20.
 
 Additional information
 ======================
