@@ -51,41 +51,6 @@ Special Technical Topics
 .. index:: saving to file; number with uncertainty
 .. index:: reading from file; number with uncertainty
 
-.. _pickling:
-
-Pickling
---------
-
-The quantities with uncertainties created by the :mod:`uncertainties`
-package can be `pickled <http://docs.python.org/library/pickle.html>`_
-(they can be stored in a file, for instance).
-
-If multiple :class:`UFloat` objects are pickled together (including when pickling
-:doc:`NumPy arrays <numpy_guide>`), their correlations are preserved:
-
->>> import pickle
->>> from uncertainties import ufloat
->>> x = ufloat(2, 0.1)
->>> y = 2*x
->>> p = pickle.dumps([x, y])  # Pickling to a string
->>> (x2, y2) = pickle.loads(p)  # Unpickling into new variables
->>> y2 - 2*x2
-0.0+/-0
-
-The final result is exactly zero because the unpickled :class:`UFloat` objects
-:data:`x2` and :data:`y2` are completely correlated.
-
-The original :class:`UFloat` object is also correlated with its unpickled counerpart:
-
->>> x - x2
-0.0+/-0
-
-which shows that the original variable :data:`x` and the new variable :data:`x2`
-are completely correlated.
-
-
-.. index:: comparison operators; technical details
-
 .. _comparison_operators:
 
 

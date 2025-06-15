@@ -702,6 +702,22 @@ deviations) between a number and a :class:`UFloat` object
 
 This means that 0.17 is -3.0 standard deviations away from 0.20.
 
+Pickling
+========
+
+:class:`UFloat` objects retain all correlations before and after pickling
+
+>>> import pickle
+>>> x = UFloat(1, 0.1)
+>>> y = x**2
+>>> print(x.correlation(y))
+1.0
+>>> x2 = pickle.loads(pickle.dumps(x))
+>>> print(x2.correlation(y))
+1.0
+>>> print(x2 == x)
+True
+
 Additional information
 ======================
 
