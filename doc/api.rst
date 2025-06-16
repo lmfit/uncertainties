@@ -29,6 +29,3 @@ objects with uncertainty propagation.
 .. autofunction:: ufloat_fromstr
 
 .. autofunction:: wrap
-
-Special Technical Topics
-============================================================
