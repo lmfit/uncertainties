@@ -121,7 +121,7 @@ Linear Uncertainty Propagation
 ==============================
 
 The :mod:`uncertainties` package uses :class:`UFloat` objects apply the theory of
-linear error propagation.
+`linear error propagation <https://en.wikipedia.org/wiki/Propagation_of_uncertainty#>`_.
 Suppose ``A`` and ``B`` are real random variables which can be expressed as::
 
    A = A_0 + w_Ax dx + w_Ay dy = A_0 + dA
@@ -346,7 +346,9 @@ higher order approximations are necessary.
 When lineary uncertainty propagation is valid then, for example, if the input random
 variables are normally disributed, then the output random variables will also be
 normally distributed.
-But, whe linear uncertainty propagation breaks down, the probability distributions are
+This justifies the reduction of the probability distribution to just two numbrers, the
+mean and standard deviation.
+However, when linear uncertainty propagation breaks down, the probability distributions are
 transformed in non-trivial ways.
 
 Even more accurate uncertainty propagation calculations can be made ussing Monte-Carlo
@@ -722,7 +724,7 @@ The wrapped function must return exactly one :class:`float`.
 The resulting wrapper function can accept either a :class:`float` or :class:`UFloat`
 input for any parameter for which the wrapped function accepted a :class:`float` input.
 The derivatives of the function with respect to its inputs are, by default, calculated
-numerically.
+numerically using a three point central difference formula.
 However, if the user has alternative functions available to calculate the derivatives
 these can be used instead of the default numerical calculation.
 The :mod:`uncertainties` package needs to calculate the derivative for any parameter
