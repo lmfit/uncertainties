@@ -5,15 +5,14 @@ Uncertainties and numpy arrays
 ===============================
 
 .. index:: unumpy
-.. index:: arrays; simple use, matrices; simple use
+.. index:: arrays; simple use
 
 .. _simple_array_use:
 
 Arrays of uncertainties Variables
 ====================================
 
-It is possible to put uncertainties Variable  in NumPy_ arrays and
-matrices:
+It is possible to put :class:`UFloat` objects  in NumPy_ arrays:
 
 >>> import numpy as np
 >>> from uncertainties import ufloat
@@ -30,12 +29,11 @@ even when these arrays contain numbers with uncertainties.
 The unumpy package
 ==================
 
-
-While :ref:`basic operations on arrays <simple_array_use>` that
-contain numbers with uncertainties can be performed without it, the
-:mod:`unumpy` package is useful for more advanced uses.
-
-This package contains:
+It is possible to perform :ref:`basic operations on arrays <simple_array_use>` that
+contain :class:`UFloat` objects using the :mod:`numpy` package together with
+:class:`UFloat` objects.
+However, the :mod:`uncertainties.unumpy` package provides additional array
+functionality including:
 
 1. utilities that help with the **creation and manipulation** of
 NumPy_ arrays and matrices of numbers with uncertainties;
@@ -43,9 +41,7 @@ NumPy_ arrays and matrices of numbers with uncertainties;
 2. **generalizations** of multiple NumPy functions so that they also
 work with arrays that contain numbers with uncertainties.
 
-
-Operations on arrays (including their cosine, etc.)  can thus be
-performed transparently.
+Operations on arrays (e.g. their cosine, etc.)  can thus be performed transparently.
 
 These features can be made available with
 
@@ -54,8 +50,8 @@ These features can be made available with
 .. Here, there is no need to mention unumpy.unlinalg, because it is indeed
    made available through "import unumpy".
 
-Creation and manipulation of arrays and matrices
-------------------------------------------------
+Creation and manipulation of arrays
+-----------------------------------
 
 .. index::
    single: arrays; creation and manipulation
@@ -64,15 +60,15 @@ Creation and manipulation of arrays and matrices
 Arrays
 ^^^^^^
 
-Arrays of numbers with uncertainties can be built from values and
-uncertainties:
+Arrays of :class:`UFloat objects can be built from sequences of nominal values and
+standard deviations:
 
 >>> arr = unumpy.uarray([1, 2], [0.01, 0.002])
 >>> print(arr)
 [1.0+/-0.01 2.0+/-0.002]
 
-NumPy arrays of numbers with uncertainties can also be built directly
-through NumPy, thanks to NumPy's support of arrays of arbitrary objects:
+NumPy arrays of :class:`UFloat` objects can also be built directly through NumPy, thanks
+to NumPy's support of arrays of arbitrary objects:
 
 >>> arr = np.array([ufloat(1, 0.1), ufloat(2, 0.002)])
 
