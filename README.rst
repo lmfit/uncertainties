@@ -22,27 +22,28 @@ Basic examples
 
 .. code-block:: python
 
-    >>> from uncertainties import ufloat
-    >>> x = ufloat(2, 0.25)
-    >>> x
+    >>> from uncertainties import UFloat
+    >>> x = UFloat(2, 0.25)
+    >>> print(x)
     2.0+/-0.25
 
+    >>> print(x**2)
     >>> square = x**2
-    >>> square
+    >>> print(square)
     4.0+/-1.0
-    >>> square.nominal_value
+    >>> print(square.nominal_value)
     4.0
-    >>> square.std_dev  # Standard deviation
+    >>> print(square.std_dev)  # Standard deviation
     1.0
 
-    >>> square - x*x
-    0.0  # Exactly 0: correlations taken into account
+    >>> print(square - x*x)
+    0.0  # Exactly 0: `uncertainties` is aware of correlations
 
     >>> from uncertainties.umath import sin, cos  # and many more.
-    >>> sin(1+x**2)
+    >>> print(sin(1+x**2))
     -0.95892427466313845+/-0.2836621854632263
 
-    >>> print (2*x+1000).derivatives[x]  # Automatic calculation of derivatives
+    >>> print(2*x+1000).derivatives[x]  # Automatic calculation of derivatives
     2.0
 
     >>> from uncertainties import unumpy  # Array manipulation
@@ -64,23 +65,19 @@ Main features
 - **Correlations** between expressions are correctly taken into
   account.  Thus, ``x-x`` is exactly zero.
 
-- **Most  mathematical operations** are supported, including most
-  functions from the standard math_ module (sin,...).  Comparison
-  operators (``>``, ``==``, etc.) are supported too.
+- **Many  mathematical operations** are supported, including many
+  functions from the standard math_ module (sin,...).
 
 - Many **fast operations on arrays and matrices** of numbers with
   uncertainties are supported.
 
-- **Extensive support for printing** numbers with uncertainties
+- **Extensive support for formatting** numbers with uncertainties
   (including LaTeX support and pretty-printing).
 
 - Most uncertainty calculations are performed **analytically**.
 
-- This module also gives access to the **derivatives** of any
-  mathematical expression (they are used by `error
-  propagation theory`_, and are thus automatically calculated by this
-  module).
-
+- This module gives access to the error components and weights which contributed to the
+   total uncertainty on any :class:`UFloat` object.
 
 Installation or upgrade
 -----------------------
@@ -89,9 +86,6 @@ To install `uncertainties`, use::
 
      pip install uncertainties
 
-To upgrade from an older version, use::
-
-     pip install --upgrade uncertainties
 
 Further details are in the `on-line documentation
 <https://uncertainties.readthedocs.io/en/latest/install.html>`_.
@@ -100,13 +94,12 @@ Further details are in the `on-line documentation
 Git branches
 ------------
 
-The GitHub ``master`` branch is the latest development version, and is intended
-to be a stable pre-release version. It will be experimental, but should pass
-all tests..  Tagged releases will be available on GitHub, and correspond to the
-releases to PyPI.  The GitHub ``gh-pages`` branch will contain a stable test version
-of the documentation that can be viewed at
-`<https://lmfit.github.io/uncertainties/>`_.  Other Github branches should be
-treated as unstable and in-progress development branches.
+The GitHub ``main`` branch is the latest development version, and is intended to be a
+stable pre-release version. It will be experimental, but should pass all tests.  Tagged
+releases will be available on GitHub, and correspond to the releases to PyPI.  The
+GitHub ``gh-pages`` branch will contain a stable test version of the documentation that
+can be viewed at `<https://lmfit.github.io/uncertainties/>`_.  Other Github branches
+should be treated as unstable and in-progress development branches.
 
 
 License
