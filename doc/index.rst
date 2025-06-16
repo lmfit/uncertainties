@@ -25,10 +25,11 @@ quick taste of how to use :mod:`uncertainties`:
 6.0+/-0.5
 
 The :mod:`uncertainties` library calculates uncertainties using linear `error
-propagation theory`_ by automatically :ref:`calculating derivatives
-<derivatives>` and analytically propagating these to the results.  Correlations
-between variables are automatically handled. For other approaches, see soerp_ (using
-higher-order terms) and mcerp_ (using a Monte-Carlo approach).
+propagation theory`_ by automatically calculating derivatives and analytically
+propagating these to the results.
+Correlations between variables are automatically handled.
+For other approaches, see soerp_ (using higher-order terms) and mcerp_ (using a
+Monte-Carlo approach).
 
 The `source code`_ for the uncertainties package is licensed under the `Revised
 BSD License`_.  This documentation is licensed under the `CC-SA-3 License`_.

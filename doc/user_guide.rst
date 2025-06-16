@@ -798,7 +798,7 @@ handling are detailed in :doc:`numpy_guide`.
 
 Details about the theory behind this package and implementation
 information are given in the
-:doc:`tech_guide`.
+:doc:`api` documentation.
 
 .. _NumPy: http://numpy.scipy.org/
 
