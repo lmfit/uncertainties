@@ -277,9 +277,15 @@ class UFloat(object):
         tag -- (string) optional tag for the new UAtom used if the uncertainty is a
         float such that a new UCombo and UAtom is generated.
         """
+
         self._nominal_value = float(nominal_value)
         if not isnan(std_dev) and std_dev < 0:
             raise ValueError("The standard deviation cannot be negative")
+        elif std_dev == 0:
+            warn(
+                "Using UFloat objects with std_dev==0 may give unexpected results.",
+                stacklevel=2,
+            )
         self._uncertainty = UCombo(((UAtom(tag=tag), float(std_dev)),))
 
     @property
@@ -372,6 +378,7 @@ ops.add_arithmetic_ops(UFloat)
 
 # Legacy alias for UFloat
 AffineScalarFunc = UFloat
+ufloat = UFloat
 
 
 def wrap(f, derivatives_args=None, derivatives_kwargs=None):
@@ -565,46 +572,6 @@ def ufloat_fromstr(representation, tag=None):
     """
     (nom, std) = str_to_number_with_uncert(representation.strip())
     return ufloat(nom, std, tag)
-
-
-def ufloat(nominal_value, std_dev, tag=None):
-    """
-    Create an uncertainties Variable
-
-    Arguments:
-    ----------
-    nominal_value: float
-        nominal value of Variable
-    std_dev:   float or `None`
-        standard error of Variable, or `None` if not available [`None`]
-    tag:   string or `None`
-        optional tag for tracing and organizing Variables ['None']
-
-    Returns:
-    --------
-    uncertainties Variable
-
-    Examples
-    ----------
-    >>> from uncertainties import ufloat
-    >>> a = ufloat(5, 0.2)
-    >>> b = ufloat(1000, 30, tag='kilo')
-
-
-    Notes:
-    --------
-    1. `nominal_value` is typically interpreted as `mean` or `central value`
-    2. `std_dev` is typically interpreted as `standard deviation` or the
-        1-sigma level uncertainty.
-    3. The returned Variable will have attributes `nominal_value`, `std_dev`,
-       and `tag` which match the input values.
-    """
-    if std_dev == 0:
-        warn(
-            "Using UFloat objects with std_dev==0 may give unexpected results.",
-            stacklevel=2,
-        )
-    return UFloat(nominal_value, std_dev, tag=tag)
 
 
 # Deprecated UFloat methods
