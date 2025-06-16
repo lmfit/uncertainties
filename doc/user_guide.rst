@@ -1,4 +1,3 @@
-from uncertainties import correlation_matrixfrom uncertainties import covariance_matrix==========
 User Guide
 ==========
 

@@ -56,4 +56,4 @@ Table of Contents
    user_guide
    numpy_guide
    formatting
-   tech_guide
+   api
