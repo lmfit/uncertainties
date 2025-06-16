@@ -15,8 +15,8 @@ Arrays of uncertainties Variables
 It is possible to put :class:`UFloat` objects  in NumPy_ arrays:
 
 >>> import numpy as np
->>> from uncertainties import ufloat
->>> arr = np.array([ufloat(1, 0.01), ufloat(2, 0.1)])
+>>> from uncertainties import UFloat
+>>> arr = np.array([UFloat(1, 0.01), UFloat(2, 0.1)])
 >>> print(2*arr)
 [2.0+/-0.02 4.0+/-0.2]
 >>> print(str(arr.sum()))
@@ -70,7 +70,7 @@ standard deviations:
 NumPy arrays of :class:`UFloat` objects can also be built directly through NumPy, thanks
 to NumPy's support of arrays of arbitrary objects:
 
->>> arr = np.array([ufloat(1, 0.1), ufloat(2, 0.002)])
+>>> arr = np.array([UFloat(1, 0.1), UFloat(2, 0.002)])
 
 
 .. index::
@@ -123,7 +123,7 @@ Since NaN±1 is *not* (the scalar) NaN, functions like
 with a NaN nominal value:
 
 >>> nan = float("nan")
->>> arr = np.array([nan, ufloat(nan, 1), ufloat(1, nan), 2])
+>>> arr = np.array([nan, UFloat(nan, 1), UFloat(1, nan), 2])
 >>> print(arr)
 [nan nan+/-1.0 1.0+/-nan 2]
 >>> print(arr[~unumpy.isnan(arr)].mean())
@@ -167,8 +167,8 @@ Here is one example set of functions to perform this operation.
 We can use the first function to serialize an array
 
 >>> u_arr = np.array([
-...     [ufloat(1, 0.1), ufloat(2, 0.2)],
-...     [ufloat(3, 0.3), ufloat(4, 0.4)],
+...     [UFloat(1, 0.1), UFloat(2, 0.2)],
+...     [UFloat(3, 0.3), UFloat(4, 0.4)],
 ... ])
 >>> print(u_arr)
 [[1.0+/-0.1 2.0+/-0.2]
@@ -209,6 +209,32 @@ be preserved.
 
 .. index:: linear algebra; additional functions, ulinalg
 
+Storing arrays in text format
+=============================
+
+Formatting Arrays
+=================
+
+Arrays of :class:`UFloat` objects have ``dtype=object``.
+By default, :mod:`numpy` does not know how to format entries in these arrays and falls
+back to the object ``__repr__`` or ``__str__`` function.
+For :class:`UFloat` objects this may be inconvenient for readability.
+
+>>> arr = np.array([UFloat(1/3, 1/9), UFloat(2/3, 2/9)])
+>>> print(arr)
+[0.3333333333333333+/-0.1111111111111111
+ 0.6666666666666666+/-0.2222222222222222]
+
+The following function can be used to more nicely format arrays of :class:`UFloat`
+objects.
+
+>>> from functools import partial
+>>> def format_uarray(uarr, fmt_spec=""):
+...     return np.vectorize(lambda x: format(x, fmt_spec))(uarr)
+>>>
+>>> print(format_uarray(arr, fmt_spec=".3u"))
+['0.333+/-0.111' '0.667+/-0.222']
+
 Additional array functions: unumpy.ulinalg
 ==========================================
 
@@ -219,11 +245,13 @@ It currently offers generalizations of two functions from
 :mod:`numpy.linalg` that work on arrays (or matrices) that contain
 numbers with uncertainties, the **matrix inverse and pseudo-inverse**:
 
->>> print(unumpy.ulinalg.inv([[ufloat(2, 0.1)]]))
+>>> arr = unumpy.ulinalg.inv(np.array([[UFloat(2, 0.1)]]))
+>>> print(arr)
 [[0.5+/-0.025]]
->>> mat = np.array([[ufloat(1, 0.1), ufloat(2, 0.002)]])
->>> print(unumpy.ulinalg.pinv(mat))
-[[0.19999999999999996+/-0.012004265908417718]
- [0.3999999999999999+/-0.01600179989876138]]
+>>> arr = np.array([[UFloat(1, 0.1), UFloat(2, 0.002)]])
+>>> arr_pinv = unumpy.ulinalg.pinv(arr)
+>>> print(format_uarray(arr_pinv))
+[['0.200+/-0.012']
+ ['0.400+/-0.016']]
 
 .. _NumPy: http://numpy.scipy.org/
