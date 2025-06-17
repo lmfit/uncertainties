@@ -453,22 +453,12 @@ def inv_with_derivatives(arr, input_type, derivatives):
     See the definition of func_with_deriv_to_uncert_func() for its
     detailed semantics.
     """
-
     inverse = numpy.linalg.inv(arr)
-    # The inverse of a numpy.matrix is a numpy.matrix.  It is assumed
-    # that numpy.linalg.inv is such that other types yield
-    # numpy.ndarrays:
-    if issubclass(input_type, numpy.matrix):
-        inverse = inverse.view(numpy.matrix)
     yield inverse
-
-    # It is mathematically convenient to work with matrices:
-    inverse_mat = numpy.asmatrix(inverse)
 
     # Successive derivatives of the inverse:
     for derivative in derivatives:
-        derivative_mat = numpy.asmatrix(derivative)
-        yield -inverse_mat * derivative_mat * inverse_mat
+        yield -inverse @ derivative @ inverse
 
 
 inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
@@ -496,15 +486,9 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
     """
 
     inverse = numpy.linalg.pinv(arr, rcond)
-    # The pseudo-inverse of a numpy.matrix is a numpy.matrix.  It is
-    # assumed that numpy.linalg.pinv is such that other types yield
-    # numpy.ndarrays:
-    if issubclass(input_type, numpy.matrix):
-        inverse = inverse.view(numpy.matrix)
     yield inverse
 
     # It is mathematically convenient to work with matrices:
-    inverse_mat = numpy.asmatrix(inverse)
 
     # Formula (4.12) from The Differentiation of Pseudo-Inverses and
     # Nonlinear Least Squares Problems Whose Variables
@@ -516,20 +500,19 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
     # http://mathoverflow.net/questions/25778/analytical-formula-for-numerical-derivative-of-the-matrix-pseudo-inverse
 
     # Shortcuts.  All the following factors should be numpy.matrix objects:
-    PA = arr * inverse_mat
-    AP = inverse_mat * arr
-    factor21 = inverse_mat * inverse_mat.H
+    PA = arr @ inverse
+    AP = inverse @ arr
+    factor21 = inverse @ inverse.conj().T
     factor22 = numpy.eye(arr.shape[0]) - PA
     factor31 = numpy.eye(arr.shape[1]) - AP
-    factor32 = inverse_mat.H * inverse_mat
+    factor32 = inverse.conj().T @ inverse
 
     # Successive derivatives of the inverse:
     for derivative in derivatives:
-        derivative_mat = numpy.asmatrix(derivative)
-        term1 = -inverse_mat * derivative_mat * inverse_mat
-        derivative_mat_H = derivative_mat.H
-        term2 = factor21 * derivative_mat_H * factor22
-        term3 = factor31 * derivative_mat_H * factor32
+        term1 = -inverse @ derivative @ inverse
+        derivative_H = derivative.conj().T
+        term2 = factor21 @ derivative_H @ factor22
+        term3 = factor31 @ derivative_H @ factor32
         yield term1 + term2 + term3
 
 
