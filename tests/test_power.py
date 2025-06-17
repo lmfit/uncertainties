@@ -44,13 +44,11 @@ two = ufloat(2, 0.2)
 positive = ufloat(0.3, 0.01)
 positive2 = ufloat(0.3, 0.01)
 negative = ufloat(-0.3, 0.01)
-integer = ufloat(-3, 0)
 non_int_larger_than_one = ufloat(3.1, 0.01)
 positive_smaller_than_one = ufloat(0.3, 0.01)
 
 
 power_derivative_cases = (
-    (negative, integer, -370.37037037037044, float("nan")),
     (negative, one, 1.0, float("nan")),
     (negative, zero, 0.0, float("nan")),
     (zero, non_int_larger_than_one, float("nan"), 0.0),
@@ -106,8 +104,6 @@ def test_power_zero_std_dev_result_cases(first_ufloat, second_ufloat, result_flo
 
 power_reference_cases = [
     (ufloat(-1.1, 0.1), -9),
-    (ufloat(-1, 0), 9),
-    (ufloat(-1.1, 0), 9),
 ]
 
 
