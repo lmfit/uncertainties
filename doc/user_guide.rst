@@ -216,40 +216,6 @@ uncertainty of 0.
 >>> (x -y)
 0.0+/-0.7071067811865476
 
-
-Comparisons of magnitude
-------------------------------------
-
-The concept of comparing the magnitude of values with uncertainties is a bit
-complicated.  That is, a Variable with a value of 25 +/- 10 might be greater
-than a Variable with a value of 24 +/- 8 most of the time, but *sometimes* it
-might be less than it.   The :mod:`uncertainties` package takes the simple
-approach of comparing nominal values.  That is
-
->>> a = ufloat(25, 10)
->>> b = ufloat(24, 8)
->>> a > b
-True
-
-Note that combining this comparison and the above discussion of `==` and `!=`
-can lead to a result that maybe somewhat surprising:
-
-
->>> a = ufloat(25, 10)
->>> b = ufloat(25, 8)
->>> a >= b
-False
->>> a > b
-False
->>> a == b
-False
->>> a.nominal_value >= b.nominal_value
-True
-
-That is, since `a` is neither greater than `b` (nominal value only) nor equal to
-`b`, it cannot be greater than or equal to `b`.
-
-
  .. index::
    pair: testing (scalar); NaN
 
