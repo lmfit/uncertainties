@@ -3,6 +3,7 @@ import json
 import math
 from pathlib import Path
 import random  # noqa
+import warnings
 
 import pytest
 
@@ -182,6 +183,12 @@ def test_ufloat_method_derivativs(func_name, ufloat_tuples):
 
 
 def test_calculate_zero_equality():
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="std_dev==0 may give unexpected_results.",
+            category=UserWarning,
+        )
     zero = ufloat(0, 0)
     x = ufloat(1, 0.1)
     x_zero = x - x
