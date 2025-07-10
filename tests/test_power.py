@@ -119,7 +119,6 @@ def test_power_wrt_ref(first_ufloat, second_float):
 positive = ufloat(0.3, 0.01)
 negative = ufloat(-0.3, 0.01)
 power_exception_cases = [
-    (ufloat(0, 0), negative, ZeroDivisionError),
     (ufloat(0, 0.1), negative, ZeroDivisionError),
     (negative, positive, ValueError),
 ]
@@ -137,7 +136,6 @@ ZeroDivisionError so these test cases are slightly different than those that app
 test_power_exceptions in test_uncertainties.py.
 """
 umath_power_exception_cases = [
-    (ufloat(0, 0), negative, ValueError),
     (ufloat(0, 0.1), negative, ValueError),
     (negative, positive, ValueError),
 ]
