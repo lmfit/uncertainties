@@ -1,4 +1,5 @@
 import pytest
+import warnings
 
 from uncertainties import ufloat, ufloat_fromstr, formatting
 from helpers import nan_close
@@ -35,8 +36,14 @@ def test_small_float():
     a = 1e-324
     b = 3e-324
     assert a < b
-    str(ufloat(a, 0.0))
-    str(ufloat(b, 0.0))
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="std_dev==0 may give unexpected_results.",
+            category=UserWarning,
+        )
+        str(ufloat(a, 0.0))
+        str(ufloat(b, 0.0))
 
 
 def test_repr():
@@ -48,7 +55,13 @@ def test_repr():
     assert repr(x) == "3.14159265358979+/-0.25"
 
     x = ufloat(3.14159265358979, 0)
-    assert repr(x) == "3.14159265358979+/-0"
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="std_dev==0 may give unexpected_results.",
+            category=UserWarning,
+        )
+        assert repr(x) == "3.14159265358979+/-0"
 
     # Tagging:
     x = ufloat(3, 1, "length")
@@ -460,7 +473,13 @@ formatting_cases = [  # (Nominal value, uncertainty): {format: result,...}
 @pytest.mark.parametrize("val, std_dev, fmt_spec, expected_str", formatting_cases)
 def test_format(val, std_dev, fmt_spec, expected_str):
     """Test the formatting of numbers with uncertainty."""
-    x = ufloat(val, std_dev)
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="std_dev==0 may give unexpected_results.",
+            category=UserWarning,
+        )
+        x = ufloat(val, std_dev)
     actual_str = format(x, fmt_spec)
 
     assert actual_str == expected_str
