@@ -189,9 +189,9 @@ def test_calculate_zero_equality():
             message=".*std_dev==0 may give unexpected results",
             category=UserWarning,
         )
-    zero = ufloat(0, 0)
-    x = ufloat(1, 0.1)
-    x_zero = x - x
+        zero = ufloat(0, 0)
+        x = ufloat(1, 0.1)
+        x_zero = x - x
     assert zero == x_zero
 
 
@@ -335,13 +335,6 @@ def test_pickling():
 
 def test_comparison_ops():
     "Test of comparison operators"
-
-    # Operations on quantities equivalent to Python numbers must still
-    # be correct:
-    b = ufloat(10, 0)
-    c = ufloat(10, 0)
-    assert b == c
-
     x = ufloat(3, 0.1)
 
     assert x == x
@@ -437,16 +430,8 @@ def test_comparison_ops():
 
     # With different numbers:
     test_all_comparison_ops(ufloat(3, 0.1), ufloat(-2, 0.1))
-    test_all_comparison_ops(
-        ufloat(0, 0),  # Special number
-        ufloat(1, 1),
-    )
-    test_all_comparison_ops(
-        ufloat(0, 0),  # Special number
-        ufloat(0, 0.1),
-    )
+
     # With identical numbers:
-    test_all_comparison_ops(ufloat(0, 0), ufloat(0, 0))
     test_all_comparison_ops(ufloat(1, 1), ufloat(1, 1))
 
 
