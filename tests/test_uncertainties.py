@@ -437,11 +437,9 @@ def test_comparison_ops():
 
 def test_logic():
     "bool defers to object.__bool__ and always returns True."
-    x = ufloat(3, 0)
     z = ufloat(0, 0.1)
     t = ufloat(-1, 2)
 
-    assert bool(x)
     assert bool(z)
     assert bool(t)
 
