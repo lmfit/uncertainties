@@ -54,14 +54,14 @@ def test_repr():
     x = ufloat(3.14159265358979, 0.25)
     assert repr(x) == "3.14159265358979+/-0.25"
 
-    x = ufloat(3.14159265358979, 0)
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore",
             message="std_dev==0 may give unexpected_results.",
             category=UserWarning,
         )
-        assert repr(x) == "3.14159265358979+/-0"
+        x = ufloat(3.14159265358979, 0)
+    assert repr(x) == "3.14159265358979+/-0"
 
     # Tagging:
     x = ufloat(3, 1, "length")
