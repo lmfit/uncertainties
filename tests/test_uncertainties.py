@@ -497,12 +497,12 @@ def test_basic_access_to_data():
 def test_correlations():
     "Correlations between variables"
 
-    a = ufloat(1, 0)
+    a = ufloat(1, 0.2)
     x = ufloat(4, 0.1)
     y = x * 2 + a
     # Correlations cancel "naive" additions of uncertainties:
     assert y.std_dev != 0
-    normally_zero = y - (x * 2 + 1)
+    normally_zero = y - (x * 2 + a)
     assert normally_zero.nominal_value == 0
     assert normally_zero.std_dev == 0
 
