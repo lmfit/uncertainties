@@ -186,7 +186,7 @@ def test_calculate_zero_equality():
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore",
-            message="std_dev==0 may give unexpected_results.",
+            message=".*std_dev==0 may give unexpected_results.",
             category=UserWarning,
         )
     zero = ufloat(0, 0)
