@@ -39,7 +39,7 @@ def test_small_float():
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore",
-            message=".*std_dev==0 may give unexpected_results.",
+            message=".*std_dev==0 may give unexpected results",
             category=UserWarning,
         )
         str(ufloat(a, 0.0))
@@ -57,7 +57,7 @@ def test_repr():
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore",
-            message=".*std_dev==0 may give unexpected_results.",
+            message=".*std_dev==0 may give unexpected results",
             category=UserWarning,
         )
         x = ufloat(3.14159265358979, 0)
@@ -476,7 +476,7 @@ def test_format(val, std_dev, fmt_spec, expected_str):
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore",
-            message=".*std_dev==0 may give unexpected_results.",
+            message=".*std_dev==0 may give unexpected results",
             category=UserWarning,
         )
         x = ufloat(val, std_dev)
