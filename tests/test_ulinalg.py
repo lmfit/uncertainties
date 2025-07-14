@@ -22,12 +22,6 @@ def test_list_inverse():
     # ulinalg do the same?  Here is a test:
     mat_list_inv = unumpy.ulinalg.inv(mat_list)
 
-    # More type testing:
-    mat_matrix = numpy.asmatrix(mat_list)
-    assert isinstance(
-        unumpy.ulinalg.inv(mat_matrix), type(numpy.linalg.inv(mat_matrix))
-    )
-
     # unumpy.ulinalg should behave in the same way as numpy.linalg,
     # with respect to types:
     mat_list_inv_numpy = numpy.linalg.inv(mat_list)

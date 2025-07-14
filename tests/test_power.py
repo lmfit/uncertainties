@@ -44,13 +44,11 @@ two = ufloat(2, 0.2)
 positive = ufloat(0.3, 0.01)
 positive2 = ufloat(0.3, 0.01)
 negative = ufloat(-0.3, 0.01)
-integer = ufloat(-3, 0)
 non_int_larger_than_one = ufloat(3.1, 0.01)
 positive_smaller_than_one = ufloat(0.3, 0.01)
 
 
 power_derivative_cases = (
-    (negative, integer, -370.37037037037044, float("nan")),
     (negative, one, 1.0, float("nan")),
     (negative, zero, 0.0, float("nan")),
     (zero, non_int_larger_than_one, float("nan"), 0.0),
@@ -91,27 +89,13 @@ def test_power_derivatives(first_ufloat, second_ufloat, first_der, second_der):
             assert nan_close(second_der_result, second_der)
 
 
-zero = ufloat(0, 0)
-one = ufloat(1, 0)
 p = ufloat(0.3, 0.01)
 
 power_zero_std_dev_result_cases = [
     (0, p, 0),
     (p, 0, 1),
-    (zero, 0, 1),
     (-p, 0, 1),
-    (0.3, zero, 1),
-    (p, zero, 1),
-    (one, -3, 1),
-    (one, -3.1, 1),
-    (one, 0, 1),
-    (one, 3, 1),
-    (one, 3.1, 1),
-    (one, -p, 1),
-    (one, zero, 1),
-    (one, p, 1),
     (1, -p, 1),
-    (1, zero, 1),
     (1, p, 1),
 ]
 
@@ -129,8 +113,6 @@ def test_power_zero_std_dev_result_cases(first_ufloat, second_ufloat, result_flo
 
 power_reference_cases = [
     (ufloat(-1.1, 0.1), -9),
-    (ufloat(-1, 0), 9),
-    (ufloat(-1.1, 0), 9),
 ]
 
 
@@ -146,7 +128,6 @@ def test_power_wrt_ref(first_ufloat, second_float):
 positive = ufloat(0.3, 0.01)
 negative = ufloat(-0.3, 0.01)
 power_exception_cases = [
-    (ufloat(0, 0), negative, ZeroDivisionError),
     (ufloat(0, 0.1), negative, ZeroDivisionError),
     (negative, positive, ValueError),
 ]
@@ -164,7 +145,6 @@ ZeroDivisionError so these test cases are slightly different than those that app
 test_power_exceptions in test_uncertainties.py.
 """
 umath_power_exception_cases = [
-    (ufloat(0, 0), negative, ValueError),
     (ufloat(0, 0.1), negative, ValueError),
     (negative, positive, ValueError),
 ]

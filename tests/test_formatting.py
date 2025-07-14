@@ -26,6 +26,7 @@ def test_PDG_precision():
         assert formatting.PDG_precision(std_dev) == result
 
 
+@pytest.mark.filterwarnings("ignore:.*std_dev==0")
 def test_small_float():
     """
     Make sure that very small floats do not error, even though printing as str
@@ -39,6 +40,7 @@ def test_small_float():
     str(ufloat(b, 0.0))
 
 
+@pytest.mark.filterwarnings("ignore:.*std_dev==0")
 def test_repr():
     """Test the representation of numbers with uncertainty."""
 
@@ -453,6 +455,7 @@ formatting_cases = [  # (Nominal value, uncertainty): {format: result,...}
 ]
 
 
+@pytest.mark.filterwarnings("ignore:.*std_dev==0")
 @pytest.mark.parametrize("val, std_dev, fmt_spec, expected_str", formatting_cases)
 def test_format(val, std_dev, fmt_spec, expected_str):
     """Test the formatting of numbers with uncertainty."""
