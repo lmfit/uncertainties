@@ -17,6 +17,10 @@ Adds:
 
 Deprecates:
 
+- The `AffineScalarFunc.derivatives` property has been marked as deprecated. This
+   property will be removed in a future release.
+- The `AffineScalarFunc.error_components()` method has been marked as deprecated. This
+   method will be replaced by a property of the same name in a future release.
 - Support for interoperability between `uncertainties` `AffineScalarFunc` scalar objects
    and `np.matrix` objects is now marked as deprecated. According to the
    `numpy documentation <https://numpy.org/doc/stable/reference/generated/numpy.matrix.html>`_
