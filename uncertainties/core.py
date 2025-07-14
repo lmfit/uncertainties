@@ -446,7 +446,7 @@ class AffineScalarFunc(object):
         This mapping is cached, for subsequent calls.
         """
         warn(
-            f"{self.__class__.___name__}.derivatives() is deprecated. It will "
+            f"{self.__class__.__name__}.derivatives() is deprecated. It will "
             f"be removed in a future release.",
             FutureWarning,
             stacklevel=2,
@@ -476,7 +476,7 @@ class AffineScalarFunc(object):
         math.frexp() returns, for instance).
         """
         warn(
-            f"{self.__class__.___name__}.error_components() is currently an "
+            f"{self.__class__.__name__}.error_components() is currently an "
             f"instance method. This method is deprecated. In a future release it will "
             f"be replaced with an instance property by the same name. It will be "
             f"accessed by {self.__class__.__name__}.error_components (with no "
