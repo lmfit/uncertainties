@@ -159,6 +159,14 @@ the common exponent.
 An uncertainty which is *exactly* **zero** is always formatted as an
 integer:
 
+.. doctest::
+   :hide:
+
+   >>> import warnings
+   >>> original_filters = warnings.filters[:]
+   >>> warnings.filterwarnings("ignore", message=".*std_dev==0")
+
+
 >>> print(ufloat(3.1415, 0))
 3.1415+/-0
 >>> print(ufloat(3.1415e10, 0))
@@ -169,6 +177,12 @@ integer:
 3.14+/-0.00
 >>> print('{:.2f}'.format(ufloat(3.14, 0.00)))
 3.14+/-0
+
+
+.. doctest::
+   :hide:
+
+   >>> warnings.filters = original_filters
 
 **All the digits** of a number with uncertainty are given in its
 representation:
