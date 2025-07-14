@@ -37,7 +37,7 @@ def test_numpy():
     assert numpy.exp(arr).all()  # All elements > 0
     # Equivalent with an array of AffineScalarFunc objects:
     try:
-        numpy.exp(arr + ufloat(0, 0))
+        numpy.exp(arr + ufloat(0, 0.1))
     except (AttributeError, TypeError):
         # In numpy<1.17, an AttributeError is raised in this situation. This was
         # considered a bug however, and in numpy 1.17 it was changed to a
@@ -74,7 +74,7 @@ def derivatives_close(x, y):
 def test_inverse():
     "Tests of the matrix inverse"
 
-    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)]])
+    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0.1)]])
     m_nominal_values = unumpy.nominal_values(m)
 
     # "Regular" inverse matrix, when uncertainties are not taken
@@ -160,7 +160,7 @@ def test_wrap_array_func():
 
     ##########
     # Full rank rectangular matrix:
-    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
+    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0.1)], [1, -3.1]])
 
     # Numerical and package (analytical) pseudo-inverses: they must be
     # the same:
@@ -178,7 +178,7 @@ def test_pseudo_inverse():
 
     ##########
     # Full rank rectangular matrix:
-    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
+    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0.1)], [1, -3.1]])
 
     # Numerical and package (analytical) pseudo-inverses: they must be
     # the same:

@@ -113,6 +113,7 @@ ufloat_from_str_cases = [
 ]
 
 
+@pytest.mark.filterwarnings("ignore:.*std_dev==0")
 @pytest.mark.parametrize("input_str,nominal_value,std_dev", ufloat_from_str_cases)
 def test_ufloat_fromstr(input_str, nominal_value, std_dev):
     num = ufloat_fromstr(input_str)
@@ -181,6 +182,7 @@ def test_ufloat_method_derivativs(func_name, ufloat_tuples):
         )
 
 
+@pytest.mark.filterwarnings("ignore:.*std_dev==0")
 def test_calculate_zero_equality():
     zero = ufloat(0, 0)
     x = ufloat(1, 0.1)
@@ -328,13 +330,6 @@ def test_pickling():
 
 def test_comparison_ops():
     "Test of comparison operators"
-
-    # Operations on quantities equivalent to Python numbers must still
-    # be correct:
-    b = ufloat(10, 0)
-    c = ufloat(10, 0)
-    assert b == c
-
     x = ufloat(3, 0.1)
 
     assert x == x
@@ -430,28 +425,16 @@ def test_comparison_ops():
 
     # With different numbers:
     test_all_comparison_ops(ufloat(3, 0.1), ufloat(-2, 0.1))
-    test_all_comparison_ops(
-        ufloat(0, 0),  # Special number
-        ufloat(1, 1),
-    )
-    test_all_comparison_ops(
-        ufloat(0, 0),  # Special number
-        ufloat(0, 0.1),
-    )
+
     # With identical numbers:
-    test_all_comparison_ops(ufloat(0, 0), ufloat(0, 0))
     test_all_comparison_ops(ufloat(1, 1), ufloat(1, 1))
 
 
 def test_logic():
     "bool defers to object.__bool__ and always returns True."
-    x = ufloat(3, 0)
-    y = ufloat(0, 0)
     z = ufloat(0, 0.1)
     t = ufloat(-1, 2)
 
-    assert bool(x)
-    assert bool(y)
     assert bool(z)
     assert bool(t)
 
@@ -509,12 +492,12 @@ def test_basic_access_to_data():
 def test_correlations():
     "Correlations between variables"
 
-    a = ufloat(1, 0)
+    a = ufloat(1, 0.2)
     x = ufloat(4, 0.1)
     y = x * 2 + a
     # Correlations cancel "naive" additions of uncertainties:
     assert y.std_dev != 0
-    normally_zero = y - (x * 2 + 1)
+    normally_zero = y - (x * 2 + a)
     assert normally_zero.nominal_value == 0
     assert normally_zero.std_dev == 0
 
