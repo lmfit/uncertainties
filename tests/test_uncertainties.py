@@ -114,6 +114,7 @@ ufloat_from_str_cases = [
 ]
 
 
+@pytest.mark.filterwarnings("ignore:.*std_dev==0")
 @pytest.mark.parametrize("input_str,nominal_value,std_dev", ufloat_from_str_cases)
 def test_ufloat_fromstr(input_str, nominal_value, std_dev):
     num = ufloat_fromstr(input_str)
