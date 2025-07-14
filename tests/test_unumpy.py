@@ -160,7 +160,7 @@ def test_wrap_array_func():
 
     ##########
     # Full rank rectangular matrix:
-    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
+    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0.1)], [1, -3.1]])
 
     # Numerical and package (analytical) pseudo-inverses: they must be
     # the same:
@@ -178,7 +178,7 @@ def test_pseudo_inverse():
 
     ##########
     # Full rank rectangular matrix:
-    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
+    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0.1)], [1, -3.1]])
 
     # Numerical and package (analytical) pseudo-inverses: they must be
     # the same:
