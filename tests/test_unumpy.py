@@ -74,7 +74,7 @@ def derivatives_close(x, y):
 def test_inverse():
     "Tests of the matrix inverse"
 
-    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)]])
+    m = numpy.array([[ufloat(10, 1), -3.1], [0, ufloat(3, 0.1)]])
     m_nominal_values = unumpy.nominal_values(m)
 
     # "Regular" inverse matrix, when uncertainties are not taken
