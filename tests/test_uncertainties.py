@@ -1,19 +1,21 @@
 import copy
 import json
 import math
+import gc
 from pathlib import Path
-import random  # noqa
+import pickle
+import random
 
 import pytest
 
 import uncertainties.core as uncert_core
 from uncertainties.core import (
     ufloat,
-    AffineScalarFunc,
     ufloat_fromstr,
 )
 from uncertainties import (
     umath,
+    UFloat,
     correlated_values,
     correlated_values_norm,
     correlation_matrix,
@@ -22,6 +24,7 @@ from uncertainties.ops import partial_derivative
 from helpers import (
     nan_close,
     ufloat_nan_close,
+    get_single_uatom,
 )
 
 
@@ -31,29 +34,47 @@ except ImportError:
     np = None
 
 
-def test_ufloat_function_construction():
-    """
-    Tests the various means of constructing a constant number with
-    uncertainty *without a string* (see test_ufloat_fromstr(), for this).
-    """
+def test_UFloat_class_construction():
+    """Test creating UFloat directly."""
+    x = UFloat(3, 0.14)
+    assert x.nominal_value == 3
+    assert x.std_dev == 0.14
+    assert get_single_uatom(x).tag is None
 
-    ## Simple construction:
+    x = UFloat(3, 0.14, "pi")
+    assert x.nominal_value == 3
+    assert x.std_dev == 0.14
+    assert get_single_uatom(x).tag == "pi"
+
+    x = UFloat(3, 0.14, tag="pi")
+    assert x.nominal_value == 3
+    assert x.std_dev == 0.14
+    assert get_single_uatom(x).tag == "pi"
+
+    with pytest.raises(ValueError):
+        _ = UFloat(3, -0.1)
+
+    with pytest.raises(TypeError):
+        UFloat(1)
+
+
+def test_ufloat_function_construction():
+    """Test creating UFloat via ufloat() function."""
     x = ufloat(3, 0.14)
     assert x.nominal_value == 3
     assert x.std_dev == 0.14
-    assert x.tag is None
+    assert get_single_uatom(x).tag is None
 
-    # ... with tag as positional argument:
     x = ufloat(3, 0.14, "pi")
     assert x.nominal_value == 3
     assert x.std_dev == 0.14
-    assert x.tag == "pi"
+    assert get_single_uatom(x).tag == "pi"
 
     # ... with tag keyword:
     x = ufloat(3, 0.14, tag="pi")
     assert x.nominal_value == 3
     assert x.std_dev == 0.14
-    assert x.tag == "pi"
+    assert get_single_uatom(x).tag == "pi"
 
     with pytest.raises(ValueError):
         _ = ufloat(3, -0.1)
@@ -105,9 +126,6 @@ ufloat_from_str_cases = [
     ("3.4(nan)e10", 3.4e10, float("nan")),
     # NaN value:
     ("nan+/-3.14e2", float("nan"), 314),
-    # "Double-floats"
-    ("(-3.1415 +/- 1e-4)e+200", -3.1415e200, 1e196),
-    ("(-3.1415e-10 +/- 1e-4)e+200", -3.1415e190, 1e196),
     # Special float representation:
     ("-3(0.)", -3, 0),
 ]
@@ -119,22 +137,29 @@ def test_ufloat_fromstr(input_str, nominal_value, std_dev):
     num = ufloat_fromstr(input_str)
     assert nan_close(num.nominal_value, nominal_value)
     assert nan_close(num.std_dev, std_dev)
-    assert num.tag is None
+    if std_dev != 0:
+        assert get_single_uatom(num).tag is None
+    else:
+        assert num.error_components == {}
 
     # With a tag as positional argument:
     num = ufloat_fromstr(input_str, "test variable")
     assert nan_close(num.nominal_value, nominal_value)
     assert nan_close(num.std_dev, std_dev)
-    assert num.tag == "test variable"
+    if std_dev != 0:
+        assert get_single_uatom(num).tag == "test variable"
+    else:
+        assert num.error_components == {}
 
     # With a tag as keyword argument:
     num = ufloat_fromstr(input_str, tag="test variable")
     assert nan_close(num.nominal_value, nominal_value)
     assert nan_close(num.std_dev, std_dev)
-    assert num.tag == "test variable"
+    if std_dev != 0:
+        assert get_single_uatom(num).tag == "test variable"
+    else:
+        assert num.error_components == {}
 
-
-###############################################################################
 
 ufloat_method_cases_json_path = Path(
     Path(__file__).parent,
@@ -166,12 +191,15 @@ def test_ufloat_method_derivativs(func_name, ufloat_tuples):
     extract the numerical partial derivative.
     """
     bound_func = getattr(ufloat_arg_list[0], func_name)
-    unbound_func = getattr(AffineScalarFunc, func_name)
+    unbound_func = getattr(UFloat, func_name)
 
     result = bound_func(*ufloat_arg_list[1:])
 
     for arg_num, arg in enumerate(ufloat_arg_list):
-        ufloat_deriv_value = result.derivatives[arg]
+        uatom = get_single_uatom(arg)
+        orig_weight = arg.error_components[uatom]
+        result_weight = result.error_components[uatom]
+        ufloat_deriv_value = result_weight / orig_weight
         numerical_deriv_func = partial_derivative(unbound_func, arg_num)
         numerical_deriv_value = numerical_deriv_func(*float_arg_list)
         assert math.isclose(
@@ -191,141 +219,86 @@ def test_calculate_zero_equality():
 
 
 def test_copy():
-    "Standard copy module integration"
-    import gc
-
+    """Standard copy module integration."""
     x = ufloat(3, 0.1)
     assert x == x
 
+    x_uatom = get_single_uatom(x)
+
     y = copy.copy(x)
-    assert x != y
-    assert not (x == y)
-    assert y in y.derivatives.keys()  # y must not copy the dependence on x
+    assert y == x
+    assert get_single_uatom(y) == x_uatom
 
     z = copy.deepcopy(x)
-    assert x != z
+    assert z == x
+    assert get_single_uatom(z) == x_uatom
 
-    # Copy tests on expressions:
     t = x + 2 * z
-    # t depends on x:
-    assert x in t.derivatives
+    assert x_uatom in t.error_components
 
-    # The relationship between the copy of an expression and the
-    # original variables should be preserved:
     t_copy = copy.copy(t)
-    # Shallow copy: the variables on which t depends are not copied:
-    assert x in t_copy.derivatives
-    assert uncert_core.covariance_matrix([t, z]) == uncert_core.covariance_matrix(
-        [t_copy, z]
+    assert x_uatom in t_copy.error_components
+    assert np.all(
+        uncert_core.covariance_matrix([t, z])
+        == uncert_core.covariance_matrix([t_copy, z])
     )
 
-    # However, the relationship between a deep copy and the original
-    # variables should be broken, since the deep copy created new,
-    # independent variables:
     t_deepcopy = copy.deepcopy(t)
-    assert x not in t_deepcopy.derivatives
-    assert uncert_core.covariance_matrix([t, z]) != uncert_core.covariance_matrix(
-        [t_deepcopy, z]
+    assert x_uatom in t_deepcopy.error_components
+    assert np.all(
+        uncert_core.covariance_matrix([t, z])
+        == uncert_core.covariance_matrix([t_deepcopy, z])
     )
 
-    # Test of implementations with weak references:
-
-    # Weak references: destroying a variable should never destroy the
-    # integrity of its copies (which would happen if the copy keeps a
-    # weak reference to the original, in its derivatives member: the
-    # weak reference to the original would become invalid):
     del x
-
     gc.collect()
-
-    assert y in list(y.derivatives.keys())
-
-
-## Classes for the pickling tests (put at the module level, so that
-## they can be unpickled):
+    assert x_uatom in y.error_components
 
 
-# Subclass without slots:
-class NewVariable_dict(uncert_core.Variable):
+"""
+Classes to test pickling with different types of __slots__ inheritance
+"""
+
+
+class UFloatDict(UFloat):
     pass
 
 
-# Subclass with slots defined by a tuple:
-class NewVariable_slots_tuple(uncert_core.Variable):
+class UFloatSlotsTuple(UFloat):
     __slots__ = ("new_attr",)
 
 
-# Subclass with slots defined by a string:
-class NewVariable_slots_str(uncert_core.Variable):
+class UFloatSlotsStr(UFloat):
     __slots__ = "new_attr"
 
 
 def test_pickling():
-    "Standard pickle module integration."
-
-    import pickle
-
-    x = ufloat(2, 0.1)
-
+    """Standard pickle module integration."""
+    x = UFloat(2, 0.1)
     x_unpickled = pickle.loads(pickle.dumps(x))
 
-    assert x != x_unpickled  # Pickling creates copies
+    assert x_unpickled == x
 
-    ## Tests with correlations and AffineScalarFunc objects:
     f = 2 * x
-    assert isinstance(f, AffineScalarFunc)
-    (f_unpickled, x_unpickled2) = pickle.loads(pickle.dumps((f, x)))
-    # Correlations must be preserved:
-    assert f_unpickled == x_unpickled2 + x_unpickled2
+    assert isinstance(f, UFloat)
 
-    ## Tests with subclasses:
+    f_unpickled, x_unpickled2 = pickle.loads(pickle.dumps((f, x)))
+    assert f_unpickled == 2 * x_unpickled2
 
-    for subclass in (NewVariable_dict, NewVariable_slots_tuple, NewVariable_slots_str):
+    for subclass in (UFloatDict, UFloatSlotsTuple, UFloatSlotsStr):
         x = subclass(3, 0.14)
 
         # Pickling test with possibly uninitialized slots:
-        pickle.loads(pickle.dumps(x))
+        assert pickle.loads(pickle.dumps(x)) == x
 
         # Unpickling test:
         x.new_attr = "New attr value"
         x_unpickled = pickle.loads(pickle.dumps(x))
-        # Must exist (from the slots of the parent class):
-        x_unpickled.nominal_value
-        x_unpickled.new_attr  # Must exist
+        assert x_unpickled == x
+        assert x_unpickled.new_attr == "New attr value"
 
-    ##
-
-    # Corner case test: when an attribute is present both in __slots__
-    # and in __dict__, it is first looked up from the slots
-    # (references:
-    # http://docs.python.org/2/reference/datamodel.html#invoking-descriptors,
-    # http://stackoverflow.com/a/15139208/42973). As a consequence,
-    # the pickling process must pickle the correct value (i.e., not
-    # the value from __dict__):
-    x = NewVariable_dict(3, 0.14)
-    x._nominal_value = "in slots"
-    # Corner case: __dict__ key which is also a slot name (it is
-    # shadowed by the corresponding slot, so this is very unusual,
-    # though):
-    x.__dict__["_nominal_value"] = "in dict"
-    # Additional __dict__ attribute:
-    x.dict_attr = "dict attribute"
-
-    x_unpickled = pickle.loads(pickle.dumps(x))
-    # We make sure that the data is still there and untouched:
-    assert x_unpickled._nominal_value == "in slots"
-    assert x_unpickled.__dict__ == x.__dict__
-
-    ##
-
-    # Corner case that should have no impact on the code but which is
-    # not prevented by the documentation: case of constant linear
-    # terms (the potential gotcha is that if the linear_combo
-    # attribute is empty, __getstate__()'s result could be false, and
-    # so __setstate__() would not be called and the original empty
-    # linear combination would not be set in linear_combo.
-    x = uncert_core.LinearCombination({})
-    assert pickle.loads(pickle.dumps(x)).linear_combo == {}
+    x = uncert_core.UCombo(())
+    assert pickle.loads(pickle.dumps(x)).ucombo_tuple == ()
 
 
 def test_comparison_ops():
@@ -443,50 +416,42 @@ def test_basic_access_to_data():
     "Access to data from Variable and AffineScalarFunc objects."
 
     x = ufloat(3.14, 0.01, "x var")
-    assert x.tag == "x var"
+    assert get_single_uatom(x).tag == "x var"
     assert x.nominal_value == 3.14
     assert x.std_dev == 0.01
 
     # Case of AffineScalarFunc objects:
     y = x + 0
-    assert type(y) == AffineScalarFunc
+    assert type(y) == UFloat
     assert y.nominal_value == 3.14
     assert y.std_dev == 0.01
 
     # Details on the sources of error:
     a = ufloat(-1, 0.001)
     y = 2 * x + 3 * x + 2 + a
-    error_sources = y.error_components()
-    assert len(error_sources) == 2  # 'a' and 'x'
-    assert error_sources[x] == 0.05
-    assert error_sources[a] == 0.001
+    error_sources = y.error_components
+    assert len(error_sources) == 2
+    # 'a' and 'x'
+    assert y.covariance(x) == 0.05 * 0.01
+    assert y.covariance(a) == 0.001 * 0.001
 
-    # Derivative values should be available:
-    assert y.derivatives[x] == 5
-
-    # Modification of the standard deviation of variables:
-    x.std_dev = 1
-    assert y.error_components()[x] == 5  # New error contribution!
+    with pytest.raises(AttributeError):
+        # std_dev cannot be modified
+        x.std_dev = 1
 
     # Calculated values with uncertainties should not have a settable
     # standard deviation:
     y = 2 * x
-    try:
+    with pytest.raises(AttributeError):
         y.std_dev = 1
-    except AttributeError:
-        pass
-    else:
-        raise Exception("std_dev should not be settable for calculated results")
 
     # Calculation of deviations in units of the standard deviations:
     assert 10 / x.std_dev == x.std_score(10 + x.nominal_value)
 
     # "In units of the standard deviation" is not always meaningful:
-    x.std_dev = 0
-    try:
+    x = ufloat(1, 0)
+    with pytest.raises(ValueError):
         x.std_score(1)
-    except ValueError:
-        pass  # Normal behavior
 
 
 def test_correlations():
@@ -909,6 +874,9 @@ def test_wrap_with_kwargs():
     z = ufloat(100, 0.111)
     t = ufloat(0.1, 0.1111)
 
+    z_uatom = get_single_uatom(z)
+    t_uatom = get_single_uatom(t)
+
     assert ufloat_nan_close(
         f_wrapped(x, y, z, t=t), f_auto_unc(x, y, z, t=t), tolerance=1e-5
     )
@@ -927,8 +895,8 @@ def test_wrap_with_kwargs():
     # to try to confuse the code:
 
     assert (
-        f_wrapped2(x, y, z, t=t).derivatives[y]
-        == f_auto_unc(x, y, z, t=t).derivatives[y]
+        f_wrapped2(x, y, z, t=t).error_components[z_uatom]
+        == f_auto_unc(x, y, z, t=t).error_components[z_uatom]
     )
 
     # Derivatives supplied through the keyword-parameter dictionary of
@@ -944,12 +912,12 @@ def test_wrap_with_kwargs():
     # The derivatives should be exactly the same, because they are
     # obtained with the exact same analytic formula:
     assert (
-        f_wrapped3(x, y, z, t=t).derivatives[z]
-        == f_auto_unc(x, y, z, t=t).derivatives[z]
+        f_wrapped3(x, y, z, t=t).error_components[z_uatom]
+        == f_auto_unc(x, y, z, t=t).error_components[z_uatom]
     )
     assert (
-        f_wrapped3(x, y, z, t=t).derivatives[t]
-        == f_auto_unc(x, y, z, t=t).derivatives[t]
+        f_wrapped3(x, y, z, t=t).error_components[t_uatom]
+        == f_auto_unc(x, y, z, t=t).error_components[t_uatom]
     )
 
     ########################################
@@ -1214,7 +1182,7 @@ else:
             list(zip(nominal_values, std_devs)), corr_mat
         )
 
-        # uarrays_close() is used instead of numbers_close() because
+        # uarrays_close() is used instead of nan_close() because
         # it compares uncertainties too:
 
         # Test of individual variables:

@@ -6,6 +6,8 @@ import itertools
 from inspect import getfullargspec
 import numbers
 
+from uncertainties.ucombo import UCombo
+
 # Some types known to not depend on Variable objects are put in
 # CONSTANT_TYPES.  The most common types can be put in front, as this
 # may slightly improve the execution speed.
@@ -341,6 +343,16 @@ class IndexableIter(object):
         )
 
 
+def ufloat_from_uncertainty(cls, nominal_value: float, uncertainty: UCombo):
+    # TODO: It is a hack that needs to be removed that this function uses a generic
+    #   cls input. This issue stems from the monkey patching that connects core.py and
+    #   ops.py.
+    result = object.__new__(cls)
+    result._nominal_value = nominal_value
+    result._uncertainty = uncertainty
+    return result
+
+
 def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
     if derivatives_args is None:
         derivatives_args = []
@@ -516,17 +528,13 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
         # defined by (coefficient, argument) pairs, where 'argument'
         # is an AffineScalarFunc (for all AffineScalarFunc found as
         # argument of f):
-        linear_part = []
+        uncertainty = UCombo(())
 
         for pos in pos_w_uncert:
-            linear_part.append(
-                (
-                    # Coefficient:
-                    derivatives_args_index[pos](*args_values, **kwargs),
-                    # Linear part of the AffineScalarFunc expression:
-                    args[pos]._linear_part,
-                )
-            )
+            arg_uncertainty = args[pos]._uncertainty
+            # if arg_uncertainty:
+            derivative_val = derivatives_args_index[pos](*args_values, **kwargs)
+            uncertainty += derivative_val * arg_uncertainty
 
         for name in names_w_uncert:
             # Optimization: caching of the automatic numerical
@@ -534,24 +542,19 @@ def _wrap(cls, f, derivatives_args=None, derivatives_kwargs=None):
             # discovered. This gives a speedup when the original
             # function is called repeatedly with the same keyword
             # arguments:
-            derivative = derivatives_all_kwargs.setdefault(
+            # if not kwargs_uncert_values[name].uncertainty:
+            #     continue
+            derivative_func = derivatives_all_kwargs.setdefault(
                 name,
                 # Derivative never needed before:
                 partial_derivative(f, name),
             )
-
-            linear_part.append(
-                (
-                    # Coefficient:
-                    derivative(*args_values, **kwargs),
-                    # Linear part of the AffineScalarFunc expression:
-                    kwargs_uncert_values[name]._linear_part,
-                )
-            )
+            derivative_val = derivative_func(*args_values, **kwargs)
+            uncertainty += derivative_val * kwargs_uncert_values[name]._uncertainty
 
         # The function now returns the necessary linear approximation
         # to the function:
-        return cls(f_nominal_value, linear_part)
+        return ufloat_from_uncertainty(cls, f_nominal_value, uncertainty)
 
     f_with_affine_output = set_doc(
         """\

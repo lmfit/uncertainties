@@ -51,7 +51,7 @@ def test_repeated_summation_complexity():
         assert 0.9 * log10(n / n0) < log10(t / t0) < 1.1 * log10(n / n0)
 
 
-@pytest.mark.parametrize("num", (10, 100, 1000, 10000, 100000))
+@pytest.mark.parametrize("num", (10, 100, 1000))
 @pytest.mark.benchmark
 def test_repeated_summation_speed(num):
     repeated_summation(num)

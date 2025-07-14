@@ -5,10 +5,11 @@ from pathlib import Path
 
 import pytest
 
+from helpers import get_single_uatom
 from uncertainties import ufloat
 import uncertainties.core as uncert_core
-import uncertainties.umath_core as umath_core
 from uncertainties.ops import partial_derivative
+import uncertainties.umath_core as umath_core
 
 from helpers import nan_close, ufloat_nan_close
 ###############################################################################
@@ -43,7 +44,13 @@ def test_umath_function_derivatives(func_name, ufloat_tuples):
     result = func(*ufloat_arg_list)
 
     for arg_num, arg in enumerate(ufloat_arg_list):
-        ufloat_deriv_value = result.derivatives[arg]
+        uatom = get_single_uatom(arg)
+        orig_weight = arg.error_components[uatom]
+        try:
+            result_weight = result.error_components[uatom]
+        except KeyError:
+            result_weight = 0
+        ufloat_deriv_value = result_weight / orig_weight
         numerical_deriv_func = partial_derivative(func, arg_num)
         numerical_deriv_value = numerical_deriv_func(*float_arg_list)
         assert math.isclose(
@@ -250,8 +257,10 @@ def test_hypot():
     """
     x = ufloat(0, 1)
     y = ufloat(0, 2)
+    x_uatom = get_single_uatom(x)
+    y_uatom = get_single_uatom(y)
     # Derivatives that cannot be calculated simply return NaN, with no
     # exception being raised, normally:
     result = umath_core.hypot(x, y)
-    assert isnan(result.derivatives[x])
-    assert isnan(result.derivatives[y])
+    assert isnan(result.error_components[x_uatom])
+    assert isnan(result.error_components[y_uatom])

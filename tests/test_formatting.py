@@ -52,10 +52,6 @@ def test_repr():
     x = ufloat(3.14159265358979, 0)
     assert repr(x) == "3.14159265358979+/-0"
 
-    # Tagging:
-    x = ufloat(3, 1, "length")
-    assert repr(x) == "< length = 3.0+/-1.0 >"
-
 
 # The way NaN is formatted with F, E and G depends on the version of Python (NAN for
 # Python 2.5+ at least):

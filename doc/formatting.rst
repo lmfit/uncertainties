@@ -14,7 +14,8 @@ Printing
 
 .. Overview:
 
-Numbers with uncertainties can be printed conveniently:
+The :mod:`uncertainties` package provides functionality for convenient formatting of
+:class:`UFloat` objects:
 
 >>> from uncertainties import ufloat
 >>> x = ufloat(0.2, 0.01)
@@ -34,8 +35,7 @@ Standard formats
 
 .. Formatting method:
 
-More **control over the format** can be obtained (in Python 2.6+)
-through the usual :func:`format` method of strings:
+The formatting can be controlled using various means of formatting python strings:
 
 >>> print('Result = {:10.2f}'.format(x))
 Result =       0.20+/-      0.01
@@ -48,10 +48,9 @@ with the ``n`` format type. In particular, a fill character, an
 alignment option, a sign or zero option, a width, or the ``%`` format
 type are all supported.
 
-The usual **float formats with a precision** retain their original
-meaning (e.g. ``.2e`` uses two digits after the decimal point): code
-that works with floats produces similar results when running with
-numbers with uncertainties.
+The usual **float formats with a precision** retain their original meaning (e.g. ``.2e``
+uses two digits after the decimal point): code that works with floats produces similar
+results when running used with :class:`UFloat` objects.
 
 Precision control
 -----------------
@@ -203,7 +202,7 @@ It is sometimes useful to have a **consistent formatting** across
 multiple parts of a program. Python's `string.Formatter class
 <https://docs.python.org/3/library/string.html#custom-string-formatting>`_
 allows one to do just that. Here is how it can be used to consistently
-use the shorthand notation for numbers with uncertainties:
+use the shorthand notation for :class:`UFloat` objects:
 
 .. code-block:: python
 
@@ -230,10 +229,10 @@ Customizing the pretty-print and LaTeX outputs
 
 The pretty print and LaTeX outputs themselves can be customized.
 
-For example, the pretty-print representation of numbers with uncertainty can
-display multiplication with a centered dot (⋅) instead of the default symbol
-(×), like in ``(2.00±0.10)⋅10⁻¹``; this is easily done through the global
-setting ``uncertainties.core.MULT_SYMBOLS["pretty-print"] = "⋅"``.
+For example, the pretty-print representation of :class:`UFloat` objects can display
+multiplication with a centered dot (⋅) instead of the default symbol (×), like in
+``(2.00±0.10)⋅10⁻¹``; this is easily done through the global setting
+``uncertainties.core.MULT_SYMBOLS["pretty-print"] = "⋅"``.
 
 Beyond this multiplication symbol, the "±" symbol, the parentheses and the
 exponent representations can also be customized globally. The details can be

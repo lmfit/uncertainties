@@ -10,11 +10,11 @@ Core functions used by unumpy and some of its submodules.
 # user.
 
 # Standard modules:
-from builtins import next
 from builtins import zip
-from builtins import range
+from functools import wraps
 import sys
-import inspect
+from typing import Callable, Union
+from numbers import Real
 
 # 3rd-party modules:
 import numpy
@@ -22,6 +22,10 @@ import numpy
 # Local modules:
 import uncertainties.umath_core as umath_core
 import uncertainties.core as uncert_core
+from uncertainties import UFloat
+from uncertainties.ops import ufloat_from_uncertainty
+from uncertainties.ucombo import UCombo
+
 
 __all__ = [
     # Factory functions:
@@ -30,6 +34,184 @@ __all__ = [
     "nominal_values",
     "std_devs",
 ]
+
+
+def inject_to_args_kwargs(param, injected_arg, *args, **kwargs):
+    if isinstance(param, int):
+        new_kwargs = kwargs
+        new_args = []
+        for idx, arg in enumerate(args):
+            if idx == param:
+                new_args.append(injected_arg)
+            else:
+                new_args.append(arg)
+    elif isinstance(param, str):
+        new_args = args
+        new_kwargs = kwargs
+        new_kwargs[param] = injected_arg
+    else:
+        raise TypeError(f"{param} must be an int or str, not {type(param)}.")
+    return new_args, new_kwargs
+
+
+def get_args_kwargs_list(*args, **kwargs):
+    args_kwargs_list = []
+    for idx, arg in enumerate(args):
+        args_kwargs_list.append((idx, arg))
+    for key, arg in kwargs.items():
+        args_kwargs_list.append((key, arg))
+    return args_kwargs_list
+
+
+SQRT_EPS = numpy.sqrt(sys.float_info.epsilon)
+
+
+def array_numerical_partial_derivative(
+    f: Callable[..., Real],
+    target_param: Union[str, int],
+    array_multi_index: tuple = None,
+    *args,
+    **kwargs,
+) -> float:
+    """
+    Numerically calculate the partial derivative of a function f with respect to the
+    target_param (string name or position number of the float parameter to f to be
+    varied) holding all other arguments, *args and **kwargs, constant.
+    """
+    if isinstance(target_param, int):
+        x = args[target_param]
+    else:
+        x = kwargs[target_param]
+
+    if array_multi_index is None:
+        dx = abs(x) * SQRT_EPS  # Numerical Recipes 3rd Edition, eq. 5.7.5
+        x_lower = x - dx
+        x_upper = x + dx
+    else:
+        dx = numpy.mean(numpy.abs(x)) * SQRT_EPS
+        x_lower = numpy.copy(x)
+        x_upper = numpy.copy(x)
+        x_lower[array_multi_index] -= dx
+        x_upper[array_multi_index] += dx
+
+    lower_args, lower_kwargs = inject_to_args_kwargs(
+        target_param,
+        x_lower,
+        *args,
+        **kwargs,
+    )
+    upper_args, upper_kwargs = inject_to_args_kwargs(
+        target_param,
+        x_upper,
+        *args,
+        **kwargs,
+    )
+
+    lower_y = f(*lower_args, **lower_kwargs)
+    upper_y = f(*upper_args, **upper_kwargs)
+
+    derivative = (upper_y - lower_y) / (2 * dx)
+    return derivative
+
+
+def to_uarray_func(func, derivs=None):
+    if derivs is None:
+        derivs = {}
+
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        return_uarray = False
+        return_matrix = False
+
+        float_args = []
+        for arg in args:
+            if isinstance(arg, UFloat):
+                float_args.append(arg.nominal_value)
+                return_uarray = True
+            elif isinstance(arg, numpy.ndarray):
+                if isinstance(arg, numpy.matrix):
+                    return_matrix = True
+                if isinstance(arg.flat[0], UFloat):
+                    float_args.append(to_nominal_values(arg))
+                    return_uarray = True
+                else:
+                    float_args.append(arg)
+            else:
+                float_args.append(arg)
+
+        float_kwargs = {}
+        for key, arg in kwargs.items():
+            if isinstance(arg, UFloat):
+                float_kwargs[key] = arg.nominal_value
+                return_uarray = True
+            elif isinstance(arg, numpy.ndarray):
+                if isinstance(arg, numpy.matrix):
+                    return_matrix = True
+                if isinstance(arg.flat[0], UFloat):
+                    float_kwargs[key] = to_nominal_values(arg)
+                    return_uarray = True
+                else:
+                    float_kwargs[key] = arg
+            else:
+                float_kwargs[key] = arg
+
+        new_nominal_array = func(*float_args, **float_kwargs)
+        if not return_uarray:
+            return new_nominal_array
+
+        args_kwargs_list = get_args_kwargs_list(*args, **kwargs)
+
+        ucombo_array = numpy.full(new_nominal_array.shape, UCombo(()))
+
+        for label, arg in args_kwargs_list:
+            if isinstance(arg, UFloat):
+                if label in derivs and derivs[label] is not None:
+                    deriv_func = derivs[label]
+                    deriv_arr = deriv_func(
+                        label,
+                        None,
+                        *float_args,
+                        **float_kwargs,
+                    )
+                else:
+                    deriv_arr = array_numerical_partial_derivative(
+                        func, label, None, *float_args, **float_kwargs
+                    )
+                ucombo_array += deriv_arr * arg._uncertainty
+            elif isinstance(arg, numpy.ndarray):
+                if isinstance(arg.flat[0], UFloat):
+                    it = numpy.nditer(arg, flags=["multi_index", "refs_ok"])
+                    for sub_arg in it:
+                        u_num = sub_arg.item()
+                        if isinstance(u_num, UFloat):
+                            multi_index = it.multi_index
+                            if label in derivs and derivs[label] is not None:
+                                deriv_func = derivs[label]
+                                deriv_arr = deriv_func(
+                                    label,
+                                    multi_index,
+                                    *float_args,
+                                    **float_kwargs,
+                                )
+                            else:
+                                deriv_arr = array_numerical_partial_derivative(
+                                    func,
+                                    label,
+                                    multi_index,
+                                    *float_args,
+                                    **float_kwargs,
+                                )
+                            ucombo_array += numpy.array(deriv_arr) * u_num._uncertainty
+
+        u_array = numpy.vectorize(ufloat_from_uncertainty)(
+            UFloat, new_nominal_array, ucombo_array
+        )
+        if return_matrix:
+            u_array = numpy.matrix(u_array)
+        return u_array
+
+    return wrapped
+
 
 ###############################################################################
 # Utilities:
@@ -95,170 +277,6 @@ def std_devs(arr):
 
 
 ###############################################################################
-
-
-def derivative(u, var):
-    """
-    Return the derivative of u along var, if u is an
-    uncert_core.AffineScalarFunc instance, and if var is one of the
-    variables on which it depends.  Otherwise, return 0.
-    """
-    if isinstance(u, uncert_core.AffineScalarFunc):
-        try:
-            return u.derivatives[var]
-        except KeyError:
-            return 0.0
-    else:
-        return 0.0
-
-
-def wrap_array_func(func):
-    # !!! This function is not used in the code, except in the tests.
-    #
-    # !!! The implementation seems superficially similar to
-    # uncertainties.core.wrap(): is there code/logic duplication
-    # (which should be removed)?
-    """
-    Return a version of the function func() that works even when
-    func() is given a NumPy array that contains numbers with
-    uncertainties, as first argument.
-
-    This wrapper is similar to uncertainties.core.wrap(), except that
-    it handles an array argument instead of float arguments, and that
-    the result can be an array.
-
-    However, the returned function is more restricted: the array
-    argument cannot be given as a keyword argument with the name in
-    the original function (it is not a drop-in replacement).
-
-    func -- function whose first argument is a single NumPy array,
-    and which returns a NumPy array.
-    """
-
-    @uncert_core.set_doc(
-        """\
-    Version of %s(...) that works even when its first argument is a NumPy
-    array that contains numbers with uncertainties.
-
-    Warning: elements of the first argument array that are not
-    AffineScalarFunc objects must not depend on uncert_core.Variable
-    objects in any way.  Otherwise, the dependence of the result in
-    uncert_core.Variable objects will be incorrect.
-
-    Original documentation:
-    %s"""
-        % (func.__name__, func.__doc__)
-    )
-    def wrapped_func(arr, *args, **kwargs):
-        # Nominal value:
-        arr_nominal_value = nominal_values(arr)
-        func_nominal_value = func(arr_nominal_value, *args, **kwargs)
-
-        # The algorithm consists in numerically calculating the derivatives
-        # of func:
-
-        # Variables on which the array depends are collected:
-        variables = set()
-        for element in arr.flat:
-            # floats, etc. might be present
-            if isinstance(element, uncert_core.AffineScalarFunc):
-                # !!!! The following forces an evaluation of the
-                # derivatives!? Isn't this very slow, when
-                # working with a large number of arrays?
-                #
-                # !! set() is only needed for Python 2 compatibility:
-                variables |= set(element.derivatives.keys())
-
-        # If the matrix has no variables, then the function value can be
-        # directly returned:
-        if not variables:
-            return func_nominal_value
-
-        # Calculation of the derivatives of each element with respect
-        # to the variables.  Each element must be independent of the
-        # others.  The derivatives have the same shape as the output
-        # array (which might differ from the shape of the input array,
-        # in the case of the pseudo-inverse).
-        derivatives = numpy.vectorize(lambda _: {})(func_nominal_value)
-        for var in variables:
-            # A basic assumption of this package is that the user
-            # guarantees that uncertainties cover a zone where
-            # evaluated functions are linear enough.  Thus, numerical
-            # estimates of the derivative should be good over the
-            # standard deviation interval.  This is true for the
-            # common case of a non-zero standard deviation of var.  If
-            # the standard deviation of var is zero, then var has no
-            # impact on the uncertainty of the function func being
-            # calculated: an incorrect derivative has no impact.  One
-            # scenario can give incorrect results, however, but it
-            # should be extremely uncommon: the user defines a
-            # variable x with 0 standard deviation, sets y = func(x)
-            # through this routine, changes the standard deviation of
-            # x, and prints y; in this case, the uncertainty on y
-            # might be incorrect, because this program had no idea of
-            # the scale on which func() is linear, when it calculated
-            # the numerical derivative.
-
-            # The standard deviation might be numerically too small
-            # for the evaluation of the derivative, though: we set the
-            # minimum variable shift.
-
-            shift_var = max(var._std_dev / 1e5, 1e-8 * abs(var._nominal_value))
-            # An exceptional case is that of var being exactly zero.
-            # In this case, an arbitrary shift is used for the
-            # numerical calculation of the derivative.  The resulting
-            # derivative value might be quite incorrect, but this does
-            # not matter as long as the uncertainty of var remains 0,
-            # since it is, in this case, a constant.
-            if not shift_var:
-                shift_var = 1e-8
-
-            # Shift of all the elements of arr when var changes by shift_var:
-            shift_arr = array_derivative(arr, var) * shift_var
-
-            # Origin value of array arr when var is shifted by shift_var:
-            shifted_arr_values = arr_nominal_value + shift_arr
-            func_shifted = func(shifted_arr_values, *args, **kwargs)
-            numerical_deriv = (func_shifted - func_nominal_value) / shift_var
-
-            # Update of the list of variables and associated
-            # derivatives, for each element:
-            for derivative_dict, derivative_value in zip(
-                derivatives.flat, numerical_deriv.flat
-            ):
-                if derivative_value:
-                    derivative_dict[var] = derivative_value
-
-        # numbers with uncertainties are built from the result:
-        return numpy.vectorize(uncert_core.AffineScalarFunc)(
-            func_nominal_value,
-            numpy.vectorize(uncert_core.LinearCombination)(derivatives),
-        )
-
-    wrapped_func = uncert_core.set_doc(
-        """\
-    Version of %s(...) that works even when its first argument is a NumPy
-    array that contains numbers with uncertainties.
-
-    Warning: elements of the first argument array that are not
-    AffineScalarFunc objects must not depend on uncert_core.Variable
-    objects in any way.  Otherwise, the dependence of the result in
-    uncert_core.Variable objects will be incorrect.
-
-    Original documentation:
-    %s"""
-        % (func.__name__, func.__doc__)
-    )(wrapped_func)
-
-    # It is easier to work with wrapped_func, which represents a
-    # wrapped version of 'func', when it bears the same name as
-    # 'func' (the name is used by repr(wrapped_func)).
-    wrapped_func.__name__ = func.__name__
-
-    return wrapped_func
-
-
-###############################################################################
 # Arrays
 
 
@@ -284,7 +302,7 @@ def uarray(nominal_values, std_devs=None):
         # ! Looking up uncert_core.Variable beforehand through
         # '_Variable = uncert_core.Variable' does not result in a
         # significant speed up:
-        lambda v, s: uncert_core.Variable(v, s),
+        lambda v, s: uncert_core.UFloat(v, s),
         otypes=[object],
     )(nominal_values, std_devs)
 
@@ -292,177 +310,26 @@ def uarray(nominal_values, std_devs=None):
 ###############################################################################
 
 
-def array_derivative(array_like, var):
-    """
-    Return the derivative of the given array with respect to the
-    given variable.
-
-    The returned derivative is a NumPy ndarray of the same shape as
-    array_like, that contains floats.
-
-    array_like -- array-like object (list, etc.)  that contains
-    scalars or numbers with uncertainties.
-
-    var -- Variable object.
-    """
-    return numpy.vectorize(
-        lambda u: derivative(u, var),
-        # The type is set because an
-        # integer derivative should not
-        # set the output type of the
-        # array:
-        otypes=[float],
-    )(array_like)
-
-
-def func_with_deriv_to_uncert_func(func_with_derivatives):
-    # This function is used for instance for the calculation of the
-    # inverse and pseudo-inverse of a matrix with uncertainties.
-    """
-    Return a function that can be applied to array-like objects that
-    contain numbers with uncertainties (lists, lists of lists, NumPy
-    arrays, etc.).
-
-    func_with_derivatives -- defines a function that takes an
-    array-like object containing scalars and returns an array.  Both
-    the value and the derivatives of this function with respect to
-    multiple scalar parameters are calculated by this
-    func_with_derivatives() argument.
-
-    func_with_derivatives(arr, input_type, derivatives, *args,
-    **kwargs) must return an iterator.  The first element returned by
-    this iterator is the value of the function at the n-dimensional
-    array-like 'arr' (with the correct type).  The following elements
-    are arrays that represent the derivative of the function for each
-    derivative array from the iterator 'derivatives'.
-
-    func_with_derivatives() takes the following arguments:
-
-      arr -- NumPy ndarray of scalars where the function must be
-      evaluated.
-
-      input_type -- data type of the input array-like object.  This
-      type is used for determining the type that the function should
-      return.
-
-      derivatives -- iterator that returns the derivatives of the
-      argument of the function with respect to multiple scalar
-      variables.  func_with_derivatives() returns the derivatives of
-      the defined function with respect to these variables.
-
-      args -- additional arguments that define the result (example:
-      for the pseudo-inverse numpy.linalg.pinv: numerical cutoff).
-
-    Examples of func_with_derivatives: inv_with_derivatives().
-    """
-
-    def wrapped_func(array_like, *args, **kwargs):
-        """
-        array_like -- n-dimensional array-like object that contains
-        numbers with uncertainties (list, NumPy ndarray or matrix,
-        etc.).
-
-        args -- additional arguments that are passed directly to
-        func_with_derivatives.
-        """
-
-        # The calculation below is not lazy, contrary to the linear
-        # error propagation done in AffineScalarFunc. Making it lazy
-        # in the same way would be quite a specific task: basically
-        # this would amount to generalizing scalar coefficients in
-        # core.LinearCombination to more general matrix
-        # multiplications, and to replace Variable differentials by
-        # full matrices of coefficients. This does not look very
-        # efficient, as matrices are quite big, and since caching the
-        # result of a few matrix functions that are not typically
-        # stringed one after the other (unlike a big sum of numbers)
-        # should not be needed.
-
-        # So that .flat works even if array_like is a list:
-        array_version = numpy.asanyarray(array_like)
-
-        # Variables on which the array depends are collected:
-        variables = set()
-        for element in array_version.flat:
-            # floats, etc. might be present
-            if isinstance(element, uncert_core.AffineScalarFunc):
-                # !!! set() is only needed for Python 2 compatibility:
-                variables |= set(element.derivatives.keys())
-
-        array_nominal = nominal_values(array_version)
-        # Function value, then derivatives at array_nominal (the
-        # derivatives are with respect to the variables contained in
-        # array_like):
-        func_then_derivs = func_with_derivatives(
-            array_nominal,
-            type(array_like),
-            (array_derivative(array_version, var) for var in variables),
-            *args,
-            **kwargs,
-        )
-
-        func_nominal_value = next(func_then_derivs)
-
-        if not variables:
-            return func_nominal_value
-
-        # The result is built progressively, with the contribution of
-        # each variable added in turn:
-
-        # Calculation of the derivatives of the result with respect to
-        # the variables.
-        derivatives = numpy.array(
-            [{} for _ in range(func_nominal_value.size)], dtype=object
-        ).reshape(func_nominal_value.shape)
-
-        # Memory-efficient approach.  A memory-hungry approach would
-        # be to calculate the matrix derivatives will respect to all
-        # variables and then combine them into a matrix of
-        # AffineScalarFunc objects.  The approach followed here is to
-        # progressively build the matrix of derivatives, by
-        # progressively adding the derivatives with respect to
-        # successive variables.
-        for var, deriv_wrt_var in zip(variables, func_then_derivs):
-            # Update of the list of variables and associated
-            # derivatives, for each element:
-            for derivative_dict, derivative_value in zip(
-                derivatives.flat, deriv_wrt_var.flat
-            ):
-                if derivative_value:
-                    derivative_dict[var] = derivative_value
-
-        # An array of numbers with uncertainties is built from the
-        # result:
-        result = numpy.vectorize(uncert_core.AffineScalarFunc)(
-            func_nominal_value,
-            numpy.vectorize(uncert_core.LinearCombination)(derivatives),
-        )
-
-        return result
-
-    return wrapped_func
-
-
 ########## Matrix inverse
 
 
-def inv_with_derivatives(arr, input_type, derivatives):
-    """
-    Defines the matrix inverse and its derivatives.
+def inv_deriv(label, multi_index, *args, **kwargs):
+    if isinstance(label, int):
+        arr = args[label]
+    elif isinstance(label, str):
+        arr = kwargs[label]
+    else:
+        raise ValueError
 
-    See the definition of func_with_deriv_to_uncert_func() for its
-    detailed semantics.
-    """
-    inverse = numpy.linalg.inv(arr)
-    yield inverse
+    deriv_arr = numpy.zeros_like(arr)
+    deriv_arr[multi_index] = 1
 
-    # Successive derivatives of the inverse:
-    for derivative in derivatives:
-        yield -inverse @ derivative @ inverse
+    inv_arr = numpy.linalg.inv(arr)
+    return -inv_arr @ deriv_arr @ inv_arr
 
 
-inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
-inv.__doc__ = """
+inv = to_uarray_func(numpy.linalg.inv, derivs={0: inv_deriv, "a": inv_deriv})
+inv.__doc__ = """\
     Version of numpy.linalg.inv that works with array-like objects
     that contain numbers with uncertainties.
 
@@ -475,68 +342,51 @@ inv.__doc__ = """
 ########## Matrix pseudo-inverse
 
 
-def pinv_with_derivatives(arr, input_type, derivatives, rcond):
+def pinv_deriv(label, multi_index, *args, **kwargs):
+    if isinstance(label, int):
+        A = args[label]
+    elif isinstance(label, str):
+        A = kwargs[label]
+    else:
+        raise ValueError
+
     """
-    Defines the matrix pseudo-inverse and its derivatives.
+    Analytical calculation of the derivative of the Pseudo-Inverse of matrix A with
+    respect to an element of matrix A. This calculatinon is done according to
+    formula (4.12) from
 
-    Works with real or complex matrices.
+    G. H. Golub, V. Pereyra, "The Differentiation of Pseudo-Inverses and Nonlinear Least
+    Squares Problems Whose Variables Separate", Journal on Numerical Analysis, Vol. 10,
+    No. 2 (Apr., 1973), pp. 413-432
 
-    See the definition of func_with_deriv_to_uncert_func() for its
-    detailed semantics.
+    See also
+    http://mathoverflow.net/questions/25778/analytical-formula-for-numerical-derivative-of-the-matrix-pseudo-inverse
     """
 
-    inverse = numpy.linalg.pinv(arr, rcond)
-    yield inverse
+    Aprime = numpy.zeros_like(A)
+    Aprime[multi_index] = 1
 
-    # It is mathematically convenient to work with matrices:
+    Aplus = numpy.linalg.pinv(*args, **kwargs)
 
-    # Formula (4.12) from The Differentiation of Pseudo-Inverses and
-    # Nonlinear Least Squares Problems Whose Variables
-    # Separate. Author(s): G. H. Golub and V. Pereyra. Source: SIAM
-    # Journal on Numerical Analysis, Vol. 10, No. 2 (Apr., 1973),
-    # pp. 413-432
+    n, m = A.shape[-2:]
+    eye_n = numpy.eye(n)
+    eye_m = numpy.eye(m)
 
-    # See also
-    # http://mathoverflow.net/questions/25778/analytical-formula-for-numerical-derivative-of-the-matrix-pseudo-inverse
+    ndim = len(A.shape)
+    trans_axes = list(range(ndim))
+    trans_axes[0], trans_axes[1] = trans_axes[1], trans_axes[0]
 
-    # Shortcuts.  All the following factors should be numpy.matrix objects:
-    PA = arr @ inverse
-    AP = inverse @ arr
-    factor21 = inverse @ inverse.conj().T
-    factor22 = numpy.eye(arr.shape[0]) - PA
-    factor31 = numpy.eye(arr.shape[1]) - AP
-    factor32 = inverse.conj().T @ inverse
+    AplusT = numpy.transpose(Aplus, axes=trans_axes)
+    AprimeT = numpy.transpose(Aprime, axes=trans_axes)
 
-    # Successive derivatives of the inverse:
-    for derivative in derivatives:
-        term1 = -inverse @ derivative @ inverse
-        derivative_H = derivative.conj().T
-        term2 = factor21 @ derivative_H @ factor22
-        term3 = factor31 @ derivative_H @ factor32
-        yield term1 + term2 + term3
+    return (
+        -Aplus @ Aprime @ Aplus
+        + Aplus @ AplusT @ AprimeT @ (eye_n - A @ Aplus)
+        + (eye_m - Aplus @ A) @ AprimeT @ AplusT @ Aplus
+    )
 
 
-# Default rcond argument for the generalization of numpy.linalg.pinv:
-#
-# Most common modern case first:
-try:
-    pinv_default = inspect.signature(numpy.linalg.pinv).parameters["rcond"].default
-except AttributeError:  # No inspect.signature() before Python 3.3
-    try:
-        # In numpy 1.17+, pinv is wrapped using a decorator which unfortunately
-        # results in the metadata (argument defaults) being lost. However, we
-        # can still get at the original function using the __wrapped__
-        # attribute (which is what inspect.signature() does).
-        pinv_default = numpy.linalg.pinv.__wrapped__.__defaults__[0]
-    except AttributeError:  # Function not wrapped in NumPy < 1.17
-        pinv_default = numpy.linalg.pinv.__defaults__[0]  # Python 1, 2.6+:
-
-pinv_with_uncert = func_with_deriv_to_uncert_func(pinv_with_derivatives)
-
-
-def pinv(array_like, rcond=pinv_default):
-    return pinv_with_uncert(array_like, rcond)
-
+pinv = to_uarray_func(numpy.linalg.pinv, derivs={0: pinv_deriv, "a": pinv_deriv})
 
 pinv = uncert_core.set_doc(
     """
