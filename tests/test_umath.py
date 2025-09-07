@@ -244,14 +244,19 @@ def test_math_module():
         assert err_math_args == err_ufloat.args
     else:
         raise Exception("%s exception expected" % exception_class.__name__)
+
+    # Exception message is different for int and float so create the math
+    # exception for float rather than reusing the int one above
+    try:
+        math.log(0.0)
+    except Exception as err_math:
+        # Python 3 does not make exceptions local variables: they are
+        # restricted to their except block:
+        err_math_args = err_math.args
+        exception_class = err_math.__class__
+
     try:
         umath_core.log(ufloat(0, 0))
-    except exception_class as err_ufloat:
-        assert err_math_args == err_ufloat.args
-    else:
-        raise Exception("%s exception expected" % exception_class.__name__)
-    try:
-        umath_core.log(ufloat(0, 1))
     except exception_class as err_ufloat:
         assert err_math_args == err_ufloat.args
     else:
