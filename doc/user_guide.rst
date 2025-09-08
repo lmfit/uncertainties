@@ -297,7 +297,7 @@ There is not a unique definition for ``0**0``, however python takes the conventi
 If the power operation is performed on an ``(x, y)`` pair for which ``x**y`` is
 undefined then an exception will be raised:
 
->>> x = ufloat(0.0, 0.2)
+>>> x = ufloat(0, 0.2)
 >>> y = ufloat(-3.4, 0.4)
 >>> print(x**y)
 Traceback (most recent call last):
