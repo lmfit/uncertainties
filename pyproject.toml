@@ -68,3 +68,4 @@ all = ["uncertainties[doc,test,arrays]"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+doctest_optionflags = "IGNORE_EXCEPTION_DETAIL"
