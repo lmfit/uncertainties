@@ -67,5 +67,6 @@ doc = ["sphinx", "sphinx-copybutton", "python-docs-theme"]
 all = ["uncertainties[doc,test,arrays]"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "doc", "uncertainties"]
+addopts = "--doctest-modules --doctest-glob=*.rst"
 doctest_optionflags = "IGNORE_EXCEPTION_DETAIL"
