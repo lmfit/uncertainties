@@ -261,6 +261,12 @@ def test_math_module():
         assert err_math_args == err_ufloat.args
     else:
         raise Exception("%s exception expected" % exception_class.__name__)
+    try:
+        umath_core.log(ufloat(0, 1))
+    except exception_class as err_ufloat:
+        assert err_math_args == err_ufloat.args
+    else:
+        raise Exception("%s exception expected" % exception_class.__name__)
 
 
 def test_hypot():
