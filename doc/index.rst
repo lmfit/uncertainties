@@ -58,7 +58,7 @@ some specific benefits from the architecture update.
    :class:`UFloat`.
 
 In addition to reformating the underlying architecture, this update makes a number of
-changes and simplifications to the API to improve consistency. Some of these API change
+changes and simplifications to the API to improve consistency. Some of these API changes
 break backwards compatibility.
 Notable changes are
 
