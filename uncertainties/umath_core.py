@@ -19,7 +19,6 @@ import itertools
 
 # Local modules
 import uncertainties.core as uncert_core
-from uncertainties.core import to_affine_scalar, AffineScalarFunc, LinearCombination
 
 ###############################################################################
 
@@ -58,7 +57,7 @@ many_scalars_to_scalar_funcs = []
 # Functions with numerical derivatives:
 #
 # !! Python2.7+: {..., ...}
-num_deriv_funcs = set(["fmod", "gamma", "lgamma"])
+num_deriv_funcs = set(["gamma", "lgamma"])
 
 # Functions are by definition locally constant (on real
 # numbers): their value does not depend on the uncertainty (because
@@ -70,7 +69,7 @@ num_deriv_funcs = set(["fmod", "gamma", "lgamma"])
 # comparisons (==, >, etc.).
 #
 # !! Python 2.7+: {..., ...}
-locally_cst_funcs = set(["ceil", "floor", "isinf", "isnan", "trunc"])
+locally_cst_funcs = set(["isinf", "isnan"])
 
 # Functions that do not belong in many_scalars_to_scalar_funcs, but
 # that have a version that handles uncertainties. These functions are
@@ -192,7 +191,6 @@ fixed_derivatives = {
         lambda y, x: -y / (x**2 + y**2),
     ],  # Correct for x == 0
     "atanh": [lambda x: 1 / (1 - x**2)],
-    "copysign": [_deriv_copysign, lambda x, y: 0],
     "cos": [lambda x: -math.sin(x)],
     "cosh": [math.sinh],
     "degrees": [lambda x: math.degrees(1)],
@@ -200,7 +198,6 @@ fixed_derivatives = {
     "erfc": [lambda x: -math.exp(-(x**2)) * erf_coef],
     "exp": [math.exp],
     "expm1": [math.exp],
-    "fabs": [_deriv_fabs],
     "hypot": [lambda x, y: x / math.hypot(x, y), lambda x, y: y / math.hypot(x, y)],
     "log": [log_der0, lambda x, y: -math.log(x, y) / y / math.log(y)],
     "log10": [lambda x: 1 / x / math.log(10)],
@@ -291,10 +288,6 @@ for name in dir(math):
 
 # Only for Python 2.6+:
 
-# For drop-in compatibility with the math module:
-factorial = math.factorial
-non_std_wrapped_funcs.append("factorial")
-
 
 # We wrap math.fsum
 
@@ -322,136 +315,6 @@ def wrapped_fsum():
 # !!!!!!!! Documented?
 fsum = wrapped_fsum()
 non_std_wrapped_funcs.append("fsum")
-
-##########
-
-# Some functions that either return multiple arguments (modf, frexp)
-# or take some non-float arguments (which should not be converted to
-# numbers with uncertainty).
-
-# ! The arguments have the same names as in the math module
-# documentation, so that the docstrings are consistent with them.
-
-
-@uncert_core.set_doc(math.modf.__doc__)
-def modf(x):
-    """
-    Version of modf that works for numbers with uncertainty, and also
-    for regular numbers.
-    """
-
-    # The code below is inspired by uncert_core.wrap().  It is
-    # simpler because only 1 argument is given, and there is no
-    # delegation to other functions involved (as for __mul__, etc.).
-
-    aff_func = to_affine_scalar(x)  # Uniform treatment of all numbers
-
-    (frac_part, int_part) = math.modf(aff_func.nominal_value)
-
-    if aff_func._linear_part:  # If not a constant
-        # The derivative of the fractional part is simply 1: the
-        # linear part of modf(x)[0] is the linear part of x:
-        return (AffineScalarFunc(frac_part, aff_func._linear_part), int_part)
-    else:
-        # This function was not called with an AffineScalarFunc
-        # argument: there is no need to return numbers with uncertainties:
-        return (frac_part, int_part)
-
-
-many_scalars_to_scalar_funcs.append("modf")
-
-
-@uncert_core.set_doc(math.ldexp.__doc__)
-def ldexp(x, i):
-    # Another approach would be to add an additional argument to
-    # uncert_core.wrap() so that some arguments are automatically
-    # considered as constants.
-
-    aff_func = to_affine_scalar(x)  # y must be an integer, for math.ldexp
-
-    if aff_func._linear_part:
-        return AffineScalarFunc(
-            math.ldexp(aff_func.nominal_value, i),
-            LinearCombination([(2**i, aff_func._linear_part)]),
-        )
-    else:
-        # This function was not called with an AffineScalarFunc
-        # argument: there is no need to return numbers with uncertainties:
-
-        # aff_func.nominal_value is not passed instead of x, because
-        # we do not have to care about the type of the return value of
-        # math.ldexp, this way (aff_func.nominal_value might be the
-        # value of x coerced to a difference type [int->float, for
-        # instance]):
-        return math.ldexp(x, i)
-
-
-many_scalars_to_scalar_funcs.append("ldexp")
-
-
-@uncert_core.set_doc(math.frexp.__doc__)
-def frexp(x):
-    """
-    Version of frexp that works for numbers with uncertainty, and also
-    for regular numbers.
-    """
-
-    # The code below is inspired by uncert_core.wrap().  It is
-    # simpler because only 1 argument is given, and there is no
-    # delegation to other functions involved (as for __mul__, etc.).
-
-    aff_func = to_affine_scalar(x)
-
-    if aff_func._linear_part:
-        (mantissa, exponent) = math.frexp(aff_func.nominal_value)
-        return (
-            AffineScalarFunc(
-                mantissa,
-                # With frexp(x) = (m, e), x = m*2**e, so m = x*2**-e
-                # and therefore dm/dx = 2**-e (as e in an integer that
-                # does not vary when x changes):
-                LinearCombination([2**-exponent, aff_func._linear_part]),
-            ),
-            # The exponent is an integer and is supposed to be
-            # continuous (errors must be small):
-            exponent,
-        )
-    else:
-        # This function was not called with an AffineScalarFunc
-        # argument: there is no need to return numbers with uncertainties:
-        return math.frexp(x)
-
-
-non_std_wrapped_funcs.append("frexp")
-
-# Deprecated functions
-
-deprecated_functions = [
-    "ceil",
-    "copysign",
-    "fabs",
-    "factorial",
-    "floor",
-    "fmod",
-    "frexp",
-    "ldexp",
-    "modf",
-    "trunc",
-]
-
-for function_name in deprecated_functions:
-    message = (
-        f"umath.{function_name}() is deprecated. It will be removed in a future "
-        f"release."
-    )
-    setattr(
-        this_module,
-        function_name,
-        uncert_core.deprecation_wrapper(
-            getattr(this_module, function_name),
-            message,
-        ),
-    )
 
 
 ###############################################################################

@@ -469,26 +469,10 @@ class AffineScalarFunc(object):
         object take scalar values (and are not a tuple, like what
         math.frexp() returns, for instance).
         """
-
-        # Calculation of the variance:
-        error_components = {}
-
-        for variable, derivative in self.derivatives.items():
-            # print "TYPE", type(variable), type(derivative)
-
-            # Individual standard error due to variable:
-
-            # 0 is returned even for a NaN derivative (in this case no
-            # multiplication by the derivative is performed): an exact
-            # variable obviously leads to no uncertainty in the
-            # functions that depend on it.
-            if variable._std_dev == 0:
-                # !!! Shouldn't the errors always be floats, as a
-                # convention of this module?
-                error_components[variable] = 0
-            else:
-                error_components[variable] = abs(derivative * variable._std_dev)
-
+        error_components = {
+            variable: abs(derivative * variable._std_dev)
+            for variable, derivative in self.derivatives.items()
+        }
         return error_components
 
     @property
@@ -512,6 +496,12 @@ class AffineScalarFunc(object):
 
     # Abbreviation (for formulas, etc.):
     s = std_dev
+
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        diff = self - other
+        return diff.n == 0 and diff.s == 0
 
     def __repr__(self):
         # Not putting spaces around "+/-" helps with arrays of
@@ -656,8 +646,6 @@ class AffineScalarFunc(object):
 
 
 ops.add_arithmetic_ops(AffineScalarFunc)
-ops.add_comparative_ops(AffineScalarFunc)
-to_affine_scalar = AffineScalarFunc._to_affine_scalar
 
 # Nicer name, for users: isinstance(ufloat(...), UFloat) is
 # True. Also: isinstance(..., UFloat) is the test for "is this a
@@ -715,12 +703,6 @@ def wrap(f, derivatives_args=None, derivatives_kwargs=None):
 
 
 ###############################################################################
-
-
-class NegativeStdDev(Exception):
-    """Raise for a negative standard deviation"""
-
-    pass
 
 
 class Variable(AffineScalarFunc):
@@ -792,7 +774,7 @@ class Variable(AffineScalarFunc):
         # separately for NaN. But this is not guaranteed, even if it
         # should work on most platforms.)
         if std_dev < 0 and isfinite(std_dev):
-            raise NegativeStdDev("The standard deviation cannot be negative")
+            raise ValueError("The standard deviation cannot be negative")
 
         self._std_dev = float(std_dev)
 
@@ -1038,26 +1020,3 @@ def deprecation_wrapper(func, msg):
         return func(*args, **kwargs)
 
     return wrapped
-
-
-deprecated_methods = [
-    "__floordiv__",
-    "__mod__",
-    "__abs__",
-    "__trunc__",
-    "__lt__",
-    "__gt__",
-    "__le__",
-    "__ge__",
-]
-
-for method_name in deprecated_methods:
-    message = (
-        f"AffineScalarFunc.{method_name}() is deprecated. It will be removed in a future "
-        f"release."
-    )
-    setattr(
-        AffineScalarFunc,
-        method_name,
-        deprecation_wrapper(getattr(AffineScalarFunc, method_name), message),
-    )

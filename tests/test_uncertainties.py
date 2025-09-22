@@ -1,6 +1,5 @@
 import copy
 import json
-import inspect
 import math
 from pathlib import Path
 import random  # noqa
@@ -12,7 +11,6 @@ from uncertainties.core import (
     ufloat,
     AffineScalarFunc,
     ufloat_fromstr,
-    deprecated_methods,
 )
 from uncertainties import (
     umath,
@@ -57,7 +55,7 @@ def test_ufloat_function_construction():
     assert x.std_dev == 0.14
     assert x.tag == "pi"
 
-    with pytest.raises(uncert_core.NegativeStdDev):
+    with pytest.raises(ValueError):
         _ = ufloat(3, -0.1)
 
     with pytest.raises(TypeError):
@@ -115,6 +113,7 @@ ufloat_from_str_cases = [
 ]
 
 
+@pytest.mark.filterwarnings("ignore:.*std_dev==0")
 @pytest.mark.parametrize("input_str,nominal_value,std_dev", ufloat_from_str_cases)
 def test_ufloat_fromstr(input_str, nominal_value, std_dev):
     num = ufloat_fromstr(input_str)
@@ -183,6 +182,7 @@ def test_ufloat_method_derivativs(func_name, ufloat_tuples):
         )
 
 
+@pytest.mark.filterwarnings("ignore:.*std_dev==0")
 def test_calculate_zero_equality():
     zero = ufloat(0, 0)
     x = ufloat(1, 0.1)
@@ -276,7 +276,7 @@ def test_pickling():
     assert isinstance(f, AffineScalarFunc)
     (f_unpickled, x_unpickled2) = pickle.loads(pickle.dumps((f, x)))
     # Correlations must be preserved:
-    assert f_unpickled - x_unpickled2 - x_unpickled2 == 0
+    assert f_unpickled == x_unpickled2 + x_unpickled2
 
     ## Tests with subclasses:
 
@@ -328,44 +328,9 @@ def test_pickling():
     assert pickle.loads(pickle.dumps(x)).linear_combo == {}
 
 
-def test_int_div():
-    "Integer division"
-    # We perform all operations on floats, because derivatives can
-    # otherwise be meaningless:
-    x = ufloat(3.9, 2) // 2
-    assert x.nominal_value == 1.0
-    # All errors are supposed to be small, so the ufloat()
-    # in x violates the assumption.  Therefore, the following is
-    # correct:
-    assert x.std_dev == 0.0
-
-
 def test_comparison_ops():
     "Test of comparison operators"
-
-    # Operations on quantities equivalent to Python numbers must still
-    # be correct:
-    a = ufloat(-3, 0)
-    b = ufloat(10, 0)
-    c = ufloat(10, 0)
-    assert a < b
-    assert a < 3
-    assert 3 < b  # This is first given to int.__lt__()
-    assert b == c
-
     x = ufloat(3, 0.1)
-
-    # One constraint is that usual Python code for inequality testing
-    # still work in a reasonable way (for instance, it is generally
-    # desirable that functions defined by different formulas on
-    # different intervals can still do "if 0 < x < 1:...".  This
-    # supposes again that errors are "small" (as for the estimate of
-    # the standard error).
-    assert x > 1
-
-    # The limit case is not obvious:
-    assert not (x >= 3)
-    assert not (x < 3)
 
     assert x == x
     # Comparaison between Variable and AffineScalarFunc:
@@ -384,7 +349,7 @@ def test_comparison_ops():
 
     # Comparison to other types should work:
     assert x is not None  # Not comparable
-    assert x - x == 0  # Comparable, even though the types are different
+    assert x - x != 0  # Equality comparison with float is always False
     assert x != [1, 2]
 
     ####################
@@ -417,7 +382,7 @@ def test_comparison_ops():
             return (random.random() - 0.5) * min(var.std_dev, 1e-5) + var.nominal_value
 
         # All operations are tested:
-        for op in ["__%s__" % name for name in ("ne", "eq", "lt", "le", "gt", "ge")]:
+        for op in ["__%s__" % name for name in ("ne", "eq")]:
             try:
                 float_func = getattr(float, op)
             except AttributeError:  # Python 2.3's floats don't have __ne__
@@ -460,31 +425,18 @@ def test_comparison_ops():
 
     # With different numbers:
     test_all_comparison_ops(ufloat(3, 0.1), ufloat(-2, 0.1))
-    test_all_comparison_ops(
-        ufloat(0, 0),  # Special number
-        ufloat(1, 1),
-    )
-    test_all_comparison_ops(
-        ufloat(0, 0),  # Special number
-        ufloat(0, 0.1),
-    )
+
     # With identical numbers:
-    test_all_comparison_ops(ufloat(0, 0), ufloat(0, 0))
     test_all_comparison_ops(ufloat(1, 1), ufloat(1, 1))
 
 
 def test_logic():
-    "Boolean logic: __nonzero__, bool."
-
-    x = ufloat(3, 0)
-    y = ufloat(0, 0)
+    "bool defers to object.__bool__ and always returns True."
     z = ufloat(0, 0.1)
     t = ufloat(-1, 2)
 
-    assert bool(x)
-    assert not bool(y)
     assert bool(z)
-    assert bool(t)  # Only infinitseimal neighborhood are used
+    assert bool(t)
 
 
 def test_basic_access_to_data():
@@ -540,12 +492,12 @@ def test_basic_access_to_data():
 def test_correlations():
     "Correlations between variables"
 
-    a = ufloat(1, 0)
+    a = ufloat(1, 0.2)
     x = ufloat(4, 0.1)
     y = x * 2 + a
     # Correlations cancel "naive" additions of uncertainties:
     assert y.std_dev != 0
-    normally_zero = y - (x * 2 + 1)
+    normally_zero = y - (x * 2 + a)
     assert normally_zero.nominal_value == 0
     assert normally_zero.std_dev == 0
 
@@ -1106,20 +1058,6 @@ else:
         assert len(numpy.array([x, x, x]) == x) == 3
         assert numpy.all(x == numpy.array([x, x, x]))
 
-        # Inequalities:
-        assert len(x < numpy.arange(10)) == 10
-        assert len(numpy.arange(10) > x) == 10
-        assert len(x <= numpy.arange(10)) == 10
-        assert len(numpy.arange(10) >= x) == 10
-        assert len(x > numpy.arange(10)) == 10
-        assert len(numpy.arange(10) < x) == 10
-        assert len(x >= numpy.arange(10)) == 10
-        assert len(numpy.arange(10) <= x) == 10
-
-        # More detailed test, that shows that the comparisons are
-        # meaningful (x >= 0, but not x <= 1):
-        assert numpy.all((x >= numpy.arange(3)) == [True, False, False])
-
     def test_correlated_values():
         """
         Correlated variables.
@@ -1334,23 +1272,6 @@ def test_no_numpy():
         match="not able to import numpy",
     ):
         _ = correlation_matrix([x, y, z])
-
-
-@pytest.mark.parametrize("method_name", deprecated_methods)
-def test_deprecated_method(method_name):
-    x = ufloat(1, 0.1)
-    y = ufloat(-12, 2.4)
-    num_args = len(inspect.signature(getattr(float, method_name)).parameters)
-    with pytest.warns(FutureWarning, match="will be removed"):
-        if num_args == 1:
-            getattr(x, method_name)()
-        else:
-            getattr(x, method_name)(y)
-
-
-def test_deprecated_bool():
-    with pytest.warns(FutureWarning, match="is deprecated.*will defer to"):
-        bool(ufloat(0, 0))
 
 
 def test_zero_std_dev_warn():

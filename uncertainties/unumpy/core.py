@@ -15,7 +15,6 @@ from builtins import zip
 from builtins import range
 import sys
 import inspect
-from warnings import warn
 
 # 3rd-party modules:
 import numpy
@@ -27,12 +26,9 @@ import uncertainties.core as uncert_core
 __all__ = [
     # Factory functions:
     "uarray",
-    "umatrix",
     # Utilities:
     "nominal_values",
     "std_devs",
-    # Classes:
-    "matrix",
 ]
 
 ###############################################################################
@@ -72,22 +68,6 @@ to_std_devs = numpy.vectorize(
 )
 
 
-def unumpy_to_numpy_matrix(arr):
-    """
-    If arr in a unumpy.matrix, it is converted to a numpy.matrix.
-    Otherwise, it is returned unchanged.
-    """
-    msg = (
-        "the uncertainties.unumpy.unumpy_to_numpy_matrix function is deprecated. It "
-        "will be removed in a future release."
-    )
-    warn(msg, FutureWarning)
-    if isinstance(arr, matrix):
-        return arr.view(numpy.matrix)
-    else:
-        return arr
-
-
 def nominal_values(arr):
     """
     Return the nominal values of the numbers in NumPy array arr.
@@ -96,13 +76,9 @@ def nominal_values(arr):
     class from this module) are passed through untouched (because a
     numpy.array can contain numbers with uncertainties and pure floats
     simultaneously).
-
-    If arr is of type unumpy.matrix, the returned array is a
-    numpy.matrix, because the resulting matrix does not contain
-    numbers with uncertainties.
     """
 
-    return unumpy_to_numpy_matrix(to_nominal_values(arr))
+    return to_nominal_values(arr)
 
 
 def std_devs(arr):
@@ -113,13 +89,9 @@ def std_devs(arr):
     class from this module) are passed through untouched (because a
     numpy.array can contain numbers with uncertainties and pure floats
     simultaneously).
-
-    If arr is of type unumpy.matrix, the returned array is a
-    numpy.matrix, because the resulting matrix does not contain
-    numbers with uncertainties.
     """
 
-    return unumpy_to_numpy_matrix(to_std_devs(arr))
+    return to_std_devs(arr)
 
 
 ###############################################################################
@@ -466,11 +438,6 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
             numpy.vectorize(uncert_core.LinearCombination)(derivatives),
         )
 
-        # NumPy matrices that contain numbers with uncertainties are
-        # better as unumpy matrices:
-        if isinstance(result, numpy.matrix):
-            result = result.view(matrix)
-
         return result
 
     return wrapped_func
@@ -486,22 +453,12 @@ def inv_with_derivatives(arr, input_type, derivatives):
     See the definition of func_with_deriv_to_uncert_func() for its
     detailed semantics.
     """
-
     inverse = numpy.linalg.inv(arr)
-    # The inverse of a numpy.matrix is a numpy.matrix.  It is assumed
-    # that numpy.linalg.inv is such that other types yield
-    # numpy.ndarrays:
-    if issubclass(input_type, numpy.matrix):
-        inverse = inverse.view(numpy.matrix)
     yield inverse
-
-    # It is mathematically convenient to work with matrices:
-    inverse_mat = numpy.asmatrix(inverse)
 
     # Successive derivatives of the inverse:
     for derivative in derivatives:
-        derivative_mat = numpy.asmatrix(derivative)
-        yield -inverse_mat * derivative_mat * inverse_mat
+        yield -inverse @ derivative @ inverse
 
 
 inv = func_with_deriv_to_uncert_func(inv_with_derivatives)
@@ -529,15 +486,9 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
     """
 
     inverse = numpy.linalg.pinv(arr, rcond)
-    # The pseudo-inverse of a numpy.matrix is a numpy.matrix.  It is
-    # assumed that numpy.linalg.pinv is such that other types yield
-    # numpy.ndarrays:
-    if issubclass(input_type, numpy.matrix):
-        inverse = inverse.view(numpy.matrix)
     yield inverse
 
     # It is mathematically convenient to work with matrices:
-    inverse_mat = numpy.asmatrix(inverse)
 
     # Formula (4.12) from The Differentiation of Pseudo-Inverses and
     # Nonlinear Least Squares Problems Whose Variables
@@ -549,20 +500,19 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
     # http://mathoverflow.net/questions/25778/analytical-formula-for-numerical-derivative-of-the-matrix-pseudo-inverse
 
     # Shortcuts.  All the following factors should be numpy.matrix objects:
-    PA = arr * inverse_mat
-    AP = inverse_mat * arr
-    factor21 = inverse_mat * inverse_mat.H
+    PA = arr @ inverse
+    AP = inverse @ arr
+    factor21 = inverse @ inverse.conj().T
     factor22 = numpy.eye(arr.shape[0]) - PA
     factor31 = numpy.eye(arr.shape[1]) - AP
-    factor32 = inverse_mat.H * inverse_mat
+    factor32 = inverse.conj().T @ inverse
 
     # Successive derivatives of the inverse:
     for derivative in derivatives:
-        derivative_mat = numpy.asmatrix(derivative)
-        term1 = -inverse_mat * derivative_mat * inverse_mat
-        derivative_mat_H = derivative_mat.H
-        term2 = factor21 * derivative_mat_H * factor22
-        term3 = factor31 * derivative_mat_H * factor32
+        term1 = -inverse @ derivative @ inverse
+        derivative_H = derivative.conj().T
+        term2 = factor21 @ derivative_H @ factor22
+        term3 = factor31 @ derivative_H @ factor32
         yield term1 + term2 + term3
 
 
@@ -599,84 +549,6 @@ pinv = uncert_core.set_doc(
     Analytical formulas are used.
     """
 )(pinv)
-
-########## Matrix class
-
-
-class matrix(numpy.matrix):
-    # The name of this class is the same as NumPy's, which is why it
-    # does not follow PEP 8.
-    """
-    Class equivalent to numpy.matrix, but that behaves better when the
-    matrix contains numbers with uncertainties.
-    """
-
-    def __init__(self, *args, **kwargs):
-        warn(
-            "the uncertainties.unumpy.matrix() class is deprecated. It will be "
-            "removed in a future release.",
-            FutureWarning,
-        )
-        super().__init__()
-
-    def __rmul__(self, other):
-        # ! NumPy's matrix __rmul__ uses an apparently restrictive
-        # dot() function that cannot handle the multiplication of a
-        # scalar and of a matrix containing objects (when the
-        # arguments are given in this order).  We go around this
-        # limitation:
-        if numpy.isscalar(other):
-            return numpy.dot(self, other)
-        else:
-            return numpy.dot(other, self)  # The order is important
-
-    def getI(self):
-        """Matrix inverse or pseudo-inverse."""
-        m, n = self.shape
-        return (inv if m == n else pinv)(self)
-
-    I = numpy.matrix.I.getter(getI)  # noqa
-
-    # !!! The following function is not in the official documentation
-    # of the module. Maybe this is because arrays with uncertainties
-    # do not have any equivalent in this module, and they should be
-    # the first ones to have such methods?
-    @property
-    def nominal_values(self):
-        """
-        Nominal value of all the elements of the matrix.
-        """
-        return nominal_values(self)
-
-    # !!! The following function is not in the official documentation
-    # of the module. Maybe this is because arrays with uncertainties
-    # do not have any equivalent in this module, and they should be
-    # the first ones to have such methods?
-    @property
-    def std_devs(self):
-        return numpy.matrix(std_devs(self))
-
-
-def umatrix(nominal_values, std_devs=None):
-    """
-    Constructs a matrix that contains numbers with uncertainties.
-
-    The arguments are the same as for uarray(...): nominal values, and
-    standard deviations.
-
-    The returned matrix can be inverted, thanks to the fact that it is
-    a unumpy.matrix object instead of a numpy.matrix one.
-    """
-    msg = (
-        "the uncertainties.unumpy.umatrix function is deprecated. It will be removed in "
-        "a future release."
-    )
-    warn(msg, FutureWarning)
-
-    if std_devs is None:  # Obsolete, single tuple argument call
-        raise TypeError("umatrix() should be called with two arguments.")
-
-    return uarray(nominal_values, std_devs).view(matrix)
 
 
 ###############################################################################
