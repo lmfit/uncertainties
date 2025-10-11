@@ -4,10 +4,9 @@ Change Log
 Unreleased
 ----------
 
-Fixes:
-
 Adds:
 
+- Adds a section in the documentation advertising the forthcoming `4.0.0` release.
 - Add github action CI to automatically publish a new package version to ``pypi`` when
    a github release of a new version is published.
 - Increases the stacklevel of the warning about `std_dev==0` so that it blames
