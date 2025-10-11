@@ -46,11 +46,11 @@ into the future. At the heart of the architecture change is the idea that
 :class:`UFloat` objects should closely resemble mathematical random variables. Here are
 some specific benefits from the architecture update.
 
-- It will now be possible to hash :class:`UFloat` objects in a well-controlled way.
-- :class:`UFloat` objects will exhibit more intuitive behavior under copying and
-   pickling.
-- There is a clear path towards implementing correlation-preserving serialization and
-   deserialization of :class:`UFloat` objects.
+- :class:`UFloat` objects will now be immutable and hashing them will follow the python
+   data model rule that two objects which are equal should have the same hash.
+- Previously, :class:`UFloat` instances did not preserve correlations upon copying,
+   pickling, or any other form of serialization. Now :class:`UFloat` instances will
+   preserve correlations upon copying and pickling.
 - Previously when users generated a number with uncertainties, the resulting object may
    have been a :class:`Variable` or :class:`AffineScalarFunc` instance depending on how
    the object was created. Now all numbers with uncertainty are uniformly represented by
@@ -68,7 +68,14 @@ Notable changes are
    :attr:`UFloat.error_components` property
 - Elimination of a number of :class:`UFloat` instance methods and :mod:`umath` module
    functions which do not make sense for random variables such as comparison methods
-   and modulo methods and functions.
+   and modulo methods and functions. These changes are recorded in the `3.2` series
+   changelog. These deprecated methods and functions emit warnings in the most recent
+   :mod:`uncertainties` versions.
+
+Note that basic usage of the :mod:`uncertainties` package including creating numbers
+with uncertainty and manipulating them using basic arithmetic or math methods and
+functions (other than those which have been removed) will still work as it did
+previously.
 
 There will continue to be support for the latest version 3 release as the community
 transitions to the new version.
