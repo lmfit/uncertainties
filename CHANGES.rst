@@ -14,6 +14,7 @@ Adds:
   the caller rather than blaming the `ufloat()` function.
 - Adjusts the Sphinx configuration to allow for reproducible builds using
   ``SOURCE_DATE_EPOCH``.
+- Mark Python 3.13 and 3.14 as officially supported.
 
 Deprecates:
 

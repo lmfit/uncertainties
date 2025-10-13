@@ -37,6 +37,8 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: Implementation :: Jython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Topic :: Education",
@@ -67,4 +69,6 @@ doc = ["sphinx", "sphinx-copybutton", "python-docs-theme"]
 all = ["uncertainties[doc,test,arrays]"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "doc", "uncertainties"]
+addopts = "--doctest-modules --doctest-glob=*.rst"
+doctest_optionflags = "IGNORE_EXCEPTION_DETAIL"
