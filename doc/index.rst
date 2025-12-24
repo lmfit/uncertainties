@@ -54,15 +54,14 @@ some specific benefits from the architecture update.
 - Previously when users generated a number with uncertainties, the resulting object may
    have been a :class:`Variable` or :class:`AffineScalarFunc` instance depending on how
    the object was created. Now all numbers with uncertainty are uniformly represented by
-   :class:`UFloat` instances. :class:`AffineScalarFunc` remains as a legacy name for
-   :class:`UFloat`.
+   :class:`UFloat` instances. :class:`AffineScalarFunc` and :class:`Variable` remain as
+   legacy names for :class:`UFloat`.
 
 In addition to reformating the underlying architecture, this update makes a number of
 changes and simplifications to the API to improve consistency. Some of these API changes
 break backwards compatibility.
 Notable changes are
 
-- Elimination of the :class:`Variable` class.
 - Elimination of the :attr:`AffineScalarFunc.derivatives` property.
 - Replacing the :func:`AffineScalarFunc.error_components()` method with the
    :attr:`UFloat.error_components` property
