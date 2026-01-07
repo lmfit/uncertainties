@@ -64,7 +64,7 @@ Notable changes are
 
 - Elimination of the :attr:`AffineScalarFunc.derivatives` property.
 - Replacing the :func:`AffineScalarFunc.error_components()` method with the
-   :attr:`UFloat.error_components` property
+   :attr:`UFloat.error_components` property.
 - Elimination of a number of :class:`UFloat` instance methods and :mod:`umath` module
    functions which do not make sense for random variables such as comparison methods
    and modulo methods and functions. These changes are recorded in the `3.2` series
