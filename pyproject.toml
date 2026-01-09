@@ -21,14 +21,14 @@ keywords = [
     "standard deviation", "derivatives", "partial derivatives",
     "differentiation"
 ]
-license = {text = "Revised BSD License"}
+license = "BSD-3-Clause"
+license-files = ["LICENSE.txt"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Education",
     "Intended Audience :: Other Audience",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
