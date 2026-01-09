@@ -14,6 +14,7 @@ Adds:
 - Adjusts the Sphinx configuration to allow for reproducible builds using
   ``SOURCE_DATE_EPOCH``.
 - Mark Python 3.13 and 3.14 as officially supported.
+- Drop support for Python 3.8
 
 Deprecates:
 
@@ -25,6 +26,7 @@ Deprecates:
    and `np.matrix` objects is now marked as deprecated. According to the
    `numpy documentation <https://numpy.org/doc/stable/reference/generated/numpy.matrix.html>`_
    usage of the `np.matrix` class is no longer recommended.
+
 
 3.2.3   2025-April-18
 -----------------------
