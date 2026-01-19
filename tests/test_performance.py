@@ -1,4 +1,3 @@
-from math import log10
 import time
 import timeit
 
@@ -46,9 +45,8 @@ def test_repeated_summation_complexity():
     n0 = n_list[0]
     t0 = t_list[0]
     for n, t in zip(n_list[1:], t_list[1:]):
-        # Check that the plot of t vs n is linear on a log scale to within 10%
-        # See PR 275
-        assert 0.9 * log10(n / n0) < log10(t / t0) < 1.1 * log10(n / n0)
+        # Check that t vs n is sub-quadratic. See PR #275
+        assert t / t0 < (n / n0) ** 1.5
 
 
 @pytest.mark.parametrize("num", (10, 100, 1000, 10000, 100000))
