@@ -8,7 +8,8 @@ Fixes:
 
 - The `test_repeated_summation_complexity` test regularly failed close to its threshold
   despite the repeated summation complexity not being compromised. In this release, the
-  test tolerance has been relaxed to reduce the number of false failures.
+  test tolerance has been relaxed to reduce the number of false failures. Fixes
+  `#343 <https://github.com/lmfit/uncertainties/issues/343>`_.
 
 3.2.4   2026-January-9
 -----------------------
