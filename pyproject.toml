@@ -14,7 +14,7 @@ authors = [
 ]
 description = "calculations with values with uncertainties, error propagation"
 readme = "README.rst"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 keywords = [
     "error propagation", "uncertainties", "uncertainty calculations",
     "standard deviation", "derivatives", "partial derivatives",
