@@ -1,6 +1,15 @@
 Change Log
 ===================
 
+
+3.2.5 2026-January-21
+-----------------------
+
+- change warnings about deprecation of error_components() and
+  derivates to PendingDeprecationWarning
+- Drop support for Python 3.8
+
+
 3.2.4   2026-January-9
 -----------------------
 
