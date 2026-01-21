@@ -448,7 +448,7 @@ class AffineScalarFunc(object):
         warn(
             f"{self.__class__.__name__}.derivatives() is deprecated. It will "
             f"be removed in a future release.",
-            FutureWarning,
+            PendingDeprecationWarning,
             stacklevel=2,
         )
 
@@ -481,7 +481,7 @@ class AffineScalarFunc(object):
             f"be replaced with an instance property by the same name. It will be "
             f"accessed by {self.__class__.__name__}.error_components (with no "
             f"parentheses).",
-            FutureWarning,
+            PendingDeprecationWarning,
             stacklevel=2,
         )
 
