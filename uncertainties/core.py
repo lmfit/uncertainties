@@ -433,7 +433,7 @@ class AffineScalarFunc(object):
     @property
     def _derivatives(self):
         """
-        Private wrapper for derivatives without raising a FutureWarning.
+        Private version of `derivatives` for internal use.
         """
         if not self._linear_part.expanded():
             self._linear_part.expand()
@@ -494,7 +494,7 @@ class AffineScalarFunc(object):
 
     def _error_components(self):
         """
-        Private wrapper for error_compents without FutureWarning.
+        Private version of `error_components` for internal use.
         """
         # Calculation of the variance:
         error_components = {}
