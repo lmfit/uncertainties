@@ -433,15 +433,7 @@ class AffineScalarFunc(object):
     @property
     def _derivatives(self):
         """
-        Return a mapping from each Variable object on which the function
-        (self) depends to the value of the derivative with respect to
-        that variable.
-
-        This mapping should not be modified.
-
-        Derivative values are always floats.
-
-        This mapping is cached, for subsequent calls.
+        Private wrapper for derivatives without raising a FutureWarning.
         """
         if not self._linear_part.expanded():
             self._linear_part.expand()
@@ -456,7 +448,15 @@ class AffineScalarFunc(object):
     @property
     def derivatives(self):
         """
-        Public wrapper for _derivatives.
+        Return a mapping from each Variable object on which the function
+        (self) depends to the value of the derivative with respect to
+        that variable.
+
+        This mapping should not be modified.
+
+        Derivative values are always floats.
+
+        This mapping is cached, for subsequent calls.
         """
         warn(
             f"{self.__class__.__name__}.derivatives() is deprecated. It will "
@@ -471,7 +471,14 @@ class AffineScalarFunc(object):
     # Uncertainties handling:
     def error_components(self):
         """
-        Publich wrapper of _error_compents with FutureWarning.
+        Individual components of the standard deviation of the affine
+        function (in absolute value), returned as a dictionary with
+        Variable objects as keys. The returned variables are the
+        independent variables that the affine function depends on.
+
+        This method assumes that the derivatives contained in the
+        object take scalar values (and are not a tuple, like what
+        math.frexp() returns, for instance).
         """
         warn(
             f"{self.__class__.__name__}.error_components() is currently an "
@@ -487,14 +494,7 @@ class AffineScalarFunc(object):
 
     def _error_components(self):
         """
-        Individual components of the standard deviation of the affine
-        function (in absolute value), returned as a dictionary with
-        Variable objects as keys. The returned variables are the
-        independent variables that the affine function depends on.
-
-        This method assumes that the derivatives contained in the
-        object take scalar values (and are not a tuple, like what
-        math.frexp() returns, for instance).
+        Private wrapper for error_compents without FutureWarning.
         """
         # Calculation of the variance:
         error_components = {}
