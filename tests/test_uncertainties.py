@@ -172,7 +172,7 @@ def test_ufloat_method_derivativs(func_name, ufloat_tuples):
     result = bound_func(*ufloat_arg_list[1:])
 
     for arg_num, arg in enumerate(ufloat_arg_list):
-        ufloat_deriv_value = result.derivatives[arg]
+        ufloat_deriv_value = result._derivatives[arg]
         numerical_deriv_func = partial_derivative(unbound_func, arg_num)
         numerical_deriv_value = numerical_deriv_func(*float_arg_list)
         assert math.isclose(
@@ -200,7 +200,7 @@ def test_copy():
     y = copy.copy(x)
     assert x != y
     assert not (x == y)
-    assert y in y.derivatives.keys()  # y must not copy the dependence on x
+    assert y in y._derivatives.keys()  # y must not copy the dependence on x
 
     z = copy.deepcopy(x)
     assert x != z
@@ -208,13 +208,13 @@ def test_copy():
     # Copy tests on expressions:
     t = x + 2 * z
     # t depends on x:
-    assert x in t.derivatives
+    assert x in t._derivatives
 
     # The relationship between the copy of an expression and the
     # original variables should be preserved:
     t_copy = copy.copy(t)
     # Shallow copy: the variables on which t depends are not copied:
-    assert x in t_copy.derivatives
+    assert x in t_copy._derivatives
     assert uncert_core.covariance_matrix([t, z]) == uncert_core.covariance_matrix(
         [t_copy, z]
     )
@@ -223,7 +223,7 @@ def test_copy():
     # variables should be broken, since the deep copy created new,
     # independent variables:
     t_deepcopy = copy.deepcopy(t)
-    assert x not in t_deepcopy.derivatives
+    assert x not in t_deepcopy._derivatives
     assert uncert_core.covariance_matrix([t, z]) != uncert_core.covariance_matrix(
         [t_deepcopy, z]
     )
@@ -238,7 +238,7 @@ def test_copy():
 
     gc.collect()
 
-    assert y in list(y.derivatives.keys())
+    assert y in list(y._derivatives.keys())
 
 
 ## Classes for the pickling tests (put at the module level, so that
@@ -510,7 +510,7 @@ def test_basic_access_to_data():
     assert error_sources[a] == 0.001
 
     # Derivative values should be available:
-    assert y.derivatives[x] == 5
+    assert y._derivatives[x] == 5
 
     # Modification of the standard deviation of variables:
     x.std_dev = 1
@@ -975,8 +975,8 @@ def test_wrap_with_kwargs():
     # to try to confuse the code:
 
     assert (
-        f_wrapped2(x, y, z, t=t).derivatives[y]
-        == f_auto_unc(x, y, z, t=t).derivatives[y]
+        f_wrapped2(x, y, z, t=t)._derivatives[y]
+        == f_auto_unc(x, y, z, t=t)._derivatives[y]
     )
 
     # Derivatives supplied through the keyword-parameter dictionary of
@@ -992,12 +992,12 @@ def test_wrap_with_kwargs():
     # The derivatives should be exactly the same, because they are
     # obtained with the exact same analytic formula:
     assert (
-        f_wrapped3(x, y, z, t=t).derivatives[z]
-        == f_auto_unc(x, y, z, t=t).derivatives[z]
+        f_wrapped3(x, y, z, t=t)._derivatives[z]
+        == f_auto_unc(x, y, z, t=t)._derivatives[z]
     )
     assert (
-        f_wrapped3(x, y, z, t=t).derivatives[t]
-        == f_auto_unc(x, y, z, t=t).derivatives[t]
+        f_wrapped3(x, y, z, t=t)._derivatives[t]
+        == f_auto_unc(x, y, z, t=t)._derivatives[t]
     )
 
     ########################################

@@ -70,14 +70,14 @@ power_derivative_cases = (
 )
 def test_power_derivatives(first_ufloat, second_ufloat, first_der, second_der):
     result = pow(first_ufloat, second_ufloat)
-    first_der_result = result.derivatives[first_ufloat]
-    second_der_result = result.derivatives[second_ufloat]
+    first_der_result = result._derivatives[first_ufloat]
+    second_der_result = result._derivatives[second_ufloat]
     assert nan_close(first_der_result, first_der)
     assert nan_close(second_der_result, second_der)
 
     result = umath_pow(first_ufloat, second_ufloat)
-    first_der_result = result.derivatives[first_ufloat]
-    second_der_result = result.derivatives[second_ufloat]
+    first_der_result = result._derivatives[first_ufloat]
+    second_der_result = result._derivatives[second_ufloat]
     assert nan_close(first_der_result, first_der)
     assert nan_close(second_der_result, second_der)
 
