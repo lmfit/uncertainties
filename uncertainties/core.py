@@ -430,10 +430,8 @@ class AffineScalarFunc(object):
 
     ############################################################
 
-    # Making derivatives a property gives the user a clean syntax,
-    # which is consistent with derivatives becoming a dictionary.
     @property
-    def derivatives(self):
+    def _derivatives(self):
         """
         Return a mapping from each Variable object on which the function
         (self) depends to the value of the derivative with respect to
@@ -445,13 +443,6 @@ class AffineScalarFunc(object):
 
         This mapping is cached, for subsequent calls.
         """
-        warn(
-            f"{self.__class__.__name__}.derivatives() is deprecated. It will "
-            f"be removed in a future release.",
-            FutureWarning,
-            stacklevel=2,
-        )
-
         if not self._linear_part.expanded():
             self._linear_part.expand()
             # Attempts to get the contribution of a variable that the
@@ -460,20 +451,27 @@ class AffineScalarFunc(object):
 
         return self._linear_part.linear_combo
 
+    # Making derivatives a property gives the user a clean syntax,
+    # which is consistent with derivatives becoming a dictionary.
+    @property
+    def derivatives(self):
+        """
+        Public wrapper for _derivatives.
+        """
+        warn(
+            f"{self.__class__.__name__}.derivatives() is deprecated. It will "
+            f"be removed in a future release.",
+            FutureWarning,
+            stacklevel=2,
+        )
+        return self._derivatives
+
     ########################################
 
     # Uncertainties handling:
-
     def error_components(self):
         """
-        Individual components of the standard deviation of the affine
-        function (in absolute value), returned as a dictionary with
-        Variable objects as keys. The returned variables are the
-        independent variables that the affine function depends on.
-
-        This method assumes that the derivatives contained in the
-        object take scalar values (and are not a tuple, like what
-        math.frexp() returns, for instance).
+        Publich wrapper of _error_compents with FutureWarning.
         """
         warn(
             f"{self.__class__.__name__}.error_components() is currently an "
@@ -485,10 +483,23 @@ class AffineScalarFunc(object):
             stacklevel=2,
         )
 
+        return self._error_components()
+
+    def _error_components(self):
+        """
+        Individual components of the standard deviation of the affine
+        function (in absolute value), returned as a dictionary with
+        Variable objects as keys. The returned variables are the
+        independent variables that the affine function depends on.
+
+        This method assumes that the derivatives contained in the
+        object take scalar values (and are not a tuple, like what
+        math.frexp() returns, for instance).
+        """
         # Calculation of the variance:
         error_components = {}
 
-        for variable, derivative in self.derivatives.items():
+        for variable, derivative in self._derivatives.items():
             # print "TYPE", type(variable), type(derivative)
 
             # Individual standard error due to variable:
@@ -523,7 +534,7 @@ class AffineScalarFunc(object):
         # std_dev value (in fact, many intermediate AffineScalarFunc do
         # not need to have their std_dev calculated: only the final
         # AffineScalarFunc returned to the user does).
-        return float(sqrt(sum(delta**2 for delta in self.error_components().values())))
+        return float(sqrt(sum(delta**2 for delta in self._error_components().values())))
 
     # Abbreviation (for formulas, etc.):
     s = std_dev
@@ -920,12 +931,12 @@ def covariance_matrix(nums_with_uncert):
 
     covariance_matrix = []
     for i1, expr1 in enumerate(nums_with_uncert, 1):
-        derivatives1 = expr1.derivatives  # Optimization
+        derivatives1 = expr1._derivatives  # Optimization
         vars1 = set(derivatives1)  # !! Python 2.7+: viewkeys() would work
         coefs_expr1 = []
 
         for expr2 in nums_with_uncert[:i1]:
-            derivatives2 = expr2.derivatives  # Optimization
+            derivatives2 = expr2._derivatives  # Optimization
             coefs_expr1.append(
                 sum(
                     (

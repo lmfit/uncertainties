@@ -504,7 +504,7 @@ def test_basic_access_to_data():
     # Details on the sources of error:
     a = ufloat(-1, 0.001)
     y = 2 * x + 3 * x + 2 + a
-    error_sources = y.error_components()
+    error_sources = y._error_components()
     assert len(error_sources) == 2  # 'a' and 'x'
     assert error_sources[x] == 0.05
     assert error_sources[a] == 0.001
@@ -514,7 +514,7 @@ def test_basic_access_to_data():
 
     # Modification of the standard deviation of variables:
     x.std_dev = 1
-    assert y.error_components()[x] == 5  # New error contribution!
+    assert y._error_components()[x] == 5  # New error contribution!
 
     # Calculated values with uncertainties should not have a settable
     # standard deviation:

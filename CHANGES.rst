@@ -1,6 +1,12 @@
 Change Log
 ===================
 
+3.2.4a  2026-January-22
+-----------------------
+
+Adds:
+- Add new internal _derivatives and _error_components properties for internal use without deprecation warning
+
 3.2.4   2026-January-9
 -----------------------
 
