@@ -603,4 +603,3 @@ def test_percentage_uncertainty_roundtrip():
     x_back = ufloat_fromstr(formatted)
     assert nan_close(x.nominal_value, x_back.nominal_value)
     assert nan_close(x.std_dev, x_back.std_dev, rel_tol=1e-4)
-

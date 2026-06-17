@@ -68,6 +68,7 @@ PERCENTAGE_WITH_UNCERT_RE_MATCH = re.compile(
     re.VERBOSE,
 ).match
 
+
 class NotParenUncert(ValueError):
     """
     Raised when a string representing an exact number or a number with

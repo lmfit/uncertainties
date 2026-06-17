@@ -63,6 +63,8 @@ value:
 >>> x = ufloat_fromstr("0.20(1)")  # Short-hand notation
 >>> x = ufloat_fromstr("20(1)e-2")  # Exponent notation
 >>> x = ufloat_fromstr(u"0.20±0.01")  # Pretty-print form
+>>> x = ufloat_fromstr("0.20±5%")  # Percentage uncertainty
+>>> x = ufloat_fromstr("0.20 (+-5%)")
 >>> x = ufloat_fromstr("0.20")  # Automatic uncertainty of +/-1 on last digit
 
 More details on the :func:`ufloat` and :func:`ufloat_from_str` can be found in
