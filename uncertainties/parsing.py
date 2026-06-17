@@ -48,6 +48,25 @@ NUMBER_WITH_UNCERT_GLOBAL_EXP_RE_MATCH = re.compile(
     re.VERBOSE,
 ).match
 
+# Regexp for percentage uncertainties (e.g., "23 ± 13%", "2.037e5 (±3.270%)")
+PERCENTAGE_WITH_UNCERT_RE_STR = r"""
+    ([+-])?                     # Sign for value
+    ([\d\.]+(?:[eE][+-]?\d+)?)  # Main value (with scientific notation)
+    \s*                         # Optional whitespace
+    \(?                         # Optional opening parenthesis
+    \s*                         # Optional whitespace
+    (?:[±+-]+)?                 # Optional symbol (±, +, -, +-, -+, +/-)
+    \s*                         # Optional whitespace
+    ([\d\.]+(?:[eE][+-]?\d+)?)  # Percentage uncertainty (with scientific notation)
+    \s*                         # Optional whitespace
+    %                           # Literal % symbol
+    \)?                         # Optional closing parenthesis
+"""
+
+PERCENTAGE_WITH_UNCERT_RE_MATCH = re.compile(
+    PERCENTAGE_WITH_UNCERT_RE_STR,
+    re.VERBOSE,
+).match
 
 class NotParenUncert(ValueError):
     """
@@ -121,6 +140,35 @@ def parse_error_in_parentheses(representation):
     uncert_value *= factor
 
     return (value, uncert_value)
+
+
+def parse_percentage_uncertainty(representation):
+    """
+    Parse a string with percentage uncertainty, e.g., "23 ± 13%",
+    "2.037e5 (±3.270%)", or "23 +- 1.3e-5%".
+
+    The percentage uncertainty is converted to an absolute uncertainty:
+        uncertainty = value * (percentage / 100)
+
+    Returns (value, uncertainty) as floats.
+
+    Raises ValueError if the string cannot be parsed.
+    """
+    match = PERCENTAGE_WITH_UNCERT_RE_MATCH(representation)
+    if not match:
+        raise ValueError(cannot_parse_ufloat_msg_pat % representation)
+
+    sign, value_str, uncertainty_str = match.groups()
+
+    try:
+        value = float((sign or "") + value_str)
+        uncertainty_percent = float(uncertainty_str)
+    except ValueError:
+        raise ValueError(cannot_parse_ufloat_msg_pat % representation)
+
+    # Convert percentage uncertainty to absolute
+    uncertainty = abs(value) * (uncertainty_percent / 100)
+    return (value, uncertainty)
 
 
 # Regexp for catching the two variable parts of -1.2×10⁻¹²:
@@ -211,6 +259,13 @@ def str_to_number_with_uncert(representation):
         representation = match.group("simple_num_with_uncert")
     else:
         factor = 1  # No global exponential factor
+
+    try:
+        # Check for percentage uncertainty format
+        parsed_value = parse_percentage_uncertainty(representation)
+        return (parsed_value[0] * factor, parsed_value[1] * factor)
+    except ValueError:
+        pass
 
     match = re.match("(.*)(?:\\+/-|±)(.*)", representation)
     if match:
