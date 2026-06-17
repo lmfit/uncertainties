@@ -525,3 +525,82 @@ def test_custom_pretty_print_and_latex():
     # We restore the defaults:
     for var, setting in PREV_CUSTOMIZATIONS.items():
         setattr(formatting, var, setting)
+
+
+def test_percentage_uncertainty_parsing():
+    """
+    Test parsing of strings with percentage uncertainties,
+    e.g., "23 ± 13%", "2.037e5 (±3.270%)", "23 +- 1.3e-5%".
+    The percentage is converted to an absolute uncertainty:
+        uncertainty = value * (percentage / 100)
+    """
+    # Basic cases with different symbols and spacing
+    x = ufloat_fromstr("23 ± 13%")
+    assert nan_close(x.nominal_value, 23.0)
+    assert nan_close(x.std_dev, 2.99)  # 23 * 0.13
+
+    x = ufloat_fromstr("23 +- 13%")
+    assert nan_close(x.nominal_value, 23.0)
+    assert nan_close(x.std_dev, 2.99)
+
+    x = ufloat_fromstr("23(±13%)")
+    assert nan_close(x.nominal_value, 23.0)
+    assert nan_close(x.std_dev, 2.99)
+
+    x = ufloat_fromstr("23 (±13%)")
+    assert nan_close(x.nominal_value, 23.0)
+    assert nan_close(x.std_dev, 2.99)
+
+    x = ufloat_fromstr("23±13%")
+    assert nan_close(x.nominal_value, 23.0)
+    assert nan_close(x.std_dev, 2.99)
+
+    # Scientific notation in value and uncertainty
+    x = ufloat_fromstr("2.037e5 (±3.270%)")
+    assert nan_close(x.nominal_value, 2.037e5)
+    assert nan_close(x.std_dev, 2.037e5 * 0.0327)
+
+    x = ufloat_fromstr("2.037e5 (±3.270e-2%)")
+    assert nan_close(x.nominal_value, 2.037e5)
+    assert nan_close(x.std_dev, 2.037e5 * 0.000327)
+
+    # Negative values
+    x = ufloat_fromstr("-23 ± 13%")
+    assert nan_close(x.nominal_value, -23.0)
+    assert nan_close(x.std_dev, 2.99)  # Uncertainty is always positive
+
+    # Small values
+    x = ufloat_fromstr("0.42 ± 0.5%")
+    assert nan_close(x.nominal_value, 0.42)
+    assert nan_close(x.std_dev, 0.0021)  # 0.42 * 0.005
+
+    # With global exponent
+    x = ufloat_fromstr("(2.037e5 ± 3.270%)e10")
+    assert nan_close(x.nominal_value, 2.037e15)
+    assert nan_close(x.std_dev, 2.037e15 * 0.0327)
+
+    # Edge cases
+    x = ufloat_fromstr("23 ± 0%")
+    assert nan_close(x.nominal_value, 23.0)
+    assert nan_close(x.std_dev, 0.0)
+
+    x = ufloat_fromstr("100 ± 0.001%")
+    assert nan_close(x.nominal_value, 100.0)
+    assert nan_close(x.std_dev, 0.001)  # 100 * 0.00001
+
+
+def test_percentage_uncertainty_roundtrip():
+    """Test that parsing percentage uncertainties produces consistent ufloat objects."""
+    x = ufloat_fromstr("23 ± 13%")
+    formatted = format(x, ".3uf")  # Use 3 significant digits to preserve 2.99
+    x_back = ufloat_fromstr(formatted)
+    assert nan_close(x.nominal_value, x_back.nominal_value)
+    assert nan_close(x.std_dev, x_back.std_dev, rel_tol=1e-4)
+
+    # Test with scientific notation
+    x = ufloat_fromstr("2.037e5 (±3.270%)")
+    formatted = format(x, ".4ue")
+    x_back = ufloat_fromstr(formatted)
+    assert nan_close(x.nominal_value, x_back.nominal_value)
+    assert nan_close(x.std_dev, x_back.std_dev, rel_tol=1e-4)
+
