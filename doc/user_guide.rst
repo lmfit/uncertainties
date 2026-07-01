@@ -324,7 +324,7 @@ At these points the ``x`` derivative would be complex so a NaN value is used:
 
 >>> x = ufloat(0, 0.2)
 >>> y=1.5
->>> print((x**y).error_components())
+>>> print((x**y)._error_components())
 {0.0+/-0.2: nan}
 
 The ``y`` derivative is real anywhere ``x**y`` is real as long as ``x>=0``.
@@ -332,7 +332,7 @@ For ``x < 0`` the ``y`` derivative is always complex valued so a NaN value is us
 
 >>> x = -2
 >>> y = ufloat(1, 0.2)
->>> print((x**y).error_components())
+>>> print((x**y)._error_components())
 {1.0+/-0.2: nan}
 
 Automatic correlations
@@ -386,7 +386,7 @@ when the variables are **tagged**:
 >>> sum_value = u+2*v
 >>> sum_value
 21.0+/-0.223606797749979
->>> for (var, error) in sum_value.error_components().items():
+>>> for (var, error) in sum_value._error_components().items():
 ...     print("{}: {}".format(var.tag, error))
 ...
 v variable: 0.2
@@ -407,7 +407,7 @@ the total uncertainty of :data:`result` can simply be obtained as:
 >>> result = x**y / z
 >>> syst_error = math.sqrt(sum(  # Error from *all* systematic errors
 ...     error**2
-...     for (var, error) in result.error_components().items()
+...     for (var, error) in result._error_components().items()
 ...     if var.tag == "systematic"))
 >>> print(format(syst_error, ".3f"))
 577.984
@@ -651,9 +651,9 @@ variables:
 >>> u = ufloat(1, 0.1)
 >>> v = ufloat(10, 0.1)
 >>> sum_value = u+2*v
->>> sum_value.derivatives[u]
+>>> sum_value._derivatives[u]
 1.0
->>> sum_value.derivatives[v]
+>>> sum_value._derivatives[v]
 2.0
 
 These values are obtained with a :ref:`fast differentiation algorithm

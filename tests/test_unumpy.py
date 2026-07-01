@@ -96,11 +96,11 @@ def derivatives_close(x, y):
     """
 
     # x and y must depend on the same variables:
-    if set(x.derivatives) != set(y.derivatives):
+    if set(x._derivatives) != set(y._derivatives):
         return False  # Not the same variables
 
     return all(
-        nan_close(x.derivatives[var], y.derivatives[var]) for var in x.derivatives
+        nan_close(x._derivatives[var], y._derivatives[var]) for var in x._derivatives
     )
 
 
@@ -162,8 +162,8 @@ def test_inverse():
 
     # There are correlations if both the next two derivatives are
     # not zero:
-    assert m_inverse[0, 0].derivatives[x]
-    assert m_inverse[0, 1].derivatives[x]
+    assert m_inverse[0, 0]._derivatives[x]
+    assert m_inverse[0, 1]._derivatives[x]
 
     # Correlations between m and m_inverse should create a perfect
     # inversion:
