@@ -16,6 +16,12 @@ Adds:
 - Mark Python 3.13 and 3.14 as officially supported.
 - Support for percentage uncertainties in the `ufloat_fromstr` function.
 
+Fixes:
+
+- Fixes `umath.frexp()` so that the uncertainty is correctly propagated onto the
+  returned mantissa. Previously, reading the `std_dev` of the mantissa raised a
+  `TypeError`.
+
 Deprecates:
 
 - The `AffineScalarFunc.derivatives` property has been marked as deprecated. This

@@ -282,6 +282,88 @@ def test_hypot():
     assert isnan(result.derivatives[y])
 
 
+def test_frexp():
+    """
+    frexp() must propagate the uncertainty onto the returned mantissa.
+
+    For frexp(x) = (m, e), we have x = m * 2**e with e a
+    locally-constant integer, hence m = x * 2**-e and dm/dx = 2**-e.
+    This is a regression test for a malformed ``LinearCombination`` in
+    the mantissa: it was built as ``[coeff, linear_part]`` instead of
+    ``[(coeff, linear_part)]``, so merely reading the mantissa's
+    ``std_dev`` raised ``TypeError: cannot unpack non-iterable
+    LinearCombination object``.
+    """
+    cases = [
+        (3.0, 0.1),
+        (-12.5, 0.4),
+        (1.0, 0.2),
+        (0.5, 0.05),
+        (1024.0, 8.0),
+        (-0.03125, 1e-3),
+    ]
+    for nominal, std_dev in cases:
+        x = ufloat(nominal, std_dev)
+        with pytest.warns(FutureWarning, match="will be removed"):
+            mantissa, exponent = umath_core.frexp(x)
+
+        ref_mantissa, ref_exponent = math.frexp(nominal)
+        # Nominal value and exponent match the plain-float result:
+        assert mantissa.nominal_value == ref_mantissa
+        assert exponent == ref_exponent
+        # The exponent is a plain int and carries no uncertainty (it is
+        # returned as-is, not wrapped into an AffineScalarFunc):
+        assert isinstance(exponent, int)
+        assert not isinstance(exponent, uncert_core.AffineScalarFunc)
+        # frexp postcondition on the returned mantissa magnitude:
+        assert 0.5 <= abs(mantissa.nominal_value) < 1.0
+
+        # Reading the uncertainty must not raise, and must equal the
+        # analytical first-order propagation dm/dx = 2**-e:
+        assert nan_close(mantissa.std_dev, 2.0**-exponent * std_dev)
+
+        # The mantissa is an exact linear function of x, so
+        # m * 2**e is fully correlated with x and their difference
+        # carries neither a nominal value nor an uncertainty:
+        residual = mantissa * 2.0**exponent - x
+        assert residual.nominal_value == 0
+        assert residual.std_dev == 0
+
+    # A mantissa whose linear part spans several variables exercises the
+    # full expansion of the (previously malformed) linear combination:
+    a = ufloat(5.0, 0.2)
+    b = ufloat(3.0, 0.1)
+    with pytest.warns(FutureWarning, match="will be removed"):
+        mantissa, exponent = umath_core.frexp(a + b)
+    # a + b = 8.0 = 0.5 * 2**4, so dm/da = dm/db = 2**-4:
+    assert nan_close(mantissa.std_dev, 2.0**-exponent * (a + b).std_dev)
+    residual = mantissa * 2.0**exponent - (a + b)
+    assert residual.std_dev == 0
+    # The expanded linear combination must assign the coefficient 2**-e
+    # to *each* input variable, so subtracting both contributions
+    # cancels the mantissa exactly in nominal value and uncertainty.
+    # This directly exercises the multi-term expansion that the bad
+    # (non-pair) LinearCombination could not walk:
+    decomposed = mantissa - a * 2.0**-exponent - b * 2.0**-exponent
+    assert decomposed.nominal_value == 0
+    assert decomposed.std_dev == 0
+
+    # At an exact power of two the mantissa is exactly +/-0.5 (the lower
+    # boundary of frexp's [0.5, 1.0) magnitude range), for both a value
+    # above 1 and a negative value below 1:
+    for power, ref_exponent in [(2.0, 2), (-0.25, -1)]:
+        p = ufloat(power, 0.01)
+        with pytest.warns(FutureWarning, match="will be removed"):
+            mantissa, exponent = umath_core.frexp(p)
+        assert mantissa.nominal_value == math.copysign(0.5, power)
+        assert exponent == ref_exponent
+        assert nan_close(mantissa.std_dev, 0.01 * 2.0**-exponent)
+
+    # Called on a plain float, frexp stays a drop-in for math.frexp:
+    with pytest.warns(FutureWarning, match="will be removed"):
+        assert umath_core.frexp(10.0) == math.frexp(10.0)
+
+
 @pytest.mark.parametrize("function_name", umath_core.deprecated_functions)
 def test_deprecated_function(function_name):
     num_args = len(inspect.signature(getattr(math, function_name)).parameters)

@@ -410,7 +410,7 @@ def frexp(x):
                 # With frexp(x) = (m, e), x = m*2**e, so m = x*2**-e
                 # and therefore dm/dx = 2**-e (as e in an integer that
                 # does not vary when x changes):
-                LinearCombination([2**-exponent, aff_func._linear_part]),
+                LinearCombination([(2**-exponent, aff_func._linear_part)]),
             ),
             # The exponent is an integer and is supposed to be
             # continuous (errors must be small):
