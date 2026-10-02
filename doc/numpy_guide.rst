@@ -159,6 +159,14 @@ NaN testing and NaN-aware operations
 One particular function pertains to NaN testing: ``unumpy.isnan()``. It
 returns true for each NaN *nominal value* (and false otherwise).
 
+Both ``unumpy.isnan()`` and ``unumpy.isinf()`` return boolean arrays with
+the same shape as their input, including empty arrays:
+
+>>> unumpy.isnan([])
+array([], dtype=bool)
+>>> unumpy.isinf(np.empty((2, 0, 3))).shape
+(2, 0, 3)
+
 Since NaN±1 is *not* (the scalar) NaN, functions like
 ``numpy.nanmean()`` do not skip such values. This is where
 ``unumpy.isnan()`` is useful, as it can be used for masking out numbers

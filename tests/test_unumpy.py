@@ -5,6 +5,8 @@ except ImportError:
 
     sys.exit()  # There is no reason to test the interface to NumPy
 
+import pytest
+
 import uncertainties
 import uncertainties.core as uncert_core
 from uncertainties import ufloat, unumpy
@@ -258,6 +260,84 @@ def test_broadcast_funcs():
 
     # Test of the __all__ variable:
     assert "acos" not in unumpy.__all__
+
+
+@pytest.mark.parametrize("name", ["isnan", "isinf"])
+@pytest.mark.parametrize(
+    "values",
+    [
+        [],
+        numpy.empty(0),
+        numpy.empty(0, dtype=object),
+        numpy.empty((2, 0, 3)),
+        numpy.empty((2, 0, 3), dtype=object),
+    ],
+)
+def test_predicates_empty(name, values):
+    result = getattr(unumpy, name)(values)
+    expected = getattr(numpy, name)(numpy.empty(numpy.shape(values)))
+    numpy.testing.assert_array_equal(result, expected)
+    assert result.shape == expected.shape
+    assert result.dtype == numpy.dtype(bool)
+    assert numpy.asarray(values)[result].size == 0
+
+
+@pytest.mark.parametrize("name", ["isnan", "isinf"])
+@pytest.mark.parametrize(
+    "values",
+    [
+        1.5,
+        numpy.inf,
+        -numpy.inf,
+        numpy.nan,
+        [[0.0, numpy.inf, numpy.nan], [-numpy.inf, 1.5, -2.0]],
+    ],
+)
+def test_predicates_match_numpy(name, values):
+    result = getattr(unumpy, name)(values)
+    expected = getattr(numpy, name)(values)
+    numpy.testing.assert_array_equal(result, expected)
+    assert result.shape == numpy.shape(expected)
+    assert result.dtype == numpy.dtype(bool)
+
+
+@pytest.mark.parametrize(
+    "name, expected",
+    [
+        ("isnan", [[False, True, False], [False, True, False]]),
+        ("isinf", [[False, False, True], [True, False, False]]),
+    ],
+)
+def test_predicates_use_nominal_values(name, expected):
+    values = numpy.array(
+        [
+            [ufloat(1, numpy.nan), ufloat(numpy.nan, 1), ufloat(numpy.inf, 1)],
+            [ufloat(-numpy.inf, 1), numpy.nan, ufloat(2, numpy.inf)],
+        ]
+    )
+    predicate = getattr(unumpy, name)
+    result = predicate(values)
+    numpy.testing.assert_array_equal(result, expected)
+    assert result.shape == values.shape
+    assert result.dtype == numpy.dtype(bool)
+    # Exercise boolean indexing without comparing NaNs or uncertain numbers.
+    indices = numpy.arange(values.size).reshape(values.shape)
+    numpy.testing.assert_array_equal(indices[result], indices[numpy.array(expected)])
+    for value, expected_value in zip(values.flat, numpy.array(expected).flat):
+        scalar_result = predicate(value)
+        assert scalar_result.shape == ()
+        assert scalar_result.dtype == numpy.dtype(bool)
+        assert scalar_result == expected_value
+
+
+@pytest.mark.parametrize(
+    "name, expected",
+    [("ceil", [-1, 3]), ("floor", [-2, 2]), ("trunc", [-1, 2])],
+)
+def test_locally_constant_numeric_functions(name, expected):
+    result = getattr(unumpy, name)([ufloat(-1.5, 0.1), ufloat(2.5, 0.1)])
+    numpy.testing.assert_array_equal(result, expected)
+    assert numpy.issubdtype(result.dtype, numpy.integer)
 
 
 def test_array_and_matrix_creation():

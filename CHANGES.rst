@@ -1,6 +1,14 @@
 Change Log
 ===================
 
+Unreleased
+----------
+
+Fixes:
+
+- Fix ``unumpy.isnan()`` and ``unumpy.isinf()`` for empty inputs, returning
+  boolean arrays with the input shape. (#164)
+
 3.2.4   2026-January-9
 -----------------------
 

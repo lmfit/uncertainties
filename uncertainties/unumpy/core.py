@@ -736,6 +736,9 @@ def define_vectorized_funcs():
             # type of first element only).
             else {"otypes": [object]}
         )
+        # Predicates have a known output type, even for empty inputs.
+        if function_name in ("isnan", "isinf"):
+            otypes = {"otypes": [bool]}
 
         setattr(
             this_module,
