@@ -7,6 +7,7 @@ import random  # noqa
 
 import pytest
 
+import uncertainties
 import uncertainties.core as uncert_core
 from uncertainties.core import (
     ufloat,
@@ -1356,3 +1357,74 @@ def test_deprecated_bool():
 def test_zero_std_dev_warn():
     with pytest.warns(UserWarning, match="std_dev==0.*unexpected results"):
         ufloat(1, 0)
+
+
+@pytest.mark.parametrize(
+    "nominal_value, std_dev, expected",
+    [
+        (2, 0.1, 0.05),
+        (-2, 0.1, 0.05),
+        (0.5, 0.25, 0.5),
+        # Zero nominal value with a non-zero standard deviation:
+        (0, 0.1, float("inf")),
+        (-0.0, 0.1, float("inf")),
+        # A zero standard deviation always gives zero:
+        (3, 0, 0.0),
+        (0, 0, 0.0),
+        (float("inf"), 0, 0.0),
+        # NaN takes precedence over the zero rules:
+        (float("nan"), 0.1, float("nan")),
+        (float("nan"), 0, float("nan")),
+        (2, float("nan"), float("nan")),
+        (0, float("nan"), float("nan")),
+        # Infinite values:
+        (float("inf"), 0.1, 0.0),
+        (float("-inf"), 0.1, 0.0),
+        (2, float("inf"), float("inf")),
+        (float("inf"), float("inf"), float("nan")),
+    ],
+)
+@pytest.mark.filterwarnings("ignore:Using UFloat objects with std_dev==0")
+def test_relative_uncertainty(nominal_value, std_dev, expected):
+    result = ufloat(nominal_value, std_dev).relative_uncertainty
+    assert isinstance(result, float)
+    assert nan_close(result, expected)
+
+
+def test_relative_uncertainty_of_derived_quantity():
+    x = ufloat(2, 0.1)
+
+    assert nan_close((-4 * x).relative_uncertainty, 0.05)
+    # An exact zero has no uncertainty:
+    assert (x - x).relative_uncertainty == 0.0
+
+
+def test_relative_uncertainty_follows_std_dev_update():
+    x = ufloat(2, 0.1)
+    y = 2 * x
+    x.std_dev = 0.5
+
+    assert x.relative_uncertainty == 0.25
+    assert y.relative_uncertainty == 0.25
+
+
+def test_relative_uncertainty_is_read_only():
+    x = ufloat(2, 0.1)
+    with pytest.raises(AttributeError):
+        x.relative_uncertainty = 0.5
+
+
+def test_relative_uncertainty_matches_percentage_parsing():
+    assert nan_close(ufloat_fromstr("-2±5%").relative_uncertainty, 0.05)
+
+
+def test_relative_uncertainty_function():
+    "Uniform access to the relative uncertainty of numbers with or without uncertainty."
+
+    assert uncertainties.relative_uncertainty(ufloat(-2, 0.1)) == 0.05
+    assert uncertainties.relative_uncertainty(ufloat(0, 0.1)) == float("inf")
+
+    for number in (3, 3.0, 0, 0.0):
+        result = uncertainties.relative_uncertainty(number)
+        assert isinstance(result, float)
+        assert result == 0.0

@@ -129,6 +129,16 @@ array([1., 2.])
 >>> unumpy.std_devs(mat)
 matrix([[0.1  , 0.002]])
 
+Relative uncertainties (``std_dev / abs(nominal_value)``) are obtained
+in the same way. Each element follows the same rules as the
+`relative_uncertainty` attribute of numbers with uncertainties: NaN if
+the nominal value or the standard deviation is NaN, otherwise zero for
+a zero standard deviation, and infinity for a zero nominal value with
+a non-zero standard deviation.
+
+>>> unumpy.relative_uncertainties(arr)
+array([0.1  , 0.001])
+
 
 .. index:: mathematical operation; on an array of numbers
 

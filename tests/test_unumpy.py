@@ -5,6 +5,10 @@ except ImportError:
 
     sys.exit()  # There is no reason to test the interface to NumPy
 
+import warnings
+
+import pytest
+
 import uncertainties
 import uncertainties.core as uncert_core
 from uncertainties import ufloat, unumpy
@@ -300,3 +304,63 @@ def test_array_comparisons():
     # For matrices, 1D arrays are converted to 2D arrays:
     mat = unumpy.umatrix([1, 2], [1, 4])
     assert numpy.all((mat == [mat[0, 0], 4]) == [True, False])
+
+
+def test_relative_uncertainties():
+    "Extracting the relative uncertainties from an array"
+
+    nan = float("nan")
+    inf = float("inf")
+
+    arr = unumpy.uarray(
+        [[2, -2, 0], [nan, 4, 0.5]], [[0.1, 0.1, 0.1], [0.1, nan, 0.25]]
+    )
+    result = unumpy.relative_uncertainties(arr)
+
+    assert isinstance(result, numpy.ndarray)
+    assert result.dtype == float
+    assert result.shape == (2, 3)
+    assert numpy.array_equal(
+        result, [[0.05, 0.05, inf], [nan, nan, 0.5]], equal_nan=True
+    )
+
+
+@pytest.mark.filterwarnings("ignore:Using UFloat objects with std_dev==0")
+def test_relative_uncertainties_zero_std_dev():
+    arr = unumpy.uarray([3, 0], [0, 0])
+
+    assert numpy.array_equal(unumpy.relative_uncertainties(arr), [0.0, 0.0])
+
+
+def test_relative_uncertainties_mixed_with_plain_numbers():
+    "Plain numbers have no uncertainty, like for unumpy.std_devs()"
+
+    result = unumpy.relative_uncertainties([ufloat(-2, 0.1), 3, 0, 0.0])
+
+    assert result.dtype == float
+    assert numpy.array_equal(result, [0.05, 0.0, 0.0, 0.0])
+
+
+@pytest.mark.filterwarnings("ignore:Using UFloat objects with std_dev==0")
+def test_relative_uncertainties_match_scalar_accessor():
+    nan = float("nan")
+    numbers = [
+        [ufloat(2, 0.1), ufloat(-2, 0.1), ufloat(0, 0.1), ufloat(0, 0)],
+        [ufloat(nan, 0.1), ufloat(3, 0), 3, 0.0],
+    ]
+
+    result = unumpy.relative_uncertainties(numbers)
+
+    assert result.shape == (2, 4)
+    for row, result_row in zip(numbers, result):
+        for number, element in zip(row, result_row):
+            assert nan_close(element, uncertainties.relative_uncertainty(number))
+
+
+@pytest.mark.filterwarnings("ignore:Using UFloat objects with std_dev==0")
+def test_relative_uncertainties_emits_no_warning():
+    arr = unumpy.uarray([0, float("nan"), 2, 0], [0.1, 0.1, 0.1, 0])
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        unumpy.relative_uncertainties(arr)

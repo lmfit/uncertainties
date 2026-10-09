@@ -52,6 +52,24 @@ abbreviated as `n` and `std_dev` as `s`:
 >>> print(x.n,  x.s)
 2.7 0.01
 
+.. index::
+   pair: relative uncertainty; scalar
+
+The relative uncertainty, defined as ``std_dev / abs(nominal_value)``, is
+available through the `relative_uncertainty` attribute:
+
+>>> print(ufloat(-2, 0.1).relative_uncertainty)
+0.05
+
+It is a fraction (not a percentage) and is never negative. A number with a zero
+standard deviation has a relative uncertainty of ``0.0``, even if its nominal
+value is also zero. If only the nominal value is zero, the relative uncertainty
+is infinite. If the nominal value or the standard deviation is NaN, the relative
+uncertainty is NaN.
+
+>>> print(ufloat(0, 0.1).relative_uncertainty)
+inf
+
 uncertainties Variables can also be created from one of many string
 representations.  The following forms will all create Variables with the same
 value:
@@ -624,6 +642,15 @@ manner**.  This is what the :func:`nominal_value` and
 >>> print(nominal_value(3))
 3
 >>> print(std_dev(3))
+0.0
+
+The :func:`relative_uncertainty` function similarly returns zero for
+numbers without uncertainty:
+
+>>> from uncertainties import relative_uncertainty
+>>> print(relative_uncertainty(ufloat(2, 0.1)))
+0.05
+>>> print(relative_uncertainty(3))
 0.0
 
 Finally, a utility method is provided that directly yields the

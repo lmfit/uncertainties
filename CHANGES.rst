@@ -1,6 +1,18 @@
 Change Log
 ===================
 
+Unreleased
+----------
+
+Adds:
+
+- Access to the relative uncertainty (``std_dev / abs(nominal_value)``) of numbers with
+  uncertainties through the `UFloat.relative_uncertainty` property, the
+  `uncertainties.relative_uncertainty()` function and the
+  `unumpy.relative_uncertainties()` function. The relative uncertainty is zero when
+  the standard deviation is zero (even if the nominal value is also zero), and infinite
+  when only the nominal value is zero.
+
 3.2.4   2026-January-9
 -----------------------
 
