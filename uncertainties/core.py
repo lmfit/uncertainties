@@ -16,7 +16,7 @@ from __future__ import division  # Many analytical derivatives depend on this
 
 from builtins import str, zip, range, object
 import functools
-from math import sqrt, isfinite  # Optimization: no attribute look-up
+from math import sqrt, isfinite, isnan  # Optimization: no attribute look-up
 from warnings import warn
 
 import copy
@@ -40,9 +40,11 @@ __all__ = [
     # in particular because NumPy might be unavailable.
     "ufloat",  # Main function: returns a number with uncertainty
     "ufloat_fromstr",  # Important function: returns a number with uncertainty
-    # Uniform access to nominal values and standard deviations:
+    # Uniform access to nominal values, standard deviations and relative
+    # uncertainties:
     "nominal_value",
     "std_dev",
+    "relative_uncertainty",
     # Utility functions (more are exported if NumPy is present):
     "covariance_matrix",
     # Class for testing whether an object is a number with
@@ -528,6 +530,27 @@ class AffineScalarFunc(object):
     # Abbreviation (for formulas, etc.):
     s = std_dev
 
+    @property
+    def relative_uncertainty(self):
+        """
+        Relative standard uncertainty: std_dev / abs(nominal_value).
+
+        The result is NaN if the nominal value or the standard
+        deviation is NaN. Otherwise, it is zero if the standard
+        deviation is zero (even when the nominal value is also zero),
+        and infinite if only the nominal value is zero.
+        """
+        nominal_value = self.nominal_value
+        std_dev = self.std_dev
+
+        if isnan(nominal_value) or isnan(std_dev):
+            return float("nan")
+        if std_dev == 0:
+            return 0.0
+        if nominal_value == 0:
+            return float("inf")
+        return float(std_dev / abs(nominal_value))
+
     def __repr__(self):
         # Not putting spaces around "+/-" helps with arrays of
         # Variable, as each value with an uncertainty is a
@@ -895,6 +918,22 @@ def std_dev(x):
 
     if isinstance(x, AffineScalarFunc):
         return x.std_dev
+    else:
+        return 0.0
+
+
+def relative_uncertainty(x):
+    """
+    Return the relative uncertainty of x if it is a quantity with
+    uncertainty (i.e., an AffineScalarFunc object); otherwise, returns
+    the float 0.
+
+    This utility function is useful for transforming a series of
+    numbers, when only some of them generally carry an uncertainty.
+    """
+
+    if isinstance(x, AffineScalarFunc):
+        return x.relative_uncertainty
     else:
         return 0.0
 

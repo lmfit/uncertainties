@@ -31,6 +31,7 @@ __all__ = [
     # Utilities:
     "nominal_values",
     "std_devs",
+    "relative_uncertainties",
     # Classes:
     "matrix",
 ]
@@ -120,6 +121,41 @@ def std_devs(arr):
     """
 
     return unumpy_to_numpy_matrix(to_std_devs(arr))
+
+
+to_relative_uncertainties = numpy.vectorize(
+    uncert_core.relative_uncertainty,
+    otypes=[float],  # Because vectorize() has side effects (dtype setting)
+    doc=(
+        "Return the relative uncertainty of the numbers with uncertainties"
+        " contained in a NumPy array, or zero for other objects."
+    ),
+)
+
+
+def relative_uncertainties(arr):
+    """
+    Return the relative uncertainties (std_dev / abs(nominal_value))
+    of the numbers in NumPy array arr.
+
+    Each element follows the rules of the relative_uncertainty
+    attribute of numbers with uncertainties: NaN if the nominal value
+    or the standard deviation is NaN, otherwise zero for a zero
+    standard deviation, and infinity for a zero nominal value with a
+    non-zero standard deviation.
+
+    Elements that are not numbers with uncertainties (derived from a
+    class from this module) have a relative uncertainty of zero.
+
+    If arr is of type unumpy.matrix, the returned array is a
+    numpy.matrix, because the resulting matrix does not contain
+    numbers with uncertainties.
+    """
+
+    result = to_relative_uncertainties(arr)
+    if isinstance(result, matrix):
+        result = result.view(numpy.matrix)
+    return result
 
 
 ###############################################################################
