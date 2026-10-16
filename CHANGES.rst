@@ -1,6 +1,13 @@
 Change Log
 ===================
 
+Unreleased
+-----------------------
+
+Fixes:
+
+- Avoid cancellation in tanh derivatives for saturated inputs, retaining their propagated uncertainties.
+
 3.2.4   2026-January-9
 -----------------------
 
