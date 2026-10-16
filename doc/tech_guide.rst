@@ -81,8 +81,8 @@ representation can be stored in a file and read from another program
 after the program that did the pickling is finished: the unpickled
 variables cannot be correlated to variables that can disappear).  Thus
 
->>> x - x2
-0.0+/-0.14142135623730953
+>>> x - x2  # doctest: +ELLIPSIS
+0.0+/-0.1414213562373095...
 
 which shows that the original variable :data:`x` and the new variable :data:`x2`
 are completely uncorrelated.

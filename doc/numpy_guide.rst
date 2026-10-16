@@ -105,8 +105,8 @@ work).  This is why the :class:`unumpy.matrix` class is provided: both
 the inverse and the pseudo-inverse of a matrix can be calculated in
 the usual way: if :data:`mat` is a :class:`unumpy.matrix`,
 
->>> print(mat.I)
-[[0.19999999999999996+/-0.012004265908417718]
+>>> print(mat.I)  # doctest: +ELLIPSIS
+[[0.19999999999999996+/-0.0120042659084177...]
  [0.3999999999999999+/-0.01600179989876138]]
 
 does calculate the inverse or pseudo-inverse of :data:`mat` with
@@ -263,8 +263,8 @@ numbers with uncertainties, the **matrix inverse and pseudo-inverse**:
 
 >>> print(unumpy.ulinalg.inv([[ufloat(2, 0.1)]]))
 [[0.5+/-0.025]]
->>> print(unumpy.ulinalg.pinv(mat))
-[[0.19999999999999996+/-0.012004265908417718]
+>>> print(unumpy.ulinalg.pinv(mat))  # doctest: +ELLIPSIS
+[[0.19999999999999996+/-0.0120042659084177...]
  [0.3999999999999999+/-0.01600179989876138]]
 
 .. _NumPy: http://numpy.scipy.org/

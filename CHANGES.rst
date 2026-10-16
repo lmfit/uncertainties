@@ -1,6 +1,13 @@
 Change Log
 ===================
 
+Unreleased
+-----------------------
+
+Fixes:
+
+- Preserve finite standard deviations when squared error components overflow or underflow.
+
 3.2.4   2026-January-9
 -----------------------
 

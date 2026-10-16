@@ -16,7 +16,7 @@ from __future__ import division  # Many analytical derivatives depend on this
 
 from builtins import str, zip, range, object
 import functools
-from math import sqrt, isfinite  # Optimization: no attribute look-up
+from math import sqrt, isfinite, hypot, isnan  # Optimization: no attribute look-up
 from warnings import warn
 
 import copy
@@ -523,7 +523,11 @@ class AffineScalarFunc(object):
         # std_dev value (in fact, many intermediate AffineScalarFunc do
         # not need to have their std_dev calculated: only the final
         # AffineScalarFunc returned to the user does).
-        return float(sqrt(sum(delta**2 for delta in self.error_components().values())))
+        components = self.error_components().values()
+        # Preserve unknown uncertainties even when another component is infinite.
+        if any(isnan(delta) for delta in components):
+            return float("nan")
+        return hypot(*components)
 
     # Abbreviation (for formulas, etc.):
     s = std_dev
