@@ -178,6 +178,13 @@ def _deriv_pow_1(x, y):
         return math.log(x) * math.pow(x, y)
 
 
+def _deriv_tanh(x):
+    """Evaluate sech(x)**2 without subtracting nearly equal numbers."""
+    exp_negative_abs_x = math.exp(-abs(x))
+    sech = 2 * exp_negative_abs_x / (1 + exp_negative_abs_x**2)
+    return sech**2
+
+
 erf_coef = 2 / math.sqrt(math.pi)  # Optimization for erf()
 
 fixed_derivatives = {
@@ -211,7 +218,7 @@ fixed_derivatives = {
     "sinh": [math.cosh],
     "sqrt": [lambda x: 0.5 / math.sqrt(x)],
     "tan": [lambda x: 1 + math.tan(x) ** 2],
-    "tanh": [lambda x: 1 - math.tanh(x) ** 2],
+    "tanh": [_deriv_tanh],
 }
 
 # Many built-in functions in the math module are wrapped with a
