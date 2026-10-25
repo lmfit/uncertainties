@@ -41,7 +41,7 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     - name: Benchmarking upload to Codspeed
       if: matrix.python-version == '3.15' && matrix.os == 'ubuntu-latest'
-      uses: CodSpeedHQ/action@v3
+      uses: CodSpeedHQ/action@v5
       with:
         run: |
           cd tests
