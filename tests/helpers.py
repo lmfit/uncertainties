@@ -1,4 +1,6 @@
+from contextlib import contextmanager
 from math import isclose, isnan
+import warnings
 
 
 def nan_close(first, second, *, rel_tol=1e-9, abs_tol=0.0):
@@ -80,3 +82,14 @@ else:
             atol=precision,
         )
         return np.logical_and(nominal_values_close_arr, std_devs_close_arr)
+
+
+@contextmanager
+def deprecated_ok():
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            action="ignore",
+            message=".*deprecated",
+            category=FutureWarning,
+        )
+        yield
