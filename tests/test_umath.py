@@ -44,7 +44,7 @@ def test_umath_function_derivatives(func_name, ufloat_tuples):
     result = func(*ufloat_arg_list)
 
     for arg_num, arg in enumerate(ufloat_arg_list):
-        ufloat_deriv_value = result.derivatives[arg]
+        ufloat_deriv_value = result._derivatives[arg]
         numerical_deriv_func = partial_derivative(func, arg_num)
         numerical_deriv_value = numerical_deriv_func(*float_arg_list)
         assert math.isclose(
@@ -278,8 +278,8 @@ def test_hypot():
     # Derivatives that cannot be calculated simply return NaN, with no
     # exception being raised, normally:
     result = umath_core.hypot(x, y)
-    assert isnan(result.derivatives[x])
-    assert isnan(result.derivatives[y])
+    assert isnan(result._derivatives[x])
+    assert isnan(result._derivatives[y])
 
 
 @pytest.mark.parametrize("function_name", umath_core.deprecated_functions)

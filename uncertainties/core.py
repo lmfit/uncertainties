@@ -430,6 +430,19 @@ class AffineScalarFunc(object):
 
     ############################################################
 
+    @property
+    def _derivatives(self):
+        """
+        Private version of `derivatives` for internal use.
+        """
+        if not self._linear_part.expanded():
+            self._linear_part.expand()
+            # Attempts to get the contribution of a variable that the
+            # function does not depend on raise a KeyError:
+            self._linear_part.linear_combo.default_factory = None
+
+        return self._linear_part.linear_combo
+
     # Making derivatives a property gives the user a clean syntax,
     # which is consistent with derivatives becoming a dictionary.
     @property
@@ -451,19 +464,11 @@ class AffineScalarFunc(object):
             FutureWarning,
             stacklevel=2,
         )
-
-        if not self._linear_part.expanded():
-            self._linear_part.expand()
-            # Attempts to get the contribution of a variable that the
-            # function does not depend on raise a KeyError:
-            self._linear_part.linear_combo.default_factory = None
-
-        return self._linear_part.linear_combo
+        return self._derivatives
 
     ########################################
 
     # Uncertainties handling:
-
     def error_components(self):
         """
         Individual components of the standard deviation of the affine
@@ -485,10 +490,16 @@ class AffineScalarFunc(object):
             stacklevel=2,
         )
 
+        return self._error_components()
+
+    def _error_components(self):
+        """
+        Private version of `error_components` for internal use.
+        """
         # Calculation of the variance:
         error_components = {}
 
-        for variable, derivative in self.derivatives.items():
+        for variable, derivative in self._derivatives.items():
             # print "TYPE", type(variable), type(derivative)
 
             # Individual standard error due to variable:
@@ -523,7 +534,7 @@ class AffineScalarFunc(object):
         # std_dev value (in fact, many intermediate AffineScalarFunc do
         # not need to have their std_dev calculated: only the final
         # AffineScalarFunc returned to the user does).
-        return float(sqrt(sum(delta**2 for delta in self.error_components().values())))
+        return float(sqrt(sum(delta**2 for delta in self._error_components().values())))
 
     # Abbreviation (for formulas, etc.):
     s = std_dev
@@ -920,12 +931,12 @@ def covariance_matrix(nums_with_uncert):
 
     covariance_matrix = []
     for i1, expr1 in enumerate(nums_with_uncert, 1):
-        derivatives1 = expr1.derivatives  # Optimization
+        derivatives1 = expr1._derivatives  # Optimization
         vars1 = set(derivatives1)  # !! Python 2.7+: viewkeys() would work
         coefs_expr1 = []
 
         for expr2 in nums_with_uncert[:i1]:
-            derivatives2 = expr2.derivatives  # Optimization
+            derivatives2 = expr2._derivatives  # Optimization
             coefs_expr1.append(
                 sum(
                     (
