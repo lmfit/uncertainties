@@ -1,6 +1,16 @@
 Change Log
 ===================
 
+Unreleased
+----------
+
+Changes:
+
+- Updates test configuration to run against python versions `3.11` through `3.15`. Previously tests ran against python
+  versions `3.8` through `3.14`.
+- Updates the `codspeed` github action to use `v5` instead of `v3`. This was required for compatibility with github
+  actions updating their ubuntu action runners.
+
 3.2.4   2026-January-9
 -----------------------
 
