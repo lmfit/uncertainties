@@ -9,7 +9,7 @@ except ImportError:
     sys.exit()  # There is no reason to test the interface to NumPy
 
 from uncertainties import unumpy, ufloat
-from helpers import uarrays_close
+from helpers import uarrays_close, deprecated_ok
 
 
 def test_list_inverse():
@@ -20,13 +20,15 @@ def test_list_inverse():
     # numpy.linalg.inv(mat_list) does calculate the inverse even
     # though mat_list is a list of lists (and not a matrix).  Can
     # ulinalg do the same?  Here is a test:
-    mat_list_inv = unumpy.ulinalg.inv(mat_list)
+    with deprecated_ok():
+        mat_list_inv = unumpy.ulinalg.inv(mat_list)
 
     # More type testing:
     mat_matrix = numpy.asmatrix(mat_list)
-    assert isinstance(
-        unumpy.ulinalg.inv(mat_matrix), type(numpy.linalg.inv(mat_matrix))
-    )
+    with deprecated_ok():
+        assert isinstance(
+            unumpy.ulinalg.inv(mat_matrix), type(numpy.linalg.inv(mat_matrix))
+        )
 
     # unumpy.ulinalg should behave in the same way as numpy.linalg,
     # with respect to types:
@@ -44,12 +46,13 @@ def test_list_inverse():
 
     x = ufloat(1, 0.1)
     y = ufloat(2, 0.1)
-    mat = unumpy.matrix([[x, x], [y, 0]])
+    with deprecated_ok():
+        mat = unumpy.matrix([[x, x], [y, 0]])
 
-    # Internal consistency: ulinalg.inv() must coincide with the
-    # unumpy.matrix inverse, for square matrices (.I is the
-    # pseudo-inverse, for non-square matrices, but inv() is not).
-    assert uarrays_close(unumpy.ulinalg.inv(mat), mat.I).all()
+        # Internal consistency: ulinalg.inv() must coincide with the
+        # unumpy.matrix inverse, for square matrices (.I is the
+        # pseudo-inverse, for non-square matrices, but inv() is not).
+        assert uarrays_close(unumpy.ulinalg.inv(mat), mat.I).all()
 
 
 def test_list_pseudo_inverse():
@@ -57,25 +60,28 @@ def test_list_pseudo_inverse():
 
     x = ufloat(1, 0.1)
     y = ufloat(2, 0.1)
-    mat = unumpy.matrix([[x, x], [y, 0]])
+    with deprecated_ok():
+        mat = unumpy.matrix([[x, x], [y, 0]])
 
     # Internal consistency: the inverse and the pseudo-inverse yield
     # the same result on square matrices:
-    assert uarrays_close(mat.I, unumpy.ulinalg.pinv(mat), 1e-4).all()
-    assert uarrays_close(
-        unumpy.ulinalg.inv(mat),
-        # Support for the optional pinv argument is
-        # tested:
-        unumpy.ulinalg.pinv(mat, 1e-15),
-        1e-4,
-    ).all()
+    with deprecated_ok():
+        assert uarrays_close(mat.I, unumpy.ulinalg.pinv(mat), 1e-4).all()
+        assert uarrays_close(
+            unumpy.ulinalg.inv(mat),
+            # Support for the optional pinv argument is
+            # tested:
+            unumpy.ulinalg.pinv(mat, 1e-15),
+            1e-4,
+        ).all()
 
     # Non-square matrices:
     x = ufloat(1, 0.1)
     y = ufloat(2, 0.1)
-    mat1 = unumpy.matrix([[x, y]])  # "Long" matrix
-    mat2 = unumpy.matrix([[x, y], [1, 3 + x], [y, 2 * x]])  # "Tall" matrix
+    with deprecated_ok():
+        mat1 = unumpy.matrix([[x, y]])  # "Long" matrix
+        mat2 = unumpy.matrix([[x, y], [1, 3 + x], [y, 2 * x]])  # "Tall" matrix
 
-    # Internal consistency:
-    assert uarrays_close(mat1.I, unumpy.ulinalg.pinv(mat1, 1e-10)).all()
-    assert uarrays_close(mat2.I, unumpy.ulinalg.pinv(mat2, 1e-8)).all()
+        # Internal consistency:
+        assert uarrays_close(mat1.I, unumpy.ulinalg.pinv(mat1, 1e-10)).all()
+        assert uarrays_close(mat2.I, unumpy.ulinalg.pinv(mat2, 1e-8)).all()

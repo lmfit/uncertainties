@@ -89,12 +89,24 @@ Matrices
 Matrices of numbers with uncertainties are best created in one of
 two ways.  The first way is similar to using :func:`uarray`:
 
+.. doctest::
+   :hide:
+
+   >>> from tests.helpers import deprecated_ok
+   >>> _deprecated_context = deprecated_ok()
+   >>> _deprecated_context.__enter__()
+
 >>> mat = unumpy.umatrix([1, 2], [0.01, 0.002])
 
 Matrices can also be built by converting arrays of numbers with
 uncertainties into matrices through the :class:`unumpy.matrix` class:
 
 >>> mat = unumpy.matrix(arr)
+
+.. doctest::
+   :hide:
+
+   >>> _ = _deprecated_context.__exit__(None, None, None)
 
 :class:`unumpy.matrix` objects behave like :class:`numpy.matrix`
 objects of numbers with uncertainties, but with better support for

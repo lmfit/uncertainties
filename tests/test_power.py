@@ -6,7 +6,7 @@ from uncertainties import ufloat
 from uncertainties.ops import pow_deriv_0, pow_deriv_1
 from uncertainties.umath_core import pow as umath_pow
 
-from helpers import nan_close
+from helpers import deprecated_ok, nan_close
 
 
 pow_deriv_cases = [
@@ -70,14 +70,16 @@ power_derivative_cases = (
 )
 def test_power_derivatives(first_ufloat, second_ufloat, first_der, second_der):
     result = pow(first_ufloat, second_ufloat)
-    first_der_result = result.derivatives[first_ufloat]
-    second_der_result = result.derivatives[second_ufloat]
+    with deprecated_ok():
+        first_der_result = result.derivatives[first_ufloat]
+        second_der_result = result.derivatives[second_ufloat]
     assert nan_close(first_der_result, first_der)
     assert nan_close(second_der_result, second_der)
 
     result = umath_pow(first_ufloat, second_ufloat)
-    first_der_result = result.derivatives[first_ufloat]
-    second_der_result = result.derivatives[second_ufloat]
+    with deprecated_ok():
+        first_der_result = result.derivatives[first_ufloat]
+        second_der_result = result.derivatives[second_ufloat]
     assert nan_close(first_der_result, first_der)
     assert nan_close(second_der_result, second_der)
 

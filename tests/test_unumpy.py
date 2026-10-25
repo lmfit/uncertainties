@@ -1,3 +1,5 @@
+from tests.helpers import deprecated_ok
+
 try:
     import numpy
 except ImportError:
@@ -31,19 +33,21 @@ def test_numpy():
     # Operations with arrays work (they are first handled by NumPy,
     # then by this module):
     prod1 * prod2  # This should be calculable
-    assert not (prod1 - prod2).any()  # All elements must be 0
+    with deprecated_ok():
+        assert not (prod1 - prod2).any()  # All elements must be 0
 
     # Comparisons work too:
 
     # Usual behavior:
     assert len(arr[arr > 1.5]) == 1
-    # Comparisons with Variable objects:
-    assert len(arr[arr > ufloat(1.5, 0.1)]) == 1
+    with deprecated_ok():
+        # Comparisons with Variable objects:
+        assert len(arr[arr > ufloat(1.5, 0.1)]) == 1
 
-    assert len(prod1[prod1 < prod1 * prod2]) == 2
+        assert len(prod1[prod1 < prod1 * prod2]) == 2
 
-    # The following can be calculated (special NumPy abs() function):
-    numpy.abs(arr + ufloat(-1, 0.1))
+        # The following can be calculated (special NumPy abs() function):
+        numpy.abs(arr + ufloat(-1, 0.1))
 
     # The following does not completely work, because NumPy does not
     # implement numpy.exp on an array of general objects, apparently:
@@ -75,11 +79,12 @@ def test_matrix():
     # Matrix with a mix of Variable objects and regular
     # Python numbers:
 
-    m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)]])
-    m_nominal_values = unumpy.nominal_values(m)
+    with deprecated_ok():
+        m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)]])
+        m_nominal_values = unumpy.nominal_values(m)
 
-    # Test of the nominal_value attribute:
-    assert numpy.all(m_nominal_values == m.nominal_values)
+        # Test of the nominal_value attribute:
+        assert numpy.all(m_nominal_values == m.nominal_values)
 
     assert type(m[0, 0]) == uncert_core.Variable
 
@@ -96,19 +101,21 @@ def derivatives_close(x, y):
     """
 
     # x and y must depend on the same variables:
-    if set(x.derivatives) != set(y.derivatives):
-        return False  # Not the same variables
+    with deprecated_ok():
+        if set(x.derivatives) != set(y.derivatives):
+            return False  # Not the same variables
 
-    return all(
-        nan_close(x.derivatives[var], y.derivatives[var]) for var in x.derivatives
-    )
+        return all(
+            nan_close(x.derivatives[var], y.derivatives[var]) for var in x.derivatives
+        )
 
 
 def test_inverse():
     "Tests of the matrix inverse"
 
-    m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)]])
-    m_nominal_values = unumpy.nominal_values(m)
+    with deprecated_ok():
+        m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)]])
+        m_nominal_values = unumpy.nominal_values(m)
 
     # "Regular" inverse matrix, when uncertainties are not taken
     # into account:
@@ -117,8 +124,9 @@ def test_inverse():
     # The matrix inversion should not yield numbers with uncertainties:
     assert m_no_uncert_inv.dtype == numpy.dtype(float)
 
-    # Inverse with uncertainties:
-    m_inv_uncert = m.I  # AffineScalarFunc elements
+    with deprecated_ok():
+        # Inverse with uncertainties:
+        m_inv_uncert = m.I  # AffineScalarFunc elements
     # The inverse contains uncertainties: it must support custom
     # operations on matrices with uncertainties:
     assert isinstance(m_inv_uncert, unumpy.matrix)
@@ -139,12 +147,13 @@ def test_inverse():
 
     # Checks of the covariances between elements:
     x = ufloat(10, 1)
-    m = unumpy.matrix([[x, x], [0, 3 + 2 * x]])
+    with deprecated_ok():
+        m = unumpy.matrix([[x, x], [0, 3 + 2 * x]])
 
-    m_inverse = m.I
+        m_inverse = m.I
 
-    # Check of the properties of the inverse:
-    m_double_inverse = m_inverse.I
+        # Check of the properties of the inverse:
+        m_double_inverse = m_inverse.I
     # The initial matrix should be recovered, including its
     # derivatives, which define covariances:
     assert nan_close(m_double_inverse[0, 0].nominal_value, m[0, 0].nominal_value)
@@ -162,12 +171,13 @@ def test_inverse():
 
     # There are correlations if both the next two derivatives are
     # not zero:
-    assert m_inverse[0, 0].derivatives[x]
-    assert m_inverse[0, 1].derivatives[x]
+    with deprecated_ok():
+        assert m_inverse[0, 0].derivatives[x]
+        assert m_inverse[0, 1].derivatives[x]
 
-    # Correlations between m and m_inverse should create a perfect
-    # inversion:
-    assert uarrays_close(m * m_inverse, numpy.eye(m.shape[0])).all()
+        # Correlations between m and m_inverse should create a perfect
+        # inversion:
+        assert uarrays_close(m * m_inverse, numpy.eye(m.shape[0])).all()
 
 
 def test_wrap_array_func():
@@ -193,12 +203,13 @@ def test_wrap_array_func():
 
     ##########
     # Full rank rectangular matrix:
-    m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
+    with deprecated_ok():
+        m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
 
-    # Numerical and package (analytical) pseudo-inverses: they must be
-    # the same:
-    m_f_wrapped = f_wrapped(m, 2, factor=10)
-    m_f_unc = f_unc(m, 2, factor=10)
+        # Numerical and package (analytical) pseudo-inverses: they must be
+        # the same:
+        m_f_wrapped = f_wrapped(m, 2, factor=10)
+        m_f_unc = f_unc(m, 2, factor=10)
 
     assert uarrays_close(m_f_wrapped, m_f_unc).all()
 
@@ -211,29 +222,30 @@ def test_pseudo_inverse():
 
     ##########
     # Full rank rectangular matrix:
-    m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
+    with deprecated_ok():
+        m = unumpy.matrix([[ufloat(10, 1), -3.1], [0, ufloat(3, 0)], [1, -3.1]])
 
-    # Numerical and package (analytical) pseudo-inverses: they must be
-    # the same:
-    rcond = 1e-8  # Test of the second argument to pinv()
-    m_pinv_num = pinv_num(m, rcond)
-    m_pinv_package = core.pinv(m, rcond)
-    assert uarrays_close(m_pinv_num, m_pinv_package).all()
+        # Numerical and package (analytical) pseudo-inverses: they must be
+        # the same:
+        rcond = 1e-8  # Test of the second argument to pinv()
+        m_pinv_num = pinv_num(m, rcond)
+        m_pinv_package = core.pinv(m, rcond)
+        assert uarrays_close(m_pinv_num, m_pinv_package).all()
 
-    ##########
-    # Example with a non-full rank rectangular matrix:
-    vector = [ufloat(10, 1), -3.1, 11]
-    m = unumpy.matrix([vector, vector])
-    m_pinv_num = pinv_num(m, rcond)
-    m_pinv_package = core.pinv(m, rcond)
-    assert uarrays_close(m_pinv_num, m_pinv_package).all()
+        ##########
+        # Example with a non-full rank rectangular matrix:
+        vector = [ufloat(10, 1), -3.1, 11]
+        m = unumpy.matrix([vector, vector])
+        m_pinv_num = pinv_num(m, rcond)
+        m_pinv_package = core.pinv(m, rcond)
+        assert uarrays_close(m_pinv_num, m_pinv_package).all()
 
-    ##########
-    # Example with a non-full-rank square matrix:
-    m = unumpy.matrix([[ufloat(10, 1), 0], [3, 0]])
-    m_pinv_num = pinv_num(m, rcond)
-    m_pinv_package = core.pinv(m, rcond)
-    assert uarrays_close(m_pinv_num, m_pinv_package).all()
+        ##########
+        # Example with a non-full-rank square matrix:
+        m = unumpy.matrix([[ufloat(10, 1), 0], [3, 0]])
+        m_pinv_num = pinv_num(m, rcond)
+        m_pinv_package = core.pinv(m, rcond)
+        assert uarrays_close(m_pinv_num, m_pinv_package).all()
 
 
 def test_broadcast_funcs():
@@ -269,7 +281,8 @@ def test_array_and_matrix_creation():
     assert arr[1].std_dev == 0.2
 
     # Same thing for matrices:
-    mat = unumpy.umatrix([1, 2], [0.1, 0.2])
+    with deprecated_ok():
+        mat = unumpy.umatrix([1, 2], [0.1, 0.2])
     assert mat[0, 1].nominal_value == 2
     assert mat[0, 1].std_dev == 0.2
 
@@ -279,16 +292,17 @@ def test_component_extraction():
 
     arr = unumpy.uarray([1, 2], [0.1, 0.2])
 
-    assert numpy.all(unumpy.nominal_values(arr) == [1, 2])
-    assert numpy.all(unumpy.std_devs(arr) == [0.1, 0.2])
+    with deprecated_ok():
+        assert numpy.all(unumpy.nominal_values(arr) == [1, 2])
+        assert numpy.all(unumpy.std_devs(arr) == [0.1, 0.2])
 
-    # unumpy matrices, in addition, should have nominal_values that
-    # are simply numpy matrices (not unumpy ones, because they have no
-    # uncertainties):
-    mat = unumpy.matrix(arr)
-    assert numpy.all(unumpy.nominal_values(mat) == [1, 2])
-    assert numpy.all(unumpy.std_devs(mat) == [0.1, 0.2])
-    assert type(unumpy.nominal_values(mat)) == numpy.matrix
+        # unumpy matrices, in addition, should have nominal_values that
+        # are simply numpy matrices (not unumpy ones, because they have no
+        # uncertainties):
+        mat = unumpy.matrix(arr)
+        assert numpy.all(unumpy.nominal_values(mat) == [1, 2])
+        assert numpy.all(unumpy.std_devs(mat) == [0.1, 0.2])
+        assert type(unumpy.nominal_values(mat)) == numpy.matrix
 
 
 def test_array_comparisons():
@@ -297,6 +311,7 @@ def test_array_comparisons():
     arr = unumpy.uarray([1, 2], [1, 4])
     assert numpy.all((arr == [arr[0], 4]) == [True, False])
 
-    # For matrices, 1D arrays are converted to 2D arrays:
-    mat = unumpy.umatrix([1, 2], [1, 4])
+    with deprecated_ok():
+        # For matrices, 1D arrays are converted to 2D arrays:
+        mat = unumpy.umatrix([1, 2], [1, 4])
     assert numpy.all((mat == [mat[0, 0], 4]) == [True, False])

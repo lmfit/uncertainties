@@ -4,6 +4,7 @@ Core functions used by unumpy and some of its submodules.
 (c) 2010-2016 by Eric O. LEBIGOT (EOL).
 """
 
+import warnings
 # The functions found in this module cannot be defined in unumpy or
 # its submodule: this creates import loops, when unumpy explicitly
 # imports one of the submodules in order to make it available to the
@@ -102,7 +103,13 @@ def nominal_values(arr):
     numbers with uncertainties.
     """
 
-    return unumpy_to_numpy_matrix(to_nominal_values(arr))
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            action="ignore",
+            message=r"the uncertainties\.unumpy\.unumpy_to_numpy_matrix function is deprecated\.",
+            category=FutureWarning,
+        )
+        return unumpy_to_numpy_matrix(to_nominal_values(arr))
 
 
 def std_devs(arr):
@@ -119,7 +126,13 @@ def std_devs(arr):
     numbers with uncertainties.
     """
 
-    return unumpy_to_numpy_matrix(to_std_devs(arr))
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            action="ignore",
+            message=r"the uncertainties\.unumpy\.unumpy_to_numpy_matrix function is deprecated\.",
+            category=FutureWarning,
+        )
+        return unumpy_to_numpy_matrix(to_std_devs(arr))
 
 
 ###############################################################################
@@ -133,7 +146,13 @@ def derivative(u, var):
     """
     if isinstance(u, uncert_core.AffineScalarFunc):
         try:
-            return u.derivatives[var]
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    action="ignore",
+                    message=r"(Variable|AffineScalarFunc)\.(error_components|derivatives)\(\).*deprecated",
+                    category=FutureWarning,
+                )
+                return u.derivatives[var]
         except KeyError:
             return 0.0
     else:
@@ -415,7 +434,13 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
             # floats, etc. might be present
             if isinstance(element, uncert_core.AffineScalarFunc):
                 # !!! set() is only needed for Python 2 compatibility:
-                variables |= set(element.derivatives.keys())
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        action="ignore",
+                        message=r"(Variable|AffineScalarFunc)\.(error_components|derivatives)\(\).*deprecated",
+                        category=FutureWarning,
+                    )
+                    variables |= set(element.derivatives.keys())
 
         array_nominal = nominal_values(array_version)
         # Function value, then derivatives at array_nominal (the
@@ -558,7 +583,13 @@ def pinv_with_derivatives(arr, input_type, derivatives, rcond):
 
     # Successive derivatives of the inverse:
     for derivative in derivatives:
-        derivative_mat = numpy.asmatrix(derivative)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action="ignore",
+                message=r"the uncertainties\.unumpy\.matrix\(\) class is deprecated\.",
+                category=FutureWarning,
+            )
+            derivative_mat = numpy.asmatrix(derivative)
         term1 = -inverse_mat * derivative_mat * inverse_mat
         derivative_mat_H = derivative_mat.H
         term2 = factor21 * derivative_mat_H * factor22

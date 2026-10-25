@@ -18,6 +18,7 @@ from builtins import str, zip, range, object
 import functools
 from math import sqrt, isfinite  # Optimization: no attribute look-up
 from warnings import warn
+import warnings
 
 import copy
 import collections
@@ -523,7 +524,15 @@ class AffineScalarFunc(object):
         # std_dev value (in fact, many intermediate AffineScalarFunc do
         # not need to have their std_dev calculated: only the final
         # AffineScalarFunc returned to the user does).
-        return float(sqrt(sum(delta**2 for delta in self.error_components().values())))
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action="ignore",
+                message=r"(Variable|AffineScalarFunc)\.(error_components|derivatives)\(\).*deprecated",
+                category=FutureWarning,
+            )
+            return float(
+                sqrt(sum(delta**2 for delta in self.error_components().values()))
+            )
 
     # Abbreviation (for formulas, etc.):
     s = std_dev
@@ -920,12 +929,24 @@ def covariance_matrix(nums_with_uncert):
 
     covariance_matrix = []
     for i1, expr1 in enumerate(nums_with_uncert, 1):
-        derivatives1 = expr1.derivatives  # Optimization
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action="ignore",
+                message=r"(Variable|AffineScalarFunc)\.derivatives\(\) is deprecated.",
+                category=FutureWarning,
+            )
+            derivatives1 = expr1.derivatives  # Optimization
         vars1 = set(derivatives1)  # !! Python 2.7+: viewkeys() would work
         coefs_expr1 = []
 
         for expr2 in nums_with_uncert[:i1]:
-            derivatives2 = expr2.derivatives  # Optimization
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    action="ignore",
+                    message=r"(Variable|AffineScalarFunc)\.derivatives\(\) is deprecated.",
+                    category=FutureWarning,
+                )
+                derivatives2 = expr2.derivatives  # Optimization
             coefs_expr1.append(
                 sum(
                     (

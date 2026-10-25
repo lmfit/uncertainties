@@ -11,7 +11,7 @@ import uncertainties.core as uncert_core
 import uncertainties.umath_core as umath_core
 from uncertainties.ops import partial_derivative
 
-from helpers import nan_close, ufloat_nan_close
+from helpers import deprecated_ok, nan_close, ufloat_nan_close
 ###############################################################################
 # Unit tests
 
@@ -44,7 +44,8 @@ def test_umath_function_derivatives(func_name, ufloat_tuples):
     result = func(*ufloat_arg_list)
 
     for arg_num, arg in enumerate(ufloat_arg_list):
-        ufloat_deriv_value = result.derivatives[arg]
+        with deprecated_ok():
+            ufloat_deriv_value = result.derivatives[arg]
         numerical_deriv_func = partial_derivative(func, arg_num)
         numerical_deriv_value = numerical_deriv_func(*float_arg_list)
         assert math.isclose(
@@ -122,9 +123,10 @@ def test_monte_carlo_comparison():
     nominal_value_this_module = function_result_this_module.nominal_value
 
     # Covariances "f*f", "f*x", "f*y":
-    covariances_this_module = numpy.array(
-        uncert_core.covariance_matrix((x, y, function_result_this_module))
-    )
+    with deprecated_ok():
+        covariances_this_module = numpy.array(
+            uncert_core.covariance_matrix((x, y, function_result_this_module))
+        )
 
     def monte_carlo_calc(n_samples):
         """
@@ -205,7 +207,8 @@ def test_math_module():
     # factorial() does not work on numbers with uncertainties
     # because it is restricted to integers, as for
     # math.factorial()):
-    assert umath_core.factorial(4) == 24
+    with deprecated_ok():
+        assert umath_core.factorial(4) == 24
 
     # fsum is special because it does not take a fixed number of
     # variables:
@@ -219,10 +222,11 @@ def test_math_module():
         except AttributeError:
             continue  # Not in the math module, so not in umath_core either
 
-        assert func(x) == func(x.nominal_value)
-        # The type should be left untouched. For example, isnan()
-        # should always give a boolean:
-        assert isinstance(func(x), type(func(x.nominal_value)))
+        with deprecated_ok():
+            assert func(x) == func(x.nominal_value)
+            # The type should be left untouched. For example, isnan()
+            # should always give a boolean:
+            assert isinstance(func(x), type(func(x.nominal_value)))
 
     # The same exceptions should be generated when numbers with uncertainties
     # are used:
@@ -278,8 +282,9 @@ def test_hypot():
     # Derivatives that cannot be calculated simply return NaN, with no
     # exception being raised, normally:
     result = umath_core.hypot(x, y)
-    assert isnan(result.derivatives[x])
-    assert isnan(result.derivatives[y])
+    with deprecated_ok():
+        assert isnan(result.derivatives[x])
+        assert isnan(result.derivatives[y])
 
 
 @pytest.mark.parametrize("function_name", umath_core.deprecated_functions)
