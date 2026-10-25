@@ -146,6 +146,13 @@ from the result of ``z = 3.14; t = 3.14; print(z == t)``, because
 
 Similarly,
 
+.. doctest::
+   :hide:
+
+   >>> from tests.helpers import deprecated_ok
+   >>> _deprecated_context = deprecated_ok()
+   >>> _deprecated_context.__enter__()
+
 >>> x = ufloat(3.14, 0.01)
 >>> y = ufloat(3.00, 0.01)
 >>> x > y
@@ -186,6 +193,11 @@ sometimes be compared unambiguously:
 3.0002+/-1.0
 >>> y > x
 True
+
+.. doctest::
+   :hide:
+
+   >>> _ = _deprecated_context.__exit__(None, None, None)
 
 In fact, correlations guarantee that :data:`y` is always larger than
 :data:`x`: ``y-x`` correctly satisfies the assumption of linearity,

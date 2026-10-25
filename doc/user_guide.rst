@@ -228,6 +228,13 @@ than a Variable with a value of 24 +/- 8 most of the time, but *sometimes* it
 might be less than it.   The :mod:`uncertainties` package takes the simple
 approach of comparing nominal values.  That is
 
+.. doctest::
+   :hide:
+
+   >>> from tests.helpers import deprecated_ok
+   >>> _deprecated_context = deprecated_ok()
+   >>> _deprecated_context.__enter__()
+
 >>> a = ufloat(25, 10)
 >>> b = ufloat(24, 8)
 >>> a > b
@@ -247,6 +254,11 @@ False
 False
 >>> a.nominal_value >= b.nominal_value
 True
+
+.. doctest::
+   :hide:
+
+   >>> _ = _deprecated_context.__exit__(None, None, None)
 
 That is, since `a` is neither greater than `b` (nominal value only) nor equal to
 `b`, it cannot be greater than or equal to `b`.
@@ -322,6 +334,12 @@ The ``x`` derivative is real anywhere ``x**y`` is real except along ``x==0`` for
 non-integer ``y``.
 At these points the ``x`` derivative would be complex so a NaN value is used:
 
+.. doctest::
+   :hide:
+
+   >>> _deprecated_context = deprecated_ok()
+   >>> _deprecated_context.__enter__()
+
 >>> x = ufloat(0, 0.2)
 >>> y=1.5
 >>> print((x**y).error_components())
@@ -334,6 +352,11 @@ For ``x < 0`` the ``y`` derivative is always complex valued so a NaN value is us
 >>> y = ufloat(1, 0.2)
 >>> print((x**y).error_components())
 {1.0+/-0.2: nan}
+
+.. doctest::
+   :hide:
+
+   >>> _ = _deprecated_context.__exit__(None, None, None)
 
 Automatic correlations
 ======================
@@ -381,6 +404,12 @@ uncertainty.
 The individual contributions to the uncertainty are more easily usable
 when the variables are **tagged**:
 
+.. doctest::
+   :hide:
+
+   >>> _deprecated_context = deprecated_ok()
+   >>> _deprecated_context.__enter__()
+
 >>> u = ufloat(1, 0.1, "u variable")  # Tag
 >>> v = ufloat(10, 0.1, "v variable")
 >>> sum_value = u+2*v
@@ -411,6 +440,11 @@ the total uncertainty of :data:`result` can simply be obtained as:
 ...     if var.tag == "systematic"))
 >>> print(format(syst_error, ".3f"))
 577.984
+
+.. doctest::
+   :hide:
+
+   >>> _ = _deprecated_context.__exit__(None, None, None)
 
 The remaining contribution to the uncertainty is:
 
@@ -647,6 +681,11 @@ Since the application of :ref:`linear error propagation theory
 package automatically performs such calculations; users can thus
 easily get the derivative of an expression with respect to any of its
 variables:
+.. doctest::
+   :hide:
+
+   >>> _deprecated_context = deprecated_ok()
+   >>> _deprecated_context.__enter__()
 
 >>> u = ufloat(1, 0.1)
 >>> v = ufloat(10, 0.1)
@@ -655,6 +694,11 @@ variables:
 1.0
 >>> sum_value.derivatives[v]
 2.0
+
+.. doctest::
+   :hide:
+
+   >>> _ = _deprecated_context.__exit__(None, None, None)
 
 These values are obtained with a :ref:`fast differentiation algorithm
 <differentiation method>`.

@@ -72,3 +72,8 @@ all = ["uncertainties[doc,test,arrays]"]
 testpaths = ["tests", "doc", "uncertainties"]
 addopts = "--doctest-modules --doctest-glob=*.rst"
 doctest_optionflags = "IGNORE_EXCEPTION_DETAIL"
+filterwarnings = [
+    "error",
+    "ignore:the matrix subclass is not the recommended way:PendingDeprecationWarning",
+    "ignore:Using UFloat objects with std_dev==0 may give unexpected results\\.:UserWarning",
+]
