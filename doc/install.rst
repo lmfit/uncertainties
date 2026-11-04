@@ -9,11 +9,9 @@ Installation and Credits
 Download and Installation
 =========================
 
-In general :mod:`uncertainties` strives to support the same python versions which are supported by the python
-developers.
-Currently the :mod:`uncertainties` package tests agains python versions `3.11` through `3.15`.
-It is likely that :mod:`uncertainties` will function with older versions of python but we do not regularly test against
-these older versions.
+The :mod:`uncertainties` package currently tests against python versions `3.11` through `3.15`.
+The :mod:`uncertainties` package may function with older versions of python but we do not regularly test against these
+older verions.
 
 To install :mod:`uncertainties`, use:
 
