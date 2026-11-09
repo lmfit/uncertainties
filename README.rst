@@ -97,6 +97,32 @@ Further details are in the `on-line documentation
 <https://uncertainties.readthedocs.io/en/latest/install.html>`_.
 
 
+Running the tests
+-----------------
+
+From a source checkout, install the development extras in your Python
+environment and run the test suite with pytest:
+
+.. code-block:: sh
+
+    git clone https://github.com/lmfit/uncertainties.git
+    cd uncertainties
+    python -m pip install -e ".[all]"
+    cd tests
+    python -m pytest --cov=uncertainties --cov-report=term
+
+The ``all`` extra includes the test, array, and documentation dependencies.
+The editable installation lets the tests use your local changes. Run pytest
+from the ``tests/`` directory. To also collect the doctests in the package
+source and documentation, include those directories explicitly::
+
+    python -m pytest . ../uncertainties ../doc
+
+To run a single test module while working on a change, use, for example::
+
+    python -m pytest test_uncertainties.py
+
+
 Git branches
 ------------
 
