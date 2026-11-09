@@ -45,7 +45,7 @@ def test_repeated_summation_complexity():
     n0 = n_list[0]
     t0 = t_list[0]
     for n, t in zip(n_list[1:], t_list[1:]):
-        # Check that t vs n is sub-quadratic. See PR #275
+        # Check that t vs n is sub-quadratic.
         assert t / t0 < (n / n0) ** 1.5
 
 
