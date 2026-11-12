@@ -221,6 +221,9 @@ for bug reports, feature requests, or feedback.
 This software is released under the BSD license.
 """
 
+from warnings import filterwarnings
+filterwarnings('once')
+
 from .core import *  # noqa
 from .core import __all__  # noqa For a correct help(uncertainties)
 
