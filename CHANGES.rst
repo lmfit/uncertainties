@@ -11,6 +11,13 @@ Changes:
 - Updates the `codspeed` github action to use `v5` instead of `v3`. This was required for compatibility with github
   actions updating their ubuntu action runners.
 
+Fixes:
+
+- The `test_repeated_summation_complexity` test regularly failed close to its threshold
+  despite the repeated summation complexity not being compromised. In this release, the
+  test tolerance has been relaxed to reduce the number of false failures. Fixes
+  `#343 <https://github.com/lmfit/uncertainties/issues/343>`_.
+
 3.2.4   2026-January-9
 -----------------------
 
@@ -24,7 +31,6 @@ Adds:
 - Adjusts the Sphinx configuration to allow for reproducible builds using
   ``SOURCE_DATE_EPOCH``.
 - Mark Python 3.13 and 3.14 as officially supported.
-- Support for percentage uncertainties in the `ufloat_fromstr` function.
 
 Deprecates:
 
