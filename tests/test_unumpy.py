@@ -1,5 +1,3 @@
-from tests.helpers import deprecated_ok
-
 try:
     import numpy
 except ImportError:
@@ -11,7 +9,7 @@ import uncertainties
 import uncertainties.core as uncert_core
 from uncertainties import ufloat, unumpy
 from uncertainties.unumpy import core
-from helpers import nan_close, uarrays_close
+from helpers import deprecated_ok, nan_close, uarrays_close
 
 
 def test_numpy():
