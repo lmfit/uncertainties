@@ -10,9 +10,27 @@ Changes:
   versions `3.8` through `3.14`.
 - Updates the `codspeed` github action to use `v5` instead of `v3`. This was required for compatibility with github
   actions updating their ubuntu action runners.
+- The `pytest` configuration has been updated to fail if any uncaught warnings are
+  encountered. This will alert more quickly to warning spam issues introduced by changes
+  to `uncertainties` or `numpy` code.
+- In many cases we test code that is pending deprecation. To ensure the deprecation
+  warnings raised by these tests do not cause the new `pytest` configuration to fail,
+  we have introduced a new `deprecated_ok` context for use in the test suite. This
+  context allows us to pass tests of deprecated behavior by suppressing the deprecation
+  warnings. Presence of the `deprecated_ok` wrapper will also serve as a useful marker
+  for which tests need to be removed when deprecations are finalized.
 
 Fixes:
 
+- Previously standard `UFloat` arithmetic operations were causing a flood of warnings to
+  propagate up to the user's context. This bug arose because of deprecation warnings
+  inserted into the `error_components()` function and `derivatives` properties intended
+  to warn users calling these attributes directly about upcoming deprecations. However,
+  these attributes are currently used internally and failed to mask the warnings during
+  those internal calls. This release resolves this bug by moving the internal logic into
+  `_error_components()` and `_derivatives` attributes which are now called internally.
+  The public attributes raise the `FutureWarning`, the private attributes do not.
+  `#352 <https://github.com/lmfit/uncertainties/issues/352>`_.
 - The `test_repeated_summation_complexity` test regularly failed close to its threshold
   despite the repeated summation complexity not being compromised. In this release, the
   test tolerance has been relaxed to reduce the number of false failures. Fixes
