@@ -18,7 +18,6 @@ from builtins import str, zip, range, object
 import functools
 from math import sqrt, isfinite  # Optimization: no attribute look-up
 from warnings import warn
-import warnings
 
 import copy
 import collections
@@ -927,24 +926,12 @@ def covariance_matrix(nums_with_uncert):
 
     covariance_matrix = []
     for i1, expr1 in enumerate(nums_with_uncert, 1):
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                action="ignore",
-                message=r"(Variable|AffineScalarFunc)\.derivatives\(\) is deprecated.",
-                category=FutureWarning,
-            )
-            derivatives1 = expr1.derivatives  # Optimization
+        derivatives1 = expr1._derivatives  # Optimization
         vars1 = set(derivatives1)  # !! Python 2.7+: viewkeys() would work
         coefs_expr1 = []
 
         for expr2 in nums_with_uncert[:i1]:
-            with warnings.catch_warnings():
-                warnings.filterwarnings(
-                    action="ignore",
-                    message=r"(Variable|AffineScalarFunc)\.derivatives\(\) is deprecated.",
-                    category=FutureWarning,
-                )
-                derivatives2 = expr2.derivatives  # Optimization
+            derivatives2 = expr2._derivatives  # Optimization
             coefs_expr1.append(
                 sum(
                     (

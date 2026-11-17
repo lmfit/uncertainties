@@ -146,13 +146,7 @@ def derivative(u, var):
     """
     if isinstance(u, uncert_core.AffineScalarFunc):
         try:
-            with warnings.catch_warnings():
-                warnings.filterwarnings(
-                    action="ignore",
-                    message=r"(Variable|AffineScalarFunc)\.(error_components|derivatives)\(\).*deprecated",
-                    category=FutureWarning,
-                )
-                return u.derivatives[var]
+            return u._derivatives[var]
         except KeyError:
             return 0.0
     else:
@@ -434,13 +428,7 @@ def func_with_deriv_to_uncert_func(func_with_derivatives):
             # floats, etc. might be present
             if isinstance(element, uncert_core.AffineScalarFunc):
                 # !!! set() is only needed for Python 2 compatibility:
-                with warnings.catch_warnings():
-                    warnings.filterwarnings(
-                        action="ignore",
-                        message=r"(Variable|AffineScalarFunc)\.(error_components|derivatives)\(\).*deprecated",
-                        category=FutureWarning,
-                    )
-                    variables |= set(element.derivatives.keys())
+                variables |= set(element._derivatives.keys())
 
         array_nominal = nominal_values(array_version)
         # Function value, then derivatives at array_nominal (the
