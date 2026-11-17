@@ -433,6 +433,16 @@ class AffineScalarFunc(object):
     # Making derivatives a property gives the user a clean syntax,
     # which is consistent with derivatives becoming a dictionary.
     @property
+    def _derivatives(self):
+        if not self._linear_part.expanded():
+            self._linear_part.expand()
+            # Attempts to get the contribution of a variable that the
+            # function does not depend on raise a KeyError:
+            self._linear_part.linear_combo.default_factory = None
+
+        return self._linear_part.linear_combo
+
+    @property
     def derivatives(self):
         """
         Return a mapping from each Variable object on which the function
@@ -452,17 +462,32 @@ class AffineScalarFunc(object):
             stacklevel=2,
         )
 
-        if not self._linear_part.expanded():
-            self._linear_part.expand()
-            # Attempts to get the contribution of a variable that the
-            # function does not depend on raise a KeyError:
-            self._linear_part.linear_combo.default_factory = None
-
-        return self._linear_part.linear_combo
+        return self._derivatives
 
     ########################################
 
     # Uncertainties handling:
+
+    def _error_components(self):
+        error_components = {}
+
+        for variable, derivative in self._derivatives.items():
+            # print "TYPE", type(variable), type(derivative)
+
+            # Individual standard error due to variable:
+
+            # 0 is returned even for a NaN derivative (in this case no
+            # multiplication by the derivative is performed): an exact
+            # variable obviously leads to no uncertainty in the
+            # functions that depend on it.
+            if variable._std_dev == 0:
+                # !!! Shouldn't the errors always be floats, as a
+                # convention of this module?
+                error_components[variable] = 0
+            else:
+                error_components[variable] = abs(derivative * variable._std_dev)
+
+        return error_components
 
     def error_components(self):
         """
@@ -485,26 +510,7 @@ class AffineScalarFunc(object):
             stacklevel=2,
         )
 
-        # Calculation of the variance:
-        error_components = {}
-
-        for variable, derivative in self.derivatives.items():
-            # print "TYPE", type(variable), type(derivative)
-
-            # Individual standard error due to variable:
-
-            # 0 is returned even for a NaN derivative (in this case no
-            # multiplication by the derivative is performed): an exact
-            # variable obviously leads to no uncertainty in the
-            # functions that depend on it.
-            if variable._std_dev == 0:
-                # !!! Shouldn't the errors always be floats, as a
-                # convention of this module?
-                error_components[variable] = 0
-            else:
-                error_components[variable] = abs(derivative * variable._std_dev)
-
-        return error_components
+        return self._error_components()
 
     @property
     def std_dev(self):
@@ -523,7 +529,7 @@ class AffineScalarFunc(object):
         # std_dev value (in fact, many intermediate AffineScalarFunc do
         # not need to have their std_dev calculated: only the final
         # AffineScalarFunc returned to the user does).
-        return float(sqrt(sum(delta**2 for delta in self.error_components().values())))
+        return float(sqrt(sum(delta**2 for delta in self._error_components().values())))
 
     # Abbreviation (for formulas, etc.):
     s = std_dev
@@ -920,12 +926,12 @@ def covariance_matrix(nums_with_uncert):
 
     covariance_matrix = []
     for i1, expr1 in enumerate(nums_with_uncert, 1):
-        derivatives1 = expr1.derivatives  # Optimization
+        derivatives1 = expr1._derivatives  # Optimization
         vars1 = set(derivatives1)  # !! Python 2.7+: viewkeys() would work
         coefs_expr1 = []
 
         for expr2 in nums_with_uncert[:i1]:
-            derivatives2 = expr2.derivatives  # Optimization
+            derivatives2 = expr2._derivatives  # Optimization
             coefs_expr1.append(
                 sum(
                     (
